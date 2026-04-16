@@ -21,6 +21,14 @@ The progression is: **notebook** (where you develop and test your code) → **sc
 For a full treatment of converting notebooks to scripts, command-line arguments, and `if __name__ == "__main__"` patterns, see *Missing Manual* Chapter 17: Scripting. For version control with Git, see *Missing Manual* Chapter 26: Version Control.
 :::
 
+## Why Automate?
+
+The techniques you have learned in earlier chapters — scraping web pages, querying APIs, parsing documents — are powerful for capturing a snapshot of data at a single point in time. But many of the most interesting research questions in web data science are fundamentally temporal. How do Rotten Tomatoes scores evolve during a film's theatrical release? How does the composition of a Spotify playlist shift with the seasons? Which Wikipedia articles surge in pageviews when a news event breaks, and how quickly does attention decay? These questions require not a single extraction but a time series: the same data collected at regular intervals over days, weeks, or months.
+
+Automation transforms web data science from a one-time extraction exercise into a longitudinal research methodology. A scraper that runs once gives you a cross-sectional dataset. A scraper that runs every six hours for three months gives you a panel dataset that can reveal trends, cycles, and responses to external events. The infrastructure cost is modest — GitHub Actions provides free compute for public repositories — but the analytical payoff is substantial.
+
+This chapter teaches you how to build that infrastructure from the tools you already know. The progression mirrors a real development workflow: you start with a working notebook, convert it to a standalone script, wrap it in a GitHub Actions workflow, and then monitor the pipeline over time. Each step introduces new skills, but the underlying logic remains the same code you have already written. The goal is not to learn a new programming paradigm but to move your existing skills from the interactive notebook environment into a production context where they run unattended. By the end, you will have built data collection infrastructure that connects directly to the research design considerations in @sec-research-design.
+
 ## Step 1: Notebook to Script
 
 Let us convert a Rotten Tomatoes score scraper from notebook format to a standalone script. The key changes: remove interactive exploration, add a `main()` function, handle imports and configuration at the top, and write output to a file.
@@ -101,6 +109,27 @@ if __name__ == "__main__":
 
 Notice the headless Chrome configuration: `--headless` runs the browser without a visible window, `--no-sandbox` and `--disable-dev-shm-usage` are required for running in CI/CD environments like GitHub Actions.
 
+### Testing Your Script Locally
+
+Before deploying your script to GitHub Actions, always test it locally from the command line. Running a script in the terminal is different from running cells in a notebook — import errors, missing dependencies, and file path issues that were invisible in Jupyter will surface immediately.
+
+```python
+# From your terminal, run the script directly:
+# $ python scraper.py
+# Saved scores at 2024-11-15T14:23:07.482361
+
+# Verify the output file was created and contains data:
+# $ head scores.csv
+# timestamp,url,critic_score,audience_score
+# 2024-11-15T14:23:07.482361,https://www.rottentomatoes.com/m/the_wild_robot,97,95
+
+# Check the file size to confirm it is not empty:
+# $ ls -la scores.csv
+# -rw-r--r--  1 user  staff  142 Nov 15 14:23 scores.csv
+```
+
+Debugging a Python script on your own machine is straightforward: you can add `print()` statements, inspect variables, and re-run instantly. Debugging the same script inside a GitHub Actions YAML workflow is far more painful — each attempt requires a commit, a push, and waiting for the runner to spin up, install dependencies, and execute. The few minutes you spend testing locally will save you hours of frustrating CI debugging later. If the script runs cleanly on your machine and produces the expected output file, you can be reasonably confident it will work in the Actions environment, provided the dependencies match.
+
 ## Step 2: GitHub Actions
 
 GitHub Actions lets you run scripts on a schedule using GitHub's cloud infrastructure. You define a workflow in a YAML file placed in `.github/workflows/`:
@@ -178,6 +207,20 @@ jobs:
           git push
 ```
 
+### Understanding Cron Syntax
+
+The `cron` field in your workflow file controls when the scraper runs. Cron expressions use five fields separated by spaces: `minute hour day-of-month month day-of-week`. Each field can be a specific number, a range, a list, or a wildcard (`*` for "every"). The `*/N` syntax means "every N units." All times are in UTC, not your local timezone.
+
+| Expression | Meaning |
+|---|---|
+| `0 */6 * * *` | Every 6 hours (at minute 0) |
+| `0 12 * * 1-5` | Weekdays at noon UTC |
+| `30 8 * * *` | Daily at 8:30 AM UTC |
+| `0 0 1 * *` | First day of each month at midnight |
+| `0 0 * * 0` | Weekly on Sunday at midnight |
+
+The interactive tool at [crontab.guru](https://crontab.guru/) lets you build and verify cron expressions visually — type in an expression and it will show you in plain English when the job will run. Bookmark it; you will use it more often than you expect. Note that GitHub Actions does not guarantee exact execution times for scheduled workflows. Your job may run several minutes after the scheduled time, especially during periods of high demand on GitHub's infrastructure. For most data collection tasks, this jitter is inconsequential.
+
 ### Secrets Management
 
 For authenticated APIs (like Spotify from @sec-social), store credentials as GitHub repository secrets:
@@ -194,6 +237,56 @@ For authenticated APIs (like Spotify from @sec-social), store credentials as Git
 ## Missing Manual Reference
 For a full treatment of automation with GitHub Actions, cron syntax, and CI/CD concepts, see *Missing Manual* Chapter 28: Automation. For secrets management, see *Missing Manual* Chapter 29: Environment Variables and Secrets.
 :::
+
+### Monitoring and Debugging Actions
+
+Once your workflow is running on a schedule, you need to monitor it. GitHub's Actions tab shows the status of every workflow run — green check for success, red X for failure. Click into a failed run to read the step-by-step log output, which will show you exactly where the error occurred. Common failure modes include expired API keys (the scraper worked for weeks, then the token expired), package version conflicts (a dependency updated and broke your import), and Chrome driver version mismatches (Selenium's ChromeDriver must match the installed Chrome version, and both update frequently).
+
+A particularly insidious failure mode is the "silent success": the workflow runs to completion without errors, but the scraper did not actually collect any data — perhaps the target website changed its HTML structure, or an API endpoint started returning empty results. Your workflow reports success because no Python exception was raised, but your CSV file has a new row full of empty values. To catch this, add a validation step to your workflow that checks whether the data actually grew.
+
+```yaml
+      - name: Validate scrape results
+        run: |
+          # Count rows in the CSV (excluding the header)
+          ROW_COUNT=$(tail -n +2 scores.csv | wc -l)
+          echo "Current row count: $ROW_COUNT"
+
+          # Check if the latest row has non-empty score fields
+          LAST_LINE=$(tail -1 scores.csv)
+          if echo "$LAST_LINE" | grep -q ",,"; then
+            echo "ERROR: Latest row contains empty fields"
+            exit 1
+          fi
+
+          echo "Validation passed"
+```
+
+Adding this step after your scraping step means the workflow will fail with a clear error message when the data is incomplete, rather than silently committing garbage to your repository. You can also configure GitHub to send email notifications on workflow failures, so you learn about problems promptly rather than discovering weeks of missing data when you finally sit down to analyze your dataset.
+
+### Handling Failures Gracefully
+
+Even with validation in place, your scraper will occasionally fail due to circumstances beyond your control: the target website goes down for maintenance, a rate limit is temporarily enforced, or a network timeout occurs. A well-designed scraping pipeline handles these failures without losing previously collected data or crashing the workflow.
+
+The simplest approach is to wrap your scraping logic in a try/except block that logs the error and exits gracefully rather than raising an unhandled exception:
+
+```python
+import sys
+import traceback
+
+def main():
+    url = "https://www.rottentomatoes.com/m/the_wild_robot"
+    try:
+        scores = get_scores(url)
+        save_scores(scores)
+        print(f"Saved scores at {scores['timestamp']}")
+    except Exception as e:
+        print(f"Scraper failed: {e}", file=sys.stderr)
+        traceback.print_exc()
+        # Exit with code 1 so the GitHub Actions step reports failure
+        sys.exit(1)
+```
+
+This pattern ensures that a single failed scrape does not corrupt your data file. The error is logged, the workflow step is marked as failed, and the next scheduled run will try again. Over a multi-week collection period, you should expect a small number of failures — the important thing is that they are visible, documented, and do not cascade into data loss.
 
 ## Step 3: Analyze Collected Data
 
@@ -225,6 +318,10 @@ plt.show()
 
 3. **Monitoring.** Design a simple monitoring strategy for your scraper: a check that validates the output file size, row count, or data freshness. Add it as a step in your GitHub Actions workflow.
 
+4. **Government data collector.** Set up a daily GitHub Actions workflow that retrieves data from a free API (Open-Meteo weather, OpenAQ air quality, or USGS earthquake data). Run it for at least one week. Download the collected data and create a visualization showing how the measurements changed over the collection period.
+
+5. **Staleness monitor.** Write a `check_freshness.py` script that reads your CSV file, checks whether the most recent timestamp is less than 24 hours old, and prints a warning if the data is stale. Add it as a step in your GitHub Actions workflow that runs after the scraping step. Test it by temporarily disabling the scraper and verifying the freshness check fails.
+
 ::: {.callout-note}
 ## Public Interest Connection
 Automated data collection is how you build the independent infrastructure that @sec-post-api describes as **ownership**. A GitHub Actions scraper does not depend on platform goodwill — it runs on your terms, on your schedule, collecting data you control. But ownership comes with responsibility: the ongoing labor of monitoring, maintaining, and updating your scrapers is itself a form of stewardship.
@@ -236,12 +333,15 @@ Automated data collection powers some of the most important public interest proj
 
 But automation also raises the ethical stakes from @sec-ethics. A manual scraper that you run once makes a few requests. An automated scraper running every hour, indefinitely, accumulates a much larger footprint. The commitment to maintaining an automated scraper responsibly — monitoring for errors, respecting rate limits, adjusting to site changes — is a form of ongoing stewardship.
 
+The Internet Archive's Wayback Machine is perhaps the most ambitious automated data collection project in history — it has been systematically crawling and archiving the web since 1996, preserving billions of pages that would otherwise be lost as websites change and disappear. On a smaller scale, projects like the GDELT Project monitor global news media in real time, and the Pushshift archive (before its shutdown) collected every public Reddit post and comment for over a decade. These projects demonstrate both the power and the responsibility of automated collection: the data they preserved has enabled thousands of research studies, but maintaining the infrastructure required sustained funding, technical labor, and institutional commitment. When you build your own automated scraper, you are participating in this same tradition of data stewardship — on a smaller scale, but with the same obligations.
+
 ## Common Issues to Debug
 
 - **YAML indentation errors**: YAML is whitespace-sensitive. Use a YAML validator before committing.
 - **GitHub Actions runner environment**: The Ubuntu runner may differ from your local setup. Pin Python and Chrome versions explicitly.
 - **Git conflicts**: If the Action runs while you are also pushing changes, you will get merge conflicts. Add `git pull` before `git push` in your workflow.
 - **Cron syntax**: The five fields are `minute hour day-of-month month day-of-week`. Use [crontab.guru](https://crontab.guru/) to verify your schedule.
+- **Stale ChromeDriver**: Selenium requires a ChromeDriver version that matches your Chrome version. The `browser-actions/setup-chrome@v1` action in GitHub Actions handles this automatically, but local setups may drift. Use `webdriver-manager` for automatic local driver management.
 
 ## Key Takeaways
 
