@@ -136,6 +136,65 @@ for i in range(5):
     time.sleep(1)  # Wait for new content to load
 ```
 
+### Waiting for Dynamic Content
+
+The `time.sleep()` calls in the examples above are a crude approach to waiting for content to load. A better strategy is *explicit waits*, which pause execution until a specific condition is met:
+
+```python
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+# Navigate to a page with dynamically loaded content
+driver.get("https://example-dynamic-site.com")
+
+# Wait up to 10 seconds for a specific element to appear
+element = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.CLASS_NAME, "results-container"))
+)
+print(f"Element found: {element.tag_name}")
+```
+
+`WebDriverWait` checks the condition repeatedly (every 0.5 seconds by default) and returns the element as soon as it appears, or raises a `TimeoutException` if the timeout expires. This is superior to `time.sleep()` in two ways: it does not wait longer than necessary (if the element appears in 0.2 seconds, it proceeds immediately), and it fails loudly if the element never appears (rather than silently returning an empty page).
+
+The most common expected conditions you will use are:
+
+- `presence_of_element_located` — the element exists in the DOM (even if not visible)
+- `visibility_of_element_located` — the element is both present and visible on the page
+- `element_to_be_clickable` — the element is visible, enabled, and can receive clicks
+- `text_to_be_present_in_element` — specific text has appeared inside an element
+
+Use these instead of `time.sleep()` whenever possible. The combination of `WebDriverWait` with explicit conditions makes your Selenium scripts both more reliable (they wait for exactly what they need) and faster (they proceed as soon as the condition is met rather than waiting a fixed duration). You will see this pattern used in the practical workflow section at the end of this chapter.
+
+### Scraping Infinite Scroll Pages
+
+Many modern websites load content progressively as you scroll — social media feeds, image galleries, and product listings all use this pattern. The technique for scraping these pages involves scrolling to the bottom, waiting for new content to load, and repeating until no more content appears:
+
+```python
+def scrape_infinite_scroll(driver, max_scrolls=20, scroll_pause=2):
+    """Scroll an infinite-scroll page and collect all loaded content."""
+    last_height = driver.execute_script("return document.body.scrollHeight")
+
+    for i in range(max_scrolls):
+        # Scroll to the bottom of the page
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(scroll_pause)
+
+        # Check if the page grew
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            print(f"No new content after scroll {i+1}. Stopping.")
+            break
+        last_height = new_height
+        print(f"Scroll {i+1}: page height grew to {new_height}px")
+
+    # Return the fully-loaded page source
+    return driver.page_source
+```
+
+The key insight is checking `document.body.scrollHeight` before and after each scroll. When the height stops growing, you have reached the end of the available content. Some sites use a "Load More" button instead of infinite scroll — for those, replace the scroll with a click on the button and watch for the button to disappear or become disabled.
+
+A practical consideration: infinite scroll pages can contain thousands of items, and loading them all consumes significant memory in the browser process. Set a reasonable `max_scrolls` limit based on how much data you actually need. If you are collecting data for a class project, you rarely need more than a few hundred items — scrolling through an entire social media feed of 10,000 posts is both unnecessary and discourteous to the server. Remember the proportionality principle from @sec-ethics: collect only the data you need for your research question.
+
 ## Passing to BeautifulSoup
 
 Once the page is fully rendered in the browser, you can extract the complete HTML and parse it with the familiar BeautifulSoup tools:
@@ -152,7 +211,9 @@ links = soup.find_all("a", href=True)
 print(f"Total links on page: {len(links)}")
 ```
 
-This hybrid approach — Selenium for rendering, BeautifulSoup for parsing — gives you the best of both worlds.
+This hybrid approach — Selenium for rendering, BeautifulSoup for parsing — gives you the best of both worlds. Selenium excels at navigating, clicking, scrolling, and waiting for JavaScript to execute. BeautifulSoup excels at searching and extracting data from HTML. By combining them, you avoid the awkwardness of using Selenium's relatively limited element-finding API for complex extraction tasks while still getting access to the fully-rendered page content.
+
+The workflow is always the same: use Selenium to get the page into the state you need (scrolled, clicked, searched, logged in), then hand off the rendered HTML to BeautifulSoup for extraction. Think of Selenium as the hands that navigate the browser and BeautifulSoup as the eyes that read the content. This division of labor keeps your code cleaner and more maintainable than trying to do everything with Selenium alone.
 
 ## Always Close the Driver
 
@@ -181,6 +242,28 @@ Screen-scraping with Selenium is inherently fragile. The Twitter scraping exampl
 
 This fragility reinforces a principle from @sec-post-api: when an API is available, use it. Selenium is a powerful last resort for cases where you ethically need data that no API provides, but it is slow, resource-intensive, and brittle compared to API access. The decision tree should be: API first → static scraping second → Selenium third.
 
+### Headless Mode
+
+For production scraping, you do not need a visible browser window. Headless mode runs the browser without a graphical interface, which is faster and can run on servers without a display:
+
+```python
+from selenium.webdriver.chrome.options import Options
+
+options = Options()
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+
+driver = webdriver.Chrome(options=options)
+driver.get("https://example.com")
+print(f"Title: {driver.title}")
+driver.quit()
+```
+
+The `--no-sandbox` and `--disable-dev-shm-usage` flags resolve common issues when running Chrome in containerized or server environments (like GitHub Actions, which you will use in @sec-automation). Headless mode is essential for automated data collection pipelines where no one is watching the browser window.
+
+One important caveat: some websites detect headless browsers and serve different content or block access entirely. They do this by checking for browser properties that headless mode handles differently (like the `navigator.webdriver` flag). If you get different results in headless mode than in a visible browser, this is likely the cause. For educational purposes, switching back to headed mode usually resolves the issue. In production settings, there are legitimate workarounds, but circumventing bot detection raises the ethical questions discussed in @sec-ethics — the fact that you *can* evade detection does not mean you *should*.
+
 ## Exercises
 
 1. **Dynamic content extraction.** Find a website that loads content dynamically (via JavaScript, infinite scroll, or AJAX). Use Selenium to load the full page, then pass the source to BeautifulSoup and extract the dynamically-loaded data. Compare what you get with Selenium to what `requests.get()` returns.
@@ -188,6 +271,10 @@ This fragility reinforces a principle from @sec-post-api: when an API is availab
 2. **Multi-step interaction.** Use Selenium to automate a multi-step process: navigate to a site with a search form, enter a query, submit it, and extract results from the response page.
 
 3. **Static vs. dynamic comparison.** For three websites of your choice, compare the HTML returned by `requests.get()` with the `driver.page_source` from Selenium. Categorize each site as static, partially dynamic, or fully dynamic.
+
+4. **Load More button.** Find a website that uses a "Load More" button (rather than infinite scroll) to reveal additional content. Write a Selenium script that clicks the button in a loop until it disappears or becomes disabled, then extracts all the loaded data. How many items were hidden behind the button?
+
+5. **Performance comparison.** For the same URL, measure the time taken by three approaches: `requests.get()`, headed Selenium (with a visible browser), and headless Selenium. Use `time.time()` to measure each. Create a table comparing the three approaches on speed, completeness of data retrieved, and resource usage. When is the speed tradeoff of Selenium worth it?
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -198,7 +285,12 @@ For background on debugging strategies when Selenium scripts fail, see *Missing 
 
 The shift from server-rendered to client-rendered web pages represents a fundamental change in the web's architecture. JavaScript frameworks like React, Angular, and Vue have made the web more interactive but also more opaque to automated observation. The ability to "view source" — once a straightforward way to see exactly what a page contained — now often reveals only a JavaScript bootstrap that fetches and renders content dynamically.
 
-This architectural shift interacts with the enclosure dynamics described in @sec-post-api. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures — CAPTCHAs, bot detection, dynamically-generated class names — become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes.
+This architectural shift interacts with the enclosure dynamics described in @sec-post-api. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures — CAPTCHAs, bot detection, dynamically-generated class names — become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes. The tools in this chapter are a response to that architectural shift — they exist because the simpler approaches taught in @sec-static-pages are no longer sufficient for much of the modern web.
+
+::: {.callout-note}
+## Public Interest Connection
+When platforms close their APIs and render content exclusively through JavaScript, browser automation becomes the last-resort path to data that serves the public interest. The tools in this chapter exist because of the **enclosure** dynamic from @sec-post-api — the progressive restriction of access to data that was once openly available. Researchers studying algorithmic bias, misinformation, and platform governance increasingly depend on Selenium-based methods precisely because the APIs that once served these research needs have been shut down or restricted beyond practical use.
+:::
 
 ## Common Issues to Debug
 
