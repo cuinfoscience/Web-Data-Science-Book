@@ -1,0 +1,266 @@
+# Parsing Static Web Pages {#sec-static-pages}
+
+::: {.callout-tip}
+## Learning Objectives
+- Use browser developer tools to identify HTML elements containing target data
+- Extract data from HTML tables manually using BeautifulSoup's tag navigation
+- Use `pandas.read_html()` as a shortcut for well-structured tables
+- Write a custom HTML parser for non-tabular data using DOM tree navigation
+- Abstract repeated scraping logic into reusable functions with error handling
+:::
+
+## From HTML to Data
+
+The overall goal of web scraping is converting data from one structured format — HTML, the language of web pages — into another structured format suitable for analysis: typically a pandas DataFrame, a CSV file, or a JSON document. This chapter teaches three strategies for that conversion, each appropriate for different situations and progressively more general.
+
+HTML is essentially a dialect of XML (which you learned to parse in @sec-data-formats), so the BeautifulSoup skills you already have transfer directly. The difference is that real-world HTML is far messier than the clean XML examples from the previous chapter. Web pages contain navigation bars, advertisements, tracking scripts, and deeply nested `<div>` tags that obscure the data you care about. Learning to cut through this noise is the core skill of this chapter.
+
+## Strategy 1: Manual Table Parsing
+
+Many interesting datasets live in HTML tables — economic data, sports statistics, legislative records, demographic breakdowns. Let us extract box office revenue data from [The Numbers](https://www.the-numbers.com), a popular source of movie financial data.
+
+### Retrieving and Inspecting
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+url = "https://www.the-numbers.com/box-office-chart-weekly-2018-christmas"
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+response = requests.get(url, headers=headers)
+soup = BeautifulSoup(response.text, "html.parser")
+```
+
+Before writing parsing code, inspect the page in your browser's developer tools. Right-click on the table and select "Inspect" to see the HTML structure. You are looking for the `<table>` tag and, within it, `<tr>` (table row) and `<td>` (table data) tags.
+
+```python
+# Find all tables on the page
+tables = soup.find_all("table")
+print(f"Number of tables found: {len(tables)}")
+# Often there are navigation tables mixed in with data tables
+
+# The main data table is usually the largest one
+# Inspect each to find the right one
+for i, table in enumerate(tables):
+    rows = table.find_all("tr")
+    print(f"Table {i}: {len(rows)} rows")
+```
+
+### Extracting Row Data
+
+Once you have identified the correct table, iterate through its rows and extract the text from each cell:
+
+```python
+# Assuming the data table is tables[1] (verify by inspection)
+data_table = tables[1]
+rows = data_table.find_all("tr")
+
+# Inspect the first row (headers)
+header_row = rows[0]
+print(header_row.text)
+
+# Inspect a data row
+data_row = rows[1]
+print(data_row.text)
+# You'll see newline characters between cell values
+
+# Clean extraction: split text on newlines and filter empties
+cells = [cell.strip() for cell in data_row.text.split("\n") if cell.strip()]
+print(cells)
+```
+
+### Building the DataFrame
+
+```python
+# Loop through all rows, extract cleaned cell data
+all_rows = []
+for row in rows:
+    cells = [cell.strip() for cell in row.text.split("\n") if cell.strip()]
+    if cells:  # Skip empty rows
+        all_rows.append(cells)
+
+import pandas as pd
+
+# First row as headers, rest as data
+df = pd.DataFrame(all_rows[1:], columns=all_rows[0])
+print(df.head())
+```
+
+This manual approach gives you complete control over the extraction process. The tradeoff is that it requires more code and careful attention to the specific HTML structure of each page.
+
+## Strategy 2: `pandas.read_html()`
+
+For well-structured HTML tables, pandas provides a powerful shortcut. The `read_html()` function finds all tables on a page and converts each one to a DataFrame:
+
+```python
+import pandas as pd
+
+# Point read_html directly at a URL — no requests or BeautifulSoup needed
+url = "https://en.wikipedia.org/wiki/2018_in_film"
+tables = pd.read_html(url)
+
+print(f"Number of tables found: {len(tables)}")
+# Wikipedia pages often have many tables
+```
+
+You can specify which row contains the column headers and select the table you want by index:
+
+```python
+# The highest-grossing films table might be at index 3 (verify by inspection)
+films_df = pd.read_html(url, header=0)[3]
+print(films_df.head())
+```
+
+The `read_html` function is remarkably powerful for its simplicity, but it has limitations. It struggles with tables that use `colspan` or `rowspan` attributes to merge cells — for example, a table where "Disney" spans two rows to cover multiple films. In those cases, you may need to fall back to manual parsing or clean up the DataFrame after extraction.
+
+## Strategy 3: Writing a Custom Parser
+
+Many web pages present structured data without using HTML tables. Award nominees, product listings, news articles, and directory entries are often structured with `<div>` tags and CSS classes. Extracting this data requires navigating the HTML tree to find the right containers.
+
+### The Oscars Example
+
+The [Academy Awards](https://www.oscars.org) website lists nominees and winners organized by category. The data is structured with nested `<div>` tags rather than `<table>` elements. Let us build a parser for it.
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+url = "https://www.oscars.org/oscars/ceremonies/2024"
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+response = requests.get(url, headers=headers)
+soup = BeautifulSoup(response.text, "html.parser")
+```
+
+### Finding Reliable Anchors
+
+The key challenge with non-tabular scraping is finding HTML elements that reliably contain your target data. Start by using the browser's Inspector tool to examine the structure around one category:
+
+```python
+# Look for grouping elements — the structure may use classes like
+# "view-grouping" or similar containers for each award category
+groupings = soup.find_all("div", class_="view-grouping")
+print(f"Found {len(groupings)} category groupings")
+
+# If the count doesn't match expectations (24 Oscar categories),
+# you may need to navigate to a more specific parent element
+```
+
+### Navigating the Tree for Specificity
+
+If your initial `find_all` returns too many or too few results, you need to navigate the tree structure to find a more specific anchor. This involves going *up* to a unique parent and then searching *down* within it:
+
+```python
+# Find the main content area first
+content_area = soup.find("div", class_="field--name-field-award-categories")
+
+if content_area:
+    # Now search only within this specific container
+    categories = content_area.find_all("div", class_="view-grouping")
+    print(f"Categories within content area: {len(categories)}")
+```
+
+### Extracting Category Data
+
+For each category, extract the award name and the list of nominees:
+
+```python
+results = []
+
+for category in categories:
+    # Extract the category name
+    name_tag = category.find("div", class_="view-grouping-header")
+    if not name_tag:
+        continue
+    category_name = name_tag.text.strip()
+    
+    # Extract individual nominees
+    nominees = category.find_all("div", class_="views-row")
+    for nominee in nominees:
+        nominee_name = nominee.text.strip()
+        results.append({
+            "category": category_name,
+            "nominee": nominee_name
+        })
+
+df = pd.DataFrame(results)
+print(df.head(10))
+```
+
+### Abstracting into Functions
+
+Once your parser works for one page, abstract it into a function you can reuse:
+
+```python
+import time
+
+def scrape_oscar_year(year, headers):
+    """Scrape Oscar nominees for a given ceremony year.
+    
+    Parameters
+    ----------
+    year : int
+        The ceremony year (e.g., 2024)
+    headers : dict
+        HTTP headers including User-Agent
+    
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with columns: category, nominee, year
+    """
+    url = f"https://www.oscars.org/oscars/ceremonies/{year}"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raise exception for bad status codes
+    except requests.RequestException as e:
+        print(f"Error fetching {year}: {e}")
+        return pd.DataFrame()
+    
+    soup = BeautifulSoup(response.text, "html.parser")
+    # ... parsing logic ...
+    
+    time.sleep(1)  # Respect the server
+    return df
+```
+
+::: {.callout-warning}
+## A Note on Fragility
+Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).
+:::
+
+## Exercises
+
+1. **Wikipedia table extraction.** Use `pd.read_html()` to extract a table of your choice from Wikipedia (e.g., a list of countries by population, U.S. states by area, or planets in the solar system). Clean up the resulting DataFrame and create a visualization.
+
+2. **Custom parser.** Write a custom BeautifulSoup parser for a non-tabular web page. Good candidates include a course catalog, a restaurant menu, or a list of elected officials. Document your element selection strategy: why did you choose these specific tags and classes?
+
+3. **Multi-page scraping.** Extend your parser from Exercise 2 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use `time.sleep()` between requests, `try/except` for error handling, and a function to abstract the repeated logic.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a refresher on writing functions, handling exceptions with `try/except`, and structuring reusable code, see *Missing Manual* Chapter 17: Scripting.
+:::
+
+## Social History and Public Interest
+
+Web scraping has deep roots in data journalism. Organizations like ProPublica, The Markup, and the Investigative Reporters and Editors (IRE) have built some of their most important investigations on data scraped from public websites — court records, school inspection reports, environmental compliance databases, campaign finance disclosures. The skill of turning a web page into a dataset is, in this tradition, a form of civic empowerment: it enables citizens and journalists to analyze information that is nominally public but practically inaccessible in its raw HTML form.
+
+The Colorado General Assembly website ([leg.colorado.gov](https://leg.colorado.gov)) provides a concrete example. Biographical information about legislators — their districts, party affiliations, committee assignments, and contact information — is published on the web, but not in a structured format you can download and analyze. Scraping this data into a DataFrame enables research on representation, diversity, and legislative behavior that would be impossible otherwise.
+
+## Common Issues to Debug
+
+- **Multiple tables on a page**: `read_html` and `find_all("table")` return all tables, including navigation elements. Inspect each to find the one with your data.
+- **Character encoding**: Watch for `\xa0` (non-breaking spaces) and other Unicode characters in names and text. Use `.strip()` and `.replace('\xa0', ' ')`.
+- **Elements that look unique but are not**: Always verify your `find_all` count against the expected number of results before building your parser.
+- **Dynamic content**: If `requests` + BeautifulSoup returns a nearly-empty page, the content may be loaded by JavaScript. See @sec-dynamic-pages for Selenium-based solutions.
+
+## Key Takeaways
+
+HTML scraping follows a consistent pattern: retrieve the page, inspect it with developer tools, identify your target elements, extract the data, and convert it to a DataFrame. Start with `read_html()` for tables — it handles most simple cases. Fall back to manual BeautifulSoup parsing when you need more control. Write custom parsers for non-tabular data by navigating the DOM tree to find reliable anchors. Always abstract your parsing logic into functions, handle errors gracefully, and rate-limit your requests. Web pages change, so code defensively.
+
+## Further Reading
+
+- pandas `read_html` documentation: <https://pandas.pydata.org/docs/reference/api/pandas.read_html.html>
+- @mitchell2018web — Chapters 2–5 on HTML scraping patterns
+- @vandenbroucke2018practical — best practices for production web scraping

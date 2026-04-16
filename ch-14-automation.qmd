@@ -1,0 +1,254 @@
+# Automating Data Collection {#sec-automation}
+
+::: {.callout-tip}
+## Learning Objectives
+- Convert a Jupyter Notebook into a standalone Python script
+- Configure headless Selenium for server-side browser automation
+- Write GitHub Actions workflow files (YAML) to schedule scraping jobs
+- Manage secrets (API keys, credentials) in GitHub repository settings
+- Implement end-to-end automated scraping pipelines
+- Assess the maintenance commitments of sustained data collection
+:::
+
+## From Exploration to Production
+
+Interactive notebooks are for exploration; production data collection requires automation. This chapter moves from the interactive scraping techniques of Parts II and III into scheduled, unattended data pipelines that run in the cloud.
+
+The progression is: **notebook** (where you develop and test your code) → **script** (a standalone `.py` file that runs without interaction) → **scheduled pipeline** (a script that runs automatically on a regular schedule). By the end of this chapter, you will have data collection infrastructure that runs every hour without your intervention.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a full treatment of converting notebooks to scripts, command-line arguments, and `if __name__ == "__main__"` patterns, see *Missing Manual* Chapter 17: Scripting. For version control with Git, see *Missing Manual* Chapter 26: Version Control.
+:::
+
+## Step 1: Notebook to Script
+
+Let us convert a Rotten Tomatoes score scraper from notebook format to a standalone script. The key changes: remove interactive exploration, add a `main()` function, handle imports and configuration at the top, and write output to a file.
+
+```python
+# scraper.py — Rotten Tomatoes Score Scraper
+"""Scrape Rotten Tomatoes audience and critic scores for a film."""
+
+import csv
+import os
+from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+
+def get_scores(url):
+    """Retrieve audience and critic scores from a Rotten Tomatoes page.
+    
+    Parameters
+    ----------
+    url : str
+        The Rotten Tomatoes movie URL
+    
+    Returns
+    -------
+    dict
+        Dictionary with 'timestamp', 'url', 'critic_score', 'audience_score'
+    """
+    # Configure headless Chrome
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    
+    driver = webdriver.Chrome(options=options)
+    
+    try:
+        driver.get(url)
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        
+        # Extract scores from metadata tags
+        scores = {}
+        for tag in soup.find_all("score-icon-critic-deprecated"):
+            scores["critic_score"] = tag.get("percentage", "")
+        for tag in soup.find_all("score-icon-audience-deprecated"):
+            scores["audience_score"] = tag.get("percentage", "")
+        
+        scores["timestamp"] = datetime.utcnow().isoformat()
+        scores["url"] = url
+        return scores
+    finally:
+        driver.quit()
+
+
+def save_scores(scores, filepath="scores.csv"):
+    """Append scores to a CSV file, creating it if needed."""
+    file_exists = os.path.exists(filepath)
+    
+    with open(filepath, "a", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=scores.keys())
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(scores)
+
+
+def main():
+    url = "https://www.rottentomatoes.com/m/the_wild_robot"
+    scores = get_scores(url)
+    save_scores(scores)
+    print(f"Saved scores at {scores['timestamp']}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Notice the headless Chrome configuration: `--headless` runs the browser without a visible window, `--no-sandbox` and `--disable-dev-shm-usage` are required for running in CI/CD environments like GitHub Actions.
+
+## Step 2: GitHub Actions
+
+GitHub Actions lets you run scripts on a schedule using GitHub's cloud infrastructure. You define a workflow in a YAML file placed in `.github/workflows/`:
+
+```yaml
+# .github/workflows/scraper-action.yml
+name: Scrape Rotten Tomatoes Scores
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # Every 6 hours
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+      
+      - name: Run scraper
+        run: python scraper.py
+      
+      - name: Commit and push results
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add scores.csv
+          git diff --staged --quiet || git commit -m "Update scores $(date -u)"
+          git push
+```
+
+### Python-Free Scraping
+
+Not every automated scraper needs Python. The Wikimedia REST API returns JSON, so you can retrieve data with `curl` directly in the YAML workflow:
+
+```yaml
+# .github/workflows/wiki-top-pages.yml
+name: Top Wikipedia Pages
+
+on:
+  schedule:
+    - cron: "0 12 * * *"  # Daily at noon UTC
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Fetch top pages
+        run: |
+          DATE=$(date -u -d "yesterday" +%Y/%m/%d)
+          curl -s "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/$DATE" \
+            -H "User-Agent: WebDataScience/1.0" \
+            -o "data/top_pages_$(date -u -d yesterday +%Y%m%d).json"
+      
+      - name: Commit results
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add data/
+          git diff --staged --quiet || git commit -m "Top pages $(date -u -d yesterday +%Y-%m-%d)"
+          git push
+```
+
+### Secrets Management
+
+For authenticated APIs (like Spotify from @sec-social), store credentials as GitHub repository secrets:
+
+```yaml
+      - name: Run Spotify scraper
+        env:
+          SPOTIPY_CLIENT_ID: ${{ secrets.SPOTIPY_CLIENT_ID }}
+          SPOTIPY_CLIENT_SECRET: ${{ secrets.SPOTIPY_CLIENT_SECRET }}
+        run: python spotify_scraper.py
+```
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a full treatment of automation with GitHub Actions, cron syntax, and CI/CD concepts, see *Missing Manual* Chapter 28: Automation. For secrets management, see *Missing Manual* Chapter 29: Environment Variables and Secrets.
+:::
+
+## Step 3: Analyze Collected Data
+
+After running your scraper for a period, you will have accumulated data to analyze:
+
+```python
+import pandas as pd
+
+df = pd.read_csv("scores.csv")
+df["timestamp"] = pd.to_datetime(df["timestamp"])
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 5))
+plt.plot(df["timestamp"], df["critic_score"], label="Critics", marker="o")
+plt.plot(df["timestamp"], df["audience_score"], label="Audience", marker="s")
+plt.title("Rotten Tomatoes Score Tracking")
+plt.ylabel("Score (%)")
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
+
+## Exercises
+
+1. **Build a scraper.** Set up a GitHub Actions scraper for a data source of your choice. Run it for at least three days and analyze the results. Good candidates include weather APIs, news site headlines, government dashboards, or e-commerce prices.
+
+2. **Script conversion.** Take one of your scraping projects from earlier chapters, convert it to a standalone `.py` script with headless execution, and verify it runs from the command line.
+
+3. **Monitoring.** Design a simple monitoring strategy for your scraper: a check that validates the output file size, row count, or data freshness. Add it as a step in your GitHub Actions workflow.
+
+::: {.callout-note}
+## Public Interest Connection
+Automated data collection is how you build the independent infrastructure that @sec-post-api describes as **ownership**. A GitHub Actions scraper does not depend on platform goodwill — it runs on your terms, on your schedule, collecting data you control. But ownership comes with responsibility: the ongoing labor of monitoring, maintaining, and updating your scrapers is itself a form of stewardship.
+:::
+
+## Social History and Public Interest
+
+Automated data collection powers some of the most important public interest projects in data science. Air quality monitoring networks, transit performance trackers, and legislative activity dashboards all depend on regular, automated data retrieval. Community data projects — where citizens build their own monitoring infrastructure rather than depending on platforms or government agencies — embody the ownership value described in @sec-post-api.
+
+But automation also raises the ethical stakes from @sec-ethics. A manual scraper that you run once makes a few requests. An automated scraper running every hour, indefinitely, accumulates a much larger footprint. The commitment to maintaining an automated scraper responsibly — monitoring for errors, respecting rate limits, adjusting to site changes — is a form of ongoing stewardship.
+
+## Common Issues to Debug
+
+- **YAML indentation errors**: YAML is whitespace-sensitive. Use a YAML validator before committing.
+- **GitHub Actions runner environment**: The Ubuntu runner may differ from your local setup. Pin Python and Chrome versions explicitly.
+- **Git conflicts**: If the Action runs while you are also pushing changes, you will get merge conflicts. Add `git pull` before `git push` in your workflow.
+- **Cron syntax**: The five fields are `minute hour day-of-month month day-of-week`. Use [crontab.guru](https://crontab.guru/) to verify your schedule.
+
+## Key Takeaways
+
+Interactive notebooks are for exploration; production data collection requires automation. The progression is notebook → script → scheduled pipeline. GitHub Actions provides free cloud-based scheduling for public repositories. But automation is not "set and forget" — scrapers break, APIs change, and data quality drifts. Building your own data infrastructure means accepting responsibility for its upkeep. That ongoing commitment is a form of the stewardship and ownership that defines public interest data science.
+
+## Further Reading
+
+- GitHub Actions documentation: <https://docs.github.com/en/actions>
+- Cron syntax reference: <https://crontab.guru/>
+- Selenium headless mode: <https://www.selenium.dev/documentation/webdriver/drivers/options/>

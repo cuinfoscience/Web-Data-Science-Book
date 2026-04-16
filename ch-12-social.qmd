@@ -1,0 +1,350 @@
+# Social and Media Platform APIs {#sec-social}
+
+::: {.callout-tip}
+## Learning Objectives
+- Explain OAuth authentication flows and implement authenticated API access
+- Retrieve and analyze subreddit metadata, submissions, comment trees, and user histories from Reddit
+- Retrieve artist, album, track, and audio feature data from Spotify
+- Access decentralized social network data from Bluesky and Mastodon
+- Compare API design patterns across platforms and assess research implications of different access models
+:::
+
+## Platforms, Data, and Power
+
+Social and media platform APIs mediate access to an enormous share of public discourse. Unlike the government APIs in @sec-government — which exist because of transparency mandates — platform APIs exist at the discretion of private companies. This means access can change overnight, as the Reddit and Twitter cases illustrate.
+
+This chapter teaches authenticated API access through four platforms that represent different points on the spectrum from proprietary to open: Reddit (PRAW), Spotify (spotipy), Bluesky (AT Protocol), and Mastodon (Mastodon.py). Pay attention to the structural differences — they embody the tensions between enclosure and openness discussed in @sec-post-api.
+
+## Reddit via PRAW
+
+Reddit provides a free API tier for non-commercial use (100 queries per minute). The PRAW (Python Reddit API Wrapper) library simplifies authentication and data retrieval.
+
+### Authentication
+
+```python
+# Install: pip install praw
+import praw
+
+reddit = praw.Reddit(
+    client_id="your_client_id",
+    client_secret="your_client_secret",
+    user_agent="WebDataScience/1.0 by u/your_username"
+)
+
+# Verify authentication
+print(f"Authenticated as: {reddit.user.me()}")
+```
+
+You will need to create a Reddit app at <https://www.reddit.com/prefs/apps/> and obtain your client ID and secret. Store these in a separate file, not in your notebook.
+
+### Exploring Subreddits
+
+```python
+import pandas as pd
+from datetime import datetime
+
+subreddit = reddit.subreddit("news")
+
+# Subreddit metadata
+print(f"Subscribers: {subreddit.subscribers:,}")
+print(f"Created: {datetime.fromtimestamp(subreddit.created_utc)}")
+print(f"Description: {subreddit.public_description[:200]}")
+
+# Subreddit rules
+for rule in subreddit.rules:
+    print(f"- {rule['short_name']}")
+```
+
+### Retrieving Submissions
+
+```python
+# Get the top 25 submissions
+submissions = []
+for submission in subreddit.top(limit=25, time_filter="week"):
+    submissions.append({
+        "title": submission.title,
+        "score": submission.score,
+        "num_comments": submission.num_comments,
+        "author": str(submission.author),
+        "created_utc": datetime.fromtimestamp(submission.created_utc),
+        "url": submission.url
+    })
+
+df = pd.DataFrame(submissions)
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(8, 6))
+plt.scatter(df["score"], df["num_comments"], alpha=0.7)
+plt.xlabel("Score")
+plt.ylabel("Number of Comments")
+plt.title("r/news: Score vs. Comments (Top 25 Weekly)")
+plt.tight_layout()
+plt.show()
+```
+
+### Comment Trees
+
+```python
+# Get a submission and its comments
+submission = reddit.submission(url="https://www.reddit.com/r/AskReddit/...")
+submission.comments.replace_more(limit=0)  # Flatten the tree
+
+comments = []
+for comment in submission.comments.list():
+    comments.append({
+        "body": comment.body[:200],
+        "score": comment.score,
+        "depth": comment.depth,
+        "author": str(comment.author)
+    })
+
+df_comments = pd.DataFrame(comments)
+print(f"Total comments: {len(df_comments)}")
+```
+
+::: {.callout-note}
+## Public Interest Connection
+Reddit's 2023 API pricing changes — from free to $0.24 per 1,000 calls — and the shutdown of the Pushshift archive are a live example of **enclosure** in action. The free tier still supports research use, but the death of third-party apps and Pushshift fundamentally changed what data is available and on whose terms [@baumgartner2020pushshift].
+:::
+
+## Spotify via spotipy
+
+Spotify provides rich metadata and audio analysis data through its API:
+
+```python
+# Install: pip install spotipy
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
+auth = SpotifyClientCredentials(
+    client_id="your_spotify_client_id",
+    client_secret="your_spotify_client_secret"
+)
+sp = spotipy.Spotify(auth_manager=auth)
+```
+
+### Searching and Exploring
+
+```python
+# Search for an artist
+results = sp.search(q="Queen", type="artist", limit=5)
+for artist in results["artists"]["items"]:
+    print(f"{artist['name']} — Followers: {artist['followers']['total']:,}")
+
+# Get the top artist's ID
+queen_id = results["artists"]["items"][0]["id"]
+
+# Get top tracks
+top_tracks = sp.artist_top_tracks(queen_id)
+for track in top_tracks["tracks"][:5]:
+    print(f"  {track['name']} ({track['album']['name']})")
+```
+
+### Audio Features
+
+One of the most powerful features of the Spotify API is access to audio analysis data:
+
+```python
+# Get audio features for top tracks
+track_ids = [t["id"] for t in top_tracks["tracks"][:10]]
+features = sp.audio_features(track_ids)
+
+df_features = pd.DataFrame(features)
+print(df_features[["danceability", "energy", "tempo", "valence"]].describe())
+```
+
+## Bluesky via AT Protocol
+
+Bluesky, built on the AT Protocol, represents a structural alternative to proprietary platforms. Its open protocol means that API access is an architectural feature, not a business decision:
+
+```python
+# Install: pip install atproto
+from atproto import Client
+
+client = Client()
+client.login("your-handle.bsky.social", "your-app-password")
+
+# Get your own profile
+profile = client.app.bsky.actor.get_profile({"actor": client.me.did})
+print(f"Handle: {profile.handle}")
+print(f"Followers: {profile.followers_count}")
+print(f"Following: {profile.follows_count}")
+
+# Get your timeline
+timeline = client.app.bsky.feed.get_timeline({"limit": 10})
+for item in timeline.feed:
+    post = item.post
+    print(f"@{post.author.handle}: {post.record.text[:80]}")
+```
+
+The key difference from Reddit and Spotify: Bluesky's protocol is designed so that no single company controls API access. Your identity, social graph, and data are portable across any service that implements the AT Protocol.
+
+## Mastodon via Mastodon.py
+
+Mastodon is a decentralized social network built on the ActivityPub protocol. Each server (instance) hosts its own API [@diener2026mastodonpy]:
+
+```python
+# Install: pip install Mastodon.py
+from mastodon import Mastodon
+
+# Register your app (one-time setup)
+# Mastodon.create_app(
+#     "WebDataScience",
+#     api_base_url="https://mastodon.social",
+#     to_file="app_cred.secret"
+# )
+
+mastodon = Mastodon(
+    client_id="app_cred.secret",
+    api_base_url="https://mastodon.social"
+)
+
+# mastodon.log_in("your-email", "your-password", to_file="user_cred.secret")
+mastodon = Mastodon(access_token="user_cred.secret", api_base_url="https://mastodon.social")
+
+# Get the public timeline
+timeline = mastodon.timeline_public(limit=10)
+for toot in timeline:
+    print(f"@{toot['account']['username']}: {toot['content'][:80]}")
+```
+
+## Exercises
+
+1. **Reddit analysis.** Compare two subreddits on the same broad topic (e.g., r/science and r/askscience). How do submission patterns, comment engagement, and moderation structures differ?
+
+2. **Audio features.** Using spotipy, analyze the audio features of a playlist or an artist's full discography. How do tempo, energy, and danceability vary across albums or over the artist's career?
+
+3. **Open vs. closed.** Attempt to retrieve the same type of information (user profile, social graph, recent posts) from both Bluesky and Reddit. Compare the ease of access, the richness of the data, and the authentication requirements. What does this comparison tell you about platform governance?
+
+## Social History and Public Interest
+
+The contrast between Reddit, Spotify, Bluesky, and Mastodon illustrates the governance spectrum described in @sec-post-api. Reddit's 2023 changes demonstrate how a platform can unilaterally restrict access that researchers depended on. Spotify's API represents a productive commercial arrangement — rich data in exchange for engagement. Bluesky and Mastodon represent structural alternatives where open protocols make enclosure architecturally harder.
+
+The PRAW library and Mastodon.py continue to work because their platforms maintain documented APIs. But the history of Twitter's API — which went from the most important data source in computational social science to essentially inaccessible within a year of its acquisition — is a reminder that platform goodwill is not infrastructure.
+
+## Common Issues to Debug
+
+- **PRAW `OAuthException`**: Double-check your `client_id`, `client_secret`, and `user_agent`. The user_agent must be unique and descriptive.
+- **Spotify client credentials vs. authorization code**: Client credentials flow cannot access user-specific data like listening history. It works for public search, artist, and track data.
+- **Bluesky `atproto` SDK**: Still pre-1.0; API may change between versions. Check the changelog before upgrading.
+- **Mastodon instance differences**: Different instances have different rate limits, rules, and may block automated access. Always register your app properly.
+
+## Key Takeaways
+
+Platform APIs provide access to behavioral data at unprecedented scale, but that access is conditional, costly, and fragile. The pattern across all four platforms is the same: authenticate, construct requests, parse nested JSON, convert to DataFrames. The difference is in governance: who controls the data, on what terms, and what happens when they change the rules. Build skills across both proprietary and open platforms so that the closure of any single source does not shut down your research.
+
+## Further Reading
+
+- PRAW documentation: <https://praw.readthedocs.io/>
+- spotipy documentation: <https://spotipy.readthedocs.io/>
+- AT Protocol SDK: <https://atproto.blue/>
+- Mastodon.py documentation: <https://mastodonpy.readthedocs.io/>
+- @baumgartner2020pushshift — the Pushshift Reddit dataset
+- @diener2026mastodonpy — the Mastodon.py library
+
+## Comparing Platform Architectures
+
+The four platforms in this chapter represent fundamentally different governance architectures, and these differences shape what data is available, on what terms, and how durable the access is.
+
+| Platform | Protocol | Authentication | Rate Limit (free) | Data Ownership |
+|----------|----------|----------------|-------------------|----------------|
+| Reddit | Proprietary REST API | OAuth2 | 100 QPM | Platform-controlled |
+| Spotify | Proprietary REST API | OAuth2 / Client Credentials | ~180 RPM | Platform-controlled |
+| Bluesky | AT Protocol (open) | App password | Generous, per-PDS | User-portable |
+| Mastodon | ActivityPub (open) | OAuth2, per-instance | Varies by instance | Instance-governed |
+
+The structural difference matters: Reddit and Spotify can unilaterally change their API terms because they control both the platform and the protocol. Bluesky and Mastodon cannot — or at least, no single entity can — because the protocols are open standards that anyone can implement. This is the architectural embodiment of the **ownership** value from @sec-post-api.
+
+### Building a Bluesky Social Network
+
+The AT Protocol makes social graph data directly accessible, enabling network analysis that would be difficult on more restricted platforms:
+
+```python
+def get_social_graph(client, handle, direction="followers", limit=100):
+    """Get followers or following for a Bluesky user.
+    
+    Parameters
+    ----------
+    client : atproto.Client
+        Authenticated Bluesky client
+    handle : str
+        The user's handle (e.g., 'username.bsky.social')
+    direction : str
+        'followers' or 'following'
+    limit : int
+        Maximum number of accounts to retrieve
+    
+    Returns
+    -------
+    list
+        List of dictionaries with handle and display name
+    """
+    results = []
+    cursor = None
+    
+    while len(results) < limit:
+        if direction == "followers":
+            response = client.app.bsky.graph.get_followers(
+                {"actor": handle, "limit": 50, "cursor": cursor}
+            )
+            accounts = response.followers
+        else:
+            response = client.app.bsky.graph.get_follows(
+                {"actor": handle, "limit": 50, "cursor": cursor}
+            )
+            accounts = response.follows
+        
+        for account in accounts:
+            results.append({
+                "handle": account.handle,
+                "display_name": account.display_name or "",
+                "description": (account.description or "")[:100]
+            })
+        
+        cursor = response.cursor
+        if not cursor or not accounts:
+            break
+    
+    return results[:limit]
+
+# Get followers for a user
+followers = get_social_graph(client, "your-handle.bsky.social", "followers")
+following = get_social_graph(client, "your-handle.bsky.social", "following")
+
+print(f"Followers: {len(followers)}")
+print(f"Following: {len(following)}")
+
+# Find mutual connections
+follower_handles = {f["handle"] for f in followers}
+following_handles = {f["handle"] for f in following}
+mutuals = follower_handles & following_handles
+print(f"Mutual connections: {len(mutuals)}")
+```
+
+### Mastodon: Working Across Instances
+
+A key difference between Mastodon and centralized platforms is that there is no single API endpoint for "all of Mastodon." Each instance maintains its own API, and you can only directly access the data on instances you authenticate with. This federated architecture means that comprehensive data collection requires accessing multiple instances — a fundamentally different research design challenge:
+
+```python
+# Search for accounts across the instance you're connected to
+results = mastodon.account_search("data science", limit=10)
+for account in results:
+    print(f"@{account['acct']} — {account['followers_count']} followers")
+    print(f"  {account['note'][:100]}")
+    print()
+
+# Get a user's recent statuses (toots)
+user_id = results[0]["id"]
+statuses = mastodon.account_statuses(user_id, limit=20)
+
+for status in statuses[:5]:
+    # Strip HTML tags from content
+    from bs4 import BeautifulSoup
+    text = BeautifulSoup(status["content"], "html.parser").get_text()
+    print(f"  [{status['created_at'][:10]}] {text[:100]}")
+
+# Track a hashtag
+tagged = mastodon.timeline_hashtag("datascience", limit=20)
+print(f"\nRecent posts tagged #datascience: {len(tagged)}")
+```

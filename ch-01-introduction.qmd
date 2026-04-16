@@ -1,0 +1,193 @@
+# Introduction to Web Data Science {#sec-introduction}
+
+::: {.callout-tip}
+## Learning Objectives
+- Articulate what distinguishes web data science from general data science
+- Set up a reproducible computing environment with Anaconda, Python, and Jupyter Notebooks
+- Make a first HTTP request with the `requests` library and interpret the response
+- Locate, read, and apply library documentation as a core professional skill
+- Adopt the dispositions — growth mindset, computational thinking, hacker ethic, and scientific norms — that distinguish effective practitioners
+:::
+
+## Why Web Data Science?
+
+The web is the largest, most dynamic, and most contested data source ever created. Every day, government agencies publish legislative records, researchers share datasets, journalists file stories, and billions of people generate behavioral traces on social platforms. This data can answer questions that matter: How does misinformation spread during elections? How have housing costs changed in your community? How do online communities govern themselves? How are platforms shaping public discourse?
+
+But the web is not a database. It is a chaotic, evolving ecosystem of documents, APIs, protocols, and norms. Data on the web does not come in tidy CSV files ready for analysis. It comes as HTML tables embedded in pages full of tracking scripts, as JSON responses from APIs that require authentication and rate limiting, as scanned PDFs of city council meeting minutes, and as social media posts that might disappear tomorrow. Transforming this raw material into analyzable data requires a specific set of skills that sits at the intersection of programming, research design, and ethical judgment.
+
+That is what this book teaches. Web data science is the practice of retrieving data from the web, parsing it into structured formats, and analyzing it to produce knowledge. It differs from general data science in that your first challenge is not modeling or visualization — it is *getting the data in the first place*.
+
+## The Data Science Mindset
+
+Working with web data requires not just technical fluency but a professional disposition. Four components of this disposition will serve you throughout this book and your career.
+
+**Growth mindset** means understanding that ability develops through effort. You will encounter libraries you have never used, error messages you do not understand, and web pages that resist your parsing attempts. This is normal. The goal is continual improvement, not instant mastery. Treat each frustration as a learning signal, not evidence of inadequacy.
+
+**Computational thinking** is the disciplined approach that computer scientists bring to problems: decomposing large tasks into smaller pieces, recognizing patterns across examples, abstracting away inessential details, and specifying unambiguous sequences of steps. When you face a complex scraping task, you will practice breaking it into retrieve, parse, clean, and analyze stages — each with clear inputs and outputs.
+
+**The hacker ethic** emphasizes sharing, openness, creativity, and a bias toward action. The open-source libraries you will use throughout this book exist because communities of developers chose to share their work. You should approach problems with curiosity, experiment freely, and share what you learn.
+
+**Scientific norms** ground your work in communalism, skepticism, and reproducibility. Document your methods so others can replicate them. Question your assumptions about the data. Communicate your findings honestly, including their limitations.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a deeper discussion of computational thinking and its four components — decomposition, pattern recognition, abstraction, and algorithmic thinking — see *Missing Manual* Chapter 1: Introduction.
+:::
+
+## Setting Up Your Environment
+
+You will need three things to work through this book: a Python installation, a way to run Jupyter Notebooks, and a few core libraries.
+
+### Installing Anaconda
+
+The Anaconda distribution of Python provides a curated collection of scientific computing libraries along with the `conda` package manager. Download the latest version from [anaconda.com](https://www.anaconda.com/download) and follow the installation instructions for your operating system.
+
+After installation, open a terminal (macOS/Linux) or Anaconda Prompt (Windows) and update your installation:
+
+```python
+# Run these commands in a terminal, not in Python
+# conda update conda
+# conda install anaconda=2024.06
+```
+
+::: {.callout-tip}
+## Missing Manual Reference
+If you run into installation issues, see *Missing Manual* Chapter 14: Package Management for troubleshooting `conda` and `pip`.
+:::
+
+### Jupyter Notebooks
+
+Jupyter Notebooks are interactive computing environments that keep your code, documentation, and results in a single file. Launch one from the terminal with `jupyter notebook`, which will open a browser window where you can create and edit notebooks.
+
+A notebook consists of cells. **Code cells** contain Python that you can execute with Shift+Enter. **Markdown cells** contain formatted text for documentation. The ability to interleave code with narrative explanation makes notebooks ideal for the kind of exploratory, iterative work that characterizes web data science.
+
+```python
+# This is a code cell. When you run it, Python executes the code
+# and displays any output below the cell.
+print("Hello, web data science!")
+# Output: Hello, web data science!
+```
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a thorough introduction to Jupyter Notebooks — cell types, execution order, keyboard shortcuts, kernel management, and common pitfalls — see *Missing Manual* Chapter 16: Jupyter.
+:::
+
+### Core Libraries
+
+This book uses several Python libraries extensively. Install them now if they are not already available in your Anaconda distribution:
+
+```python
+# Run in a terminal:
+# pip install requests beautifulsoup4 pandas matplotlib seaborn
+```
+
+Throughout this book, you will install additional libraries as needed for specific chapters. For now, confirm that the core libraries import without error:
+
+```python
+import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+from bs4 import BeautifulSoup
+
+print("All core libraries loaded successfully.")
+```
+
+## Your First Request
+
+Let us preview the loop that structures every chapter in this book: **retrieve** data from the web, **parse** it into a usable structure, and **analyze** it to produce insight.
+
+The `requests` library lets you make HTTP requests — the same kind of request your browser makes when you type a URL. Here you will retrieve the Wikipedia article for the University of Colorado Boulder:
+
+```python
+import requests
+
+# Retrieve the page
+url = "https://en.wikipedia.org/wiki/University_of_Colorado_Boulder"
+response = requests.get(url)
+
+# Check the response
+print(response.status_code)  # 200 means success
+print(type(response))        # <class 'requests.models.Response'>
+print(len(response.text))    # Number of characters in the HTML
+```
+
+The `response` object contains everything the server sent back: a status code indicating success or failure, headers with metadata about the response, and the body of the document as a text string. You can inspect the first 500 characters of the HTML:
+
+```python
+print(response.text[:500])
+# You'll see raw HTML: <!DOCTYPE html>, <head>, <title>, etc.
+```
+
+This is raw HTML — not yet useful for analysis. In @sec-data-formats and @sec-static-pages, you will learn to parse this HTML into structured data using BeautifulSoup. For now, the point is that retrieving a web page programmatically is as simple as `requests.get(url)`.
+
+You can also retrieve data in JSON format from an API. Here is a request to the Wikimedia pageviews API, which returns the number of times a Wikipedia article was viewed on a given day:
+
+```python
+import requests
+
+api_url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
+article = "University_of_Colorado_Boulder"
+url = f"{api_url}/en.wikipedia/all-access/all-agents/{article}/daily/20240101/20240131"
+
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+response = requests.get(url, headers=headers)
+
+data = response.json()  # Parse the JSON response into a Python dictionary
+print(type(data))        # <class 'dict'>
+print(data.keys())       # What keys are in the response?
+```
+
+Notice two things. First, you included a custom `User-Agent` header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the `.json()` method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate.
+
+You could now convert this data into a pandas DataFrame and plot a time series of daily pageviews — but that is getting ahead of ourselves. The point of this first example is to demonstrate that the entire arc of web data science, from question to data to insight, is accessible with tools you will master in this book.
+
+## Documentation as Professional Practice
+
+Your previous classes may have discouraged using online resources. The training wheels are off now. Finding, reading, interpreting, and applying documentation is an essential professional skill — not a shortcut, not cheating, but the primary way that working programmers, data scientists, and researchers learn to use new tools.
+
+Bookmark the documentation for the libraries you will use throughout this book:
+
+- **requests**: [requests.readthedocs.io](https://requests.readthedocs.io/)
+- **BeautifulSoup**: [crummy.com/software/BeautifulSoup/bs4/doc](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+- **pandas**: [pandas.pydata.org/docs](https://pandas.pydata.org/docs/)
+- **matplotlib**: [matplotlib.org/stable/contents.html](https://matplotlib.org/stable/contents.html)
+
+When you encounter an error or do not know how to do something, start with the official documentation. If that does not help, search for the specific error message. When asking for help — from a classmate, an instructor, or an AI tool — "it's not working" is not an actionable request. Describe what you tried, what you expected to happen, what actually happened, and what the error message says.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For strategies on asking effective technical questions and reading official documentation, see *Missing Manual* Chapter 2: Asking Technical Questions and Chapter 4: Reading Official Documentation.
+:::
+
+## Exercises
+
+1. **Environment check.** Create a new Jupyter Notebook. In the first cell, import `requests`, `pandas`, `matplotlib.pyplot`, and `BeautifulSoup`. In the second cell, use `requests.get()` to retrieve any web page of your choice and print the status code. In the third cell, write a Markdown cell explaining what the status code means.
+
+2. **Exploring the Response object.** Use the `dir()` function on a `requests.Response` object to list all its attributes and methods. Identify three attributes not discussed in this chapter and use the `help()` function or online documentation to figure out what they do. Write a brief explanation of each in a Markdown cell.
+
+3. **Your first API call.** Using the Wikimedia pageviews API URL pattern from this chapter, retrieve the daily pageview data for a Wikipedia article of your choice over a month-long period. Convert the `data['items']` list into a pandas DataFrame and create a simple line plot of views over time using `matplotlib`.
+
+## Social History and Public Interest
+
+Web data science emerged at the intersection of several traditions. Computational social scientists in the 2000s and 2010s recognized that the web was generating behavioral data at unprecedented scale — traces of how people communicate, collaborate, and organize [@lazer2009computational]. Data journalists discovered that web scraping could hold institutions accountable by making nominally public data actually analyzable. Civic technologists built tools to make government data accessible to citizens.
+
+These traditions share a commitment to the idea that data fluency is a form of power, and that this power should serve the public interest. As you develop your skills throughout this book, you will encounter recurring questions about who benefits from web data collection, who is harmed by it, and what obligations come with the ability to automate access to information at scale.
+
+## Common Issues to Debug
+
+- **`ModuleNotFoundError`**: A library is not installed in your current Python environment. Run `pip install library-name` from a terminal, then restart your Jupyter kernel.
+- **`ConnectionError`**: Your computer cannot reach the server. Check your internet connection; if you are on a university network, try a different network.
+- **Status code 403 (Forbidden)**: The server rejected your request, often because you did not include a `User-Agent` header. See @sec-ethics for how to set custom headers.
+- **Cells running out of order**: Jupyter cells can be executed in any order, which leads to stale variables. When in doubt, restart the kernel and run all cells from the top.
+
+## Key Takeaways
+
+The web is a data source unlike any other — massive, dynamic, messy, and politically contested. Working with it requires not just code but a professional disposition: the habits of documentation, skepticism, and ethical reflection that distinguish a data scientist from someone who can run a script. Every technique in this book follows the same basic loop: retrieve data from the web, parse it into a usable structure, and analyze it to produce knowledge. You now have your environment set up and have made your first request. The rest of the book builds from here.
+
+## Further Reading
+
+- `requests` library documentation: <https://requests.readthedocs.io/>
+- Jupyter Notebook documentation: <https://jupyter-notebook.readthedocs.io/>
+- @wilson2017good — practical guidance on scientific computing workflows
+- @salganik2018bit — Chapter 1: Introduction, for an overview of social research in the digital age

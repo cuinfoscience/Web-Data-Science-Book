@@ -1,0 +1,320 @@
+# Extracting Data from PDFs {#sec-pdfs}
+
+::: {.callout-tip}
+## Learning Objectives
+- Explain why PDF text extraction is difficult and how PDFs differ from structured formats
+- Use PyPDF to open PDF files, access metadata, and extract page-level text
+- Apply string methods and regular expressions to clean and structure extracted text
+- Build a data pipeline that processes multiple PDF files to extract structured information
+- Visualize trends across a corpus of PDF documents
+:::
+
+## The Web's Filing Cabinets
+
+PDFs are everywhere in institutional record-keeping: city council meeting minutes, legislative bill texts, financial reports, court filings, academic papers, and environmental impact assessments. They are the format of choice for "official" documents precisely because they preserve visual layout across different devices and printers. But that design priority — visual fidelity over semantic structure — makes them hostile to programmatic data extraction.
+
+When you read a PDF, you see paragraphs, tables, headers, and page numbers. When a computer reads a PDF, it sees a sequence of drawing instructions: place this character at coordinates (x, y), draw a line from here to there, embed this image at this location. Text extraction from PDFs is *reconstruction*, not reading — the computer must infer the logical structure from the spatial layout.
+
+This chapter teaches you to work within these constraints. The results will not be perfect, but they can be good enough to turn inaccessible institutional records into analyzable datasets.
+
+::: {.callout-note}
+## Public Interest Connection
+When governments publish meeting minutes, budgets, and regulatory filings only as PDFs, they create what @sec-post-api describes as "soft enclosure" — records that are nominally public but practically inaccessible for analysis. Building the skills to extract data from PDFs is itself a form of the **oversight** value: it enables independent analysis of institutional records.
+:::
+
+## PyPDF Basics
+
+The `pypdf` library provides page-level text extraction and metadata access:
+
+```python
+# Install if needed:
+# pip install pypdf
+
+from pypdf import PdfReader
+
+# Open a PDF file (download Boulder City Council minutes first)
+reader = PdfReader("council_minutes_2024_01.pdf")
+
+# Document-level metadata
+print(f"Number of pages: {len(reader.pages)}")
+print(f"Metadata: {reader.metadata}")
+```
+
+### Extracting Text
+
+```python
+# Extract text from the first page
+page = reader.pages[0]
+text = page.extract_text()
+print(text[:500])  # Print the first 500 characters
+```
+
+The output will likely be messy: line breaks may not correspond to paragraph boundaries, headers and footers are mixed in with content, and table data may be garbled. This is normal. Cleaning up extracted text is a core part of the workflow.
+
+### Cleanup Strategies
+
+```python
+import re
+
+def clean_page_text(raw_text):
+    """Clean text extracted from a PDF page.
+    
+    Parameters
+    ----------
+    raw_text : str
+        Raw text from PdfReader.pages[n].extract_text()
+    
+    Returns
+    -------
+    str
+        Cleaned text with normalized whitespace
+    """
+    # Normalize whitespace
+    text = re.sub(r'\s+', ' ', raw_text)
+    
+    # Remove page numbers (common patterns)
+    text = re.sub(r'Page \d+ of \d+', '', text)
+    
+    # Remove common headers/footers (customize per document)
+    text = re.sub(r'CITY COUNCIL MEETING MINUTES', '', text)
+    
+    return text.strip()
+
+cleaned = clean_page_text(text)
+print(cleaned[:300])
+```
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a thorough introduction to regular expressions — the pattern-matching tool you will use extensively for text cleanup — see *Missing Manual* Chapter 18: Regular Expressions.
+:::
+
+## Case Study: Boulder City Council Minutes
+
+Boulder's City Council publishes signed minutes of its public meetings [online](https://documents.bouldercolorado.gov). These PDFs contain structured information — council member attendance, public comment speakers, agenda items, voting records — that can be extracted and analyzed.
+
+### Measuring Council Attendance
+
+```python
+import os
+from pypdf import PdfReader
+
+# Assuming you have downloaded several PDF files into a directory
+pdf_dir = "council_minutes/"
+pdf_files = sorted([f for f in os.listdir(pdf_dir) if f.endswith(".pdf")])
+
+def extract_attendance(pdf_path):
+    """Extract council member attendance from a meeting minutes PDF.
+    
+    Parameters
+    ----------
+    pdf_path : str
+        Path to the PDF file
+    
+    Returns
+    -------
+    dict
+        Dictionary with 'date', 'present', 'absent' counts
+    """
+    reader = PdfReader(pdf_path)
+    
+    # Attendance is typically on the first page
+    first_page_text = reader.pages[0].extract_text()
+    
+    # Count members listed as present vs. absent
+    # This regex pattern will need to be adapted to the specific format
+    present = len(re.findall(r'(?:Present|PRESENT):.*?(?=Absent|ABSENT|$)', 
+                              first_page_text, re.DOTALL))
+    
+    return {
+        "file": os.path.basename(pdf_path),
+        "pages": len(reader.pages),
+        "first_page_length": len(first_page_text)
+    }
+```
+
+### Building the Pipeline
+
+```python
+import time
+
+results = []
+for pdf_file in pdf_files:
+    try:
+        pdf_path = os.path.join(pdf_dir, pdf_file)
+        result = extract_attendance(pdf_path)
+        results.append(result)
+        print(f"Processed: {pdf_file}")
+    except Exception as e:
+        print(f"Error processing {pdf_file}: {e}")
+
+import pandas as pd
+
+df = pd.DataFrame(results)
+print(df.head())
+```
+
+### Visualizing Trends
+
+```python
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 5))
+plt.bar(range(len(df)), df["first_page_length"])
+plt.xlabel("Meeting")
+plt.ylabel("First Page Text Length")
+plt.title("Boulder City Council Meeting Minutes: First Page Length Over Time")
+plt.tight_layout()
+plt.show()
+```
+
+## Exercises
+
+1. **Find and extract.** Locate a set of PDF documents from a government source — city council agendas, regulatory filings, or budget summaries. Extract a consistent data element across at least ten documents and build a DataFrame.
+
+2. **Extraction quality comparison.** Compare the text extraction quality of PyPDF on three different types of PDFs: a text-based report, a document with complex tables, and a slide deck exported to PDF. What works well and what fails?
+
+3. **Clean and visualize.** Write a function that takes a path to a PDF and returns a dictionary of extracted metadata and key content fields. Apply it across a corpus of at least five related documents and create a visualization showing how a measurable quantity changes over time.
+
+## Social History and Public Interest
+
+The PDF format was created by Adobe in 1993 to solve a real problem: documents needed to look the same regardless of what printer or screen displayed them. But the format's emphasis on visual fidelity came at the cost of semantic accessibility. Organizations like DocumentCloud, MuckRock, and the Sunlight Foundation have built tools to extract structured data from the flood of PDFs that government agencies produce — bridging the gap between nominally public records and practically accessible data.
+
+The Boulder City Council case illustrates this tension at the local level. The same meeting information could be published as structured data (allowing citizens to easily track attendance, voting patterns, and public comment frequency) or as scanned PDFs (requiring significant technical effort to analyze). The format choice is itself a policy decision with consequences for transparency and accountability.
+
+## Common Issues to Debug
+
+- **Garbled text from scanned PDFs**: PyPDF extracts text only from PDFs that have a text layer. Truly scanned documents require OCR tools like Tesseract.
+- **Table data extracted as a text stream**: PyPDF is not a table extraction tool. For tabular data in PDFs, consider `pdfplumber` or `camelot`.
+- **Regular expressions that work on one document but fail on another**: PDF formatting varies even within documents from the same source. Test your patterns on multiple files.
+- **Encoding issues**: Some PDFs use non-standard character encodings. Use `.encode('utf-8', errors='replace')` if needed.
+
+## Key Takeaways
+
+PDFs are designed for visual fidelity, not data extraction. PyPDF gives you page-level text as a starting point; string methods and regex let you clean and structure what you extract; and function abstractions let you process many documents consistently. Expect messiness — PDF extraction is reconstruction, not reading. The broader lesson connects to @sec-post-api: when institutions publish data only in PDF form, they create a practical barrier to the analysis that nominally public records are meant to enable.
+
+## Further Reading
+
+- PyPDF documentation: <https://pypdf.readthedocs.io/>
+- pdfplumber (for table extraction): <https://github.com/jsvine/pdfplumber>
+- Python `re` module: <https://docs.python.org/3/library/re.html>
+- DocumentCloud: <https://www.documentcloud.org/>
+
+## Building a Reusable PDF Pipeline
+
+When you work with PDFs at scale — processing dozens or hundreds of documents from the same source — you need a structured pipeline. Here is a pattern that works for most government document collections:
+
+```python
+import os
+import re
+import pandas as pd
+from pypdf import PdfReader
+
+class PDFCorpusAnalyzer:
+    """A reusable pipeline for extracting and analyzing PDF corpora.
+    
+    This class encapsulates the full workflow:
+    1. Discover PDF files in a directory
+    2. Extract text from each file
+    3. Apply document-specific cleanup rules
+    4. Extract structured fields
+    5. Compile results into a DataFrame
+    """
+    
+    def __init__(self, directory, cleanup_patterns=None):
+        self.directory = directory
+        self.cleanup_patterns = cleanup_patterns or []
+        self.files = sorted([
+            f for f in os.listdir(directory) if f.lower().endswith(".pdf")
+        ])
+    
+    def extract_text(self, filepath, pages=None):
+        """Extract text from specified pages of a PDF."""
+        reader = PdfReader(filepath)
+        
+        if pages is None:
+            pages = range(len(reader.pages))
+        
+        text = ""
+        for page_num in pages:
+            if page_num < len(reader.pages):
+                text += reader.pages[page_num].extract_text() + "\n"
+        
+        # Apply cleanup patterns
+        for pattern, replacement in self.cleanup_patterns:
+            text = re.sub(pattern, replacement, text)
+        
+        return text.strip()
+    
+    def process_all(self, extract_fn):
+        """Process all PDFs using a custom extraction function.
+        
+        Parameters
+        ----------
+        extract_fn : callable
+            Function that takes (filepath, text) and returns a dict
+        """
+        results = []
+        for filename in self.files:
+            filepath = os.path.join(self.directory, filename)
+            try:
+                text = self.extract_text(filepath)
+                result = extract_fn(filepath, text)
+                result["filename"] = filename
+                results.append(result)
+            except Exception as e:
+                print(f"Error processing {filename}: {e}")
+                results.append({"filename": filename, "error": str(e)})
+        
+        return pd.DataFrame(results)
+
+# Usage example: analyze Boulder City Council meeting lengths
+def extract_meeting_info(filepath, text):
+    """Extract meeting metadata from council minutes text."""
+    # Count approximate words
+    word_count = len(text.split())
+    
+    # Try to find the meeting date (format varies by document)
+    date_match = re.search(
+        r'(January|February|March|April|May|June|July|August|'
+        r'September|October|November|December)\s+\d{1,2},\s+\d{4}',
+        text
+    )
+    
+    return {
+        "word_count": word_count,
+        "date": date_match.group(0) if date_match else None,
+        "page_count": len(PdfReader(filepath).pages)
+    }
+
+analyzer = PDFCorpusAnalyzer(
+    "council_minutes/",
+    cleanup_patterns=[
+        (r'\s+', ' '),                  # Normalize whitespace
+        (r'Page \d+ of \d+', ''),       # Remove page numbers
+    ]
+)
+
+df = analyzer.process_all(extract_meeting_info)
+print(df.head())
+```
+
+### When PyPDF Is Not Enough
+
+PyPDF handles text-based PDFs well but struggles with two common scenarios:
+
+**Tables in PDFs**: PyPDF extracts tables as streams of text, losing the column-row structure. For tabular PDF data, use `pdfplumber`, which preserves spatial relationships:
+
+```python
+# pip install pdfplumber
+import pdfplumber
+
+with pdfplumber.open("report.pdf") as pdf:
+    page = pdf.pages[0]
+    table = page.extract_table()
+    
+    # table is a list of lists (rows of cells)
+    df = pd.DataFrame(table[1:], columns=table[0])
+```
+
+**Scanned PDFs**: If the PDF was created by scanning a physical document (no text layer), PyPDF will extract empty or garbled text. You need OCR (Optical Character Recognition). The Tesseract OCR engine, accessible through the `pytesseract` library, can process scanned pages, though accuracy varies with scan quality.

@@ -1,0 +1,388 @@
+# AI and Language Model APIs {#sec-ai-apis}
+
+::: {.callout-tip}
+## Learning Objectives
+- Set up authenticated access to LLM APIs (OpenAI, Anthropic)
+- Construct chat completion requests with system, user, and assistant roles
+- Use few-shot prompting and structured output to extract data from unstructured text
+- Compute text embeddings for document similarity and clustering
+- Assess the costs, reproducibility challenges, and appropriate uses of LLMs in research
+:::
+
+## LLMs as Web Data Science Tools
+
+Large language model APIs represent a fundamentally new category of tool for web data science. They can transform the unstructured text outputs of Chapters 6–9 (scraped web pages, PDF extractions, archived documents) into structured, analyzable data — performing tasks like sentiment analysis, entity extraction, content coding, and summarization at scale.
+
+This chapter treats LLMs as another API to learn: the same patterns of authentication, request construction, and response parsing apply. But LLMs have distinctive properties — non-determinism, cost, and limited reproducibility — that require careful handling.
+
+## The OpenAI API
+
+```python
+# Install: pip install openai
+from openai import OpenAI
+
+# Store your key securely (see Missing Manual Ch. 29)
+import os
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+```
+
+### Basic Chat Completion
+
+```python
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What is web scraping in one sentence?"}
+    ]
+)
+
+# Extract the response text
+answer = response.choices[0].message.content
+print(answer)
+```
+
+### Customizing Roles
+
+The `system` message sets the assistant's behavior. The `user` message is your input. The `assistant` message lets you simulate prior conversation turns:
+
+```python
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You are a legislative analyst specializing in Colorado state policy."},
+        {"role": "user", "content": "Summarize the key provisions of this bill in three bullet points."},
+        {"role": "assistant", "content": "I'd be happy to analyze that bill. Could you share the text?"},
+        {"role": "user", "content": bill_text}  # Variable containing bill text
+    ]
+)
+```
+
+### Structured Output and Few-Shot Prompting
+
+For research applications, you typically want structured data, not free text. Use few-shot prompting — providing examples of the desired input-output format:
+
+```python
+prompt = """Classify the following bill summary into one of these categories: 
+education, healthcare, environment, taxation, criminal_justice, other.
+
+Examples:
+Summary: "Increases funding for K-12 teacher salaries across the state."
+Category: education
+
+Summary: "Establishes new emission standards for power plants."
+Category: environment
+
+Now classify:
+Summary: "{bill_summary}"
+Category:"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "Respond with only the category label, nothing else."},
+        {"role": "user", "content": prompt.format(bill_summary=bill_summary)}
+    ],
+    temperature=0  # Reduce randomness for classification tasks
+)
+
+category = response.choices[0].message.content.strip()
+print(f"Category: {category}")
+```
+
+## Text Embeddings
+
+Embeddings are vector representations that encode the semantic meaning of text. You can use them to measure document similarity:
+
+```python
+def get_embedding(text, model="text-embedding-3-small"):
+    """Get the embedding vector for a text string."""
+    response = client.embeddings.create(input=text, model=model)
+    return response.data[0].embedding
+
+# Compute embeddings for bill summaries
+import numpy as np
+from scipy.spatial.distance import cosine
+
+bill_summaries = ["Summary of bill 1...", "Summary of bill 2...", "Summary of bill 3..."]
+embeddings = [get_embedding(s) for s in bill_summaries]
+
+# Compute pairwise similarity
+embedding_matrix = np.array(embeddings)
+n = len(bill_summaries)
+similarity_matrix = np.zeros((n, n))
+
+for i in range(n):
+    for j in range(n):
+        similarity_matrix[i][j] = 1 - cosine(embedding_matrix[i], embedding_matrix[j])
+
+# Visualize as a heatmap
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(6, 5))
+sns.heatmap(similarity_matrix, annot=True, fmt=".2f", cmap="YlOrRd",
+            xticklabels=range(1, n+1), yticklabels=range(1, n+1))
+plt.title("Bill Summary Similarity (Cosine)")
+plt.tight_layout()
+plt.show()
+```
+
+
+## Applied Example: Legislative Bill Analysis
+
+Let us apply these tools to a concrete web data science task. Suppose you have scraped bill summaries from the Colorado General Assembly website (building on the scraping techniques from @sec-static-pages). You want to classify each bill by policy area, extract the key stakeholders mentioned, and measure how similar bills are to each other.
+
+### Step 1: Classifying Bills
+
+```python
+def classify_bill(summary, client):
+    """Classify a bill summary into a policy category.
+    
+    Parameters
+    ----------
+    summary : str
+        The text of the bill summary
+    client : OpenAI
+        An authenticated OpenAI client
+    
+    Returns
+    -------
+    str
+        The policy category
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a legislative analyst. Classify bill summaries into "
+                    "exactly one category: education, healthcare, environment, "
+                    "taxation, criminal_justice, transportation, housing, labor, "
+                    "technology, or other. Respond with only the category label."
+                )
+            },
+            {"role": "user", "content": summary}
+        ],
+        temperature=0
+    )
+    return response.choices[0].message.content.strip().lower()
+
+# Apply across a list of bills
+bills = [
+    {"id": "HB24-1001", "summary": "Increases funding for K-12 teacher salaries..."},
+    {"id": "HB24-1042", "summary": "Establishes new emission standards for power plants..."},
+    {"id": "SB24-087", "summary": "Requires health insurers to cover annual mental health..."},
+]
+
+for bill in bills:
+    bill["category"] = classify_bill(bill["summary"], client)
+    print(f"{bill['id']}: {bill['category']}")
+
+import time
+time.sleep(1)  # Rate limit between API calls
+```
+
+### Step 2: Extracting Structured Information
+
+You can use few-shot prompting to extract multiple fields at once:
+
+```python
+import json
+
+extraction_prompt = """Extract the following fields from this bill summary as JSON:
+- primary_topic: one phrase describing the main topic
+- stakeholders: list of groups affected
+- fiscal_impact: "yes", "no", or "unclear"
+- geographic_scope: "statewide", "local", or "specific_region"
+
+Example input: "Requires all school districts to provide free breakfast and lunch to students."
+Example output: {{"primary_topic": "school meals", "stakeholders": ["students", "school districts", "food service workers"], "fiscal_impact": "yes", "geographic_scope": "statewide"}}
+
+Now extract from: "{summary}"
+"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "Respond with valid JSON only. No markdown formatting."},
+        {"role": "user", "content": extraction_prompt.format(summary=bills[0]["summary"])}
+    ],
+    temperature=0
+)
+
+try:
+    extracted = json.loads(response.choices[0].message.content)
+    print(json.dumps(extracted, indent=2))
+except json.JSONDecodeError:
+    print("Failed to parse response as JSON")
+    print(response.choices[0].message.content)
+```
+
+### Step 3: Measuring Similarity with Embeddings
+
+Embeddings let you move beyond keyword matching to semantic similarity. Two bills about "school funding" and "educational resource allocation" would have low keyword overlap but high embedding similarity:
+
+```python
+import numpy as np
+from scipy.spatial.distance import cosine
+
+def get_embeddings(texts, client, model="text-embedding-3-small"):
+    """Get embedding vectors for a list of texts."""
+    embeddings = []
+    for text in texts:
+        response = client.embeddings.create(input=text, model=model)
+        embeddings.append(response.data[0].embedding)
+        time.sleep(0.5)  # Rate limit
+    return np.array(embeddings)
+
+# Get embeddings for all bill summaries
+summaries = [b["summary"] for b in bills]
+embedding_matrix = get_embeddings(summaries, client)
+
+# Compute pairwise cosine similarity
+n = len(summaries)
+similarity = np.zeros((n, n))
+for i in range(n):
+    for j in range(n):
+        similarity[i][j] = 1 - cosine(embedding_matrix[i], embedding_matrix[j])
+
+# Visualize
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+labels = [b["id"] for b in bills]
+plt.figure(figsize=(8, 6))
+sns.heatmap(similarity, annot=True, fmt=".2f", cmap="YlOrRd",
+            xticklabels=labels, yticklabels=labels)
+plt.title("Bill Summary Similarity (Cosine Distance of Embeddings)")
+plt.tight_layout()
+plt.show()
+```
+
+## Fine-Tuning for Domain-Specific Tasks
+
+Sometimes a general model does not produce consistent results for your specific task. Fine-tuning lets you train the model on your own examples:
+
+```python
+# Prepare training data in JSONL format
+# Each line is a complete conversation demonstrating the desired behavior
+training_data = [
+    {
+        "messages": [
+            {"role": "system", "content": "Classify Colorado bill summaries by policy area."},
+            {"role": "user", "content": "Increases the minimum wage to $15/hour by 2026."},
+            {"role": "assistant", "content": "labor"}
+        ]
+    },
+    {
+        "messages": [
+            {"role": "system", "content": "Classify Colorado bill summaries by policy area."},
+            {"role": "user", "content": "Requires electric vehicle charging at new buildings."},
+            {"role": "assistant", "content": "environment"}
+        ]
+    },
+    # ... at least 10 examples, ideally 50+
+]
+
+# Save to JSONL file
+import json
+
+with open("training_data.jsonl", "w") as f:
+    for example in training_data:
+        f.write(json.dumps(example) + "\n")
+
+# Upload the training file
+training_file = client.files.create(
+    file=open("training_data.jsonl", "rb"),
+    purpose="fine-tune"
+)
+
+# Start a fine-tuning job
+job = client.fine_tuning.jobs.create(
+    training_file=training_file.id,
+    model="gpt-4o-mini-2024-07-18"
+)
+
+print(f"Fine-tuning job started: {job.id}")
+print(f"Status: {job.status}")
+```
+
+Fine-tuning takes time (minutes to hours depending on dataset size). You can check the status periodically and then use the fine-tuned model by specifying its ID in place of the base model name.
+
+## Cost Management
+
+LLM API calls cost money. Before running a large batch, estimate the cost:
+
+```python
+# Rough cost estimation for GPT-4o-mini
+# Input: ~$0.15 per 1M tokens; Output: ~$0.60 per 1M tokens
+# A typical bill summary is ~200 tokens; a classification response is ~5 tokens
+
+num_bills = 500
+input_tokens = num_bills * 200
+output_tokens = num_bills * 5
+
+estimated_cost = (input_tokens * 0.15 / 1_000_000) + (output_tokens * 0.60 / 1_000_000)
+print(f"Estimated cost for classifying {num_bills} bills: ${estimated_cost:.4f}")
+# Typically a few cents for small jobs, but can add up with larger models
+```
+
+Use `gpt-4o-mini` for development and testing. Switch to `gpt-4o` only when you need higher quality and have validated your prompts on a smaller sample.
+## The Anthropic API
+
+Anthropic's Claude provides an alternative LLM API with a similar interface:
+
+```python
+# Install: pip install anthropic
+from anthropic import Anthropic
+
+client_anthropic = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+
+response = client_anthropic.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "What is the AT Protocol in one sentence?"}
+    ]
+)
+
+print(response.content[0].text)
+```
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a deeper understanding of how language models work internally — tokens, embeddings, attention, context windows — see *Missing Manual* Chapter 30: How Language Models Work.
+:::
+
+## Exercises
+
+1. **Structured extraction.** Use an LLM API to extract structured metadata (topic, stakeholders, geographic scope) from a set of at least 10 web-scraped documents. Design your prompt, test it, and assess the quality of the results.
+
+2. **Embedding analysis.** Compute embeddings for a corpus of at least 20 related documents and use cosine similarity to identify clusters. Visualize the results. Do the clusters match your intuitive groupings?
+
+3. **Human-AI agreement.** Design a classification task for a set of documents. Manually classify 20 documents, then have an LLM classify the same documents. Compute the agreement rate. Where does the LLM disagree with your judgment?
+
+## Social History and Public Interest
+
+LLMs have accelerated the enclosure dynamics described in @sec-post-api — the enormous value of user-generated content as training data has given platforms new incentives to restrict access. At the same time, LLMs provide researchers with powerful analytical tools that can partially offset restricted data access: if you can retrieve even a small sample of text, LLMs can help you code, classify, and extract information from it at scales that would be impossible manually [@ziems2024can].
+
+The key challenge is reproducibility. LLM outputs are non-deterministic (even with `temperature=0`, there is some variation), model versions change, and the cost structure means that replication requires financial investment. These properties require new norms for documentation and disclosure — see @sec-appendix-ai-disclosure.
+
+## Common Issues to Debug
+
+- **API key exposure**: Use environment variables. Never commit keys to version control.
+- **Rate limiting and costs**: Estimate costs before large batch runs. Use `gpt-4o-mini` for development, `gpt-4o` for production.
+- **JSON parsing failures**: When requesting structured output, the model may not follow your format exactly. Use `try/except` around JSON parsing.
+- **Model version changes**: Pin your model version in code. Document which model you used in your methods section.
+
+## Key Takeaways
+
+LLM APIs are powerful tools for processing web data, but they require careful handling: non-determinism, cost, and reproducibility challenges are real. Use them for tasks where their strengths — scale, multilingual capability, structured extraction — outweigh their weaknesses. Always validate outputs against manual inspection. And treat the API like any other: read the documentation, manage your keys, and parse your responses carefully.
+
+## Further Reading
+
+- OpenAI API documentation: <https://platform.openai.com/docs/>
+- Anthropic API documentation: <https://docs.anthropic.com/>
+- @ziems2024can — LLMs and computational social science

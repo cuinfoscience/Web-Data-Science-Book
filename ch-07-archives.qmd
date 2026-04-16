@@ -1,0 +1,268 @@
+# Archived Web Pages and the Wayback Machine {#sec-archives}
+
+::: {.callout-tip}
+## Learning Objectives
+- Explain the Internet Archive's role as a public infrastructure for web preservation
+- Query the Wayback Machine's Availability API and CDX Server API to find historical snapshots
+- Retrieve and parse historical page content to track changes over time
+- Apply basic NLP techniques (tokenization, stopword removal, bag-of-words) to measure document similarity
+- Serialize scraped data to JSON files for persistence and reproducibility
+:::
+
+## The Web Is Not Permanent
+
+Web pages change, disappear, and get redesigned constantly. Studies have found that a significant fraction of URLs break within just a few years — a phenomenon called *link rot*. For researchers, this impermanence creates a fundamental challenge: how do you study something that might not be there tomorrow? And how do you study how something has changed over time when only the current version is visible?
+
+The [Internet Archive](https://archive.org), founded by Brewster Kahle in 1996, addresses this challenge by archiving the web. Its [Wayback Machine](https://web.archive.org) has captured over 800 billion web pages, creating a historical record of the web that is freely accessible to anyone. For web data scientists, the Wayback Machine is both a data source and a form of the counter-erosion infrastructure described in @sec-post-api — a community-governed resource that preserves access to web content even as platforms and governments take pages down.
+
+## The Availability API
+
+The simplest way to check whether the Wayback Machine has a snapshot of a URL is the Availability API:
+
+```python
+import requests
+
+url = "https://www.cnn.com"
+timestamp = "20000815"  # August 15, 2000
+
+api_url = f"https://archive.org/wayback/available?url={url}&timestamp={timestamp}"
+response = requests.get(api_url)
+data = response.json()
+
+# Check if a snapshot is available
+if data["archived_snapshots"]:
+    snapshot = data["archived_snapshots"]["closest"]
+    print(f"Snapshot available: {snapshot['available']}")
+    print(f"URL: {snapshot['url']}")
+    print(f"Timestamp: {snapshot['timestamp']}")
+else:
+    print("No snapshot available near this date")
+```
+
+The API returns the closest snapshot to your requested timestamp. You can then retrieve and parse that historical page just as you would a current page:
+
+```python
+from bs4 import BeautifulSoup
+
+# Retrieve the archived page
+archived_url = snapshot["url"]
+archived_response = requests.get(archived_url)
+soup = BeautifulSoup(archived_response.text, "html.parser")
+
+# Extract links from the year-2000 version of CNN
+links = soup.find_all("a")
+print(f"Number of links on CNN in August 2000: {len(links)}")
+```
+
+## The CDX Server API
+
+The Availability API finds one snapshot near a date. The CDX Server API lets you query the entire history of snapshots for a URL, which is essential for longitudinal research:
+
+```python
+import requests
+import pandas as pd
+
+# Query all snapshots of Facebook's Terms of Service
+cdx_url = "https://web.archive.org/cdx/search/cdx"
+params = {
+    "url": "facebook.com/terms",
+    "output": "json",
+    "fl": "timestamp,original,statuscode,length"
+}
+
+response = requests.get(cdx_url, params=params)
+data = response.json()
+
+# First row is column headers, rest is data
+df = pd.DataFrame(data[1:], columns=data[0])
+df["timestamp"] = pd.to_datetime(df["timestamp"], format="%Y%m%d%H%M%S")
+df["length"] = pd.to_numeric(df["length"], errors="coerce")
+
+print(f"Total snapshots: {len(df)}")
+print(f"Date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
+```
+
+You can visualize how frequently the page was captured and how its size changed over time:
+
+```python
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+
+# Snapshot frequency over time
+df.set_index("timestamp").resample("M").size().plot(ax=axes[0])
+axes[0].set_ylabel("Snapshots per month")
+axes[0].set_title("Wayback Machine Capture Frequency")
+
+# Page size over time
+df.set_index("timestamp")["length"].plot(ax=axes[1])
+axes[1].set_ylabel("Page size (bytes)")
+axes[1].set_title("Page Size Over Time")
+
+plt.tight_layout()
+plt.show()
+```
+
+## Tracking Policy Changes Over Time
+
+A current research project explores how social media platforms' terms of service have evolved. Let us track changes in Facebook's Terms of Service by retrieving content at regular intervals.
+
+### Generating Date Ranges
+
+```python
+import pandas as pd
+
+# Generate quarterly dates from 2005 to 2024
+dates = pd.date_range(start="2005-01-01", end="2024-01-01", freq="QS")
+print(f"Querying {len(dates)} time points")
+```
+
+### Retrieving Historical Content
+
+```python
+import time
+from datetime import datetime
+
+fb_tos_url = "facebook.com/terms"
+
+def get_wayback_content(url, date, headers=None):
+    """Retrieve a page from the Wayback Machine closest to a given date.
+    
+    Parameters
+    ----------
+    url : str
+        The original URL (without http://)
+    date : datetime
+        The target date for the snapshot
+    headers : dict, optional
+        HTTP headers for the request
+    
+    Returns
+    -------
+    dict
+        Dictionary with 'timestamp', 'url', 'content', and 'word_count'
+    """
+    timestamp = date.strftime("%Y%m%d")
+    api_url = f"https://archive.org/wayback/available?url={url}&timestamp={timestamp}"
+    
+    api_response = requests.get(api_url, headers=headers)
+    api_data = api_response.json()
+    
+    if not api_data.get("archived_snapshots"):
+        return None
+    
+    snapshot_url = api_data["archived_snapshots"]["closest"]["url"]
+    page_response = requests.get(snapshot_url, headers=headers)
+    soup = BeautifulSoup(page_response.text, "html.parser")
+    
+    # Extract text content
+    text = soup.get_text(separator=" ", strip=True)
+    
+    time.sleep(1)  # Rate limit
+    
+    return {
+        "timestamp": api_data["archived_snapshots"]["closest"]["timestamp"],
+        "url": snapshot_url,
+        "word_count": len(text.split()),
+        "content": text[:5000]  # First 5000 characters to avoid memory issues
+    }
+```
+
+### Serializing Data
+
+Once you have collected historical content, save it so you do not need to re-scrape:
+
+```python
+import json
+
+# After collecting data into a list called 'results':
+with open("fb_tos_history.json", "w") as f:
+    json.dump(results, f, indent=2)
+
+# Load it back later:
+with open("fb_tos_history.json", "r") as f:
+    results = json.load(f)
+```
+
+## Document Similarity with Bag-of-Words
+
+To measure how much a document changed between versions, you can use a bag-of-words approach. This technique represents each document as a vector of word frequencies, ignoring word order, and then measures the similarity between vectors.
+
+```python
+from gensim.utils import simple_preprocess
+from nltk.corpus import stopwords
+import nltk
+
+# Download stopwords (first time only)
+# nltk.download('stopwords')
+
+stop_words = set(stopwords.words('english'))
+
+def preprocess_document(text):
+    """Tokenize, lowercase, and remove stopwords from a document."""
+    tokens = simple_preprocess(text)  # Tokenize and lowercase
+    return [token for token in tokens if token not in stop_words]
+
+# Preprocess two versions of the ToS
+doc_v1 = preprocess_document(results[0]["content"])
+doc_v2 = preprocess_document(results[-1]["content"])
+
+print(f"Version 1 tokens: {len(doc_v1)}")
+print(f"Version 2 tokens: {len(doc_v2)}")
+```
+
+Using gensim's dictionary and bag-of-words tools, you can build a corpus and compute similarity:
+
+```python
+from gensim import corpora, similarities
+
+# Build a dictionary mapping words to IDs
+documents = [doc_v1, doc_v2]
+dictionary = corpora.Dictionary(documents)
+
+# Convert documents to bag-of-words vectors
+corpus = [dictionary.doc2bow(doc) for doc in documents]
+
+# Compute similarity
+index = similarities.SparseMatrixSimilarity(corpus, num_features=len(dictionary))
+sims = index[corpus[0]]
+print(f"Similarity between versions: {sims[1]:.3f}")
+# 1.0 = identical, 0.0 = completely different
+```
+
+## Exercises
+
+1. **Policy tracking.** Track the evolution of a policy document of your choice (a university's academic integrity policy, a company's privacy policy, or a government agency's FAQ page) over at least five time points using the Wayback Machine. Visualize how document length changes and identify periods of major revision.
+
+2. **CDX analysis.** Use the CDX Server API to compare the snapshot frequency and page size trends for two competing organizations (e.g., two news outlets, two universities, or two tech companies). What does the capture frequency tell you about the organizations' web presence?
+
+3. **Document similarity.** Compute pairwise document similarity across all versions of your tracked document from Exercise 1. Create a heatmap or matrix visualization. Which version transitions involved the largest changes?
+
+::: {.callout-note}
+## Public Interest Connection
+The Wayback Machine embodies the value of **ownership** discussed in @sec-post-api — it is collectively governed, freely accessible, and exists to preserve the web as a public resource. When platforms delete content, change their policies, or redesign their sites, the Wayback Machine often provides the only independent record of what existed before.
+:::
+
+## Social History and Public Interest
+
+Brewster Kahle founded the Internet Archive with the vision of creating a "library of everything" — a comprehensive, freely accessible archive of human knowledge. The Wayback Machine, launched in 2001, has become indispensable for journalists investigating corporate claims, lawyers establishing timelines of events, and researchers conducting longitudinal studies of online content.
+
+The Internet Archive has faced legal challenges from publishers, platforms, and governments that would prefer certain content to remain forgotten. Its continued operation depends on the support of its users and donors — a reminder that the infrastructure of openness requires ongoing stewardship.
+
+## Common Issues to Debug
+
+- **Wayback Machine rate limiting**: Space your requests with `time.sleep()`. The service is free and community-maintained; do not abuse it.
+- **Incomplete archived pages**: Many snapshots are missing CSS, images, or JavaScript-rendered content. The text content is usually preserved, but visual rendering may be broken.
+- **CDX data inconsistencies**: Some entries may have missing fields or redirect status codes instead of actual content. Filter your data carefully.
+- **NLTK download errors**: Run `nltk.download('stopwords')` once in a fresh Python session to download the stopwords corpus.
+
+## Key Takeaways
+
+The web is not permanent, and the Wayback Machine is your most important tool for longitudinal web research. The Availability API finds specific snapshots; the CDX Server enumerates the full history; and BeautifulSoup parses archived pages just like current ones. Document similarity techniques give you quantitative tools for measuring change over time. Always serialize your scraped data — you may not be able to re-scrape it later, and the page you studied today may be gone tomorrow.
+
+## Further Reading
+
+- Internet Archive Wayback Machine APIs: <https://archive.org/help/wayback_api.php>
+- CDX Server API: <https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server>
+- gensim documentation: <https://radimrehurek.com/gensim/>
+- @rogers2019doing — Chapter on web historiography

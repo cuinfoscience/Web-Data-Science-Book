@@ -1,0 +1,242 @@
+# Web Architecture and Protocols {#sec-protocols}
+
+::: {.callout-tip}
+## Learning Objectives
+- Describe the client-server model and trace the sequence of operations from URL to rendered page
+- Use browser developer tools to examine page structure, HTTP requests, and response headers
+- Explain the roles of TCP/IP, DNS, and HTTP in web communication
+- Construct HTTP requests with custom headers using `requests` and parse URL components with `urllib.parse`
+- Make an API call and convert the response to a time series visualization
+:::
+
+## What Happens When You Load a Web Page?
+
+When you type a URL into your browser and press Enter, a remarkable sequence of operations unfolds in milliseconds. Your browser resolves the domain name to an IP address, opens a connection to a remote server, sends a request formatted in a specific protocol, receives a response, and renders the result on your screen. Understanding this sequence transforms web data collection from magic into engineering.
+
+This chapter walks through each layer of the stack: the **client-server model** that structures the conversation, **TCP/IP** that transports the data, **DNS** that resolves names to addresses, **HTTP** that structures requests and responses, and **URLs** that identify what you are asking for. You will use browser developer tools to observe this machinery in action, then use Python libraries to replicate what your browser does programmatically.
+
+## The Client-Server Model
+
+The web follows a client-server architecture. A **client** (your browser, your Python script) sends a **request** to a **server** (a computer hosting a website or API). The server processes the request and sends back a **response**. This request-response cycle is the fundamental unit of web communication, and every scraping and API operation you perform in this book is an instance of it.
+
+Your browser is a sophisticated client that handles many things automatically — resolving domain names, managing cookies, rendering HTML and CSS, executing JavaScript. When you use `requests.get()` in Python, you are acting as a much simpler client that only handles the HTTP layer. Understanding what your browser does behind the scenes will help you diagnose problems when your Python client gets different results than your browser.
+
+## Browser Developer Tools
+
+Before writing code to scrape a page, you should always inspect it manually using your browser's developer tools. Every modern browser includes these tools:
+
+- **Windows/Linux**: Ctrl + Shift + I or F12
+- **Mac**: ⌘ + ⌥ + I
+
+### The Inspector Tab
+
+The Inspector shows the HTML structure of the page as a tree. You can hover over elements to highlight them on the page, expand nested tags to explore the structure, and identify the CSS selectors or element attributes you will need for scraping. Start with a simple page like a Wikipedia article — most commercial websites are full of tracking scripts and dynamic content that obscure the actual structure.
+
+### The Network Tab
+
+The Network tab reveals all the HTTP requests your browser makes to load a page. When you reload a page with the Network tab open, you will see dozens or even hundreds of requests — not just for the HTML, but for CSS stylesheets, JavaScript files, images, fonts, and tracking pixels. Each request shows:
+
+- The URL being requested
+- The HTTP method (GET, POST, etc.)
+- The status code of the response (200 OK, 404 Not Found, etc.)
+- The response headers, including `Content-Type`, `Set-Cookie`, and `User-Agent`
+
+Click on any individual request to inspect its headers. Pay particular attention to the `User-Agent` header (how your browser identifies itself) and any `Cookie` headers (session information that the server uses to recognize you).
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a broader introduction to how HTTP and web APIs work, see *Missing Manual* Chapter 24: HTTP and Web APIs.
+:::
+
+## TCP/IP: The Transport Layer
+
+Every computer on a public network has an IP address — a numerical identifier that functions like a postal address. IPv4 addresses are formatted as four numbers separated by dots (e.g., `151.101.130.133`), allowing for about 4.3 billion unique addresses. IPv6 uses a longer hexadecimal format to support a vastly larger address space.
+
+You can find your own computer's IP address programmatically:
+
+```python
+import socket
+
+# Your computer's hostname on the local network
+hostname = socket.gethostname()
+print(f"Hostname: {hostname}")
+
+# Your local IP address
+local_ip = socket.gethostbyname(hostname)
+print(f"Local IP: {local_ip}")
+```
+
+To see your *public* IP address (as seen by servers on the internet), you can query an external service:
+
+```python
+import requests
+
+response = requests.get("https://api.ipify.org?format=json")
+print(response.json())
+# {'ip': '128.138.xxx.xxx'} — your public IP
+```
+
+### Traceroute
+
+When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers. You can trace this path using the `scapy` library:
+
+```python
+from scapy.all import traceroute
+
+# Trace the path to Wikipedia
+# Note: scapy requires root/administrator access on some systems
+result, unans = traceroute("en.wikipedia.org", maxttl=20)
+```
+
+Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:
+
+```python
+import requests
+
+def geolocate_ip(ip):
+    """Look up the geographic location of an IP address."""
+    response = requests.get(f"http://ip-api.com/json/{ip}")
+    return response.json()
+
+# Note: ip-api.com limits you to 45 requests per minute
+location = geolocate_ip("151.101.130.133")
+print(f"{location['city']}, {location['country']}")
+```
+
+::: {.callout-important}
+`scapy` requires root/administrator access to send and receive raw network packets. On macOS or Linux, you may need to run `sudo jupyter notebook` from the terminal. On Windows, launch Anaconda Prompt as Administrator. See the Chapter 4 notebook for platform-specific instructions.
+:::
+
+## DNS: The Address Book
+
+The Domain Name System translates human-readable domain names (like `en.wikipedia.org`) into IP addresses that computers can route to. You can perform DNS lookups programmatically with the `dnspython` library:
+
+```python
+import dns.resolver
+
+# Look up the IP address for Wikipedia
+answers = dns.resolver.resolve("en.wikipedia.org", "A")
+for answer in answers:
+    print(f"IP address: {answer}")
+```
+
+Domain names have a hierarchical structure: `subdomain.domain.top-level-domain`. The top-level domains (`.com`, `.org`, `.edu`) are managed by ICANN. The domain (`wikipedia`) is registered by the organization. Subdomains (`en`, `es`, `m`) are controlled by the domain owner and do not require separate registration.
+
+## HTTP: The Application Layer
+
+HTTP (Hypertext Transfer Protocol) is the language that clients and servers use to communicate. A client sends a **request** with a method (GET, POST, PUT, DELETE), headers (metadata), and optionally a body. The server sends a **response** with a status code, headers, and a body.
+
+The status codes you will encounter most often:
+
+- **200 OK**: The request succeeded and the response body contains the data
+- **301/302 Redirect**: The resource has moved; follow the `Location` header
+- **403 Forbidden**: The server understood your request but refused to fulfill it (often a User-Agent issue)
+- **404 Not Found**: The resource does not exist at this URL
+- **429 Too Many Requests**: You are being rate-limited; slow down
+- **500 Internal Server Error**: Something went wrong on the server side
+
+### Making API Requests with Custom Headers
+
+Let us retrieve data from the Wikimedia pageviews API. This API requires a meaningful `User-Agent` header — if you send the default `requests` User-Agent, you will get a 403 error:
+
+```python
+import requests
+
+article = "University_of_Colorado_Boulder"
+api_url = (
+    f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
+    f"/en.wikipedia/all-access/all-agents/{article}/daily/20240101/20240131"
+)
+
+# This will likely fail with a 403
+response = requests.get(api_url)
+print(response.status_code)  # 403
+
+# Add a custom User-Agent header
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+response = requests.get(api_url, headers=headers)
+print(response.status_code)  # 200
+
+# Parse the JSON response
+data = response.json()
+```
+
+Now convert the response to a DataFrame and plot it:
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# The pageview data is nested inside data['items']
+df = pd.DataFrame(data["items"])
+df["timestamp"] = pd.to_datetime(df["timestamp"], format="%Y%m%d00")
+
+plt.figure(figsize=(10, 4))
+plt.plot(df["timestamp"], df["views"])
+plt.title(f"Daily Pageviews: {article}")
+plt.xlabel("Date")
+plt.ylabel("Views")
+plt.tight_layout()
+plt.show()
+```
+
+## URLs: Anatomy and Parsing
+
+URLs (Uniform Resource Locators) have a well-defined structure:
+
+```
+scheme://userinfo@host:port/path?query#fragment
+```
+
+Never write regular expressions to parse URLs. Use the `urllib.parse` module instead:
+
+```python
+from urllib.parse import urlparse, parse_qs
+
+url = "https://api.census.gov/data/2022/acs/acs5?get=NAME,B01001_001E&for=place:07850&in=state:08"
+
+parsed = urlparse(url)
+print(f"Scheme: {parsed.scheme}")      # https
+print(f"Host: {parsed.netloc}")        # api.census.gov
+print(f"Path: {parsed.path}")          # /data/2022/acs/acs5
+print(f"Query: {parsed.query}")        # get=NAME,...
+
+# Parse query parameters into a dictionary
+params = parse_qs(parsed.query)
+print(params)
+# {'get': ['NAME,B01001_001E'], 'for': ['place:07850'], 'in': ['state:08']}
+```
+
+Understanding URL structure is essential for constructing API requests. In @sec-wikipedia through @sec-ai-apis, you will build URLs programmatically by assembling scheme, host, path, and query parameters.
+
+## Exercises
+
+1. **Browser developer tools.** Open a Wikipedia article and a commercial news site side by side, each with the Network tab open. Reload both pages and compare: how many requests does each make? What types of resources (HTML, CSS, JS, images, fonts, tracking) does each load? What does this tell you about modern web architecture?
+
+2. **DNS exploration.** Use `dns.resolver` to look up the IP addresses for five related domains (e.g., `google.com`, `youtube.com`, `gmail.com`, `drive.google.com`, `cloud.google.com`). Are any of them hosted at the same IP address? What does this tell you about Google's infrastructure?
+
+3. **Wikimedia pageviews.** Using the API pattern from this chapter, retrieve and plot daily pageview data for three related Wikipedia articles over the same time period. Identify any spikes and hypothesize about what real-world events caused them.
+
+## Social History and Public Interest
+
+The protocols described in this chapter were designed as public infrastructure. Vint Cerf and Bob Kahn developed TCP/IP in the 1970s for DARPA, creating a transport layer engineered for resilience under attack. Tim Berners-Lee invented HTTP and URLs at CERN in 1989–1991, and made the deliberate decision to release them into the public domain. The web was born open.
+
+Browser developer tools embody this original spirit of openness. The ability to "view source" — to inspect exactly what a web server sends your browser — was a foundational feature of the web. It is what makes web data science possible. As you will see in @sec-post-api, the tension between this transparency and platforms' desire to control their data is one of the defining conflicts of the contemporary web.
+
+## Common Issues to Debug
+
+- **`scapy` import errors**: Requires `pcap` drivers. On Windows, install Npcap. On macOS, the built-in `libpcap` usually works.
+- **403 from Wikimedia API**: You forgot the custom `User-Agent` header.
+- **DNS results varying by location**: Normal — content delivery networks return different IPs based on your geographic location.
+- **URL encoding issues**: Use `urllib.parse.quote()` for article titles with spaces or special characters.
+
+## Key Takeaways
+
+The web is built on a layered stack of protocols: TCP/IP transports data, DNS resolves names to addresses, HTTP structures the conversation, and URLs identify the target. Understanding this stack transforms debugging from guesswork into systematic diagnosis. When a request fails, you can ask: can I reach the server at all? Am I resolving the right address? What status code did I get? Are my headers correct? Is my URL well-formed? This systematic approach carries through every chapter that follows.
+
+## Further Reading
+
+- Mozilla Developer Network — How the Web Works: <https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works>
+- Mozilla Developer Network — HTTP Overview: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview>
+- `scapy` documentation: <https://scapy.readthedocs.io/>
+- `dnspython` documentation: <https://dnspython.readthedocs.io/>

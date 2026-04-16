@@ -1,0 +1,232 @@
+# Research Design with Web Data {#sec-research-design}
+
+::: {.callout-tip}
+## Learning Objectives
+- Develop a research question suited to web data and match it to appropriate data sources
+- Design a multi-stage data collection plan combining scraping, APIs, and supplementary data
+- Evaluate the sampling, representativeness, and validity challenges specific to web data
+- Build a reproducible research pipeline from data collection through analysis
+- Communicate findings to different audiences with appropriate evidentiary standards
+- Apply the values of openness, oversight, and ownership to your own research practice
+:::
+
+## Technical Skill Is Not Enough
+
+You now command a substantial technical toolkit: you can scrape static and dynamic web pages, parse PDFs, query APIs for platforms from Wikipedia to Spotify to the Federal Reserve, apply NLP and LLM-based analysis, and automate your data collection with GitHub Actions. These are powerful capabilities. But technical skill without research design produces data, not knowledge.
+
+This chapter steps back from code to address the questions that determine whether your technically-excellent scraping produces genuine insight: What is the right question for this data source? What can this data actually tell you? What are the threats to the validity of your conclusions? How do you communicate your findings responsibly?
+
+## From Question to Data Source
+
+The best web data science projects start with a question, not a dataset. The data source serves the question, not the other way around.
+
+### The Proposal Arc
+
+A research proposal — whether for a class project, a thesis, a journal article, or a grant application — follows a consistent structure:
+
+1. **Motivation**: What is the question or problem? Why does it matter? Who benefits from the answer?
+2. **Data source**: What specific web data could address this question? What constructs does the data measure? What are the gaps?
+3. **Methods**: How will you collect the data? What tools and techniques from this book will you use? What analytical approach will you apply?
+4. **Expected results**: What kinds of analyses or visualizations will you produce? What patterns do you expect to find?
+5. **Implications**: What should stakeholders do if your findings hold? What are the practical consequences?
+6. **Limitations**: What can this data *not* tell you? What are the threats to validity? What alternative explanations exist?
+
+Notice that limitations are not an afterthought — they are a core component of the design. Acknowledging what your data cannot do is as important as demonstrating what it can.
+
+### Matching Questions to Methods
+
+| Research Design | Web Data Methods | Example |
+|---|---|---|
+| Longitudinal tracking | Wayback Machine (@sec-archives), GitHub Actions (@sec-automation) | How has a platform's privacy policy changed over time? |
+| Cross-sectional snapshot | API queries (@sec-wikipedia, @sec-government, @sec-social) | How does Reddit moderation differ across subreddits? |
+| Content analysis | HTML scraping (@sec-static-pages) + LLM coding (@sec-ai-apis) | What topics dominate legislative activity in Colorado? |
+| Network analysis | Link extraction (@sec-wikipedia), social graphs (@sec-social) | How connected are Wikipedia articles about climate change? |
+| Natural experiment | Event-triggered collection (@sec-automation) | How did a policy change affect web search patterns? |
+
+## Sampling and Representativeness
+
+Web data is not a random sample of anything. It is a convenience sample shaped by who uses the platform, what the API exposes, and what your scraper can reach. Understanding these biases is essential for interpreting your findings.
+
+**Who is missing?** Reddit users skew young, male, and American. Wikipedia editors skew educated, male, and from the Global North. Bluesky's early adopters skew toward journalists and technologists. The data you retrieve from any platform reflects its user base, not the broader population.
+
+**What is hidden?** APIs expose what platforms choose to expose. Reddit's API does not reveal deleted posts, shadow-banned users, or the internal ranking algorithms that determine what content becomes visible. Spotify's audio features are proprietary measurements, not raw audio data. What you can measure is constrained by what the platform makes available.
+
+**What has been lost?** Longitudinal studies face the erosion problem from @sec-post-api. Articles are deleted, accounts are suspended, pages are redesigned. The data available today may not be available tomorrow, and the data available yesterday may already be gone.
+
+## Data Quality and Validation
+
+Web data is messy. Scrapers fail silently, APIs return incomplete results, and the same information can appear in different formats across sources. Build validation into your pipeline:
+
+```python
+def validate_dataset(df, expected_columns, min_rows=10):
+    """Basic validation checks for a scraped dataset.
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The dataset to validate
+    expected_columns : list
+        Columns that should be present
+    min_rows : int
+        Minimum expected number of rows
+    
+    Returns
+    -------
+    bool
+        True if all checks pass
+    """
+    checks = []
+    
+    # Check column presence
+    missing_cols = set(expected_columns) - set(df.columns)
+    if missing_cols:
+        print(f"WARNING: Missing columns: {missing_cols}")
+        checks.append(False)
+    else:
+        checks.append(True)
+    
+    # Check minimum rows
+    if len(df) < min_rows:
+        print(f"WARNING: Only {len(df)} rows (expected >= {min_rows})")
+        checks.append(False)
+    else:
+        checks.append(True)
+    
+    # Check for excessive missing data
+    null_pct = df.isnull().mean()
+    high_null = null_pct[null_pct > 0.5]
+    if not high_null.empty:
+        print(f"WARNING: High null rates: {dict(high_null)}")
+        checks.append(False)
+    else:
+        checks.append(True)
+    
+    return all(checks)
+```
+
+## Reproducibility and Documentation
+
+A reproducible research pipeline means that someone else — or you, six months from now — can re-run your code and get the same results. This requires:
+
+- **Version control**: Your code, configuration, and documentation should be in a git repository. See *Missing Manual* Chapter 26.
+- **Data documentation**: For each dataset, record what it contains, how it was collected, when it was collected, and what its known quality issues are [@gebru2021datasheets].
+- **Environment specification**: A `requirements.txt` or `environment.yml` file that pins the exact versions of your dependencies.
+- **Collection parameters**: Document not just what data you collected but how: the API endpoints, query parameters, rate limiting, date ranges, and any filters you applied.
+
+## Communicating Findings
+
+Web data science serves different audiences, each with different expectations:
+
+- **Academic papers** require methodological precision, explicit limitations, and engagement with prior scholarship. Your data collection methods should be replicable from the description alone.
+- **Policy briefs** need actionable findings, clear implications, and accessible language. Lead with the "so what?" rather than the methodology.
+- **Data journalism** demands narrative structure, visual evidence, and accountability framing. The question is not just "what did you find?" but "what should the public know?"
+
+In all cases, the visualizations you create with matplotlib and seaborn are not decorations — they are arguments. Every axis label, every color choice, every title should serve your analytical purpose.
+
+## Public Interest Framing
+
+As you design your research, return to the values introduced in @sec-post-api:
+
+- **Openness**: Will you publish your code, data (to the extent ethically permissible), and methods so others can evaluate and build on your work?
+- **Oversight**: Does your research contribute to independent accountability — helping citizens, journalists, or policymakers understand systems that affect them?
+- **Ownership**: Are you building infrastructure (datasets, tools, pipelines) that others can use, or are you extracting value from public resources without contributing back?
+
+These questions do not have formulaic answers. But asking them is itself a practice of responsible web data science.
+
+## Exercises
+
+1. **Research proposal.** Write a 1,500-word research proposal for a web data science project. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.
+
+2. **Validity threats.** Identify three potential threats to validity in a hypothetical study that uses scraped social media data to measure public opinion. For each threat, propose a mitigation strategy.
+
+3. **Data documentation.** Take a dataset you collected in an earlier chapter and write a "datasheet" following @gebru2021datasheets: what does each variable measure, how was it collected, what are the known quality issues, and how should it be cited?
+
+## Key Takeaways
+
+Technical skill without research design produces data, not knowledge. Every project needs a clear question, a defensible data collection strategy, honest assessment of limitations, and responsible communication of findings. The web is the richest data source humanity has ever created; using it well is both a technical and an ethical challenge. The skills in this book — scraping, API access, PDF extraction, NLP, LLM analysis, automation — are means, not ends. The end is producing knowledge that serves openness, oversight, and ownership.
+
+## Further Reading
+
+- @salganik2018bit — comprehensive treatment of digital-age research design
+- @gebru2021datasheets — a framework for documenting datasets
+- @lazer2020computational — obstacles and opportunities in computational social science
+- @vanatteveldt2022computational — methods for computational analysis of communication
+- @rogers2019doing — qualitative and critical approaches to digital methods
+
+## Common Research Designs with Web Data
+
+The technical toolkit in this book supports several distinct research designs. Choosing the right one depends on your question, your data source, and the claims you want to make.
+
+### Longitudinal Tracking
+
+**Question type**: How does X change over time?
+
+You observed something on the web and want to track how it evolves — the content of a policy document, the composition of a playlist, the frequency of a term in news coverage, or the price of a product. Longitudinal tracking requires either archival data (the Wayback Machine in @sec-archives) or forward-looking automated collection (GitHub Actions in @sec-automation).
+
+**Design considerations**: The Wayback Machine captures snapshots opportunistically, not on a fixed schedule, so your temporal resolution is uneven. Automated scrapers give you consistent intervals but require maintenance. In both cases, you need to account for changes in the underlying structure (a website redesign, an API version change) that might affect your measurements without reflecting genuine change in the phenomenon you are studying.
+
+### Cross-Sectional Snapshot
+
+**Question type**: How does X vary across cases at a point in time?
+
+You want to compare legislative activity across states, subreddit moderation policies across communities, or audio features across genres. Cross-sectional designs collect data at one point in time and analyze variation across units.
+
+**Design considerations**: The main threat is selection bias — you are limited to the platforms, communities, and data sources that exist and are accessible. If a platform's API does not expose the variable you need, you cannot include it. If a community is private or a government website does not publish the data you want, it is missing from your sample.
+
+### Content Analysis
+
+**Question type**: What is the substantive content of a corpus?
+
+You have collected a body of text — scraped web pages, PDF documents, social media posts — and want to characterize what it contains. Content analysis can be manual (human coding), automated (NLP in @sec-archives, LLM-assisted coding in @sec-ai-apis), or a combination.
+
+**Design considerations**: The reliability of automated coding should be validated against manual coding on a random sample. LLM-based classification is powerful but non-deterministic — run the same prompt twice and you may get different results. Always report inter-coder reliability or human-AI agreement rates.
+
+### Natural Experiments
+
+**Question type**: What was the causal effect of an event or policy change?
+
+Sometimes external events — a platform policy change, a natural disaster, a legislative decision — create natural variation that allows you to estimate causal effects. For example, you might compare Wikipedia editing behavior before and after a major news event, or Reddit community dynamics before and after a moderation policy change.
+
+**Design considerations**: Causal claims from observational data are always tentative. You need a clear "treatment" event, a defensible comparison group, and controls for confounding variables. Web data makes it easy to observe change but does not, by itself, establish causation.
+
+## Managing the Research Process
+
+### Version Control for Research Projects
+
+Your code, data documentation, and analysis notebooks should be version-controlled with git from the start. This is not just good practice — it is essential for reproducibility. When you revise your analysis after a reviewer's feedback, you need to be able to trace exactly what changed and when.
+
+```
+my-project/
+├── .gitignore           # Exclude api_keys.json, large data files
+├── README.md            # Project overview and setup instructions
+├── requirements.txt     # Python dependencies with pinned versions
+├── data/
+│   ├── raw/             # Original scraped data (never modify)
+│   ├── processed/       # Cleaned and transformed data
+│   └── README.md        # Data documentation (provenance, variables)
+├── notebooks/
+│   ├── 01_collection.ipynb
+│   ├── 02_cleaning.ipynb
+│   └── 03_analysis.ipynb
+├── scripts/
+│   └── scraper.py       # Production scraping scripts
+└── output/
+    ├── figures/
+    └── tables/
+```
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a complete guide to version control with Git and GitHub — commits, branches, pull requests, and collaboration workflows — see *Missing Manual* Chapter 26: Version Control.
+:::
+
+### Data Documentation
+
+For every dataset you create, write a datasheet [@gebru2021datasheets] that answers:
+
+- **What**: What does each variable measure? What are the units? What do missing values mean?
+- **How**: What tools did you use? What parameters and filters did you apply? What date range does the data cover?
+- **Limits**: What is not captured? What biases are likely present? What quality issues are you aware of?
+- **Ethics**: Does the data contain personally identifiable information? Was it collected in accordance with the platform's terms? Are there privacy risks if the dataset is shared?
+
+This documentation is not busywork — it is the difference between a dataset that can be used by others (including future-you) and one that is a black box.

@@ -1,0 +1,73 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Web Data Science"
+  subtitle: "Retrieving, Parsing, and Analyzing Data from the Web with Python"
+  author: "Brian C. Keegan, Ph.D."
+  affiliation: "Department of Information Science, University of Colorado Boulder"
+  date: today
+  date-format: "MMMM YYYY"
+
+  sidebar:
+    style: docked
+
+  chapters:
+    - index.qmd
+    - part: "Foundations"
+      chapters:
+        - ch-01-introduction.qmd
+        - ch-02-ethics.qmd
+        - ch-03-post-api.qmd
+        - ch-04-data-formats.qmd
+        - ch-05-protocols.qmd
+    - part: "Documents"
+      chapters:
+        - ch-06-static-pages.qmd
+        - ch-07-archives.qmd
+        - ch-08-dynamic-pages.qmd
+        - ch-09-pdfs.qmd
+    - part: "APIs"
+      chapters:
+        - ch-10-wikipedia.qmd
+        - ch-11-government.qmd
+        - ch-12-social.qmd
+        - ch-13-ai-apis.qmd
+    - part: "Practice"
+      chapters:
+        - ch-14-automation.qmd
+        - ch-15-research-design.qmd
+    - part: "Appendices"
+      chapters:
+        - appendix-ai-disclosure.qmd
+        - appendix-further.qmd
+  
+  references: references.bib
+
+format:
+  html:
+    theme: cosmo
+    code-link: true
+    code-tools: true
+    code-fold: false
+    code-line-numbers: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    crossref:
+      chapters: true
+    callout-appearance: simple
+
+  pdf:
+    documentclass: scrreprt
+    papersize: letter
+    toc: true
+    number-sections: true
+    colorlinks: true
+
+jupyter: python3
+
+execute:
+  eval: false
+  echo: true

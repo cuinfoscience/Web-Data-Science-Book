@@ -1,0 +1,168 @@
+# Ethics, Law, and Responsible Data Collection {#sec-ethics}
+
+::: {.callout-tip}
+## Learning Objectives
+- Explain the legal frameworks governing web data access, including the CFAA, GDPR, and platform Terms of Service
+- Retrieve and interpret a website's `robots.txt` file to determine what is permitted for automated access
+- Configure responsible HTTP request headers including custom User-Agent strings with contact information
+- Apply a structured ethical decision framework before collecting web data
+- Implement rate limiting with `time.sleep()` to avoid overloading servers
+:::
+
+## The Ethics of Retrieval
+
+The phrase "web scraping" is colloquial and popular but has pejorative connotations. Data is valuable: other people invested time, money, and effort to create and host the content you are about to retrieve programmatically. Before writing a single line of scraping code, you need to understand the legal, normative, and ethical landscape that governs your work.
+
+This chapter establishes a decision framework that you should revisit before every data collection project in this book and beyond. The question is never simply "can I scrape this?" but rather "should I, and if so, how do I do it responsibly?"
+
+## Legal Frameworks
+
+### The Computer Fraud and Abuse Act
+
+The [Computer Fraud and Abuse Act](https://en.wikipedia.org/wiki/Computer_Fraud_and_Abuse_Act) (CFAA) was passed in 1984 in response to growing concerns about computer crime. Its key provision prohibits "unauthorized access" to computer systems, but what counts as "unauthorized" in the context of web scraping has been a matter of ongoing litigation.
+
+The landmark case *hiQ Labs v. LinkedIn* (2022) tested whether scraping publicly accessible data constitutes unauthorized access. hiQ, a data analytics company, scraped public LinkedIn profiles to build workforce analytics products. LinkedIn sent a cease-and-desist letter and blocked hiQ's access. The Ninth Circuit ultimately held that scraping publicly accessible data does not violate the CFAA, since the data was not behind an authentication barrier. However, this ruling is narrow in scope — it applies to public-facing data and does not address data behind logins.
+
+The case of *Sandvig v. Barr* challenged the CFAA's application to researchers who violated a website's Terms of Service in order to conduct audit studies of algorithmic discrimination. The concern was that the CFAA criminalized legitimate research. This case illustrates the tension between researchers' need for data and platforms' desire to control how their systems are studied.
+
+The key takeaway: the legal landscape is unsettled and varies by jurisdiction. "It's technically possible" is not the same as "it's legal," and "it's legal" is not the same as "it's ethical."
+
+### Terms of Service as Quasi-Law
+
+Every major platform has Terms of Service (ToS) that restrict automated data collection. When you create an account on Twitter, Reddit, or Facebook, you agree to these terms. Violating them can result in account suspension, IP blocking, or even legal action.
+
+::: {.callout-warning}
+## Warning
+The code in several chapters of this book will retrieve data in ways that may violate the Terms of Service of the platforms involved. This is done in an educational context to teach technical skills. You are responsible for understanding and abiding by the terms of any platform you access. When in doubt, do not scrape — use an official API or request access through an institutional research program.
+:::
+
+### International Considerations
+
+The European Union's General Data Protection Regulation (GDPR) adds another layer of complexity. GDPR gives individuals the right to control how their personal data is collected and processed. If you are scraping data that includes personally identifiable information about EU residents — names, email addresses, social media handles — you may be subject to GDPR requirements regardless of where you are located.
+
+## Technical Norms: `robots.txt`
+
+Beyond legal requirements, the web has developed a set of community norms for responsible automated access. The most important of these is the `robots.txt` protocol.
+
+A `robots.txt` file lives at the root of a website (e.g., `https://example.com/robots.txt`) and specifies which parts of the site automated agents are permitted or forbidden from accessing. It uses a simple syntax:
+
+```python
+import requests
+
+# Retrieve robots.txt for Wikipedia
+response = requests.get("https://en.wikipedia.org/robots.txt")
+print(response.text[:500])
+# You'll see directives like:
+# User-agent: *
+# Disallow: /w/
+# Allow: /w/api.php
+```
+
+The key directives are `User-agent` (which crawler the rule applies to), `Disallow` (paths that should not be accessed), `Allow` (exceptions to disallow rules), and `Crawl-delay` (requested time between requests). You can parse these programmatically:
+
+```python
+from urllib.robotparser import RobotFileParser
+
+rp = RobotFileParser()
+rp.set_url("https://en.wikipedia.org/robots.txt")
+rp.read()
+
+# Can a generic crawler access the main API?
+print(rp.can_fetch("*", "https://en.wikipedia.org/w/api.php"))
+# True — the API is explicitly allowed
+
+# Can it access the edit interface?
+print(rp.can_fetch("*", "https://en.wikipedia.org/w/index.php?action=edit"))
+# Check the result — many edit paths are restricted
+```
+
+Two important caveats. First, `robots.txt` is a norm, not a law. Violating it is not illegal (in most jurisdictions), but it is disrespectful of the site operator's wishes and may result in your IP being blocked. Second, if a site does not have a `robots.txt` file (the request returns a 404), that means there are no crawling restrictions — not that you should crawl aggressively.
+
+## Responsible Request Headers
+
+When your code makes requests to a web server, the server sees metadata about the request including the `User-Agent` header, which identifies who is making the request. By default, the `requests` library sends a generic User-Agent string. You should replace it with one that identifies you and provides contact information:
+
+```python
+import requests
+
+headers = {
+    "User-Agent": "WebDataScience/1.0 (INFO 4871; brian.keegan@colorado.edu)"
+}
+
+response = requests.get("https://example.com", headers=headers)
+```
+
+This practice serves two purposes: it lets site operators contact you if your scraping causes problems, and it signals that you are a responsible actor rather than a malicious bot. Some APIs (including the Wikimedia API you used in @sec-introduction) require a meaningful User-Agent and will return errors or impose stricter rate limits if you do not provide one.
+
+## Rate Limiting
+
+Making hundreds of requests per second to a web server can degrade its performance for other users — effectively mounting a denial-of-service attack on a site you are trying to study. Always space out your requests:
+
+```python
+import time
+import requests
+
+urls = ["https://example.com/page1", "https://example.com/page2"]
+
+for url in urls:
+    response = requests.get(url, headers=headers)
+    # Process the response...
+    time.sleep(1)  # Wait 1 second between requests
+```
+
+A good default is one request per second. If the site's `robots.txt` specifies a `Crawl-delay`, respect it. If you are hitting an API with documented rate limits, stay well within them.
+
+## An Ethical Decision Framework
+
+Before any data collection project, work through these five questions:
+
+1. **Legality.** Is this data collection permitted under the CFAA, GDPR, and any applicable local laws? Is it consistent with the site's Terms of Service?
+
+2. **Consent.** Did the people whose data you are collecting consent to this use? Is the data truly public, or did users share it within a platform with reasonable expectations of limited visibility?
+
+3. **Proportionality.** Are you collecting only the data you need for your research question? Could you answer your question with less data or with less sensitive data?
+
+4. **Privacy.** Does your dataset contain personally identifiable information? Could individuals be re-identified from ostensibly anonymized data? What are the risks if the data is breached or misused?
+
+5. **Server impact.** Will your scraping impose a meaningful load on the server? Are you rate-limiting appropriately? Are you scraping during off-peak hours for high-traffic sites?
+
+No framework can substitute for judgment. But working through these questions systematically will help you identify risks and make defensible decisions.
+
+## Exercises
+
+1. **Compare robots.txt files.** Retrieve and compare `robots.txt` for five websites in the same category (e.g., five news organizations, five universities, or five social media platforms). What patterns emerge in what they allow and restrict? Write a brief analysis in a Markdown cell.
+
+2. **Terms of Service audit.** Read the Terms of Service for a platform you use regularly. Identify three clauses that restrict automated data collection. For each, assess whether academic research would be covered by any exceptions or fair use arguments.
+
+3. **Ethical decision framework.** Apply the five-question framework to a hypothetical scenario: a researcher wants to scrape user profiles from a dating app to study patterns in self-presentation across demographic groups. Work through each question and write a recommendation.
+
+4. **Rate limiting experiment.** Using `time.time()` to measure elapsed time, write a loop that makes five requests to a public website with a one-second delay between each. Then modify the delay to two seconds. Confirm that your actual request timing matches your intended rate.
+
+::: {.callout-note}
+## Public Interest Connection
+The ethical framework introduced here connects directly to the values of **oversight** and **openness** discussed in @sec-post-api. Responsible data collection practices are themselves a form of oversight — they make your methods transparent and accountable. And the commitment to documenting your scraping practices (User-Agent strings, rate limiting, data handling) embodies the openness that the web data science community depends on.
+:::
+
+## Social History and Public Interest
+
+The tension between data access and data protection is not new. Journalists have long navigated similar terrain through freedom-of-information laws, source protection, and editorial ethics. The CFAA was originally designed to combat hacking, but its vague language about "unauthorized access" has been used to threaten researchers, journalists, and security auditors. The Aaron Swartz case — in which a young activist faced federal charges for downloading academic articles from JSTOR through MIT's network — remains a sobering reminder of how aggressively the CFAA can be applied [@fiesler2020no].
+
+The Cambridge Analytica scandal of 2018 was a turning point. A researcher collected Facebook data through the platform's API, ostensibly for academic purposes, then shared it with a political consulting firm. The fallout led Facebook, and then other platforms, to drastically restrict API access — a closure that affected all researchers, not just those who had misused data. This history is central to understanding the post-API landscape described in @sec-post-api.
+
+## Common Issues to Debug
+
+- **`robots.txt` not found (404)**: This means there are no crawling restrictions, not that the site is blocking you.
+- **Requests blocked despite `robots.txt` allowing access**: Some sites use additional bot detection (CAPTCHAs, JavaScript challenges, behavioral analysis) beyond `robots.txt`.
+- **403 Forbidden with a responsible User-Agent**: The site may be blocking all automated access regardless of your headers. Respect this.
+- **Forgetting `time.sleep()`**: If your IP gets temporarily banned, wait at least an hour before trying again, and add appropriate delays to your code.
+
+## Key Takeaways
+
+Every capability introduced in subsequent chapters raises the questions you have worked through here. The legal landscape is unsettled; technical norms like `robots.txt` provide guidance but not protection; and ethical principles require case-by-case judgment. The framework — legality, consent, proportionality, privacy, server impact — should become habitual. When in doubt, err on the side of caution: use an API instead of scraping, collect less data rather than more, and always identify yourself in your request headers.
+
+## Further Reading
+
+- @fiesler2020no — legal and ethical analysis of ToS-based data collection restrictions
+- @freelon2018computational — the changing landscape of computational research access
+- Electronic Frontier Foundation on the CFAA: <https://www.eff.org/issues/cfaa>
+- The `robots.txt` specification: <https://www.robotstxt.org/>

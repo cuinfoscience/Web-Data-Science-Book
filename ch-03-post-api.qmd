@@ -1,0 +1,140 @@
+# The Post-API Age {#sec-post-api}
+
+::: {.callout-tip}
+## Learning Objectives
+- Describe the historical arc of web data access from open APIs to restricted, monetized, and disappearing endpoints
+- Analyze specific cases of access restriction using the enclosure, exemption, and erosion framework
+- Identify alternative data access strategies including archives, FOIA requests, data donations, and federated platforms
+- Connect contemporary data access challenges to longer traditions of public interest inquiry
+- Articulate the values of openness, oversight, and ownership as guiding principles for web data practice
+:::
+
+::: {.callout-important}
+## Author Note
+This chapter provides the structural framework for the post-API age argument. Sections marked with `[TO FILL]` require the author's lecture notes, specific examples from class, and personal voice. The enclosure/exemption/erosion framework and the openness/oversight/ownership values are drawn from the JRC working paper and should be adapted for an undergraduate/MS audience.
+:::
+
+## The Golden Age of Web Data Access
+
+`[TO FILL: Narrative of the 2008–2018 period. Key points to cover:]`
+
+- The rise of generous, well-documented APIs: Twitter API v1 (2006), Facebook Graph API (2010), Reddit API (free since 2008), Google APIs
+- Why platforms invested in open data access: developer ecosystems, academic partnerships, advertising optimization, the "platform as infrastructure" model
+- What this access enabled: computational social science at scale, network science research, data journalism investigations, civic tech applications
+- Specific examples from your own research trajectory: how web data access was foundational to your work on Wikipedia, online collaboration, and platform dynamics
+
+## Three Structural Pressures
+
+The landscape of web data access has undergone a structural transformation since approximately 2018. Three pressures — enclosure, exemption, and erosion — explain not just *that* access is shrinking but *why*, and what forces are driving the change.
+
+### Enclosure
+
+`[TO FILL: Adapt from JRC paper Section X. Key points:]`
+
+- **Definition**: The privatization of previously accessible data — platforms converting shared resources into controlled assets
+- **Mechanisms**: API shutdowns and pricing changes, removal of third-party archives, restrictions on data exports, data licensing deals for AI training
+- **Cases to detail**:
+  - Twitter/X: from free Academic Research API to paid tiers ($42K/month for enterprise access), to effective shutdown of research access post-acquisition
+  - Reddit: free API since 2008 → $0.24 per 1,000 API calls (July 2023), Pushshift removal, 7,000+ subreddit blackout
+  - Facebook: post-Cambridge Analytica lockdown of Graph API, CrowdTangle shutdown
+- **Historical parallel**: enclosure of common land in England — how a shared resource was privatized, who benefited, and what was lost
+- **The LLM accelerant**: how generative AI made user-generated content valuable as training data (Reddit's $60M licensing deal with Google), accelerating the incentive to enclose
+
+### Exemption
+
+`[TO FILL: Adapt from JRC paper Section X. Key points:]`
+
+- **Definition**: Platforms operating beyond meaningful regulatory scrutiny, invoking privacy, IP, or competitive sensitivity to resist independent investigation
+- **Mechanisms**: weaponizing the CFAA against researchers, selective deployment of "user protection" narratives, regulatory capture, lobbying against transparency mandates
+- **Cases to detail**:
+  - Platform claims that API restrictions protect user privacy — while continuing to sell user data to advertisers
+  - Resistance to researcher access under the EU Digital Services Act
+  - The asymmetry: platforms can study their users at will, but independent researchers cannot study the platforms
+- **Connection to Chapter 2**: how the legal frameworks from @sec-ethics are deployed strategically by platforms
+
+### Erosion
+
+`[TO FILL: Adapt from JRC paper Section X. Key points:]`
+
+- **Definition**: The decay of the infrastructure for sustained observation — the gradual disappearance of the conditions that make web data research possible
+- **Mechanisms**: link rot, platform churn (Twitter → X), migration to federated/decentralized networks complicating basic measurement, reproducibility crisis as underlying data disappears
+- **Cases to detail**:
+  - Studies showing that significant percentages of web links break within years
+  - The challenge of longitudinal research when platforms redesign their HTML, change their APIs, or disappear entirely
+  - The reproducibility crisis in computational social science: papers that cannot be replicated because the data source no longer exists
+- **Connection to later chapters**: the Wayback Machine (@sec-archives) as a counter-erosion infrastructure; automation (@sec-automation) as a response to data impermanence
+
+## Three Counter-Values
+
+In response to these pressures, three values can guide how researchers, technologists, and institutions build and sustain access to web data for the public interest.
+
+### Openness
+
+`[TO FILL: Adapt from JRC paper. Key points:]`
+
+- Transparent methods and pipelines so others can evaluate and reproduce your work
+- Redundant archives that do not depend on any single platform's cooperation
+- Methodological legibility: documenting not just *what* data you collected but *how* you collected it and *what constraints* shaped the collection
+- Durable public repositories (Internet Archive, Zenodo, institutional data archives)
+
+### Oversight
+
+`[TO FILL: Adapt from JRC paper. Key points:]`
+
+- Independent auditing of platform algorithms and content moderation
+- Documentation standards for datasets and collection methods
+- Impact assessments before and after data access changes
+- Regulatory frameworks that mandate researcher access (EU DSA Article 40)
+
+### Ownership
+
+`[TO FILL: Adapt from JRC paper. Key points:]`
+
+- Collective governance over data preservation and access
+- Community-maintained infrastructure that resists centralized enclosure
+- Interoperable systems (federated protocols like ActivityPub and AT Protocol) that distribute control
+- Data cooperatives and community-managed archives
+
+## Public Interest Lineages
+
+The tensions described in this chapter are not new to data science. Other professions have confronted analogous challenges — powerful actors controlling access to information that the public needs — and developed institutional responses.
+
+`[TO FILL: Brief treatment of each lineage. Key points:]`
+
+- **Journalism**: Freedom of information laws, source protection, the tradition of investigative reporting as public accountability
+- **Law**: Discovery processes, transparency requirements, due process as protection against arbitrary power
+- **Accounting**: Audit standards, disclosure requirements, the fiduciary duty to stakeholders
+- **Planning**: Public comment periods, environmental impact assessments, community input on decisions affecting shared resources
+- **Engineering**: Safety standards, professional codes of ethics, the obligation to consider public welfare
+
+`[Author note: the goal here is a brief paragraph on each, not a deep dive. The argument is that data science is developing its own public interest mission and can learn from these precedents.]`
+
+## What This Means for Practice
+
+The rest of this book equips you with a diverse technical toolkit precisely because no single method of access is reliable. When APIs close, you may need to scrape HTML (@sec-static-pages, @sec-dynamic-pages). When web pages change, archives provide continuity (@sec-archives). When documents are locked in inaccessible formats, PDF extraction opens them up (@sec-pdfs). When platforms restrict automated access, federated alternatives offer open protocols (@sec-social). And when you need sustained observation over time, automation turns one-time data collection into durable infrastructure (@sec-automation).
+
+The strategic lesson is redundancy and flexibility. Build your skills across the full range of techniques so that the closure of any single data source does not shut down your research program.
+
+`[TO FILL: Add specific alternative strategies — official research access programs, data donations, FOIA/public records, crowdsourcing — with brief examples of each.]`
+
+## Exercises
+
+1. **Timeline exercise.** Create a timeline of major API access changes from 2008 to the present. Include at least five events across at least three platforms. For each event, identify which of the three pressures (enclosure, exemption, erosion) best characterizes it.
+
+2. **Framework application.** Choose a platform API change not discussed in this chapter. Write a 500-word analysis applying the enclosure/exemption/erosion framework.
+
+3. **Data contingency plan.** Design a research project that depends on a specific web data source. Then write a contingency plan: if your primary source disappears mid-study, what are your backup strategies? Consider at least three alternatives.
+
+4. **Public interest audit.** Identify a web data research project (published paper, journalism investigation, or civic tech tool) that was enabled by API access. Assess how the project would be affected by current access restrictions. Which of the three values — openness, oversight, or ownership — does the project embody?
+
+## Key Takeaways
+
+`[TO FILL: Synthesize the chapter's argument in the author's voice. The core message should be that understanding *why* access is shrinking — not just *that* it is — equips students to navigate constraints strategically. The three pressures explain the structural forces; the three values provide normative guidance; and the rest of the book provides the technical toolkit for operating in this constrained environment.]`
+
+## Further Reading
+
+- @freelon2018computational — the original articulation of the "post-API age"
+- @bruns2019after — platforms' fight against critical scholarly research
+- @davidson2023platform — empirical study of how API restrictions threaten open science
+- @perriam2020digital — digital methods in a post-API environment
+- @lazer2020computational — obstacles and opportunities in computational social science

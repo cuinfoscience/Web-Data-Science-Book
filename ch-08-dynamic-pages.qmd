@@ -1,0 +1,300 @@
+# Dynamic Web Pages with Selenium {#sec-dynamic-pages}
+
+::: {.callout-tip}
+## Learning Objectives
+- Explain why JavaScript-rendered content is invisible to `requests` + BeautifulSoup
+- Install and configure Selenium WebDriver for Chrome, Firefox, or Safari
+- Locate elements using multiple strategies (ID, name, XPath, CSS selector)
+- Simulate user interactions — clicking, typing, and scrolling — programmatically
+- Pass fully-rendered page source from Selenium back to BeautifulSoup for parsing
+- Assess the fragility and ethical implications of browser automation
+:::
+
+## When Static Scraping Fails
+
+In @sec-static-pages, you learned to retrieve web pages with `requests` and parse them with BeautifulSoup. This works well for pages whose content is fully present in the initial HTML — what we call *static* pages. But most modern websites are *dynamic*: their content is loaded, modified, or entirely rendered by JavaScript after the initial HTML arrives.
+
+When you use `requests.get()` on a dynamic page, you get the HTML skeleton before JavaScript has run. The data you see in your browser may simply not exist in the response that `requests` receives. You can verify this by comparing `requests.get(url).text` with what you see in the browser — if significant content is missing from the `requests` version, the page is dynamic.
+
+The solution is to use a tool that can execute JavaScript: a real web browser, controlled programmatically. Selenium is the standard tool for this.
+
+## Setting Up Selenium
+
+Selenium requires two components: the `selenium` Python library and a browser driver that lets Python control a specific browser.
+
+```python
+# Install from a terminal:
+# pip install selenium webdriver-manager
+```
+
+The `webdriver_manager` library automatically downloads and configures the correct driver for your browser:
+
+```python
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+
+# For Chrome:
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service)
+
+# For Firefox:
+# from selenium.webdriver.firefox.service import Service
+# from webdriver_manager.firefox import GeckoDriverManager
+# service = Service(GeckoDriverManager().install())
+# driver = webdriver.Firefox(service=service)
+```
+
+When you create the `driver`, a browser window opens. This is your programmable browser — every command you issue through the `driver` object happens in that window.
+
+## Navigating and Finding Elements
+
+```python
+# Navigate to a website
+driver.get("https://xkcd.com")
+
+# Find elements by various strategies
+from selenium.webdriver.common.by import By
+
+# By ID
+comic_div = driver.find_element(By.ID, "comic")
+
+# By CSS selector
+nav_links = driver.find_elements(By.CSS_SELECTOR, "ul.comicNav li a")
+
+# By XPath
+title = driver.find_element(By.XPATH, "//div[@id='ctitle']")
+print(title.text)  # The title of the current comic
+```
+
+The `find_element` method (singular) returns the first matching element. The `find_elements` method (plural) returns a list of all matches.
+
+## Extracting Data
+
+xkcd is famous for its hidden alt-text messages. You can extract element attributes:
+
+```python
+# Find the comic image
+img = driver.find_element(By.XPATH, "//div[@id='comic']//img")
+
+# Get the alt-text and title attributes
+print(f"Alt text: {img.get_attribute('alt')}")
+print(f"Title (hover text): {img.get_attribute('title')}")
+```
+
+## Simulating Interactions
+
+Selenium can simulate clicks, keyboard input, and scrolling — anything a human user would do:
+
+### Clicking
+
+```python
+# Click the "Random" button to navigate to a random comic
+random_button = driver.find_element(By.XPATH, "//ul[@class='comicNav']//a[contains(text(),'Random')]")
+random_button.click()
+
+# Extract the alt-text from the random page
+import time
+time.sleep(1)  # Wait for the page to load
+
+img = driver.find_element(By.XPATH, "//div[@id='comic']//img")
+print(f"Random comic title: {img.get_attribute('title')}")
+```
+
+### Typing and Searching
+
+```python
+from selenium.webdriver.common.keys import Keys
+
+# Navigate to Google
+driver.get("https://www.google.com")
+
+# Find the search box
+search_box = driver.find_element(By.NAME, "q")
+
+# Type a query
+search_box.send_keys("Colorado Buffaloes")
+time.sleep(1)  # Observe autocomplete suggestions
+
+# Press Enter to search
+search_box.send_keys(Keys.ENTER)
+time.sleep(2)  # Wait for results
+```
+
+### Scrolling
+
+Some pages load content as you scroll (infinite scroll). You can simulate this:
+
+```python
+from selenium.webdriver.common.keys import Keys
+
+body = driver.find_element(By.TAG_NAME, "body")
+
+# Scroll down 5 times
+for i in range(5):
+    body.send_keys(Keys.PAGE_DOWN)
+    time.sleep(1)  # Wait for new content to load
+```
+
+## Passing to BeautifulSoup
+
+Once the page is fully rendered in the browser, you can extract the complete HTML and parse it with the familiar BeautifulSoup tools:
+
+```python
+from bs4 import BeautifulSoup
+
+# Get the fully-rendered page source from Selenium
+html = driver.page_source
+soup = BeautifulSoup(html, "html.parser")
+
+# Now use BeautifulSoup as usual
+links = soup.find_all("a", href=True)
+print(f"Total links on page: {len(links)}")
+```
+
+This hybrid approach — Selenium for rendering, BeautifulSoup for parsing — gives you the best of both worlds.
+
+## Always Close the Driver
+
+When you are done, close the browser window:
+
+```python
+driver.quit()
+```
+
+After calling `quit()`, any subsequent calls to the driver will raise an error. Use `try/finally` blocks to ensure cleanup:
+
+```python
+try:
+    driver.get("https://example.com")
+    # ... scraping logic ...
+finally:
+    driver.quit()
+```
+
+## The Fragility Problem
+
+::: {.callout-warning}
+## Warning
+Screen-scraping with Selenium is inherently fragile. The Twitter scraping examples that worked in the 2019 version of this course broke completely by 2024 because Twitter (now X) redesigned its HTML to use dynamically-generated class names and require authentication for basic browsing. This is not unusual — platforms regularly change their front-end code, sometimes specifically to resist automated access.
+:::
+
+This fragility reinforces a principle from @sec-post-api: when an API is available, use it. Selenium is a powerful last resort for cases where you ethically need data that no API provides, but it is slow, resource-intensive, and brittle compared to API access. The decision tree should be: API first → static scraping second → Selenium third.
+
+## Exercises
+
+1. **Dynamic content extraction.** Find a website that loads content dynamically (via JavaScript, infinite scroll, or AJAX). Use Selenium to load the full page, then pass the source to BeautifulSoup and extract the dynamically-loaded data. Compare what you get with Selenium to what `requests.get()` returns.
+
+2. **Multi-step interaction.** Use Selenium to automate a multi-step process: navigate to a site with a search form, enter a query, submit it, and extract results from the response page.
+
+3. **Static vs. dynamic comparison.** For three websites of your choice, compare the HTML returned by `requests.get()` with the `driver.page_source` from Selenium. Categorize each site as static, partially dynamic, or fully dynamic.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For background on debugging strategies when Selenium scripts fail, see *Missing Manual* Chapter 5: Debugging and Chapter 6: Reading Python Tracebacks.
+:::
+
+## Social History and Public Interest
+
+The shift from server-rendered to client-rendered web pages represents a fundamental change in the web's architecture. JavaScript frameworks like React, Angular, and Vue have made the web more interactive but also more opaque to automated observation. The ability to "view source" — once a straightforward way to see exactly what a page contained — now often reveals only a JavaScript bootstrap that fetches and renders content dynamically.
+
+This architectural shift interacts with the enclosure dynamics described in @sec-post-api. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures — CAPTCHAs, bot detection, dynamically-generated class names — become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes.
+
+## Common Issues to Debug
+
+- **`NoSuchElementException`**: The element does not exist yet because the page has not finished loading. Add `time.sleep()` or use explicit waits with `WebDriverWait`.
+- **`StaleElementReferenceException`**: The DOM changed between when you found the element and when you tried to interact with it. Re-find the element.
+- **Driver/browser version mismatch**: `webdriver_manager` usually handles this, but new browser releases occasionally break compatibility temporarily.
+- **Memory issues**: Each Selenium driver runs a full browser process. Close drivers promptly with `driver.quit()`.
+
+## Key Takeaways
+
+The modern web is dynamic: JavaScript renders content after the initial HTML loads, making it invisible to static scraping tools. Selenium controls a real browser programmatically, letting you access fully-rendered pages, simulate user interactions, and extract content that `requests` cannot see. But Selenium is slow, fragile, and resource-intensive — a last resort when APIs and static scraping are unavailable. The hybrid approach of Selenium for rendering plus BeautifulSoup for parsing gives you full access to the modern web while keeping your parsing code familiar.
+
+## Further Reading
+
+- Selenium documentation: <https://www.selenium.dev/documentation/>
+- Selenium Python bindings: <https://selenium-python.readthedocs.io/>
+- webdriver_manager: <https://github.com/SergeyPirogov/webdriver_manager>
+- @mitchell2018web — Chapter 11: Scraping JavaScript
+
+## A Practical Selenium Workflow
+
+Here is a complete workflow that demonstrates the typical pattern for scraping a dynamically-rendered page. We will automate a multi-page interaction: navigating to a website, performing a search, waiting for results to load, extracting the data, and repeating across multiple pages.
+
+```python
+import time
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup
+import pandas as pd
+
+def scrape_with_selenium(search_term, max_pages=3):
+    """Scrape search results from a dynamic website.
+    
+    This demonstrates the full Selenium workflow:
+    1. Launch a headless browser
+    2. Navigate and interact with the page
+    3. Wait for dynamic content to load
+    4. Extract data via BeautifulSoup
+    5. Handle pagination
+    6. Clean up
+    """
+    options = Options()
+    options.add_argument("--headless")
+    driver = webdriver.Chrome(options=options)
+    
+    all_results = []
+    
+    try:
+        driver.get("https://example-search-site.com")
+        
+        # Find and fill the search box
+        search_box = driver.find_element(By.NAME, "q")
+        search_box.send_keys(search_term)
+        search_box.submit()
+        
+        for page in range(max_pages):
+            # Wait for results to load (up to 10 seconds)
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "result-item"))
+            )
+            
+            # Pass rendered HTML to BeautifulSoup
+            soup = BeautifulSoup(driver.page_source, "html.parser")
+            
+            # Extract data from this page
+            for item in soup.find_all("div", class_="result-item"):
+                all_results.append({
+                    "title": item.find("h3").text.strip(),
+                    "description": item.find("p").text.strip(),
+                    "page": page + 1
+                })
+            
+            # Try to click "Next" for pagination
+            try:
+                next_button = driver.find_element(By.LINK_TEXT, "Next")
+                next_button.click()
+                time.sleep(2)  # Wait for next page to load
+            except Exception:
+                break  # No more pages
+    
+    finally:
+        driver.quit()  # Always clean up
+    
+    return pd.DataFrame(all_results)
+```
+
+Notice the use of `WebDriverWait` with `expected_conditions` — this is superior to `time.sleep()` because it waits only as long as needed for the element to appear, rather than waiting a fixed amount of time that might be too short (element not loaded) or too long (wasted time). The `try/finally` block ensures the browser is closed even if an error occurs.
+
+### When to Use Selenium vs. APIs
+
+The decision tree for choosing your data access method:
+
+1. **Is there an API?** Use it. APIs are faster, more reliable, and more structured (see @sec-wikipedia through @sec-ai-apis).
+2. **Is the content in the static HTML?** Use `requests` + BeautifulSoup (see @sec-static-pages). It is simpler and faster than Selenium.
+3. **Is the content loaded by JavaScript?** Use Selenium. But be aware that it is slower, more fragile, and more resource-intensive.
+4. **Is the content behind a login?** This is where ethical judgment matters most. Automating access to login-gated content may violate Terms of Service. See @sec-ethics.

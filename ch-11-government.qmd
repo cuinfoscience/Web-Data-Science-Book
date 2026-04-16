@@ -1,0 +1,323 @@
+# Government Data APIs {#sec-government}
+
+::: {.callout-tip}
+## Learning Objectives
+- Manage API keys securely using environment variables and configuration files
+- Navigate complex API documentation to identify endpoints, parameters, and variable catalogs
+- Query the U.S. Census Bureau API with geographic and variable filters
+- Retrieve economic time series from the FRED API with server-side transformations
+- Search campaign finance records through the FEC API
+- Combine data from multiple government APIs to build richer analytical datasets
+:::
+
+## Public Data by Mandate
+
+Government APIs exist because of democratic commitments to transparency, not because of business strategy. The Census Bureau is constitutionally mandated to count the population. The Federal Reserve is required to publish economic data. The Federal Election Commission must disclose campaign finance records. As a result, these APIs embody the **openness** value described in @sec-post-api: public data, freely accessible, maintained by public mandate rather than platform goodwill.
+
+These APIs also tend to be more *stable* than commercial offerings — government agencies do not pivot their business models or get acquired by billionaires. But they are often less *polished*: the documentation can be dense, variable names can be cryptic, and error messages can be unhelpful. Learning to navigate these tradeoffs is itself a valuable skill.
+
+## API Key Management
+
+Most government APIs require an API key — a unique string that identifies your application, tracks your usage, and enforces rate limits. Proper key management is a professional practice that applies to every authenticated API in this book and beyond.
+
+**Never hardcode API keys in your notebooks.** If you share your notebook (on GitHub, in a class submission, with a collaborator), your key goes with it. Instead, use one of these approaches:
+
+### Environment Variables
+
+```python
+import os
+
+# Set in your terminal before launching Jupyter:
+#   export CENSUS_API_KEY="your-key-here"     (macOS/Linux)
+#   set CENSUS_API_KEY=your-key-here          (Windows)
+
+census_key = os.environ.get("CENSUS_API_KEY")
+if not census_key:
+    raise ValueError(
+        "CENSUS_API_KEY not found. "
+        "Get a key at https://api.census.gov/data/key_signup.html "
+        "and set it as an environment variable."
+    )
+```
+
+### Configuration Files
+
+```python
+import json
+
+# Create a file called 'api_keys.json' with your keys
+# IMPORTANT: Add 'api_keys.json' to your .gitignore file!
+# Contents: {"census": "your-key", "fred": "your-key", "fec": "your-key"}
+
+with open("api_keys.json") as f:
+    keys = json.load(f)
+
+census_key = keys["census"]
+fred_key = keys["fred"]
+fec_key = keys["fec"]
+```
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a comprehensive guide to API keys, environment variables, `.env` files, and secrets management, see *Missing Manual* Chapter 29: Environment Variables and Secrets.
+:::
+
+## U.S. Census Bureau API
+
+The Census Bureau provides access to an enormous range of demographic, economic, and housing data. The American Community Survey (ACS) alone contains thousands of variables organized into thematic groups. The challenge is not access — the API is free and well-maintained — but navigation: finding the right variable among thousands.
+
+### Navigating the Variable Catalog
+
+The Census API organizes variables into groups. Each group has a code (like `B25034` for "Year Structure Built") and contains multiple variables representing different breakdowns:
+
+```python
+import requests
+import pandas as pd
+
+# Browse all groups at: https://api.census.gov/data/2022/acs/acs5/groups.html
+
+# Inspect the variables in the "Year Structure Built" group
+variables_url = "https://api.census.gov/data/2022/acs/acs5/groups/B25034.json"
+response = requests.get(variables_url)
+variables = response.json()
+
+for var_id, var_info in sorted(variables["variables"].items()):
+    if "label" in var_info and not var_id.endswith("M"):  # Skip margin-of-error
+        print(f"{var_id}: {var_info['label'][:80]}")
+```
+
+The variable naming convention follows a pattern: `B25034_001E` is the total estimate, `B25034_002E` through `B25034_011E` are breakdowns by decade of construction, and variables ending in `M` are margins of error. Learning to read these codes quickly will save you significant time.
+
+### Querying for Specific Places
+
+Census data is organized geographically using FIPS codes. Colorado is state `08`; Boulder is place `07850`; Longmont is place `45970`. You can find FIPS codes at [census.gov/library/reference/code-lists](https://www.census.gov/library/reference/code-lists/ansi.html).
+
+```python
+api_url = "https://api.census.gov/data/2022/acs/acs5"
+
+# Housing age distribution for Boulder, CO
+params = {
+    "get": "NAME,B25034_001E,B25034_002E,B25034_003E,B25034_004E,B25034_005E",
+    "for": "place:07850",
+    "in": "state:08",
+    "key": census_key
+}
+
+response = requests.get(api_url, params=params)
+data = response.json()
+
+# First row is column headers, remaining rows are data
+df = pd.DataFrame(data[1:], columns=data[0])
+
+# Convert numeric columns from strings
+numeric_cols = [c for c in df.columns if c.startswith("B25034")]
+df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric)
+
+print(df)
+```
+
+### Comparing Multiple Locations
+
+You can pass multiple FIPS codes to compare locations side by side:
+
+```python
+# Compare Boulder and Longmont
+params["for"] = "place:07850,45970"
+
+response = requests.get(api_url, params=params)
+data = response.json()
+df_compare = pd.DataFrame(data[1:], columns=data[0])
+df_compare[numeric_cols] = df_compare[numeric_cols].apply(pd.to_numeric)
+
+# Reshape for visualization
+import matplotlib.pyplot as plt
+
+df_plot = df_compare.set_index("NAME")[numeric_cols].T
+df_plot.index = ["Total", "2020+", "2010-2019", "2000-2009", "1990-1999"]
+
+df_plot.plot(kind="bar", figsize=(10, 5))
+plt.title("Housing Stock by Decade Built: Boulder vs. Longmont")
+plt.ylabel("Number of Housing Units")
+plt.xlabel("Decade Built")
+plt.xticks(rotation=45)
+plt.legend(title="City")
+plt.tight_layout()
+plt.show()
+```
+
+## FRED API
+
+The Federal Reserve Bank of St. Louis maintains FRED (Federal Reserve Economic Data), arguably the world's best free source of economic time series. It contains over 800,000 data series covering macroeconomics, banking, labor markets, prices, and more.
+
+### Finding Series IDs
+
+FRED organizes data by "series" — each series is a specific time series with a unique ID. The easiest way to find series IDs is to search the [FRED website](https://fred.stlouisfed.org/) interactively. For example, searching for "median household income Boulder County" will lead you to the series `MHIBS08013A052NCEN`.
+
+```python
+# Retrieve median household income for Boulder County
+url = "https://api.stlouisfed.org/fred/series/observations"
+
+params = {
+    "series_id": "MHIBS08013A052NCEN",
+    "api_key": fred_key,
+    "file_type": "json"
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+df_income = pd.DataFrame(data["observations"])
+df_income["date"] = pd.to_datetime(df_income["date"])
+df_income["value"] = pd.to_numeric(df_income["value"], errors="coerce")
+
+print(df_income.head())
+```
+
+### Combining Multiple Series
+
+The real power of FRED emerges when you combine multiple series to tell a richer story:
+
+```python
+# Also get CPI data for comparison
+params_cpi = {
+    "series_id": "CPIAUCSL",  # Consumer Price Index, All Urban Consumers
+    "api_key": fred_key,
+    "file_type": "json",
+    "observation_start": "2000-01-01"
+}
+
+response_cpi = requests.get(url, params=params_cpi)
+df_cpi = pd.DataFrame(response_cpi.json()["observations"])
+df_cpi["date"] = pd.to_datetime(df_cpi["date"])
+df_cpi["cpi"] = pd.to_numeric(df_cpi["value"], errors="coerce")
+
+# Merge income and CPI data
+df_merged = pd.merge_asof(
+    df_income.sort_values("date"),
+    df_cpi[["date", "cpi"]].sort_values("date"),
+    on="date",
+    direction="nearest"
+)
+```
+
+### Server-Side Transformations
+
+FRED can compute transformations before returning data, saving you work:
+
+```python
+# Get CPI as year-over-year percent change
+params_transform = {
+    "series_id": "CPIAUCSL",
+    "api_key": fred_key,
+    "file_type": "json",
+    "units": "pc1",  # Percent change from 1 year ago
+    "observation_start": "2020-01-01"
+}
+
+response = requests.get(url, params=params_transform)
+df_inflation = pd.DataFrame(response.json()["observations"])
+df_inflation["date"] = pd.to_datetime(df_inflation["date"])
+df_inflation["inflation_pct"] = pd.to_numeric(df_inflation["value"], errors="coerce")
+
+plt.figure(figsize=(12, 5))
+plt.plot(df_inflation["date"], df_inflation["inflation_pct"])
+plt.axhline(y=2, color="red", linestyle="--", label="2% target")
+plt.title("Year-over-Year Inflation Rate (CPI)")
+plt.ylabel("Percent Change")
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
+
+Other available transformations include `chg` (change from previous value), `log` (natural log), `pca` (compounded annual rate of change), and frequency aggregation (converting monthly data to quarterly or annual).
+
+## FEC API
+
+The Federal Election Commission provides campaign finance data through a free API. This data enables accountability journalism and research on the influence of money in politics:
+
+```python
+fec_key = keys["fec"]
+
+# Search for a candidate
+url = "https://api.open.fec.gov/v1/candidates/search/"
+params = {
+    "q": "Biden",
+    "office": "P",
+    "election_year": 2024,
+    "api_key": fec_key,
+    "per_page": 5
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+for candidate in data["results"]:
+    print(f"{candidate['name']} ({candidate['party_full']})")
+    print(f"  ID: {candidate['candidate_id']}")
+    print(f"  State: {candidate['state']}")
+    print()
+```
+
+### Getting Campaign Finance Data
+
+```python
+# Get committee (campaign) information for a candidate
+candidate_id = "P80000722"  # Biden's presidential committee
+
+url = f"https://api.open.fec.gov/v1/candidate/{candidate_id}/totals/"
+params = {
+    "api_key": fec_key,
+    "election_year": 2024
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+for result in data["results"]:
+    print(f"Cycle: {result.get('cycle')}")
+    print(f"  Receipts: ${result.get('receipts', 0):,.0f}")
+    print(f"  Disbursements: ${result.get('disbursements', 0):,.0f}")
+```
+
+## Exercises
+
+1. **Census exploration.** Using the Census API, retrieve a variable group of your choice (browse at `api.census.gov/data/2022/acs/acs5/groups.html`) for at least five geographic areas. Create a comparative visualization and write a brief analytical narrative explaining what the data reveals.
+
+2. **FRED time series.** Retrieve two related economic time series for your local area or state using the FRED API. Plot them on the same or side-by-side axes. What story does the data tell? Common pairings include housing prices and mortgage rates, unemployment and job creation, or income and cost of living.
+
+3. **Campaign finance.** Using the FEC API, retrieve contribution data for a local congressional race. How much did each major candidate raise? Can you find differences in the geographic distribution or size distribution of contributions?
+
+4. **Multi-source integration.** Combine data from at least two different government APIs (Census + FRED, Census + FEC, or FRED + FEC) into a single analysis. For example, compare median household income (Census) with campaign contributions (FEC) across congressional districts, or compare housing construction rates (Census) with interest rates (FRED).
+
+::: {.callout-note}
+## Public Interest Connection
+Government data APIs embody the value of **openness** from @sec-post-api — they exist because of democratic commitments to transparency. But government data infrastructure is not immune to erosion. Datasets are occasionally withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. The fragility of government data infrastructure is itself a public interest concern.
+:::
+
+## Social History and Public Interest
+
+The Census Bureau has been counting the American population since 1790, making the decennial census one of the oldest continuous data collection programs in the world. The American Community Survey, launched in 2005, replaced the census long form with continuous measurement, providing annual estimates of demographic, social, economic, and housing characteristics. The decision to make this data freely accessible through APIs reflects a commitment to the idea that public data should be accessible to all, not just to researchers with institutional subscriptions or specialized software.
+
+FRED was created by the Federal Reserve Bank of St. Louis with a similar philosophy: economic data should be freely accessible to anyone who wants it. Before FRED, accessing Federal Reserve data required specialized terminals or institutional subscriptions. By making the data freely available and well-documented, FRED democratized access to economic information that was previously the province of Wall Street and government insiders.
+
+The FEC's public disclosure requirements enable some of the most important accountability journalism in American democracy. News organizations, research groups, and citizens use FEC data to track the flow of money in politics, identify potential conflicts of interest, and hold elected officials accountable. This data exists because of the Federal Election Campaign Act (1971) and subsequent legislation mandating transparency in campaign finance.
+
+## Common Issues to Debug
+
+- **Census variable codes**: The naming convention is opaque. Bookmark the variable catalog and use it as a reference. Variables ending in `E` are estimates; those ending in `M` are margins of error.
+- **FIPS codes**: Geographic identifiers like `08` (Colorado) and `07850` (Boulder) are strings, not integers. Do not strip leading zeros.
+- **FRED series IDs**: These are alphanumeric strings with no consistent pattern. Use the FRED website search to find them, then copy the ID into your code.
+- **API key exposure**: The most common mistake. Add `api_keys.json` to `.gitignore` *before* your first commit, or the key will persist in your git history even after deletion.
+- **Rate limiting**: Government APIs generally have generous limits (several hundred requests per minute), but stay well within them, especially during automated collection.
+
+## Key Takeaways
+
+Government APIs provide access to some of the most valuable, reliable, and stable data sources available. The Census Bureau, Federal Reserve, and FEC each serve a specific transparency mandate, and their APIs reflect this mission. The key skills — navigating complex variable catalogs, managing API keys securely, combining data from multiple sources, and understanding the institutional context behind the data — apply to every authenticated API you will encounter. These APIs exist because of public interest mandates, and using them effectively is itself a form of civic engagement.
+
+## Further Reading
+
+- U.S. Census Bureau API: <https://www.census.gov/data/developers.html>
+- FRED API documentation: <https://fred.stlouisfed.org/docs/api/fred/>
+- FEC API documentation: <https://api.open.fec.gov/developers/>
+- @salganik2018bit — Chapter 2: Observing Behavior
+- @munzert2014automated — Chapter on working with web APIs

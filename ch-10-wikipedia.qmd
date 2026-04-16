@@ -1,0 +1,408 @@
+# Introduction to APIs: Wikipedia {#sec-wikipedia}
+
+::: {.callout-tip}
+## Learning Objectives
+- Explain what an API is and how it differs from web scraping as a data access method
+- Read API documentation to identify endpoints, parameters, and response formats
+- Construct parameterized API requests and handle pagination with continuation tokens
+- Use multiple MediaWiki API endpoints to answer research questions
+- Write raw API requests from documentation rather than relying on wrapper functions
+:::
+
+## What Is an API?
+
+An API (Application Programming Interface) is a contract between a client and a server that specifies what data you can request, what parameters you can pass, and in what format you will receive the response. Unlike web scraping, where you reverse-engineer the HTML structure of a page designed for human readers, APIs provide structured, documented, and intentional access to data. They return clean JSON rather than cluttered HTML. They offer stable endpoints rather than fragile CSS selectors. And they come with documentation that tells you exactly what is available and how to ask for it.
+
+The tradeoff, of course, is that APIs only expose what their operators choose to expose. You cannot query a field that the API does not provide. You cannot exceed the rate limits the server enforces. And as @sec-post-api describes, APIs can be restricted, repriced, or shut down entirely at the operator's discretion. But when they are available, APIs are almost always preferable to scraping.
+
+This chapter marks the transition from document scraping (Part II) to API-based data access (Part III). The skills you learn here — reading documentation, constructing parameterized URLs, handling pagination, parsing nested JSON responses — transfer directly to every API you will work with in subsequent chapters.
+
+## Why Wikipedia?
+
+Wikipedia's [MediaWiki API](https://www.mediawiki.org/wiki/API:Main_page) is pedagogically ideal for learning API access. It is free, requires no authentication beyond a User-Agent header, has comprehensive documentation, and provides data rich enough to support diverse research designs — from content analysis to network mapping to event detection. It is also an example of what @sec-post-api describes as **openness**: a mission-driven organization that maintains free, well-documented data access by design.
+
+We will use the English Wikipedia article for [Elizabeth II](https://en.wikipedia.org/wiki/Elizabeth_II) as our primary case study. The article has a rich editing history with dramatic spikes around major events, making it ideal for demonstrating how to extract and analyze temporal patterns from API data.
+
+## The Anatomy of an API Call
+
+Every MediaWiki API request follows the same structure: a base URL, an `action` parameter specifying what you want to do, additional parameters narrowing your request, and a `format` parameter specifying the response format. Let us trace through a simple example:
+
+```python
+import requests
+
+url = "https://en.wikipedia.org/w/api.php"
+
+params = {
+    "action": "query",         # We want to query for information
+    "titles": "Elizabeth_II",  # About this article
+    "prop": "info",            # Specifically, basic info about the page
+    "format": "json"           # Return the response as JSON
+}
+
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+
+response = requests.get(url, params=params, headers=headers)
+data = response.json()
+
+print(data)
+```
+
+The response is a nested JSON structure. You navigate it one level at a time:
+
+```python
+# The data lives inside data > query > pages > {page_id}
+pages = data["query"]["pages"]
+
+# Page IDs are keys — get the first (and usually only) one
+page_id = list(pages.keys())[0]
+page_info = pages[page_id]
+
+print(f"Title: {page_info['title']}")
+print(f"Page ID: {page_info['pageid']}")
+print(f"Last edited: {page_info.get('touched', 'unknown')}")
+```
+
+This nested navigation pattern — `data["query"]["pages"][page_id]` — is consistent across the MediaWiki API. Once you internalize it, every endpoint feels familiar.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For strategies on reading and navigating unfamiliar API documentation, see *Missing Manual* Chapter 4: Reading Official Documentation.
+:::
+
+## Getting Revisions
+
+Every edit ever made to a Wikipedia article is recorded and accessible through the API. The revisions endpoint returns metadata about each edit: who made it, when, how much the article size changed, and what edit summary they left.
+
+```python
+import requests
+import pandas as pd
+
+def get_revisions(title, headers=None):
+    """Get all revisions for a Wikipedia article.
+    
+    Parameters
+    ----------
+    title : str
+        The article title (e.g., 'Elizabeth_II')
+    headers : dict, optional
+        HTTP headers including User-Agent
+    
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with revision metadata
+    """
+    url = "https://en.wikipedia.org/w/api.php"
+    
+    params = {
+        "action": "query",
+        "titles": title,
+        "prop": "revisions",
+        "rvprop": "ids|timestamp|user|size|comment",
+        "rvlimit": "max",  # Get as many as possible per request
+        "format": "json"
+    }
+    
+    all_revisions = []
+    
+    while True:
+        response = requests.get(url, params=params, headers=headers)
+        data = response.json()
+        
+        # Navigate the nested response
+        pages = data["query"]["pages"]
+        page_id = list(pages.keys())[0]
+        revisions = pages[page_id].get("revisions", [])
+        all_revisions.extend(revisions)
+        
+        # Handle pagination
+        if "continue" in data:
+            params.update(data["continue"])
+            print(f"  Fetched {len(all_revisions)} revisions so far...")
+        else:
+            break
+    
+    return pd.DataFrame(all_revisions)
+
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+df_revisions = get_revisions("Elizabeth_II", headers=headers)
+print(f"Total revisions: {len(df_revisions)}")
+```
+
+### Understanding Pagination
+
+The MediaWiki API limits the number of results returned per request. When more results are available, the response includes a `"continue"` key with parameters you must add to your next request. This loop — request, extract, check for continuation, update parameters, repeat — is the standard pagination pattern for most APIs. You will see it again in @sec-government and @sec-social.
+
+The critical mistake newcomers make is forgetting to check for continuation. Without the `while True` loop and `"continue"` check, you only get the first batch of results — potentially a small fraction of the total dataset.
+
+### Analyzing Revision History
+
+```python
+# Convert timestamps to datetime
+df_revisions["timestamp"] = pd.to_datetime(df_revisions["timestamp"])
+
+# Count monthly edits
+monthly_edits = df_revisions.set_index("timestamp").resample("ME").size()
+
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(14, 5))
+monthly_edits.plot(ax=ax)
+ax.set_title("Monthly Edits to 'Elizabeth II' Wikipedia Article")
+ax.set_ylabel("Number of edits")
+ax.set_xlabel("")
+plt.tight_layout()
+plt.show()
+# You'll see a massive spike around September 2022 (her death)
+```
+
+You can also analyze who edits the article:
+
+```python
+# Top editors by number of revisions
+top_editors = df_revisions["user"].value_counts().head(10)
+print(top_editors)
+
+# What fraction of edits come from the top 10 editors?
+top10_share = top_editors.sum() / len(df_revisions)
+print(f"Top 10 editors account for {top10_share:.1%} of all edits")
+```
+
+## Getting Pageviews
+
+The Wikimedia REST API (separate from the MediaWiki Action API) provides article pageview data — how many times an article was accessed across web and mobile platforms:
+
+```python
+def get_pageviews(title, start="20230101", end="20231231", headers=None):
+    """Get daily pageviews for a Wikipedia article.
+    
+    Parameters
+    ----------
+    title : str
+        Article title with underscores for spaces
+    start, end : str
+        Date range in YYYYMMDD format
+    headers : dict, optional
+        HTTP headers
+    
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with daily pageview counts
+    """
+    url = (
+        f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
+        f"/en.wikipedia/all-access/all-agents/{title}/daily/{start}/{end}"
+    )
+    
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    
+    df = pd.DataFrame(data["items"])
+    df["timestamp"] = pd.to_datetime(df["timestamp"], format="%Y%m%d00")
+    return df
+
+views = get_pageviews("Elizabeth_II", start="20220101", end="20221231", headers=headers)
+
+plt.figure(figsize=(14, 5))
+plt.plot(views["timestamp"], views["views"])
+plt.title("Daily Pageviews: Elizabeth II (2022)")
+plt.ylabel("Views")
+plt.axvline(pd.Timestamp("2022-09-08"), color="red", linestyle="--", label="Death (Sep 8)")
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
+
+## Getting Links and Categories
+
+The API exposes the internal structure of Wikipedia — the web of connections between articles:
+
+```python
+def get_outlinks(title, headers=None):
+    """Get all internal wikilinks from an article."""
+    url = "https://en.wikipedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "titles": title,
+        "prop": "links",
+        "pllimit": "max",
+        "format": "json"
+    }
+    
+    all_links = []
+    while True:
+        response = requests.get(url, params=params, headers=headers)
+        data = response.json()
+        
+        pages = data["query"]["pages"]
+        page_id = list(pages.keys())[0]
+        links = pages[page_id].get("links", [])
+        all_links.extend([link["title"] for link in links])
+        
+        if "continue" in data:
+            params.update(data["continue"])
+        else:
+            break
+    
+    return all_links
+
+outlinks = get_outlinks("Elizabeth_II", headers=headers)
+print(f"Outgoing wikilinks: {len(outlinks)}")
+print(f"First 10: {outlinks[:10]}")
+```
+
+You can do the same for external links (URLs that point outside Wikipedia), interlanguage links (corresponding articles in other language editions), and category memberships:
+
+```python
+def get_categories(title, headers=None):
+    """Get all categories an article belongs to."""
+    url = "https://en.wikipedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "titles": title,
+        "prop": "categories",
+        "cllimit": "max",
+        "format": "json"
+    }
+    
+    all_categories = []
+    while True:
+        response = requests.get(url, params=params, headers=headers)
+        data = response.json()
+        
+        pages = data["query"]["pages"]
+        page_id = list(pages.keys())[0]
+        cats = pages[page_id].get("categories", [])
+        all_categories.extend([c["title"] for c in cats])
+        
+        if "continue" in data:
+            params.update(data["continue"])
+        else:
+            break
+    
+    return all_categories
+
+categories = get_categories("Elizabeth_II", headers=headers)
+print(f"Categories: {len(categories)}")
+for cat in categories[:10]:
+    print(f"  {cat}")
+```
+
+## Getting User Contributions
+
+You can also retrieve the editing history of individual Wikipedia users, which is useful for studying editor behavior and community dynamics:
+
+```python
+def get_user_contributions(username, limit=50, headers=None):
+    """Get recent contributions by a Wikipedia user."""
+    url = "https://en.wikipedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "list": "usercontribs",
+        "ucuser": username,
+        "uclimit": limit,
+        "ucprop": "title|timestamp|sizediff|comment",
+        "format": "json"
+    }
+    
+    response = requests.get(url, params=params, headers=headers)
+    data = response.json()
+    return pd.DataFrame(data["query"]["usercontribs"])
+
+# Get contributions from a prolific editor
+contribs = get_user_contributions("Drmies", limit=100, headers=headers)
+print(f"Recent edits: {len(contribs)}")
+print(contribs[["title", "timestamp", "sizediff"]].head())
+```
+
+## Writing Raw API Requests from Documentation
+
+The functions above packaged API requests for you. But the transferable skill is writing requests from scratch using only the documentation. Here is the process:
+
+1. Go to the [MediaWiki API documentation](https://www.mediawiki.org/wiki/API:Main_page)
+2. Find an endpoint you have not used (e.g., `action=query&list=search`)
+3. Read its parameters: what is required, what is optional, what values are accepted
+4. Construct a request, make it, and inspect the response structure
+
+```python
+# Example: search Wikipedia for articles about "web scraping"
+url = "https://en.wikipedia.org/w/api.php"
+params = {
+    "action": "query",
+    "list": "search",
+    "srsearch": "web scraping",
+    "srlimit": 10,
+    "srprop": "size|wordcount|timestamp|snippet",
+    "format": "json"
+}
+
+response = requests.get(url, params=params, headers=headers)
+data = response.json()
+
+results = data["query"]["search"]
+for r in results:
+    print(f"{r['title']} — {r['wordcount']} words, last edited {r['timestamp'][:10]}")
+```
+
+The ability to go from documentation to working code is the skill that transfers to every API in @sec-government, @sec-social, and @sec-ai-apis. The specifics change — different base URLs, different authentication methods, different response structures — but the pattern remains: read the docs, construct the request, parse the response.
+
+## A Second Case Study: World War II
+
+To reinforce these patterns, try applying the same functions to a different article. The [World War II](https://en.wikipedia.org/wiki/World_War_II) article is one of the most-edited on Wikipedia:
+
+```python
+ww2_revisions = get_revisions("World_War_II", headers=headers)
+print(f"World War II revisions: {len(ww2_revisions)}")
+
+ww2_views = get_pageviews("World_War_II", start="20230101", end="20231231", headers=headers)
+
+ww2_links = get_outlinks("World_War_II", headers=headers)
+print(f"World War II outlinks: {len(ww2_links)}")
+
+# Compare with Elizabeth II
+print(f"\nElizabeth II revisions: {len(df_revisions)}")
+print(f"Elizabeth II outlinks: {len(outlinks)}")
+```
+
+The comparison reveals how article structure and editing dynamics vary: a biographical article about a contemporary figure versus a historical event article that has been built over nearly two decades of collaborative editing.
+
+## Exercises
+
+1. **Comparative revision analysis.** Retrieve the revision histories for two related Wikipedia articles (e.g., "Democratic_Party_(United_States)" and "Republican_Party_(United_States)"). Compare the number of unique editors, the distribution of edits per editor (is editing concentrated or distributed?), and the pattern of monthly editing activity. Are there periods where editing spikes simultaneously on both articles?
+
+2. **Event detection with pageviews.** Use the pageviews API to retrieve daily data for five related articles over a full year. Identify spikes in each article and map them to real-world events. Did all articles spike together (suggesting a common cause), or were there article-specific events? Create a multi-line plot with labeled annotations for the key events.
+
+3. **Link network.** Retrieve the outgoing wikilinks from three articles on related topics. How much do their link sets overlap? What articles appear in all three link sets? This overlap analysis is a simple form of the network analysis described in @sec-appendix-further.
+
+4. **Raw API practice.** Using only the MediaWiki API documentation at <https://www.mediawiki.org/wiki/API:Main_page>, construct a working request for an endpoint not covered in this chapter. Good candidates include `interlanguagelinks` (how many language editions does an article have?), `extlinks` (what external websites does an article link to?), or `recentchanges` (what are the most recent edits across all of Wikipedia?). Document your process: what parameters did you choose and why?
+
+5. **Editor network.** For a single article, identify the top 20 editors by revision count. Then use `get_user_contributions()` to find what other articles these editors work on. Do they share other editing interests, or is this article their only point of overlap?
+
+## Social History and Public Interest
+
+Wikipedia is the largest collaboratively-authored reference work in human history, maintained by tens of thousands of volunteer editors working in over 300 languages. Its commitment to open APIs reflects its broader mission: anyone can read, edit, and computationally access Wikipedia's content. The Wikimedia Foundation explicitly positions API access as part of its commitment to free knowledge [@ford2022writing].
+
+But openness does not mean representativeness. Research has documented significant demographic skew in who edits Wikipedia — editors are disproportionately male, from the Global North, and technically fluent. This translates into content gaps: articles about women, people of color, and the Global South are systematically shorter, less detailed, and less well-referenced than articles about men and Western topics [@mesgari2015sum]. The data you retrieve from Wikipedia's API reflects these patterns. Ease of access does not guarantee completeness or neutrality — a principle that applies equally to every data source in this book.
+
+Wikipedia also demonstrates what sustainable, mission-driven data access looks like. While commercial platforms have restricted and monetized their APIs (see @sec-post-api), Wikipedia's API has remained free and has expanded in functionality over time. This is possible because the Wikimedia Foundation is a nonprofit funded by donations, not advertising revenue. The organizational structure shapes the data access policies.
+
+## Common Issues to Debug
+
+- **Pagination**: The single most common mistake. Always check for `"continue"` in the response. Without it, you get only the first batch (often 500 or fewer results out of thousands).
+- **Nested JSON navigation**: The MediaWiki API nests data several levels deep. Print `data.keys()`, then `data["query"].keys()`, then `data["query"]["pages"].keys()` to navigate step by step.
+- **URL encoding**: Article titles with spaces use underscores in the API. For titles with special characters (parentheses, accented letters), use `urllib.parse.quote()`.
+- **Rate limiting**: Wikipedia requests a meaningful User-Agent header. Without it, you may get slower responses or be blocked. The rate limit is approximately 200 requests per second for identified clients — generous, but not infinite.
+- **Missing pages**: If you request an article that does not exist, the page ID will be negative (e.g., `-1`). Always check for this before trying to access revision data.
+
+## Key Takeaways
+
+APIs provide structured, documented, intentional access to web data. Learning to work with one API well gives you a transferable skill for any API: read the documentation, construct parameterized requests, handle pagination with continuation tokens, and parse nested JSON responses one level at a time. Wikipedia's MediaWiki API demonstrates these patterns clearly and generously — it is a model of what open, mission-driven data access looks like. The key habits: always handle pagination, always use a meaningful User-Agent, always read the documentation before writing code, and always check the response structure before assuming its contents.
+
+## Further Reading
+
+- MediaWiki API documentation: <https://www.mediawiki.org/wiki/API:Main_page>
+- Wikimedia REST API (pageviews): <https://wikimedia.org/api/rest_v1/>
+- @ford2022writing — Wikipedia's role in the survival of facts in the digital age
+- @mesgari2015sum — systematic review of scholarly research on Wikipedia content
+- @salganik2018bit — Chapter 2: Observing Behavior, on using digital trace data for research

@@ -1,0 +1,66 @@
+# Where to Go from Here {#sec-appendix-further}
+
+This book has introduced the core tools and concepts of web data science. This appendix points you toward advanced topics, tools, and communities for continuing your education beyond this textbook.
+
+## Advanced Scraping and Data Collection
+
+**Scrapy** is a full-featured web crawling framework for large-scale, production-grade scraping. If your projects outgrow the `requests` + BeautifulSoup approach of this book, Scrapy provides built-in support for following links, handling pagination, managing request queues, and exporting data. Documentation: <https://scrapy.org/>
+
+**Playwright** is a modern alternative to Selenium developed by Microsoft. It is faster, more reliable, and has better async support. If you work extensively with dynamic pages (as in @sec-dynamic-pages), Playwright is worth learning. Documentation: <https://playwright.dev/python/>
+
+**Cloud-based scraping** with AWS Lambda, Google Cloud Functions, or similar serverless platforms lets you run scrapers without maintaining servers. This extends the GitHub Actions approach of @sec-automation for larger-scale or more complex workflows.
+
+## Advanced APIs and Data Access
+
+**GraphQL APIs** represent a different approach to API design than the REST APIs covered in this book. Instead of multiple endpoints returning fixed data structures, GraphQL lets you specify exactly what data you want in a single query. GitHub's API v4 is a prominent example.
+
+**Websockets and streaming APIs** provide real-time data rather than request-response interactions. If you need to monitor live events — breaking news, financial markets, or social media feeds — streaming APIs are the appropriate tool.
+
+**The EU Digital Services Act (DSA)** mandates researcher access to data from very large online platforms. As this framework matures, it may create new, regulated pathways for the kind of research data access that has been restricted by the enclosure dynamics described in @sec-post-api.
+
+## Text Analysis and NLP
+
+**spaCy** is an industrial-strength NLP library for tasks like named entity recognition, part-of-speech tagging, and dependency parsing. It complements the bag-of-words approach from @sec-archives and the LLM-based analysis from @sec-ai-apis. Documentation: <https://spacy.io/>
+
+**Hugging Face Transformers** provides access to thousands of pre-trained models for text classification, summarization, translation, and embedding computation. If you need more control than the OpenAI API provides, or want to run models locally, Transformers is the standard library. Documentation: <https://huggingface.co/docs/transformers/>
+
+**Topic modeling** with BERTopic or Latent Dirichlet Allocation (LDA) can help you discover the thematic structure of large text corpora — a natural extension of the content analysis techniques in @sec-ai-apis.
+
+## Network Analysis
+
+**NetworkX** is the standard Python library for creating, analyzing, and visualizing graphs. The link structures from @sec-wikipedia and social graphs from @sec-social are natural inputs for network analysis. Documentation: <https://networkx.org/>
+
+**Gephi** provides interactive network visualization for larger graphs. It can import data from NetworkX and produce publication-quality network visualizations. Download: <https://gephi.org/>
+
+## Geospatial Analysis
+
+**GeoPandas** extends pandas with support for spatial data types and operations. Combined with Census geographic data from @sec-government, it enables spatial analysis and mapping of web-scraped data. Documentation: <https://geopandas.org/>
+
+**Folium** creates interactive maps using Leaflet.js. It is useful for visualizing scraped data with geographic components (business locations, legislative districts, environmental monitoring stations). Documentation: <https://python-visualization.github.io/folium/>
+
+## Data Management and Infrastructure
+
+**SQLite** and **PostgreSQL** provide database storage for scraped data that outgrows flat CSV files. If your automated scrapers (@sec-automation) accumulate large datasets, migrating from CSV to a database improves performance and query flexibility.
+
+**Apache Airflow** orchestrates complex data pipelines with dependencies between tasks. It is the production-grade equivalent of the GitHub Actions workflows in @sec-automation, suited for pipelines with many steps, conditional logic, and failure recovery.
+
+**Docker** provides reproducible computing environments that bundle your code, dependencies, and configuration into a portable container. This solves the "works on my machine" problem for collaborative projects.
+
+**DVC (Data Version Control)** extends git to handle large data files, tracking datasets alongside code. It addresses the challenge of versioning scraped data that is too large for standard git.
+
+## Communities and Continuing Education
+
+**Summer Institutes in Computational Social Science (SICSS)** are intensive two-week programs held at universities around the world. They cover advanced topics in computational social science with hands-on training and collaborative research. Apply at: <https://sicss.io/>
+
+**The Carpentries** (Software Carpentry, Data Carpentry, Library Carpentry) offer workshops on foundational computing and data skills. Their instructor training program is also an excellent way to improve your own teaching. Information: <https://carpentries.org/>
+
+**GESIS Computational Social Science Resource List** maintains a curated collection of courses, textbooks, and tools: <https://github.com/gesiscss/awesome-computational-social-science>
+
+## Recommended Textbooks
+
+- @salganik2018bit — the methodological companion to this book's technical focus; essential reading on observing behavior, asking questions, and running experiments in the digital age
+- @vanatteveldt2022computational — deeper treatment of text analysis, NLP methods, and communication research with computational tools
+- @vandenbroucke2018practical — more advanced scraping patterns, anti-detection techniques, and production considerations
+- @rogers2019doing — qualitative and critical approaches to web data, complementing this book's quantitative emphasis
+- @munzert2014automated — covers similar ground to this book but using R; useful for multilingual researchers
+- @lazer2009computational — the foundational manifesto for computational social science as a field

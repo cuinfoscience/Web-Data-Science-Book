@@ -1,0 +1,309 @@
+# Data Formats: XML and JSON {#sec-data-formats}
+
+::: {.callout-tip}
+## Learning Objectives
+- Distinguish between XML and JSON as structured data formats and identify when each is typically encountered
+- Parse XML documents using BeautifulSoup's tree navigation methods
+- Navigate nested JSON structures using Python's native lists and dictionaries
+- Convert nested data structures into pandas DataFrames for analysis
+- Handle common edge cases in structured data parsing
+:::
+
+## Why Data Formats Matter
+
+Before you can extract data from the web, you need to understand how data is structured on the web. Every web page, every API response, every data feed uses a format that organizes information in a specific way. The two dominant formats you will encounter are XML (Extensible Markup Language) and JSON (JavaScript Object Notation).
+
+XML is the older format, born from the document-centric web of the 1990s. It represents data as a tree of nested tags — a structure you will recognize when you encounter HTML in @sec-static-pages, since HTML is essentially a specific vocabulary of XML. JSON is the newer, lighter format that rose with Web 2.0 and the API economy. It maps directly onto Python's native data structures — lists and dictionaries — making it especially natural to work with programmatically.
+
+This chapter teaches you to parse both formats, building the foundational skills that every subsequent chapter depends on.
+
+## XML and BeautifulSoup
+
+### The Tree Structure
+
+XML organizes data as a hierarchy of nested tags. Each tag can contain text, attributes, and child tags. Here is a simplified example of Congressional member data:
+
+```python
+house_raw = """<?xml version="1.0" encoding="UTF-8"?>
+<congress session="118">
+  <chamber name="House">
+    <member>
+      <first-name>Nancy</first-name>
+      <last-name>Pelosi</last-name>
+      <party>D</party>
+      <state>CA</state>
+      <district>11</district>
+    </member>
+    <member>
+      <first-name>Kevin</first-name>
+      <last-name>McCarthy</last-name>
+      <party>R</party>
+      <state>CA</state>
+      <district>20</district>
+    </member>
+  </chamber>
+</congress>"""
+```
+
+This is still just a string. To search and navigate it, you need to parse it into a data structure that understands the tree relationships. That is what BeautifulSoup does.
+
+### Parsing with BeautifulSoup
+
+```python
+from bs4 import BeautifulSoup
+
+soup = BeautifulSoup(house_raw, "xml")
+
+# Navigate the tree: congress > chamber > first member > first-name
+print(soup.congress.chamber.member)
+# Returns the first <member> tag and all its children
+```
+
+The power of BeautifulSoup is in its search methods. The `.find()` method returns the first tag matching your criteria. The `.find_all()` method returns all matching tags as a list:
+
+```python
+# Find all member tags
+members = soup.find_all("member")
+print(len(members))  # 2
+
+# Access text inside a tag
+for member in members:
+    first = member.find("first-name").text
+    last = member.find("last-name").text
+    party = member.find("party").text
+    print(f"{first} {last} ({party})")
+# Nancy Pelosi (D)
+# Kevin McCarthy (R)
+```
+
+Notice the use of `.find("first-name")` rather than `.first-name` as a Python attribute. Hyphenated tag names break Python's dot notation, so you must use the `.find()` method for them.
+
+### Extracting and Counting
+
+A common pattern is extracting all values for a particular tag and then analyzing the distribution:
+
+```python
+# Count party affiliations
+parties = [m.find("party").text for m in soup.find_all("member")]
+print(parties)
+# ['D', 'R']
+
+# In a real dataset with all 435 members, you could count:
+from collections import Counter
+party_counts = Counter(parties)
+print(party_counts)
+# Counter({'D': 1, 'R': 1}) — with full data you'd see actual totals
+```
+
+The `.contents` method gives you a list of a tag's direct children, which is useful for exploring unfamiliar XML structures:
+
+```python
+first_member = soup.find("member")
+print(first_member.contents)
+# A list of child tags and whitespace strings
+```
+
+### Working with Real XML
+
+Let us retrieve and parse actual Congressional member data. The [clerk.house.gov](https://clerk.house.gov) website publishes member data in XML format:
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+url = "https://clerk.house.gov/xml/lists/MemberData.xml"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, "xml")
+
+# Find all members
+members = soup.find_all("member")
+print(f"Total members found: {len(members)}")
+
+# Extract party information
+parties = []
+for m in members:
+    party_tag = m.find("party")
+    if party_tag:
+        parties.append(party_tag.text)
+
+from collections import Counter
+print(Counter(parties))
+```
+
+## JSON and Python Data Structures
+
+### Lists and Dictionaries
+
+JSON maps onto two Python data structures you already know. A JSON **array** is a Python **list** — ordered, indexed by position:
+
+```python
+classroom = ["Alice", "Bob", "Carol"]
+print(classroom[0])   # "Alice"
+print(len(classroom))  # 3
+```
+
+A JSON **object** is a Python **dictionary** — unordered, accessed by key:
+
+```python
+state = {
+    "name": "Colorado",
+    "capital": "Denver",
+    "population": 5773714
+}
+print(state["capital"])     # "Denver"
+print(state.keys())         # dict_keys(['name', 'capital', 'population'])
+```
+
+### Nested Structures
+
+Real-world JSON data nests these structures inside each other. A dictionary can contain lists, lists can contain dictionaries, and the nesting can go several levels deep:
+
+```python
+schools = {
+    "School 1": {
+        "Classroom A": ["Alice", "Bob"],
+        "Classroom B": ["Carol", "Dave", "Eve"]
+    },
+    "School 2": {
+        "Classroom A": ["Frank", "Grace"],
+        "Classroom B": ["Heidi", "Ivan", "Judy"]
+    }
+}
+
+# Access the 3rd student in School 2, Classroom B
+print(schools["School 2"]["Classroom B"][2])  # "Judy"
+```
+
+The skill of navigating nested structures — working from the outside in, one key or index at a time — is essential for parsing API responses. When you encounter a complex JSON response, start by checking `type()` and `.keys()` at the top level, then work your way down.
+
+### The List-of-Dictionaries Pattern
+
+The most common JSON pattern you will encounter in web data is a list of dictionaries, where each dictionary represents a record and each key-value pair represents a field:
+
+```python
+census_data = [
+    {"state": "Colorado", "year": 2020, "population": 5773714},
+    {"state": "Colorado", "year": 2010, "population": 5029196},
+    {"state": "Colorado", "year": 2000, "population": 4301261}
+]
+
+# Access the population in 2020
+print(census_data[0]["population"])  # 5773714
+```
+
+This pattern converts directly into a pandas DataFrame:
+
+```python
+import pandas as pd
+
+df = pd.DataFrame(census_data)
+print(df)
+#        state  year  population
+# 0  Colorado  2020     5773714
+# 1  Colorado  2010     5029196
+# 2  Colorado  2000     4301261
+```
+
+This list-of-dictionaries-to-DataFrame pipeline is the standard way to convert API responses into analyzable data. You will use it in nearly every chapter from here forward.
+
+### Parsing JSON Strings
+
+When you receive JSON data from the web (as a string), you need to parse it into Python objects:
+
+```python
+import json
+
+# Parse a JSON string into a Python object
+json_string = '{"name": "Colorado", "population": 5773714}'
+data = json.loads(json_string)  # loads = "load string"
+print(type(data))    # <class 'dict'>
+print(data["name"])  # "Colorado"
+
+# The reverse: convert a Python object to a JSON string
+json_output = json.dumps(data, indent=2)  # dumps = "dump string"
+print(json_output)
+```
+
+When working with `requests`, the `.json()` method on a response object does this parsing for you automatically:
+
+```python
+response = requests.get("https://api.example.com/data")
+data = response.json()  # Equivalent to json.loads(response.text)
+```
+
+### Working with a Real JSON Object
+
+Here is a simplified version of a social media post object, similar to what Twitter's API used to return:
+
+```python
+tweet = {
+    "id": 266031293945503744,
+    "text": "Four more years.",
+    "created_at": "Wed Nov 07 04:49:06 +0000 2012",
+    "user": {
+        "name": "Barack Obama",
+        "screen_name": "BarackObama",
+        "followers_count": 23456789
+    },
+    "entities": {
+        "hashtags": [],
+        "user_mentions": [],
+        "urls": []
+    },
+    "retweet_count": 814974,
+    "favorite_count": 302015
+}
+
+# Top-level keys
+print(tweet.keys())
+# dict_keys(['id', 'text', 'created_at', 'user', 'entities', ...])
+
+# Nested access
+print(tweet["user"]["screen_name"])  # "BarackObama"
+print(tweet["created_at"])            # "Wed Nov 07 04:49:06 +0000 2012"
+
+# Check for mentions
+print(len(tweet["entities"]["user_mentions"]))  # 0
+```
+
+## When to Use Which
+
+XML tends to appear in older web services, government data feeds (congressional records, SEC filings, RSS feeds), and configuration files. JSON dominates modern web APIs, database exports, and any context where data is being exchanged between web services. HTML — which you will parse extensively beginning in @sec-static-pages — is structurally similar to XML and is parsed with the same BeautifulSoup methods.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For more on data file formats including CSV, TSV, and other common structures, see *Missing Manual* Chapter 20: Data File Formats.
+:::
+
+## Exercises
+
+1. **RSS feed parsing.** Find an RSS feed from a news outlet (most news sites have one at `/rss` or `/feed`). Retrieve it with `requests`, parse it with BeautifulSoup (using the `"xml"` parser), and extract the title, link, and publication date for each item. Convert the results to a DataFrame.
+
+2. **Nested JSON navigation.** The following URL returns weather data in JSON format: `https://api.open-meteo.com/v1/forecast?latitude=40.01&longitude=-105.27&daily=temperature_2m_max&timezone=America/Denver`. Retrieve the data, navigate the nested JSON response, and create a DataFrame with dates and maximum temperatures for Boulder, CO.
+
+3. **XML vs. JSON comparison.** Find a data source that provides the same information in both XML and JSON formats (e.g., a government API or data service). Retrieve both versions and compare: how does the structure differ? Which is easier to parse in Python? Which contains more metadata?
+
+## Social History and Public Interest
+
+XML emerged in the late 1990s from the standardization efforts of the World Wide Web Consortium (W3C), designed to be a universal format for document and data exchange. Its verbosity made it rigorous but heavy. JSON was created by Douglas Crockford in the early 2000s as a lightweight alternative that leveraged JavaScript's native object syntax. Its simplicity and the rise of AJAX-powered web applications made it the default format for APIs by the 2010s.
+
+The politics of data formats may seem esoteric, but format choices have real consequences for access and transparency. When a government publishes budget data as XML, it is machine-readable by design. When it publishes the same data as a scanned PDF, it is technically "public" but practically inaccessible — a form of the soft enclosure discussed in @sec-post-api. Open government data initiatives like data.gov have pushed for machine-readable formats precisely because format determines who can actually use the data.
+
+## Common Issues to Debug
+
+- **Parser selection**: Use `"xml"` for XML documents and `"html.parser"` or `"lxml"` for HTML. Using the wrong parser produces unexpected results.
+- **`json.JSONDecodeError`**: The string is not valid JSON. Common causes include trailing commas, single quotes (JSON requires double quotes), or the response containing HTML error pages instead of JSON.
+- **`KeyError` in dictionaries**: The key does not exist. Use `.get("key", default_value)` for safe access.
+- **Confusion between `json.loads()` and `json.load()`**: `loads` parses a **s**tring; `load` parses a **f**ile object.
+
+## Key Takeaways
+
+XML and JSON are the two structural languages of web data. XML organizes data as a tree of nested tags; BeautifulSoup makes that tree navigable through `.find()`, `.find_all()`, and `.text`. JSON organizes data as nested lists and dictionaries; Python's native data structures map directly onto it. The skill of converting nested structures into flat DataFrames — the list-of-dictionaries-to-DataFrame pipeline — is the bridge between raw web data and analysis, and you will use it in nearly every subsequent chapter.
+
+## Further Reading
+
+- BeautifulSoup documentation: <https://www.crummy.com/software/BeautifulSoup/bs4/doc/>
+- Python `json` module: <https://docs.python.org/3/library/json.html>
+- W3C XML specification: <https://www.w3.org/XML/>
+- JSON specification: <https://www.json.org/>
+- @mitchell2018web — Chapter 1: Your First Web Scraper
