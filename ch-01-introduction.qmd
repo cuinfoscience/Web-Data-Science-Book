@@ -140,7 +140,52 @@ print(data.keys())       # What keys are in the response?
 
 Notice two things. First, you included a custom `User-Agent` header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the `.json()` method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate.
 
-You could now convert this data into a pandas DataFrame and plot a time series of daily pageviews — but that is getting ahead of ourselves. The point of this first example is to demonstrate that the entire arc of web data science, from question to data to insight, is accessible with tools you will master in this book.
+### From Response to DataFrame
+
+The `data["items"]` key contains a list of dictionaries, one per day, each with fields like `timestamp`, `views`, `article`, and `project`. This is exactly the kind of structure that pandas can convert into a DataFrame with a single call:
+
+```python
+import pandas as pd
+
+# Convert the list of dictionaries into a DataFrame
+df = pd.DataFrame(data["items"])
+print(df.head())
+# You'll see columns: project, article, granularity, timestamp, access, agent, views
+
+# The timestamp column looks like "2024010100" — convert it to a proper date
+df["date"] = pd.to_datetime(df["timestamp"], format="%Y%m%d00")
+
+# Plot the time series
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 4))
+plt.plot(df["date"], df["views"])
+plt.xlabel("Date")
+plt.ylabel("Daily Pageviews")
+plt.title(f"Wikipedia Pageviews: {article}")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+```
+
+This retrieve-parse-DataFrame-visualize pipeline is the fundamental pattern of this book. In every subsequent chapter, you will repeat these steps with different data sources: retrieve HTML pages, XML feeds, JSON API responses, or PDF documents; parse them into structured records; convert those records into a pandas DataFrame; and analyze or visualize the result. The specifics change — BeautifulSoup for HTML, `json.loads()` for JSON, regular expressions for messy text — but the arc remains the same. Recognizing this pattern early will help you approach each new chapter with a clear mental model of what you are trying to accomplish.
+
+The DataFrame also gives you immediate analytical power. You can compute summary statistics with `df["views"].describe()`, identify the highest-traffic day with `df.loc[df["views"].idxmax()]`, or resample the data to weekly totals. These operations are not the focus of this chapter, but they illustrate why getting data into a DataFrame is such a valuable intermediate step.
+
+### Saving Your Work
+
+Once you have data in a DataFrame, save it to disk. This is not optional — it is a core practice of responsible web data science:
+
+```python
+# Save to CSV
+df.to_csv("cu_boulder_pageviews.csv", index=False)
+
+# Later, load it back without making another API request
+df = pd.read_csv("cu_boulder_pageviews.csv")
+print(f"Loaded {len(df)} rows from disk.")
+```
+
+Serialization — saving your data to a file — matters for three reasons. First, courtesy: every API call consumes server resources, and re-requesting data you already have is wasteful. Second, reproducibility: if you save the data you retrieved on a specific date, your analysis can be reproduced even if the API changes or goes offline. Third, the data itself may change — Wikipedia pageview counts are finalized after a short delay, and an article's content can be edited at any moment. The version you retrieved is a snapshot, and saving it preserves that snapshot. You will explore JSON serialization for more complex data structures in @sec-archives.
 
 ## Documentation as Professional Practice
 
@@ -168,11 +213,24 @@ For strategies on asking effective technical questions and reading official docu
 
 3. **Your first API call.** Using the Wikimedia pageviews API URL pattern from this chapter, retrieve the daily pageview data for a Wikipedia article of your choice over a month-long period. Convert the `data['items']` list into a pandas DataFrame and create a simple line plot of views over time using `matplotlib`.
 
+4. **POST vs. GET.** Read the `requests` library documentation and find the method for making a POST request. In a Markdown cell, explain how POST differs from GET and describe a scenario where you would use each. What kind of data does a POST request typically send, and why would an API require it instead of GET?
+
+5. **Multi-article comparison.** Retrieve daily pageview data for three Wikipedia articles of your choice over the same month. Save each to a separate CSV file using `df.to_csv()`. Load all three back with `pd.read_csv()` and create a single plot with all three time series on the same axes, with a legend identifying each article. Which article had the most variable traffic, and can you hypothesize why?
+
 ## Social History and Public Interest
 
 Web data science emerged at the intersection of several traditions. Computational social scientists in the 2000s and 2010s recognized that the web was generating behavioral data at unprecedented scale — traces of how people communicate, collaborate, and organize [@lazer2009computational]. Data journalists discovered that web scraping could hold institutions accountable by making nominally public data actually analyzable. Civic technologists built tools to make government data accessible to citizens.
 
 These traditions share a commitment to the idea that data fluency is a form of power, and that this power should serve the public interest. As you develop your skills throughout this book, you will encounter recurring questions about who benefits from web data collection, who is harmed by it, and what obligations come with the ability to automate access to information at scale.
+
+Some of the most consequential data science work of the past decade has come from this tradition. ProPublica's "Machine Bias" investigation in 2016 used scraped court records to reveal racial bias in criminal risk assessment algorithms — a finding that shaped national policy debates about algorithmic fairness. The Markup's "Citizen Browser" project recruited a panel of real users to study how Facebook's news feed algorithm distributed political content, producing evidence that would have been impossible to obtain through the platform's official research tools. These projects combined technical scraping skills with domain expertise and ethical frameworks to produce knowledge that served the public interest.
+
+The intellectual roots of web data science run deeper than any single investigation. The computational social science manifesto by @lazer2009computational articulated a vision of research that leverages the "digital traces" left by online behavior — search queries, social media posts, hyperlink structures, editing histories — to answer questions at population scale. These traces are not designed for research; they are byproducts of ordinary activity. The researcher's task is to transform them into meaningful evidence while respecting the privacy and dignity of the people who generated them. This tension between the analytical power of digital trace data and the ethical obligations it creates is a thread that runs through every chapter of this book.
+
+::: {.callout-note}
+## Public Interest Connection
+The tools you learn in this book are not neutral. Web data collection can serve **openness** — making public information practically accessible — or it can enable surveillance and exploitation. The ethical frameworks in @sec-ethics and the public interest framing in @sec-post-api will help you navigate this tension throughout the course.
+:::
 
 ## Common Issues to Debug
 
