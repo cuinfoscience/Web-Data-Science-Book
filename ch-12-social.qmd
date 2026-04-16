@@ -103,6 +103,54 @@ df_comments = pd.DataFrame(comments)
 print(f"Total comments: {len(df_comments)}")
 ```
 
+### Analyzing Comment Engagement
+
+With the comment tree flattened into a DataFrame, you can start asking quantitative questions about how engagement varies with comment structure and position. One natural question: do deeper comments — replies to replies to replies — receive less attention than top-level responses? The `depth` field PRAW provides makes this straightforward to investigate.
+
+```python
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Scatter plot: comment depth vs. score
+axes[0].scatter(df_comments["depth"], df_comments["score"], alpha=0.4)
+axes[0].set_xlabel("Comment Depth")
+axes[0].set_ylabel("Score (Upvotes - Downvotes)")
+axes[0].set_title("Comment Depth vs. Score")
+
+# Histogram of comment lengths (word count)
+df_comments["word_count"] = df_comments["body"].apply(lambda x: len(x.split()))
+axes[1].hist(df_comments["word_count"], bins=30, edgecolor="black", alpha=0.7)
+axes[1].set_xlabel("Word Count")
+axes[1].set_ylabel("Frequency")
+axes[1].set_title("Distribution of Comment Lengths")
+
+plt.tight_layout()
+plt.show()
+```
+
+```python
+# Summary statistics by depth
+depth_summary = df_comments.groupby("depth").agg(
+    mean_score=("score", "mean"),
+    mean_length=("word_count", "mean"),
+    count=("score", "size")
+).reset_index()
+
+print(depth_summary)
+# depth  mean_score  mean_length  count
+# 0        45.2        28.1       312
+# 1        12.8        22.5       487
+# 2         5.3        18.9       201
+# ...
+```
+
+You can also compute the correlation between depth and score to quantify this relationship. A Spearman rank correlation is appropriate here because the score distribution is heavily skewed — a handful of top-level comments accumulate hundreds or thousands of votes while most comments hover near zero.
+
+The pattern you will typically observe is a clear decay: top-level comments (depth 0) receive the highest scores because they are the most visible, appearing directly below the submission. Each additional level of nesting reduces both visibility and engagement. This is not necessarily a reflection of comment quality — it is an artifact of Reddit's interface design, where nested comments are progressively collapsed and harder to reach.
+
+Comment length tells a complementary story. Most Reddit comments are short — a few sentences at most — but the distribution has a long right tail of substantive, multi-paragraph responses. These longer comments often appear in subreddits with stricter moderation norms (like r/AskHistorians or r/science), where low-effort replies are actively removed. The relationship between platform governance and the data you can collect is not incidental; it is fundamental to interpreting what you find.
+
 ::: {.callout-note}
 ## Public Interest Connection
 Reddit's 2023 API pricing changes — from free to $0.24 per 1,000 calls — and the shutdown of the Pushshift archive are a live example of **enclosure** in action. The free tier still supports research use, but the death of third-party apps and Pushshift fundamentally changed what data is available and on whose terms [@baumgartner2020pushshift].
@@ -153,6 +201,77 @@ features = sp.audio_features(track_ids)
 df_features = pd.DataFrame(features)
 print(df_features[["danceability", "energy", "tempo", "valence"]].describe())
 ```
+
+### Comparing Artists by Audio Profile
+
+Audio features become especially revealing when you compare artists across genres. Spotify's numerical representations of musical characteristics let you quantify differences that listeners perceive intuitively. Let us retrieve audio features for two contrasting artists — one from classical music and one from electronic dance music — and see whether the API's features capture the distinction.
+
+```python
+def get_artist_audio_profile(sp, artist_name):
+    """Retrieve mean audio features for an artist's top tracks.
+
+    Parameters
+    ----------
+    sp : spotipy.Spotify
+        Authenticated Spotify client
+    artist_name : str
+        Name of the artist to search for
+
+    Returns
+    -------
+    dict
+        Mean values for key audio features
+    """
+    results = sp.search(q=artist_name, type="artist", limit=1)
+    artist_id = results["artists"]["items"][0]["id"]
+
+    top_tracks = sp.artist_top_tracks(artist_id)
+    track_ids = [t["id"] for t in top_tracks["tracks"][:10]]
+    features = sp.audio_features(track_ids)
+
+    df = pd.DataFrame(features)
+    return df[["danceability", "energy", "valence", "tempo"]].mean().to_dict()
+
+# Compare two contrasting artists
+profile_classical = get_artist_audio_profile(sp, "Yo-Yo Ma")
+profile_electronic = get_artist_audio_profile(sp, "Daft Punk")
+
+comparison = pd.DataFrame({
+    "Yo-Yo Ma": profile_classical,
+    "Daft Punk": profile_electronic
+})
+print(comparison)
+```
+
+```python
+import numpy as np
+
+# Grouped bar chart comparing audio profiles
+features_to_plot = ["danceability", "energy", "valence"]
+x = np.arange(len(features_to_plot))
+width = 0.35
+
+fig, ax = plt.subplots(figsize=(8, 5))
+bars1 = ax.bar(x - width/2, [profile_classical[f] for f in features_to_plot],
+               width, label="Yo-Yo Ma", color="#4C72B0")
+bars2 = ax.bar(x + width/2, [profile_electronic[f] for f in features_to_plot],
+               width, label="Daft Punk", color="#DD8452")
+
+ax.set_ylabel("Mean Feature Value (0-1)")
+ax.set_title("Audio Feature Comparison: Classical vs. Electronic")
+ax.set_xticks(x)
+ax.set_xticklabels([f.capitalize() for f in features_to_plot])
+ax.legend()
+ax.set_ylim(0, 1)
+plt.tight_layout()
+plt.show()
+```
+
+The differences are stark. Daft Punk's tracks score high on danceability and energy — characteristics that define electronic dance music — while Yo-Yo Ma's cello performances register low on both dimensions. Valence, Spotify's measure of musical positivity, may be more surprising: classical pieces often score in the middle range, neither clearly "happy" nor "sad" by the algorithm's standards, while electronic tracks tend toward higher valence.
+
+This kind of comparison scales naturally. You could extend it to dozens of artists, building a feature matrix that maps the audio landscape of an entire genre or era. Clustering algorithms applied to these profiles can reveal subgenre structure that mirrors musicological categories — or, more interestingly, identifies groupings that cut across traditional genre boundaries.
+
+These audio features are not ground truth about music — they are Spotify's proprietary algorithmic interpretations. Tempo is measured in beats per minute and is relatively objective; danceability and valence are learned from training data and reflect particular cultural assumptions about what makes music "danceable" or "positive." When you use these features in research, you are analyzing Spotify's model of music as much as you are analyzing the music itself. This is a recurring theme in web data science: the data you collect from platforms is always mediated by the platform's own interpretive layer.
 
 ## Bluesky via AT Protocol
 
@@ -217,11 +336,17 @@ for toot in timeline:
 
 3. **Open vs. closed.** Attempt to retrieve the same type of information (user profile, social graph, recent posts) from both Bluesky and Reddit. Compare the ease of access, the richness of the data, and the authentication requirements. What does this comparison tell you about platform governance?
 
+4. **Genre fingerprints.** Choose two Spotify playlists representing different genres (e.g., country vs. electronic). Retrieve audio features for the tracks in each playlist using `sp.playlist_tracks()` and `sp.audio_features()`. Create overlapping distribution plots (using histograms or kernel density estimates) comparing danceability, energy, and valence across genres. Can you distinguish the genres algorithmically based on audio features alone?
+
+5. **Bluesky analysis.** Retrieve the 50 most recent posts from a Bluesky account of your choice using the AT Protocol SDK. Compute summary statistics: average post length, posting frequency (posts per day), fraction of posts that are replies vs. original posts, and the most common words used. How does this activity profile compare to what you might expect from the same account on Twitter/X? What limitations of the AT Protocol API did you encounter during data collection?
+
 ## Social History and Public Interest
 
 The contrast between Reddit, Spotify, Bluesky, and Mastodon illustrates the governance spectrum described in @sec-post-api. Reddit's 2023 changes demonstrate how a platform can unilaterally restrict access that researchers depended on. Spotify's API represents a productive commercial arrangement — rich data in exchange for engagement. Bluesky and Mastodon represent structural alternatives where open protocols make enclosure architecturally harder.
 
 The PRAW library and Mastodon.py continue to work because their platforms maintain documented APIs. But the history of Twitter's API — which went from the most important data source in computational social science to essentially inaccessible within a year of its acquisition — is a reminder that platform goodwill is not infrastructure.
+
+The Fediverse offers two distinct architectural responses to this problem. ActivityPub, the protocol underlying Mastodon, creates a federated network where each instance is independently operated but can communicate with others — much like email servers. No single company controls the protocol, so no single company can revoke access. The AT Protocol, which powers Bluesky, takes a different approach centered on portable identity: your account data, social graph, and content can move between providers, preventing the lock-in that makes platform migration so costly. Both represent structural alternatives to centralized platforms, distributing control rather than concentrating it. This is the architectural embodiment of **ownership** (@sec-post-api) — users and communities, not corporations, control the infrastructure. For researchers, these open protocols mean that data access is a design feature rather than a business concession, offering more durable foundations for longitudinal research than any corporate API ever could. The trade-off is fragmentation: collecting comprehensive data from a federated network requires engaging with multiple instances, each with its own norms, moderation policies, and technical configurations. Decentralization solves the single-point-of-failure problem but introduces new challenges for research design that centralized platforms never posed.
 
 ## Common Issues to Debug
 
