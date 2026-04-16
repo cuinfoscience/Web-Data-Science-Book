@@ -330,6 +330,15 @@ print(f"Estimated cost for classifying {num_bills} bills: ${estimated_cost:.4f}"
 ```
 
 Use `gpt-4o-mini` for development and testing. Switch to `gpt-4o` only when you need higher quality and have validated your prompts on a smaller sample.
+
+## Reproducibility and Documentation
+
+LLM-based research faces reproducibility challenges that are fundamentally different from those of traditional computational methods. When you write a Python script to parse HTML, anyone with the same input file will get the same output. LLMs break this guarantee in multiple ways. Even with `temperature=0`, model outputs can vary slightly between calls due to floating-point non-determinism in the inference process. More significantly, model versions change over time: a prompt that works reliably with GPT-4 in early 2024 may produce different results with the same model name in late 2024, because the underlying weights have been updated. And when a model is deprecated entirely — as GPT-3.5 eventually will be — exact replication becomes impossible. These properties do not disqualify LLMs as research tools, but they demand a level of documentation that most researchers are not yet accustomed to providing.
+
+At a minimum, every research project that uses LLM APIs should record the following for each API call: the exact model name and version (e.g., `gpt-4o-mini-2024-07-18`, not just `gpt-4o-mini`), the complete prompt text including the system message, all generation parameters (`temperature`, `max_tokens`, `top_p`, `frequency_penalty`), the date and time of the API call, and any post-processing or validation steps applied to the output. Store this metadata alongside your results, not in a methods section written months later from memory. A simple practice is to log each API call to a JSONL file that includes both the request parameters and the full response object — this creates an audit trail that supports both reproducibility and debugging.
+
+This documentation burden connects to the broader norms of scientific reproducibility discussed in @sec-appendix-ai-disclosure. The AI disclosure framework presented there provides a structured template for reporting LLM use in research. The core principle is transparency: another researcher should be able to read your methods section and understand exactly what model, prompt, and parameters produced your results — even if they cannot reproduce them identically, they should be able to reproduce them approximately and assess whether the differences are meaningful. Treating LLM documentation as a first-class methodological concern — not an afterthought — is what separates rigorous research from ad hoc analysis.
+
 ## The Anthropic API
 
 Anthropic's Claude provides an alternative LLM API with a similar interface:
@@ -351,6 +360,52 @@ response = client_anthropic.messages.create(
 print(response.content[0].text)
 ```
 
+### Comparing Model Outputs
+
+When you use LLMs for research tasks like content classification, a critical question is whether your results depend on which model you chose. The answer, almost always, is yes — and the degree of that dependence matters for the credibility of your findings. You can test this directly by sending the same prompt to both APIs and comparing their responses.
+
+```python
+# Send the same classification prompt to both models
+bill_text = "Establishes new emission standards for power plants operating in Colorado."
+
+system_prompt = (
+    "You are a legislative analyst. Classify this bill summary into exactly one "
+    "category: education, healthcare, environment, taxation, criminal_justice, "
+    "transportation, housing, labor, technology, or other. "
+    "Respond with only the category label."
+)
+
+# OpenAI classification
+openai_response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": bill_text}
+    ],
+    temperature=0
+)
+openai_label = openai_response.choices[0].message.content.strip()
+
+# Anthropic classification
+anthropic_response = client_anthropic.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=50,
+    system=system_prompt,
+    messages=[
+        {"role": "user", "content": bill_text}
+    ]
+)
+anthropic_label = anthropic_response.content[0].text.strip()
+
+print(f"OpenAI:    {openai_label}")     # environment
+print(f"Anthropic: {anthropic_label}")   # environment
+print(f"Agreement: {openai_label == anthropic_label}")
+```
+
+For straightforward cases like the example above, both models will likely agree. The disagreements emerge at the boundaries — a bill about "electric vehicle incentives" might be classified as `environment` by one model and `transportation` or `taxation` by the other. These boundary cases are not failures; they reflect genuine ambiguity in the classification scheme. But they mean that your results are partially an artifact of your model choice, not purely a reflection of the underlying data.
+
+This makes validation against human judgment essential. If two state-of-the-art models disagree on 15 percent of your cases, you need to know whether one of them aligns better with how a domain expert would classify the same text. Running a cross-model comparison on a human-labeled sample is the minimum standard for any research that uses LLM-based classification. Treat the model as a measurement instrument, and like any instrument, it needs calibration.
+
 ::: {.callout-tip}
 ## Missing Manual Reference
 For a deeper understanding of how language models work internally — tokens, embeddings, attention, context windows — see *Missing Manual* Chapter 30: How Language Models Work.
@@ -364,11 +419,22 @@ For a deeper understanding of how language models work internally — tokens, em
 
 3. **Human-AI agreement.** Design a classification task for a set of documents. Manually classify 20 documents, then have an LLM classify the same documents. Compute the agreement rate. Where does the LLM disagree with your judgment?
 
+4. **Cross-model comparison.** Code 20 text samples manually according to a classification scheme of your choice. Have both GPT-4o-mini and Claude classify the same 20 samples. Compute the agreement rate between each model and your human labels, and between the two models. Where do the models disagree with each other, and what does that tell you about the task?
+
+5. **Hierarchical clustering.** Generate embeddings for 30 Wikipedia article titles spanning three different topic areas (10 per topic). Use `scipy.cluster.hierarchy` to create a dendrogram. Do the embeddings cluster by topic? How does the clustering compare to your intuitive groupings?
+
 ## Social History and Public Interest
 
 LLMs have accelerated the enclosure dynamics described in @sec-post-api — the enormous value of user-generated content as training data has given platforms new incentives to restrict access. At the same time, LLMs provide researchers with powerful analytical tools that can partially offset restricted data access: if you can retrieve even a small sample of text, LLMs can help you code, classify, and extract information from it at scales that would be impossible manually [@ziems2024can].
 
 The key challenge is reproducibility. LLM outputs are non-deterministic (even with `temperature=0`, there is some variation), model versions change, and the cost structure means that replication requires financial investment. These properties require new norms for documentation and disclosure — see @sec-appendix-ai-disclosure.
+
+There is also a cost-based access inequality shaping who can use these tools for research. GPT-4-class models cost orders of magnitude more per token than GPT-3.5-class models, creating a tier system where well-funded labs can afford the most capable models while under-resourced researchers are limited to cheaper, less capable alternatives. Open-weight models like LLaMA, Mistral, and Qwen represent a partial counterbalance — their weights are freely available for download and local inference. But running these models requires significant GPU infrastructure, creating a different kind of barrier rooted in compute rather than API fees. The result is a landscape where access to the most capable AI tools is stratified by institutional resources, raising questions about whose research questions get answered and whose analytical methods are considered state-of-the-art.
+
+::: {.callout-note}
+## Public Interest Connection
+The cost structure of LLM APIs creates a form of **oversight** asymmetry (@sec-post-api). Well-resourced organizations can afford to run large-scale analyses that smaller teams cannot replicate or verify. Open-weight models and transparent pricing help, but the fundamental tension between capability and accessibility remains unresolved.
+:::
 
 ## Common Issues to Debug
 
