@@ -78,6 +78,31 @@ print(rp.can_fetch("*", "https://en.wikipedia.org/w/index.php?action=edit"))
 
 Two important caveats. First, `robots.txt` is a norm, not a law. Violating it is not illegal (in most jurisdictions), but it is disrespectful of the site operator's wishes and may result in your IP being blocked. Second, if a site does not have a `robots.txt` file (the request returns a 404), that means there are no crawling restrictions — not that you should crawl aggressively.
 
+### Comparing robots.txt Across Platforms
+
+Different organizations have dramatically different approaches to automated access, and their `robots.txt` files reveal these philosophies. Compare three major sites:
+
+```python
+import requests
+
+sites = {
+    "Wikipedia": "https://en.wikipedia.org/robots.txt",
+    "Reddit": "https://www.reddit.com/robots.txt",
+    "NY Times": "https://www.nytimes.com/robots.txt",
+}
+
+for name, url in sites.items():
+    response = requests.get(url)
+    lines = response.text.strip().split("\n")
+    disallow_count = sum(1 for line in lines if line.startswith("Disallow"))
+    allow_count = sum(1 for line in lines if line.startswith("Allow"))
+    print(f"{name}: {len(lines)} lines, {disallow_count} Disallow rules, {allow_count} Allow rules")
+```
+
+Wikipedia's `robots.txt` is relatively permissive — it restricts access to editing interfaces and internal administration pages but explicitly allows its API (`Allow: /w/api.php`). This reflects Wikipedia's organizational commitment to openness: the data exists to be shared. Reddit's file is more complex, restricting many URL patterns (user profiles, search results, sorted listings) while permitting basic page access. The New York Times is more restrictive still, blocking large sections of the site from automated access — reflecting the fact that its content is a commercial product.
+
+These differences are not arbitrary. They reflect each organization's relationship with automated access: Wikipedia encourages it as part of its mission, Reddit tolerates it within limits, and the Times treats its content as proprietary. Reading `robots.txt` before you scrape tells you not just what is permitted but what kind of organization you are dealing with.
+
 ## Responsible Request Headers
 
 When your code makes requests to a web server, the server sees metadata about the request including the `User-Agent` header, which identifies who is making the request. By default, the `requests` library sends a generic User-Agent string. You should replace it with one that identifies you and provides contact information:
@@ -112,6 +137,55 @@ for url in urls:
 
 A good default is one request per second. If the site's `robots.txt` specifies a `Crawl-delay`, respect it. If you are hitting an API with documented rate limits, stay well within them.
 
+### Building a Responsible Scraper Function
+
+The principles above — custom User-Agent, rate limiting, error handling — appear in every scraping project. Rather than implementing them ad hoc each time, you can wrap them into a reusable function:
+
+```python
+import requests
+import time
+import logging
+
+def responsible_get(url, headers=None, delay=1.0):
+    """Make an HTTP GET request with responsible defaults.
+
+    Parameters
+    ----------
+    url : str
+        The URL to request
+    headers : dict, optional
+        Custom headers; a default User-Agent is added if none provided
+    delay : float
+        Seconds to wait after the request (default: 1.0)
+
+    Returns
+    -------
+    requests.Response or None
+        The response object, or None if the request failed
+    """
+    default_headers = {
+        "User-Agent": "WebDataScience/1.0 (student-project; your-email@colorado.edu)"
+    }
+    if headers:
+        default_headers.update(headers)
+
+    try:
+        response = requests.get(url, headers=default_headers, timeout=30)
+        logging.info(f"{response.status_code} {url}")
+        time.sleep(delay)
+        return response
+    except requests.exceptions.ConnectionError:
+        logging.error(f"Connection failed: {url}")
+        return None
+    except requests.exceptions.Timeout:
+        logging.error(f"Request timed out: {url}")
+        return None
+```
+
+Every design choice in this function reflects a principle from this chapter. The default User-Agent identifies you and provides contact information, so site operators can reach you if your scraping causes problems. The configurable delay enforces rate limiting by default — you have to explicitly override it, which makes aggressive scraping a conscious decision rather than an oversight. The `try/except` blocks handle the two most common network failures gracefully, logging the error instead of crashing your entire scraping run. The `timeout` parameter prevents your script from hanging indefinitely on an unresponsive server.
+
+You will use variations of this pattern in @sec-static-pages when scraping HTML tables, in @sec-archives when retrieving historical snapshots, and throughout the API chapters. Building responsible defaults into your tools is more reliable than remembering to add them each time.
+
 ## An Ethical Decision Framework
 
 Before any data collection project, work through these five questions:
@@ -128,6 +202,14 @@ Before any data collection project, work through these five questions:
 
 No framework can substitute for judgment. But working through these questions systematically will help you identify risks and make defensible decisions.
 
+### IRBs and Web Data
+
+If you are conducting research at a university, there is an additional layer of oversight: the Institutional Review Board (IRB). IRBs review research involving human subjects to ensure it meets ethical standards derived from the Belmont Report's three principles — respect for persons, beneficence, and justice.
+
+When does web scraping become human subjects research? The general rule is that it qualifies when you collect data *about identifiable people* to produce *generalizable knowledge*. Scraping public government records — legislative votes, budget documents, meeting minutes — is usually not human subjects research because the subjects are institutions and public officials acting in their official capacities. But scraping social media profiles to study health behaviors, political attitudes, or personal relationships almost certainly is, because you are studying identifiable individuals and their behavior.
+
+The line is not always clear. Scraping aggregated, anonymous data (like Wikipedia edit counts without usernames) falls into a gray area. When in doubt, consult your institution's IRB. Many universities have expedited review processes for minimal-risk research involving publicly available data, and the process of writing an IRB protocol forces you to think carefully about privacy, consent, and data security — exactly the issues this chapter's framework addresses. The Belmont Report's principles complement the five-question framework above: respect for persons maps to consent, beneficence to proportionality and privacy, and justice to the question of who bears the risks and who receives the benefits of your research.
+
 ## Exercises
 
 1. **Compare robots.txt files.** Retrieve and compare `robots.txt` for five websites in the same category (e.g., five news organizations, five universities, or five social media platforms). What patterns emerge in what they allow and restrict? Write a brief analysis in a Markdown cell.
@@ -137,6 +219,8 @@ No framework can substitute for judgment. But working through these questions sy
 3. **Ethical decision framework.** Apply the five-question framework to a hypothetical scenario: a researcher wants to scrape user profiles from a dating app to study patterns in self-presentation across demographic groups. Work through each question and write a recommendation.
 
 4. **Rate limiting experiment.** Using `time.time()` to measure elapsed time, write a loop that makes five requests to a public website with a one-second delay between each. Then modify the delay to two seconds. Confirm that your actual request timing matches your intended rate.
+
+5. **Personal robots.txt audit.** Retrieve `robots.txt` for a website you use daily but have never scraped. Read the `Disallow` rules carefully. Then find and read the site's Terms of Service (look for links in the footer). Write a 300-word analysis: if you wanted to collect data from this site for a class project, what would `robots.txt`, the Terms of Service, and the five-question ethical framework each permit and restrict? Where do these three sources of guidance agree, and where do they conflict?
 
 ::: {.callout-note}
 ## Public Interest Connection
@@ -148,6 +232,8 @@ The ethical framework introduced here connects directly to the values of **overs
 The tension between data access and data protection is not new. Journalists have long navigated similar terrain through freedom-of-information laws, source protection, and editorial ethics. The CFAA was originally designed to combat hacking, but its vague language about "unauthorized access" has been used to threaten researchers, journalists, and security auditors. The Aaron Swartz case — in which a young activist faced federal charges for downloading academic articles from JSTOR through MIT's network — remains a sobering reminder of how aggressively the CFAA can be applied [@fiesler2020no].
 
 The Cambridge Analytica scandal of 2018 was a turning point. A researcher collected Facebook data through the platform's API, ostensibly for academic purposes, then shared it with a political consulting firm. The fallout led Facebook, and then other platforms, to drastically restrict API access — a closure that affected all researchers, not just those who had misused data. This history is central to understanding the post-API landscape described in @sec-post-api.
+
+The aftermath of Cambridge Analytica created a chilling effect that extended far beyond Facebook. IRBs at universities became more cautious about approving any research involving social media data, even when the data was public and the research served clear public interests. Platforms shut down APIs that legitimate researchers had depended on for years, citing privacy concerns that conveniently also prevented the kind of external scrutiny that might reveal algorithmic bias or content moderation failures. The academic research community is still rebuilding trust and access through alternative frameworks: the European Union's Digital Services Act (DSA) now mandates researcher access to platform data for public interest research, data donation programs ask users to voluntarily share their data with researchers, and negotiated research agreements between universities and platforms provide structured access with privacy safeguards. These developments represent an ongoing effort to balance legitimate privacy concerns with the public's interest in understanding how platforms shape information, attention, and behavior. The tools and ethical frameworks in this chapter position you to participate in that effort responsibly.
 
 ## Common Issues to Debug
 

@@ -289,6 +289,59 @@ for cat in categories[:10]:
     print(f"  {cat}")
 ```
 
+### Interlanguage Links
+
+One of the most revealing structural features of Wikipedia is which articles exist in which languages. The `langlinks` property tells you how many of Wikipedia's 300+ language editions have a corresponding article for a given topic — and which languages those are.
+
+```python
+def get_langlinks(title, headers=None):
+    """Get all interlanguage links for an article.
+
+    Parameters
+    ----------
+    title : str
+        Article title
+    headers : dict, optional
+        HTTP headers including User-Agent
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with language codes and article titles
+    """
+    url = "https://en.wikipedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "titles": title,
+        "prop": "langlinks",
+        "lllimit": "max",
+        "format": "json"
+    }
+
+    all_links = []
+    while True:
+        response = requests.get(url, params=params, headers=headers)
+        data = response.json()
+
+        pages = data["query"]["pages"]
+        page_id = list(pages.keys())[0]
+        links = pages[page_id].get("langlinks", [])
+        all_links.extend(links)
+
+        if "continue" in data:
+            params.update(data["continue"])
+        else:
+            break
+
+    return pd.DataFrame(all_links)
+
+langs = get_langlinks("Elizabeth_II", headers=headers)
+print(f"Article exists in {len(langs)} language editions")
+print(langs["lang"].head(20))
+```
+
+The number of language editions an article appears in is itself a measure of global significance — or at least of global *interest* as perceived by Wikipedia's volunteer editors. Articles about Western political leaders, major cities, and scientific concepts tend to appear in 100 or more language editions. Articles about topics primarily relevant to the Global South — local politicians, regional cultural practices, indigenous languages — may exist in only a handful. This asymmetry reflects the demographic composition of Wikipedia's editor community, which skews heavily toward the Global North and toward speakers of European languages. When you use Wikipedia data for cross-cultural analysis, interlanguage link counts are a useful but imperfect proxy for a topic's global visibility.
+
 ## Getting User Contributions
 
 You can also retrieve the editing history of individual Wikipedia users, which is useful for studying editor behavior and community dynamics:
@@ -367,6 +420,47 @@ print(f"Elizabeth II outlinks: {len(outlinks)}")
 
 The comparison reveals how article structure and editing dynamics vary: a biographical article about a contemporary figure versus a historical event article that has been built over nearly two decades of collaborative editing.
 
+### Combining Endpoints
+
+The real analytical power of the MediaWiki API emerges when you combine data from multiple endpoints to answer questions that no single endpoint can address. A natural question is whether editing activity and viewing activity are related: do articles get edited more during periods when they are being read more, or do edits happen independently of audience attention?
+
+```python
+# Get monthly revision counts for Elizabeth II in 2022
+df_revisions["timestamp"] = pd.to_datetime(df_revisions["timestamp"])
+monthly_revs = (df_revisions
+    .set_index("timestamp")
+    .loc["2022"]
+    .resample("ME")
+    .size()
+    .reset_index(name="revisions"))
+
+# Get monthly pageviews for the same period
+views_2022 = get_pageviews("Elizabeth_II", start="20220101", end="20221231",
+                            headers=headers)
+monthly_views = (views_2022
+    .set_index("timestamp")
+    .resample("ME")["views"]
+    .sum()
+    .reset_index())
+
+# Dual-axis plot: revisions on left, pageviews on right
+fig, ax1 = plt.subplots(figsize=(12, 5))
+ax1.bar(monthly_revs["timestamp"], monthly_revs["revisions"],
+        width=20, alpha=0.7, color="steelblue", label="Revisions")
+ax1.set_ylabel("Monthly Revisions", color="steelblue")
+
+ax2 = ax1.twinx()
+ax2.plot(monthly_views["timestamp"], monthly_views["views"],
+         color="darkred", linewidth=2, label="Pageviews")
+ax2.set_ylabel("Monthly Pageviews", color="darkred")
+
+plt.title("Elizabeth II: Editing Activity vs. Reading Activity (2022)")
+fig.tight_layout()
+plt.show()
+```
+
+The September 2022 spike — corresponding to the death of Queen Elizabeth II — should appear in both time series, but their relationship across quieter months is less obvious. In general, major events drive both pageviews and revisions simultaneously, but routine editing often happens independently of audience attention. Many of Wikipedia's most active editors work on articles regardless of whether anyone is reading them. This decoupling of production and consumption is a distinctive feature of Wikipedia's volunteer model.
+
 ## Exercises
 
 1. **Comparative revision analysis.** Retrieve the revision histories for two related Wikipedia articles (e.g., "Democratic_Party_(United_States)" and "Republican_Party_(United_States)"). Compare the number of unique editors, the distribution of edits per editor (is editing concentrated or distributed?), and the pattern of monthly editing activity. Are there periods where editing spikes simultaneously on both articles?
@@ -384,6 +478,8 @@ The comparison reveals how article structure and editing dynamics vary: a biogra
 Wikipedia is the largest collaboratively-authored reference work in human history, maintained by tens of thousands of volunteer editors working in over 300 languages. Its commitment to open APIs reflects its broader mission: anyone can read, edit, and computationally access Wikipedia's content. The Wikimedia Foundation explicitly positions API access as part of its commitment to free knowledge [@ford2022writing].
 
 But openness does not mean representativeness. Research has documented significant demographic skew in who edits Wikipedia — editors are disproportionately male, from the Global North, and technically fluent. This translates into content gaps: articles about women, people of color, and the Global South are systematically shorter, less detailed, and less well-referenced than articles about men and Western topics [@mesgari2015sum]. The data you retrieve from Wikipedia's API reflects these patterns. Ease of access does not guarantee completeness or neutrality — a principle that applies equally to every data source in this book.
+
+Wikipedia's gender gap illustrates how community demographics shape content. Research has consistently found that Wikipedia's editor community is predominantly male, and this demographic skew is reflected in coverage — biographies of women are fewer, shorter, and more likely to mention marital status or family relationships than biographies of men. WikiProject Women in Red has worked systematically to address this gap, organizing edit-a-thons and maintaining lists of missing biographies. Data retrieved from the API reflects these structural patterns: any Wikipedia-based analysis inherits the biases of its volunteer editor community. Recognizing this is not a reason to avoid Wikipedia data but a reason to interpret it carefully.
 
 Wikipedia also demonstrates what sustainable, mission-driven data access looks like. While commercial platforms have restricted and monetized their APIs (see @sec-post-api), Wikipedia's API has remained free and has expanded in functionality over time. This is possible because the Wikimedia Foundation is a nonprofit funded by donations, not advertising revenue. The organizational structure shapes the data access policies.
 

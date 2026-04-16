@@ -123,6 +123,50 @@ Web data science serves different audiences, each with different expectations:
 
 In all cases, the visualizations you create with matplotlib and seaborn are not decorations — they are arguments. Every axis label, every color choice, every title should serve your analytical purpose.
 
+### Visualization as Argument
+
+Consider the difference between a default plot and one designed to communicate a finding. A default `plt.plot()` call with no labels, no title, and no context forces the reader to guess what they are looking at. A well-designed figure makes its argument legible at a glance: the title states a claim, the annotations connect data patterns to real-world causes, and the axis labels include units so the reader can evaluate the evidence independently.
+
+```python
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import pandas as pd
+
+# Suppose you have monthly Wikipedia pageviews for "Affordable Care Act"
+# with columns: 'month' (datetime) and 'pageviews' (int)
+df = pd.read_csv('aca_pageviews.csv', parse_dates=['month'])
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(df['month'], df['pageviews'], color='#2c3e50', linewidth=1.5)
+
+# Annotate key events with vertical lines and text
+ax.axvline(pd.Timestamp('2017-07-28'), color='#e74c3c', linestyle='--', alpha=0.7)
+ax.text(pd.Timestamp('2017-08-15'), df['pageviews'].max() * 0.92,
+        '"Skinny repeal"\nvote fails',
+        fontsize=9, color='#e74c3c')
+
+ax.axvline(pd.Timestamp('2020-03-11'), color='#2980b9', linestyle='--', alpha=0.7)
+ax.text(pd.Timestamp('2020-04-01'), df['pageviews'].max() * 0.78,
+        'WHO declares\nCOVID-19 pandemic',
+        fontsize=9, color='#2980b9')
+
+# Labels that include units and a title that states a finding
+ax.set_title('Public attention to the ACA spikes around legislative and health crises',
+             fontsize=12, fontweight='bold')
+ax.set_xlabel('Month')
+ax.set_ylabel('Monthly pageviews (thousands)')
+ax.xaxis.set_major_locator(mdates.YearLocator())
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+
+plt.tight_layout()
+plt.savefig('aca_pageviews_annotated.png', dpi=150)
+# plt.show()
+```
+
+Notice that the title does not say "Wikipedia Pageviews for Affordable Care Act Over Time" — that merely describes the axes. Instead, it states a finding: public attention spikes around legislative and health crises. The annotations connect specific peaks to specific events, transforming a line chart into an argument about the relationship between political events and public information-seeking behavior. The clean axis formatting and removal of chart junk (top and right spines) keep the reader's attention on the data rather than on visual noise. When you build a figure, ask yourself: if a reader saw only this image and its title, would they understand the claim you are making?
+
 ## Public Interest Framing
 
 As you design your research, return to the values introduced in @sec-post-api:
@@ -133,6 +177,14 @@ As you design your research, return to the values introduced in @sec-post-api:
 
 These questions do not have formulaic answers. But asking them is itself a practice of responsible web data science.
 
+### Data Journalism as a Model
+
+Some of the most compelling examples of web data science in practice come not from academia but from data journalism. Consider ProPublica's "Dollars for Docs" investigation: it began with a straightforward question — which doctors receive payments from pharmaceutical companies? — and pursued it by scraping publicly available but practically inaccessible disclosure databases maintained by drug manufacturers. The team cleaned, standardized, and linked records across companies, then published a searchable database that allowed local journalists across the country to investigate payment patterns in their own communities. The project moved from question to data collection to analysis to public accountability, following the same arc that a strong research proposal describes.
+
+Academic researchers can learn several things from this model. Data journalists are accountable to an audience that will scrutinize their methods and challenge their conclusions. This pressure produces methodological transparency: the best data journalism outlets publish their code, describe their scraping and cleaning procedures, and explain the limitations of their data. They also structure their findings as narratives rather than tables of regression coefficients, making complex analyses accessible to non-specialist readers without sacrificing rigor. The journalistic commitment to showing your work — publishing the underlying data, linking to source documents, and explaining analytical choices — aligns directly with the reproducibility standards discussed earlier in this chapter.
+
+The practitioners who do this work well — computational social scientists, civic technologists, data journalists — share a common profile: they combine data fluency with deep domain expertise. They understand not just how to scrape a website or query an API but why the data matters, who it affects, and what questions it can and cannot answer. This integration of technical and substantive knowledge is precisely what this book aims to develop. The tools you have learned are necessary but not sufficient; pairing them with domain knowledge, ethical reflection, and a commitment to public accountability is what transforms data collection into genuine contribution.
+
 ## Exercises
 
 1. **Research proposal.** Write a 1,500-word research proposal for a web data science project. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.
@@ -140,6 +192,10 @@ These questions do not have formulaic answers. But asking them is itself a pract
 2. **Validity threats.** Identify three potential threats to validity in a hypothetical study that uses scraped social media data to measure public opinion. For each threat, propose a mitigation strategy.
 
 3. **Data documentation.** Take a dataset you collected in an earlier chapter and write a "datasheet" following @gebru2021datasheets: what does each variable measure, how was it collected, what are the known quality issues, and how should it be cited?
+
+4. **Data limitations assessment.** Choose a dataset you collected in an earlier chapter. Write a 500-word assessment of its limitations, covering: sampling bias (what is included and excluded?), measurement validity (does your variable actually measure what you claim?), temporal scope (what period does the data cover, and what might have changed?), and platform constraints (how does the platform's design shape the data you can collect?).
+
+5. **Multi-method design.** Design a research study that combines at least three techniques from this book (e.g., API data collection, web scraping, PDF extraction, text analysis, or automated collection). Write a one-page methods section that describes your data sources, collection procedures, analysis plan, and anticipated limitations. This should read like a methods section in an academic paper.
 
 ## Key Takeaways
 

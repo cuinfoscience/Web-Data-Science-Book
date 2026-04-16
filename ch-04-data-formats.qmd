@@ -130,6 +130,47 @@ from collections import Counter
 print(Counter(parties))
 ```
 
+### From XML to DataFrame
+
+Counting party affiliations is useful, but the real power of parsing XML comes from converting it into a DataFrame for systematic analysis. The pattern is straightforward: use `find_all()` to get all records, extract the fields you need from each one, build a list of dictionaries, and pass it to `pd.DataFrame()`:
+
+```python
+import pandas as pd
+
+# Extract structured data from each member
+records = []
+for m in soup.find_all("member"):
+    record = {
+        "first_name": m.find("first-name").text if m.find("first-name") else None,
+        "last_name": m.find("last-name").text if m.find("last-name") else None,
+        "party": m.find("party").text if m.find("party") else None,
+        "state": m.find("state").text if m.find("state") else None,
+    }
+    records.append(record)
+
+df = pd.DataFrame(records)
+print(df.head())
+#   first_name  last_name party state
+# 0      Nancy     Pelosi     D    CA
+# 1      Kevin   McCarthy     R    CA
+```
+
+With the full Congressional dataset, you can now perform real analysis:
+
+```python
+# Party breakdown
+print(df.groupby("party").size())
+
+# Top 10 states by number of representatives
+print(df.groupby("state").size().sort_values(ascending=False).head(10))
+```
+
+This `find_all` → extract fields → list of dictionaries → DataFrame pipeline is the fundamental pattern of this book. You will use it to parse HTML tables in @sec-static-pages, extract data from archived web pages in @sec-archives, and process PDF text in @sec-pdfs. The data source changes, the tag names change, but the pipeline stays the same. Once you internalize this pattern, every new parsing challenge becomes a question of "what tags contain the data I need?" rather than "how do I get data into a DataFrame?"
+
+The conditional checks (`if m.find("first-name") else None`) protect against missing tags — a common issue with real-world XML where not every record contains every field. Without these checks, a single missing tag would crash your entire extraction loop with an `AttributeError`.
+
+Once the data is in a DataFrame, you have the full power of pandas at your disposal. You can filter members by state (`df[df["state"] == "CO"]`), compute cross-tabulations of party by state (`pd.crosstab(df["state"], df["party"])`), or merge Congressional data with external datasets like election results or demographic information. The DataFrame is the universal intermediate format — regardless of whether your data started as XML, JSON, HTML, or PDF text, getting it into a DataFrame is the step that unlocks analysis. This chapter introduces the pattern with XML; the chapters that follow apply it to every other data source on the web.
+
 ## JSON and Python Data Structures
 
 ### Lists and Dictionaries
@@ -266,9 +307,77 @@ print(tweet["created_at"])            # "Wed Nov 07 04:49:06 +0000 2012"
 print(len(tweet["entities"]["user_mentions"]))  # 0
 ```
 
+### Handling Deeply Nested JSON
+
+The Twitter example above is only two levels deep. Real API responses often nest data three or four levels down, and the path to the data you need is not always obvious. Let us work through a live example using the Open-Meteo weather API, which returns a forecast for Boulder, Colorado:
+
+```python
+import requests
+
+url = "https://api.open-meteo.com/v1/forecast"
+params = {
+    "latitude": 40.01,
+    "longitude": -105.27,
+    "daily": "temperature_2m_max,temperature_2m_min",
+    "timezone": "America/Denver"
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+# Start by understanding the top-level structure
+print(type(data))       # <class 'dict'>
+print(data.keys())      # dict_keys(['latitude', 'longitude', 'daily', 'daily_units', ...])
+
+# The daily data is nested one level down
+print(type(data["daily"]))      # <class 'dict'>
+print(data["daily"].keys())     # dict_keys(['time', 'temperature_2m_max', 'temperature_2m_min'])
+
+# The actual values are lists inside the 'daily' dictionary
+print(data["daily"]["time"][:3])              # ['2024-01-15', '2024-01-16', '2024-01-17']
+print(data["daily"]["temperature_2m_max"][:3]) # [5.2, 8.1, 3.7]
+
+# Use .get() for safe access with a default
+elevation = data.get("elevation", "unknown")
+print(f"Elevation: {elevation} meters")
+```
+
+The strategy is always the same: start with `type()` and `.keys()` at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.DataFrame({
+    "date": pd.to_datetime(data["daily"]["time"]),
+    "high": data["daily"]["temperature_2m_max"],
+    "low": data["daily"]["temperature_2m_min"],
+})
+
+plt.figure(figsize=(10, 4))
+plt.plot(df["date"], df["high"], label="High", color="red")
+plt.plot(df["date"], df["low"], label="Low", color="blue")
+plt.fill_between(df["date"], df["low"], df["high"], alpha=0.2)
+plt.xlabel("Date")
+plt.ylabel("Temperature (°C)")
+plt.title("Boulder, CO — 7-Day Forecast")
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
+
+The `.get()` method is your most important tool for navigating unfamiliar JSON. Unlike bracket notation (`data["key"]`), which raises a `KeyError` if the key is missing, `.get("key", default)` returns the default value silently. This is especially useful when API responses vary — some records might include optional fields that others omit.
+
+Notice the general strategy for tackling any unfamiliar JSON response. First, check the type and keys at the top level. Then pick the key that looks most relevant and repeat the process one level deeper. Continue until you find the lists of values you need. This "peel the onion" approach works regardless of how deeply nested the data is, and it avoids the common mistake of trying to write complex extraction code before you understand the structure. You will use this strategy repeatedly in @sec-wikipedia, @sec-government, and @sec-social when working with APIs that return richly structured JSON responses.
+
 ## When to Use Which
 
 XML tends to appear in older web services, government data feeds (congressional records, SEC filings, RSS feeds), and configuration files. JSON dominates modern web APIs, database exports, and any context where data is being exchanged between web services. HTML — which you will parse extensively beginning in @sec-static-pages — is structurally similar to XML and is parsed with the same BeautifulSoup methods.
+
+::: {.callout-note}
+## Public Interest Connection
+The choice of data format is itself a transparency decision. When governments and institutions publish data in machine-readable XML or JSON, they embody **openness** — making information practically accessible to anyone with basic programming skills. When the same data is published as scanned PDFs or proprietary spreadsheets, it creates barriers to the kind of **oversight** that democratic accountability requires (@sec-post-api). Advocating for open data formats is one of the most concrete things a data scientist can do to serve the public interest.
+:::
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -283,11 +392,17 @@ For more on data file formats including CSV, TSV, and other common structures, s
 
 3. **XML vs. JSON comparison.** Find a data source that provides the same information in both XML and JSON formats (e.g., a government API or data service). Retrieve both versions and compare: how does the structure differ? Which is easier to parse in Python? Which contains more metadata?
 
+4. **Reusable extraction function.** Write a function `xml_to_dataframe(soup, tag_name, fields)` that takes a BeautifulSoup object, the name of the repeating tag (e.g., `"member"`), and a list of child tag names to extract (e.g., `["first-name", "last-name", "party"]`). The function should return a DataFrame. Test it on the Congressional XML from this chapter, then try it on an RSS feed (where the repeating tag is `"item"` and the fields might be `["title", "link", "pubDate"]`).
+
+5. **Weather data analysis.** Retrieve a 7-day forecast from the Open-Meteo API for Boulder, CO using the URL pattern from this chapter. Navigate the nested JSON response, build a DataFrame with dates and both high and low temperatures, and create a plot showing both temperature series. Add a horizontal line at 0°C and annotate any days where the low drops below freezing.
+
 ## Social History and Public Interest
 
 XML emerged in the late 1990s from the standardization efforts of the World Wide Web Consortium (W3C), designed to be a universal format for document and data exchange. Its verbosity made it rigorous but heavy. JSON was created by Douglas Crockford in the early 2000s as a lightweight alternative that leveraged JavaScript's native object syntax. Its simplicity and the rise of AJAX-powered web applications made it the default format for APIs by the 2010s.
 
 The politics of data formats may seem esoteric, but format choices have real consequences for access and transparency. When a government publishes budget data as XML, it is machine-readable by design. When it publishes the same data as a scanned PDF, it is technically "public" but practically inaccessible — a form of the soft enclosure discussed in @sec-post-api. Open government data initiatives like data.gov have pushed for machine-readable formats precisely because format determines who can actually use the data.
+
+RSS (Really Simple Syndication) deserves special mention as an early experiment in open data distribution. Built on XML, RSS feeds allowed anyone to subscribe to updates from blogs, news sites, and podcasts without visiting each site individually. In the mid-2000s, RSS was the backbone of the blogosphere and an early tool for computational journalism — researchers could subscribe to thousands of news feeds and analyze coverage patterns at scale. But RSS declined as social media platforms offered their own proprietary feed algorithms. Facebook, Twitter, and later platforms replaced the open, user-controlled subscription model with opaque algorithmic curation. The decline of RSS was one of the earliest examples of the enclosure pattern that @sec-post-api describes: an open protocol replaced by a proprietary system that centralized control over information distribution.
 
 ## Common Issues to Debug
 

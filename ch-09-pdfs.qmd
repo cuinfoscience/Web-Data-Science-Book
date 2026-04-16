@@ -84,6 +84,42 @@ cleaned = clean_page_text(text)
 print(cleaned[:300])
 ```
 
+### Regular Expressions for PDF Text
+
+Regular expressions are your primary tool for imposing structure on the messy text that comes out of PDF extraction. Where structured data formats give you fields and columns, PDF text gives you a wall of characters — and regex is how you carve that wall into usable pieces. The patterns below cover the most common extraction tasks you will encounter when working with government and institutional PDFs.
+
+Each pattern targets a specific kind of structured information that appears in unstructured text. Learning to recognize these patterns and adapt them to your specific documents is a skill that improves with practice. No single regex will work across all PDFs, but these five cover a wide range of common scenarios.
+
+```python
+import re
+
+# 1. Dates in slash-separated format (e.g., "1/15/2024", "12/03/23")
+date_pattern = r'\d{1,2}/\d{1,2}/\d{2,4}'
+dates = re.findall(date_pattern, cleaned)
+# Returns: ['1/15/2024', '2/6/2024', ...]
+
+# 2. Dollar amounts (e.g., "$1,250.00", "$50", "$3,400,000")
+dollar_pattern = r'\$[\d,]+\.?\d*'
+amounts = re.findall(dollar_pattern, cleaned)
+# Returns: ['$1,250.00', '$50', '$3,400,000']
+
+# 3. Repeating headers that PDF extraction duplicates on every page
+header_pattern = r'CITY COUNCIL.*?MINUTES'
+cleaned_text = re.sub(header_pattern, '', cleaned)
+
+# 4. Section headings in ALL CAPS (at least 6 characters, start of line)
+heading_pattern = r'^[A-Z][A-Z\s]{5,}$'
+headings = re.findall(heading_pattern, cleaned, re.MULTILINE)
+# Returns: ['PUBLIC COMMENT', 'CONSENT AGENDA', 'ADJOURNMENT', ...]
+
+# 5. Email addresses embedded in document text
+email_pattern = r'[\w.+-]+@[\w-]+\.[\w.-]+'
+emails = re.findall(email_pattern, cleaned)
+# Returns: ['clerk@bouldercolorado.gov', ...]
+```
+
+Notice that each of these patterns makes assumptions about the document format. The date pattern assumes slash-separated dates; if your documents use "January 15, 2024" instead, you need a different pattern. The dollar amount pattern assumes a leading `$` sign; budget documents that use parentheses for negative values need additional handling. The section heading pattern assumes uppercase formatting; some documents use title case or bold formatting that does not survive text extraction. Always test your patterns against multiple pages and multiple documents from the same source before committing to a pipeline.
+
 ::: {.callout-tip}
 ## Missing Manual Reference
 For a thorough introduction to regular expressions — the pattern-matching tool you will use extensively for text cleanup — see *Missing Manual* Chapter 18: Regular Expressions.
@@ -168,6 +204,77 @@ plt.tight_layout()
 plt.show()
 ```
 
+### Measuring Public Comment Frequency
+
+One of the most civically valuable pieces of information buried in meeting minutes is how many members of the public showed up to speak. Public comment sections are where residents voice concerns about zoning changes, police oversight, budget priorities, and development projects. Extracting this data requires detective work: you need to identify the textual markers that signal a public comment section and then count the speakers within it.
+
+The challenge is that different municipalities format public comment sections differently, and even within the same city, the format may shift over time as clerks change or recording practices evolve. You are looking for patterns — section headers like "PUBLIC COMMENT" or "PUBLIC HEARING," followed by names or numbered items indicating individual speakers. This is the kind of work where you iterate: try a pattern on one document, inspect the results manually, refine the pattern, test it on a second document, and adjust again. Start by printing the raw text of several public comment sections to understand the format before writing any extraction code.
+
+```python
+def count_public_comments(text):
+    """Count the number of public comment speakers in meeting text.
+
+    Parameters
+    ----------
+    text : str
+        Full text extracted from a meeting minutes PDF
+
+    Returns
+    -------
+    int
+        Estimated number of public comment speakers
+    """
+    # Find the public comment section
+    comment_section = re.search(
+        r'(?:PUBLIC COMMENT|PUBLIC HEARING)(.*?)(?:CONSENT AGENDA|OLD BUSINESS|NEW BUSINESS)',
+        text, re.DOTALL | re.IGNORECASE
+    )
+
+    if not comment_section:
+        return 0
+
+    section_text = comment_section.group(1)
+
+    # Count speakers by looking for common patterns
+    # Pattern 1: "spoke regarding" or "spoke about" or "spoke in favor"
+    spoke_count = len(re.findall(r'spoke\s+(?:regarding|about|in|on|to)',
+                                  section_text, re.IGNORECASE))
+
+    # Pattern 2: numbered items like "1." "2." "3."
+    numbered_count = len(re.findall(r'^\s*\d+\.', section_text, re.MULTILINE))
+
+    # Return the higher count (different formats capture different patterns)
+    return max(spoke_count, numbered_count)
+```
+
+```python
+# Apply across all meeting files
+comment_counts = []
+for pdf_file in pdf_files:
+    pdf_path = os.path.join(pdf_dir, pdf_file)
+    try:
+        reader = PdfReader(pdf_path)
+        full_text = " ".join([p.extract_text() for p in reader.pages])
+        count = count_public_comments(full_text)
+        comment_counts.append({"file": pdf_file, "speakers": count})
+    except Exception as e:
+        comment_counts.append({"file": pdf_file, "speakers": 0})
+
+df_comments = pd.DataFrame(comment_counts)
+
+plt.figure(figsize=(12, 5))
+plt.bar(range(len(df_comments)), df_comments["speakers"])
+plt.xlabel("Meeting")
+plt.ylabel("Public Comment Speakers")
+plt.title("Public Comment Participation in Boulder City Council Meetings")
+plt.tight_layout()
+plt.show()
+```
+
+What does this data reveal? Spikes in public comment frequency often correspond to controversial agenda items — a proposed development project, a change in policing policy, or a budget reallocation. Periods of low participation may indicate either public satisfaction or public disengagement. Neither interpretation is self-evident from the data alone, which is why combining extracted counts with knowledge of the agenda (also extractable from the same PDFs) produces richer analysis.
+
+This kind of measurement is inherently imperfect. Your regex patterns will miss some speakers and occasionally count non-speakers. But even approximate counts, applied consistently across dozens of meetings, reveal patterns that would be invisible to someone reading a single set of minutes. The imprecision of PDF extraction is the price of scale — and scale is what transforms individual documents into a dataset.
+
 ## Exercises
 
 1. **Find and extract.** Locate a set of PDF documents from a government source — city council agendas, regulatory filings, or budget summaries. Extract a consistent data element across at least ten documents and build a DataFrame.
@@ -176,11 +283,19 @@ plt.show()
 
 3. **Clean and visualize.** Write a function that takes a path to a PDF and returns a dictionary of extracted metadata and key content fields. Apply it across a corpus of at least five related documents and create a visualization showing how a measurable quantity changes over time.
 
+4. **Government PDF pipeline.** Choose a government agency that publishes PDF documents regularly (meeting minutes, inspection reports, court records, or budget documents). Download at least five PDFs from the same source, write a pipeline that extracts a consistent data element from each, build a DataFrame, and create a visualization showing how that element varies across documents.
+
+5. **Tool comparison.** Install `pdfplumber` alongside `pypdf`. Extract text from the same PDF using both tools. Compare the quality of text extraction — line breaks, whitespace handling, table detection. Which tool handles your specific PDF better, and why?
+
 ## Social History and Public Interest
 
 The PDF format was created by Adobe in 1993 to solve a real problem: documents needed to look the same regardless of what printer or screen displayed them. But the format's emphasis on visual fidelity came at the cost of semantic accessibility. Organizations like DocumentCloud, MuckRock, and the Sunlight Foundation have built tools to extract structured data from the flood of PDFs that government agencies produce — bridging the gap between nominally public records and practically accessible data.
 
-The Boulder City Council case illustrates this tension at the local level. The same meeting information could be published as structured data (allowing citizens to easily track attendance, voting patterns, and public comment frequency) or as scanned PDFs (requiring significant technical effort to analyze). The format choice is itself a policy decision with consequences for transparency and accountability.
+DocumentCloud, built by ProPublica and IRE (Investigative Reporters and Editors), emerged as a platform where journalists could upload, analyze, annotate, and share document collections. It has been used in investigations of police misconduct records, corporate fraud filings, and government secrecy — cases where the raw documents are public but the volume makes manual analysis impractical. DocumentCloud's contribution was not just technical but organizational: it created a shared infrastructure where one journalist's document processing work could benefit others investigating the same institutions.
+
+MuckRock took a different approach to the document access problem by automating the Freedom of Information Act (FOIA) request process itself. The platform helped journalists and citizens file thousands of public records requests, tracked agency response times, and published the results openly. The Sunlight Foundation, active from 2006 to 2020, advocated for government agencies to publish documents in machine-readable formats rather than PDFs in the first place — arguing that true transparency requires not just publication but *usability*. Together, these tools and organizations represent the infrastructure of transparency: community-built resources that bridge the gap between nominally public documents and practically accessible data. Their work embodies the **ownership** value from @sec-post-api — the idea that public records belong to the public, and that technical barriers to access are themselves a form of enclosure that undermines democratic accountability.
+
+The Boulder City Council case illustrates this tension at the local level. The same meeting information could be published as structured data (allowing citizens to easily track attendance, voting patterns, and public comment frequency) or as scanned PDFs (requiring significant technical effort to analyze). The format choice is itself a policy decision with consequences for transparency and accountability. When you build a pipeline that extracts structured data from PDFs, you are not just doing data science — you are doing the work that these organizations have championed for decades.
 
 ## Common Issues to Debug
 
