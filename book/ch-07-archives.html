@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>7&nbsp; Archived Web Pages and the Wayback Machine – Web Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./ch-08-dynamic-pages.html" rel="next">
+<link href="./ch-06-static-pages.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ea8ef702a3f84812c808b1cddcfad5b3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-06-static-pages.html">Documents</a></li><li class="breadcrumb-item"><a href="./ch-07-archives.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Web Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Web Data Science</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-02-ethics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ethics, Law, and Responsible Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-03-post-api.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">The Post-API Age</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-04-data-formats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Formats: XML and JSON</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-05-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documents</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-06-static-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-07-archives.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-08-dynamic-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-09-pdfs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">APIs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-10-wikipedia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-11-government.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Government Data APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-12-social.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Social and Media Platform APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-13-ai-apis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Practice</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-14-automation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Automating Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-15-research-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-ai-disclosure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">AI Coauthorship and Responsible Disclosure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-further.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Where to Go from Here</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-web-is-not-permanent" id="toc-the-web-is-not-permanent" class="nav-link active" data-scroll-target="#the-web-is-not-permanent"><span class="header-section-number">7.1</span> The Web Is Not Permanent</a></li>
+  <li><a href="#the-availability-api" id="toc-the-availability-api" class="nav-link" data-scroll-target="#the-availability-api"><span class="header-section-number">7.2</span> The Availability API</a>
+  <ul class="collapse">
+  <li><a href="#comparing-multiple-snapshots" id="toc-comparing-multiple-snapshots" class="nav-link" data-scroll-target="#comparing-multiple-snapshots"><span class="header-section-number">7.2.1</span> Comparing Multiple Snapshots</a></li>
+  </ul></li>
+  <li><a href="#the-cdx-server-api" id="toc-the-cdx-server-api" class="nav-link" data-scroll-target="#the-cdx-server-api"><span class="header-section-number">7.3</span> The CDX Server API</a>
+  <ul class="collapse">
+  <li><a href="#filtering-and-analyzing-cdx-data" id="toc-filtering-and-analyzing-cdx-data" class="nav-link" data-scroll-target="#filtering-and-analyzing-cdx-data"><span class="header-section-number">7.3.1</span> Filtering and Analyzing CDX Data</a></li>
+  </ul></li>
+  <li><a href="#tracking-policy-changes-over-time" id="toc-tracking-policy-changes-over-time" class="nav-link" data-scroll-target="#tracking-policy-changes-over-time"><span class="header-section-number">7.4</span> Tracking Policy Changes Over Time</a>
+  <ul class="collapse">
+  <li><a href="#generating-date-ranges" id="toc-generating-date-ranges" class="nav-link" data-scroll-target="#generating-date-ranges"><span class="header-section-number">7.4.1</span> Generating Date Ranges</a></li>
+  <li><a href="#retrieving-historical-content" id="toc-retrieving-historical-content" class="nav-link" data-scroll-target="#retrieving-historical-content"><span class="header-section-number">7.4.2</span> Retrieving Historical Content</a></li>
+  <li><a href="#serializing-data" id="toc-serializing-data" class="nav-link" data-scroll-target="#serializing-data"><span class="header-section-number">7.4.3</span> Serializing Data</a></li>
+  </ul></li>
+  <li><a href="#document-similarity-with-bag-of-words" id="toc-document-similarity-with-bag-of-words" class="nav-link" data-scroll-target="#document-similarity-with-bag-of-words"><span class="header-section-number">7.5</span> Document Similarity with Bag-of-Words</a>
+  <ul class="collapse">
+  <li><a href="#visualizing-document-change-over-time" id="toc-visualizing-document-change-over-time" class="nav-link" data-scroll-target="#visualizing-document-change-over-time"><span class="header-section-number">7.5.1</span> Visualizing Document Change Over Time</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">7.6</span> Exercises</a></li>
+  <li><a href="#social-history-and-public-interest" id="toc-social-history-and-public-interest" class="nav-link" data-scroll-target="#social-history-and-public-interest"><span class="header-section-number">7.7</span> Social History and Public Interest</a></li>
+  <li><a href="#common-issues-to-debug" id="toc-common-issues-to-debug" class="nav-link" data-scroll-target="#common-issues-to-debug"><span class="header-section-number">7.8</span> Common Issues to Debug</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">7.9</span> Key Takeaways</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">7.10</span> Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-06-static-pages.html">Documents</a></li><li class="breadcrumb-item"><a href="./ch-07-archives.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-archives" class="quarto-section-identifier"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Explain the Internet Archive’s role as a public infrastructure for web preservation</li>
+<li>Query the Wayback Machine’s Availability API and CDX Server API to find historical snapshots</li>
+<li>Retrieve and parse historical page content to track changes over time</li>
+<li>Apply basic NLP techniques (tokenization, stopword removal, bag-of-words) to measure document similarity</li>
+<li>Serialize scraped data to JSON files for persistence and reproducibility</li>
+</ul>
+</div>
+</div>
+<section id="the-web-is-not-permanent" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="the-web-is-not-permanent"><span class="header-section-number">7.1</span> The Web Is Not Permanent</h2>
+<p>Web pages change, disappear, and get redesigned constantly. Studies have found that a significant fraction of URLs break within just a few years — a phenomenon called <em>link rot</em>. For researchers, this impermanence creates a fundamental challenge: how do you study something that might not be there tomorrow? And how do you study how something has changed over time when only the current version is visible?</p>
+<p>The <a href="https://archive.org">Internet Archive</a>, founded by Brewster Kahle in 1996, addresses this challenge by archiving the web. Its <a href="https://web.archive.org">Wayback Machine</a> has captured over 800 billion web pages, creating a historical record of the web that is freely accessible to anyone. For web data scientists, the Wayback Machine is both a data source and a form of the counter-erosion infrastructure described in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — a community-governed resource that preserves access to web content even as platforms and governments take pages down.</p>
+</section>
+<section id="the-availability-api" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="the-availability-api"><span class="header-section-number">7.2</span> The Availability API</h2>
+<p>The simplest way to check whether the Wayback Machine has a snapshot of a URL is the Availability API:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a>url <span class="op">=</span> <span class="st">"https://www.cnn.com"</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>timestamp <span class="op">=</span> <span class="st">"20000815"</span>  <span class="co"># August 15, 2000</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a>api_url <span class="op">=</span> <span class="ss">f"https://archive.org/wayback/available?url=</span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">&amp;timestamp=</span><span class="sc">{</span>timestamp<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>response <span class="op">=</span> requests.get(api_url)</span>
+<span id="cb1-8"><a href="#cb1-8"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb1-9"><a href="#cb1-9"></a></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co"># Check if a snapshot is available</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="cf">if</span> data[<span class="st">"archived_snapshots"</span>]:</span>
+<span id="cb1-12"><a href="#cb1-12"></a>    snapshot <span class="op">=</span> data[<span class="st">"archived_snapshots"</span>][<span class="st">"closest"</span>]</span>
+<span id="cb1-13"><a href="#cb1-13"></a>    <span class="bu">print</span>(<span class="ss">f"Snapshot available: </span><span class="sc">{</span>snapshot[<span class="st">'available'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14"></a>    <span class="bu">print</span>(<span class="ss">f"URL: </span><span class="sc">{</span>snapshot[<span class="st">'url'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15"></a>    <span class="bu">print</span>(<span class="ss">f"Timestamp: </span><span class="sc">{</span>snapshot[<span class="st">'timestamp'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="cf">else</span>:</span>
+<span id="cb1-17"><a href="#cb1-17"></a>    <span class="bu">print</span>(<span class="st">"No snapshot available near this date"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The API returns the closest snapshot to your requested timestamp. You can then retrieve and parse that historical page just as you would a current page:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># Retrieve the archived page</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>archived_url <span class="op">=</span> snapshot[<span class="st">"url"</span>]</span>
+<span id="cb2-5"><a href="#cb2-5"></a>archived_response <span class="op">=</span> requests.get(archived_url)</span>
+<span id="cb2-6"><a href="#cb2-6"></a>soup <span class="op">=</span> BeautifulSoup(archived_response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7"></a></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co"># Extract links from the year-2000 version of CNN</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a>links <span class="op">=</span> soup.find_all(<span class="st">"a"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="bu">print</span>(<span class="ss">f"Number of links on CNN in August 2000: </span><span class="sc">{</span><span class="bu">len</span>(links)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="comparing-multiple-snapshots" class="level3" data-number="7.2.1">
+<h3 data-number="7.2.1" class="anchored" data-anchor-id="comparing-multiple-snapshots"><span class="header-section-number">7.2.1</span> Comparing Multiple Snapshots</h3>
+<p>A single historical snapshot is interesting; comparing snapshots across time is where the real research value lies. Let us retrieve CNN’s homepage at three different points in history and see how the web has evolved:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">import</span> requests</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="kw">def</span> get_snapshot_stats(url, timestamp, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb3-5"><a href="#cb3-5"></a>    <span class="co">"""Retrieve a Wayback snapshot and compute basic statistics."""</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>    api_url <span class="op">=</span> <span class="ss">f"https://archive.org/wayback/available?url=</span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">&amp;timestamp=</span><span class="sc">{</span>timestamp<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>    api_response <span class="op">=</span> requests.get(api_url, headers<span class="op">=</span>headers)</span>
+<span id="cb3-8"><a href="#cb3-8"></a>    api_data <span class="op">=</span> api_response.json()</span>
+<span id="cb3-9"><a href="#cb3-9"></a></span>
+<span id="cb3-10"><a href="#cb3-10"></a>    <span class="cf">if</span> <span class="kw">not</span> api_data.get(<span class="st">"archived_snapshots"</span>):</span>
+<span id="cb3-11"><a href="#cb3-11"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a>    snapshot_url <span class="op">=</span> api_data[<span class="st">"archived_snapshots"</span>][<span class="st">"closest"</span>][<span class="st">"url"</span>]</span>
+<span id="cb3-14"><a href="#cb3-14"></a>    page_response <span class="op">=</span> requests.get(snapshot_url, headers<span class="op">=</span>headers)</span>
+<span id="cb3-15"><a href="#cb3-15"></a>    soup <span class="op">=</span> BeautifulSoup(page_response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16"></a></span>
+<span id="cb3-17"><a href="#cb3-17"></a>    <span class="cf">return</span> {</span>
+<span id="cb3-18"><a href="#cb3-18"></a>        <span class="st">"year"</span>: timestamp[:<span class="dv">4</span>],</span>
+<span id="cb3-19"><a href="#cb3-19"></a>        <span class="st">"num_links"</span>: <span class="bu">len</span>(soup.find_all(<span class="st">"a"</span>)),</span>
+<span id="cb3-20"><a href="#cb3-20"></a>        <span class="st">"text_length"</span>: <span class="bu">len</span>(soup.get_text()),</span>
+<span id="cb3-21"><a href="#cb3-21"></a>        <span class="st">"num_images"</span>: <span class="bu">len</span>(soup.find_all(<span class="st">"img"</span>)),</span>
+<span id="cb3-22"><a href="#cb3-22"></a>        <span class="st">"num_scripts"</span>: <span class="bu">len</span>(soup.find_all(<span class="st">"script"</span>)),</span>
+<span id="cb3-23"><a href="#cb3-23"></a>    }</span>
+<span id="cb3-24"><a href="#cb3-24"></a></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co"># Compare CNN across three eras</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a>timestamps <span class="op">=</span> [<span class="st">"20000815"</span>, <span class="st">"20120815"</span>, <span class="st">"20240815"</span>]</span>
+<span id="cb3-27"><a href="#cb3-27"></a>stats <span class="op">=</span> []</span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="cf">for</span> ts <span class="kw">in</span> timestamps:</span>
+<span id="cb3-29"><a href="#cb3-29"></a>    result <span class="op">=</span> get_snapshot_stats(<span class="st">"www.cnn.com"</span>, ts)</span>
+<span id="cb3-30"><a href="#cb3-30"></a>    <span class="cf">if</span> result:</span>
+<span id="cb3-31"><a href="#cb3-31"></a>        stats.append(result)</span>
+<span id="cb3-32"><a href="#cb3-32"></a>    time.sleep(<span class="dv">2</span>)  <span class="co"># Be respectful of the Archive</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a>comparison <span class="op">=</span> pd.DataFrame(stats)</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="bu">print</span>(comparison)</span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#   year  num_links  text_length  num_images  num_scripts</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co"># 0  2000        150         8500          20            2</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co"># 1  2012        450        25000          80           35</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co"># 2  2024        800        45000         120           95</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The numbers tell a story about the web’s evolution: pages have grown dramatically in complexity, with more links, more text, more images, and — most strikingly — far more JavaScript. The 2000-era web was largely static HTML; the 2024 web is a JavaScript application that happens to render as a web page. This increasing complexity is part of why the techniques in <a href="ch-08-dynamic-pages.html" class="quarto-xref"><span>Chapter 8</span></a> become necessary for modern scraping.</p>
+<p>You can extend this approach to any pair of sites or time periods. Comparing how two competing news organizations’ homepages evolved reveals different editorial strategies. Tracking a government agency’s page across presidential administrations can reveal shifts in priorities and transparency. The Wayback Machine turns the web from a snapshot medium into a longitudinal data source — one where you can measure change rather than merely observing it.</p>
+<p>Note the importance of the <code>time.sleep(2)</code> call in the loop above. The Internet Archive is a nonprofit that provides this service for free. Aggressive scraping degrades the experience for everyone. Treat the Archive with the same courtesy you would extend to any community resource — use it responsibly, and it will be there when you need it.</p>
+</section>
+</section>
+<section id="the-cdx-server-api" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="the-cdx-server-api"><span class="header-section-number">7.3</span> The CDX Server API</h2>
+<p>The Availability API finds one snapshot near a date. The CDX Server API lets you query the entire history of snapshots for a URL, which is essential for longitudinal research:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">import</span> requests</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co"># Query all snapshots of Facebook's Terms of Service</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>cdx_url <span class="op">=</span> <span class="st">"https://web.archive.org/cdx/search/cdx"</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>params <span class="op">=</span> {</span>
+<span id="cb5-7"><a href="#cb5-7"></a>    <span class="st">"url"</span>: <span class="st">"facebook.com/terms"</span>,</span>
+<span id="cb5-8"><a href="#cb5-8"></a>    <span class="st">"output"</span>: <span class="st">"json"</span>,</span>
+<span id="cb5-9"><a href="#cb5-9"></a>    <span class="st">"fl"</span>: <span class="st">"timestamp,original,statuscode,length"</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a>}</span>
+<span id="cb5-11"><a href="#cb5-11"></a></span>
+<span id="cb5-12"><a href="#cb5-12"></a>response <span class="op">=</span> requests.get(cdx_url, params<span class="op">=</span>params)</span>
+<span id="cb5-13"><a href="#cb5-13"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb5-14"><a href="#cb5-14"></a></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co"># First row is column headers, rest is data</span></span>
+<span id="cb5-16"><a href="#cb5-16"></a>df <span class="op">=</span> pd.DataFrame(data[<span class="dv">1</span>:], columns<span class="op">=</span>data[<span class="dv">0</span>])</span>
+<span id="cb5-17"><a href="#cb5-17"></a>df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">%H%M%S"</span>)</span>
+<span id="cb5-18"><a href="#cb5-18"></a>df[<span class="st">"length"</span>] <span class="op">=</span> pd.to_numeric(df[<span class="st">"length"</span>], errors<span class="op">=</span><span class="st">"coerce"</span>)</span>
+<span id="cb5-19"><a href="#cb5-19"></a></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="bu">print</span>(<span class="ss">f"Total snapshots: </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="bu">print</span>(<span class="ss">f"Date range: </span><span class="sc">{</span>df[<span class="st">'timestamp'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>df[<span class="st">'timestamp'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You can visualize how frequently the page was captured and how its size changed over time:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-4"><a href="#cb6-4"></a></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co"># Snapshot frequency over time</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>df.set_index(<span class="st">"timestamp"</span>).resample(<span class="st">"M"</span>).size().plot(ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
+<span id="cb6-7"><a href="#cb6-7"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Snapshots per month"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Wayback Machine Capture Frequency"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9"></a></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co"># Page size over time</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>df.set_index(<span class="st">"timestamp"</span>)[<span class="st">"length"</span>].plot(ax<span class="op">=</span>axes[<span class="dv">1</span>])</span>
+<span id="cb6-12"><a href="#cb6-12"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Page size (bytes)"</span>)</span>
+<span id="cb6-13"><a href="#cb6-13"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Page Size Over Time"</span>)</span>
+<span id="cb6-14"><a href="#cb6-14"></a></span>
+<span id="cb6-15"><a href="#cb6-15"></a>plt.tight_layout()</span>
+<span id="cb6-16"><a href="#cb6-16"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="filtering-and-analyzing-cdx-data" class="level3" data-number="7.3.1">
+<h3 data-number="7.3.1" class="anchored" data-anchor-id="filtering-and-analyzing-cdx-data"><span class="header-section-number">7.3.1</span> Filtering and Analyzing CDX Data</h3>
+<p>The raw CDX data often includes failed requests, redirects, and duplicate captures that can skew your analysis. Filtering to only successful captures (status code 200) and analyzing trends gives you a cleaner picture:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Filter to successful captures only</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>df_ok <span class="op">=</span> df[df[<span class="st">"statuscode"</span>] <span class="op">==</span> <span class="st">"200"</span>].copy()</span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="bu">print</span>(<span class="ss">f"Successful captures: </span><span class="sc">{</span><span class="bu">len</span>(df_ok)<span class="sc">}</span><span class="ss"> out of </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> total"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4"></a></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co"># Resample to quarterly frequency for trend analysis</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>df_ok <span class="op">=</span> df_ok.set_index(<span class="st">"timestamp"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7"></a>quarterly <span class="op">=</span> df_ok.resample(<span class="st">"QS"</span>).agg(</span>
+<span id="cb7-8"><a href="#cb7-8"></a>    captures<span class="op">=</span>(<span class="st">"length"</span>, <span class="st">"size"</span>),</span>
+<span id="cb7-9"><a href="#cb7-9"></a>    mean_size<span class="op">=</span>(<span class="st">"length"</span>, <span class="st">"mean"</span>),</span>
+<span id="cb7-10"><a href="#cb7-10"></a>)</span>
+<span id="cb7-11"><a href="#cb7-11"></a></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co"># Compute year-over-year page size growth</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a>yearly <span class="op">=</span> df_ok.resample(<span class="st">"YS"</span>).agg(mean_size<span class="op">=</span>(<span class="st">"length"</span>, <span class="st">"mean"</span>))</span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="bu">print</span>(yearly.tail(<span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a>quarterly[<span class="st">"captures"</span>].plot(ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
+<span id="cb8-4"><a href="#cb8-4"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Captures per quarter"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Capture Frequency (Status 200 Only)"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6"></a></span>
+<span id="cb8-7"><a href="#cb8-7"></a>quarterly[<span class="st">"mean_size"</span>].plot(ax<span class="op">=</span>axes[<span class="dv">1</span>])</span>
+<span id="cb8-8"><a href="#cb8-8"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Mean page size (bytes)"</span>)</span>
+<span id="cb8-9"><a href="#cb8-9"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Average Page Size Over Time"</span>)</span>
+<span id="cb8-10"><a href="#cb8-10"></a></span>
+<span id="cb8-11"><a href="#cb8-11"></a>plt.tight_layout()</span>
+<span id="cb8-12"><a href="#cb8-12"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Filtering matters because CDX data includes every capture attempt, not just successful ones. A spike in 301 (redirect) codes might indicate a site restructuring; a cluster of 503 (Service Unavailable) codes might indicate a period of downtime. These metadata are themselves interesting — they tell you about the infrastructure behind the page, not just its content.</p>
+<p>Page size trends are particularly revealing. A steady increase in page size often correlates with the addition of tracking scripts, advertising frameworks, and JavaScript-heavy interfaces. A sudden jump might indicate a redesign; a sudden drop might mean the site moved content behind a login wall. When combined with the content analysis techniques later in this chapter, CDX metadata provides the quantitative backbone for your longitudinal research — telling you <em>how much</em> changed while bag-of-words analysis tells you <em>what</em> changed.</p>
+</section>
+</section>
+<section id="tracking-policy-changes-over-time" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="tracking-policy-changes-over-time"><span class="header-section-number">7.4</span> Tracking Policy Changes Over Time</h2>
+<p>A current research project explores how social media platforms’ terms of service have evolved. Let us track changes in Facebook’s Terms of Service by retrieving content at regular intervals.</p>
+<section id="generating-date-ranges" class="level3" data-number="7.4.1">
+<h3 data-number="7.4.1" class="anchored" data-anchor-id="generating-date-ranges"><span class="header-section-number">7.4.1</span> Generating Date Ranges</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb9-2"><a href="#cb9-2"></a></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co"># Generate quarterly dates from 2005 to 2024</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>dates <span class="op">=</span> pd.date_range(start<span class="op">=</span><span class="st">"2005-01-01"</span>, end<span class="op">=</span><span class="st">"2024-01-01"</span>, freq<span class="op">=</span><span class="st">"QS"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="bu">print</span>(<span class="ss">f"Querying </span><span class="sc">{</span><span class="bu">len</span>(dates)<span class="sc">}</span><span class="ss"> time points"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="retrieving-historical-content" class="level3" data-number="7.4.2">
+<h3 data-number="7.4.2" class="anchored" data-anchor-id="retrieving-historical-content"><span class="header-section-number">7.4.2</span> Retrieving Historical Content</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="im">import</span> time</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb10-3"><a href="#cb10-3"></a></span>
+<span id="cb10-4"><a href="#cb10-4"></a>fb_tos_url <span class="op">=</span> <span class="st">"facebook.com/terms"</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="kw">def</span> get_wayback_content(url, date, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb10-7"><a href="#cb10-7"></a>    <span class="co">"""Retrieve a page from the Wayback Machine closest to a given date.</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co">    </span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="co">    Parameters</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co">    ----------</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co">    url : str</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="co">        The original URL (without http://)</span></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="co">    date : datetime</span></span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="co">        The target date for the snapshot</span></span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb10-16"><a href="#cb10-16"></a><span class="co">        HTTP headers for the request</span></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="co">    </span></span>
+<span id="cb10-18"><a href="#cb10-18"></a><span class="co">    Returns</span></span>
+<span id="cb10-19"><a href="#cb10-19"></a><span class="co">    -------</span></span>
+<span id="cb10-20"><a href="#cb10-20"></a><span class="co">    dict</span></span>
+<span id="cb10-21"><a href="#cb10-21"></a><span class="co">        Dictionary with 'timestamp', 'url', 'content', and 'word_count'</span></span>
+<span id="cb10-22"><a href="#cb10-22"></a><span class="co">    """</span></span>
+<span id="cb10-23"><a href="#cb10-23"></a>    timestamp <span class="op">=</span> date.strftime(<span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">"</span>)</span>
+<span id="cb10-24"><a href="#cb10-24"></a>    api_url <span class="op">=</span> <span class="ss">f"https://archive.org/wayback/available?url=</span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">&amp;timestamp=</span><span class="sc">{</span>timestamp<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb10-25"><a href="#cb10-25"></a>    </span>
+<span id="cb10-26"><a href="#cb10-26"></a>    api_response <span class="op">=</span> requests.get(api_url, headers<span class="op">=</span>headers)</span>
+<span id="cb10-27"><a href="#cb10-27"></a>    api_data <span class="op">=</span> api_response.json()</span>
+<span id="cb10-28"><a href="#cb10-28"></a>    </span>
+<span id="cb10-29"><a href="#cb10-29"></a>    <span class="cf">if</span> <span class="kw">not</span> api_data.get(<span class="st">"archived_snapshots"</span>):</span>
+<span id="cb10-30"><a href="#cb10-30"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb10-31"><a href="#cb10-31"></a>    </span>
+<span id="cb10-32"><a href="#cb10-32"></a>    snapshot_url <span class="op">=</span> api_data[<span class="st">"archived_snapshots"</span>][<span class="st">"closest"</span>][<span class="st">"url"</span>]</span>
+<span id="cb10-33"><a href="#cb10-33"></a>    page_response <span class="op">=</span> requests.get(snapshot_url, headers<span class="op">=</span>headers)</span>
+<span id="cb10-34"><a href="#cb10-34"></a>    soup <span class="op">=</span> BeautifulSoup(page_response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb10-35"><a href="#cb10-35"></a>    </span>
+<span id="cb10-36"><a href="#cb10-36"></a>    <span class="co"># Extract text content</span></span>
+<span id="cb10-37"><a href="#cb10-37"></a>    text <span class="op">=</span> soup.get_text(separator<span class="op">=</span><span class="st">" "</span>, strip<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-38"><a href="#cb10-38"></a>    </span>
+<span id="cb10-39"><a href="#cb10-39"></a>    time.sleep(<span class="dv">1</span>)  <span class="co"># Rate limit</span></span>
+<span id="cb10-40"><a href="#cb10-40"></a>    </span>
+<span id="cb10-41"><a href="#cb10-41"></a>    <span class="cf">return</span> {</span>
+<span id="cb10-42"><a href="#cb10-42"></a>        <span class="st">"timestamp"</span>: api_data[<span class="st">"archived_snapshots"</span>][<span class="st">"closest"</span>][<span class="st">"timestamp"</span>],</span>
+<span id="cb10-43"><a href="#cb10-43"></a>        <span class="st">"url"</span>: snapshot_url,</span>
+<span id="cb10-44"><a href="#cb10-44"></a>        <span class="st">"word_count"</span>: <span class="bu">len</span>(text.split()),</span>
+<span id="cb10-45"><a href="#cb10-45"></a>        <span class="st">"content"</span>: text[:<span class="dv">5000</span>]  <span class="co"># First 5000 characters to avoid memory issues</span></span>
+<span id="cb10-46"><a href="#cb10-46"></a>    }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="serializing-data" class="level3" data-number="7.4.3">
+<h3 data-number="7.4.3" class="anchored" data-anchor-id="serializing-data"><span class="header-section-number">7.4.3</span> Serializing Data</h3>
+<p>Once you have collected historical content, save it so you do not need to re-scrape:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="im">import</span> json</span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co"># After collecting data into a list called 'results':</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"fb_tos_history.json"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
+<span id="cb11-5"><a href="#cb11-5"></a>    json.dump(results, f, indent<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb11-6"><a href="#cb11-6"></a></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co"># Load it back later:</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"fb_tos_history.json"</span>, <span class="st">"r"</span>) <span class="im">as</span> f:</span>
+<span id="cb11-9"><a href="#cb11-9"></a>    results <span class="op">=</span> json.load(f)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="document-similarity-with-bag-of-words" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="document-similarity-with-bag-of-words"><span class="header-section-number">7.5</span> Document Similarity with Bag-of-Words</h2>
+<p>To measure how much a document changed between versions, you can use a bag-of-words approach. This technique represents each document as a vector of word frequencies, ignoring word order, and then measures the similarity between vectors.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="im">import</span> nltk</span>
+<span id="cb12-4"><a href="#cb12-4"></a></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="co"># Download stopwords (first time only)</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co"># nltk.download('stopwords')</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a></span>
+<span id="cb12-8"><a href="#cb12-8"></a>stop_words <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">'english'</span>))</span>
+<span id="cb12-9"><a href="#cb12-9"></a></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="kw">def</span> preprocess_document(text):</span>
+<span id="cb12-11"><a href="#cb12-11"></a>    <span class="co">"""Tokenize, lowercase, and remove stopwords from a document."""</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a>    tokens <span class="op">=</span> simple_preprocess(text)  <span class="co"># Tokenize and lowercase</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a>    <span class="cf">return</span> [token <span class="cf">for</span> token <span class="kw">in</span> tokens <span class="cf">if</span> token <span class="kw">not</span> <span class="kw">in</span> stop_words]</span>
+<span id="cb12-14"><a href="#cb12-14"></a></span>
+<span id="cb12-15"><a href="#cb12-15"></a><span class="co"># Preprocess two versions of the ToS</span></span>
+<span id="cb12-16"><a href="#cb12-16"></a>doc_v1 <span class="op">=</span> preprocess_document(results[<span class="dv">0</span>][<span class="st">"content"</span>])</span>
+<span id="cb12-17"><a href="#cb12-17"></a>doc_v2 <span class="op">=</span> preprocess_document(results[<span class="op">-</span><span class="dv">1</span>][<span class="st">"content"</span>])</span>
+<span id="cb12-18"><a href="#cb12-18"></a></span>
+<span id="cb12-19"><a href="#cb12-19"></a><span class="bu">print</span>(<span class="ss">f"Version 1 tokens: </span><span class="sc">{</span><span class="bu">len</span>(doc_v1)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-20"><a href="#cb12-20"></a><span class="bu">print</span>(<span class="ss">f"Version 2 tokens: </span><span class="sc">{</span><span class="bu">len</span>(doc_v2)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Using gensim’s dictionary and bag-of-words tools, you can build a corpus and compute similarity:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
+<span id="cb13-2"><a href="#cb13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co"># Build a dictionary mapping words to IDs</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>documents <span class="op">=</span> [doc_v1, doc_v2]</span>
+<span id="cb13-5"><a href="#cb13-5"></a>dictionary <span class="op">=</span> corpora.Dictionary(documents)</span>
+<span id="cb13-6"><a href="#cb13-6"></a></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co"># Convert documents to bag-of-words vectors</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a>corpus <span class="op">=</span> [dictionary.doc2bow(doc) <span class="cf">for</span> doc <span class="kw">in</span> documents]</span>
+<span id="cb13-9"><a href="#cb13-9"></a></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co"># Compute similarity</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a>index <span class="op">=</span> similarities.SparseMatrixSimilarity(corpus, num_features<span class="op">=</span><span class="bu">len</span>(dictionary))</span>
+<span id="cb13-12"><a href="#cb13-12"></a>sims <span class="op">=</span> index[corpus[<span class="dv">0</span>]]</span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="bu">print</span>(<span class="ss">f"Similarity between versions: </span><span class="sc">{</span>sims[<span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="co"># 1.0 = identical, 0.0 = completely different</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="visualizing-document-change-over-time" class="level3" data-number="7.5.1">
+<h3 data-number="7.5.1" class="anchored" data-anchor-id="visualizing-document-change-over-time"><span class="header-section-number">7.5.1</span> Visualizing Document Change Over Time</h3>
+<p>The bag-of-words similarity measure tells you how similar two documents are, but plotting similarity between <em>consecutive</em> versions over time creates a “change timeline” — a visual record of when and how much a document evolved:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
+<span id="cb14-4"><a href="#cb14-4"></a></span>
+<span id="cb14-5"><a href="#cb14-5"></a>stop_words <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">"english"</span>))</span>
+<span id="cb14-6"><a href="#cb14-6"></a></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="co"># Preprocess all versions</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a>processed_docs <span class="op">=</span> []</span>
+<span id="cb14-9"><a href="#cb14-9"></a><span class="cf">for</span> r <span class="kw">in</span> results:</span>
+<span id="cb14-10"><a href="#cb14-10"></a>    <span class="cf">if</span> r <span class="kw">and</span> r.get(<span class="st">"content"</span>):</span>
+<span id="cb14-11"><a href="#cb14-11"></a>        tokens <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> simple_preprocess(r[<span class="st">"content"</span>]) <span class="cf">if</span> t <span class="kw">not</span> <span class="kw">in</span> stop_words]</span>
+<span id="cb14-12"><a href="#cb14-12"></a>        processed_docs.append(tokens)</span>
+<span id="cb14-13"><a href="#cb14-13"></a></span>
+<span id="cb14-14"><a href="#cb14-14"></a><span class="co"># Build dictionary and corpus</span></span>
+<span id="cb14-15"><a href="#cb14-15"></a>dictionary <span class="op">=</span> corpora.Dictionary(processed_docs)</span>
+<span id="cb14-16"><a href="#cb14-16"></a>corpus <span class="op">=</span> [dictionary.doc2bow(doc) <span class="cf">for</span> doc <span class="kw">in</span> processed_docs]</span>
+<span id="cb14-17"><a href="#cb14-17"></a></span>
+<span id="cb14-18"><a href="#cb14-18"></a><span class="co"># Compute similarity between consecutive versions</span></span>
+<span id="cb14-19"><a href="#cb14-19"></a>change_scores <span class="op">=</span> []</span>
+<span id="cb14-20"><a href="#cb14-20"></a>index <span class="op">=</span> similarities.SparseMatrixSimilarity(corpus, num_features<span class="op">=</span><span class="bu">len</span>(dictionary))</span>
+<span id="cb14-21"><a href="#cb14-21"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(corpus)):</span>
+<span id="cb14-22"><a href="#cb14-22"></a>    sim <span class="op">=</span> index[corpus[i<span class="op">-</span><span class="dv">1</span>]][i]</span>
+<span id="cb14-23"><a href="#cb14-23"></a>    change_scores.append(<span class="dv">1</span> <span class="op">-</span> sim)  <span class="co"># Convert similarity to change score</span></span>
+<span id="cb14-24"><a href="#cb14-24"></a></span>
+<span id="cb14-25"><a href="#cb14-25"></a><span class="co"># Plot the change timeline</span></span>
+<span id="cb14-26"><a href="#cb14-26"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb14-27"><a href="#cb14-27"></a>plt.plot(<span class="bu">range</span>(<span class="bu">len</span>(change_scores)), change_scores, marker<span class="op">=</span><span class="st">"o"</span>)</span>
+<span id="cb14-28"><a href="#cb14-28"></a>plt.xlabel(<span class="st">"Version Transition"</span>)</span>
+<span id="cb14-29"><a href="#cb14-29"></a>plt.ylabel(<span class="st">"Change Score (0 = identical, 1 = completely different)"</span>)</span>
+<span id="cb14-30"><a href="#cb14-30"></a>plt.title(<span class="st">"Document Change Over Time"</span>)</span>
+<span id="cb14-31"><a href="#cb14-31"></a>plt.tight_layout()</span>
+<span id="cb14-32"><a href="#cb14-32"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Spikes in this timeline correspond to major revisions — a new Terms of Service policy, a site redesign, or a significant content update. By cross-referencing these spikes with real-world events (a data breach, a regulatory action, a public controversy), you can begin to tell a story about <em>why</em> the document changed, not just <em>that</em> it changed. This kind of temporal analysis is at the heart of longitudinal web research.</p>
+<p>The change score visualization complements the CDX analysis from earlier in this chapter. CDX data tells you <em>how often</em> the page was captured and how its size changed; the change timeline tells you <em>how different</em> consecutive versions are from each other. Together, they create a multi-dimensional picture of a document’s evolution. A page might be captured frequently but change very little (a stable, well-maintained site), or captured infrequently but show dramatic changes between captures (a site that undergoes periodic major overhauls).</p>
+<p>You can also extend this approach beyond consecutive comparisons. Computing pairwise similarity between <em>all</em> versions produces a similarity matrix that you can visualize as a heatmap. Clusters of similar versions reveal stable periods; off-diagonal dissimilarities reveal turning points. For research on platform governance, these turning points often align with public controversies, regulatory actions, or leadership changes — patterns that would be invisible without longitudinal data.</p>
+<p>The combination of the Wayback Machine’s historical data with computational text analysis techniques creates a powerful research methodology. You are not just reading old web pages — you are measuring institutional behavior over time, producing evidence that can inform policy debates, academic research, and public accountability. This is precisely the kind of public interest data science that <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> describes.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Missing Manual Reference
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For more on data serialization formats including JSON, CSV, and pickle, see <em>Missing Manual</em> Chapter 20: Data File Formats.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="exercises" class="level2" data-number="7.6">
+<h2 data-number="7.6" class="anchored" data-anchor-id="exercises"><span class="header-section-number">7.6</span> Exercises</h2>
+<ol type="1">
+<li><p><strong>Policy tracking.</strong> Track the evolution of a policy document of your choice (a university’s academic integrity policy, a company’s privacy policy, or a government agency’s FAQ page) over at least five time points using the Wayback Machine. Visualize how document length changes and identify periods of major revision.</p></li>
+<li><p><strong>CDX analysis.</strong> Use the CDX Server API to compare the snapshot frequency and page size trends for two competing organizations (e.g., two news outlets, two universities, or two tech companies). What does the capture frequency tell you about the organizations’ web presence?</p></li>
+<li><p><strong>Document similarity.</strong> Compute pairwise document similarity across all versions of your tracked document from Exercise 1. Create a heatmap or matrix visualization. Which version transitions involved the largest changes?</p></li>
+<li><p><strong>Government web archive.</strong> Use the CDX Server API to analyze the archival history of a government website (e.g., a state legislature, a federal agency, or a city government). How frequently was the page captured? Are there gaps in coverage? How has the page size changed over time? Write a brief analysis of what the archival patterns reveal about the site’s evolution.</p></li>
+<li><p><strong>Then-and-now similarity.</strong> For a website of your choice, retrieve the earliest available Wayback Machine snapshot and the most recent snapshot. Preprocess both with tokenization and stopword removal, compute bag-of-words similarity, and write a 200-word analysis of what changed. What kinds of content were added, removed, or restructured?</p></li>
+</ol>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Public Interest Connection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Wayback Machine embodies the value of <strong>ownership</strong> discussed in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — it is collectively governed, freely accessible, and exists to preserve the web as a public resource. When platforms delete content, change their policies, or redesign their sites, the Wayback Machine often provides the only independent record of what existed before.</p>
+</div>
+</div>
+</section>
+<section id="social-history-and-public-interest" class="level2" data-number="7.7">
+<h2 data-number="7.7" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">7.7</span> Social History and Public Interest</h2>
+<p>Brewster Kahle founded the Internet Archive with the vision of creating a “library of everything” — a comprehensive, freely accessible archive of human knowledge. The Wayback Machine, launched in 2001, has become indispensable for journalists investigating corporate claims, lawyers establishing timelines of events, and researchers conducting longitudinal studies of online content.</p>
+<p>The Internet Archive has faced legal challenges from publishers, platforms, and governments that would prefer certain content to remain forgotten. Its continued operation depends on the support of its users and donors — a reminder that the infrastructure of openness requires ongoing stewardship.</p>
+<p>Journalists have been among the most creative users of the Wayback Machine. When politicians delete social media posts or companies quietly change their terms of service, archived versions provide accountability. Legal teams use archived web pages as evidence in intellectual property disputes, contract disagreements, and regulatory investigations — establishing what a website said on a specific date can be the difference between winning and losing a case. Researchers in fields from political science to public health use longitudinal snapshots to study how organizations communicate about crises, how policy language evolves, and how online communities form and fragment over time.</p>
+<p>The Internet Archive’s work also raises fundamental questions about the right to be forgotten versus the public’s right to know. The European Union’s GDPR includes provisions allowing individuals to request deletion of personal data, which can conflict with the archival mission. Some organizations have requested that the Wayback Machine remove their content. These tensions mirror the broader conflicts between openness, oversight, and ownership that <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> explores — the same data that enables accountability can also enable surveillance, and the infrastructure that preserves public knowledge can also preserve content that individuals wish to retract.</p>
+</section>
+<section id="common-issues-to-debug" class="level2" data-number="7.8">
+<h2 data-number="7.8" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">7.8</span> Common Issues to Debug</h2>
+<ul>
+<li><strong>Wayback Machine rate limiting</strong>: Space your requests with <code>time.sleep()</code>. The service is free and community-maintained; do not abuse it.</li>
+<li><strong>Incomplete archived pages</strong>: Many snapshots are missing CSS, images, or JavaScript-rendered content. The text content is usually preserved, but visual rendering may be broken.</li>
+<li><strong>CDX data inconsistencies</strong>: Some entries may have missing fields or redirect status codes instead of actual content. Filter your data carefully.</li>
+<li><strong>NLTK download errors</strong>: Run <code>nltk.download('stopwords')</code> once in a fresh Python session to download the stopwords corpus.</li>
+</ul>
+</section>
+<section id="key-takeaways" class="level2" data-number="7.9">
+<h2 data-number="7.9" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">7.9</span> Key Takeaways</h2>
+<p>The web is not permanent, and the Wayback Machine is your most important tool for longitudinal web research. The Availability API finds specific snapshots; the CDX Server enumerates the full history; and BeautifulSoup parses archived pages just like current ones. Document similarity techniques give you quantitative tools for measuring change over time. Always serialize your scraped data — you may not be able to re-scrape it later, and the page you studied today may be gone tomorrow.</p>
+</section>
+<section id="further-reading" class="level2" data-number="7.10">
+<h2 data-number="7.10" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">7.10</span> Further Reading</h2>
+<ul>
+<li>Internet Archive Wayback Machine APIs: <a href="https://archive.org/help/wayback_api.php" class="uri">https://archive.org/help/wayback_api.php</a></li>
+<li>CDX Server API: <a href="https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server" class="uri">https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server</a></li>
+<li>gensim documentation: <a href="https://radimrehurek.com/gensim/" class="uri">https://radimrehurek.com/gensim/</a></li>
+<li><span class="citation" data-cites="rogers2019doing">@rogers2019doing</span> — Chapter on web historiography</li>
+</ul>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./ch-06-static-pages.html" class="pagination-link" aria-label="Parsing Static Web Pages">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./ch-08-dynamic-pages.html" class="pagination-link" aria-label="Dynamic Web Pages with Selenium">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu"># Archived Web Pages and the Wayback Machine {#sec-archives}</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3"></a>::: {.callout-tip}</span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="fu">## Learning Objectives</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="ss">- </span>Explain the Internet Archive's role as a public infrastructure for web preservation</span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="ss">- </span>Query the Wayback Machine's Availability API and CDX Server API to find historical snapshots</span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="ss">- </span>Retrieve and parse historical page content to track changes over time</span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="ss">- </span>Apply basic NLP techniques (tokenization, stopword removal, bag-of-words) to measure document similarity</span>
+<span id="cb15-9"><a href="#cb15-9"></a><span class="ss">- </span>Serialize scraped data to JSON files for persistence and reproducibility</span>
+<span id="cb15-10"><a href="#cb15-10"></a>:::</span>
+<span id="cb15-11"><a href="#cb15-11"></a></span>
+<span id="cb15-12"><a href="#cb15-12"></a><span class="fu">## The Web Is Not Permanent</span></span>
+<span id="cb15-13"><a href="#cb15-13"></a></span>
+<span id="cb15-14"><a href="#cb15-14"></a>Web pages change, disappear, and get redesigned constantly. Studies have found that a significant fraction of URLs break within just a few years — a phenomenon called *link rot*. For researchers, this impermanence creates a fundamental challenge: how do you study something that might not be there tomorrow? And how do you study how something has changed over time when only the current version is visible?</span>
+<span id="cb15-15"><a href="#cb15-15"></a></span>
+<span id="cb15-16"><a href="#cb15-16"></a>The <span class="co">[</span><span class="ot">Internet Archive</span><span class="co">](https://archive.org)</span>, founded by Brewster Kahle in 1996, addresses this challenge by archiving the web. Its <span class="co">[</span><span class="ot">Wayback Machine</span><span class="co">](https://web.archive.org)</span> has captured over 800 billion web pages, creating a historical record of the web that is freely accessible to anyone. For web data scientists, the Wayback Machine is both a data source and a form of the counter-erosion infrastructure described in @sec-post-api — a community-governed resource that preserves access to web content even as platforms and governments take pages down.</span>
+<span id="cb15-17"><a href="#cb15-17"></a></span>
+<span id="cb15-18"><a href="#cb15-18"></a><span class="fu">## The Availability API</span></span>
+<span id="cb15-19"><a href="#cb15-19"></a></span>
+<span id="cb15-20"><a href="#cb15-20"></a>The simplest way to check whether the Wayback Machine has a snapshot of a URL is the Availability API:</span>
+<span id="cb15-21"><a href="#cb15-21"></a></span>
+<span id="cb15-22"><a href="#cb15-22"></a><span class="in">```python</span></span>
+<span id="cb15-23"><a href="#cb15-23"></a><span class="im">import</span> requests</span>
+<span id="cb15-24"><a href="#cb15-24"></a></span>
+<span id="cb15-25"><a href="#cb15-25"></a>url <span class="op">=</span> <span class="st">"https://www.cnn.com"</span></span>
+<span id="cb15-26"><a href="#cb15-26"></a>timestamp <span class="op">=</span> <span class="st">"20000815"</span>  <span class="co"># August 15, 2000</span></span>
+<span id="cb15-27"><a href="#cb15-27"></a></span>
+<span id="cb15-28"><a href="#cb15-28"></a>api_url <span class="op">=</span> <span class="ss">f"https://archive.org/wayback/available?url=</span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">&amp;timestamp=</span><span class="sc">{</span>timestamp<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb15-29"><a href="#cb15-29"></a>response <span class="op">=</span> requests.get(api_url)</span>
+<span id="cb15-30"><a href="#cb15-30"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb15-31"><a href="#cb15-31"></a></span>
+<span id="cb15-32"><a href="#cb15-32"></a><span class="co"># Check if a snapshot is available</span></span>
+<span id="cb15-33"><a href="#cb15-33"></a><span class="cf">if</span> data[<span class="st">"archived_snapshots"</span>]:</span>
+<span id="cb15-34"><a href="#cb15-34"></a>    snapshot <span class="op">=</span> data[<span class="st">"archived_snapshots"</span>][<span class="st">"closest"</span>]</span>
+<span id="cb15-35"><a href="#cb15-35"></a>    <span class="bu">print</span>(<span class="ss">f"Snapshot available: </span><span class="sc">{</span>snapshot[<span class="st">'available'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-36"><a href="#cb15-36"></a>    <span class="bu">print</span>(<span class="ss">f"URL: </span><span class="sc">{</span>snapshot[<span class="st">'url'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-37"><a href="#cb15-37"></a>    <span class="bu">print</span>(<span class="ss">f"Timestamp: </span><span class="sc">{</span>snapshot[<span class="st">'timestamp'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-38"><a href="#cb15-38"></a><span class="cf">else</span>:</span>
+<span id="cb15-39"><a href="#cb15-39"></a>    <span class="bu">print</span>(<span class="st">"No snapshot available near this date"</span>)</span>
+<span id="cb15-40"><a href="#cb15-40"></a><span class="in">```</span></span>
+<span id="cb15-41"><a href="#cb15-41"></a></span>
+<span id="cb15-42"><a href="#cb15-42"></a>The API returns the closest snapshot to your requested timestamp. You can then retrieve and parse that historical page just as you would a current page:</span>
+<span id="cb15-43"><a href="#cb15-43"></a></span>
+<span id="cb15-44"><a href="#cb15-44"></a><span class="in">```python</span></span>
+<span id="cb15-45"><a href="#cb15-45"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb15-46"><a href="#cb15-46"></a></span>
+<span id="cb15-47"><a href="#cb15-47"></a><span class="co"># Retrieve the archived page</span></span>
+<span id="cb15-48"><a href="#cb15-48"></a>archived_url <span class="op">=</span> snapshot[<span class="st">"url"</span>]</span>
+<span id="cb15-49"><a href="#cb15-49"></a>archived_response <span class="op">=</span> requests.get(archived_url)</span>
+<span id="cb15-50"><a href="#cb15-50"></a>soup <span class="op">=</span> BeautifulSoup(archived_response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb15-51"><a href="#cb15-51"></a></span>
+<span id="cb15-52"><a href="#cb15-52"></a><span class="co"># Extract links from the year-2000 version of CNN</span></span>
+<span id="cb15-53"><a href="#cb15-53"></a>links <span class="op">=</span> soup.find_all(<span class="st">"a"</span>)</span>
+<span id="cb15-54"><a href="#cb15-54"></a><span class="bu">print</span>(<span class="ss">f"Number of links on CNN in August 2000: </span><span class="sc">{</span><span class="bu">len</span>(links)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-55"><a href="#cb15-55"></a><span class="in">```</span></span>
+<span id="cb15-56"><a href="#cb15-56"></a></span>
+<span id="cb15-57"><a href="#cb15-57"></a><span class="fu">### Comparing Multiple Snapshots</span></span>
+<span id="cb15-58"><a href="#cb15-58"></a></span>
+<span id="cb15-59"><a href="#cb15-59"></a>A single historical snapshot is interesting; comparing snapshots across time is where the real research value lies. Let us retrieve CNN's homepage at three different points in history and see how the web has evolved:</span>
+<span id="cb15-60"><a href="#cb15-60"></a></span>
+<span id="cb15-61"><a href="#cb15-61"></a><span class="in">```python</span></span>
+<span id="cb15-62"><a href="#cb15-62"></a><span class="im">import</span> requests</span>
+<span id="cb15-63"><a href="#cb15-63"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb15-64"><a href="#cb15-64"></a></span>
+<span id="cb15-65"><a href="#cb15-65"></a><span class="kw">def</span> get_snapshot_stats(url, timestamp, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb15-66"><a href="#cb15-66"></a>    <span class="co">"""Retrieve a Wayback snapshot and compute basic statistics."""</span></span>
+<span id="cb15-67"><a href="#cb15-67"></a>    api_url <span class="op">=</span> <span class="ss">f"https://archive.org/wayback/available?url=</span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">&amp;timestamp=</span><span class="sc">{</span>timestamp<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb15-68"><a href="#cb15-68"></a>    api_response <span class="op">=</span> requests.get(api_url, headers<span class="op">=</span>headers)</span>
+<span id="cb15-69"><a href="#cb15-69"></a>    api_data <span class="op">=</span> api_response.json()</span>
+<span id="cb15-70"><a href="#cb15-70"></a></span>
+<span id="cb15-71"><a href="#cb15-71"></a>    <span class="cf">if</span> <span class="kw">not</span> api_data.get(<span class="st">"archived_snapshots"</span>):</span>
+<span id="cb15-72"><a href="#cb15-72"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb15-73"><a href="#cb15-73"></a></span>
+<span id="cb15-74"><a href="#cb15-74"></a>    snapshot_url <span class="op">=</span> api_data[<span class="st">"archived_snapshots"</span>][<span class="st">"closest"</span>][<span class="st">"url"</span>]</span>
+<span id="cb15-75"><a href="#cb15-75"></a>    page_response <span class="op">=</span> requests.get(snapshot_url, headers<span class="op">=</span>headers)</span>
+<span id="cb15-76"><a href="#cb15-76"></a>    soup <span class="op">=</span> BeautifulSoup(page_response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb15-77"><a href="#cb15-77"></a></span>
+<span id="cb15-78"><a href="#cb15-78"></a>    <span class="cf">return</span> {</span>
+<span id="cb15-79"><a href="#cb15-79"></a>        <span class="st">"year"</span>: timestamp[:<span class="dv">4</span>],</span>
+<span id="cb15-80"><a href="#cb15-80"></a>        <span class="st">"num_links"</span>: <span class="bu">len</span>(soup.find_all(<span class="st">"a"</span>)),</span>
+<span id="cb15-81"><a href="#cb15-81"></a>        <span class="st">"text_length"</span>: <span class="bu">len</span>(soup.get_text()),</span>
+<span id="cb15-82"><a href="#cb15-82"></a>        <span class="st">"num_images"</span>: <span class="bu">len</span>(soup.find_all(<span class="st">"img"</span>)),</span>
+<span id="cb15-83"><a href="#cb15-83"></a>        <span class="st">"num_scripts"</span>: <span class="bu">len</span>(soup.find_all(<span class="st">"script"</span>)),</span>
+<span id="cb15-84"><a href="#cb15-84"></a>    }</span>
+<span id="cb15-85"><a href="#cb15-85"></a></span>
+<span id="cb15-86"><a href="#cb15-86"></a><span class="co"># Compare CNN across three eras</span></span>
+<span id="cb15-87"><a href="#cb15-87"></a>timestamps <span class="op">=</span> [<span class="st">"20000815"</span>, <span class="st">"20120815"</span>, <span class="st">"20240815"</span>]</span>
+<span id="cb15-88"><a href="#cb15-88"></a>stats <span class="op">=</span> []</span>
+<span id="cb15-89"><a href="#cb15-89"></a><span class="cf">for</span> ts <span class="kw">in</span> timestamps:</span>
+<span id="cb15-90"><a href="#cb15-90"></a>    result <span class="op">=</span> get_snapshot_stats(<span class="st">"www.cnn.com"</span>, ts)</span>
+<span id="cb15-91"><a href="#cb15-91"></a>    <span class="cf">if</span> result:</span>
+<span id="cb15-92"><a href="#cb15-92"></a>        stats.append(result)</span>
+<span id="cb15-93"><a href="#cb15-93"></a>    time.sleep(<span class="dv">2</span>)  <span class="co"># Be respectful of the Archive</span></span>
+<span id="cb15-94"><a href="#cb15-94"></a><span class="in">```</span></span>
+<span id="cb15-95"><a href="#cb15-95"></a></span>
+<span id="cb15-96"><a href="#cb15-96"></a><span class="in">```python</span></span>
+<span id="cb15-97"><a href="#cb15-97"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb15-98"><a href="#cb15-98"></a></span>
+<span id="cb15-99"><a href="#cb15-99"></a>comparison <span class="op">=</span> pd.DataFrame(stats)</span>
+<span id="cb15-100"><a href="#cb15-100"></a><span class="bu">print</span>(comparison)</span>
+<span id="cb15-101"><a href="#cb15-101"></a><span class="co">#   year  num_links  text_length  num_images  num_scripts</span></span>
+<span id="cb15-102"><a href="#cb15-102"></a><span class="co"># 0  2000        150         8500          20            2</span></span>
+<span id="cb15-103"><a href="#cb15-103"></a><span class="co"># 1  2012        450        25000          80           35</span></span>
+<span id="cb15-104"><a href="#cb15-104"></a><span class="co"># 2  2024        800        45000         120           95</span></span>
+<span id="cb15-105"><a href="#cb15-105"></a><span class="in">```</span></span>
+<span id="cb15-106"><a href="#cb15-106"></a></span>
+<span id="cb15-107"><a href="#cb15-107"></a>The numbers tell a story about the web's evolution: pages have grown dramatically in complexity, with more links, more text, more images, and — most strikingly — far more JavaScript. The 2000-era web was largely static HTML; the 2024 web is a JavaScript application that happens to render as a web page. This increasing complexity is part of why the techniques in @sec-dynamic-pages become necessary for modern scraping.</span>
+<span id="cb15-108"><a href="#cb15-108"></a></span>
+<span id="cb15-109"><a href="#cb15-109"></a>You can extend this approach to any pair of sites or time periods. Comparing how two competing news organizations' homepages evolved reveals different editorial strategies. Tracking a government agency's page across presidential administrations can reveal shifts in priorities and transparency. The Wayback Machine turns the web from a snapshot medium into a longitudinal data source — one where you can measure change rather than merely observing it.</span>
+<span id="cb15-110"><a href="#cb15-110"></a></span>
+<span id="cb15-111"><a href="#cb15-111"></a>Note the importance of the <span class="in">`time.sleep(2)`</span> call in the loop above. The Internet Archive is a nonprofit that provides this service for free. Aggressive scraping degrades the experience for everyone. Treat the Archive with the same courtesy you would extend to any community resource — use it responsibly, and it will be there when you need it.</span>
+<span id="cb15-112"><a href="#cb15-112"></a></span>
+<span id="cb15-113"><a href="#cb15-113"></a><span class="fu">## The CDX Server API</span></span>
+<span id="cb15-114"><a href="#cb15-114"></a></span>
+<span id="cb15-115"><a href="#cb15-115"></a>The Availability API finds one snapshot near a date. The CDX Server API lets you query the entire history of snapshots for a URL, which is essential for longitudinal research:</span>
+<span id="cb15-116"><a href="#cb15-116"></a></span>
+<span id="cb15-117"><a href="#cb15-117"></a><span class="in">```python</span></span>
+<span id="cb15-118"><a href="#cb15-118"></a><span class="im">import</span> requests</span>
+<span id="cb15-119"><a href="#cb15-119"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb15-120"><a href="#cb15-120"></a></span>
+<span id="cb15-121"><a href="#cb15-121"></a><span class="co"># Query all snapshots of Facebook's Terms of Service</span></span>
+<span id="cb15-122"><a href="#cb15-122"></a>cdx_url <span class="op">=</span> <span class="st">"https://web.archive.org/cdx/search/cdx"</span></span>
+<span id="cb15-123"><a href="#cb15-123"></a>params <span class="op">=</span> {</span>
+<span id="cb15-124"><a href="#cb15-124"></a>    <span class="st">"url"</span>: <span class="st">"facebook.com/terms"</span>,</span>
+<span id="cb15-125"><a href="#cb15-125"></a>    <span class="st">"output"</span>: <span class="st">"json"</span>,</span>
+<span id="cb15-126"><a href="#cb15-126"></a>    <span class="st">"fl"</span>: <span class="st">"timestamp,original,statuscode,length"</span></span>
+<span id="cb15-127"><a href="#cb15-127"></a>}</span>
+<span id="cb15-128"><a href="#cb15-128"></a></span>
+<span id="cb15-129"><a href="#cb15-129"></a>response <span class="op">=</span> requests.get(cdx_url, params<span class="op">=</span>params)</span>
+<span id="cb15-130"><a href="#cb15-130"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb15-131"><a href="#cb15-131"></a></span>
+<span id="cb15-132"><a href="#cb15-132"></a><span class="co"># First row is column headers, rest is data</span></span>
+<span id="cb15-133"><a href="#cb15-133"></a>df <span class="op">=</span> pd.DataFrame(data[<span class="dv">1</span>:], columns<span class="op">=</span>data[<span class="dv">0</span>])</span>
+<span id="cb15-134"><a href="#cb15-134"></a>df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">%H%M%S"</span>)</span>
+<span id="cb15-135"><a href="#cb15-135"></a>df[<span class="st">"length"</span>] <span class="op">=</span> pd.to_numeric(df[<span class="st">"length"</span>], errors<span class="op">=</span><span class="st">"coerce"</span>)</span>
+<span id="cb15-136"><a href="#cb15-136"></a></span>
+<span id="cb15-137"><a href="#cb15-137"></a><span class="bu">print</span>(<span class="ss">f"Total snapshots: </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-138"><a href="#cb15-138"></a><span class="bu">print</span>(<span class="ss">f"Date range: </span><span class="sc">{</span>df[<span class="st">'timestamp'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>df[<span class="st">'timestamp'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-139"><a href="#cb15-139"></a><span class="in">```</span></span>
+<span id="cb15-140"><a href="#cb15-140"></a></span>
+<span id="cb15-141"><a href="#cb15-141"></a>You can visualize how frequently the page was captured and how its size changed over time:</span>
+<span id="cb15-142"><a href="#cb15-142"></a></span>
+<span id="cb15-143"><a href="#cb15-143"></a><span class="in">```python</span></span>
+<span id="cb15-144"><a href="#cb15-144"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb15-145"><a href="#cb15-145"></a></span>
+<span id="cb15-146"><a href="#cb15-146"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-147"><a href="#cb15-147"></a></span>
+<span id="cb15-148"><a href="#cb15-148"></a><span class="co"># Snapshot frequency over time</span></span>
+<span id="cb15-149"><a href="#cb15-149"></a>df.set_index(<span class="st">"timestamp"</span>).resample(<span class="st">"M"</span>).size().plot(ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
+<span id="cb15-150"><a href="#cb15-150"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Snapshots per month"</span>)</span>
+<span id="cb15-151"><a href="#cb15-151"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Wayback Machine Capture Frequency"</span>)</span>
+<span id="cb15-152"><a href="#cb15-152"></a></span>
+<span id="cb15-153"><a href="#cb15-153"></a><span class="co"># Page size over time</span></span>
+<span id="cb15-154"><a href="#cb15-154"></a>df.set_index(<span class="st">"timestamp"</span>)[<span class="st">"length"</span>].plot(ax<span class="op">=</span>axes[<span class="dv">1</span>])</span>
+<span id="cb15-155"><a href="#cb15-155"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Page size (bytes)"</span>)</span>
+<span id="cb15-156"><a href="#cb15-156"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Page Size Over Time"</span>)</span>
+<span id="cb15-157"><a href="#cb15-157"></a></span>
+<span id="cb15-158"><a href="#cb15-158"></a>plt.tight_layout()</span>
+<span id="cb15-159"><a href="#cb15-159"></a>plt.show()</span>
+<span id="cb15-160"><a href="#cb15-160"></a><span class="in">```</span></span>
+<span id="cb15-161"><a href="#cb15-161"></a></span>
+<span id="cb15-162"><a href="#cb15-162"></a><span class="fu">### Filtering and Analyzing CDX Data</span></span>
+<span id="cb15-163"><a href="#cb15-163"></a></span>
+<span id="cb15-164"><a href="#cb15-164"></a>The raw CDX data often includes failed requests, redirects, and duplicate captures that can skew your analysis. Filtering to only successful captures (status code 200) and analyzing trends gives you a cleaner picture:</span>
+<span id="cb15-165"><a href="#cb15-165"></a></span>
+<span id="cb15-166"><a href="#cb15-166"></a><span class="in">```python</span></span>
+<span id="cb15-167"><a href="#cb15-167"></a><span class="co"># Filter to successful captures only</span></span>
+<span id="cb15-168"><a href="#cb15-168"></a>df_ok <span class="op">=</span> df[df[<span class="st">"statuscode"</span>] <span class="op">==</span> <span class="st">"200"</span>].copy()</span>
+<span id="cb15-169"><a href="#cb15-169"></a><span class="bu">print</span>(<span class="ss">f"Successful captures: </span><span class="sc">{</span><span class="bu">len</span>(df_ok)<span class="sc">}</span><span class="ss"> out of </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> total"</span>)</span>
+<span id="cb15-170"><a href="#cb15-170"></a></span>
+<span id="cb15-171"><a href="#cb15-171"></a><span class="co"># Resample to quarterly frequency for trend analysis</span></span>
+<span id="cb15-172"><a href="#cb15-172"></a>df_ok <span class="op">=</span> df_ok.set_index(<span class="st">"timestamp"</span>)</span>
+<span id="cb15-173"><a href="#cb15-173"></a>quarterly <span class="op">=</span> df_ok.resample(<span class="st">"QS"</span>).agg(</span>
+<span id="cb15-174"><a href="#cb15-174"></a>    captures<span class="op">=</span>(<span class="st">"length"</span>, <span class="st">"size"</span>),</span>
+<span id="cb15-175"><a href="#cb15-175"></a>    mean_size<span class="op">=</span>(<span class="st">"length"</span>, <span class="st">"mean"</span>),</span>
+<span id="cb15-176"><a href="#cb15-176"></a>)</span>
+<span id="cb15-177"><a href="#cb15-177"></a></span>
+<span id="cb15-178"><a href="#cb15-178"></a><span class="co"># Compute year-over-year page size growth</span></span>
+<span id="cb15-179"><a href="#cb15-179"></a>yearly <span class="op">=</span> df_ok.resample(<span class="st">"YS"</span>).agg(mean_size<span class="op">=</span>(<span class="st">"length"</span>, <span class="st">"mean"</span>))</span>
+<span id="cb15-180"><a href="#cb15-180"></a><span class="bu">print</span>(yearly.tail(<span class="dv">10</span>))</span>
+<span id="cb15-181"><a href="#cb15-181"></a><span class="in">```</span></span>
+<span id="cb15-182"><a href="#cb15-182"></a></span>
+<span id="cb15-183"><a href="#cb15-183"></a><span class="in">```python</span></span>
+<span id="cb15-184"><a href="#cb15-184"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-185"><a href="#cb15-185"></a></span>
+<span id="cb15-186"><a href="#cb15-186"></a>quarterly[<span class="st">"captures"</span>].plot(ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
+<span id="cb15-187"><a href="#cb15-187"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Captures per quarter"</span>)</span>
+<span id="cb15-188"><a href="#cb15-188"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Capture Frequency (Status 200 Only)"</span>)</span>
+<span id="cb15-189"><a href="#cb15-189"></a></span>
+<span id="cb15-190"><a href="#cb15-190"></a>quarterly[<span class="st">"mean_size"</span>].plot(ax<span class="op">=</span>axes[<span class="dv">1</span>])</span>
+<span id="cb15-191"><a href="#cb15-191"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Mean page size (bytes)"</span>)</span>
+<span id="cb15-192"><a href="#cb15-192"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Average Page Size Over Time"</span>)</span>
+<span id="cb15-193"><a href="#cb15-193"></a></span>
+<span id="cb15-194"><a href="#cb15-194"></a>plt.tight_layout()</span>
+<span id="cb15-195"><a href="#cb15-195"></a>plt.show()</span>
+<span id="cb15-196"><a href="#cb15-196"></a><span class="in">```</span></span>
+<span id="cb15-197"><a href="#cb15-197"></a></span>
+<span id="cb15-198"><a href="#cb15-198"></a>Filtering matters because CDX data includes every capture attempt, not just successful ones. A spike in 301 (redirect) codes might indicate a site restructuring; a cluster of 503 (Service Unavailable) codes might indicate a period of downtime. These metadata are themselves interesting — they tell you about the infrastructure behind the page, not just its content.</span>
+<span id="cb15-199"><a href="#cb15-199"></a></span>
+<span id="cb15-200"><a href="#cb15-200"></a>Page size trends are particularly revealing. A steady increase in page size often correlates with the addition of tracking scripts, advertising frameworks, and JavaScript-heavy interfaces. A sudden jump might indicate a redesign; a sudden drop might mean the site moved content behind a login wall. When combined with the content analysis techniques later in this chapter, CDX metadata provides the quantitative backbone for your longitudinal research — telling you *how much* changed while bag-of-words analysis tells you *what* changed.</span>
+<span id="cb15-201"><a href="#cb15-201"></a></span>
+<span id="cb15-202"><a href="#cb15-202"></a><span class="fu">## Tracking Policy Changes Over Time</span></span>
+<span id="cb15-203"><a href="#cb15-203"></a></span>
+<span id="cb15-204"><a href="#cb15-204"></a>A current research project explores how social media platforms' terms of service have evolved. Let us track changes in Facebook's Terms of Service by retrieving content at regular intervals.</span>
+<span id="cb15-205"><a href="#cb15-205"></a></span>
+<span id="cb15-206"><a href="#cb15-206"></a><span class="fu">### Generating Date Ranges</span></span>
+<span id="cb15-207"><a href="#cb15-207"></a></span>
+<span id="cb15-208"><a href="#cb15-208"></a><span class="in">```python</span></span>
+<span id="cb15-209"><a href="#cb15-209"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb15-210"><a href="#cb15-210"></a></span>
+<span id="cb15-211"><a href="#cb15-211"></a><span class="co"># Generate quarterly dates from 2005 to 2024</span></span>
+<span id="cb15-212"><a href="#cb15-212"></a>dates <span class="op">=</span> pd.date_range(start<span class="op">=</span><span class="st">"2005-01-01"</span>, end<span class="op">=</span><span class="st">"2024-01-01"</span>, freq<span class="op">=</span><span class="st">"QS"</span>)</span>
+<span id="cb15-213"><a href="#cb15-213"></a><span class="bu">print</span>(<span class="ss">f"Querying </span><span class="sc">{</span><span class="bu">len</span>(dates)<span class="sc">}</span><span class="ss"> time points"</span>)</span>
+<span id="cb15-214"><a href="#cb15-214"></a><span class="in">```</span></span>
+<span id="cb15-215"><a href="#cb15-215"></a></span>
+<span id="cb15-216"><a href="#cb15-216"></a><span class="fu">### Retrieving Historical Content</span></span>
+<span id="cb15-217"><a href="#cb15-217"></a></span>
+<span id="cb15-218"><a href="#cb15-218"></a><span class="in">```python</span></span>
+<span id="cb15-219"><a href="#cb15-219"></a><span class="im">import</span> time</span>
+<span id="cb15-220"><a href="#cb15-220"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb15-221"><a href="#cb15-221"></a></span>
+<span id="cb15-222"><a href="#cb15-222"></a>fb_tos_url <span class="op">=</span> <span class="st">"facebook.com/terms"</span></span>
+<span id="cb15-223"><a href="#cb15-223"></a></span>
+<span id="cb15-224"><a href="#cb15-224"></a><span class="kw">def</span> get_wayback_content(url, date, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb15-225"><a href="#cb15-225"></a>    <span class="co">"""Retrieve a page from the Wayback Machine closest to a given date.</span></span>
+<span id="cb15-226"><a href="#cb15-226"></a><span class="co">    </span></span>
+<span id="cb15-227"><a href="#cb15-227"></a><span class="co">    Parameters</span></span>
+<span id="cb15-228"><a href="#cb15-228"></a><span class="co">    ----------</span></span>
+<span id="cb15-229"><a href="#cb15-229"></a><span class="co">    url : str</span></span>
+<span id="cb15-230"><a href="#cb15-230"></a><span class="co">        The original URL (without http://)</span></span>
+<span id="cb15-231"><a href="#cb15-231"></a><span class="co">    date : datetime</span></span>
+<span id="cb15-232"><a href="#cb15-232"></a><span class="co">        The target date for the snapshot</span></span>
+<span id="cb15-233"><a href="#cb15-233"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb15-234"><a href="#cb15-234"></a><span class="co">        HTTP headers for the request</span></span>
+<span id="cb15-235"><a href="#cb15-235"></a><span class="co">    </span></span>
+<span id="cb15-236"><a href="#cb15-236"></a><span class="co">    Returns</span></span>
+<span id="cb15-237"><a href="#cb15-237"></a><span class="co">    -------</span></span>
+<span id="cb15-238"><a href="#cb15-238"></a><span class="co">    dict</span></span>
+<span id="cb15-239"><a href="#cb15-239"></a><span class="co">        Dictionary with 'timestamp', 'url', 'content', and 'word_count'</span></span>
+<span id="cb15-240"><a href="#cb15-240"></a><span class="co">    """</span></span>
+<span id="cb15-241"><a href="#cb15-241"></a>    timestamp <span class="op">=</span> date.strftime(<span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">"</span>)</span>
+<span id="cb15-242"><a href="#cb15-242"></a>    api_url <span class="op">=</span> <span class="ss">f"https://archive.org/wayback/available?url=</span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">&amp;timestamp=</span><span class="sc">{</span>timestamp<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb15-243"><a href="#cb15-243"></a>    </span>
+<span id="cb15-244"><a href="#cb15-244"></a>    api_response <span class="op">=</span> requests.get(api_url, headers<span class="op">=</span>headers)</span>
+<span id="cb15-245"><a href="#cb15-245"></a>    api_data <span class="op">=</span> api_response.json()</span>
+<span id="cb15-246"><a href="#cb15-246"></a>    </span>
+<span id="cb15-247"><a href="#cb15-247"></a>    <span class="cf">if</span> <span class="kw">not</span> api_data.get(<span class="st">"archived_snapshots"</span>):</span>
+<span id="cb15-248"><a href="#cb15-248"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb15-249"><a href="#cb15-249"></a>    </span>
+<span id="cb15-250"><a href="#cb15-250"></a>    snapshot_url <span class="op">=</span> api_data[<span class="st">"archived_snapshots"</span>][<span class="st">"closest"</span>][<span class="st">"url"</span>]</span>
+<span id="cb15-251"><a href="#cb15-251"></a>    page_response <span class="op">=</span> requests.get(snapshot_url, headers<span class="op">=</span>headers)</span>
+<span id="cb15-252"><a href="#cb15-252"></a>    soup <span class="op">=</span> BeautifulSoup(page_response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb15-253"><a href="#cb15-253"></a>    </span>
+<span id="cb15-254"><a href="#cb15-254"></a>    <span class="co"># Extract text content</span></span>
+<span id="cb15-255"><a href="#cb15-255"></a>    text <span class="op">=</span> soup.get_text(separator<span class="op">=</span><span class="st">" "</span>, strip<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-256"><a href="#cb15-256"></a>    </span>
+<span id="cb15-257"><a href="#cb15-257"></a>    time.sleep(<span class="dv">1</span>)  <span class="co"># Rate limit</span></span>
+<span id="cb15-258"><a href="#cb15-258"></a>    </span>
+<span id="cb15-259"><a href="#cb15-259"></a>    <span class="cf">return</span> {</span>
+<span id="cb15-260"><a href="#cb15-260"></a>        <span class="st">"timestamp"</span>: api_data[<span class="st">"archived_snapshots"</span>][<span class="st">"closest"</span>][<span class="st">"timestamp"</span>],</span>
+<span id="cb15-261"><a href="#cb15-261"></a>        <span class="st">"url"</span>: snapshot_url,</span>
+<span id="cb15-262"><a href="#cb15-262"></a>        <span class="st">"word_count"</span>: <span class="bu">len</span>(text.split()),</span>
+<span id="cb15-263"><a href="#cb15-263"></a>        <span class="st">"content"</span>: text[:<span class="dv">5000</span>]  <span class="co"># First 5000 characters to avoid memory issues</span></span>
+<span id="cb15-264"><a href="#cb15-264"></a>    }</span>
+<span id="cb15-265"><a href="#cb15-265"></a><span class="in">```</span></span>
+<span id="cb15-266"><a href="#cb15-266"></a></span>
+<span id="cb15-267"><a href="#cb15-267"></a><span class="fu">### Serializing Data</span></span>
+<span id="cb15-268"><a href="#cb15-268"></a></span>
+<span id="cb15-269"><a href="#cb15-269"></a>Once you have collected historical content, save it so you do not need to re-scrape:</span>
+<span id="cb15-270"><a href="#cb15-270"></a></span>
+<span id="cb15-271"><a href="#cb15-271"></a><span class="in">```python</span></span>
+<span id="cb15-272"><a href="#cb15-272"></a><span class="im">import</span> json</span>
+<span id="cb15-273"><a href="#cb15-273"></a></span>
+<span id="cb15-274"><a href="#cb15-274"></a><span class="co"># After collecting data into a list called 'results':</span></span>
+<span id="cb15-275"><a href="#cb15-275"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"fb_tos_history.json"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
+<span id="cb15-276"><a href="#cb15-276"></a>    json.dump(results, f, indent<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb15-277"><a href="#cb15-277"></a></span>
+<span id="cb15-278"><a href="#cb15-278"></a><span class="co"># Load it back later:</span></span>
+<span id="cb15-279"><a href="#cb15-279"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"fb_tos_history.json"</span>, <span class="st">"r"</span>) <span class="im">as</span> f:</span>
+<span id="cb15-280"><a href="#cb15-280"></a>    results <span class="op">=</span> json.load(f)</span>
+<span id="cb15-281"><a href="#cb15-281"></a><span class="in">```</span></span>
+<span id="cb15-282"><a href="#cb15-282"></a></span>
+<span id="cb15-283"><a href="#cb15-283"></a><span class="fu">## Document Similarity with Bag-of-Words</span></span>
+<span id="cb15-284"><a href="#cb15-284"></a></span>
+<span id="cb15-285"><a href="#cb15-285"></a>To measure how much a document changed between versions, you can use a bag-of-words approach. This technique represents each document as a vector of word frequencies, ignoring word order, and then measures the similarity between vectors.</span>
+<span id="cb15-286"><a href="#cb15-286"></a></span>
+<span id="cb15-287"><a href="#cb15-287"></a><span class="in">```python</span></span>
+<span id="cb15-288"><a href="#cb15-288"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
+<span id="cb15-289"><a href="#cb15-289"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
+<span id="cb15-290"><a href="#cb15-290"></a><span class="im">import</span> nltk</span>
+<span id="cb15-291"><a href="#cb15-291"></a></span>
+<span id="cb15-292"><a href="#cb15-292"></a><span class="co"># Download stopwords (first time only)</span></span>
+<span id="cb15-293"><a href="#cb15-293"></a><span class="co"># nltk.download('stopwords')</span></span>
+<span id="cb15-294"><a href="#cb15-294"></a></span>
+<span id="cb15-295"><a href="#cb15-295"></a>stop_words <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">'english'</span>))</span>
+<span id="cb15-296"><a href="#cb15-296"></a></span>
+<span id="cb15-297"><a href="#cb15-297"></a><span class="kw">def</span> preprocess_document(text):</span>
+<span id="cb15-298"><a href="#cb15-298"></a>    <span class="co">"""Tokenize, lowercase, and remove stopwords from a document."""</span></span>
+<span id="cb15-299"><a href="#cb15-299"></a>    tokens <span class="op">=</span> simple_preprocess(text)  <span class="co"># Tokenize and lowercase</span></span>
+<span id="cb15-300"><a href="#cb15-300"></a>    <span class="cf">return</span> [token <span class="cf">for</span> token <span class="kw">in</span> tokens <span class="cf">if</span> token <span class="kw">not</span> <span class="kw">in</span> stop_words]</span>
+<span id="cb15-301"><a href="#cb15-301"></a></span>
+<span id="cb15-302"><a href="#cb15-302"></a><span class="co"># Preprocess two versions of the ToS</span></span>
+<span id="cb15-303"><a href="#cb15-303"></a>doc_v1 <span class="op">=</span> preprocess_document(results[<span class="dv">0</span>][<span class="st">"content"</span>])</span>
+<span id="cb15-304"><a href="#cb15-304"></a>doc_v2 <span class="op">=</span> preprocess_document(results[<span class="op">-</span><span class="dv">1</span>][<span class="st">"content"</span>])</span>
+<span id="cb15-305"><a href="#cb15-305"></a></span>
+<span id="cb15-306"><a href="#cb15-306"></a><span class="bu">print</span>(<span class="ss">f"Version 1 tokens: </span><span class="sc">{</span><span class="bu">len</span>(doc_v1)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-307"><a href="#cb15-307"></a><span class="bu">print</span>(<span class="ss">f"Version 2 tokens: </span><span class="sc">{</span><span class="bu">len</span>(doc_v2)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-308"><a href="#cb15-308"></a><span class="in">```</span></span>
+<span id="cb15-309"><a href="#cb15-309"></a></span>
+<span id="cb15-310"><a href="#cb15-310"></a>Using gensim's dictionary and bag-of-words tools, you can build a corpus and compute similarity:</span>
+<span id="cb15-311"><a href="#cb15-311"></a></span>
+<span id="cb15-312"><a href="#cb15-312"></a><span class="in">```python</span></span>
+<span id="cb15-313"><a href="#cb15-313"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
+<span id="cb15-314"><a href="#cb15-314"></a></span>
+<span id="cb15-315"><a href="#cb15-315"></a><span class="co"># Build a dictionary mapping words to IDs</span></span>
+<span id="cb15-316"><a href="#cb15-316"></a>documents <span class="op">=</span> [doc_v1, doc_v2]</span>
+<span id="cb15-317"><a href="#cb15-317"></a>dictionary <span class="op">=</span> corpora.Dictionary(documents)</span>
+<span id="cb15-318"><a href="#cb15-318"></a></span>
+<span id="cb15-319"><a href="#cb15-319"></a><span class="co"># Convert documents to bag-of-words vectors</span></span>
+<span id="cb15-320"><a href="#cb15-320"></a>corpus <span class="op">=</span> [dictionary.doc2bow(doc) <span class="cf">for</span> doc <span class="kw">in</span> documents]</span>
+<span id="cb15-321"><a href="#cb15-321"></a></span>
+<span id="cb15-322"><a href="#cb15-322"></a><span class="co"># Compute similarity</span></span>
+<span id="cb15-323"><a href="#cb15-323"></a>index <span class="op">=</span> similarities.SparseMatrixSimilarity(corpus, num_features<span class="op">=</span><span class="bu">len</span>(dictionary))</span>
+<span id="cb15-324"><a href="#cb15-324"></a>sims <span class="op">=</span> index[corpus[<span class="dv">0</span>]]</span>
+<span id="cb15-325"><a href="#cb15-325"></a><span class="bu">print</span>(<span class="ss">f"Similarity between versions: </span><span class="sc">{</span>sims[<span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb15-326"><a href="#cb15-326"></a><span class="co"># 1.0 = identical, 0.0 = completely different</span></span>
+<span id="cb15-327"><a href="#cb15-327"></a><span class="in">```</span></span>
+<span id="cb15-328"><a href="#cb15-328"></a></span>
+<span id="cb15-329"><a href="#cb15-329"></a><span class="fu">### Visualizing Document Change Over Time</span></span>
+<span id="cb15-330"><a href="#cb15-330"></a></span>
+<span id="cb15-331"><a href="#cb15-331"></a>The bag-of-words similarity measure tells you how similar two documents are, but plotting similarity between *consecutive* versions over time creates a "change timeline" — a visual record of when and how much a document evolved:</span>
+<span id="cb15-332"><a href="#cb15-332"></a></span>
+<span id="cb15-333"><a href="#cb15-333"></a><span class="in">```python</span></span>
+<span id="cb15-334"><a href="#cb15-334"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
+<span id="cb15-335"><a href="#cb15-335"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
+<span id="cb15-336"><a href="#cb15-336"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
+<span id="cb15-337"><a href="#cb15-337"></a></span>
+<span id="cb15-338"><a href="#cb15-338"></a>stop_words <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">"english"</span>))</span>
+<span id="cb15-339"><a href="#cb15-339"></a></span>
+<span id="cb15-340"><a href="#cb15-340"></a><span class="co"># Preprocess all versions</span></span>
+<span id="cb15-341"><a href="#cb15-341"></a>processed_docs <span class="op">=</span> []</span>
+<span id="cb15-342"><a href="#cb15-342"></a><span class="cf">for</span> r <span class="kw">in</span> results:</span>
+<span id="cb15-343"><a href="#cb15-343"></a>    <span class="cf">if</span> r <span class="kw">and</span> r.get(<span class="st">"content"</span>):</span>
+<span id="cb15-344"><a href="#cb15-344"></a>        tokens <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> simple_preprocess(r[<span class="st">"content"</span>]) <span class="cf">if</span> t <span class="kw">not</span> <span class="kw">in</span> stop_words]</span>
+<span id="cb15-345"><a href="#cb15-345"></a>        processed_docs.append(tokens)</span>
+<span id="cb15-346"><a href="#cb15-346"></a></span>
+<span id="cb15-347"><a href="#cb15-347"></a><span class="co"># Build dictionary and corpus</span></span>
+<span id="cb15-348"><a href="#cb15-348"></a>dictionary <span class="op">=</span> corpora.Dictionary(processed_docs)</span>
+<span id="cb15-349"><a href="#cb15-349"></a>corpus <span class="op">=</span> [dictionary.doc2bow(doc) <span class="cf">for</span> doc <span class="kw">in</span> processed_docs]</span>
+<span id="cb15-350"><a href="#cb15-350"></a></span>
+<span id="cb15-351"><a href="#cb15-351"></a><span class="co"># Compute similarity between consecutive versions</span></span>
+<span id="cb15-352"><a href="#cb15-352"></a>change_scores <span class="op">=</span> []</span>
+<span id="cb15-353"><a href="#cb15-353"></a>index <span class="op">=</span> similarities.SparseMatrixSimilarity(corpus, num_features<span class="op">=</span><span class="bu">len</span>(dictionary))</span>
+<span id="cb15-354"><a href="#cb15-354"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(corpus)):</span>
+<span id="cb15-355"><a href="#cb15-355"></a>    sim <span class="op">=</span> index[corpus[i<span class="op">-</span><span class="dv">1</span>]][i]</span>
+<span id="cb15-356"><a href="#cb15-356"></a>    change_scores.append(<span class="dv">1</span> <span class="op">-</span> sim)  <span class="co"># Convert similarity to change score</span></span>
+<span id="cb15-357"><a href="#cb15-357"></a></span>
+<span id="cb15-358"><a href="#cb15-358"></a><span class="co"># Plot the change timeline</span></span>
+<span id="cb15-359"><a href="#cb15-359"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb15-360"><a href="#cb15-360"></a>plt.plot(<span class="bu">range</span>(<span class="bu">len</span>(change_scores)), change_scores, marker<span class="op">=</span><span class="st">"o"</span>)</span>
+<span id="cb15-361"><a href="#cb15-361"></a>plt.xlabel(<span class="st">"Version Transition"</span>)</span>
+<span id="cb15-362"><a href="#cb15-362"></a>plt.ylabel(<span class="st">"Change Score (0 = identical, 1 = completely different)"</span>)</span>
+<span id="cb15-363"><a href="#cb15-363"></a>plt.title(<span class="st">"Document Change Over Time"</span>)</span>
+<span id="cb15-364"><a href="#cb15-364"></a>plt.tight_layout()</span>
+<span id="cb15-365"><a href="#cb15-365"></a>plt.show()</span>
+<span id="cb15-366"><a href="#cb15-366"></a><span class="in">```</span></span>
+<span id="cb15-367"><a href="#cb15-367"></a></span>
+<span id="cb15-368"><a href="#cb15-368"></a>Spikes in this timeline correspond to major revisions — a new Terms of Service policy, a site redesign, or a significant content update. By cross-referencing these spikes with real-world events (a data breach, a regulatory action, a public controversy), you can begin to tell a story about *why* the document changed, not just *that* it changed. This kind of temporal analysis is at the heart of longitudinal web research.</span>
+<span id="cb15-369"><a href="#cb15-369"></a></span>
+<span id="cb15-370"><a href="#cb15-370"></a>The change score visualization complements the CDX analysis from earlier in this chapter. CDX data tells you *how often* the page was captured and how its size changed; the change timeline tells you *how different* consecutive versions are from each other. Together, they create a multi-dimensional picture of a document's evolution. A page might be captured frequently but change very little (a stable, well-maintained site), or captured infrequently but show dramatic changes between captures (a site that undergoes periodic major overhauls).</span>
+<span id="cb15-371"><a href="#cb15-371"></a></span>
+<span id="cb15-372"><a href="#cb15-372"></a>You can also extend this approach beyond consecutive comparisons. Computing pairwise similarity between *all* versions produces a similarity matrix that you can visualize as a heatmap. Clusters of similar versions reveal stable periods; off-diagonal dissimilarities reveal turning points. For research on platform governance, these turning points often align with public controversies, regulatory actions, or leadership changes — patterns that would be invisible without longitudinal data.</span>
+<span id="cb15-373"><a href="#cb15-373"></a></span>
+<span id="cb15-374"><a href="#cb15-374"></a>The combination of the Wayback Machine's historical data with computational text analysis techniques creates a powerful research methodology. You are not just reading old web pages — you are measuring institutional behavior over time, producing evidence that can inform policy debates, academic research, and public accountability. This is precisely the kind of public interest data science that @sec-post-api describes.</span>
+<span id="cb15-375"><a href="#cb15-375"></a></span>
+<span id="cb15-376"><a href="#cb15-376"></a>::: {.callout-tip}</span>
+<span id="cb15-377"><a href="#cb15-377"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb15-378"><a href="#cb15-378"></a>For more on data serialization formats including JSON, CSV, and pickle, see *Missing Manual* Chapter 20: Data File Formats.</span>
+<span id="cb15-379"><a href="#cb15-379"></a>:::</span>
+<span id="cb15-380"><a href="#cb15-380"></a></span>
+<span id="cb15-381"><a href="#cb15-381"></a><span class="fu">## Exercises</span></span>
+<span id="cb15-382"><a href="#cb15-382"></a></span>
+<span id="cb15-383"><a href="#cb15-383"></a><span class="ss">1. </span>**Policy tracking.** Track the evolution of a policy document of your choice (a university's academic integrity policy, a company's privacy policy, or a government agency's FAQ page) over at least five time points using the Wayback Machine. Visualize how document length changes and identify periods of major revision.</span>
+<span id="cb15-384"><a href="#cb15-384"></a></span>
+<span id="cb15-385"><a href="#cb15-385"></a><span class="ss">2. </span>**CDX analysis.** Use the CDX Server API to compare the snapshot frequency and page size trends for two competing organizations (e.g., two news outlets, two universities, or two tech companies). What does the capture frequency tell you about the organizations' web presence?</span>
+<span id="cb15-386"><a href="#cb15-386"></a></span>
+<span id="cb15-387"><a href="#cb15-387"></a><span class="ss">3. </span>**Document similarity.** Compute pairwise document similarity across all versions of your tracked document from Exercise 1. Create a heatmap or matrix visualization. Which version transitions involved the largest changes?</span>
+<span id="cb15-388"><a href="#cb15-388"></a></span>
+<span id="cb15-389"><a href="#cb15-389"></a><span class="ss">4. </span>**Government web archive.** Use the CDX Server API to analyze the archival history of a government website (e.g., a state legislature, a federal agency, or a city government). How frequently was the page captured? Are there gaps in coverage? How has the page size changed over time? Write a brief analysis of what the archival patterns reveal about the site's evolution.</span>
+<span id="cb15-390"><a href="#cb15-390"></a></span>
+<span id="cb15-391"><a href="#cb15-391"></a><span class="ss">5. </span>**Then-and-now similarity.** For a website of your choice, retrieve the earliest available Wayback Machine snapshot and the most recent snapshot. Preprocess both with tokenization and stopword removal, compute bag-of-words similarity, and write a 200-word analysis of what changed. What kinds of content were added, removed, or restructured?</span>
+<span id="cb15-392"><a href="#cb15-392"></a></span>
+<span id="cb15-393"><a href="#cb15-393"></a>::: {.callout-note}</span>
+<span id="cb15-394"><a href="#cb15-394"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb15-395"><a href="#cb15-395"></a>The Wayback Machine embodies the value of **ownership** discussed in @sec-post-api — it is collectively governed, freely accessible, and exists to preserve the web as a public resource. When platforms delete content, change their policies, or redesign their sites, the Wayback Machine often provides the only independent record of what existed before.</span>
+<span id="cb15-396"><a href="#cb15-396"></a>:::</span>
+<span id="cb15-397"><a href="#cb15-397"></a></span>
+<span id="cb15-398"><a href="#cb15-398"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb15-399"><a href="#cb15-399"></a></span>
+<span id="cb15-400"><a href="#cb15-400"></a>Brewster Kahle founded the Internet Archive with the vision of creating a "library of everything" — a comprehensive, freely accessible archive of human knowledge. The Wayback Machine, launched in 2001, has become indispensable for journalists investigating corporate claims, lawyers establishing timelines of events, and researchers conducting longitudinal studies of online content.</span>
+<span id="cb15-401"><a href="#cb15-401"></a></span>
+<span id="cb15-402"><a href="#cb15-402"></a>The Internet Archive has faced legal challenges from publishers, platforms, and governments that would prefer certain content to remain forgotten. Its continued operation depends on the support of its users and donors — a reminder that the infrastructure of openness requires ongoing stewardship.</span>
+<span id="cb15-403"><a href="#cb15-403"></a></span>
+<span id="cb15-404"><a href="#cb15-404"></a>Journalists have been among the most creative users of the Wayback Machine. When politicians delete social media posts or companies quietly change their terms of service, archived versions provide accountability. Legal teams use archived web pages as evidence in intellectual property disputes, contract disagreements, and regulatory investigations — establishing what a website said on a specific date can be the difference between winning and losing a case. Researchers in fields from political science to public health use longitudinal snapshots to study how organizations communicate about crises, how policy language evolves, and how online communities form and fragment over time.</span>
+<span id="cb15-405"><a href="#cb15-405"></a></span>
+<span id="cb15-406"><a href="#cb15-406"></a>The Internet Archive's work also raises fundamental questions about the right to be forgotten versus the public's right to know. The European Union's GDPR includes provisions allowing individuals to request deletion of personal data, which can conflict with the archival mission. Some organizations have requested that the Wayback Machine remove their content. These tensions mirror the broader conflicts between openness, oversight, and ownership that @sec-post-api explores — the same data that enables accountability can also enable surveillance, and the infrastructure that preserves public knowledge can also preserve content that individuals wish to retract.</span>
+<span id="cb15-407"><a href="#cb15-407"></a></span>
+<span id="cb15-408"><a href="#cb15-408"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb15-409"><a href="#cb15-409"></a></span>
+<span id="cb15-410"><a href="#cb15-410"></a><span class="ss">- </span>**Wayback Machine rate limiting**: Space your requests with <span class="in">`time.sleep()`</span>. The service is free and community-maintained; do not abuse it.</span>
+<span id="cb15-411"><a href="#cb15-411"></a><span class="ss">- </span>**Incomplete archived pages**: Many snapshots are missing CSS, images, or JavaScript-rendered content. The text content is usually preserved, but visual rendering may be broken.</span>
+<span id="cb15-412"><a href="#cb15-412"></a><span class="ss">- </span>**CDX data inconsistencies**: Some entries may have missing fields or redirect status codes instead of actual content. Filter your data carefully.</span>
+<span id="cb15-413"><a href="#cb15-413"></a><span class="ss">- </span>**NLTK download errors**: Run <span class="in">`nltk.download('stopwords')`</span> once in a fresh Python session to download the stopwords corpus.</span>
+<span id="cb15-414"><a href="#cb15-414"></a></span>
+<span id="cb15-415"><a href="#cb15-415"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb15-416"><a href="#cb15-416"></a></span>
+<span id="cb15-417"><a href="#cb15-417"></a>The web is not permanent, and the Wayback Machine is your most important tool for longitudinal web research. The Availability API finds specific snapshots; the CDX Server enumerates the full history; and BeautifulSoup parses archived pages just like current ones. Document similarity techniques give you quantitative tools for measuring change over time. Always serialize your scraped data — you may not be able to re-scrape it later, and the page you studied today may be gone tomorrow.</span>
+<span id="cb15-418"><a href="#cb15-418"></a></span>
+<span id="cb15-419"><a href="#cb15-419"></a><span class="fu">## Further Reading</span></span>
+<span id="cb15-420"><a href="#cb15-420"></a></span>
+<span id="cb15-421"><a href="#cb15-421"></a><span class="ss">- </span>Internet Archive Wayback Machine APIs: <span class="ot">&lt;https://archive.org/help/wayback_api.php&gt;</span></span>
+<span id="cb15-422"><a href="#cb15-422"></a><span class="ss">- </span>CDX Server API: <span class="ot">&lt;https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server&gt;</span></span>
+<span id="cb15-423"><a href="#cb15-423"></a><span class="ss">- </span>gensim documentation: <span class="ot">&lt;https://radimrehurek.com/gensim/&gt;</span></span>
+<span id="cb15-424"><a href="#cb15-424"></a><span class="ss">- </span>@rogers2019doing — Chapter on web historiography</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

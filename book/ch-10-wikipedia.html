@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>10&nbsp; Introduction to APIs: Wikipedia – Web Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./ch-11-government.html" rel="next">
+<link href="./ch-09-pdfs.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ea8ef702a3f84812c808b1cddcfad5b3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html">APIs</a></li><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Web Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Web Data Science</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-02-ethics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ethics, Law, and Responsible Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-03-post-api.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">The Post-API Age</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-04-data-formats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Formats: XML and JSON</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-05-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documents</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-06-static-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-07-archives.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-08-dynamic-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-09-pdfs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">APIs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-10-wikipedia.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-11-government.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Government Data APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-12-social.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Social and Media Platform APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-13-ai-apis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Practice</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-14-automation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Automating Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-15-research-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-ai-disclosure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">AI Coauthorship and Responsible Disclosure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-further.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Where to Go from Here</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-is-an-api" id="toc-what-is-an-api" class="nav-link active" data-scroll-target="#what-is-an-api"><span class="header-section-number">10.1</span> What Is an API?</a></li>
+  <li><a href="#why-wikipedia" id="toc-why-wikipedia" class="nav-link" data-scroll-target="#why-wikipedia"><span class="header-section-number">10.2</span> Why Wikipedia?</a></li>
+  <li><a href="#the-anatomy-of-an-api-call" id="toc-the-anatomy-of-an-api-call" class="nav-link" data-scroll-target="#the-anatomy-of-an-api-call"><span class="header-section-number">10.3</span> The Anatomy of an API Call</a></li>
+  <li><a href="#getting-revisions" id="toc-getting-revisions" class="nav-link" data-scroll-target="#getting-revisions"><span class="header-section-number">10.4</span> Getting Revisions</a>
+  <ul class="collapse">
+  <li><a href="#understanding-pagination" id="toc-understanding-pagination" class="nav-link" data-scroll-target="#understanding-pagination"><span class="header-section-number">10.4.1</span> Understanding Pagination</a></li>
+  <li><a href="#analyzing-revision-history" id="toc-analyzing-revision-history" class="nav-link" data-scroll-target="#analyzing-revision-history"><span class="header-section-number">10.4.2</span> Analyzing Revision History</a></li>
+  </ul></li>
+  <li><a href="#getting-pageviews" id="toc-getting-pageviews" class="nav-link" data-scroll-target="#getting-pageviews"><span class="header-section-number">10.5</span> Getting Pageviews</a></li>
+  <li><a href="#getting-links-and-categories" id="toc-getting-links-and-categories" class="nav-link" data-scroll-target="#getting-links-and-categories"><span class="header-section-number">10.6</span> Getting Links and Categories</a>
+  <ul class="collapse">
+  <li><a href="#interlanguage-links" id="toc-interlanguage-links" class="nav-link" data-scroll-target="#interlanguage-links"><span class="header-section-number">10.6.1</span> Interlanguage Links</a></li>
+  </ul></li>
+  <li><a href="#getting-user-contributions" id="toc-getting-user-contributions" class="nav-link" data-scroll-target="#getting-user-contributions"><span class="header-section-number">10.7</span> Getting User Contributions</a></li>
+  <li><a href="#writing-raw-api-requests-from-documentation" id="toc-writing-raw-api-requests-from-documentation" class="nav-link" data-scroll-target="#writing-raw-api-requests-from-documentation"><span class="header-section-number">10.8</span> Writing Raw API Requests from Documentation</a></li>
+  <li><a href="#a-second-case-study-world-war-ii" id="toc-a-second-case-study-world-war-ii" class="nav-link" data-scroll-target="#a-second-case-study-world-war-ii"><span class="header-section-number">10.9</span> A Second Case Study: World War II</a>
+  <ul class="collapse">
+  <li><a href="#combining-endpoints" id="toc-combining-endpoints" class="nav-link" data-scroll-target="#combining-endpoints"><span class="header-section-number">10.9.1</span> Combining Endpoints</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">10.10</span> Exercises</a></li>
+  <li><a href="#social-history-and-public-interest" id="toc-social-history-and-public-interest" class="nav-link" data-scroll-target="#social-history-and-public-interest"><span class="header-section-number">10.11</span> Social History and Public Interest</a></li>
+  <li><a href="#common-issues-to-debug" id="toc-common-issues-to-debug" class="nav-link" data-scroll-target="#common-issues-to-debug"><span class="header-section-number">10.12</span> Common Issues to Debug</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">10.13</span> Key Takeaways</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">10.14</span> Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html">APIs</a></li><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-wikipedia" class="quarto-section-identifier"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Explain what an API is and how it differs from web scraping as a data access method</li>
+<li>Read API documentation to identify endpoints, parameters, and response formats</li>
+<li>Construct parameterized API requests and handle pagination with continuation tokens</li>
+<li>Use multiple MediaWiki API endpoints to answer research questions</li>
+<li>Write raw API requests from documentation rather than relying on wrapper functions</li>
+</ul>
+</div>
+</div>
+<section id="what-is-an-api" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="what-is-an-api"><span class="header-section-number">10.1</span> What Is an API?</h2>
+<p>An API (Application Programming Interface) is a contract between a client and a server that specifies what data you can request, what parameters you can pass, and in what format you will receive the response. Unlike web scraping, where you reverse-engineer the HTML structure of a page designed for human readers, APIs provide structured, documented, and intentional access to data. They return clean JSON rather than cluttered HTML. They offer stable endpoints rather than fragile CSS selectors. And they come with documentation that tells you exactly what is available and how to ask for it.</p>
+<p>The tradeoff, of course, is that APIs only expose what their operators choose to expose. You cannot query a field that the API does not provide. You cannot exceed the rate limits the server enforces. And as <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> describes, APIs can be restricted, repriced, or shut down entirely at the operator’s discretion. But when they are available, APIs are almost always preferable to scraping.</p>
+<p>This chapter marks the transition from document scraping (Part II) to API-based data access (Part III). The skills you learn here — reading documentation, constructing parameterized URLs, handling pagination, parsing nested JSON responses — transfer directly to every API you will work with in subsequent chapters.</p>
+</section>
+<section id="why-wikipedia" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="why-wikipedia"><span class="header-section-number">10.2</span> Why Wikipedia?</h2>
+<p>Wikipedia’s <a href="https://www.mediawiki.org/wiki/API:Main_page">MediaWiki API</a> is pedagogically ideal for learning API access. It is free, requires no authentication beyond a User-Agent header, has comprehensive documentation, and provides data rich enough to support diverse research designs — from content analysis to network mapping to event detection. It is also an example of what <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> describes as <strong>openness</strong>: a mission-driven organization that maintains free, well-documented data access by design.</p>
+<p>We will use the English Wikipedia article for <a href="https://en.wikipedia.org/wiki/Elizabeth_II">Elizabeth II</a> as our primary case study. The article has a rich editing history with dramatic spikes around major events, making it ideal for demonstrating how to extract and analyze temporal patterns from API data.</p>
+</section>
+<section id="the-anatomy-of-an-api-call" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="the-anatomy-of-an-api-call"><span class="header-section-number">10.3</span> The Anatomy of an API Call</h2>
+<p>Every MediaWiki API request follows the same structure: a base URL, an <code>action</code> parameter specifying what you want to do, additional parameters narrowing your request, and a <code>format</code> parameter specifying the response format. Let us trace through a simple example:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a>params <span class="op">=</span> {</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="st">"action"</span>: <span class="st">"query"</span>,         <span class="co"># We want to query for information</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>    <span class="st">"titles"</span>: <span class="st">"Elizabeth_II"</span>,  <span class="co"># About this article</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>    <span class="st">"prop"</span>: <span class="st">"info"</span>,            <span class="co"># Specifically, basic info about the page</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>    <span class="st">"format"</span>: <span class="st">"json"</span>           <span class="co"># Return the response as JSON</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>}</span>
+<span id="cb1-11"><a href="#cb1-11"></a></span>
+<span id="cb1-12"><a href="#cb1-12"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb1-13"><a href="#cb1-13"></a></span>
+<span id="cb1-14"><a href="#cb1-14"></a>response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb1-15"><a href="#cb1-15"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb1-16"><a href="#cb1-16"></a></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="bu">print</span>(data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The response is a nested JSON structure. You navigate it one level at a time:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># The data lives inside data &gt; query &gt; pages &gt; {page_id}</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Page IDs are keys — get the first (and usually only) one</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb2-6"><a href="#cb2-6"></a>page_info <span class="op">=</span> pages[page_id]</span>
+<span id="cb2-7"><a href="#cb2-7"></a></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="bu">print</span>(<span class="ss">f"Title: </span><span class="sc">{</span>page_info[<span class="st">'title'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="bu">print</span>(<span class="ss">f"Page ID: </span><span class="sc">{</span>page_info[<span class="st">'pageid'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="bu">print</span>(<span class="ss">f"Last edited: </span><span class="sc">{</span>page_info<span class="sc">.</span>get(<span class="st">'touched'</span>, <span class="st">'unknown'</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This nested navigation pattern — <code>data["query"]["pages"][page_id]</code> — is consistent across the MediaWiki API. Once you internalize it, every endpoint feels familiar.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Missing Manual Reference
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For strategies on reading and navigating unfamiliar API documentation, see <em>Missing Manual</em> Chapter 4: Reading Official Documentation.</p>
+</div>
+</div>
+</section>
+<section id="getting-revisions" class="level2" data-number="10.4">
+<h2 data-number="10.4" class="anchored" data-anchor-id="getting-revisions"><span class="header-section-number">10.4</span> Getting Revisions</h2>
+<p>Every edit ever made to a Wikipedia article is recorded and accessible through the API. The revisions endpoint returns metadata about each edit: who made it, when, how much the article size changed, and what edit summary they left.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">import</span> requests</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="kw">def</span> get_revisions(title, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb3-5"><a href="#cb3-5"></a>    <span class="co">"""Get all revisions for a Wikipedia article.</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co">    </span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">    Parameters</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">    ----------</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">    title : str</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">        The article title (e.g., 'Elizabeth_II')</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">        HTTP headers including User-Agent</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co">    </span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="co">    Returns</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co">    -------</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co">    pd.DataFrame</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co">        DataFrame with revision metadata</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">    """</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>    </span>
+<span id="cb3-21"><a href="#cb3-21"></a>    params <span class="op">=</span> {</span>
+<span id="cb3-22"><a href="#cb3-22"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb3-23"><a href="#cb3-23"></a>        <span class="st">"titles"</span>: title,</span>
+<span id="cb3-24"><a href="#cb3-24"></a>        <span class="st">"prop"</span>: <span class="st">"revisions"</span>,</span>
+<span id="cb3-25"><a href="#cb3-25"></a>        <span class="st">"rvprop"</span>: <span class="st">"ids|timestamp|user|size|comment"</span>,</span>
+<span id="cb3-26"><a href="#cb3-26"></a>        <span class="st">"rvlimit"</span>: <span class="st">"max"</span>,  <span class="co"># Get as many as possible per request</span></span>
+<span id="cb3-27"><a href="#cb3-27"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a>    }</span>
+<span id="cb3-29"><a href="#cb3-29"></a>    </span>
+<span id="cb3-30"><a href="#cb3-30"></a>    all_revisions <span class="op">=</span> []</span>
+<span id="cb3-31"><a href="#cb3-31"></a>    </span>
+<span id="cb3-32"><a href="#cb3-32"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb3-33"><a href="#cb3-33"></a>        response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb3-34"><a href="#cb3-34"></a>        data <span class="op">=</span> response.json()</span>
+<span id="cb3-35"><a href="#cb3-35"></a>        </span>
+<span id="cb3-36"><a href="#cb3-36"></a>        <span class="co"># Navigate the nested response</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a>        pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb3-38"><a href="#cb3-38"></a>        page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb3-39"><a href="#cb3-39"></a>        revisions <span class="op">=</span> pages[page_id].get(<span class="st">"revisions"</span>, [])</span>
+<span id="cb3-40"><a href="#cb3-40"></a>        all_revisions.extend(revisions)</span>
+<span id="cb3-41"><a href="#cb3-41"></a>        </span>
+<span id="cb3-42"><a href="#cb3-42"></a>        <span class="co"># Handle pagination</span></span>
+<span id="cb3-43"><a href="#cb3-43"></a>        <span class="cf">if</span> <span class="st">"continue"</span> <span class="kw">in</span> data:</span>
+<span id="cb3-44"><a href="#cb3-44"></a>            params.update(data[<span class="st">"continue"</span>])</span>
+<span id="cb3-45"><a href="#cb3-45"></a>            <span class="bu">print</span>(<span class="ss">f"  Fetched </span><span class="sc">{</span><span class="bu">len</span>(all_revisions)<span class="sc">}</span><span class="ss"> revisions so far..."</span>)</span>
+<span id="cb3-46"><a href="#cb3-46"></a>        <span class="cf">else</span>:</span>
+<span id="cb3-47"><a href="#cb3-47"></a>            <span class="cf">break</span></span>
+<span id="cb3-48"><a href="#cb3-48"></a>    </span>
+<span id="cb3-49"><a href="#cb3-49"></a>    <span class="cf">return</span> pd.DataFrame(all_revisions)</span>
+<span id="cb3-50"><a href="#cb3-50"></a></span>
+<span id="cb3-51"><a href="#cb3-51"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb3-52"><a href="#cb3-52"></a>df_revisions <span class="op">=</span> get_revisions(<span class="st">"Elizabeth_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb3-53"><a href="#cb3-53"></a><span class="bu">print</span>(<span class="ss">f"Total revisions: </span><span class="sc">{</span><span class="bu">len</span>(df_revisions)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="understanding-pagination" class="level3" data-number="10.4.1">
+<h3 data-number="10.4.1" class="anchored" data-anchor-id="understanding-pagination"><span class="header-section-number">10.4.1</span> Understanding Pagination</h3>
+<p>The MediaWiki API limits the number of results returned per request. When more results are available, the response includes a <code>"continue"</code> key with parameters you must add to your next request. This loop — request, extract, check for continuation, update parameters, repeat — is the standard pagination pattern for most APIs. You will see it again in <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a> and <a href="ch-12-social.html" class="quarto-xref"><span>Chapter 12</span></a>.</p>
+<p>The critical mistake newcomers make is forgetting to check for continuation. Without the <code>while True</code> loop and <code>"continue"</code> check, you only get the first batch of results — potentially a small fraction of the total dataset.</p>
+</section>
+<section id="analyzing-revision-history" class="level3" data-number="10.4.2">
+<h3 data-number="10.4.2" class="anchored" data-anchor-id="analyzing-revision-history"><span class="header-section-number">10.4.2</span> Analyzing Revision History</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Convert timestamps to datetime</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>df_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df_revisions[<span class="st">"timestamp"</span>])</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co"># Count monthly edits</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>monthly_edits <span class="op">=</span> df_revisions.set_index(<span class="st">"timestamp"</span>).resample(<span class="st">"ME"</span>).size()</span>
+<span id="cb4-6"><a href="#cb4-6"></a></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-8"><a href="#cb4-8"></a></span>
+<span id="cb4-9"><a href="#cb4-9"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">5</span>))</span>
+<span id="cb4-10"><a href="#cb4-10"></a>monthly_edits.plot(ax<span class="op">=</span>ax)</span>
+<span id="cb4-11"><a href="#cb4-11"></a>ax.set_title(<span class="st">"Monthly Edits to 'Elizabeth II' Wikipedia Article"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12"></a>ax.set_ylabel(<span class="st">"Number of edits"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13"></a>ax.set_xlabel(<span class="st">""</span>)</span>
+<span id="cb4-14"><a href="#cb4-14"></a>plt.tight_layout()</span>
+<span id="cb4-15"><a href="#cb4-15"></a>plt.show()</span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co"># You'll see a massive spike around September 2022 (her death)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You can also analyze who edits the article:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Top editors by number of revisions</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>top_editors <span class="op">=</span> df_revisions[<span class="st">"user"</span>].value_counts().head(<span class="dv">10</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="bu">print</span>(top_editors)</span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co"># What fraction of edits come from the top 10 editors?</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>top10_share <span class="op">=</span> top_editors.<span class="bu">sum</span>() <span class="op">/</span> <span class="bu">len</span>(df_revisions)</span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="bu">print</span>(<span class="ss">f"Top 10 editors account for </span><span class="sc">{</span>top10_share<span class="sc">:.1%}</span><span class="ss"> of all edits"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="getting-pageviews" class="level2" data-number="10.5">
+<h2 data-number="10.5" class="anchored" data-anchor-id="getting-pageviews"><span class="header-section-number">10.5</span> Getting Pageviews</h2>
+<p>The Wikimedia REST API (separate from the MediaWiki Action API) provides article pageview data — how many times an article was accessed across web and mobile platforms:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">def</span> get_pageviews(title, start<span class="op">=</span><span class="st">"20230101"</span>, end<span class="op">=</span><span class="st">"20231231"</span>, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb6-2"><a href="#cb6-2"></a>    <span class="co">"""Get daily pageviews for a Wikipedia article.</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">    </span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">    Parameters</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">    ----------</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">    title : str</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">        Article title with underscores for spaces</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">    start, end : str</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">        Date range in YYYYMMDD format</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">        HTTP headers</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">    </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">    Returns</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">    -------</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">    pd.DataFrame</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">        DataFrame with daily pageview counts</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">    """</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a>    url <span class="op">=</span> (</span>
+<span id="cb6-19"><a href="#cb6-19"></a>        <span class="ss">f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a>        <span class="ss">f"/en.wikipedia/all-access/all-agents/</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">/daily/</span><span class="sc">{</span>start<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>end<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a>    )</span>
+<span id="cb6-22"><a href="#cb6-22"></a>    </span>
+<span id="cb6-23"><a href="#cb6-23"></a>    response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb6-24"><a href="#cb6-24"></a>    data <span class="op">=</span> response.json()</span>
+<span id="cb6-25"><a href="#cb6-25"></a>    </span>
+<span id="cb6-26"><a href="#cb6-26"></a>    df <span class="op">=</span> pd.DataFrame(data[<span class="st">"items"</span>])</span>
+<span id="cb6-27"><a href="#cb6-27"></a>    df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">00"</span>)</span>
+<span id="cb6-28"><a href="#cb6-28"></a>    <span class="cf">return</span> df</span>
+<span id="cb6-29"><a href="#cb6-29"></a></span>
+<span id="cb6-30"><a href="#cb6-30"></a>views <span class="op">=</span> get_pageviews(<span class="st">"Elizabeth_II"</span>, start<span class="op">=</span><span class="st">"20220101"</span>, end<span class="op">=</span><span class="st">"20221231"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb6-31"><a href="#cb6-31"></a></span>
+<span id="cb6-32"><a href="#cb6-32"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">5</span>))</span>
+<span id="cb6-33"><a href="#cb6-33"></a>plt.plot(views[<span class="st">"timestamp"</span>], views[<span class="st">"views"</span>])</span>
+<span id="cb6-34"><a href="#cb6-34"></a>plt.title(<span class="st">"Daily Pageviews: Elizabeth II (2022)"</span>)</span>
+<span id="cb6-35"><a href="#cb6-35"></a>plt.ylabel(<span class="st">"Views"</span>)</span>
+<span id="cb6-36"><a href="#cb6-36"></a>plt.axvline(pd.Timestamp(<span class="st">"2022-09-08"</span>), color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"Death (Sep 8)"</span>)</span>
+<span id="cb6-37"><a href="#cb6-37"></a>plt.legend()</span>
+<span id="cb6-38"><a href="#cb6-38"></a>plt.tight_layout()</span>
+<span id="cb6-39"><a href="#cb6-39"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="getting-links-and-categories" class="level2" data-number="10.6">
+<h2 data-number="10.6" class="anchored" data-anchor-id="getting-links-and-categories"><span class="header-section-number">10.6</span> Getting Links and Categories</h2>
+<p>The API exposes the internal structure of Wikipedia — the web of connections between articles:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">def</span> get_outlinks(title, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb7-2"><a href="#cb7-2"></a>    <span class="co">"""Get all internal wikilinks from an article."""</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>    params <span class="op">=</span> {</span>
+<span id="cb7-5"><a href="#cb7-5"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6"></a>        <span class="st">"titles"</span>: title,</span>
+<span id="cb7-7"><a href="#cb7-7"></a>        <span class="st">"prop"</span>: <span class="st">"links"</span>,</span>
+<span id="cb7-8"><a href="#cb7-8"></a>        <span class="st">"pllimit"</span>: <span class="st">"max"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a>    }</span>
+<span id="cb7-11"><a href="#cb7-11"></a>    </span>
+<span id="cb7-12"><a href="#cb7-12"></a>    all_links <span class="op">=</span> []</span>
+<span id="cb7-13"><a href="#cb7-13"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb7-14"><a href="#cb7-14"></a>        response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb7-15"><a href="#cb7-15"></a>        data <span class="op">=</span> response.json()</span>
+<span id="cb7-16"><a href="#cb7-16"></a>        </span>
+<span id="cb7-17"><a href="#cb7-17"></a>        pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb7-18"><a href="#cb7-18"></a>        page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb7-19"><a href="#cb7-19"></a>        links <span class="op">=</span> pages[page_id].get(<span class="st">"links"</span>, [])</span>
+<span id="cb7-20"><a href="#cb7-20"></a>        all_links.extend([link[<span class="st">"title"</span>] <span class="cf">for</span> link <span class="kw">in</span> links])</span>
+<span id="cb7-21"><a href="#cb7-21"></a>        </span>
+<span id="cb7-22"><a href="#cb7-22"></a>        <span class="cf">if</span> <span class="st">"continue"</span> <span class="kw">in</span> data:</span>
+<span id="cb7-23"><a href="#cb7-23"></a>            params.update(data[<span class="st">"continue"</span>])</span>
+<span id="cb7-24"><a href="#cb7-24"></a>        <span class="cf">else</span>:</span>
+<span id="cb7-25"><a href="#cb7-25"></a>            <span class="cf">break</span></span>
+<span id="cb7-26"><a href="#cb7-26"></a>    </span>
+<span id="cb7-27"><a href="#cb7-27"></a>    <span class="cf">return</span> all_links</span>
+<span id="cb7-28"><a href="#cb7-28"></a></span>
+<span id="cb7-29"><a href="#cb7-29"></a>outlinks <span class="op">=</span> get_outlinks(<span class="st">"Elizabeth_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb7-30"><a href="#cb7-30"></a><span class="bu">print</span>(<span class="ss">f"Outgoing wikilinks: </span><span class="sc">{</span><span class="bu">len</span>(outlinks)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-31"><a href="#cb7-31"></a><span class="bu">print</span>(<span class="ss">f"First 10: </span><span class="sc">{</span>outlinks[:<span class="dv">10</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You can do the same for external links (URLs that point outside Wikipedia), interlanguage links (corresponding articles in other language editions), and category memberships:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">def</span> get_categories(title, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb8-2"><a href="#cb8-2"></a>    <span class="co">"""Get all categories an article belongs to."""</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>    params <span class="op">=</span> {</span>
+<span id="cb8-5"><a href="#cb8-5"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6"></a>        <span class="st">"titles"</span>: title,</span>
+<span id="cb8-7"><a href="#cb8-7"></a>        <span class="st">"prop"</span>: <span class="st">"categories"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8"></a>        <span class="st">"cllimit"</span>: <span class="st">"max"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a>    }</span>
+<span id="cb8-11"><a href="#cb8-11"></a>    </span>
+<span id="cb8-12"><a href="#cb8-12"></a>    all_categories <span class="op">=</span> []</span>
+<span id="cb8-13"><a href="#cb8-13"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb8-14"><a href="#cb8-14"></a>        response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb8-15"><a href="#cb8-15"></a>        data <span class="op">=</span> response.json()</span>
+<span id="cb8-16"><a href="#cb8-16"></a>        </span>
+<span id="cb8-17"><a href="#cb8-17"></a>        pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb8-18"><a href="#cb8-18"></a>        page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb8-19"><a href="#cb8-19"></a>        cats <span class="op">=</span> pages[page_id].get(<span class="st">"categories"</span>, [])</span>
+<span id="cb8-20"><a href="#cb8-20"></a>        all_categories.extend([c[<span class="st">"title"</span>] <span class="cf">for</span> c <span class="kw">in</span> cats])</span>
+<span id="cb8-21"><a href="#cb8-21"></a>        </span>
+<span id="cb8-22"><a href="#cb8-22"></a>        <span class="cf">if</span> <span class="st">"continue"</span> <span class="kw">in</span> data:</span>
+<span id="cb8-23"><a href="#cb8-23"></a>            params.update(data[<span class="st">"continue"</span>])</span>
+<span id="cb8-24"><a href="#cb8-24"></a>        <span class="cf">else</span>:</span>
+<span id="cb8-25"><a href="#cb8-25"></a>            <span class="cf">break</span></span>
+<span id="cb8-26"><a href="#cb8-26"></a>    </span>
+<span id="cb8-27"><a href="#cb8-27"></a>    <span class="cf">return</span> all_categories</span>
+<span id="cb8-28"><a href="#cb8-28"></a></span>
+<span id="cb8-29"><a href="#cb8-29"></a>categories <span class="op">=</span> get_categories(<span class="st">"Elizabeth_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb8-30"><a href="#cb8-30"></a><span class="bu">print</span>(<span class="ss">f"Categories: </span><span class="sc">{</span><span class="bu">len</span>(categories)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-31"><a href="#cb8-31"></a><span class="cf">for</span> cat <span class="kw">in</span> categories[:<span class="dv">10</span>]:</span>
+<span id="cb8-32"><a href="#cb8-32"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>cat<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="interlanguage-links" class="level3" data-number="10.6.1">
+<h3 data-number="10.6.1" class="anchored" data-anchor-id="interlanguage-links"><span class="header-section-number">10.6.1</span> Interlanguage Links</h3>
+<p>One of the most revealing structural features of Wikipedia is which articles exist in which languages. The <code>langlinks</code> property tells you how many of Wikipedia’s 300+ language editions have a corresponding article for a given topic — and which languages those are.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">def</span> get_langlinks(title, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb9-2"><a href="#cb9-2"></a>    <span class="co">"""Get all interlanguage links for an article.</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">    Parameters</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">    ----------</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="co">    title : str</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co">        Article title</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="co">        HTTP headers including User-Agent</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">    Returns</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">    -------</span></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="co">    pd.DataFrame</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co">        DataFrame with language codes and article titles</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="co">    """</span></span>
+<span id="cb9-16"><a href="#cb9-16"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb9-17"><a href="#cb9-17"></a>    params <span class="op">=</span> {</span>
+<span id="cb9-18"><a href="#cb9-18"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb9-19"><a href="#cb9-19"></a>        <span class="st">"titles"</span>: title,</span>
+<span id="cb9-20"><a href="#cb9-20"></a>        <span class="st">"prop"</span>: <span class="st">"langlinks"</span>,</span>
+<span id="cb9-21"><a href="#cb9-21"></a>        <span class="st">"lllimit"</span>: <span class="st">"max"</span>,</span>
+<span id="cb9-22"><a href="#cb9-22"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb9-23"><a href="#cb9-23"></a>    }</span>
+<span id="cb9-24"><a href="#cb9-24"></a></span>
+<span id="cb9-25"><a href="#cb9-25"></a>    all_links <span class="op">=</span> []</span>
+<span id="cb9-26"><a href="#cb9-26"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb9-27"><a href="#cb9-27"></a>        response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb9-28"><a href="#cb9-28"></a>        data <span class="op">=</span> response.json()</span>
+<span id="cb9-29"><a href="#cb9-29"></a></span>
+<span id="cb9-30"><a href="#cb9-30"></a>        pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb9-31"><a href="#cb9-31"></a>        page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb9-32"><a href="#cb9-32"></a>        links <span class="op">=</span> pages[page_id].get(<span class="st">"langlinks"</span>, [])</span>
+<span id="cb9-33"><a href="#cb9-33"></a>        all_links.extend(links)</span>
+<span id="cb9-34"><a href="#cb9-34"></a></span>
+<span id="cb9-35"><a href="#cb9-35"></a>        <span class="cf">if</span> <span class="st">"continue"</span> <span class="kw">in</span> data:</span>
+<span id="cb9-36"><a href="#cb9-36"></a>            params.update(data[<span class="st">"continue"</span>])</span>
+<span id="cb9-37"><a href="#cb9-37"></a>        <span class="cf">else</span>:</span>
+<span id="cb9-38"><a href="#cb9-38"></a>            <span class="cf">break</span></span>
+<span id="cb9-39"><a href="#cb9-39"></a></span>
+<span id="cb9-40"><a href="#cb9-40"></a>    <span class="cf">return</span> pd.DataFrame(all_links)</span>
+<span id="cb9-41"><a href="#cb9-41"></a></span>
+<span id="cb9-42"><a href="#cb9-42"></a>langs <span class="op">=</span> get_langlinks(<span class="st">"Elizabeth_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb9-43"><a href="#cb9-43"></a><span class="bu">print</span>(<span class="ss">f"Article exists in </span><span class="sc">{</span><span class="bu">len</span>(langs)<span class="sc">}</span><span class="ss"> language editions"</span>)</span>
+<span id="cb9-44"><a href="#cb9-44"></a><span class="bu">print</span>(langs[<span class="st">"lang"</span>].head(<span class="dv">20</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The number of language editions an article appears in is itself a measure of global significance — or at least of global <em>interest</em> as perceived by Wikipedia’s volunteer editors. Articles about Western political leaders, major cities, and scientific concepts tend to appear in 100 or more language editions. Articles about topics primarily relevant to the Global South — local politicians, regional cultural practices, indigenous languages — may exist in only a handful. This asymmetry reflects the demographic composition of Wikipedia’s editor community, which skews heavily toward the Global North and toward speakers of European languages. When you use Wikipedia data for cross-cultural analysis, interlanguage link counts are a useful but imperfect proxy for a topic’s global visibility.</p>
+</section>
+</section>
+<section id="getting-user-contributions" class="level2" data-number="10.7">
+<h2 data-number="10.7" class="anchored" data-anchor-id="getting-user-contributions"><span class="header-section-number">10.7</span> Getting User Contributions</h2>
+<p>You can also retrieve the editing history of individual Wikipedia users, which is useful for studying editor behavior and community dynamics:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">def</span> get_user_contributions(username, limit<span class="op">=</span><span class="dv">50</span>, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb10-2"><a href="#cb10-2"></a>    <span class="co">"""Get recent contributions by a Wikipedia user."""</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>    params <span class="op">=</span> {</span>
+<span id="cb10-5"><a href="#cb10-5"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6"></a>        <span class="st">"list"</span>: <span class="st">"usercontribs"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7"></a>        <span class="st">"ucuser"</span>: username,</span>
+<span id="cb10-8"><a href="#cb10-8"></a>        <span class="st">"uclimit"</span>: limit,</span>
+<span id="cb10-9"><a href="#cb10-9"></a>        <span class="st">"ucprop"</span>: <span class="st">"title|timestamp|sizediff|comment"</span>,</span>
+<span id="cb10-10"><a href="#cb10-10"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a>    }</span>
+<span id="cb10-12"><a href="#cb10-12"></a>    </span>
+<span id="cb10-13"><a href="#cb10-13"></a>    response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb10-14"><a href="#cb10-14"></a>    data <span class="op">=</span> response.json()</span>
+<span id="cb10-15"><a href="#cb10-15"></a>    <span class="cf">return</span> pd.DataFrame(data[<span class="st">"query"</span>][<span class="st">"usercontribs"</span>])</span>
+<span id="cb10-16"><a href="#cb10-16"></a></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="co"># Get contributions from a prolific editor</span></span>
+<span id="cb10-18"><a href="#cb10-18"></a>contribs <span class="op">=</span> get_user_contributions(<span class="st">"Drmies"</span>, limit<span class="op">=</span><span class="dv">100</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb10-19"><a href="#cb10-19"></a><span class="bu">print</span>(<span class="ss">f"Recent edits: </span><span class="sc">{</span><span class="bu">len</span>(contribs)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-20"><a href="#cb10-20"></a><span class="bu">print</span>(contribs[[<span class="st">"title"</span>, <span class="st">"timestamp"</span>, <span class="st">"sizediff"</span>]].head())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="writing-raw-api-requests-from-documentation" class="level2" data-number="10.8">
+<h2 data-number="10.8" class="anchored" data-anchor-id="writing-raw-api-requests-from-documentation"><span class="header-section-number">10.8</span> Writing Raw API Requests from Documentation</h2>
+<p>The functions above packaged API requests for you. But the transferable skill is writing requests from scratch using only the documentation. Here is the process:</p>
+<ol type="1">
+<li>Go to the <a href="https://www.mediawiki.org/wiki/API:Main_page">MediaWiki API documentation</a></li>
+<li>Find an endpoint you have not used (e.g., <code>action=query&amp;list=search</code>)</li>
+<li>Read its parameters: what is required, what is optional, what values are accepted</li>
+<li>Construct a request, make it, and inspect the response structure</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Example: search Wikipedia for articles about "web scraping"</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a>params <span class="op">=</span> {</span>
+<span id="cb11-4"><a href="#cb11-4"></a>    <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5"></a>    <span class="st">"list"</span>: <span class="st">"search"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6"></a>    <span class="st">"srsearch"</span>: <span class="st">"web scraping"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7"></a>    <span class="st">"srlimit"</span>: <span class="dv">10</span>,</span>
+<span id="cb11-8"><a href="#cb11-8"></a>    <span class="st">"srprop"</span>: <span class="st">"size|wordcount|timestamp|snippet"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9"></a>    <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a>}</span>
+<span id="cb11-11"><a href="#cb11-11"></a></span>
+<span id="cb11-12"><a href="#cb11-12"></a>response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb11-13"><a href="#cb11-13"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb11-14"><a href="#cb11-14"></a></span>
+<span id="cb11-15"><a href="#cb11-15"></a>results <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"search"</span>]</span>
+<span id="cb11-16"><a href="#cb11-16"></a><span class="cf">for</span> r <span class="kw">in</span> results:</span>
+<span id="cb11-17"><a href="#cb11-17"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>r[<span class="st">'title'</span>]<span class="sc">}</span><span class="ss"> — </span><span class="sc">{</span>r[<span class="st">'wordcount'</span>]<span class="sc">}</span><span class="ss"> words, last edited </span><span class="sc">{</span>r[<span class="st">'timestamp'</span>][:<span class="dv">10</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The ability to go from documentation to working code is the skill that transfers to every API in <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>, <a href="ch-12-social.html" class="quarto-xref"><span>Chapter 12</span></a>, and <a href="ch-13-ai-apis.html" class="quarto-xref"><span>Chapter 13</span></a>. The specifics change — different base URLs, different authentication methods, different response structures — but the pattern remains: read the docs, construct the request, parse the response.</p>
+</section>
+<section id="a-second-case-study-world-war-ii" class="level2" data-number="10.9">
+<h2 data-number="10.9" class="anchored" data-anchor-id="a-second-case-study-world-war-ii"><span class="header-section-number">10.9</span> A Second Case Study: World War II</h2>
+<p>To reinforce these patterns, try applying the same functions to a different article. The <a href="https://en.wikipedia.org/wiki/World_War_II">World War II</a> article is one of the most-edited on Wikipedia:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>ww2_revisions <span class="op">=</span> get_revisions(<span class="st">"World_War_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="bu">print</span>(<span class="ss">f"World War II revisions: </span><span class="sc">{</span><span class="bu">len</span>(ww2_revisions)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3"></a></span>
+<span id="cb12-4"><a href="#cb12-4"></a>ww2_views <span class="op">=</span> get_pageviews(<span class="st">"World_War_II"</span>, start<span class="op">=</span><span class="st">"20230101"</span>, end<span class="op">=</span><span class="st">"20231231"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb12-5"><a href="#cb12-5"></a></span>
+<span id="cb12-6"><a href="#cb12-6"></a>ww2_links <span class="op">=</span> get_outlinks(<span class="st">"World_War_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="bu">print</span>(<span class="ss">f"World War II outlinks: </span><span class="sc">{</span><span class="bu">len</span>(ww2_links)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-8"><a href="#cb12-8"></a></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co"># Compare with Elizabeth II</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Elizabeth II revisions: </span><span class="sc">{</span><span class="bu">len</span>(df_revisions)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="bu">print</span>(<span class="ss">f"Elizabeth II outlinks: </span><span class="sc">{</span><span class="bu">len</span>(outlinks)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The comparison reveals how article structure and editing dynamics vary: a biographical article about a contemporary figure versus a historical event article that has been built over nearly two decades of collaborative editing.</p>
+<section id="combining-endpoints" class="level3" data-number="10.9.1">
+<h3 data-number="10.9.1" class="anchored" data-anchor-id="combining-endpoints"><span class="header-section-number">10.9.1</span> Combining Endpoints</h3>
+<p>The real analytical power of the MediaWiki API emerges when you combine data from multiple endpoints to answer questions that no single endpoint can address. A natural question is whether editing activity and viewing activity are related: do articles get edited more during periods when they are being read more, or do edits happen independently of audience attention?</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Get monthly revision counts for Elizabeth II in 2022</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>df_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df_revisions[<span class="st">"timestamp"</span>])</span>
+<span id="cb13-3"><a href="#cb13-3"></a>monthly_revs <span class="op">=</span> (df_revisions</span>
+<span id="cb13-4"><a href="#cb13-4"></a>    .set_index(<span class="st">"timestamp"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5"></a>    .loc[<span class="st">"2022"</span>]</span>
+<span id="cb13-6"><a href="#cb13-6"></a>    .resample(<span class="st">"ME"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7"></a>    .size()</span>
+<span id="cb13-8"><a href="#cb13-8"></a>    .reset_index(name<span class="op">=</span><span class="st">"revisions"</span>))</span>
+<span id="cb13-9"><a href="#cb13-9"></a></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co"># Get monthly pageviews for the same period</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a>views_2022 <span class="op">=</span> get_pageviews(<span class="st">"Elizabeth_II"</span>, start<span class="op">=</span><span class="st">"20220101"</span>, end<span class="op">=</span><span class="st">"20221231"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12"></a>                            headers<span class="op">=</span>headers)</span>
+<span id="cb13-13"><a href="#cb13-13"></a>monthly_views <span class="op">=</span> (views_2022</span>
+<span id="cb13-14"><a href="#cb13-14"></a>    .set_index(<span class="st">"timestamp"</span>)</span>
+<span id="cb13-15"><a href="#cb13-15"></a>    .resample(<span class="st">"ME"</span>)[<span class="st">"views"</span>]</span>
+<span id="cb13-16"><a href="#cb13-16"></a>    .<span class="bu">sum</span>()</span>
+<span id="cb13-17"><a href="#cb13-17"></a>    .reset_index())</span>
+<span id="cb13-18"><a href="#cb13-18"></a></span>
+<span id="cb13-19"><a href="#cb13-19"></a><span class="co"># Dual-axis plot: revisions on left, pageviews on right</span></span>
+<span id="cb13-20"><a href="#cb13-20"></a>fig, ax1 <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
+<span id="cb13-21"><a href="#cb13-21"></a>ax1.bar(monthly_revs[<span class="st">"timestamp"</span>], monthly_revs[<span class="st">"revisions"</span>],</span>
+<span id="cb13-22"><a href="#cb13-22"></a>        width<span class="op">=</span><span class="dv">20</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">"steelblue"</span>, label<span class="op">=</span><span class="st">"Revisions"</span>)</span>
+<span id="cb13-23"><a href="#cb13-23"></a>ax1.set_ylabel(<span class="st">"Monthly Revisions"</span>, color<span class="op">=</span><span class="st">"steelblue"</span>)</span>
+<span id="cb13-24"><a href="#cb13-24"></a></span>
+<span id="cb13-25"><a href="#cb13-25"></a>ax2 <span class="op">=</span> ax1.twinx()</span>
+<span id="cb13-26"><a href="#cb13-26"></a>ax2.plot(monthly_views[<span class="st">"timestamp"</span>], monthly_views[<span class="st">"views"</span>],</span>
+<span id="cb13-27"><a href="#cb13-27"></a>         color<span class="op">=</span><span class="st">"darkred"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Pageviews"</span>)</span>
+<span id="cb13-28"><a href="#cb13-28"></a>ax2.set_ylabel(<span class="st">"Monthly Pageviews"</span>, color<span class="op">=</span><span class="st">"darkred"</span>)</span>
+<span id="cb13-29"><a href="#cb13-29"></a></span>
+<span id="cb13-30"><a href="#cb13-30"></a>plt.title(<span class="st">"Elizabeth II: Editing Activity vs. Reading Activity (2022)"</span>)</span>
+<span id="cb13-31"><a href="#cb13-31"></a>fig.tight_layout()</span>
+<span id="cb13-32"><a href="#cb13-32"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The September 2022 spike — corresponding to the death of Queen Elizabeth II — should appear in both time series, but their relationship across quieter months is less obvious. In general, major events drive both pageviews and revisions simultaneously, but routine editing often happens independently of audience attention. Many of Wikipedia’s most active editors work on articles regardless of whether anyone is reading them. This decoupling of production and consumption is a distinctive feature of Wikipedia’s volunteer model.</p>
+</section>
+</section>
+<section id="exercises" class="level2" data-number="10.10">
+<h2 data-number="10.10" class="anchored" data-anchor-id="exercises"><span class="header-section-number">10.10</span> Exercises</h2>
+<ol type="1">
+<li><p><strong>Comparative revision analysis.</strong> Retrieve the revision histories for two related Wikipedia articles (e.g., “Democratic_Party_(United_States)” and “Republican_Party_(United_States)”). Compare the number of unique editors, the distribution of edits per editor (is editing concentrated or distributed?), and the pattern of monthly editing activity. Are there periods where editing spikes simultaneously on both articles?</p></li>
+<li><p><strong>Event detection with pageviews.</strong> Use the pageviews API to retrieve daily data for five related articles over a full year. Identify spikes in each article and map them to real-world events. Did all articles spike together (suggesting a common cause), or were there article-specific events? Create a multi-line plot with labeled annotations for the key events.</p></li>
+<li><p><strong>Link network.</strong> Retrieve the outgoing wikilinks from three articles on related topics. How much do their link sets overlap? What articles appear in all three link sets? This overlap analysis is a simple form of the network analysis described in <a href="appendix-further.html" class="quarto-xref"><span>Chapter 17</span></a>.</p></li>
+<li><p><strong>Raw API practice.</strong> Using only the MediaWiki API documentation at <a href="https://www.mediawiki.org/wiki/API:Main_page" class="uri">https://www.mediawiki.org/wiki/API:Main_page</a>, construct a working request for an endpoint not covered in this chapter. Good candidates include <code>interlanguagelinks</code> (how many language editions does an article have?), <code>extlinks</code> (what external websites does an article link to?), or <code>recentchanges</code> (what are the most recent edits across all of Wikipedia?). Document your process: what parameters did you choose and why?</p></li>
+<li><p><strong>Editor network.</strong> For a single article, identify the top 20 editors by revision count. Then use <code>get_user_contributions()</code> to find what other articles these editors work on. Do they share other editing interests, or is this article their only point of overlap?</p></li>
+</ol>
+</section>
+<section id="social-history-and-public-interest" class="level2" data-number="10.11">
+<h2 data-number="10.11" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">10.11</span> Social History and Public Interest</h2>
+<p>Wikipedia is the largest collaboratively-authored reference work in human history, maintained by tens of thousands of volunteer editors working in over 300 languages. Its commitment to open APIs reflects its broader mission: anyone can read, edit, and computationally access Wikipedia’s content. The Wikimedia Foundation explicitly positions API access as part of its commitment to free knowledge <span class="citation" data-cites="ford2022writing">[@ford2022writing]</span>.</p>
+<p>But openness does not mean representativeness. Research has documented significant demographic skew in who edits Wikipedia — editors are disproportionately male, from the Global North, and technically fluent. This translates into content gaps: articles about women, people of color, and the Global South are systematically shorter, less detailed, and less well-referenced than articles about men and Western topics <span class="citation" data-cites="mesgari2015sum">[@mesgari2015sum]</span>. The data you retrieve from Wikipedia’s API reflects these patterns. Ease of access does not guarantee completeness or neutrality — a principle that applies equally to every data source in this book.</p>
+<p>Wikipedia’s gender gap illustrates how community demographics shape content. Research has consistently found that Wikipedia’s editor community is predominantly male, and this demographic skew is reflected in coverage — biographies of women are fewer, shorter, and more likely to mention marital status or family relationships than biographies of men. WikiProject Women in Red has worked systematically to address this gap, organizing edit-a-thons and maintaining lists of missing biographies. Data retrieved from the API reflects these structural patterns: any Wikipedia-based analysis inherits the biases of its volunteer editor community. Recognizing this is not a reason to avoid Wikipedia data but a reason to interpret it carefully.</p>
+<p>Wikipedia also demonstrates what sustainable, mission-driven data access looks like. While commercial platforms have restricted and monetized their APIs (see <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>), Wikipedia’s API has remained free and has expanded in functionality over time. This is possible because the Wikimedia Foundation is a nonprofit funded by donations, not advertising revenue. The organizational structure shapes the data access policies.</p>
+</section>
+<section id="common-issues-to-debug" class="level2" data-number="10.12">
+<h2 data-number="10.12" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">10.12</span> Common Issues to Debug</h2>
+<ul>
+<li><strong>Pagination</strong>: The single most common mistake. Always check for <code>"continue"</code> in the response. Without it, you get only the first batch (often 500 or fewer results out of thousands).</li>
+<li><strong>Nested JSON navigation</strong>: The MediaWiki API nests data several levels deep. Print <code>data.keys()</code>, then <code>data["query"].keys()</code>, then <code>data["query"]["pages"].keys()</code> to navigate step by step.</li>
+<li><strong>URL encoding</strong>: Article titles with spaces use underscores in the API. For titles with special characters (parentheses, accented letters), use <code>urllib.parse.quote()</code>.</li>
+<li><strong>Rate limiting</strong>: Wikipedia requests a meaningful User-Agent header. Without it, you may get slower responses or be blocked. The rate limit is approximately 200 requests per second for identified clients — generous, but not infinite.</li>
+<li><strong>Missing pages</strong>: If you request an article that does not exist, the page ID will be negative (e.g., <code>-1</code>). Always check for this before trying to access revision data.</li>
+</ul>
+</section>
+<section id="key-takeaways" class="level2" data-number="10.13">
+<h2 data-number="10.13" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">10.13</span> Key Takeaways</h2>
+<p>APIs provide structured, documented, intentional access to web data. Learning to work with one API well gives you a transferable skill for any API: read the documentation, construct parameterized requests, handle pagination with continuation tokens, and parse nested JSON responses one level at a time. Wikipedia’s MediaWiki API demonstrates these patterns clearly and generously — it is a model of what open, mission-driven data access looks like. The key habits: always handle pagination, always use a meaningful User-Agent, always read the documentation before writing code, and always check the response structure before assuming its contents.</p>
+</section>
+<section id="further-reading" class="level2" data-number="10.14">
+<h2 data-number="10.14" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">10.14</span> Further Reading</h2>
+<ul>
+<li>MediaWiki API documentation: <a href="https://www.mediawiki.org/wiki/API:Main_page" class="uri">https://www.mediawiki.org/wiki/API:Main_page</a></li>
+<li>Wikimedia REST API (pageviews): <a href="https://wikimedia.org/api/rest_v1/" class="uri">https://wikimedia.org/api/rest_v1/</a></li>
+<li><span class="citation" data-cites="ford2022writing">@ford2022writing</span> — Wikipedia’s role in the survival of facts in the digital age</li>
+<li><span class="citation" data-cites="mesgari2015sum">@mesgari2015sum</span> — systematic review of scholarly research on Wikipedia content</li>
+<li><span class="citation" data-cites="salganik2018bit">@salganik2018bit</span> — Chapter 2: Observing Behavior, on using digital trace data for research</li>
+</ul>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./ch-09-pdfs.html" class="pagination-link" aria-label="Extracting Data from PDFs">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./ch-11-government.html" class="pagination-link" aria-label="Government Data APIs">
+        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Government Data APIs</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu"># Introduction to APIs: Wikipedia {#sec-wikipedia}</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a></span>
+<span id="cb14-3"><a href="#cb14-3"></a>::: {.callout-tip}</span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="fu">## Learning Objectives</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="ss">- </span>Explain what an API is and how it differs from web scraping as a data access method</span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="ss">- </span>Read API documentation to identify endpoints, parameters, and response formats</span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="ss">- </span>Construct parameterized API requests and handle pagination with continuation tokens</span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="ss">- </span>Use multiple MediaWiki API endpoints to answer research questions</span>
+<span id="cb14-9"><a href="#cb14-9"></a><span class="ss">- </span>Write raw API requests from documentation rather than relying on wrapper functions</span>
+<span id="cb14-10"><a href="#cb14-10"></a>:::</span>
+<span id="cb14-11"><a href="#cb14-11"></a></span>
+<span id="cb14-12"><a href="#cb14-12"></a><span class="fu">## What Is an API?</span></span>
+<span id="cb14-13"><a href="#cb14-13"></a></span>
+<span id="cb14-14"><a href="#cb14-14"></a>An API (Application Programming Interface) is a contract between a client and a server that specifies what data you can request, what parameters you can pass, and in what format you will receive the response. Unlike web scraping, where you reverse-engineer the HTML structure of a page designed for human readers, APIs provide structured, documented, and intentional access to data. They return clean JSON rather than cluttered HTML. They offer stable endpoints rather than fragile CSS selectors. And they come with documentation that tells you exactly what is available and how to ask for it.</span>
+<span id="cb14-15"><a href="#cb14-15"></a></span>
+<span id="cb14-16"><a href="#cb14-16"></a>The tradeoff, of course, is that APIs only expose what their operators choose to expose. You cannot query a field that the API does not provide. You cannot exceed the rate limits the server enforces. And as @sec-post-api describes, APIs can be restricted, repriced, or shut down entirely at the operator's discretion. But when they are available, APIs are almost always preferable to scraping.</span>
+<span id="cb14-17"><a href="#cb14-17"></a></span>
+<span id="cb14-18"><a href="#cb14-18"></a>This chapter marks the transition from document scraping (Part II) to API-based data access (Part III). The skills you learn here — reading documentation, constructing parameterized URLs, handling pagination, parsing nested JSON responses — transfer directly to every API you will work with in subsequent chapters.</span>
+<span id="cb14-19"><a href="#cb14-19"></a></span>
+<span id="cb14-20"><a href="#cb14-20"></a><span class="fu">## Why Wikipedia?</span></span>
+<span id="cb14-21"><a href="#cb14-21"></a></span>
+<span id="cb14-22"><a href="#cb14-22"></a>Wikipedia's <span class="co">[</span><span class="ot">MediaWiki API</span><span class="co">](https://www.mediawiki.org/wiki/API:Main_page)</span> is pedagogically ideal for learning API access. It is free, requires no authentication beyond a User-Agent header, has comprehensive documentation, and provides data rich enough to support diverse research designs — from content analysis to network mapping to event detection. It is also an example of what @sec-post-api describes as **openness**: a mission-driven organization that maintains free, well-documented data access by design.</span>
+<span id="cb14-23"><a href="#cb14-23"></a></span>
+<span id="cb14-24"><a href="#cb14-24"></a>We will use the English Wikipedia article for <span class="co">[</span><span class="ot">Elizabeth II</span><span class="co">](https://en.wikipedia.org/wiki/Elizabeth_II)</span> as our primary case study. The article has a rich editing history with dramatic spikes around major events, making it ideal for demonstrating how to extract and analyze temporal patterns from API data.</span>
+<span id="cb14-25"><a href="#cb14-25"></a></span>
+<span id="cb14-26"><a href="#cb14-26"></a><span class="fu">## The Anatomy of an API Call</span></span>
+<span id="cb14-27"><a href="#cb14-27"></a></span>
+<span id="cb14-28"><a href="#cb14-28"></a>Every MediaWiki API request follows the same structure: a base URL, an <span class="in">`action`</span> parameter specifying what you want to do, additional parameters narrowing your request, and a <span class="in">`format`</span> parameter specifying the response format. Let us trace through a simple example:</span>
+<span id="cb14-29"><a href="#cb14-29"></a></span>
+<span id="cb14-30"><a href="#cb14-30"></a><span class="in">```python</span></span>
+<span id="cb14-31"><a href="#cb14-31"></a><span class="im">import</span> requests</span>
+<span id="cb14-32"><a href="#cb14-32"></a></span>
+<span id="cb14-33"><a href="#cb14-33"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb14-34"><a href="#cb14-34"></a></span>
+<span id="cb14-35"><a href="#cb14-35"></a>params <span class="op">=</span> {</span>
+<span id="cb14-36"><a href="#cb14-36"></a>    <span class="st">"action"</span>: <span class="st">"query"</span>,         <span class="co"># We want to query for information</span></span>
+<span id="cb14-37"><a href="#cb14-37"></a>    <span class="st">"titles"</span>: <span class="st">"Elizabeth_II"</span>,  <span class="co"># About this article</span></span>
+<span id="cb14-38"><a href="#cb14-38"></a>    <span class="st">"prop"</span>: <span class="st">"info"</span>,            <span class="co"># Specifically, basic info about the page</span></span>
+<span id="cb14-39"><a href="#cb14-39"></a>    <span class="st">"format"</span>: <span class="st">"json"</span>           <span class="co"># Return the response as JSON</span></span>
+<span id="cb14-40"><a href="#cb14-40"></a>}</span>
+<span id="cb14-41"><a href="#cb14-41"></a></span>
+<span id="cb14-42"><a href="#cb14-42"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb14-43"><a href="#cb14-43"></a></span>
+<span id="cb14-44"><a href="#cb14-44"></a>response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb14-45"><a href="#cb14-45"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb14-46"><a href="#cb14-46"></a></span>
+<span id="cb14-47"><a href="#cb14-47"></a><span class="bu">print</span>(data)</span>
+<span id="cb14-48"><a href="#cb14-48"></a><span class="in">```</span></span>
+<span id="cb14-49"><a href="#cb14-49"></a></span>
+<span id="cb14-50"><a href="#cb14-50"></a>The response is a nested JSON structure. You navigate it one level at a time:</span>
+<span id="cb14-51"><a href="#cb14-51"></a></span>
+<span id="cb14-52"><a href="#cb14-52"></a><span class="in">```python</span></span>
+<span id="cb14-53"><a href="#cb14-53"></a><span class="co"># The data lives inside data &gt; query &gt; pages &gt; {page_id}</span></span>
+<span id="cb14-54"><a href="#cb14-54"></a>pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb14-55"><a href="#cb14-55"></a></span>
+<span id="cb14-56"><a href="#cb14-56"></a><span class="co"># Page IDs are keys — get the first (and usually only) one</span></span>
+<span id="cb14-57"><a href="#cb14-57"></a>page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb14-58"><a href="#cb14-58"></a>page_info <span class="op">=</span> pages[page_id]</span>
+<span id="cb14-59"><a href="#cb14-59"></a></span>
+<span id="cb14-60"><a href="#cb14-60"></a><span class="bu">print</span>(<span class="ss">f"Title: </span><span class="sc">{</span>page_info[<span class="st">'title'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-61"><a href="#cb14-61"></a><span class="bu">print</span>(<span class="ss">f"Page ID: </span><span class="sc">{</span>page_info[<span class="st">'pageid'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-62"><a href="#cb14-62"></a><span class="bu">print</span>(<span class="ss">f"Last edited: </span><span class="sc">{</span>page_info<span class="sc">.</span>get(<span class="st">'touched'</span>, <span class="st">'unknown'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-63"><a href="#cb14-63"></a><span class="in">```</span></span>
+<span id="cb14-64"><a href="#cb14-64"></a></span>
+<span id="cb14-65"><a href="#cb14-65"></a>This nested navigation pattern — <span class="in">`data["query"]["pages"][page_id]`</span> — is consistent across the MediaWiki API. Once you internalize it, every endpoint feels familiar.</span>
+<span id="cb14-66"><a href="#cb14-66"></a></span>
+<span id="cb14-67"><a href="#cb14-67"></a>::: {.callout-tip}</span>
+<span id="cb14-68"><a href="#cb14-68"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb14-69"><a href="#cb14-69"></a>For strategies on reading and navigating unfamiliar API documentation, see *Missing Manual* Chapter 4: Reading Official Documentation.</span>
+<span id="cb14-70"><a href="#cb14-70"></a>:::</span>
+<span id="cb14-71"><a href="#cb14-71"></a></span>
+<span id="cb14-72"><a href="#cb14-72"></a><span class="fu">## Getting Revisions</span></span>
+<span id="cb14-73"><a href="#cb14-73"></a></span>
+<span id="cb14-74"><a href="#cb14-74"></a>Every edit ever made to a Wikipedia article is recorded and accessible through the API. The revisions endpoint returns metadata about each edit: who made it, when, how much the article size changed, and what edit summary they left.</span>
+<span id="cb14-75"><a href="#cb14-75"></a></span>
+<span id="cb14-76"><a href="#cb14-76"></a><span class="in">```python</span></span>
+<span id="cb14-77"><a href="#cb14-77"></a><span class="im">import</span> requests</span>
+<span id="cb14-78"><a href="#cb14-78"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb14-79"><a href="#cb14-79"></a></span>
+<span id="cb14-80"><a href="#cb14-80"></a><span class="kw">def</span> get_revisions(title, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb14-81"><a href="#cb14-81"></a>    <span class="co">"""Get all revisions for a Wikipedia article.</span></span>
+<span id="cb14-82"><a href="#cb14-82"></a><span class="co">    </span></span>
+<span id="cb14-83"><a href="#cb14-83"></a><span class="co">    Parameters</span></span>
+<span id="cb14-84"><a href="#cb14-84"></a><span class="co">    ----------</span></span>
+<span id="cb14-85"><a href="#cb14-85"></a><span class="co">    title : str</span></span>
+<span id="cb14-86"><a href="#cb14-86"></a><span class="co">        The article title (e.g., 'Elizabeth_II')</span></span>
+<span id="cb14-87"><a href="#cb14-87"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb14-88"><a href="#cb14-88"></a><span class="co">        HTTP headers including User-Agent</span></span>
+<span id="cb14-89"><a href="#cb14-89"></a><span class="co">    </span></span>
+<span id="cb14-90"><a href="#cb14-90"></a><span class="co">    Returns</span></span>
+<span id="cb14-91"><a href="#cb14-91"></a><span class="co">    -------</span></span>
+<span id="cb14-92"><a href="#cb14-92"></a><span class="co">    pd.DataFrame</span></span>
+<span id="cb14-93"><a href="#cb14-93"></a><span class="co">        DataFrame with revision metadata</span></span>
+<span id="cb14-94"><a href="#cb14-94"></a><span class="co">    """</span></span>
+<span id="cb14-95"><a href="#cb14-95"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb14-96"><a href="#cb14-96"></a>    </span>
+<span id="cb14-97"><a href="#cb14-97"></a>    params <span class="op">=</span> {</span>
+<span id="cb14-98"><a href="#cb14-98"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb14-99"><a href="#cb14-99"></a>        <span class="st">"titles"</span>: title,</span>
+<span id="cb14-100"><a href="#cb14-100"></a>        <span class="st">"prop"</span>: <span class="st">"revisions"</span>,</span>
+<span id="cb14-101"><a href="#cb14-101"></a>        <span class="st">"rvprop"</span>: <span class="st">"ids|timestamp|user|size|comment"</span>,</span>
+<span id="cb14-102"><a href="#cb14-102"></a>        <span class="st">"rvlimit"</span>: <span class="st">"max"</span>,  <span class="co"># Get as many as possible per request</span></span>
+<span id="cb14-103"><a href="#cb14-103"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb14-104"><a href="#cb14-104"></a>    }</span>
+<span id="cb14-105"><a href="#cb14-105"></a>    </span>
+<span id="cb14-106"><a href="#cb14-106"></a>    all_revisions <span class="op">=</span> []</span>
+<span id="cb14-107"><a href="#cb14-107"></a>    </span>
+<span id="cb14-108"><a href="#cb14-108"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb14-109"><a href="#cb14-109"></a>        response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb14-110"><a href="#cb14-110"></a>        data <span class="op">=</span> response.json()</span>
+<span id="cb14-111"><a href="#cb14-111"></a>        </span>
+<span id="cb14-112"><a href="#cb14-112"></a>        <span class="co"># Navigate the nested response</span></span>
+<span id="cb14-113"><a href="#cb14-113"></a>        pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb14-114"><a href="#cb14-114"></a>        page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb14-115"><a href="#cb14-115"></a>        revisions <span class="op">=</span> pages[page_id].get(<span class="st">"revisions"</span>, [])</span>
+<span id="cb14-116"><a href="#cb14-116"></a>        all_revisions.extend(revisions)</span>
+<span id="cb14-117"><a href="#cb14-117"></a>        </span>
+<span id="cb14-118"><a href="#cb14-118"></a>        <span class="co"># Handle pagination</span></span>
+<span id="cb14-119"><a href="#cb14-119"></a>        <span class="cf">if</span> <span class="st">"continue"</span> <span class="kw">in</span> data:</span>
+<span id="cb14-120"><a href="#cb14-120"></a>            params.update(data[<span class="st">"continue"</span>])</span>
+<span id="cb14-121"><a href="#cb14-121"></a>            <span class="bu">print</span>(<span class="ss">f"  Fetched </span><span class="sc">{</span><span class="bu">len</span>(all_revisions)<span class="sc">}</span><span class="ss"> revisions so far..."</span>)</span>
+<span id="cb14-122"><a href="#cb14-122"></a>        <span class="cf">else</span>:</span>
+<span id="cb14-123"><a href="#cb14-123"></a>            <span class="cf">break</span></span>
+<span id="cb14-124"><a href="#cb14-124"></a>    </span>
+<span id="cb14-125"><a href="#cb14-125"></a>    <span class="cf">return</span> pd.DataFrame(all_revisions)</span>
+<span id="cb14-126"><a href="#cb14-126"></a></span>
+<span id="cb14-127"><a href="#cb14-127"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb14-128"><a href="#cb14-128"></a>df_revisions <span class="op">=</span> get_revisions(<span class="st">"Elizabeth_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb14-129"><a href="#cb14-129"></a><span class="bu">print</span>(<span class="ss">f"Total revisions: </span><span class="sc">{</span><span class="bu">len</span>(df_revisions)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-130"><a href="#cb14-130"></a><span class="in">```</span></span>
+<span id="cb14-131"><a href="#cb14-131"></a></span>
+<span id="cb14-132"><a href="#cb14-132"></a><span class="fu">### Understanding Pagination</span></span>
+<span id="cb14-133"><a href="#cb14-133"></a></span>
+<span id="cb14-134"><a href="#cb14-134"></a>The MediaWiki API limits the number of results returned per request. When more results are available, the response includes a <span class="in">`"continue"`</span> key with parameters you must add to your next request. This loop — request, extract, check for continuation, update parameters, repeat — is the standard pagination pattern for most APIs. You will see it again in @sec-government and @sec-social.</span>
+<span id="cb14-135"><a href="#cb14-135"></a></span>
+<span id="cb14-136"><a href="#cb14-136"></a>The critical mistake newcomers make is forgetting to check for continuation. Without the <span class="in">`while True`</span> loop and <span class="in">`"continue"`</span> check, you only get the first batch of results — potentially a small fraction of the total dataset.</span>
+<span id="cb14-137"><a href="#cb14-137"></a></span>
+<span id="cb14-138"><a href="#cb14-138"></a><span class="fu">### Analyzing Revision History</span></span>
+<span id="cb14-139"><a href="#cb14-139"></a></span>
+<span id="cb14-140"><a href="#cb14-140"></a><span class="in">```python</span></span>
+<span id="cb14-141"><a href="#cb14-141"></a><span class="co"># Convert timestamps to datetime</span></span>
+<span id="cb14-142"><a href="#cb14-142"></a>df_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df_revisions[<span class="st">"timestamp"</span>])</span>
+<span id="cb14-143"><a href="#cb14-143"></a></span>
+<span id="cb14-144"><a href="#cb14-144"></a><span class="co"># Count monthly edits</span></span>
+<span id="cb14-145"><a href="#cb14-145"></a>monthly_edits <span class="op">=</span> df_revisions.set_index(<span class="st">"timestamp"</span>).resample(<span class="st">"ME"</span>).size()</span>
+<span id="cb14-146"><a href="#cb14-146"></a></span>
+<span id="cb14-147"><a href="#cb14-147"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb14-148"><a href="#cb14-148"></a></span>
+<span id="cb14-149"><a href="#cb14-149"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">5</span>))</span>
+<span id="cb14-150"><a href="#cb14-150"></a>monthly_edits.plot(ax<span class="op">=</span>ax)</span>
+<span id="cb14-151"><a href="#cb14-151"></a>ax.set_title(<span class="st">"Monthly Edits to 'Elizabeth II' Wikipedia Article"</span>)</span>
+<span id="cb14-152"><a href="#cb14-152"></a>ax.set_ylabel(<span class="st">"Number of edits"</span>)</span>
+<span id="cb14-153"><a href="#cb14-153"></a>ax.set_xlabel(<span class="st">""</span>)</span>
+<span id="cb14-154"><a href="#cb14-154"></a>plt.tight_layout()</span>
+<span id="cb14-155"><a href="#cb14-155"></a>plt.show()</span>
+<span id="cb14-156"><a href="#cb14-156"></a><span class="co"># You'll see a massive spike around September 2022 (her death)</span></span>
+<span id="cb14-157"><a href="#cb14-157"></a><span class="in">```</span></span>
+<span id="cb14-158"><a href="#cb14-158"></a></span>
+<span id="cb14-159"><a href="#cb14-159"></a>You can also analyze who edits the article:</span>
+<span id="cb14-160"><a href="#cb14-160"></a></span>
+<span id="cb14-161"><a href="#cb14-161"></a><span class="in">```python</span></span>
+<span id="cb14-162"><a href="#cb14-162"></a><span class="co"># Top editors by number of revisions</span></span>
+<span id="cb14-163"><a href="#cb14-163"></a>top_editors <span class="op">=</span> df_revisions[<span class="st">"user"</span>].value_counts().head(<span class="dv">10</span>)</span>
+<span id="cb14-164"><a href="#cb14-164"></a><span class="bu">print</span>(top_editors)</span>
+<span id="cb14-165"><a href="#cb14-165"></a></span>
+<span id="cb14-166"><a href="#cb14-166"></a><span class="co"># What fraction of edits come from the top 10 editors?</span></span>
+<span id="cb14-167"><a href="#cb14-167"></a>top10_share <span class="op">=</span> top_editors.<span class="bu">sum</span>() <span class="op">/</span> <span class="bu">len</span>(df_revisions)</span>
+<span id="cb14-168"><a href="#cb14-168"></a><span class="bu">print</span>(<span class="ss">f"Top 10 editors account for </span><span class="sc">{</span>top10_share<span class="sc">:.1%}</span><span class="ss"> of all edits"</span>)</span>
+<span id="cb14-169"><a href="#cb14-169"></a><span class="in">```</span></span>
+<span id="cb14-170"><a href="#cb14-170"></a></span>
+<span id="cb14-171"><a href="#cb14-171"></a><span class="fu">## Getting Pageviews</span></span>
+<span id="cb14-172"><a href="#cb14-172"></a></span>
+<span id="cb14-173"><a href="#cb14-173"></a>The Wikimedia REST API (separate from the MediaWiki Action API) provides article pageview data — how many times an article was accessed across web and mobile platforms:</span>
+<span id="cb14-174"><a href="#cb14-174"></a></span>
+<span id="cb14-175"><a href="#cb14-175"></a><span class="in">```python</span></span>
+<span id="cb14-176"><a href="#cb14-176"></a><span class="kw">def</span> get_pageviews(title, start<span class="op">=</span><span class="st">"20230101"</span>, end<span class="op">=</span><span class="st">"20231231"</span>, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb14-177"><a href="#cb14-177"></a>    <span class="co">"""Get daily pageviews for a Wikipedia article.</span></span>
+<span id="cb14-178"><a href="#cb14-178"></a><span class="co">    </span></span>
+<span id="cb14-179"><a href="#cb14-179"></a><span class="co">    Parameters</span></span>
+<span id="cb14-180"><a href="#cb14-180"></a><span class="co">    ----------</span></span>
+<span id="cb14-181"><a href="#cb14-181"></a><span class="co">    title : str</span></span>
+<span id="cb14-182"><a href="#cb14-182"></a><span class="co">        Article title with underscores for spaces</span></span>
+<span id="cb14-183"><a href="#cb14-183"></a><span class="co">    start, end : str</span></span>
+<span id="cb14-184"><a href="#cb14-184"></a><span class="co">        Date range in YYYYMMDD format</span></span>
+<span id="cb14-185"><a href="#cb14-185"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb14-186"><a href="#cb14-186"></a><span class="co">        HTTP headers</span></span>
+<span id="cb14-187"><a href="#cb14-187"></a><span class="co">    </span></span>
+<span id="cb14-188"><a href="#cb14-188"></a><span class="co">    Returns</span></span>
+<span id="cb14-189"><a href="#cb14-189"></a><span class="co">    -------</span></span>
+<span id="cb14-190"><a href="#cb14-190"></a><span class="co">    pd.DataFrame</span></span>
+<span id="cb14-191"><a href="#cb14-191"></a><span class="co">        DataFrame with daily pageview counts</span></span>
+<span id="cb14-192"><a href="#cb14-192"></a><span class="co">    """</span></span>
+<span id="cb14-193"><a href="#cb14-193"></a>    url <span class="op">=</span> (</span>
+<span id="cb14-194"><a href="#cb14-194"></a>        <span class="ss">f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
+<span id="cb14-195"><a href="#cb14-195"></a>        <span class="ss">f"/en.wikipedia/all-access/all-agents/</span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">/daily/</span><span class="sc">{</span>start<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>end<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb14-196"><a href="#cb14-196"></a>    )</span>
+<span id="cb14-197"><a href="#cb14-197"></a>    </span>
+<span id="cb14-198"><a href="#cb14-198"></a>    response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb14-199"><a href="#cb14-199"></a>    data <span class="op">=</span> response.json()</span>
+<span id="cb14-200"><a href="#cb14-200"></a>    </span>
+<span id="cb14-201"><a href="#cb14-201"></a>    df <span class="op">=</span> pd.DataFrame(data[<span class="st">"items"</span>])</span>
+<span id="cb14-202"><a href="#cb14-202"></a>    df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">00"</span>)</span>
+<span id="cb14-203"><a href="#cb14-203"></a>    <span class="cf">return</span> df</span>
+<span id="cb14-204"><a href="#cb14-204"></a></span>
+<span id="cb14-205"><a href="#cb14-205"></a>views <span class="op">=</span> get_pageviews(<span class="st">"Elizabeth_II"</span>, start<span class="op">=</span><span class="st">"20220101"</span>, end<span class="op">=</span><span class="st">"20221231"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb14-206"><a href="#cb14-206"></a></span>
+<span id="cb14-207"><a href="#cb14-207"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">5</span>))</span>
+<span id="cb14-208"><a href="#cb14-208"></a>plt.plot(views[<span class="st">"timestamp"</span>], views[<span class="st">"views"</span>])</span>
+<span id="cb14-209"><a href="#cb14-209"></a>plt.title(<span class="st">"Daily Pageviews: Elizabeth II (2022)"</span>)</span>
+<span id="cb14-210"><a href="#cb14-210"></a>plt.ylabel(<span class="st">"Views"</span>)</span>
+<span id="cb14-211"><a href="#cb14-211"></a>plt.axvline(pd.Timestamp(<span class="st">"2022-09-08"</span>), color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"Death (Sep 8)"</span>)</span>
+<span id="cb14-212"><a href="#cb14-212"></a>plt.legend()</span>
+<span id="cb14-213"><a href="#cb14-213"></a>plt.tight_layout()</span>
+<span id="cb14-214"><a href="#cb14-214"></a>plt.show()</span>
+<span id="cb14-215"><a href="#cb14-215"></a><span class="in">```</span></span>
+<span id="cb14-216"><a href="#cb14-216"></a></span>
+<span id="cb14-217"><a href="#cb14-217"></a><span class="fu">## Getting Links and Categories</span></span>
+<span id="cb14-218"><a href="#cb14-218"></a></span>
+<span id="cb14-219"><a href="#cb14-219"></a>The API exposes the internal structure of Wikipedia — the web of connections between articles:</span>
+<span id="cb14-220"><a href="#cb14-220"></a></span>
+<span id="cb14-221"><a href="#cb14-221"></a><span class="in">```python</span></span>
+<span id="cb14-222"><a href="#cb14-222"></a><span class="kw">def</span> get_outlinks(title, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb14-223"><a href="#cb14-223"></a>    <span class="co">"""Get all internal wikilinks from an article."""</span></span>
+<span id="cb14-224"><a href="#cb14-224"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb14-225"><a href="#cb14-225"></a>    params <span class="op">=</span> {</span>
+<span id="cb14-226"><a href="#cb14-226"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb14-227"><a href="#cb14-227"></a>        <span class="st">"titles"</span>: title,</span>
+<span id="cb14-228"><a href="#cb14-228"></a>        <span class="st">"prop"</span>: <span class="st">"links"</span>,</span>
+<span id="cb14-229"><a href="#cb14-229"></a>        <span class="st">"pllimit"</span>: <span class="st">"max"</span>,</span>
+<span id="cb14-230"><a href="#cb14-230"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb14-231"><a href="#cb14-231"></a>    }</span>
+<span id="cb14-232"><a href="#cb14-232"></a>    </span>
+<span id="cb14-233"><a href="#cb14-233"></a>    all_links <span class="op">=</span> []</span>
+<span id="cb14-234"><a href="#cb14-234"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb14-235"><a href="#cb14-235"></a>        response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb14-236"><a href="#cb14-236"></a>        data <span class="op">=</span> response.json()</span>
+<span id="cb14-237"><a href="#cb14-237"></a>        </span>
+<span id="cb14-238"><a href="#cb14-238"></a>        pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb14-239"><a href="#cb14-239"></a>        page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb14-240"><a href="#cb14-240"></a>        links <span class="op">=</span> pages[page_id].get(<span class="st">"links"</span>, [])</span>
+<span id="cb14-241"><a href="#cb14-241"></a>        all_links.extend([link[<span class="st">"title"</span>] <span class="cf">for</span> link <span class="kw">in</span> links])</span>
+<span id="cb14-242"><a href="#cb14-242"></a>        </span>
+<span id="cb14-243"><a href="#cb14-243"></a>        <span class="cf">if</span> <span class="st">"continue"</span> <span class="kw">in</span> data:</span>
+<span id="cb14-244"><a href="#cb14-244"></a>            params.update(data[<span class="st">"continue"</span>])</span>
+<span id="cb14-245"><a href="#cb14-245"></a>        <span class="cf">else</span>:</span>
+<span id="cb14-246"><a href="#cb14-246"></a>            <span class="cf">break</span></span>
+<span id="cb14-247"><a href="#cb14-247"></a>    </span>
+<span id="cb14-248"><a href="#cb14-248"></a>    <span class="cf">return</span> all_links</span>
+<span id="cb14-249"><a href="#cb14-249"></a></span>
+<span id="cb14-250"><a href="#cb14-250"></a>outlinks <span class="op">=</span> get_outlinks(<span class="st">"Elizabeth_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb14-251"><a href="#cb14-251"></a><span class="bu">print</span>(<span class="ss">f"Outgoing wikilinks: </span><span class="sc">{</span><span class="bu">len</span>(outlinks)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-252"><a href="#cb14-252"></a><span class="bu">print</span>(<span class="ss">f"First 10: </span><span class="sc">{</span>outlinks[:<span class="dv">10</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-253"><a href="#cb14-253"></a><span class="in">```</span></span>
+<span id="cb14-254"><a href="#cb14-254"></a></span>
+<span id="cb14-255"><a href="#cb14-255"></a>You can do the same for external links (URLs that point outside Wikipedia), interlanguage links (corresponding articles in other language editions), and category memberships:</span>
+<span id="cb14-256"><a href="#cb14-256"></a></span>
+<span id="cb14-257"><a href="#cb14-257"></a><span class="in">```python</span></span>
+<span id="cb14-258"><a href="#cb14-258"></a><span class="kw">def</span> get_categories(title, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb14-259"><a href="#cb14-259"></a>    <span class="co">"""Get all categories an article belongs to."""</span></span>
+<span id="cb14-260"><a href="#cb14-260"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb14-261"><a href="#cb14-261"></a>    params <span class="op">=</span> {</span>
+<span id="cb14-262"><a href="#cb14-262"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb14-263"><a href="#cb14-263"></a>        <span class="st">"titles"</span>: title,</span>
+<span id="cb14-264"><a href="#cb14-264"></a>        <span class="st">"prop"</span>: <span class="st">"categories"</span>,</span>
+<span id="cb14-265"><a href="#cb14-265"></a>        <span class="st">"cllimit"</span>: <span class="st">"max"</span>,</span>
+<span id="cb14-266"><a href="#cb14-266"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb14-267"><a href="#cb14-267"></a>    }</span>
+<span id="cb14-268"><a href="#cb14-268"></a>    </span>
+<span id="cb14-269"><a href="#cb14-269"></a>    all_categories <span class="op">=</span> []</span>
+<span id="cb14-270"><a href="#cb14-270"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb14-271"><a href="#cb14-271"></a>        response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb14-272"><a href="#cb14-272"></a>        data <span class="op">=</span> response.json()</span>
+<span id="cb14-273"><a href="#cb14-273"></a>        </span>
+<span id="cb14-274"><a href="#cb14-274"></a>        pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb14-275"><a href="#cb14-275"></a>        page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb14-276"><a href="#cb14-276"></a>        cats <span class="op">=</span> pages[page_id].get(<span class="st">"categories"</span>, [])</span>
+<span id="cb14-277"><a href="#cb14-277"></a>        all_categories.extend([c[<span class="st">"title"</span>] <span class="cf">for</span> c <span class="kw">in</span> cats])</span>
+<span id="cb14-278"><a href="#cb14-278"></a>        </span>
+<span id="cb14-279"><a href="#cb14-279"></a>        <span class="cf">if</span> <span class="st">"continue"</span> <span class="kw">in</span> data:</span>
+<span id="cb14-280"><a href="#cb14-280"></a>            params.update(data[<span class="st">"continue"</span>])</span>
+<span id="cb14-281"><a href="#cb14-281"></a>        <span class="cf">else</span>:</span>
+<span id="cb14-282"><a href="#cb14-282"></a>            <span class="cf">break</span></span>
+<span id="cb14-283"><a href="#cb14-283"></a>    </span>
+<span id="cb14-284"><a href="#cb14-284"></a>    <span class="cf">return</span> all_categories</span>
+<span id="cb14-285"><a href="#cb14-285"></a></span>
+<span id="cb14-286"><a href="#cb14-286"></a>categories <span class="op">=</span> get_categories(<span class="st">"Elizabeth_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb14-287"><a href="#cb14-287"></a><span class="bu">print</span>(<span class="ss">f"Categories: </span><span class="sc">{</span><span class="bu">len</span>(categories)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-288"><a href="#cb14-288"></a><span class="cf">for</span> cat <span class="kw">in</span> categories[:<span class="dv">10</span>]:</span>
+<span id="cb14-289"><a href="#cb14-289"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>cat<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-290"><a href="#cb14-290"></a><span class="in">```</span></span>
+<span id="cb14-291"><a href="#cb14-291"></a></span>
+<span id="cb14-292"><a href="#cb14-292"></a><span class="fu">### Interlanguage Links</span></span>
+<span id="cb14-293"><a href="#cb14-293"></a></span>
+<span id="cb14-294"><a href="#cb14-294"></a>One of the most revealing structural features of Wikipedia is which articles exist in which languages. The <span class="in">`langlinks`</span> property tells you how many of Wikipedia's 300+ language editions have a corresponding article for a given topic — and which languages those are.</span>
+<span id="cb14-295"><a href="#cb14-295"></a></span>
+<span id="cb14-296"><a href="#cb14-296"></a><span class="in">```python</span></span>
+<span id="cb14-297"><a href="#cb14-297"></a><span class="kw">def</span> get_langlinks(title, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb14-298"><a href="#cb14-298"></a>    <span class="co">"""Get all interlanguage links for an article.</span></span>
+<span id="cb14-299"><a href="#cb14-299"></a></span>
+<span id="cb14-300"><a href="#cb14-300"></a><span class="co">    Parameters</span></span>
+<span id="cb14-301"><a href="#cb14-301"></a><span class="co">    ----------</span></span>
+<span id="cb14-302"><a href="#cb14-302"></a><span class="co">    title : str</span></span>
+<span id="cb14-303"><a href="#cb14-303"></a><span class="co">        Article title</span></span>
+<span id="cb14-304"><a href="#cb14-304"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb14-305"><a href="#cb14-305"></a><span class="co">        HTTP headers including User-Agent</span></span>
+<span id="cb14-306"><a href="#cb14-306"></a></span>
+<span id="cb14-307"><a href="#cb14-307"></a><span class="co">    Returns</span></span>
+<span id="cb14-308"><a href="#cb14-308"></a><span class="co">    -------</span></span>
+<span id="cb14-309"><a href="#cb14-309"></a><span class="co">    pd.DataFrame</span></span>
+<span id="cb14-310"><a href="#cb14-310"></a><span class="co">        DataFrame with language codes and article titles</span></span>
+<span id="cb14-311"><a href="#cb14-311"></a><span class="co">    """</span></span>
+<span id="cb14-312"><a href="#cb14-312"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb14-313"><a href="#cb14-313"></a>    params <span class="op">=</span> {</span>
+<span id="cb14-314"><a href="#cb14-314"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb14-315"><a href="#cb14-315"></a>        <span class="st">"titles"</span>: title,</span>
+<span id="cb14-316"><a href="#cb14-316"></a>        <span class="st">"prop"</span>: <span class="st">"langlinks"</span>,</span>
+<span id="cb14-317"><a href="#cb14-317"></a>        <span class="st">"lllimit"</span>: <span class="st">"max"</span>,</span>
+<span id="cb14-318"><a href="#cb14-318"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb14-319"><a href="#cb14-319"></a>    }</span>
+<span id="cb14-320"><a href="#cb14-320"></a></span>
+<span id="cb14-321"><a href="#cb14-321"></a>    all_links <span class="op">=</span> []</span>
+<span id="cb14-322"><a href="#cb14-322"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb14-323"><a href="#cb14-323"></a>        response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb14-324"><a href="#cb14-324"></a>        data <span class="op">=</span> response.json()</span>
+<span id="cb14-325"><a href="#cb14-325"></a></span>
+<span id="cb14-326"><a href="#cb14-326"></a>        pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
+<span id="cb14-327"><a href="#cb14-327"></a>        page_id <span class="op">=</span> <span class="bu">list</span>(pages.keys())[<span class="dv">0</span>]</span>
+<span id="cb14-328"><a href="#cb14-328"></a>        links <span class="op">=</span> pages[page_id].get(<span class="st">"langlinks"</span>, [])</span>
+<span id="cb14-329"><a href="#cb14-329"></a>        all_links.extend(links)</span>
+<span id="cb14-330"><a href="#cb14-330"></a></span>
+<span id="cb14-331"><a href="#cb14-331"></a>        <span class="cf">if</span> <span class="st">"continue"</span> <span class="kw">in</span> data:</span>
+<span id="cb14-332"><a href="#cb14-332"></a>            params.update(data[<span class="st">"continue"</span>])</span>
+<span id="cb14-333"><a href="#cb14-333"></a>        <span class="cf">else</span>:</span>
+<span id="cb14-334"><a href="#cb14-334"></a>            <span class="cf">break</span></span>
+<span id="cb14-335"><a href="#cb14-335"></a></span>
+<span id="cb14-336"><a href="#cb14-336"></a>    <span class="cf">return</span> pd.DataFrame(all_links)</span>
+<span id="cb14-337"><a href="#cb14-337"></a></span>
+<span id="cb14-338"><a href="#cb14-338"></a>langs <span class="op">=</span> get_langlinks(<span class="st">"Elizabeth_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb14-339"><a href="#cb14-339"></a><span class="bu">print</span>(<span class="ss">f"Article exists in </span><span class="sc">{</span><span class="bu">len</span>(langs)<span class="sc">}</span><span class="ss"> language editions"</span>)</span>
+<span id="cb14-340"><a href="#cb14-340"></a><span class="bu">print</span>(langs[<span class="st">"lang"</span>].head(<span class="dv">20</span>))</span>
+<span id="cb14-341"><a href="#cb14-341"></a><span class="in">```</span></span>
+<span id="cb14-342"><a href="#cb14-342"></a></span>
+<span id="cb14-343"><a href="#cb14-343"></a>The number of language editions an article appears in is itself a measure of global significance — or at least of global *interest* as perceived by Wikipedia's volunteer editors. Articles about Western political leaders, major cities, and scientific concepts tend to appear in 100 or more language editions. Articles about topics primarily relevant to the Global South — local politicians, regional cultural practices, indigenous languages — may exist in only a handful. This asymmetry reflects the demographic composition of Wikipedia's editor community, which skews heavily toward the Global North and toward speakers of European languages. When you use Wikipedia data for cross-cultural analysis, interlanguage link counts are a useful but imperfect proxy for a topic's global visibility.</span>
+<span id="cb14-344"><a href="#cb14-344"></a></span>
+<span id="cb14-345"><a href="#cb14-345"></a><span class="fu">## Getting User Contributions</span></span>
+<span id="cb14-346"><a href="#cb14-346"></a></span>
+<span id="cb14-347"><a href="#cb14-347"></a>You can also retrieve the editing history of individual Wikipedia users, which is useful for studying editor behavior and community dynamics:</span>
+<span id="cb14-348"><a href="#cb14-348"></a></span>
+<span id="cb14-349"><a href="#cb14-349"></a><span class="in">```python</span></span>
+<span id="cb14-350"><a href="#cb14-350"></a><span class="kw">def</span> get_user_contributions(username, limit<span class="op">=</span><span class="dv">50</span>, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb14-351"><a href="#cb14-351"></a>    <span class="co">"""Get recent contributions by a Wikipedia user."""</span></span>
+<span id="cb14-352"><a href="#cb14-352"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb14-353"><a href="#cb14-353"></a>    params <span class="op">=</span> {</span>
+<span id="cb14-354"><a href="#cb14-354"></a>        <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb14-355"><a href="#cb14-355"></a>        <span class="st">"list"</span>: <span class="st">"usercontribs"</span>,</span>
+<span id="cb14-356"><a href="#cb14-356"></a>        <span class="st">"ucuser"</span>: username,</span>
+<span id="cb14-357"><a href="#cb14-357"></a>        <span class="st">"uclimit"</span>: limit,</span>
+<span id="cb14-358"><a href="#cb14-358"></a>        <span class="st">"ucprop"</span>: <span class="st">"title|timestamp|sizediff|comment"</span>,</span>
+<span id="cb14-359"><a href="#cb14-359"></a>        <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb14-360"><a href="#cb14-360"></a>    }</span>
+<span id="cb14-361"><a href="#cb14-361"></a>    </span>
+<span id="cb14-362"><a href="#cb14-362"></a>    response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb14-363"><a href="#cb14-363"></a>    data <span class="op">=</span> response.json()</span>
+<span id="cb14-364"><a href="#cb14-364"></a>    <span class="cf">return</span> pd.DataFrame(data[<span class="st">"query"</span>][<span class="st">"usercontribs"</span>])</span>
+<span id="cb14-365"><a href="#cb14-365"></a></span>
+<span id="cb14-366"><a href="#cb14-366"></a><span class="co"># Get contributions from a prolific editor</span></span>
+<span id="cb14-367"><a href="#cb14-367"></a>contribs <span class="op">=</span> get_user_contributions(<span class="st">"Drmies"</span>, limit<span class="op">=</span><span class="dv">100</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb14-368"><a href="#cb14-368"></a><span class="bu">print</span>(<span class="ss">f"Recent edits: </span><span class="sc">{</span><span class="bu">len</span>(contribs)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-369"><a href="#cb14-369"></a><span class="bu">print</span>(contribs[[<span class="st">"title"</span>, <span class="st">"timestamp"</span>, <span class="st">"sizediff"</span>]].head())</span>
+<span id="cb14-370"><a href="#cb14-370"></a><span class="in">```</span></span>
+<span id="cb14-371"><a href="#cb14-371"></a></span>
+<span id="cb14-372"><a href="#cb14-372"></a><span class="fu">## Writing Raw API Requests from Documentation</span></span>
+<span id="cb14-373"><a href="#cb14-373"></a></span>
+<span id="cb14-374"><a href="#cb14-374"></a>The functions above packaged API requests for you. But the transferable skill is writing requests from scratch using only the documentation. Here is the process:</span>
+<span id="cb14-375"><a href="#cb14-375"></a></span>
+<span id="cb14-376"><a href="#cb14-376"></a><span class="ss">1. </span>Go to the <span class="co">[</span><span class="ot">MediaWiki API documentation</span><span class="co">](https://www.mediawiki.org/wiki/API:Main_page)</span></span>
+<span id="cb14-377"><a href="#cb14-377"></a><span class="ss">2. </span>Find an endpoint you have not used (e.g., <span class="in">`action=query&amp;list=search`</span>)</span>
+<span id="cb14-378"><a href="#cb14-378"></a><span class="ss">3. </span>Read its parameters: what is required, what is optional, what values are accepted</span>
+<span id="cb14-379"><a href="#cb14-379"></a><span class="ss">4. </span>Construct a request, make it, and inspect the response structure</span>
+<span id="cb14-380"><a href="#cb14-380"></a></span>
+<span id="cb14-381"><a href="#cb14-381"></a><span class="in">```python</span></span>
+<span id="cb14-382"><a href="#cb14-382"></a><span class="co"># Example: search Wikipedia for articles about "web scraping"</span></span>
+<span id="cb14-383"><a href="#cb14-383"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb14-384"><a href="#cb14-384"></a>params <span class="op">=</span> {</span>
+<span id="cb14-385"><a href="#cb14-385"></a>    <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb14-386"><a href="#cb14-386"></a>    <span class="st">"list"</span>: <span class="st">"search"</span>,</span>
+<span id="cb14-387"><a href="#cb14-387"></a>    <span class="st">"srsearch"</span>: <span class="st">"web scraping"</span>,</span>
+<span id="cb14-388"><a href="#cb14-388"></a>    <span class="st">"srlimit"</span>: <span class="dv">10</span>,</span>
+<span id="cb14-389"><a href="#cb14-389"></a>    <span class="st">"srprop"</span>: <span class="st">"size|wordcount|timestamp|snippet"</span>,</span>
+<span id="cb14-390"><a href="#cb14-390"></a>    <span class="st">"format"</span>: <span class="st">"json"</span></span>
+<span id="cb14-391"><a href="#cb14-391"></a>}</span>
+<span id="cb14-392"><a href="#cb14-392"></a></span>
+<span id="cb14-393"><a href="#cb14-393"></a>response <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb14-394"><a href="#cb14-394"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb14-395"><a href="#cb14-395"></a></span>
+<span id="cb14-396"><a href="#cb14-396"></a>results <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"search"</span>]</span>
+<span id="cb14-397"><a href="#cb14-397"></a><span class="cf">for</span> r <span class="kw">in</span> results:</span>
+<span id="cb14-398"><a href="#cb14-398"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>r[<span class="st">'title'</span>]<span class="sc">}</span><span class="ss"> — </span><span class="sc">{</span>r[<span class="st">'wordcount'</span>]<span class="sc">}</span><span class="ss"> words, last edited </span><span class="sc">{</span>r[<span class="st">'timestamp'</span>][:<span class="dv">10</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-399"><a href="#cb14-399"></a><span class="in">```</span></span>
+<span id="cb14-400"><a href="#cb14-400"></a></span>
+<span id="cb14-401"><a href="#cb14-401"></a>The ability to go from documentation to working code is the skill that transfers to every API in @sec-government, @sec-social, and @sec-ai-apis. The specifics change — different base URLs, different authentication methods, different response structures — but the pattern remains: read the docs, construct the request, parse the response.</span>
+<span id="cb14-402"><a href="#cb14-402"></a></span>
+<span id="cb14-403"><a href="#cb14-403"></a><span class="fu">## A Second Case Study: World War II</span></span>
+<span id="cb14-404"><a href="#cb14-404"></a></span>
+<span id="cb14-405"><a href="#cb14-405"></a>To reinforce these patterns, try applying the same functions to a different article. The <span class="co">[</span><span class="ot">World War II</span><span class="co">](https://en.wikipedia.org/wiki/World_War_II)</span> article is one of the most-edited on Wikipedia:</span>
+<span id="cb14-406"><a href="#cb14-406"></a></span>
+<span id="cb14-407"><a href="#cb14-407"></a><span class="in">```python</span></span>
+<span id="cb14-408"><a href="#cb14-408"></a>ww2_revisions <span class="op">=</span> get_revisions(<span class="st">"World_War_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb14-409"><a href="#cb14-409"></a><span class="bu">print</span>(<span class="ss">f"World War II revisions: </span><span class="sc">{</span><span class="bu">len</span>(ww2_revisions)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-410"><a href="#cb14-410"></a></span>
+<span id="cb14-411"><a href="#cb14-411"></a>ww2_views <span class="op">=</span> get_pageviews(<span class="st">"World_War_II"</span>, start<span class="op">=</span><span class="st">"20230101"</span>, end<span class="op">=</span><span class="st">"20231231"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb14-412"><a href="#cb14-412"></a></span>
+<span id="cb14-413"><a href="#cb14-413"></a>ww2_links <span class="op">=</span> get_outlinks(<span class="st">"World_War_II"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb14-414"><a href="#cb14-414"></a><span class="bu">print</span>(<span class="ss">f"World War II outlinks: </span><span class="sc">{</span><span class="bu">len</span>(ww2_links)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-415"><a href="#cb14-415"></a></span>
+<span id="cb14-416"><a href="#cb14-416"></a><span class="co"># Compare with Elizabeth II</span></span>
+<span id="cb14-417"><a href="#cb14-417"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Elizabeth II revisions: </span><span class="sc">{</span><span class="bu">len</span>(df_revisions)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-418"><a href="#cb14-418"></a><span class="bu">print</span>(<span class="ss">f"Elizabeth II outlinks: </span><span class="sc">{</span><span class="bu">len</span>(outlinks)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-419"><a href="#cb14-419"></a><span class="in">```</span></span>
+<span id="cb14-420"><a href="#cb14-420"></a></span>
+<span id="cb14-421"><a href="#cb14-421"></a>The comparison reveals how article structure and editing dynamics vary: a biographical article about a contemporary figure versus a historical event article that has been built over nearly two decades of collaborative editing.</span>
+<span id="cb14-422"><a href="#cb14-422"></a></span>
+<span id="cb14-423"><a href="#cb14-423"></a><span class="fu">### Combining Endpoints</span></span>
+<span id="cb14-424"><a href="#cb14-424"></a></span>
+<span id="cb14-425"><a href="#cb14-425"></a>The real analytical power of the MediaWiki API emerges when you combine data from multiple endpoints to answer questions that no single endpoint can address. A natural question is whether editing activity and viewing activity are related: do articles get edited more during periods when they are being read more, or do edits happen independently of audience attention?</span>
+<span id="cb14-426"><a href="#cb14-426"></a></span>
+<span id="cb14-427"><a href="#cb14-427"></a><span class="in">```python</span></span>
+<span id="cb14-428"><a href="#cb14-428"></a><span class="co"># Get monthly revision counts for Elizabeth II in 2022</span></span>
+<span id="cb14-429"><a href="#cb14-429"></a>df_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df_revisions[<span class="st">"timestamp"</span>])</span>
+<span id="cb14-430"><a href="#cb14-430"></a>monthly_revs <span class="op">=</span> (df_revisions</span>
+<span id="cb14-431"><a href="#cb14-431"></a>    .set_index(<span class="st">"timestamp"</span>)</span>
+<span id="cb14-432"><a href="#cb14-432"></a>    .loc[<span class="st">"2022"</span>]</span>
+<span id="cb14-433"><a href="#cb14-433"></a>    .resample(<span class="st">"ME"</span>)</span>
+<span id="cb14-434"><a href="#cb14-434"></a>    .size()</span>
+<span id="cb14-435"><a href="#cb14-435"></a>    .reset_index(name<span class="op">=</span><span class="st">"revisions"</span>))</span>
+<span id="cb14-436"><a href="#cb14-436"></a></span>
+<span id="cb14-437"><a href="#cb14-437"></a><span class="co"># Get monthly pageviews for the same period</span></span>
+<span id="cb14-438"><a href="#cb14-438"></a>views_2022 <span class="op">=</span> get_pageviews(<span class="st">"Elizabeth_II"</span>, start<span class="op">=</span><span class="st">"20220101"</span>, end<span class="op">=</span><span class="st">"20221231"</span>,</span>
+<span id="cb14-439"><a href="#cb14-439"></a>                            headers<span class="op">=</span>headers)</span>
+<span id="cb14-440"><a href="#cb14-440"></a>monthly_views <span class="op">=</span> (views_2022</span>
+<span id="cb14-441"><a href="#cb14-441"></a>    .set_index(<span class="st">"timestamp"</span>)</span>
+<span id="cb14-442"><a href="#cb14-442"></a>    .resample(<span class="st">"ME"</span>)[<span class="st">"views"</span>]</span>
+<span id="cb14-443"><a href="#cb14-443"></a>    .<span class="bu">sum</span>()</span>
+<span id="cb14-444"><a href="#cb14-444"></a>    .reset_index())</span>
+<span id="cb14-445"><a href="#cb14-445"></a></span>
+<span id="cb14-446"><a href="#cb14-446"></a><span class="co"># Dual-axis plot: revisions on left, pageviews on right</span></span>
+<span id="cb14-447"><a href="#cb14-447"></a>fig, ax1 <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
+<span id="cb14-448"><a href="#cb14-448"></a>ax1.bar(monthly_revs[<span class="st">"timestamp"</span>], monthly_revs[<span class="st">"revisions"</span>],</span>
+<span id="cb14-449"><a href="#cb14-449"></a>        width<span class="op">=</span><span class="dv">20</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">"steelblue"</span>, label<span class="op">=</span><span class="st">"Revisions"</span>)</span>
+<span id="cb14-450"><a href="#cb14-450"></a>ax1.set_ylabel(<span class="st">"Monthly Revisions"</span>, color<span class="op">=</span><span class="st">"steelblue"</span>)</span>
+<span id="cb14-451"><a href="#cb14-451"></a></span>
+<span id="cb14-452"><a href="#cb14-452"></a>ax2 <span class="op">=</span> ax1.twinx()</span>
+<span id="cb14-453"><a href="#cb14-453"></a>ax2.plot(monthly_views[<span class="st">"timestamp"</span>], monthly_views[<span class="st">"views"</span>],</span>
+<span id="cb14-454"><a href="#cb14-454"></a>         color<span class="op">=</span><span class="st">"darkred"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Pageviews"</span>)</span>
+<span id="cb14-455"><a href="#cb14-455"></a>ax2.set_ylabel(<span class="st">"Monthly Pageviews"</span>, color<span class="op">=</span><span class="st">"darkred"</span>)</span>
+<span id="cb14-456"><a href="#cb14-456"></a></span>
+<span id="cb14-457"><a href="#cb14-457"></a>plt.title(<span class="st">"Elizabeth II: Editing Activity vs. Reading Activity (2022)"</span>)</span>
+<span id="cb14-458"><a href="#cb14-458"></a>fig.tight_layout()</span>
+<span id="cb14-459"><a href="#cb14-459"></a>plt.show()</span>
+<span id="cb14-460"><a href="#cb14-460"></a><span class="in">```</span></span>
+<span id="cb14-461"><a href="#cb14-461"></a></span>
+<span id="cb14-462"><a href="#cb14-462"></a>The September 2022 spike — corresponding to the death of Queen Elizabeth II — should appear in both time series, but their relationship across quieter months is less obvious. In general, major events drive both pageviews and revisions simultaneously, but routine editing often happens independently of audience attention. Many of Wikipedia's most active editors work on articles regardless of whether anyone is reading them. This decoupling of production and consumption is a distinctive feature of Wikipedia's volunteer model.</span>
+<span id="cb14-463"><a href="#cb14-463"></a></span>
+<span id="cb14-464"><a href="#cb14-464"></a><span class="fu">## Exercises</span></span>
+<span id="cb14-465"><a href="#cb14-465"></a></span>
+<span id="cb14-466"><a href="#cb14-466"></a><span class="ss">1. </span>**Comparative revision analysis.** Retrieve the revision histories for two related Wikipedia articles (e.g., "Democratic_Party_(United_States)" and "Republican_Party_(United_States)"). Compare the number of unique editors, the distribution of edits per editor (is editing concentrated or distributed?), and the pattern of monthly editing activity. Are there periods where editing spikes simultaneously on both articles?</span>
+<span id="cb14-467"><a href="#cb14-467"></a></span>
+<span id="cb14-468"><a href="#cb14-468"></a><span class="ss">2. </span>**Event detection with pageviews.** Use the pageviews API to retrieve daily data for five related articles over a full year. Identify spikes in each article and map them to real-world events. Did all articles spike together (suggesting a common cause), or were there article-specific events? Create a multi-line plot with labeled annotations for the key events.</span>
+<span id="cb14-469"><a href="#cb14-469"></a></span>
+<span id="cb14-470"><a href="#cb14-470"></a><span class="ss">3. </span>**Link network.** Retrieve the outgoing wikilinks from three articles on related topics. How much do their link sets overlap? What articles appear in all three link sets? This overlap analysis is a simple form of the network analysis described in @sec-appendix-further.</span>
+<span id="cb14-471"><a href="#cb14-471"></a></span>
+<span id="cb14-472"><a href="#cb14-472"></a><span class="ss">4. </span>**Raw API practice.** Using only the MediaWiki API documentation at <span class="ot">&lt;https://www.mediawiki.org/wiki/API:Main_page&gt;</span>, construct a working request for an endpoint not covered in this chapter. Good candidates include <span class="in">`interlanguagelinks`</span> (how many language editions does an article have?), <span class="in">`extlinks`</span> (what external websites does an article link to?), or <span class="in">`recentchanges`</span> (what are the most recent edits across all of Wikipedia?). Document your process: what parameters did you choose and why?</span>
+<span id="cb14-473"><a href="#cb14-473"></a></span>
+<span id="cb14-474"><a href="#cb14-474"></a><span class="ss">5. </span>**Editor network.** For a single article, identify the top 20 editors by revision count. Then use <span class="in">`get_user_contributions()`</span> to find what other articles these editors work on. Do they share other editing interests, or is this article their only point of overlap?</span>
+<span id="cb14-475"><a href="#cb14-475"></a></span>
+<span id="cb14-476"><a href="#cb14-476"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb14-477"><a href="#cb14-477"></a></span>
+<span id="cb14-478"><a href="#cb14-478"></a>Wikipedia is the largest collaboratively-authored reference work in human history, maintained by tens of thousands of volunteer editors working in over 300 languages. Its commitment to open APIs reflects its broader mission: anyone can read, edit, and computationally access Wikipedia's content. The Wikimedia Foundation explicitly positions API access as part of its commitment to free knowledge <span class="co">[</span><span class="ot">@ford2022writing</span><span class="co">]</span>.</span>
+<span id="cb14-479"><a href="#cb14-479"></a></span>
+<span id="cb14-480"><a href="#cb14-480"></a>But openness does not mean representativeness. Research has documented significant demographic skew in who edits Wikipedia — editors are disproportionately male, from the Global North, and technically fluent. This translates into content gaps: articles about women, people of color, and the Global South are systematically shorter, less detailed, and less well-referenced than articles about men and Western topics <span class="co">[</span><span class="ot">@mesgari2015sum</span><span class="co">]</span>. The data you retrieve from Wikipedia's API reflects these patterns. Ease of access does not guarantee completeness or neutrality — a principle that applies equally to every data source in this book.</span>
+<span id="cb14-481"><a href="#cb14-481"></a></span>
+<span id="cb14-482"><a href="#cb14-482"></a>Wikipedia's gender gap illustrates how community demographics shape content. Research has consistently found that Wikipedia's editor community is predominantly male, and this demographic skew is reflected in coverage — biographies of women are fewer, shorter, and more likely to mention marital status or family relationships than biographies of men. WikiProject Women in Red has worked systematically to address this gap, organizing edit-a-thons and maintaining lists of missing biographies. Data retrieved from the API reflects these structural patterns: any Wikipedia-based analysis inherits the biases of its volunteer editor community. Recognizing this is not a reason to avoid Wikipedia data but a reason to interpret it carefully.</span>
+<span id="cb14-483"><a href="#cb14-483"></a></span>
+<span id="cb14-484"><a href="#cb14-484"></a>Wikipedia also demonstrates what sustainable, mission-driven data access looks like. While commercial platforms have restricted and monetized their APIs (see @sec-post-api), Wikipedia's API has remained free and has expanded in functionality over time. This is possible because the Wikimedia Foundation is a nonprofit funded by donations, not advertising revenue. The organizational structure shapes the data access policies.</span>
+<span id="cb14-485"><a href="#cb14-485"></a></span>
+<span id="cb14-486"><a href="#cb14-486"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb14-487"><a href="#cb14-487"></a></span>
+<span id="cb14-488"><a href="#cb14-488"></a><span class="ss">- </span>**Pagination**: The single most common mistake. Always check for <span class="in">`"continue"`</span> in the response. Without it, you get only the first batch (often 500 or fewer results out of thousands).</span>
+<span id="cb14-489"><a href="#cb14-489"></a><span class="ss">- </span>**Nested JSON navigation**: The MediaWiki API nests data several levels deep. Print <span class="in">`data.keys()`</span>, then <span class="in">`data["query"].keys()`</span>, then <span class="in">`data["query"]["pages"].keys()`</span> to navigate step by step.</span>
+<span id="cb14-490"><a href="#cb14-490"></a><span class="ss">- </span>**URL encoding**: Article titles with spaces use underscores in the API. For titles with special characters (parentheses, accented letters), use <span class="in">`urllib.parse.quote()`</span>.</span>
+<span id="cb14-491"><a href="#cb14-491"></a><span class="ss">- </span>**Rate limiting**: Wikipedia requests a meaningful User-Agent header. Without it, you may get slower responses or be blocked. The rate limit is approximately 200 requests per second for identified clients — generous, but not infinite.</span>
+<span id="cb14-492"><a href="#cb14-492"></a><span class="ss">- </span>**Missing pages**: If you request an article that does not exist, the page ID will be negative (e.g., <span class="in">`-1`</span>). Always check for this before trying to access revision data.</span>
+<span id="cb14-493"><a href="#cb14-493"></a></span>
+<span id="cb14-494"><a href="#cb14-494"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb14-495"><a href="#cb14-495"></a></span>
+<span id="cb14-496"><a href="#cb14-496"></a>APIs provide structured, documented, intentional access to web data. Learning to work with one API well gives you a transferable skill for any API: read the documentation, construct parameterized requests, handle pagination with continuation tokens, and parse nested JSON responses one level at a time. Wikipedia's MediaWiki API demonstrates these patterns clearly and generously — it is a model of what open, mission-driven data access looks like. The key habits: always handle pagination, always use a meaningful User-Agent, always read the documentation before writing code, and always check the response structure before assuming its contents.</span>
+<span id="cb14-497"><a href="#cb14-497"></a></span>
+<span id="cb14-498"><a href="#cb14-498"></a><span class="fu">## Further Reading</span></span>
+<span id="cb14-499"><a href="#cb14-499"></a></span>
+<span id="cb14-500"><a href="#cb14-500"></a><span class="ss">- </span>MediaWiki API documentation: <span class="ot">&lt;https://www.mediawiki.org/wiki/API:Main_page&gt;</span></span>
+<span id="cb14-501"><a href="#cb14-501"></a><span class="ss">- </span>Wikimedia REST API (pageviews): <span class="ot">&lt;https://wikimedia.org/api/rest_v1/&gt;</span></span>
+<span id="cb14-502"><a href="#cb14-502"></a><span class="ss">- </span>@ford2022writing — Wikipedia's role in the survival of facts in the digital age</span>
+<span id="cb14-503"><a href="#cb14-503"></a><span class="ss">- </span>@mesgari2015sum — systematic review of scholarly research on Wikipedia content</span>
+<span id="cb14-504"><a href="#cb14-504"></a><span class="ss">- </span>@salganik2018bit — Chapter 2: Observing Behavior, on using digital trace data for research</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

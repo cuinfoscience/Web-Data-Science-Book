@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>13&nbsp; AI and Language Model APIs – Web Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./ch-14-automation.html" rel="next">
+<link href="./ch-12-social.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ea8ef702a3f84812c808b1cddcfad5b3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html">APIs</a></li><li class="breadcrumb-item"><a href="./ch-13-ai-apis.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Web Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Web Data Science</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-02-ethics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ethics, Law, and Responsible Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-03-post-api.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">The Post-API Age</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-04-data-formats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Formats: XML and JSON</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-05-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documents</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-06-static-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-07-archives.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-08-dynamic-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-09-pdfs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">APIs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-10-wikipedia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-11-government.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Government Data APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-12-social.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Social and Media Platform APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-13-ai-apis.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Practice</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-14-automation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Automating Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-15-research-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-ai-disclosure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">AI Coauthorship and Responsible Disclosure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-further.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Where to Go from Here</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#llms-as-web-data-science-tools" id="toc-llms-as-web-data-science-tools" class="nav-link active" data-scroll-target="#llms-as-web-data-science-tools"><span class="header-section-number">13.1</span> LLMs as Web Data Science Tools</a></li>
+  <li><a href="#the-openai-api" id="toc-the-openai-api" class="nav-link" data-scroll-target="#the-openai-api"><span class="header-section-number">13.2</span> The OpenAI API</a>
+  <ul class="collapse">
+  <li><a href="#basic-chat-completion" id="toc-basic-chat-completion" class="nav-link" data-scroll-target="#basic-chat-completion"><span class="header-section-number">13.2.1</span> Basic Chat Completion</a></li>
+  <li><a href="#customizing-roles" id="toc-customizing-roles" class="nav-link" data-scroll-target="#customizing-roles"><span class="header-section-number">13.2.2</span> Customizing Roles</a></li>
+  <li><a href="#structured-output-and-few-shot-prompting" id="toc-structured-output-and-few-shot-prompting" class="nav-link" data-scroll-target="#structured-output-and-few-shot-prompting"><span class="header-section-number">13.2.3</span> Structured Output and Few-Shot Prompting</a></li>
+  </ul></li>
+  <li><a href="#text-embeddings" id="toc-text-embeddings" class="nav-link" data-scroll-target="#text-embeddings"><span class="header-section-number">13.3</span> Text Embeddings</a></li>
+  <li><a href="#applied-example-legislative-bill-analysis" id="toc-applied-example-legislative-bill-analysis" class="nav-link" data-scroll-target="#applied-example-legislative-bill-analysis"><span class="header-section-number">13.4</span> Applied Example: Legislative Bill Analysis</a>
+  <ul class="collapse">
+  <li><a href="#step-1-classifying-bills" id="toc-step-1-classifying-bills" class="nav-link" data-scroll-target="#step-1-classifying-bills"><span class="header-section-number">13.4.1</span> Step 1: Classifying Bills</a></li>
+  <li><a href="#step-2-extracting-structured-information" id="toc-step-2-extracting-structured-information" class="nav-link" data-scroll-target="#step-2-extracting-structured-information"><span class="header-section-number">13.4.2</span> Step 2: Extracting Structured Information</a></li>
+  <li><a href="#step-3-measuring-similarity-with-embeddings" id="toc-step-3-measuring-similarity-with-embeddings" class="nav-link" data-scroll-target="#step-3-measuring-similarity-with-embeddings"><span class="header-section-number">13.4.3</span> Step 3: Measuring Similarity with Embeddings</a></li>
+  </ul></li>
+  <li><a href="#fine-tuning-for-domain-specific-tasks" id="toc-fine-tuning-for-domain-specific-tasks" class="nav-link" data-scroll-target="#fine-tuning-for-domain-specific-tasks"><span class="header-section-number">13.5</span> Fine-Tuning for Domain-Specific Tasks</a></li>
+  <li><a href="#cost-management" id="toc-cost-management" class="nav-link" data-scroll-target="#cost-management"><span class="header-section-number">13.6</span> Cost Management</a></li>
+  <li><a href="#reproducibility-and-documentation" id="toc-reproducibility-and-documentation" class="nav-link" data-scroll-target="#reproducibility-and-documentation"><span class="header-section-number">13.7</span> Reproducibility and Documentation</a></li>
+  <li><a href="#the-anthropic-api" id="toc-the-anthropic-api" class="nav-link" data-scroll-target="#the-anthropic-api"><span class="header-section-number">13.8</span> The Anthropic API</a>
+  <ul class="collapse">
+  <li><a href="#comparing-model-outputs" id="toc-comparing-model-outputs" class="nav-link" data-scroll-target="#comparing-model-outputs"><span class="header-section-number">13.8.1</span> Comparing Model Outputs</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">13.9</span> Exercises</a></li>
+  <li><a href="#social-history-and-public-interest" id="toc-social-history-and-public-interest" class="nav-link" data-scroll-target="#social-history-and-public-interest"><span class="header-section-number">13.10</span> Social History and Public Interest</a></li>
+  <li><a href="#common-issues-to-debug" id="toc-common-issues-to-debug" class="nav-link" data-scroll-target="#common-issues-to-debug"><span class="header-section-number">13.11</span> Common Issues to Debug</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">13.12</span> Key Takeaways</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">13.13</span> Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html">APIs</a></li><li class="breadcrumb-item"><a href="./ch-13-ai-apis.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-ai-apis" class="quarto-section-identifier"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Set up authenticated access to LLM APIs (OpenAI, Anthropic)</li>
+<li>Construct chat completion requests with system, user, and assistant roles</li>
+<li>Use few-shot prompting and structured output to extract data from unstructured text</li>
+<li>Compute text embeddings for document similarity and clustering</li>
+<li>Assess the costs, reproducibility challenges, and appropriate uses of LLMs in research</li>
+</ul>
+</div>
+</div>
+<section id="llms-as-web-data-science-tools" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="llms-as-web-data-science-tools"><span class="header-section-number">13.1</span> LLMs as Web Data Science Tools</h2>
+<p>Large language model APIs represent a fundamentally new category of tool for web data science. They can transform the unstructured text outputs of Chapters 6–9 (scraped web pages, PDF extractions, archived documents) into structured, analyzable data — performing tasks like sentiment analysis, entity extraction, content coding, and summarization at scale.</p>
+<p>This chapter treats LLMs as another API to learn: the same patterns of authentication, request construction, and response parsing apply. But LLMs have distinctive properties — non-determinism, cost, and limited reproducibility — that require careful handling.</p>
+</section>
+<section id="the-openai-api" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="the-openai-api"><span class="header-section-number">13.2</span> The OpenAI API</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Install: pip install openai</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># Store your key securely (see Missing Manual Ch. 29)</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="im">import</span> os</span>
+<span id="cb1-6"><a href="#cb1-6"></a>client <span class="op">=</span> OpenAI(api_key<span class="op">=</span>os.environ.get(<span class="st">"OPENAI_API_KEY"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="basic-chat-completion" class="level3" data-number="13.2.1">
+<h3 data-number="13.2.1" class="anchored" data-anchor-id="basic-chat-completion"><span class="header-section-number">13.2.1</span> Basic Chat Completion</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb2-2"><a href="#cb2-2"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>    messages<span class="op">=</span>[</span>
+<span id="cb2-4"><a href="#cb2-4"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"You are a helpful assistant."</span>},</span>
+<span id="cb2-5"><a href="#cb2-5"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"What is web scraping in one sentence?"</span>}</span>
+<span id="cb2-6"><a href="#cb2-6"></a>    ]</span>
+<span id="cb2-7"><a href="#cb2-7"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8"></a></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co"># Extract the response text</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>answer <span class="op">=</span> response.choices[<span class="dv">0</span>].message.content</span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="bu">print</span>(answer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="customizing-roles" class="level3" data-number="13.2.2">
+<h3 data-number="13.2.2" class="anchored" data-anchor-id="customizing-roles"><span class="header-section-number">13.2.2</span> Customizing Roles</h3>
+<p>The <code>system</code> message sets the assistant’s behavior. The <code>user</code> message is your input. The <code>assistant</code> message lets you simulate prior conversation turns:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb3-2"><a href="#cb3-2"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3"></a>    messages<span class="op">=</span>[</span>
+<span id="cb3-4"><a href="#cb3-4"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"You are a legislative analyst specializing in Colorado state policy."</span>},</span>
+<span id="cb3-5"><a href="#cb3-5"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Summarize the key provisions of this bill in three bullet points."</span>},</span>
+<span id="cb3-6"><a href="#cb3-6"></a>        {<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: <span class="st">"I'd be happy to analyze that bill. Could you share the text?"</span>},</span>
+<span id="cb3-7"><a href="#cb3-7"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: bill_text}  <span class="co"># Variable containing bill text</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>    ]</span>
+<span id="cb3-9"><a href="#cb3-9"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="structured-output-and-few-shot-prompting" class="level3" data-number="13.2.3">
+<h3 data-number="13.2.3" class="anchored" data-anchor-id="structured-output-and-few-shot-prompting"><span class="header-section-number">13.2.3</span> Structured Output and Few-Shot Prompting</h3>
+<p>For research applications, you typically want structured data, not free text. Use few-shot prompting — providing examples of the desired input-output format:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>prompt <span class="op">=</span> <span class="st">"""Classify the following bill summary into one of these categories: </span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="st">education, healthcare, environment, taxation, criminal_justice, other.</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="st">Examples:</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="st">Summary: "Increases funding for K-12 teacher salaries across the state."</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="st">Category: education</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="st">Summary: "Establishes new emission standards for power plants."</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="st">Category: environment</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="st">Now classify:</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="st">Summary: "</span><span class="sc">{bill_summary}</span><span class="st">"</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="st">Category:"""</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a></span>
+<span id="cb4-15"><a href="#cb4-15"></a>response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb4-16"><a href="#cb4-16"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb4-17"><a href="#cb4-17"></a>    messages<span class="op">=</span>[</span>
+<span id="cb4-18"><a href="#cb4-18"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"Respond with only the category label, nothing else."</span>},</span>
+<span id="cb4-19"><a href="#cb4-19"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt.<span class="bu">format</span>(bill_summary<span class="op">=</span>bill_summary)}</span>
+<span id="cb4-20"><a href="#cb4-20"></a>    ],</span>
+<span id="cb4-21"><a href="#cb4-21"></a>    temperature<span class="op">=</span><span class="dv">0</span>  <span class="co"># Reduce randomness for classification tasks</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a>)</span>
+<span id="cb4-23"><a href="#cb4-23"></a></span>
+<span id="cb4-24"><a href="#cb4-24"></a>category <span class="op">=</span> response.choices[<span class="dv">0</span>].message.content.strip()</span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="bu">print</span>(<span class="ss">f"Category: </span><span class="sc">{</span>category<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="text-embeddings" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="text-embeddings"><span class="header-section-number">13.3</span> Text Embeddings</h2>
+<p>Embeddings are vector representations that encode the semantic meaning of text. You can use them to measure document similarity:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">def</span> get_embedding(text, model<span class="op">=</span><span class="st">"text-embedding-3-small"</span>):</span>
+<span id="cb5-2"><a href="#cb5-2"></a>    <span class="co">"""Get the embedding vector for a text string."""</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>    response <span class="op">=</span> client.embeddings.create(<span class="bu">input</span><span class="op">=</span>text, model<span class="op">=</span>model)</span>
+<span id="cb5-4"><a href="#cb5-4"></a>    <span class="cf">return</span> response.data[<span class="dv">0</span>].embedding</span>
+<span id="cb5-5"><a href="#cb5-5"></a></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co"># Compute embeddings for bill summaries</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="im">from</span> scipy.spatial.distance <span class="im">import</span> cosine</span>
+<span id="cb5-9"><a href="#cb5-9"></a></span>
+<span id="cb5-10"><a href="#cb5-10"></a>bill_summaries <span class="op">=</span> [<span class="st">"Summary of bill 1..."</span>, <span class="st">"Summary of bill 2..."</span>, <span class="st">"Summary of bill 3..."</span>]</span>
+<span id="cb5-11"><a href="#cb5-11"></a>embeddings <span class="op">=</span> [get_embedding(s) <span class="cf">for</span> s <span class="kw">in</span> bill_summaries]</span>
+<span id="cb5-12"><a href="#cb5-12"></a></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co"># Compute pairwise similarity</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a>embedding_matrix <span class="op">=</span> np.array(embeddings)</span>
+<span id="cb5-15"><a href="#cb5-15"></a>n <span class="op">=</span> <span class="bu">len</span>(bill_summaries)</span>
+<span id="cb5-16"><a href="#cb5-16"></a>similarity_matrix <span class="op">=</span> np.zeros((n, n))</span>
+<span id="cb5-17"><a href="#cb5-17"></a></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb5-19"><a href="#cb5-19"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb5-20"><a href="#cb5-20"></a>        similarity_matrix[i][j] <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> cosine(embedding_matrix[i], embedding_matrix[j])</span>
+<span id="cb5-21"><a href="#cb5-21"></a></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co"># Visualize as a heatmap</span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb5-25"><a href="#cb5-25"></a></span>
+<span id="cb5-26"><a href="#cb5-26"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">5</span>))</span>
+<span id="cb5-27"><a href="#cb5-27"></a>sns.heatmap(similarity_matrix, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, cmap<span class="op">=</span><span class="st">"YlOrRd"</span>,</span>
+<span id="cb5-28"><a href="#cb5-28"></a>            xticklabels<span class="op">=</span><span class="bu">range</span>(<span class="dv">1</span>, n<span class="op">+</span><span class="dv">1</span>), yticklabels<span class="op">=</span><span class="bu">range</span>(<span class="dv">1</span>, n<span class="op">+</span><span class="dv">1</span>))</span>
+<span id="cb5-29"><a href="#cb5-29"></a>plt.title(<span class="st">"Bill Summary Similarity (Cosine)"</span>)</span>
+<span id="cb5-30"><a href="#cb5-30"></a>plt.tight_layout()</span>
+<span id="cb5-31"><a href="#cb5-31"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="applied-example-legislative-bill-analysis" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="applied-example-legislative-bill-analysis"><span class="header-section-number">13.4</span> Applied Example: Legislative Bill Analysis</h2>
+<p>Let us apply these tools to a concrete web data science task. Suppose you have scraped bill summaries from the Colorado General Assembly website (building on the scraping techniques from <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>). You want to classify each bill by policy area, extract the key stakeholders mentioned, and measure how similar bills are to each other.</p>
+<section id="step-1-classifying-bills" class="level3" data-number="13.4.1">
+<h3 data-number="13.4.1" class="anchored" data-anchor-id="step-1-classifying-bills"><span class="header-section-number">13.4.1</span> Step 1: Classifying Bills</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">def</span> classify_bill(summary, client):</span>
+<span id="cb6-2"><a href="#cb6-2"></a>    <span class="co">"""Classify a bill summary into a policy category.</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">    </span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">    Parameters</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">    ----------</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">    summary : str</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">        The text of the bill summary</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">    client : OpenAI</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">        An authenticated OpenAI client</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">    </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">    Returns</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">    -------</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">    str</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">        The policy category</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">    """</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a>    response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb6-17"><a href="#cb6-17"></a>        model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb6-18"><a href="#cb6-18"></a>        messages<span class="op">=</span>[</span>
+<span id="cb6-19"><a href="#cb6-19"></a>            {</span>
+<span id="cb6-20"><a href="#cb6-20"></a>                <span class="st">"role"</span>: <span class="st">"system"</span>,</span>
+<span id="cb6-21"><a href="#cb6-21"></a>                <span class="st">"content"</span>: (</span>
+<span id="cb6-22"><a href="#cb6-22"></a>                    <span class="st">"You are a legislative analyst. Classify bill summaries into "</span></span>
+<span id="cb6-23"><a href="#cb6-23"></a>                    <span class="st">"exactly one category: education, healthcare, environment, "</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a>                    <span class="st">"taxation, criminal_justice, transportation, housing, labor, "</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a>                    <span class="st">"technology, or other. Respond with only the category label."</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a>                )</span>
+<span id="cb6-27"><a href="#cb6-27"></a>            },</span>
+<span id="cb6-28"><a href="#cb6-28"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: summary}</span>
+<span id="cb6-29"><a href="#cb6-29"></a>        ],</span>
+<span id="cb6-30"><a href="#cb6-30"></a>        temperature<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb6-31"><a href="#cb6-31"></a>    )</span>
+<span id="cb6-32"><a href="#cb6-32"></a>    <span class="cf">return</span> response.choices[<span class="dv">0</span>].message.content.strip().lower()</span>
+<span id="cb6-33"><a href="#cb6-33"></a></span>
+<span id="cb6-34"><a href="#cb6-34"></a><span class="co"># Apply across a list of bills</span></span>
+<span id="cb6-35"><a href="#cb6-35"></a>bills <span class="op">=</span> [</span>
+<span id="cb6-36"><a href="#cb6-36"></a>    {<span class="st">"id"</span>: <span class="st">"HB24-1001"</span>, <span class="st">"summary"</span>: <span class="st">"Increases funding for K-12 teacher salaries..."</span>},</span>
+<span id="cb6-37"><a href="#cb6-37"></a>    {<span class="st">"id"</span>: <span class="st">"HB24-1042"</span>, <span class="st">"summary"</span>: <span class="st">"Establishes new emission standards for power plants..."</span>},</span>
+<span id="cb6-38"><a href="#cb6-38"></a>    {<span class="st">"id"</span>: <span class="st">"SB24-087"</span>, <span class="st">"summary"</span>: <span class="st">"Requires health insurers to cover annual mental health..."</span>},</span>
+<span id="cb6-39"><a href="#cb6-39"></a>]</span>
+<span id="cb6-40"><a href="#cb6-40"></a></span>
+<span id="cb6-41"><a href="#cb6-41"></a><span class="cf">for</span> bill <span class="kw">in</span> bills:</span>
+<span id="cb6-42"><a href="#cb6-42"></a>    bill[<span class="st">"category"</span>] <span class="op">=</span> classify_bill(bill[<span class="st">"summary"</span>], client)</span>
+<span id="cb6-43"><a href="#cb6-43"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>bill[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>bill[<span class="st">'category'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-44"><a href="#cb6-44"></a></span>
+<span id="cb6-45"><a href="#cb6-45"></a><span class="im">import</span> time</span>
+<span id="cb6-46"><a href="#cb6-46"></a>time.sleep(<span class="dv">1</span>)  <span class="co"># Rate limit between API calls</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="step-2-extracting-structured-information" class="level3" data-number="13.4.2">
+<h3 data-number="13.4.2" class="anchored" data-anchor-id="step-2-extracting-structured-information"><span class="header-section-number">13.4.2</span> Step 2: Extracting Structured Information</h3>
+<p>You can use few-shot prompting to extract multiple fields at once:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="im">import</span> json</span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a>extraction_prompt <span class="op">=</span> <span class="st">"""Extract the following fields from this bill summary as JSON:</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="st">- primary_topic: one phrase describing the main topic</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="st">- stakeholders: list of groups affected</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="st">- fiscal_impact: "yes", "no", or "unclear"</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="st">- geographic_scope: "statewide", "local", or "specific_region"</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="st">Example input: "Requires all school districts to provide free breakfast and lunch to students."</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="st">Example output: </span><span class="sc">{{</span><span class="st">"primary_topic": "school meals", "stakeholders": ["students", "school districts", "food service workers"], "fiscal_impact": "yes", "geographic_scope": "statewide"</span><span class="sc">}}</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="st">Now extract from: "</span><span class="sc">{summary}</span><span class="st">"</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="st">"""</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a></span>
+<span id="cb7-15"><a href="#cb7-15"></a>response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb7-16"><a href="#cb7-16"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb7-17"><a href="#cb7-17"></a>    messages<span class="op">=</span>[</span>
+<span id="cb7-18"><a href="#cb7-18"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"Respond with valid JSON only. No markdown formatting."</span>},</span>
+<span id="cb7-19"><a href="#cb7-19"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: extraction_prompt.<span class="bu">format</span>(summary<span class="op">=</span>bills[<span class="dv">0</span>][<span class="st">"summary"</span>])}</span>
+<span id="cb7-20"><a href="#cb7-20"></a>    ],</span>
+<span id="cb7-21"><a href="#cb7-21"></a>    temperature<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb7-22"><a href="#cb7-22"></a>)</span>
+<span id="cb7-23"><a href="#cb7-23"></a></span>
+<span id="cb7-24"><a href="#cb7-24"></a><span class="cf">try</span>:</span>
+<span id="cb7-25"><a href="#cb7-25"></a>    extracted <span class="op">=</span> json.loads(response.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb7-26"><a href="#cb7-26"></a>    <span class="bu">print</span>(json.dumps(extracted, indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb7-27"><a href="#cb7-27"></a><span class="cf">except</span> json.JSONDecodeError:</span>
+<span id="cb7-28"><a href="#cb7-28"></a>    <span class="bu">print</span>(<span class="st">"Failed to parse response as JSON"</span>)</span>
+<span id="cb7-29"><a href="#cb7-29"></a>    <span class="bu">print</span>(response.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="step-3-measuring-similarity-with-embeddings" class="level3" data-number="13.4.3">
+<h3 data-number="13.4.3" class="anchored" data-anchor-id="step-3-measuring-similarity-with-embeddings"><span class="header-section-number">13.4.3</span> Step 3: Measuring Similarity with Embeddings</h3>
+<p>Embeddings let you move beyond keyword matching to semantic similarity. Two bills about “school funding” and “educational resource allocation” would have low keyword overlap but high embedding similarity:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="im">from</span> scipy.spatial.distance <span class="im">import</span> cosine</span>
+<span id="cb8-3"><a href="#cb8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="kw">def</span> get_embeddings(texts, client, model<span class="op">=</span><span class="st">"text-embedding-3-small"</span>):</span>
+<span id="cb8-5"><a href="#cb8-5"></a>    <span class="co">"""Get embedding vectors for a list of texts."""</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a>    embeddings <span class="op">=</span> []</span>
+<span id="cb8-7"><a href="#cb8-7"></a>    <span class="cf">for</span> text <span class="kw">in</span> texts:</span>
+<span id="cb8-8"><a href="#cb8-8"></a>        response <span class="op">=</span> client.embeddings.create(<span class="bu">input</span><span class="op">=</span>text, model<span class="op">=</span>model)</span>
+<span id="cb8-9"><a href="#cb8-9"></a>        embeddings.append(response.data[<span class="dv">0</span>].embedding)</span>
+<span id="cb8-10"><a href="#cb8-10"></a>        time.sleep(<span class="fl">0.5</span>)  <span class="co"># Rate limit</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a>    <span class="cf">return</span> np.array(embeddings)</span>
+<span id="cb8-12"><a href="#cb8-12"></a></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co"># Get embeddings for all bill summaries</span></span>
+<span id="cb8-14"><a href="#cb8-14"></a>summaries <span class="op">=</span> [b[<span class="st">"summary"</span>] <span class="cf">for</span> b <span class="kw">in</span> bills]</span>
+<span id="cb8-15"><a href="#cb8-15"></a>embedding_matrix <span class="op">=</span> get_embeddings(summaries, client)</span>
+<span id="cb8-16"><a href="#cb8-16"></a></span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="co"># Compute pairwise cosine similarity</span></span>
+<span id="cb8-18"><a href="#cb8-18"></a>n <span class="op">=</span> <span class="bu">len</span>(summaries)</span>
+<span id="cb8-19"><a href="#cb8-19"></a>similarity <span class="op">=</span> np.zeros((n, n))</span>
+<span id="cb8-20"><a href="#cb8-20"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb8-21"><a href="#cb8-21"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb8-22"><a href="#cb8-22"></a>        similarity[i][j] <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> cosine(embedding_matrix[i], embedding_matrix[j])</span>
+<span id="cb8-23"><a href="#cb8-23"></a></span>
+<span id="cb8-24"><a href="#cb8-24"></a><span class="co"># Visualize</span></span>
+<span id="cb8-25"><a href="#cb8-25"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb8-26"><a href="#cb8-26"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb8-27"><a href="#cb8-27"></a></span>
+<span id="cb8-28"><a href="#cb8-28"></a>labels <span class="op">=</span> [b[<span class="st">"id"</span>] <span class="cf">for</span> b <span class="kw">in</span> bills]</span>
+<span id="cb8-29"><a href="#cb8-29"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb8-30"><a href="#cb8-30"></a>sns.heatmap(similarity, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, cmap<span class="op">=</span><span class="st">"YlOrRd"</span>,</span>
+<span id="cb8-31"><a href="#cb8-31"></a>            xticklabels<span class="op">=</span>labels, yticklabels<span class="op">=</span>labels)</span>
+<span id="cb8-32"><a href="#cb8-32"></a>plt.title(<span class="st">"Bill Summary Similarity (Cosine Distance of Embeddings)"</span>)</span>
+<span id="cb8-33"><a href="#cb8-33"></a>plt.tight_layout()</span>
+<span id="cb8-34"><a href="#cb8-34"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="fine-tuning-for-domain-specific-tasks" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="fine-tuning-for-domain-specific-tasks"><span class="header-section-number">13.5</span> Fine-Tuning for Domain-Specific Tasks</h2>
+<p>Sometimes a general model does not produce consistent results for your specific task. Fine-tuning lets you train the model on your own examples:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Prepare training data in JSONL format</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co"># Each line is a complete conversation demonstrating the desired behavior</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>training_data <span class="op">=</span> [</span>
+<span id="cb9-4"><a href="#cb9-4"></a>    {</span>
+<span id="cb9-5"><a href="#cb9-5"></a>        <span class="st">"messages"</span>: [</span>
+<span id="cb9-6"><a href="#cb9-6"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"Classify Colorado bill summaries by policy area."</span>},</span>
+<span id="cb9-7"><a href="#cb9-7"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Increases the minimum wage to $15/hour by 2026."</span>},</span>
+<span id="cb9-8"><a href="#cb9-8"></a>            {<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: <span class="st">"labor"</span>}</span>
+<span id="cb9-9"><a href="#cb9-9"></a>        ]</span>
+<span id="cb9-10"><a href="#cb9-10"></a>    },</span>
+<span id="cb9-11"><a href="#cb9-11"></a>    {</span>
+<span id="cb9-12"><a href="#cb9-12"></a>        <span class="st">"messages"</span>: [</span>
+<span id="cb9-13"><a href="#cb9-13"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"Classify Colorado bill summaries by policy area."</span>},</span>
+<span id="cb9-14"><a href="#cb9-14"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Requires electric vehicle charging at new buildings."</span>},</span>
+<span id="cb9-15"><a href="#cb9-15"></a>            {<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: <span class="st">"environment"</span>}</span>
+<span id="cb9-16"><a href="#cb9-16"></a>        ]</span>
+<span id="cb9-17"><a href="#cb9-17"></a>    },</span>
+<span id="cb9-18"><a href="#cb9-18"></a>    <span class="co"># ... at least 10 examples, ideally 50+</span></span>
+<span id="cb9-19"><a href="#cb9-19"></a>]</span>
+<span id="cb9-20"><a href="#cb9-20"></a></span>
+<span id="cb9-21"><a href="#cb9-21"></a><span class="co"># Save to JSONL file</span></span>
+<span id="cb9-22"><a href="#cb9-22"></a><span class="im">import</span> json</span>
+<span id="cb9-23"><a href="#cb9-23"></a></span>
+<span id="cb9-24"><a href="#cb9-24"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"training_data.jsonl"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
+<span id="cb9-25"><a href="#cb9-25"></a>    <span class="cf">for</span> example <span class="kw">in</span> training_data:</span>
+<span id="cb9-26"><a href="#cb9-26"></a>        f.write(json.dumps(example) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb9-27"><a href="#cb9-27"></a></span>
+<span id="cb9-28"><a href="#cb9-28"></a><span class="co"># Upload the training file</span></span>
+<span id="cb9-29"><a href="#cb9-29"></a>training_file <span class="op">=</span> client.files.create(</span>
+<span id="cb9-30"><a href="#cb9-30"></a>    <span class="bu">file</span><span class="op">=</span><span class="bu">open</span>(<span class="st">"training_data.jsonl"</span>, <span class="st">"rb"</span>),</span>
+<span id="cb9-31"><a href="#cb9-31"></a>    purpose<span class="op">=</span><span class="st">"fine-tune"</span></span>
+<span id="cb9-32"><a href="#cb9-32"></a>)</span>
+<span id="cb9-33"><a href="#cb9-33"></a></span>
+<span id="cb9-34"><a href="#cb9-34"></a><span class="co"># Start a fine-tuning job</span></span>
+<span id="cb9-35"><a href="#cb9-35"></a>job <span class="op">=</span> client.fine_tuning.jobs.create(</span>
+<span id="cb9-36"><a href="#cb9-36"></a>    training_file<span class="op">=</span>training_file.<span class="bu">id</span>,</span>
+<span id="cb9-37"><a href="#cb9-37"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini-2024-07-18"</span></span>
+<span id="cb9-38"><a href="#cb9-38"></a>)</span>
+<span id="cb9-39"><a href="#cb9-39"></a></span>
+<span id="cb9-40"><a href="#cb9-40"></a><span class="bu">print</span>(<span class="ss">f"Fine-tuning job started: </span><span class="sc">{</span>job<span class="sc">.</span><span class="bu">id</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-41"><a href="#cb9-41"></a><span class="bu">print</span>(<span class="ss">f"Status: </span><span class="sc">{</span>job<span class="sc">.</span>status<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Fine-tuning takes time (minutes to hours depending on dataset size). You can check the status periodically and then use the fine-tuned model by specifying its ID in place of the base model name.</p>
+</section>
+<section id="cost-management" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="cost-management"><span class="header-section-number">13.6</span> Cost Management</h2>
+<p>LLM API calls cost money. Before running a large batch, estimate the cost:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Rough cost estimation for GPT-4o-mini</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co"># Input: ~$0.15 per 1M tokens; Output: ~$0.60 per 1M tokens</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co"># A typical bill summary is ~200 tokens; a classification response is ~5 tokens</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a>num_bills <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a>input_tokens <span class="op">=</span> num_bills <span class="op">*</span> <span class="dv">200</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a>output_tokens <span class="op">=</span> num_bills <span class="op">*</span> <span class="dv">5</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a></span>
+<span id="cb10-9"><a href="#cb10-9"></a>estimated_cost <span class="op">=</span> (input_tokens <span class="op">*</span> <span class="fl">0.15</span> <span class="op">/</span> <span class="dv">1_000_000</span>) <span class="op">+</span> (output_tokens <span class="op">*</span> <span class="fl">0.60</span> <span class="op">/</span> <span class="dv">1_000_000</span>)</span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="bu">print</span>(<span class="ss">f"Estimated cost for classifying </span><span class="sc">{</span>num_bills<span class="sc">}</span><span class="ss"> bills: $</span><span class="sc">{</span>estimated_cost<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co"># Typically a few cents for small jobs, but can add up with larger models</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Use <code>gpt-4o-mini</code> for development and testing. Switch to <code>gpt-4o</code> only when you need higher quality and have validated your prompts on a smaller sample.</p>
+</section>
+<section id="reproducibility-and-documentation" class="level2" data-number="13.7">
+<h2 data-number="13.7" class="anchored" data-anchor-id="reproducibility-and-documentation"><span class="header-section-number">13.7</span> Reproducibility and Documentation</h2>
+<p>LLM-based research faces reproducibility challenges that are fundamentally different from those of traditional computational methods. When you write a Python script to parse HTML, anyone with the same input file will get the same output. LLMs break this guarantee in multiple ways. Even with <code>temperature=0</code>, model outputs can vary slightly between calls due to floating-point non-determinism in the inference process. More significantly, model versions change over time: a prompt that works reliably with GPT-4 in early 2024 may produce different results with the same model name in late 2024, because the underlying weights have been updated. And when a model is deprecated entirely — as GPT-3.5 eventually will be — exact replication becomes impossible. These properties do not disqualify LLMs as research tools, but they demand a level of documentation that most researchers are not yet accustomed to providing.</p>
+<p>At a minimum, every research project that uses LLM APIs should record the following for each API call: the exact model name and version (e.g., <code>gpt-4o-mini-2024-07-18</code>, not just <code>gpt-4o-mini</code>), the complete prompt text including the system message, all generation parameters (<code>temperature</code>, <code>max_tokens</code>, <code>top_p</code>, <code>frequency_penalty</code>), the date and time of the API call, and any post-processing or validation steps applied to the output. Store this metadata alongside your results, not in a methods section written months later from memory. A simple practice is to log each API call to a JSONL file that includes both the request parameters and the full response object — this creates an audit trail that supports both reproducibility and debugging.</p>
+<p>This documentation burden connects to the broader norms of scientific reproducibility discussed in <a href="appendix-ai-disclosure.html" class="quarto-xref"><span>Chapter 16</span></a>. The AI disclosure framework presented there provides a structured template for reporting LLM use in research. The core principle is transparency: another researcher should be able to read your methods section and understand exactly what model, prompt, and parameters produced your results — even if they cannot reproduce them identically, they should be able to reproduce them approximately and assess whether the differences are meaningful. Treating LLM documentation as a first-class methodological concern — not an afterthought — is what separates rigorous research from ad hoc analysis.</p>
+</section>
+<section id="the-anthropic-api" class="level2" data-number="13.8">
+<h2 data-number="13.8" class="anchored" data-anchor-id="the-anthropic-api"><span class="header-section-number">13.8</span> The Anthropic API</h2>
+<p>Anthropic’s Claude provides an alternative LLM API with a similar interface:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Install: pip install anthropic</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="im">from</span> anthropic <span class="im">import</span> Anthropic</span>
+<span id="cb11-3"><a href="#cb11-3"></a></span>
+<span id="cb11-4"><a href="#cb11-4"></a>client_anthropic <span class="op">=</span> Anthropic(api_key<span class="op">=</span>os.environ.get(<span class="st">"ANTHROPIC_API_KEY"</span>))</span>
+<span id="cb11-5"><a href="#cb11-5"></a></span>
+<span id="cb11-6"><a href="#cb11-6"></a>response <span class="op">=</span> client_anthropic.messages.create(</span>
+<span id="cb11-7"><a href="#cb11-7"></a>    model<span class="op">=</span><span class="st">"claude-sonnet-4-20250514"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8"></a>    max_tokens<span class="op">=</span><span class="dv">1024</span>,</span>
+<span id="cb11-9"><a href="#cb11-9"></a>    messages<span class="op">=</span>[</span>
+<span id="cb11-10"><a href="#cb11-10"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"What is the AT Protocol in one sentence?"</span>}</span>
+<span id="cb11-11"><a href="#cb11-11"></a>    ]</span>
+<span id="cb11-12"><a href="#cb11-12"></a>)</span>
+<span id="cb11-13"><a href="#cb11-13"></a></span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="bu">print</span>(response.content[<span class="dv">0</span>].text)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="comparing-model-outputs" class="level3" data-number="13.8.1">
+<h3 data-number="13.8.1" class="anchored" data-anchor-id="comparing-model-outputs"><span class="header-section-number">13.8.1</span> Comparing Model Outputs</h3>
+<p>When you use LLMs for research tasks like content classification, a critical question is whether your results depend on which model you chose. The answer, almost always, is yes — and the degree of that dependence matters for the credibility of your findings. You can test this directly by sending the same prompt to both APIs and comparing their responses.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Send the same classification prompt to both models</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>bill_text <span class="op">=</span> <span class="st">"Establishes new emission standards for power plants operating in Colorado."</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a></span>
+<span id="cb12-4"><a href="#cb12-4"></a>system_prompt <span class="op">=</span> (</span>
+<span id="cb12-5"><a href="#cb12-5"></a>    <span class="st">"You are a legislative analyst. Classify this bill summary into exactly one "</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>    <span class="st">"category: education, healthcare, environment, taxation, criminal_justice, "</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a>    <span class="st">"transportation, housing, labor, technology, or other. "</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a>    <span class="st">"Respond with only the category label."</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a>)</span>
+<span id="cb12-10"><a href="#cb12-10"></a></span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="co"># OpenAI classification</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a>openai_response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb12-13"><a href="#cb12-13"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb12-14"><a href="#cb12-14"></a>    messages<span class="op">=</span>[</span>
+<span id="cb12-15"><a href="#cb12-15"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: system_prompt},</span>
+<span id="cb12-16"><a href="#cb12-16"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: bill_text}</span>
+<span id="cb12-17"><a href="#cb12-17"></a>    ],</span>
+<span id="cb12-18"><a href="#cb12-18"></a>    temperature<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb12-19"><a href="#cb12-19"></a>)</span>
+<span id="cb12-20"><a href="#cb12-20"></a>openai_label <span class="op">=</span> openai_response.choices[<span class="dv">0</span>].message.content.strip()</span>
+<span id="cb12-21"><a href="#cb12-21"></a></span>
+<span id="cb12-22"><a href="#cb12-22"></a><span class="co"># Anthropic classification</span></span>
+<span id="cb12-23"><a href="#cb12-23"></a>anthropic_response <span class="op">=</span> client_anthropic.messages.create(</span>
+<span id="cb12-24"><a href="#cb12-24"></a>    model<span class="op">=</span><span class="st">"claude-sonnet-4-20250514"</span>,</span>
+<span id="cb12-25"><a href="#cb12-25"></a>    max_tokens<span class="op">=</span><span class="dv">50</span>,</span>
+<span id="cb12-26"><a href="#cb12-26"></a>    system<span class="op">=</span>system_prompt,</span>
+<span id="cb12-27"><a href="#cb12-27"></a>    messages<span class="op">=</span>[</span>
+<span id="cb12-28"><a href="#cb12-28"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: bill_text}</span>
+<span id="cb12-29"><a href="#cb12-29"></a>    ]</span>
+<span id="cb12-30"><a href="#cb12-30"></a>)</span>
+<span id="cb12-31"><a href="#cb12-31"></a>anthropic_label <span class="op">=</span> anthropic_response.content[<span class="dv">0</span>].text.strip()</span>
+<span id="cb12-32"><a href="#cb12-32"></a></span>
+<span id="cb12-33"><a href="#cb12-33"></a><span class="bu">print</span>(<span class="ss">f"OpenAI:    </span><span class="sc">{</span>openai_label<span class="sc">}</span><span class="ss">"</span>)     <span class="co"># environment</span></span>
+<span id="cb12-34"><a href="#cb12-34"></a><span class="bu">print</span>(<span class="ss">f"Anthropic: </span><span class="sc">{</span>anthropic_label<span class="sc">}</span><span class="ss">"</span>)   <span class="co"># environment</span></span>
+<span id="cb12-35"><a href="#cb12-35"></a><span class="bu">print</span>(<span class="ss">f"Agreement: </span><span class="sc">{</span>openai_label <span class="op">==</span> anthropic_label<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For straightforward cases like the example above, both models will likely agree. The disagreements emerge at the boundaries — a bill about “electric vehicle incentives” might be classified as <code>environment</code> by one model and <code>transportation</code> or <code>taxation</code> by the other. These boundary cases are not failures; they reflect genuine ambiguity in the classification scheme. But they mean that your results are partially an artifact of your model choice, not purely a reflection of the underlying data.</p>
+<p>This makes validation against human judgment essential. If two state-of-the-art models disagree on 15 percent of your cases, you need to know whether one of them aligns better with how a domain expert would classify the same text. Running a cross-model comparison on a human-labeled sample is the minimum standard for any research that uses LLM-based classification. Treat the model as a measurement instrument, and like any instrument, it needs calibration.</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Missing Manual Reference
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a deeper understanding of how language models work internally — tokens, embeddings, attention, context windows — see <em>Missing Manual</em> Chapter 30: How Language Models Work.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="exercises" class="level2" data-number="13.9">
+<h2 data-number="13.9" class="anchored" data-anchor-id="exercises"><span class="header-section-number">13.9</span> Exercises</h2>
+<ol type="1">
+<li><p><strong>Structured extraction.</strong> Use an LLM API to extract structured metadata (topic, stakeholders, geographic scope) from a set of at least 10 web-scraped documents. Design your prompt, test it, and assess the quality of the results.</p></li>
+<li><p><strong>Embedding analysis.</strong> Compute embeddings for a corpus of at least 20 related documents and use cosine similarity to identify clusters. Visualize the results. Do the clusters match your intuitive groupings?</p></li>
+<li><p><strong>Human-AI agreement.</strong> Design a classification task for a set of documents. Manually classify 20 documents, then have an LLM classify the same documents. Compute the agreement rate. Where does the LLM disagree with your judgment?</p></li>
+<li><p><strong>Cross-model comparison.</strong> Code 20 text samples manually according to a classification scheme of your choice. Have both GPT-4o-mini and Claude classify the same 20 samples. Compute the agreement rate between each model and your human labels, and between the two models. Where do the models disagree with each other, and what does that tell you about the task?</p></li>
+<li><p><strong>Hierarchical clustering.</strong> Generate embeddings for 30 Wikipedia article titles spanning three different topic areas (10 per topic). Use <code>scipy.cluster.hierarchy</code> to create a dendrogram. Do the embeddings cluster by topic? How does the clustering compare to your intuitive groupings?</p></li>
+</ol>
+</section>
+<section id="social-history-and-public-interest" class="level2" data-number="13.10">
+<h2 data-number="13.10" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">13.10</span> Social History and Public Interest</h2>
+<p>LLMs have accelerated the enclosure dynamics described in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — the enormous value of user-generated content as training data has given platforms new incentives to restrict access. At the same time, LLMs provide researchers with powerful analytical tools that can partially offset restricted data access: if you can retrieve even a small sample of text, LLMs can help you code, classify, and extract information from it at scales that would be impossible manually <span class="citation" data-cites="ziems2024can">[@ziems2024can]</span>.</p>
+<p>The key challenge is reproducibility. LLM outputs are non-deterministic (even with <code>temperature=0</code>, there is some variation), model versions change, and the cost structure means that replication requires financial investment. These properties require new norms for documentation and disclosure — see <a href="appendix-ai-disclosure.html" class="quarto-xref"><span>Chapter 16</span></a>.</p>
+<p>There is also a cost-based access inequality shaping who can use these tools for research. GPT-4-class models cost orders of magnitude more per token than GPT-3.5-class models, creating a tier system where well-funded labs can afford the most capable models while under-resourced researchers are limited to cheaper, less capable alternatives. Open-weight models like LLaMA, Mistral, and Qwen represent a partial counterbalance — their weights are freely available for download and local inference. But running these models requires significant GPU infrastructure, creating a different kind of barrier rooted in compute rather than API fees. The result is a landscape where access to the most capable AI tools is stratified by institutional resources, raising questions about whose research questions get answered and whose analytical methods are considered state-of-the-art.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Public Interest Connection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The cost structure of LLM APIs creates a form of <strong>oversight</strong> asymmetry (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>). Well-resourced organizations can afford to run large-scale analyses that smaller teams cannot replicate or verify. Open-weight models and transparent pricing help, but the fundamental tension between capability and accessibility remains unresolved.</p>
+</div>
+</div>
+</section>
+<section id="common-issues-to-debug" class="level2" data-number="13.11">
+<h2 data-number="13.11" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">13.11</span> Common Issues to Debug</h2>
+<ul>
+<li><strong>API key exposure</strong>: Use environment variables. Never commit keys to version control.</li>
+<li><strong>Rate limiting and costs</strong>: Estimate costs before large batch runs. Use <code>gpt-4o-mini</code> for development, <code>gpt-4o</code> for production.</li>
+<li><strong>JSON parsing failures</strong>: When requesting structured output, the model may not follow your format exactly. Use <code>try/except</code> around JSON parsing.</li>
+<li><strong>Model version changes</strong>: Pin your model version in code. Document which model you used in your methods section.</li>
+</ul>
+</section>
+<section id="key-takeaways" class="level2" data-number="13.12">
+<h2 data-number="13.12" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">13.12</span> Key Takeaways</h2>
+<p>LLM APIs are powerful tools for processing web data, but they require careful handling: non-determinism, cost, and reproducibility challenges are real. Use them for tasks where their strengths — scale, multilingual capability, structured extraction — outweigh their weaknesses. Always validate outputs against manual inspection. And treat the API like any other: read the documentation, manage your keys, and parse your responses carefully.</p>
+</section>
+<section id="further-reading" class="level2" data-number="13.13">
+<h2 data-number="13.13" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">13.13</span> Further Reading</h2>
+<ul>
+<li>OpenAI API documentation: <a href="https://platform.openai.com/docs/" class="uri">https://platform.openai.com/docs/</a></li>
+<li>Anthropic API documentation: <a href="https://docs.anthropic.com/" class="uri">https://docs.anthropic.com/</a></li>
+<li><span class="citation" data-cites="ziems2024can">@ziems2024can</span> — LLMs and computational social science</li>
+</ul>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./ch-12-social.html" class="pagination-link" aria-label="Social and Media Platform APIs">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Social and Media Platform APIs</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./ch-14-automation.html" class="pagination-link" aria-label="Automating Data Collection">
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Automating Data Collection</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu"># AI and Language Model APIs {#sec-ai-apis}</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3"></a>::: {.callout-tip}</span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="fu">## Learning Objectives</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="ss">- </span>Set up authenticated access to LLM APIs (OpenAI, Anthropic)</span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="ss">- </span>Construct chat completion requests with system, user, and assistant roles</span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="ss">- </span>Use few-shot prompting and structured output to extract data from unstructured text</span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="ss">- </span>Compute text embeddings for document similarity and clustering</span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="ss">- </span>Assess the costs, reproducibility challenges, and appropriate uses of LLMs in research</span>
+<span id="cb13-10"><a href="#cb13-10"></a>:::</span>
+<span id="cb13-11"><a href="#cb13-11"></a></span>
+<span id="cb13-12"><a href="#cb13-12"></a><span class="fu">## LLMs as Web Data Science Tools</span></span>
+<span id="cb13-13"><a href="#cb13-13"></a></span>
+<span id="cb13-14"><a href="#cb13-14"></a>Large language model APIs represent a fundamentally new category of tool for web data science. They can transform the unstructured text outputs of Chapters 6–9 (scraped web pages, PDF extractions, archived documents) into structured, analyzable data — performing tasks like sentiment analysis, entity extraction, content coding, and summarization at scale.</span>
+<span id="cb13-15"><a href="#cb13-15"></a></span>
+<span id="cb13-16"><a href="#cb13-16"></a>This chapter treats LLMs as another API to learn: the same patterns of authentication, request construction, and response parsing apply. But LLMs have distinctive properties — non-determinism, cost, and limited reproducibility — that require careful handling.</span>
+<span id="cb13-17"><a href="#cb13-17"></a></span>
+<span id="cb13-18"><a href="#cb13-18"></a><span class="fu">## The OpenAI API</span></span>
+<span id="cb13-19"><a href="#cb13-19"></a></span>
+<span id="cb13-20"><a href="#cb13-20"></a><span class="in">```python</span></span>
+<span id="cb13-21"><a href="#cb13-21"></a><span class="co"># Install: pip install openai</span></span>
+<span id="cb13-22"><a href="#cb13-22"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
+<span id="cb13-23"><a href="#cb13-23"></a></span>
+<span id="cb13-24"><a href="#cb13-24"></a><span class="co"># Store your key securely (see Missing Manual Ch. 29)</span></span>
+<span id="cb13-25"><a href="#cb13-25"></a><span class="im">import</span> os</span>
+<span id="cb13-26"><a href="#cb13-26"></a>client <span class="op">=</span> OpenAI(api_key<span class="op">=</span>os.environ.get(<span class="st">"OPENAI_API_KEY"</span>))</span>
+<span id="cb13-27"><a href="#cb13-27"></a><span class="in">```</span></span>
+<span id="cb13-28"><a href="#cb13-28"></a></span>
+<span id="cb13-29"><a href="#cb13-29"></a><span class="fu">### Basic Chat Completion</span></span>
+<span id="cb13-30"><a href="#cb13-30"></a></span>
+<span id="cb13-31"><a href="#cb13-31"></a><span class="in">```python</span></span>
+<span id="cb13-32"><a href="#cb13-32"></a>response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb13-33"><a href="#cb13-33"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb13-34"><a href="#cb13-34"></a>    messages<span class="op">=</span>[</span>
+<span id="cb13-35"><a href="#cb13-35"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"You are a helpful assistant."</span>},</span>
+<span id="cb13-36"><a href="#cb13-36"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"What is web scraping in one sentence?"</span>}</span>
+<span id="cb13-37"><a href="#cb13-37"></a>    ]</span>
+<span id="cb13-38"><a href="#cb13-38"></a>)</span>
+<span id="cb13-39"><a href="#cb13-39"></a></span>
+<span id="cb13-40"><a href="#cb13-40"></a><span class="co"># Extract the response text</span></span>
+<span id="cb13-41"><a href="#cb13-41"></a>answer <span class="op">=</span> response.choices[<span class="dv">0</span>].message.content</span>
+<span id="cb13-42"><a href="#cb13-42"></a><span class="bu">print</span>(answer)</span>
+<span id="cb13-43"><a href="#cb13-43"></a><span class="in">```</span></span>
+<span id="cb13-44"><a href="#cb13-44"></a></span>
+<span id="cb13-45"><a href="#cb13-45"></a><span class="fu">### Customizing Roles</span></span>
+<span id="cb13-46"><a href="#cb13-46"></a></span>
+<span id="cb13-47"><a href="#cb13-47"></a>The <span class="in">`system`</span> message sets the assistant's behavior. The <span class="in">`user`</span> message is your input. The <span class="in">`assistant`</span> message lets you simulate prior conversation turns:</span>
+<span id="cb13-48"><a href="#cb13-48"></a></span>
+<span id="cb13-49"><a href="#cb13-49"></a><span class="in">```python</span></span>
+<span id="cb13-50"><a href="#cb13-50"></a>response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb13-51"><a href="#cb13-51"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb13-52"><a href="#cb13-52"></a>    messages<span class="op">=</span>[</span>
+<span id="cb13-53"><a href="#cb13-53"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"You are a legislative analyst specializing in Colorado state policy."</span>},</span>
+<span id="cb13-54"><a href="#cb13-54"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Summarize the key provisions of this bill in three bullet points."</span>},</span>
+<span id="cb13-55"><a href="#cb13-55"></a>        {<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: <span class="st">"I'd be happy to analyze that bill. Could you share the text?"</span>},</span>
+<span id="cb13-56"><a href="#cb13-56"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: bill_text}  <span class="co"># Variable containing bill text</span></span>
+<span id="cb13-57"><a href="#cb13-57"></a>    ]</span>
+<span id="cb13-58"><a href="#cb13-58"></a>)</span>
+<span id="cb13-59"><a href="#cb13-59"></a><span class="in">```</span></span>
+<span id="cb13-60"><a href="#cb13-60"></a></span>
+<span id="cb13-61"><a href="#cb13-61"></a><span class="fu">### Structured Output and Few-Shot Prompting</span></span>
+<span id="cb13-62"><a href="#cb13-62"></a></span>
+<span id="cb13-63"><a href="#cb13-63"></a>For research applications, you typically want structured data, not free text. Use few-shot prompting — providing examples of the desired input-output format:</span>
+<span id="cb13-64"><a href="#cb13-64"></a></span>
+<span id="cb13-65"><a href="#cb13-65"></a><span class="in">```python</span></span>
+<span id="cb13-66"><a href="#cb13-66"></a>prompt <span class="op">=</span> <span class="st">"""Classify the following bill summary into one of these categories: </span></span>
+<span id="cb13-67"><a href="#cb13-67"></a><span class="st">education, healthcare, environment, taxation, criminal_justice, other.</span></span>
+<span id="cb13-68"><a href="#cb13-68"></a></span>
+<span id="cb13-69"><a href="#cb13-69"></a><span class="st">Examples:</span></span>
+<span id="cb13-70"><a href="#cb13-70"></a><span class="st">Summary: "Increases funding for K-12 teacher salaries across the state."</span></span>
+<span id="cb13-71"><a href="#cb13-71"></a><span class="st">Category: education</span></span>
+<span id="cb13-72"><a href="#cb13-72"></a></span>
+<span id="cb13-73"><a href="#cb13-73"></a><span class="st">Summary: "Establishes new emission standards for power plants."</span></span>
+<span id="cb13-74"><a href="#cb13-74"></a><span class="st">Category: environment</span></span>
+<span id="cb13-75"><a href="#cb13-75"></a></span>
+<span id="cb13-76"><a href="#cb13-76"></a><span class="st">Now classify:</span></span>
+<span id="cb13-77"><a href="#cb13-77"></a><span class="st">Summary: "</span><span class="sc">{bill_summary}</span><span class="st">"</span></span>
+<span id="cb13-78"><a href="#cb13-78"></a><span class="st">Category:"""</span></span>
+<span id="cb13-79"><a href="#cb13-79"></a></span>
+<span id="cb13-80"><a href="#cb13-80"></a>response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb13-81"><a href="#cb13-81"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb13-82"><a href="#cb13-82"></a>    messages<span class="op">=</span>[</span>
+<span id="cb13-83"><a href="#cb13-83"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"Respond with only the category label, nothing else."</span>},</span>
+<span id="cb13-84"><a href="#cb13-84"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt.<span class="bu">format</span>(bill_summary<span class="op">=</span>bill_summary)}</span>
+<span id="cb13-85"><a href="#cb13-85"></a>    ],</span>
+<span id="cb13-86"><a href="#cb13-86"></a>    temperature<span class="op">=</span><span class="dv">0</span>  <span class="co"># Reduce randomness for classification tasks</span></span>
+<span id="cb13-87"><a href="#cb13-87"></a>)</span>
+<span id="cb13-88"><a href="#cb13-88"></a></span>
+<span id="cb13-89"><a href="#cb13-89"></a>category <span class="op">=</span> response.choices[<span class="dv">0</span>].message.content.strip()</span>
+<span id="cb13-90"><a href="#cb13-90"></a><span class="bu">print</span>(<span class="ss">f"Category: </span><span class="sc">{</span>category<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-91"><a href="#cb13-91"></a><span class="in">```</span></span>
+<span id="cb13-92"><a href="#cb13-92"></a></span>
+<span id="cb13-93"><a href="#cb13-93"></a><span class="fu">## Text Embeddings</span></span>
+<span id="cb13-94"><a href="#cb13-94"></a></span>
+<span id="cb13-95"><a href="#cb13-95"></a>Embeddings are vector representations that encode the semantic meaning of text. You can use them to measure document similarity:</span>
+<span id="cb13-96"><a href="#cb13-96"></a></span>
+<span id="cb13-97"><a href="#cb13-97"></a><span class="in">```python</span></span>
+<span id="cb13-98"><a href="#cb13-98"></a><span class="kw">def</span> get_embedding(text, model<span class="op">=</span><span class="st">"text-embedding-3-small"</span>):</span>
+<span id="cb13-99"><a href="#cb13-99"></a>    <span class="co">"""Get the embedding vector for a text string."""</span></span>
+<span id="cb13-100"><a href="#cb13-100"></a>    response <span class="op">=</span> client.embeddings.create(<span class="bu">input</span><span class="op">=</span>text, model<span class="op">=</span>model)</span>
+<span id="cb13-101"><a href="#cb13-101"></a>    <span class="cf">return</span> response.data[<span class="dv">0</span>].embedding</span>
+<span id="cb13-102"><a href="#cb13-102"></a></span>
+<span id="cb13-103"><a href="#cb13-103"></a><span class="co"># Compute embeddings for bill summaries</span></span>
+<span id="cb13-104"><a href="#cb13-104"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-105"><a href="#cb13-105"></a><span class="im">from</span> scipy.spatial.distance <span class="im">import</span> cosine</span>
+<span id="cb13-106"><a href="#cb13-106"></a></span>
+<span id="cb13-107"><a href="#cb13-107"></a>bill_summaries <span class="op">=</span> [<span class="st">"Summary of bill 1..."</span>, <span class="st">"Summary of bill 2..."</span>, <span class="st">"Summary of bill 3..."</span>]</span>
+<span id="cb13-108"><a href="#cb13-108"></a>embeddings <span class="op">=</span> [get_embedding(s) <span class="cf">for</span> s <span class="kw">in</span> bill_summaries]</span>
+<span id="cb13-109"><a href="#cb13-109"></a></span>
+<span id="cb13-110"><a href="#cb13-110"></a><span class="co"># Compute pairwise similarity</span></span>
+<span id="cb13-111"><a href="#cb13-111"></a>embedding_matrix <span class="op">=</span> np.array(embeddings)</span>
+<span id="cb13-112"><a href="#cb13-112"></a>n <span class="op">=</span> <span class="bu">len</span>(bill_summaries)</span>
+<span id="cb13-113"><a href="#cb13-113"></a>similarity_matrix <span class="op">=</span> np.zeros((n, n))</span>
+<span id="cb13-114"><a href="#cb13-114"></a></span>
+<span id="cb13-115"><a href="#cb13-115"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb13-116"><a href="#cb13-116"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb13-117"><a href="#cb13-117"></a>        similarity_matrix[i][j] <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> cosine(embedding_matrix[i], embedding_matrix[j])</span>
+<span id="cb13-118"><a href="#cb13-118"></a></span>
+<span id="cb13-119"><a href="#cb13-119"></a><span class="co"># Visualize as a heatmap</span></span>
+<span id="cb13-120"><a href="#cb13-120"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb13-121"><a href="#cb13-121"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb13-122"><a href="#cb13-122"></a></span>
+<span id="cb13-123"><a href="#cb13-123"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">5</span>))</span>
+<span id="cb13-124"><a href="#cb13-124"></a>sns.heatmap(similarity_matrix, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, cmap<span class="op">=</span><span class="st">"YlOrRd"</span>,</span>
+<span id="cb13-125"><a href="#cb13-125"></a>            xticklabels<span class="op">=</span><span class="bu">range</span>(<span class="dv">1</span>, n<span class="op">+</span><span class="dv">1</span>), yticklabels<span class="op">=</span><span class="bu">range</span>(<span class="dv">1</span>, n<span class="op">+</span><span class="dv">1</span>))</span>
+<span id="cb13-126"><a href="#cb13-126"></a>plt.title(<span class="st">"Bill Summary Similarity (Cosine)"</span>)</span>
+<span id="cb13-127"><a href="#cb13-127"></a>plt.tight_layout()</span>
+<span id="cb13-128"><a href="#cb13-128"></a>plt.show()</span>
+<span id="cb13-129"><a href="#cb13-129"></a><span class="in">```</span></span>
+<span id="cb13-130"><a href="#cb13-130"></a></span>
+<span id="cb13-131"><a href="#cb13-131"></a></span>
+<span id="cb13-132"><a href="#cb13-132"></a><span class="fu">## Applied Example: Legislative Bill Analysis</span></span>
+<span id="cb13-133"><a href="#cb13-133"></a></span>
+<span id="cb13-134"><a href="#cb13-134"></a>Let us apply these tools to a concrete web data science task. Suppose you have scraped bill summaries from the Colorado General Assembly website (building on the scraping techniques from @sec-static-pages). You want to classify each bill by policy area, extract the key stakeholders mentioned, and measure how similar bills are to each other.</span>
+<span id="cb13-135"><a href="#cb13-135"></a></span>
+<span id="cb13-136"><a href="#cb13-136"></a><span class="fu">### Step 1: Classifying Bills</span></span>
+<span id="cb13-137"><a href="#cb13-137"></a></span>
+<span id="cb13-138"><a href="#cb13-138"></a><span class="in">```python</span></span>
+<span id="cb13-139"><a href="#cb13-139"></a><span class="kw">def</span> classify_bill(summary, client):</span>
+<span id="cb13-140"><a href="#cb13-140"></a>    <span class="co">"""Classify a bill summary into a policy category.</span></span>
+<span id="cb13-141"><a href="#cb13-141"></a><span class="co">    </span></span>
+<span id="cb13-142"><a href="#cb13-142"></a><span class="co">    Parameters</span></span>
+<span id="cb13-143"><a href="#cb13-143"></a><span class="co">    ----------</span></span>
+<span id="cb13-144"><a href="#cb13-144"></a><span class="co">    summary : str</span></span>
+<span id="cb13-145"><a href="#cb13-145"></a><span class="co">        The text of the bill summary</span></span>
+<span id="cb13-146"><a href="#cb13-146"></a><span class="co">    client : OpenAI</span></span>
+<span id="cb13-147"><a href="#cb13-147"></a><span class="co">        An authenticated OpenAI client</span></span>
+<span id="cb13-148"><a href="#cb13-148"></a><span class="co">    </span></span>
+<span id="cb13-149"><a href="#cb13-149"></a><span class="co">    Returns</span></span>
+<span id="cb13-150"><a href="#cb13-150"></a><span class="co">    -------</span></span>
+<span id="cb13-151"><a href="#cb13-151"></a><span class="co">    str</span></span>
+<span id="cb13-152"><a href="#cb13-152"></a><span class="co">        The policy category</span></span>
+<span id="cb13-153"><a href="#cb13-153"></a><span class="co">    """</span></span>
+<span id="cb13-154"><a href="#cb13-154"></a>    response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb13-155"><a href="#cb13-155"></a>        model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb13-156"><a href="#cb13-156"></a>        messages<span class="op">=</span>[</span>
+<span id="cb13-157"><a href="#cb13-157"></a>            {</span>
+<span id="cb13-158"><a href="#cb13-158"></a>                <span class="st">"role"</span>: <span class="st">"system"</span>,</span>
+<span id="cb13-159"><a href="#cb13-159"></a>                <span class="st">"content"</span>: (</span>
+<span id="cb13-160"><a href="#cb13-160"></a>                    <span class="st">"You are a legislative analyst. Classify bill summaries into "</span></span>
+<span id="cb13-161"><a href="#cb13-161"></a>                    <span class="st">"exactly one category: education, healthcare, environment, "</span></span>
+<span id="cb13-162"><a href="#cb13-162"></a>                    <span class="st">"taxation, criminal_justice, transportation, housing, labor, "</span></span>
+<span id="cb13-163"><a href="#cb13-163"></a>                    <span class="st">"technology, or other. Respond with only the category label."</span></span>
+<span id="cb13-164"><a href="#cb13-164"></a>                )</span>
+<span id="cb13-165"><a href="#cb13-165"></a>            },</span>
+<span id="cb13-166"><a href="#cb13-166"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: summary}</span>
+<span id="cb13-167"><a href="#cb13-167"></a>        ],</span>
+<span id="cb13-168"><a href="#cb13-168"></a>        temperature<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb13-169"><a href="#cb13-169"></a>    )</span>
+<span id="cb13-170"><a href="#cb13-170"></a>    <span class="cf">return</span> response.choices[<span class="dv">0</span>].message.content.strip().lower()</span>
+<span id="cb13-171"><a href="#cb13-171"></a></span>
+<span id="cb13-172"><a href="#cb13-172"></a><span class="co"># Apply across a list of bills</span></span>
+<span id="cb13-173"><a href="#cb13-173"></a>bills <span class="op">=</span> [</span>
+<span id="cb13-174"><a href="#cb13-174"></a>    {<span class="st">"id"</span>: <span class="st">"HB24-1001"</span>, <span class="st">"summary"</span>: <span class="st">"Increases funding for K-12 teacher salaries..."</span>},</span>
+<span id="cb13-175"><a href="#cb13-175"></a>    {<span class="st">"id"</span>: <span class="st">"HB24-1042"</span>, <span class="st">"summary"</span>: <span class="st">"Establishes new emission standards for power plants..."</span>},</span>
+<span id="cb13-176"><a href="#cb13-176"></a>    {<span class="st">"id"</span>: <span class="st">"SB24-087"</span>, <span class="st">"summary"</span>: <span class="st">"Requires health insurers to cover annual mental health..."</span>},</span>
+<span id="cb13-177"><a href="#cb13-177"></a>]</span>
+<span id="cb13-178"><a href="#cb13-178"></a></span>
+<span id="cb13-179"><a href="#cb13-179"></a><span class="cf">for</span> bill <span class="kw">in</span> bills:</span>
+<span id="cb13-180"><a href="#cb13-180"></a>    bill[<span class="st">"category"</span>] <span class="op">=</span> classify_bill(bill[<span class="st">"summary"</span>], client)</span>
+<span id="cb13-181"><a href="#cb13-181"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>bill[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>bill[<span class="st">'category'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-182"><a href="#cb13-182"></a></span>
+<span id="cb13-183"><a href="#cb13-183"></a><span class="im">import</span> time</span>
+<span id="cb13-184"><a href="#cb13-184"></a>time.sleep(<span class="dv">1</span>)  <span class="co"># Rate limit between API calls</span></span>
+<span id="cb13-185"><a href="#cb13-185"></a><span class="in">```</span></span>
+<span id="cb13-186"><a href="#cb13-186"></a></span>
+<span id="cb13-187"><a href="#cb13-187"></a><span class="fu">### Step 2: Extracting Structured Information</span></span>
+<span id="cb13-188"><a href="#cb13-188"></a></span>
+<span id="cb13-189"><a href="#cb13-189"></a>You can use few-shot prompting to extract multiple fields at once:</span>
+<span id="cb13-190"><a href="#cb13-190"></a></span>
+<span id="cb13-191"><a href="#cb13-191"></a><span class="in">```python</span></span>
+<span id="cb13-192"><a href="#cb13-192"></a><span class="im">import</span> json</span>
+<span id="cb13-193"><a href="#cb13-193"></a></span>
+<span id="cb13-194"><a href="#cb13-194"></a>extraction_prompt <span class="op">=</span> <span class="st">"""Extract the following fields from this bill summary as JSON:</span></span>
+<span id="cb13-195"><a href="#cb13-195"></a><span class="st">- primary_topic: one phrase describing the main topic</span></span>
+<span id="cb13-196"><a href="#cb13-196"></a><span class="st">- stakeholders: list of groups affected</span></span>
+<span id="cb13-197"><a href="#cb13-197"></a><span class="st">- fiscal_impact: "yes", "no", or "unclear"</span></span>
+<span id="cb13-198"><a href="#cb13-198"></a><span class="st">- geographic_scope: "statewide", "local", or "specific_region"</span></span>
+<span id="cb13-199"><a href="#cb13-199"></a></span>
+<span id="cb13-200"><a href="#cb13-200"></a><span class="st">Example input: "Requires all school districts to provide free breakfast and lunch to students."</span></span>
+<span id="cb13-201"><a href="#cb13-201"></a><span class="st">Example output: </span><span class="sc">{{</span><span class="st">"primary_topic": "school meals", "stakeholders": ["students", "school districts", "food service workers"], "fiscal_impact": "yes", "geographic_scope": "statewide"</span><span class="sc">}}</span></span>
+<span id="cb13-202"><a href="#cb13-202"></a></span>
+<span id="cb13-203"><a href="#cb13-203"></a><span class="st">Now extract from: "</span><span class="sc">{summary}</span><span class="st">"</span></span>
+<span id="cb13-204"><a href="#cb13-204"></a><span class="st">"""</span></span>
+<span id="cb13-205"><a href="#cb13-205"></a></span>
+<span id="cb13-206"><a href="#cb13-206"></a>response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb13-207"><a href="#cb13-207"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb13-208"><a href="#cb13-208"></a>    messages<span class="op">=</span>[</span>
+<span id="cb13-209"><a href="#cb13-209"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"Respond with valid JSON only. No markdown formatting."</span>},</span>
+<span id="cb13-210"><a href="#cb13-210"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: extraction_prompt.<span class="bu">format</span>(summary<span class="op">=</span>bills[<span class="dv">0</span>][<span class="st">"summary"</span>])}</span>
+<span id="cb13-211"><a href="#cb13-211"></a>    ],</span>
+<span id="cb13-212"><a href="#cb13-212"></a>    temperature<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb13-213"><a href="#cb13-213"></a>)</span>
+<span id="cb13-214"><a href="#cb13-214"></a></span>
+<span id="cb13-215"><a href="#cb13-215"></a><span class="cf">try</span>:</span>
+<span id="cb13-216"><a href="#cb13-216"></a>    extracted <span class="op">=</span> json.loads(response.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb13-217"><a href="#cb13-217"></a>    <span class="bu">print</span>(json.dumps(extracted, indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb13-218"><a href="#cb13-218"></a><span class="cf">except</span> json.JSONDecodeError:</span>
+<span id="cb13-219"><a href="#cb13-219"></a>    <span class="bu">print</span>(<span class="st">"Failed to parse response as JSON"</span>)</span>
+<span id="cb13-220"><a href="#cb13-220"></a>    <span class="bu">print</span>(response.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb13-221"><a href="#cb13-221"></a><span class="in">```</span></span>
+<span id="cb13-222"><a href="#cb13-222"></a></span>
+<span id="cb13-223"><a href="#cb13-223"></a><span class="fu">### Step 3: Measuring Similarity with Embeddings</span></span>
+<span id="cb13-224"><a href="#cb13-224"></a></span>
+<span id="cb13-225"><a href="#cb13-225"></a>Embeddings let you move beyond keyword matching to semantic similarity. Two bills about "school funding" and "educational resource allocation" would have low keyword overlap but high embedding similarity:</span>
+<span id="cb13-226"><a href="#cb13-226"></a></span>
+<span id="cb13-227"><a href="#cb13-227"></a><span class="in">```python</span></span>
+<span id="cb13-228"><a href="#cb13-228"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-229"><a href="#cb13-229"></a><span class="im">from</span> scipy.spatial.distance <span class="im">import</span> cosine</span>
+<span id="cb13-230"><a href="#cb13-230"></a></span>
+<span id="cb13-231"><a href="#cb13-231"></a><span class="kw">def</span> get_embeddings(texts, client, model<span class="op">=</span><span class="st">"text-embedding-3-small"</span>):</span>
+<span id="cb13-232"><a href="#cb13-232"></a>    <span class="co">"""Get embedding vectors for a list of texts."""</span></span>
+<span id="cb13-233"><a href="#cb13-233"></a>    embeddings <span class="op">=</span> []</span>
+<span id="cb13-234"><a href="#cb13-234"></a>    <span class="cf">for</span> text <span class="kw">in</span> texts:</span>
+<span id="cb13-235"><a href="#cb13-235"></a>        response <span class="op">=</span> client.embeddings.create(<span class="bu">input</span><span class="op">=</span>text, model<span class="op">=</span>model)</span>
+<span id="cb13-236"><a href="#cb13-236"></a>        embeddings.append(response.data[<span class="dv">0</span>].embedding)</span>
+<span id="cb13-237"><a href="#cb13-237"></a>        time.sleep(<span class="fl">0.5</span>)  <span class="co"># Rate limit</span></span>
+<span id="cb13-238"><a href="#cb13-238"></a>    <span class="cf">return</span> np.array(embeddings)</span>
+<span id="cb13-239"><a href="#cb13-239"></a></span>
+<span id="cb13-240"><a href="#cb13-240"></a><span class="co"># Get embeddings for all bill summaries</span></span>
+<span id="cb13-241"><a href="#cb13-241"></a>summaries <span class="op">=</span> [b[<span class="st">"summary"</span>] <span class="cf">for</span> b <span class="kw">in</span> bills]</span>
+<span id="cb13-242"><a href="#cb13-242"></a>embedding_matrix <span class="op">=</span> get_embeddings(summaries, client)</span>
+<span id="cb13-243"><a href="#cb13-243"></a></span>
+<span id="cb13-244"><a href="#cb13-244"></a><span class="co"># Compute pairwise cosine similarity</span></span>
+<span id="cb13-245"><a href="#cb13-245"></a>n <span class="op">=</span> <span class="bu">len</span>(summaries)</span>
+<span id="cb13-246"><a href="#cb13-246"></a>similarity <span class="op">=</span> np.zeros((n, n))</span>
+<span id="cb13-247"><a href="#cb13-247"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb13-248"><a href="#cb13-248"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb13-249"><a href="#cb13-249"></a>        similarity[i][j] <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> cosine(embedding_matrix[i], embedding_matrix[j])</span>
+<span id="cb13-250"><a href="#cb13-250"></a></span>
+<span id="cb13-251"><a href="#cb13-251"></a><span class="co"># Visualize</span></span>
+<span id="cb13-252"><a href="#cb13-252"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb13-253"><a href="#cb13-253"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb13-254"><a href="#cb13-254"></a></span>
+<span id="cb13-255"><a href="#cb13-255"></a>labels <span class="op">=</span> [b[<span class="st">"id"</span>] <span class="cf">for</span> b <span class="kw">in</span> bills]</span>
+<span id="cb13-256"><a href="#cb13-256"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb13-257"><a href="#cb13-257"></a>sns.heatmap(similarity, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, cmap<span class="op">=</span><span class="st">"YlOrRd"</span>,</span>
+<span id="cb13-258"><a href="#cb13-258"></a>            xticklabels<span class="op">=</span>labels, yticklabels<span class="op">=</span>labels)</span>
+<span id="cb13-259"><a href="#cb13-259"></a>plt.title(<span class="st">"Bill Summary Similarity (Cosine Distance of Embeddings)"</span>)</span>
+<span id="cb13-260"><a href="#cb13-260"></a>plt.tight_layout()</span>
+<span id="cb13-261"><a href="#cb13-261"></a>plt.show()</span>
+<span id="cb13-262"><a href="#cb13-262"></a><span class="in">```</span></span>
+<span id="cb13-263"><a href="#cb13-263"></a></span>
+<span id="cb13-264"><a href="#cb13-264"></a><span class="fu">## Fine-Tuning for Domain-Specific Tasks</span></span>
+<span id="cb13-265"><a href="#cb13-265"></a></span>
+<span id="cb13-266"><a href="#cb13-266"></a>Sometimes a general model does not produce consistent results for your specific task. Fine-tuning lets you train the model on your own examples:</span>
+<span id="cb13-267"><a href="#cb13-267"></a></span>
+<span id="cb13-268"><a href="#cb13-268"></a><span class="in">```python</span></span>
+<span id="cb13-269"><a href="#cb13-269"></a><span class="co"># Prepare training data in JSONL format</span></span>
+<span id="cb13-270"><a href="#cb13-270"></a><span class="co"># Each line is a complete conversation demonstrating the desired behavior</span></span>
+<span id="cb13-271"><a href="#cb13-271"></a>training_data <span class="op">=</span> [</span>
+<span id="cb13-272"><a href="#cb13-272"></a>    {</span>
+<span id="cb13-273"><a href="#cb13-273"></a>        <span class="st">"messages"</span>: [</span>
+<span id="cb13-274"><a href="#cb13-274"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"Classify Colorado bill summaries by policy area."</span>},</span>
+<span id="cb13-275"><a href="#cb13-275"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Increases the minimum wage to $15/hour by 2026."</span>},</span>
+<span id="cb13-276"><a href="#cb13-276"></a>            {<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: <span class="st">"labor"</span>}</span>
+<span id="cb13-277"><a href="#cb13-277"></a>        ]</span>
+<span id="cb13-278"><a href="#cb13-278"></a>    },</span>
+<span id="cb13-279"><a href="#cb13-279"></a>    {</span>
+<span id="cb13-280"><a href="#cb13-280"></a>        <span class="st">"messages"</span>: [</span>
+<span id="cb13-281"><a href="#cb13-281"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"Classify Colorado bill summaries by policy area."</span>},</span>
+<span id="cb13-282"><a href="#cb13-282"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Requires electric vehicle charging at new buildings."</span>},</span>
+<span id="cb13-283"><a href="#cb13-283"></a>            {<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: <span class="st">"environment"</span>}</span>
+<span id="cb13-284"><a href="#cb13-284"></a>        ]</span>
+<span id="cb13-285"><a href="#cb13-285"></a>    },</span>
+<span id="cb13-286"><a href="#cb13-286"></a>    <span class="co"># ... at least 10 examples, ideally 50+</span></span>
+<span id="cb13-287"><a href="#cb13-287"></a>]</span>
+<span id="cb13-288"><a href="#cb13-288"></a></span>
+<span id="cb13-289"><a href="#cb13-289"></a><span class="co"># Save to JSONL file</span></span>
+<span id="cb13-290"><a href="#cb13-290"></a><span class="im">import</span> json</span>
+<span id="cb13-291"><a href="#cb13-291"></a></span>
+<span id="cb13-292"><a href="#cb13-292"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"training_data.jsonl"</span>, <span class="st">"w"</span>) <span class="im">as</span> f:</span>
+<span id="cb13-293"><a href="#cb13-293"></a>    <span class="cf">for</span> example <span class="kw">in</span> training_data:</span>
+<span id="cb13-294"><a href="#cb13-294"></a>        f.write(json.dumps(example) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb13-295"><a href="#cb13-295"></a></span>
+<span id="cb13-296"><a href="#cb13-296"></a><span class="co"># Upload the training file</span></span>
+<span id="cb13-297"><a href="#cb13-297"></a>training_file <span class="op">=</span> client.files.create(</span>
+<span id="cb13-298"><a href="#cb13-298"></a>    <span class="bu">file</span><span class="op">=</span><span class="bu">open</span>(<span class="st">"training_data.jsonl"</span>, <span class="st">"rb"</span>),</span>
+<span id="cb13-299"><a href="#cb13-299"></a>    purpose<span class="op">=</span><span class="st">"fine-tune"</span></span>
+<span id="cb13-300"><a href="#cb13-300"></a>)</span>
+<span id="cb13-301"><a href="#cb13-301"></a></span>
+<span id="cb13-302"><a href="#cb13-302"></a><span class="co"># Start a fine-tuning job</span></span>
+<span id="cb13-303"><a href="#cb13-303"></a>job <span class="op">=</span> client.fine_tuning.jobs.create(</span>
+<span id="cb13-304"><a href="#cb13-304"></a>    training_file<span class="op">=</span>training_file.<span class="bu">id</span>,</span>
+<span id="cb13-305"><a href="#cb13-305"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini-2024-07-18"</span></span>
+<span id="cb13-306"><a href="#cb13-306"></a>)</span>
+<span id="cb13-307"><a href="#cb13-307"></a></span>
+<span id="cb13-308"><a href="#cb13-308"></a><span class="bu">print</span>(<span class="ss">f"Fine-tuning job started: </span><span class="sc">{</span>job<span class="sc">.</span><span class="bu">id</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-309"><a href="#cb13-309"></a><span class="bu">print</span>(<span class="ss">f"Status: </span><span class="sc">{</span>job<span class="sc">.</span>status<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-310"><a href="#cb13-310"></a><span class="in">```</span></span>
+<span id="cb13-311"><a href="#cb13-311"></a></span>
+<span id="cb13-312"><a href="#cb13-312"></a>Fine-tuning takes time (minutes to hours depending on dataset size). You can check the status periodically and then use the fine-tuned model by specifying its ID in place of the base model name.</span>
+<span id="cb13-313"><a href="#cb13-313"></a></span>
+<span id="cb13-314"><a href="#cb13-314"></a><span class="fu">## Cost Management</span></span>
+<span id="cb13-315"><a href="#cb13-315"></a></span>
+<span id="cb13-316"><a href="#cb13-316"></a>LLM API calls cost money. Before running a large batch, estimate the cost:</span>
+<span id="cb13-317"><a href="#cb13-317"></a></span>
+<span id="cb13-318"><a href="#cb13-318"></a><span class="in">```python</span></span>
+<span id="cb13-319"><a href="#cb13-319"></a><span class="co"># Rough cost estimation for GPT-4o-mini</span></span>
+<span id="cb13-320"><a href="#cb13-320"></a><span class="co"># Input: ~$0.15 per 1M tokens; Output: ~$0.60 per 1M tokens</span></span>
+<span id="cb13-321"><a href="#cb13-321"></a><span class="co"># A typical bill summary is ~200 tokens; a classification response is ~5 tokens</span></span>
+<span id="cb13-322"><a href="#cb13-322"></a></span>
+<span id="cb13-323"><a href="#cb13-323"></a>num_bills <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb13-324"><a href="#cb13-324"></a>input_tokens <span class="op">=</span> num_bills <span class="op">*</span> <span class="dv">200</span></span>
+<span id="cb13-325"><a href="#cb13-325"></a>output_tokens <span class="op">=</span> num_bills <span class="op">*</span> <span class="dv">5</span></span>
+<span id="cb13-326"><a href="#cb13-326"></a></span>
+<span id="cb13-327"><a href="#cb13-327"></a>estimated_cost <span class="op">=</span> (input_tokens <span class="op">*</span> <span class="fl">0.15</span> <span class="op">/</span> <span class="dv">1_000_000</span>) <span class="op">+</span> (output_tokens <span class="op">*</span> <span class="fl">0.60</span> <span class="op">/</span> <span class="dv">1_000_000</span>)</span>
+<span id="cb13-328"><a href="#cb13-328"></a><span class="bu">print</span>(<span class="ss">f"Estimated cost for classifying </span><span class="sc">{</span>num_bills<span class="sc">}</span><span class="ss"> bills: $</span><span class="sc">{</span>estimated_cost<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb13-329"><a href="#cb13-329"></a><span class="co"># Typically a few cents for small jobs, but can add up with larger models</span></span>
+<span id="cb13-330"><a href="#cb13-330"></a><span class="in">```</span></span>
+<span id="cb13-331"><a href="#cb13-331"></a></span>
+<span id="cb13-332"><a href="#cb13-332"></a>Use <span class="in">`gpt-4o-mini`</span> for development and testing. Switch to <span class="in">`gpt-4o`</span> only when you need higher quality and have validated your prompts on a smaller sample.</span>
+<span id="cb13-333"><a href="#cb13-333"></a></span>
+<span id="cb13-334"><a href="#cb13-334"></a><span class="fu">## Reproducibility and Documentation</span></span>
+<span id="cb13-335"><a href="#cb13-335"></a></span>
+<span id="cb13-336"><a href="#cb13-336"></a>LLM-based research faces reproducibility challenges that are fundamentally different from those of traditional computational methods. When you write a Python script to parse HTML, anyone with the same input file will get the same output. LLMs break this guarantee in multiple ways. Even with <span class="in">`temperature=0`</span>, model outputs can vary slightly between calls due to floating-point non-determinism in the inference process. More significantly, model versions change over time: a prompt that works reliably with GPT-4 in early 2024 may produce different results with the same model name in late 2024, because the underlying weights have been updated. And when a model is deprecated entirely — as GPT-3.5 eventually will be — exact replication becomes impossible. These properties do not disqualify LLMs as research tools, but they demand a level of documentation that most researchers are not yet accustomed to providing.</span>
+<span id="cb13-337"><a href="#cb13-337"></a></span>
+<span id="cb13-338"><a href="#cb13-338"></a>At a minimum, every research project that uses LLM APIs should record the following for each API call: the exact model name and version (e.g., <span class="in">`gpt-4o-mini-2024-07-18`</span>, not just <span class="in">`gpt-4o-mini`</span>), the complete prompt text including the system message, all generation parameters (<span class="in">`temperature`</span>, <span class="in">`max_tokens`</span>, <span class="in">`top_p`</span>, <span class="in">`frequency_penalty`</span>), the date and time of the API call, and any post-processing or validation steps applied to the output. Store this metadata alongside your results, not in a methods section written months later from memory. A simple practice is to log each API call to a JSONL file that includes both the request parameters and the full response object — this creates an audit trail that supports both reproducibility and debugging.</span>
+<span id="cb13-339"><a href="#cb13-339"></a></span>
+<span id="cb13-340"><a href="#cb13-340"></a>This documentation burden connects to the broader norms of scientific reproducibility discussed in @sec-appendix-ai-disclosure. The AI disclosure framework presented there provides a structured template for reporting LLM use in research. The core principle is transparency: another researcher should be able to read your methods section and understand exactly what model, prompt, and parameters produced your results — even if they cannot reproduce them identically, they should be able to reproduce them approximately and assess whether the differences are meaningful. Treating LLM documentation as a first-class methodological concern — not an afterthought — is what separates rigorous research from ad hoc analysis.</span>
+<span id="cb13-341"><a href="#cb13-341"></a></span>
+<span id="cb13-342"><a href="#cb13-342"></a><span class="fu">## The Anthropic API</span></span>
+<span id="cb13-343"><a href="#cb13-343"></a></span>
+<span id="cb13-344"><a href="#cb13-344"></a>Anthropic's Claude provides an alternative LLM API with a similar interface:</span>
+<span id="cb13-345"><a href="#cb13-345"></a></span>
+<span id="cb13-346"><a href="#cb13-346"></a><span class="in">```python</span></span>
+<span id="cb13-347"><a href="#cb13-347"></a><span class="co"># Install: pip install anthropic</span></span>
+<span id="cb13-348"><a href="#cb13-348"></a><span class="im">from</span> anthropic <span class="im">import</span> Anthropic</span>
+<span id="cb13-349"><a href="#cb13-349"></a></span>
+<span id="cb13-350"><a href="#cb13-350"></a>client_anthropic <span class="op">=</span> Anthropic(api_key<span class="op">=</span>os.environ.get(<span class="st">"ANTHROPIC_API_KEY"</span>))</span>
+<span id="cb13-351"><a href="#cb13-351"></a></span>
+<span id="cb13-352"><a href="#cb13-352"></a>response <span class="op">=</span> client_anthropic.messages.create(</span>
+<span id="cb13-353"><a href="#cb13-353"></a>    model<span class="op">=</span><span class="st">"claude-sonnet-4-20250514"</span>,</span>
+<span id="cb13-354"><a href="#cb13-354"></a>    max_tokens<span class="op">=</span><span class="dv">1024</span>,</span>
+<span id="cb13-355"><a href="#cb13-355"></a>    messages<span class="op">=</span>[</span>
+<span id="cb13-356"><a href="#cb13-356"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"What is the AT Protocol in one sentence?"</span>}</span>
+<span id="cb13-357"><a href="#cb13-357"></a>    ]</span>
+<span id="cb13-358"><a href="#cb13-358"></a>)</span>
+<span id="cb13-359"><a href="#cb13-359"></a></span>
+<span id="cb13-360"><a href="#cb13-360"></a><span class="bu">print</span>(response.content[<span class="dv">0</span>].text)</span>
+<span id="cb13-361"><a href="#cb13-361"></a><span class="in">```</span></span>
+<span id="cb13-362"><a href="#cb13-362"></a></span>
+<span id="cb13-363"><a href="#cb13-363"></a><span class="fu">### Comparing Model Outputs</span></span>
+<span id="cb13-364"><a href="#cb13-364"></a></span>
+<span id="cb13-365"><a href="#cb13-365"></a>When you use LLMs for research tasks like content classification, a critical question is whether your results depend on which model you chose. The answer, almost always, is yes — and the degree of that dependence matters for the credibility of your findings. You can test this directly by sending the same prompt to both APIs and comparing their responses.</span>
+<span id="cb13-366"><a href="#cb13-366"></a></span>
+<span id="cb13-367"><a href="#cb13-367"></a><span class="in">```python</span></span>
+<span id="cb13-368"><a href="#cb13-368"></a><span class="co"># Send the same classification prompt to both models</span></span>
+<span id="cb13-369"><a href="#cb13-369"></a>bill_text <span class="op">=</span> <span class="st">"Establishes new emission standards for power plants operating in Colorado."</span></span>
+<span id="cb13-370"><a href="#cb13-370"></a></span>
+<span id="cb13-371"><a href="#cb13-371"></a>system_prompt <span class="op">=</span> (</span>
+<span id="cb13-372"><a href="#cb13-372"></a>    <span class="st">"You are a legislative analyst. Classify this bill summary into exactly one "</span></span>
+<span id="cb13-373"><a href="#cb13-373"></a>    <span class="st">"category: education, healthcare, environment, taxation, criminal_justice, "</span></span>
+<span id="cb13-374"><a href="#cb13-374"></a>    <span class="st">"transportation, housing, labor, technology, or other. "</span></span>
+<span id="cb13-375"><a href="#cb13-375"></a>    <span class="st">"Respond with only the category label."</span></span>
+<span id="cb13-376"><a href="#cb13-376"></a>)</span>
+<span id="cb13-377"><a href="#cb13-377"></a></span>
+<span id="cb13-378"><a href="#cb13-378"></a><span class="co"># OpenAI classification</span></span>
+<span id="cb13-379"><a href="#cb13-379"></a>openai_response <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb13-380"><a href="#cb13-380"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
+<span id="cb13-381"><a href="#cb13-381"></a>    messages<span class="op">=</span>[</span>
+<span id="cb13-382"><a href="#cb13-382"></a>        {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: system_prompt},</span>
+<span id="cb13-383"><a href="#cb13-383"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: bill_text}</span>
+<span id="cb13-384"><a href="#cb13-384"></a>    ],</span>
+<span id="cb13-385"><a href="#cb13-385"></a>    temperature<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb13-386"><a href="#cb13-386"></a>)</span>
+<span id="cb13-387"><a href="#cb13-387"></a>openai_label <span class="op">=</span> openai_response.choices[<span class="dv">0</span>].message.content.strip()</span>
+<span id="cb13-388"><a href="#cb13-388"></a></span>
+<span id="cb13-389"><a href="#cb13-389"></a><span class="co"># Anthropic classification</span></span>
+<span id="cb13-390"><a href="#cb13-390"></a>anthropic_response <span class="op">=</span> client_anthropic.messages.create(</span>
+<span id="cb13-391"><a href="#cb13-391"></a>    model<span class="op">=</span><span class="st">"claude-sonnet-4-20250514"</span>,</span>
+<span id="cb13-392"><a href="#cb13-392"></a>    max_tokens<span class="op">=</span><span class="dv">50</span>,</span>
+<span id="cb13-393"><a href="#cb13-393"></a>    system<span class="op">=</span>system_prompt,</span>
+<span id="cb13-394"><a href="#cb13-394"></a>    messages<span class="op">=</span>[</span>
+<span id="cb13-395"><a href="#cb13-395"></a>        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: bill_text}</span>
+<span id="cb13-396"><a href="#cb13-396"></a>    ]</span>
+<span id="cb13-397"><a href="#cb13-397"></a>)</span>
+<span id="cb13-398"><a href="#cb13-398"></a>anthropic_label <span class="op">=</span> anthropic_response.content[<span class="dv">0</span>].text.strip()</span>
+<span id="cb13-399"><a href="#cb13-399"></a></span>
+<span id="cb13-400"><a href="#cb13-400"></a><span class="bu">print</span>(<span class="ss">f"OpenAI:    </span><span class="sc">{</span>openai_label<span class="sc">}</span><span class="ss">"</span>)     <span class="co"># environment</span></span>
+<span id="cb13-401"><a href="#cb13-401"></a><span class="bu">print</span>(<span class="ss">f"Anthropic: </span><span class="sc">{</span>anthropic_label<span class="sc">}</span><span class="ss">"</span>)   <span class="co"># environment</span></span>
+<span id="cb13-402"><a href="#cb13-402"></a><span class="bu">print</span>(<span class="ss">f"Agreement: </span><span class="sc">{</span>openai_label <span class="op">==</span> anthropic_label<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-403"><a href="#cb13-403"></a><span class="in">```</span></span>
+<span id="cb13-404"><a href="#cb13-404"></a></span>
+<span id="cb13-405"><a href="#cb13-405"></a>For straightforward cases like the example above, both models will likely agree. The disagreements emerge at the boundaries — a bill about "electric vehicle incentives" might be classified as <span class="in">`environment`</span> by one model and <span class="in">`transportation`</span> or <span class="in">`taxation`</span> by the other. These boundary cases are not failures; they reflect genuine ambiguity in the classification scheme. But they mean that your results are partially an artifact of your model choice, not purely a reflection of the underlying data.</span>
+<span id="cb13-406"><a href="#cb13-406"></a></span>
+<span id="cb13-407"><a href="#cb13-407"></a>This makes validation against human judgment essential. If two state-of-the-art models disagree on 15 percent of your cases, you need to know whether one of them aligns better with how a domain expert would classify the same text. Running a cross-model comparison on a human-labeled sample is the minimum standard for any research that uses LLM-based classification. Treat the model as a measurement instrument, and like any instrument, it needs calibration.</span>
+<span id="cb13-408"><a href="#cb13-408"></a></span>
+<span id="cb13-409"><a href="#cb13-409"></a>::: {.callout-tip}</span>
+<span id="cb13-410"><a href="#cb13-410"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb13-411"><a href="#cb13-411"></a>For a deeper understanding of how language models work internally — tokens, embeddings, attention, context windows — see *Missing Manual* Chapter 30: How Language Models Work.</span>
+<span id="cb13-412"><a href="#cb13-412"></a>:::</span>
+<span id="cb13-413"><a href="#cb13-413"></a></span>
+<span id="cb13-414"><a href="#cb13-414"></a><span class="fu">## Exercises</span></span>
+<span id="cb13-415"><a href="#cb13-415"></a></span>
+<span id="cb13-416"><a href="#cb13-416"></a><span class="ss">1. </span>**Structured extraction.** Use an LLM API to extract structured metadata (topic, stakeholders, geographic scope) from a set of at least 10 web-scraped documents. Design your prompt, test it, and assess the quality of the results.</span>
+<span id="cb13-417"><a href="#cb13-417"></a></span>
+<span id="cb13-418"><a href="#cb13-418"></a><span class="ss">2. </span>**Embedding analysis.** Compute embeddings for a corpus of at least 20 related documents and use cosine similarity to identify clusters. Visualize the results. Do the clusters match your intuitive groupings?</span>
+<span id="cb13-419"><a href="#cb13-419"></a></span>
+<span id="cb13-420"><a href="#cb13-420"></a><span class="ss">3. </span>**Human-AI agreement.** Design a classification task for a set of documents. Manually classify 20 documents, then have an LLM classify the same documents. Compute the agreement rate. Where does the LLM disagree with your judgment?</span>
+<span id="cb13-421"><a href="#cb13-421"></a></span>
+<span id="cb13-422"><a href="#cb13-422"></a><span class="ss">4. </span>**Cross-model comparison.** Code 20 text samples manually according to a classification scheme of your choice. Have both GPT-4o-mini and Claude classify the same 20 samples. Compute the agreement rate between each model and your human labels, and between the two models. Where do the models disagree with each other, and what does that tell you about the task?</span>
+<span id="cb13-423"><a href="#cb13-423"></a></span>
+<span id="cb13-424"><a href="#cb13-424"></a><span class="ss">5. </span>**Hierarchical clustering.** Generate embeddings for 30 Wikipedia article titles spanning three different topic areas (10 per topic). Use <span class="in">`scipy.cluster.hierarchy`</span> to create a dendrogram. Do the embeddings cluster by topic? How does the clustering compare to your intuitive groupings?</span>
+<span id="cb13-425"><a href="#cb13-425"></a></span>
+<span id="cb13-426"><a href="#cb13-426"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb13-427"><a href="#cb13-427"></a></span>
+<span id="cb13-428"><a href="#cb13-428"></a>LLMs have accelerated the enclosure dynamics described in @sec-post-api — the enormous value of user-generated content as training data has given platforms new incentives to restrict access. At the same time, LLMs provide researchers with powerful analytical tools that can partially offset restricted data access: if you can retrieve even a small sample of text, LLMs can help you code, classify, and extract information from it at scales that would be impossible manually <span class="co">[</span><span class="ot">@ziems2024can</span><span class="co">]</span>.</span>
+<span id="cb13-429"><a href="#cb13-429"></a></span>
+<span id="cb13-430"><a href="#cb13-430"></a>The key challenge is reproducibility. LLM outputs are non-deterministic (even with <span class="in">`temperature=0`</span>, there is some variation), model versions change, and the cost structure means that replication requires financial investment. These properties require new norms for documentation and disclosure — see @sec-appendix-ai-disclosure.</span>
+<span id="cb13-431"><a href="#cb13-431"></a></span>
+<span id="cb13-432"><a href="#cb13-432"></a>There is also a cost-based access inequality shaping who can use these tools for research. GPT-4-class models cost orders of magnitude more per token than GPT-3.5-class models, creating a tier system where well-funded labs can afford the most capable models while under-resourced researchers are limited to cheaper, less capable alternatives. Open-weight models like LLaMA, Mistral, and Qwen represent a partial counterbalance — their weights are freely available for download and local inference. But running these models requires significant GPU infrastructure, creating a different kind of barrier rooted in compute rather than API fees. The result is a landscape where access to the most capable AI tools is stratified by institutional resources, raising questions about whose research questions get answered and whose analytical methods are considered state-of-the-art.</span>
+<span id="cb13-433"><a href="#cb13-433"></a></span>
+<span id="cb13-434"><a href="#cb13-434"></a>::: {.callout-note}</span>
+<span id="cb13-435"><a href="#cb13-435"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb13-436"><a href="#cb13-436"></a>The cost structure of LLM APIs creates a form of **oversight** asymmetry (@sec-post-api). Well-resourced organizations can afford to run large-scale analyses that smaller teams cannot replicate or verify. Open-weight models and transparent pricing help, but the fundamental tension between capability and accessibility remains unresolved.</span>
+<span id="cb13-437"><a href="#cb13-437"></a>:::</span>
+<span id="cb13-438"><a href="#cb13-438"></a></span>
+<span id="cb13-439"><a href="#cb13-439"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb13-440"><a href="#cb13-440"></a></span>
+<span id="cb13-441"><a href="#cb13-441"></a><span class="ss">- </span>**API key exposure**: Use environment variables. Never commit keys to version control.</span>
+<span id="cb13-442"><a href="#cb13-442"></a><span class="ss">- </span>**Rate limiting and costs**: Estimate costs before large batch runs. Use <span class="in">`gpt-4o-mini`</span> for development, <span class="in">`gpt-4o`</span> for production.</span>
+<span id="cb13-443"><a href="#cb13-443"></a><span class="ss">- </span>**JSON parsing failures**: When requesting structured output, the model may not follow your format exactly. Use <span class="in">`try/except`</span> around JSON parsing.</span>
+<span id="cb13-444"><a href="#cb13-444"></a><span class="ss">- </span>**Model version changes**: Pin your model version in code. Document which model you used in your methods section.</span>
+<span id="cb13-445"><a href="#cb13-445"></a></span>
+<span id="cb13-446"><a href="#cb13-446"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb13-447"><a href="#cb13-447"></a></span>
+<span id="cb13-448"><a href="#cb13-448"></a>LLM APIs are powerful tools for processing web data, but they require careful handling: non-determinism, cost, and reproducibility challenges are real. Use them for tasks where their strengths — scale, multilingual capability, structured extraction — outweigh their weaknesses. Always validate outputs against manual inspection. And treat the API like any other: read the documentation, manage your keys, and parse your responses carefully.</span>
+<span id="cb13-449"><a href="#cb13-449"></a></span>
+<span id="cb13-450"><a href="#cb13-450"></a><span class="fu">## Further Reading</span></span>
+<span id="cb13-451"><a href="#cb13-451"></a></span>
+<span id="cb13-452"><a href="#cb13-452"></a><span class="ss">- </span>OpenAI API documentation: <span class="ot">&lt;https://platform.openai.com/docs/&gt;</span></span>
+<span id="cb13-453"><a href="#cb13-453"></a><span class="ss">- </span>Anthropic API documentation: <span class="ot">&lt;https://docs.anthropic.com/&gt;</span></span>
+<span id="cb13-454"><a href="#cb13-454"></a><span class="ss">- </span>@ziems2024can — LLMs and computational social science</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
