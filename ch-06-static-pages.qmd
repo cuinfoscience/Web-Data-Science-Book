@@ -113,6 +113,36 @@ print(films_df.head())
 
 The `read_html` function is remarkably powerful for its simplicity, but it has limitations. It struggles with tables that use `colspan` or `rowspan` attributes to merge cells — for example, a table where "Disney" spans two rows to cover multiple films. In those cases, you may need to fall back to manual parsing or clean up the DataFrame after extraction.
 
+### Cleaning Up read_html Results
+
+In practice, `read_html` rarely produces a perfect DataFrame. Column names may contain whitespace or be split across multiple header rows. Numeric columns often parse as strings because of dollar signs, commas, or percentage symbols. Merged cells create NaN values that need to be filled. Here is a typical cleanup workflow:
+
+```python
+# Retrieve and extract the table
+tables = pd.read_html(url, header=0)
+df = tables[3]  # Verify the correct index by inspection
+
+# Rename columns to something usable
+df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
+
+# Drop rows that repeat the header (common in long Wikipedia tables)
+df = df[df.iloc[:, 0] != df.columns[0]]
+
+# Convert numeric columns that parsed as strings
+df["worldwide_gross"] = pd.to_numeric(
+    df["worldwide_gross"].str.replace(r"[\$,]", "", regex=True),
+    errors="coerce"
+)
+
+# Fill NaN values from merged cells (forward-fill)
+df["studio"] = df["studio"].fillna(method="ffill")
+
+print(df.dtypes)
+print(df.head())
+```
+
+The `errors="coerce"` argument in `pd.to_numeric()` is essential: it converts unparseable values to NaN instead of raising an error, which lets your cleanup pipeline continue even when some cells contain unexpected text. The forward-fill (`ffill`) operation handles the common Wikipedia pattern where a studio name spans multiple rows — the name appears once, and subsequent rows are blank until the next studio. You should expect to spend as much time cleaning `read_html` output as you spent extracting it — this is normal and not a sign that something went wrong. The function handles the hard part (parsing HTML tables); the cleanup is your job.
+
 ## Strategy 3: Writing a Custom Parser
 
 Many web pages present structured data without using HTML tables. Award nominees, product listings, news articles, and directory entries are often structured with `<div>` tags and CSS classes. Extracting this data requires navigating the HTML tree to find the right containers.
@@ -224,6 +254,97 @@ def scrape_oscar_year(year, headers):
     return df
 ```
 
+### A Second Parser: Colorado Legislators
+
+Let us build a second parser for a very different page structure. The Colorado General Assembly website at [leg.colorado.gov/legislators](https://leg.colorado.gov/legislators) lists all current state legislators with their names, party affiliations, districts, and chambers:
+
+```python
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+url = "https://leg.colorado.gov/legislators"
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+response = requests.get(url, headers=headers)
+soup = BeautifulSoup(response.text, "html.parser")
+
+# Inspect the page structure — legislators are typically in repeating containers
+# The exact class names may change; always verify with the Inspector
+containers = soup.find_all("div", class_="views-row")
+print(f"Found {len(containers)} legislator entries")
+```
+
+For each container, extract the relevant fields. The exact tag structure will vary, so the key skill here is using the Inspector to trace from the visible text on the page back to the HTML elements that contain it:
+
+```python
+records = []
+for container in containers:
+    name_tag = container.find("a")
+    party_tag = container.find("span", class_="party-initial")
+    district_tag = container.find("span", class_="district-number")
+
+    if name_tag:
+        records.append({
+            "name": name_tag.text.strip(),
+            "party": party_tag.text.strip() if party_tag else None,
+            "district": district_tag.text.strip() if district_tag else None,
+        })
+
+df = pd.DataFrame(records)
+print(f"Extracted {len(df)} legislators")
+print(df.groupby("party").size())
+```
+
+This parser illustrates an important principle: start simple and iterate. Your first attempt at identifying the right containers may return too many or too few results. Compare your count against what you see on the page. If you find 100 containers but the page shows 65 legislators, you are matching extra elements — narrow your search with a more specific class or a parent container. If you find 0, the page may use different class names than you expected, or the content may be loaded dynamically with JavaScript (in which case, see @sec-dynamic-pages).
+
+Note that the page may have changed since this was written — that is the fundamental challenge of web scraping. If the class names above do not match what you see in the Inspector, that is not a bug in this code; it is a feature of how the web works. The skill you are building is not memorizing specific class names but learning the *process* of inspection, hypothesis, and verification that lets you adapt to any page structure. Think of each parser as a hypothesis about the page's structure — you test it, compare the output to what you expect, and refine until they match.
+
+### Error Handling Patterns
+
+As you scrape more pages, you will encounter failures: pages that do not load, elements that are missing, or structures that do not match your expectations. A robust scraper handles these gracefully:
+
+```python
+def safe_scrape(url, headers, parse_func):
+    """Scrape a URL with comprehensive error handling.
+
+    Parameters
+    ----------
+    url : str
+        The URL to scrape
+    headers : dict
+        HTTP headers
+    parse_func : callable
+        A function that takes a BeautifulSoup object and returns data
+
+    Returns
+    -------
+    list or None
+        Parsed data, or None if the scrape failed
+    """
+    try:
+        response = requests.get(url, headers=headers, timeout=30)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed for {url}: {e}")
+        return None
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    try:
+        return parse_func(soup)
+    except AttributeError as e:
+        print(f"Parsing failed for {url}: {e}")
+        print("The page structure may have changed — re-inspect with dev tools.")
+        return None
+    except Exception as e:
+        print(f"Unexpected error for {url}: {e}")
+        return None
+```
+
+The `AttributeError` catch is especially important: it fires when `.find()` returns `None` and you try to call `.text` on it — the single most common scraping error. By catching it explicitly, you get an informative message ("the page structure may have changed") instead of a cryptic traceback. The broader `Exception` catch ensures your scraping loop continues even if an individual page has an unexpected problem.
+
+This pattern separates the *what* (your parsing logic in `parse_func`) from the *how* (request handling, error recovery). You can write a clean parsing function that assumes everything works, then wrap it in `safe_scrape` for production use. This is the same separation-of-concerns principle you saw with the `responsible_get()` function in @sec-ethics, and you will use it again in @sec-archives when building pipelines that retrieve dozens or hundreds of pages.
+
 ::: {.callout-warning}
 ## A Note on Fragility
 Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).
@@ -237,6 +358,10 @@ Websites redesign their HTML regularly. The specific CSS classes and tag structu
 
 3. **Multi-page scraping.** Extend your parser from Exercise 2 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use `time.sleep()` between requests, `try/except` for error handling, and a function to abstract the repeated logic.
 
+4. **Non-English Wikipedia.** Use `pd.read_html()` to scrape a data table from a non-English Wikipedia edition (e.g., the French, Spanish, or Japanese Wikipedia). Does `read_html` handle non-ASCII characters correctly? What cleanup is needed compared to the English version? Write a brief analysis of any encoding issues you encounter.
+
+5. **Multi-page scraper with progress.** Build a scraper that collects data across multiple pages — for example, Oscars results for five different years, or box office data for five different weeks. Include `time.sleep()` between requests, `try/except` for error handling, and a progress indicator that prints which page you are currently scraping. Save the combined results to a CSV file.
+
 ::: {.callout-tip}
 ## Missing Manual Reference
 For a refresher on writing functions, handling exceptions with `try/except`, and structuring reusable code, see *Missing Manual* Chapter 17: Scripting.
@@ -245,6 +370,11 @@ For a refresher on writing functions, handling exceptions with `try/except`, and
 ## Social History and Public Interest
 
 Web scraping has deep roots in data journalism. Organizations like ProPublica, The Markup, and the Investigative Reporters and Editors (IRE) have built some of their most important investigations on data scraped from public websites — court records, school inspection reports, environmental compliance databases, campaign finance disclosures. The skill of turning a web page into a dataset is, in this tradition, a form of civic empowerment: it enables citizens and journalists to analyze information that is nominally public but practically inaccessible in its raw HTML form.
+
+::: {.callout-note}
+## Public Interest Connection
+Turning a web page into a dataset is a form of **oversight** (@sec-post-api). When government agencies publish information as web pages but not as downloadable data, scraping bridges the gap between nominal transparency and practical accountability. The ability to parse a legislative directory into a DataFrame enables analysis of representation, diversity, and political geography that the agency itself may not provide.
+:::
 
 The Colorado General Assembly website ([leg.colorado.gov](https://leg.colorado.gov)) provides a concrete example. Biographical information about legislators — their districts, party affiliations, committee assignments, and contact information — is published on the web, but not in a structured format you can download and analyze. Scraping this data into a DataFrame enables research on representation, diversity, and legislative behavior that would be impossible otherwise.
 
