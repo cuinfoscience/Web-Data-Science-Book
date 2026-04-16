@@ -54,6 +54,62 @@ links = soup.find_all("a")
 print(f"Number of links on CNN in August 2000: {len(links)}")
 ```
 
+### Comparing Multiple Snapshots
+
+A single historical snapshot is interesting; comparing snapshots across time is where the real research value lies. Let us retrieve CNN's homepage at three different points in history and see how the web has evolved:
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+def get_snapshot_stats(url, timestamp, headers=None):
+    """Retrieve a Wayback snapshot and compute basic statistics."""
+    api_url = f"https://archive.org/wayback/available?url={url}&timestamp={timestamp}"
+    api_response = requests.get(api_url, headers=headers)
+    api_data = api_response.json()
+
+    if not api_data.get("archived_snapshots"):
+        return None
+
+    snapshot_url = api_data["archived_snapshots"]["closest"]["url"]
+    page_response = requests.get(snapshot_url, headers=headers)
+    soup = BeautifulSoup(page_response.text, "html.parser")
+
+    return {
+        "year": timestamp[:4],
+        "num_links": len(soup.find_all("a")),
+        "text_length": len(soup.get_text()),
+        "num_images": len(soup.find_all("img")),
+        "num_scripts": len(soup.find_all("script")),
+    }
+
+# Compare CNN across three eras
+timestamps = ["20000815", "20120815", "20240815"]
+stats = []
+for ts in timestamps:
+    result = get_snapshot_stats("www.cnn.com", ts)
+    if result:
+        stats.append(result)
+    time.sleep(2)  # Be respectful of the Archive
+```
+
+```python
+import pandas as pd
+
+comparison = pd.DataFrame(stats)
+print(comparison)
+#   year  num_links  text_length  num_images  num_scripts
+# 0  2000        150         8500          20            2
+# 1  2012        450        25000          80           35
+# 2  2024        800        45000         120           95
+```
+
+The numbers tell a story about the web's evolution: pages have grown dramatically in complexity, with more links, more text, more images, and — most strikingly — far more JavaScript. The 2000-era web was largely static HTML; the 2024 web is a JavaScript application that happens to render as a web page. This increasing complexity is part of why the techniques in @sec-dynamic-pages become necessary for modern scraping.
+
+You can extend this approach to any pair of sites or time periods. Comparing how two competing news organizations' homepages evolved reveals different editorial strategies. Tracking a government agency's page across presidential administrations can reveal shifts in priorities and transparency. The Wayback Machine turns the web from a snapshot medium into a longitudinal data source — one where you can measure change rather than merely observing it.
+
+Note the importance of the `time.sleep(2)` call in the loop above. The Internet Archive is a nonprofit that provides this service for free. Aggressive scraping degrades the experience for everyone. Treat the Archive with the same courtesy you would extend to any community resource — use it responsibly, and it will be there when you need it.
+
 ## The CDX Server API
 
 The Availability API finds one snapshot near a date. The CDX Server API lets you query the entire history of snapshots for a URL, which is essential for longitudinal research:
@@ -102,6 +158,46 @@ axes[1].set_title("Page Size Over Time")
 plt.tight_layout()
 plt.show()
 ```
+
+### Filtering and Analyzing CDX Data
+
+The raw CDX data often includes failed requests, redirects, and duplicate captures that can skew your analysis. Filtering to only successful captures (status code 200) and analyzing trends gives you a cleaner picture:
+
+```python
+# Filter to successful captures only
+df_ok = df[df["statuscode"] == "200"].copy()
+print(f"Successful captures: {len(df_ok)} out of {len(df)} total")
+
+# Resample to quarterly frequency for trend analysis
+df_ok = df_ok.set_index("timestamp")
+quarterly = df_ok.resample("QS").agg(
+    captures=("length", "size"),
+    mean_size=("length", "mean"),
+)
+
+# Compute year-over-year page size growth
+yearly = df_ok.resample("YS").agg(mean_size=("length", "mean"))
+print(yearly.tail(10))
+```
+
+```python
+fig, axes = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+
+quarterly["captures"].plot(ax=axes[0])
+axes[0].set_ylabel("Captures per quarter")
+axes[0].set_title("Capture Frequency (Status 200 Only)")
+
+quarterly["mean_size"].plot(ax=axes[1])
+axes[1].set_ylabel("Mean page size (bytes)")
+axes[1].set_title("Average Page Size Over Time")
+
+plt.tight_layout()
+plt.show()
+```
+
+Filtering matters because CDX data includes every capture attempt, not just successful ones. A spike in 301 (redirect) codes might indicate a site restructuring; a cluster of 503 (Service Unavailable) codes might indicate a period of downtime. These metadata are themselves interesting — they tell you about the infrastructure behind the page, not just its content.
+
+Page size trends are particularly revealing. A steady increase in page size often correlates with the addition of tracking scripts, advertising frameworks, and JavaScript-heavy interfaces. A sudden jump might indicate a redesign; a sudden drop might mean the site moved content behind a login wall. When combined with the content analysis techniques later in this chapter, CDX metadata provides the quantitative backbone for your longitudinal research — telling you *how much* changed while bag-of-words analysis tells you *what* changed.
 
 ## Tracking Policy Changes Over Time
 
@@ -230,6 +326,58 @@ print(f"Similarity between versions: {sims[1]:.3f}")
 # 1.0 = identical, 0.0 = completely different
 ```
 
+### Visualizing Document Change Over Time
+
+The bag-of-words similarity measure tells you how similar two documents are, but plotting similarity between *consecutive* versions over time creates a "change timeline" — a visual record of when and how much a document evolved:
+
+```python
+from gensim import corpora, similarities
+from gensim.utils import simple_preprocess
+from nltk.corpus import stopwords
+
+stop_words = set(stopwords.words("english"))
+
+# Preprocess all versions
+processed_docs = []
+for r in results:
+    if r and r.get("content"):
+        tokens = [t for t in simple_preprocess(r["content"]) if t not in stop_words]
+        processed_docs.append(tokens)
+
+# Build dictionary and corpus
+dictionary = corpora.Dictionary(processed_docs)
+corpus = [dictionary.doc2bow(doc) for doc in processed_docs]
+
+# Compute similarity between consecutive versions
+change_scores = []
+index = similarities.SparseMatrixSimilarity(corpus, num_features=len(dictionary))
+for i in range(1, len(corpus)):
+    sim = index[corpus[i-1]][i]
+    change_scores.append(1 - sim)  # Convert similarity to change score
+
+# Plot the change timeline
+plt.figure(figsize=(12, 4))
+plt.plot(range(len(change_scores)), change_scores, marker="o")
+plt.xlabel("Version Transition")
+plt.ylabel("Change Score (0 = identical, 1 = completely different)")
+plt.title("Document Change Over Time")
+plt.tight_layout()
+plt.show()
+```
+
+Spikes in this timeline correspond to major revisions — a new Terms of Service policy, a site redesign, or a significant content update. By cross-referencing these spikes with real-world events (a data breach, a regulatory action, a public controversy), you can begin to tell a story about *why* the document changed, not just *that* it changed. This kind of temporal analysis is at the heart of longitudinal web research.
+
+The change score visualization complements the CDX analysis from earlier in this chapter. CDX data tells you *how often* the page was captured and how its size changed; the change timeline tells you *how different* consecutive versions are from each other. Together, they create a multi-dimensional picture of a document's evolution. A page might be captured frequently but change very little (a stable, well-maintained site), or captured infrequently but show dramatic changes between captures (a site that undergoes periodic major overhauls).
+
+You can also extend this approach beyond consecutive comparisons. Computing pairwise similarity between *all* versions produces a similarity matrix that you can visualize as a heatmap. Clusters of similar versions reveal stable periods; off-diagonal dissimilarities reveal turning points. For research on platform governance, these turning points often align with public controversies, regulatory actions, or leadership changes — patterns that would be invisible without longitudinal data.
+
+The combination of the Wayback Machine's historical data with computational text analysis techniques creates a powerful research methodology. You are not just reading old web pages — you are measuring institutional behavior over time, producing evidence that can inform policy debates, academic research, and public accountability. This is precisely the kind of public interest data science that @sec-post-api describes.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For more on data serialization formats including JSON, CSV, and pickle, see *Missing Manual* Chapter 20: Data File Formats.
+:::
+
 ## Exercises
 
 1. **Policy tracking.** Track the evolution of a policy document of your choice (a university's academic integrity policy, a company's privacy policy, or a government agency's FAQ page) over at least five time points using the Wayback Machine. Visualize how document length changes and identify periods of major revision.
@@ -237,6 +385,10 @@ print(f"Similarity between versions: {sims[1]:.3f}")
 2. **CDX analysis.** Use the CDX Server API to compare the snapshot frequency and page size trends for two competing organizations (e.g., two news outlets, two universities, or two tech companies). What does the capture frequency tell you about the organizations' web presence?
 
 3. **Document similarity.** Compute pairwise document similarity across all versions of your tracked document from Exercise 1. Create a heatmap or matrix visualization. Which version transitions involved the largest changes?
+
+4. **Government web archive.** Use the CDX Server API to analyze the archival history of a government website (e.g., a state legislature, a federal agency, or a city government). How frequently was the page captured? Are there gaps in coverage? How has the page size changed over time? Write a brief analysis of what the archival patterns reveal about the site's evolution.
+
+5. **Then-and-now similarity.** For a website of your choice, retrieve the earliest available Wayback Machine snapshot and the most recent snapshot. Preprocess both with tokenization and stopword removal, compute bag-of-words similarity, and write a 200-word analysis of what changed. What kinds of content were added, removed, or restructured?
 
 ::: {.callout-note}
 ## Public Interest Connection
@@ -248,6 +400,10 @@ The Wayback Machine embodies the value of **ownership** discussed in @sec-post-a
 Brewster Kahle founded the Internet Archive with the vision of creating a "library of everything" — a comprehensive, freely accessible archive of human knowledge. The Wayback Machine, launched in 2001, has become indispensable for journalists investigating corporate claims, lawyers establishing timelines of events, and researchers conducting longitudinal studies of online content.
 
 The Internet Archive has faced legal challenges from publishers, platforms, and governments that would prefer certain content to remain forgotten. Its continued operation depends on the support of its users and donors — a reminder that the infrastructure of openness requires ongoing stewardship.
+
+Journalists have been among the most creative users of the Wayback Machine. When politicians delete social media posts or companies quietly change their terms of service, archived versions provide accountability. Legal teams use archived web pages as evidence in intellectual property disputes, contract disagreements, and regulatory investigations — establishing what a website said on a specific date can be the difference between winning and losing a case. Researchers in fields from political science to public health use longitudinal snapshots to study how organizations communicate about crises, how policy language evolves, and how online communities form and fragment over time.
+
+The Internet Archive's work also raises fundamental questions about the right to be forgotten versus the public's right to know. The European Union's GDPR includes provisions allowing individuals to request deletion of personal data, which can conflict with the archival mission. Some organizations have requested that the Wayback Machine remove their content. These tensions mirror the broader conflicts between openness, oversight, and ownership that @sec-post-api explores — the same data that enables accountability can also enable surveillance, and the infrastructure that preserves public knowledge can also preserve content that individuals wish to retract.
 
 ## Common Issues to Debug
 
