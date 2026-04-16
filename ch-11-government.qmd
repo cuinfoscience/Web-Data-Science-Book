@@ -88,6 +88,16 @@ for var_id, var_info in sorted(variables["variables"].items()):
 
 The variable naming convention follows a pattern: `B25034_001E` is the total estimate, `B25034_002E` through `B25034_011E` are breakdowns by decade of construction, and variables ending in `M` are margins of error. Learning to read these codes quickly will save you significant time.
 
+### Finding the Right Variable
+
+The Census API contains thousands of variables, and finding the right one is often the hardest part of the workflow. The discovery process follows a consistent pattern. Start with the groups index at `api.census.gov/data/2022/acs/acs5/groups.html`, which lists all thematic groupings. Browse or search for broad categories related to your question — housing, education, income, transportation, language spoken at home.
+
+Once you identify a promising group, drill into its variables. For example, group `B01001` (Sex by Age) contains dozens of variables breaking down the population by gender and age bracket. Group `B25034` (Year Structure Built) breaks down housing stock by decade of construction. Group `B19013` contains median household income. The skill of navigating these catalogs matters far more than memorizing specific variable codes, because the codes change across survey years and table versions.
+
+Use keyword searches to narrow your focus. If you are interested in commuting patterns, search the groups page for "commut" or "transportation" or "travel time." If you are interested in educational attainment, search for "education" or "school" or "degree." Multiple groups may be relevant to your question — `B15003` covers educational attainment for the population 25 and over, while `B14001` covers school enrollment for the population 3 and over. Choosing between them requires reading the variable labels carefully and understanding which population denominator matches your research question.
+
+A practical tip: when you find a variable that looks right, always retrieve it for a geography you know well and sanity-check the values. If you expect Boulder's median household income to be around $70,000 and the API returns 70000, you are on track. If it returns 7 or 70000000, you may have the wrong variable or the wrong unit. This kind of spot-checking catches errors early and builds confidence in your data pipeline before you scale it to dozens of geographies.
+
 ### Querying for Specific Places
 
 Census data is organized geographically using FIPS codes. Colorado is state `08`; Boulder is place `07850`; Longmont is place `45970`. You can find FIPS codes at [census.gov/library/reference/code-lists](https://www.census.gov/library/reference/code-lists/ansi.html).
@@ -231,6 +241,54 @@ plt.show()
 
 Other available transformations include `chg` (change from previous value), `log` (natural log), `pca` (compounded annual rate of change), and frequency aggregation (converting monthly data to quarterly or annual).
 
+### Comparing CPI Across Locations
+
+National economic indicators often mask significant regional variation. The Denver metro area, for instance, experienced housing cost increases that diverged sharply from the national average during the post-pandemic period. FRED provides regional CPI series that let you measure this divergence directly.
+
+```python
+# Retrieve Denver metro CPI and national CPI
+denver_params = {
+    "series_id": "CUURS49BSA0",  # CPI, Denver-Aurora-Lakewood
+    "api_key": fred_key,
+    "file_type": "json",
+    "units": "pc1",              # Year-over-year percent change
+    "observation_start": "2019-01-01"
+}
+
+national_params = {
+    "series_id": "CPIAUCSL",     # CPI, All Urban Consumers (national)
+    "api_key": fred_key,
+    "file_type": "json",
+    "units": "pc1",
+    "observation_start": "2019-01-01"
+}
+
+df_denver = pd.DataFrame(requests.get(url, params=denver_params).json()["observations"])
+df_national = pd.DataFrame(requests.get(url, params=national_params).json()["observations"])
+
+df_denver["date"] = pd.to_datetime(df_denver["date"])
+df_denver["denver_cpi"] = pd.to_numeric(df_denver["value"], errors="coerce")
+df_national["date"] = pd.to_datetime(df_national["date"])
+df_national["national_cpi"] = pd.to_numeric(df_national["value"], errors="coerce")
+
+# Merge and plot both series
+df_cpi_compare = pd.merge(df_denver[["date", "denver_cpi"]],
+                           df_national[["date", "national_cpi"]],
+                           on="date", how="inner")
+
+plt.figure(figsize=(12, 5))
+plt.plot(df_cpi_compare["date"], df_cpi_compare["denver_cpi"], label="Denver Metro")
+plt.plot(df_cpi_compare["date"], df_cpi_compare["national_cpi"], label="National Average")
+plt.axhline(y=2, color="gray", linestyle="--", alpha=0.5, label="2% target")
+plt.ylabel("Year-over-Year Inflation (%)")
+plt.title("Regional vs. National Inflation: Denver Metro Area")
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
+
+What drives local inflation to diverge from national trends? Housing costs are often the primary factor — markets with constrained supply and strong demand (like Denver's Front Range corridor) see price increases that outpace the national average. Energy prices, labor market tightness, and local policy decisions (such as minimum wage increases or zoning restrictions) all contribute to regional variation. Comparing local and national series is a simple but powerful way to contextualize the economic conditions that affect your community specifically.
+
 ## FEC API
 
 The Federal Election Commission provides campaign finance data through a free API. This data enables accountability journalism and research on the influence of money in politics:
@@ -279,6 +337,57 @@ for result in data["results"]:
     print(f"  Disbursements: ${result.get('disbursements', 0):,.0f}")
 ```
 
+## Combining Census and FRED Data
+
+The most compelling analyses often integrate data from multiple government sources to tell a story that no single dataset can tell alone. Census data provides snapshots of demographic and housing characteristics; FRED provides economic time series that capture the conditions under which those characteristics formed. Combining them reveals the relationship between macro-level economic forces and community-level outcomes.
+
+```python
+# Census: housing vintage by decade for Boulder
+housing_params = {
+    "get": "NAME,B25034_001E,B25034_002E,B25034_003E,B25034_004E,"
+           "B25034_005E,B25034_006E,B25034_007E",
+    "for": "place:07850",
+    "in": "state:08",
+    "key": census_key
+}
+response = requests.get("https://api.census.gov/data/2022/acs/acs5",
+                         params=housing_params)
+housing_data = response.json()
+
+decades = ["2020+", "2010s", "2000s", "1990s", "1980s", "1970s"]
+counts = [int(housing_data[1][i]) for i in range(2, 8)]
+
+# FRED: 30-year mortgage rates (annual average)
+mortgage_params = {
+    "series_id": "MORTGAGE30US",
+    "api_key": fred_key,
+    "file_type": "json",
+    "frequency": "a",
+    "observation_start": "1970-01-01"
+}
+df_mortgage = pd.DataFrame(
+    requests.get(url, params=mortgage_params).json()["observations"]
+)
+df_mortgage["date"] = pd.to_datetime(df_mortgage["date"])
+df_mortgage["rate"] = pd.to_numeric(df_mortgage["value"], errors="coerce")
+
+# Multi-panel figure
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+ax1.bar(decades, counts, color="steelblue")
+ax1.set_title("Boulder Housing Stock by Decade Built")
+ax1.set_ylabel("Housing Units")
+ax1.set_xlabel("Decade")
+
+ax2.plot(df_mortgage["date"], df_mortgage["rate"], color="darkred")
+ax2.set_title("30-Year Mortgage Rate (Annual Average)")
+ax2.set_ylabel("Interest Rate (%)")
+plt.tight_layout()
+plt.show()
+```
+
+The juxtaposition is revealing. Decades with low mortgage rates tend to correspond to more construction activity, while high-rate periods see building slow down. Boulder's housing stock tells a specific story: significant construction in the 1970s and 1990s, with constraints imposed by the city's growth management policies limiting new development regardless of interest rate conditions. This is the value of integrating multiple government data sources — economic trends provide context that makes local patterns interpretable. The Census tells you *what* the housing stock looks like today; FRED tells you *why* it looks that way, by revealing the economic conditions that shaped building decisions over decades. Neither dataset alone answers the question as well as both together.
+
 ## Exercises
 
 1. **Census exploration.** Using the Census API, retrieve a variable group of your choice (browse at `api.census.gov/data/2022/acs/acs5/groups.html`) for at least five geographic areas. Create a comparative visualization and write a brief analytical narrative explaining what the data reveals.
@@ -288,6 +397,8 @@ for result in data["results"]:
 3. **Campaign finance.** Using the FEC API, retrieve contribution data for a local congressional race. How much did each major candidate raise? Can you find differences in the geographic distribution or size distribution of contributions?
 
 4. **Multi-source integration.** Combine data from at least two different government APIs (Census + FRED, Census + FEC, or FRED + FEC) into a single analysis. For example, compare median household income (Census) with campaign contributions (FEC) across congressional districts, or compare housing construction rates (Census) with interest rates (FRED).
+
+5. **County-level analysis.** Retrieve a Census variable of your choice for all counties in Colorado using `for=county:*&in=state:08`. Create a ranked bar chart of the top 20 counties. Write a brief analysis of the geographic patterns you observe.
 
 ::: {.callout-note}
 ## Public Interest Connection
