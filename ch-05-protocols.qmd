@@ -122,6 +122,16 @@ for answer in answers:
 
 Domain names have a hierarchical structure: `subdomain.domain.top-level-domain`. The top-level domains (`.com`, `.org`, `.edu`) are managed by ICANN. The domain (`wikipedia`) is registered by the organization. Subdomains (`en`, `es`, `m`) are controlled by the domain owner and do not require separate registration.
 
+### The Structure of Domain Names
+
+Understanding this hierarchy helps you navigate the web programmatically. Consider two examples:
+
+- `en.wikipedia.org` — The TLD is `.org` (a generic TLD for organizations). The domain is `wikipedia` (registered by the Wikimedia Foundation). The subdomain `en` indicates the English-language edition. Other subdomains like `es`, `de`, or `m` (mobile) are all controlled by Wikipedia and do not require separate registration. The API lives at a different subdomain entirely: `wikimedia.org`.
+
+- `api.census.gov` — The TLD is `.gov` (restricted to U.S. government entities). The domain is `census`. The subdomain `api` indicates this is the programmatic access point rather than the public-facing website at `www.census.gov`.
+
+When you construct URLs for scraping or API calls, knowing which part of the domain identifies the service (the domain) versus which part routes you to a specific feature (the subdomain and path) helps you anticipate URL patterns. Government APIs often live at `api.agency.gov`, data portals at `data.agency.gov`, and documentation at `developers.agency.gov`. Recognizing these conventions saves you time when exploring new data sources.
+
 ## HTTP: The Application Layer
 
 HTTP (Hypertext Transfer Protocol) is the language that clients and servers use to communicate. A client sends a **request** with a method (GET, POST, PUT, DELETE), headers (metadata), and optionally a body. The server sends a **response** with a status code, headers, and a body.
@@ -134,6 +144,57 @@ The status codes you will encounter most often:
 - **404 Not Found**: The resource does not exist at this URL
 - **429 Too Many Requests**: You are being rate-limited; slow down
 - **500 Internal Server Error**: Something went wrong on the server side
+
+### Diagnosing HTTP Errors
+
+When a request fails, the status code tells you *what* went wrong, but diagnosing *why* requires looking at the full response. A diagnostic function can help:
+
+```python
+import requests
+
+def diagnose_request(url, headers=None):
+    """Print diagnostic information about an HTTP request."""
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        print(f"URL: {url}")
+        print(f"Status: {response.status_code}")
+        print(f"Content-Type: {response.headers.get('Content-Type', 'not specified')}")
+        print(f"Server: {response.headers.get('Server', 'not specified')}")
+        print(f"Response size: {len(response.content):,} bytes")
+        if response.history:
+            print(f"Redirected from: {response.history[0].url}")
+        return response
+    except requests.exceptions.ConnectionError:
+        print(f"Connection failed: {url}")
+    except requests.exceptions.Timeout:
+        print(f"Request timed out: {url}")
+
+# Test on a few URLs
+diagnose_request("https://en.wikipedia.org/wiki/Python_(programming_language)")
+diagnose_request("https://en.wikipedia.org/wiki/Nonexistent_Page_12345")
+```
+
+The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a `User-Agent` header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:
+
+```python
+import time
+
+def get_with_backoff(url, headers=None, max_retries=3):
+    """Retry a request with exponential backoff on 429 errors."""
+    for attempt in range(max_retries):
+        response = requests.get(url, headers=headers)
+        if response.status_code == 429:
+            wait_time = 2 ** attempt  # 1s, 2s, 4s
+            print(f"Rate limited. Waiting {wait_time}s before retry...")
+            time.sleep(wait_time)
+        else:
+            return response
+    return response  # Return the last response even if still 429
+```
+
+Exponential backoff doubles the wait time with each retry, giving the server progressively more breathing room. Many APIs include a `Retry-After` header in their 429 responses that tells you exactly how long to wait — check for it with `response.headers.get("Retry-After")` before falling back to your own backoff schedule.
+
+Understanding status codes in context makes debugging much faster. A 403 from the Wikimedia API almost always means you forgot the `User-Agent` header — the fix is a single line of code. A 403 from a news site might mean the site blocks all automated access, and no header change will help. A 404 could mean the page was deleted, the URL has a typo, or the site restructured its paths. A 500 is the server's problem, not yours — retry after a delay. Building this diagnostic intuition takes practice, but the pattern is always the same: check the status code, inspect the response headers, read the response body for error messages, and adjust your request accordingly. This systematic approach to debugging carries through every chapter that follows.
 
 ### Making API Requests with Custom Headers
 
@@ -209,6 +270,40 @@ print(params)
 
 Understanding URL structure is essential for constructing API requests. In @sec-wikipedia through @sec-ai-apis, you will build URLs programmatically by assembling scheme, host, path, and query parameters.
 
+### Building URLs Programmatically
+
+While you can construct URLs with f-strings, this approach breaks when values contain special characters like spaces, ampersands, or non-ASCII text. The `urllib.parse` module provides tools for building URLs safely:
+
+```python
+from urllib.parse import urlencode
+
+# Build a Wikimedia API URL from components
+base_url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
+article = "University of Colorado Boulder"  # Note the spaces
+
+# urlencode handles special characters automatically
+params = {
+    "project": "en.wikipedia",
+    "access": "all-access",
+    "agent": "all-agents",
+    "granularity": "daily",
+    "start": "20240101",
+    "end": "20240131",
+}
+query_string = urlencode(params)
+print(query_string)
+# project=en.wikipedia&access=all-access&agent=all-agents&...
+```
+
+The `requests` library also accepts a `params` dictionary that handles URL encoding automatically — this is the preferred approach for API calls:
+
+```python
+response = requests.get(base_url, params=params, headers=headers)
+print(response.url)  # Shows the full URL that was actually requested
+```
+
+Using `params` instead of manually constructing query strings prevents a category of bugs where special characters in your search terms break the URL. An article title like "Guns N' Roses" or a search query with an ampersand would silently corrupt a hand-built URL; `urlencode` and the `params` argument handle these cases correctly. You will appreciate this distinction especially in @sec-wikipedia and @sec-government, where article titles and variable names frequently contain characters that require encoding.
+
 ## Exercises
 
 1. **Browser developer tools.** Open a Wikipedia article and a commercial news site side by side, each with the Network tab open. Reload both pages and compare: how many requests does each make? What types of resources (HTML, CSS, JS, images, fonts, tracking) does each load? What does this tell you about modern web architecture?
@@ -217,11 +312,20 @@ Understanding URL structure is essential for constructing API requests. In @sec-
 
 3. **Wikimedia pageviews.** Using the API pattern from this chapter, retrieve and plot daily pageview data for three related Wikipedia articles over the same time period. Identify any spikes and hypothesize about what real-world events caused them.
 
+4. **Network tab analysis.** Pick a website you visit frequently. Reload it with the browser's Network tab open and recording. Count and categorize all requests into types: HTML documents, CSS stylesheets, JavaScript files, images, fonts, and tracking/analytics scripts. What fraction of requests serve actual content vs. tracking and advertising? Write a brief analysis of what this reveals about the site's business model.
+
+5. **URL diagnostic function.** Write a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the URL redirected (and if so, to where). Test it on at least five URLs: a working page, a 404, a redirecting URL, an API endpoint, and a site that blocks automated access. Summarize the patterns you observe.
+
 ## Social History and Public Interest
 
 The protocols described in this chapter were designed as public infrastructure. Vint Cerf and Bob Kahn developed TCP/IP in the 1970s for DARPA, creating a transport layer engineered for resilience under attack. Tim Berners-Lee invented HTTP and URLs at CERN in 1989–1991, and made the deliberate decision to release them into the public domain. The web was born open.
 
 Browser developer tools embody this original spirit of openness. The ability to "view source" — to inspect exactly what a web server sends your browser — was a foundational feature of the web. It is what makes web data science possible. As you will see in @sec-post-api, the tension between this transparency and platforms' desire to control their data is one of the defining conflicts of the contemporary web.
+
+::: {.callout-note}
+## Public Interest Connection
+The web's protocol stack was designed as public infrastructure — open standards documented in public RFCs, not proprietary products controlled by corporations. HTTP, HTML, DNS, and TCP/IP are all open protocols that anyone can implement. The "view source" capability and network inspection tools you learned in this chapter are features that embody **openness** (@sec-post-api). They exist because the web's architects believed that transparency was a feature, not a vulnerability. As platforms increasingly obfuscate their front-end code and move toward closed APIs, these tools become more important, not less.
+:::
 
 ## Common Issues to Debug
 
