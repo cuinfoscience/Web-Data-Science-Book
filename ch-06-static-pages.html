@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>6&nbsp; Parsing Static Web Pages – Web Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./ch-07-archives.html" rel="next">
+<link href="./ch-05-protocols.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-b46385535caf84bc62f311a600ac5013.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-06-static-pages.html">Documents</a></li><li class="breadcrumb-item"><a href="./ch-06-static-pages.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Web Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Web Data Science</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-02-ethics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ethics, Law, and Responsible Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-03-post-api.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">The Post-API Age</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-04-data-formats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Formats: XML and JSON</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-05-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documents</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-06-static-pages.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-07-archives.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-08-dynamic-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-09-pdfs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">APIs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-10-wikipedia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-11-government.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Government Data APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-12-social.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Social and Media Platform APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-13-ai-apis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Practice</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-14-automation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Automating Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-15-research-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-ai-disclosure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">AI Coauthorship and Responsible Disclosure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-further.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Where to Go from Here</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#from-html-to-data" id="toc-from-html-to-data" class="nav-link active" data-scroll-target="#from-html-to-data"><span class="header-section-number">6.1</span> From HTML to Data</a></li>
+  <li><a href="#strategy-1-manual-table-parsing" id="toc-strategy-1-manual-table-parsing" class="nav-link" data-scroll-target="#strategy-1-manual-table-parsing"><span class="header-section-number">6.2</span> Strategy 1: Manual Table Parsing</a>
+  <ul class="collapse">
+  <li><a href="#retrieving-and-inspecting" id="toc-retrieving-and-inspecting" class="nav-link" data-scroll-target="#retrieving-and-inspecting"><span class="header-section-number">6.2.1</span> Retrieving and Inspecting</a></li>
+  <li><a href="#extracting-row-data" id="toc-extracting-row-data" class="nav-link" data-scroll-target="#extracting-row-data"><span class="header-section-number">6.2.2</span> Extracting Row Data</a></li>
+  <li><a href="#building-the-dataframe" id="toc-building-the-dataframe" class="nav-link" data-scroll-target="#building-the-dataframe"><span class="header-section-number">6.2.3</span> Building the DataFrame</a></li>
+  </ul></li>
+  <li><a href="#strategy-2-pandas.read_html" id="toc-strategy-2-pandas.read_html" class="nav-link" data-scroll-target="#strategy-2-pandas.read_html"><span class="header-section-number">6.3</span> Strategy 2: <code>pandas.read_html()</code></a>
+  <ul class="collapse">
+  <li><a href="#cleaning-up-read_html-results" id="toc-cleaning-up-read_html-results" class="nav-link" data-scroll-target="#cleaning-up-read_html-results"><span class="header-section-number">6.3.1</span> Cleaning Up read_html Results</a></li>
+  </ul></li>
+  <li><a href="#strategy-3-writing-a-custom-parser" id="toc-strategy-3-writing-a-custom-parser" class="nav-link" data-scroll-target="#strategy-3-writing-a-custom-parser"><span class="header-section-number">6.4</span> Strategy 3: Writing a Custom Parser</a>
+  <ul class="collapse">
+  <li><a href="#the-oscars-example" id="toc-the-oscars-example" class="nav-link" data-scroll-target="#the-oscars-example"><span class="header-section-number">6.4.1</span> The Oscars Example</a></li>
+  <li><a href="#finding-reliable-anchors" id="toc-finding-reliable-anchors" class="nav-link" data-scroll-target="#finding-reliable-anchors"><span class="header-section-number">6.4.2</span> Finding Reliable Anchors</a></li>
+  <li><a href="#navigating-the-tree-for-specificity" id="toc-navigating-the-tree-for-specificity" class="nav-link" data-scroll-target="#navigating-the-tree-for-specificity"><span class="header-section-number">6.4.3</span> Navigating the Tree for Specificity</a></li>
+  <li><a href="#extracting-category-data" id="toc-extracting-category-data" class="nav-link" data-scroll-target="#extracting-category-data"><span class="header-section-number">6.4.4</span> Extracting Category Data</a></li>
+  <li><a href="#abstracting-into-functions" id="toc-abstracting-into-functions" class="nav-link" data-scroll-target="#abstracting-into-functions"><span class="header-section-number">6.4.5</span> Abstracting into Functions</a></li>
+  <li><a href="#a-second-parser-colorado-legislators" id="toc-a-second-parser-colorado-legislators" class="nav-link" data-scroll-target="#a-second-parser-colorado-legislators"><span class="header-section-number">6.4.6</span> A Second Parser: Colorado Legislators</a></li>
+  <li><a href="#error-handling-patterns" id="toc-error-handling-patterns" class="nav-link" data-scroll-target="#error-handling-patterns"><span class="header-section-number">6.4.7</span> Error Handling Patterns</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">6.5</span> Exercises</a></li>
+  <li><a href="#social-history-and-public-interest" id="toc-social-history-and-public-interest" class="nav-link" data-scroll-target="#social-history-and-public-interest"><span class="header-section-number">6.6</span> Social History and Public Interest</a></li>
+  <li><a href="#common-issues-to-debug" id="toc-common-issues-to-debug" class="nav-link" data-scroll-target="#common-issues-to-debug"><span class="header-section-number">6.7</span> Common Issues to Debug</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">6.8</span> Key Takeaways</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">6.9</span> Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-06-static-pages.html">Documents</a></li><li class="breadcrumb-item"><a href="./ch-06-static-pages.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-static-pages" class="quarto-section-identifier"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Use browser developer tools to identify HTML elements containing target data</li>
+<li>Extract data from HTML tables manually using BeautifulSoup’s tag navigation</li>
+<li>Use <code>pandas.read_html()</code> as a shortcut for well-structured tables</li>
+<li>Write a custom HTML parser for non-tabular data using DOM tree navigation</li>
+<li>Abstract repeated scraping logic into reusable functions with error handling</li>
+</ul>
+</div>
+</div>
+<section id="from-html-to-data" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="from-html-to-data"><span class="header-section-number">6.1</span> From HTML to Data</h2>
+<p>The overall goal of web scraping is converting data from one structured format — HTML, the language of web pages — into another structured format suitable for analysis: typically a pandas DataFrame, a CSV file, or a JSON document. This chapter teaches three strategies for that conversion, each appropriate for different situations and progressively more general.</p>
+<p>HTML is essentially a dialect of XML (which you learned to parse in <a href="ch-04-data-formats.html" class="quarto-xref"><span>Chapter 4</span></a>), so the BeautifulSoup skills you already have transfer directly. The difference is that real-world HTML is far messier than the clean XML examples from the previous chapter. Web pages contain navigation bars, advertisements, tracking scripts, and deeply nested <code>&lt;div&gt;</code> tags that obscure the data you care about. Learning to cut through this noise is the core skill of this chapter.</p>
+</section>
+<section id="strategy-1-manual-table-parsing" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="strategy-1-manual-table-parsing"><span class="header-section-number">6.2</span> Strategy 1: Manual Table Parsing</h2>
+<p>Many interesting datasets live in HTML tables — economic data, sports statistics, legislative records, demographic breakdowns. Let us extract box office revenue data from <a href="https://www.the-numbers.com">The Numbers</a>, a popular source of movie financial data.</p>
+<section id="retrieving-and-inspecting" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="retrieving-and-inspecting"><span class="header-section-number">6.2.1</span> Retrieving and Inspecting</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a>url <span class="op">=</span> <span class="st">"https://www.the-numbers.com/box-office-chart-weekly-2018-christmas"</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb1-6"><a href="#cb1-6"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb1-7"><a href="#cb1-7"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Before writing parsing code, inspect the page in your browser’s developer tools. Right-click on the table and select “Inspect” to see the HTML structure. You are looking for the <code>&lt;table&gt;</code> tag and, within it, <code>&lt;tr&gt;</code> (table row) and <code>&lt;td&gt;</code> (table data) tags.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Find all tables on the page</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>tables <span class="op">=</span> soup.find_all(<span class="st">"table"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="bu">print</span>(<span class="ss">f"Number of tables found: </span><span class="sc">{</span><span class="bu">len</span>(tables)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Often there are navigation tables mixed in with data tables</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co"># The main data table is usually the largest one</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co"># Inspect each to find the right one</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="cf">for</span> i, table <span class="kw">in</span> <span class="bu">enumerate</span>(tables):</span>
+<span id="cb2-9"><a href="#cb2-9"></a>    rows <span class="op">=</span> table.find_all(<span class="st">"tr"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10"></a>    <span class="bu">print</span>(<span class="ss">f"Table </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span><span class="bu">len</span>(rows)<span class="sc">}</span><span class="ss"> rows"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="extracting-row-data" class="level3" data-number="6.2.2">
+<h3 data-number="6.2.2" class="anchored" data-anchor-id="extracting-row-data"><span class="header-section-number">6.2.2</span> Extracting Row Data</h3>
+<p>Once you have identified the correct table, iterate through its rows and extract the text from each cell:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Assuming the data table is tables[1] (verify by inspection)</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>data_table <span class="op">=</span> tables[<span class="dv">1</span>]</span>
+<span id="cb3-3"><a href="#cb3-3"></a>rows <span class="op">=</span> data_table.find_all(<span class="st">"tr"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4"></a></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co"># Inspect the first row (headers)</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>header_row <span class="op">=</span> rows[<span class="dv">0</span>]</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="bu">print</span>(header_row.text)</span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co"># Inspect a data row</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>data_row <span class="op">=</span> rows[<span class="dv">1</span>]</span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="bu">print</span>(data_row.text)</span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co"># You'll see newline characters between cell values</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="co"># Clean extraction: split text on newlines and filter empties</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a>cells <span class="op">=</span> [cell.strip() <span class="cf">for</span> cell <span class="kw">in</span> data_row.text.split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>) <span class="cf">if</span> cell.strip()]</span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="bu">print</span>(cells)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="building-the-dataframe" class="level3" data-number="6.2.3">
+<h3 data-number="6.2.3" class="anchored" data-anchor-id="building-the-dataframe"><span class="header-section-number">6.2.3</span> Building the DataFrame</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Loop through all rows, extract cleaned cell data</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>all_rows <span class="op">=</span> []</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="cf">for</span> row <span class="kw">in</span> rows:</span>
+<span id="cb4-4"><a href="#cb4-4"></a>    cells <span class="op">=</span> [cell.strip() <span class="cf">for</span> cell <span class="kw">in</span> row.text.split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>) <span class="cf">if</span> cell.strip()]</span>
+<span id="cb4-5"><a href="#cb4-5"></a>    <span class="cf">if</span> cells:  <span class="co"># Skip empty rows</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>        all_rows.append(cells)</span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-9"><a href="#cb4-9"></a></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># First row as headers, rest as data</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>df <span class="op">=</span> pd.DataFrame(all_rows[<span class="dv">1</span>:], columns<span class="op">=</span>all_rows[<span class="dv">0</span>])</span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="bu">print</span>(df.head())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This manual approach gives you complete control over the extraction process. The tradeoff is that it requires more code and careful attention to the specific HTML structure of each page.</p>
+</section>
+</section>
+<section id="strategy-2-pandas.read_html" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="strategy-2-pandas.read_html"><span class="header-section-number">6.3</span> Strategy 2: <code>pandas.read_html()</code></h2>
+<p>For well-structured HTML tables, pandas provides a powerful shortcut. The <code>read_html()</code> function finds all tables on a page and converts each one to a DataFrame:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co"># Point read_html directly at a URL — no requests or BeautifulSoup needed</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/wiki/2018_in_film"</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>tables <span class="op">=</span> pd.read_html(url)</span>
+<span id="cb5-6"><a href="#cb5-6"></a></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="bu">print</span>(<span class="ss">f"Number of tables found: </span><span class="sc">{</span><span class="bu">len</span>(tables)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co"># Wikipedia pages often have many tables</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You can specify which row contains the column headers and select the table you want by index:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># The highest-grossing films table might be at index 3 (verify by inspection)</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>films_df <span class="op">=</span> pd.read_html(url, header<span class="op">=</span><span class="dv">0</span>)[<span class="dv">3</span>]</span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="bu">print</span>(films_df.head())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <code>read_html</code> function is remarkably powerful for its simplicity, but it has limitations. It struggles with tables that use <code>colspan</code> or <code>rowspan</code> attributes to merge cells — for example, a table where “Disney” spans two rows to cover multiple films. In those cases, you may need to fall back to manual parsing or clean up the DataFrame after extraction.</p>
+<section id="cleaning-up-read_html-results" class="level3" data-number="6.3.1">
+<h3 data-number="6.3.1" class="anchored" data-anchor-id="cleaning-up-read_html-results"><span class="header-section-number">6.3.1</span> Cleaning Up read_html Results</h3>
+<p>In practice, <code>read_html</code> rarely produces a perfect DataFrame. Column names may contain whitespace or be split across multiple header rows. Numeric columns often parse as strings because of dollar signs, commas, or percentage symbols. Merged cells create NaN values that need to be filled. Here is a typical cleanup workflow:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Retrieve and extract the table</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>tables <span class="op">=</span> pd.read_html(url, header<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb7-3"><a href="#cb7-3"></a>df <span class="op">=</span> tables[<span class="dv">3</span>]  <span class="co"># Verify the correct index by inspection</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co"># Rename columns to something usable</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>df.columns <span class="op">=</span> [col.strip().lower().replace(<span class="st">" "</span>, <span class="st">"_"</span>) <span class="cf">for</span> col <span class="kw">in</span> df.columns]</span>
+<span id="cb7-7"><a href="#cb7-7"></a></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co"># Drop rows that repeat the header (common in long Wikipedia tables)</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a>df <span class="op">=</span> df[df.iloc[:, <span class="dv">0</span>] <span class="op">!=</span> df.columns[<span class="dv">0</span>]]</span>
+<span id="cb7-10"><a href="#cb7-10"></a></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co"># Convert numeric columns that parsed as strings</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a>df[<span class="st">"worldwide_gross"</span>] <span class="op">=</span> pd.to_numeric(</span>
+<span id="cb7-13"><a href="#cb7-13"></a>    df[<span class="st">"worldwide_gross"</span>].<span class="bu">str</span>.replace(<span class="vs">r"</span><span class="pp">[</span><span class="ch">\$</span><span class="pp">,]</span><span class="vs">"</span>, <span class="st">""</span>, regex<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb7-14"><a href="#cb7-14"></a>    errors<span class="op">=</span><span class="st">"coerce"</span></span>
+<span id="cb7-15"><a href="#cb7-15"></a>)</span>
+<span id="cb7-16"><a href="#cb7-16"></a></span>
+<span id="cb7-17"><a href="#cb7-17"></a><span class="co"># Fill NaN values from merged cells (forward-fill)</span></span>
+<span id="cb7-18"><a href="#cb7-18"></a>df[<span class="st">"studio"</span>] <span class="op">=</span> df[<span class="st">"studio"</span>].fillna(method<span class="op">=</span><span class="st">"ffill"</span>)</span>
+<span id="cb7-19"><a href="#cb7-19"></a></span>
+<span id="cb7-20"><a href="#cb7-20"></a><span class="bu">print</span>(df.dtypes)</span>
+<span id="cb7-21"><a href="#cb7-21"></a><span class="bu">print</span>(df.head())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <code>errors="coerce"</code> argument in <code>pd.to_numeric()</code> is essential: it converts unparseable values to NaN instead of raising an error, which lets your cleanup pipeline continue even when some cells contain unexpected text. The forward-fill (<code>ffill</code>) operation handles the common Wikipedia pattern where a studio name spans multiple rows — the name appears once, and subsequent rows are blank until the next studio. You should expect to spend as much time cleaning <code>read_html</code> output as you spent extracting it — this is normal and not a sign that something went wrong. The function handles the hard part (parsing HTML tables); the cleanup is your job.</p>
+</section>
+</section>
+<section id="strategy-3-writing-a-custom-parser" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="strategy-3-writing-a-custom-parser"><span class="header-section-number">6.4</span> Strategy 3: Writing a Custom Parser</h2>
+<p>Many web pages present structured data without using HTML tables. Award nominees, product listings, news articles, and directory entries are often structured with <code>&lt;div&gt;</code> tags and CSS classes. Extracting this data requires navigating the HTML tree to find the right containers.</p>
+<section id="the-oscars-example" class="level3" data-number="6.4.1">
+<h3 data-number="6.4.1" class="anchored" data-anchor-id="the-oscars-example"><span class="header-section-number">6.4.1</span> The Oscars Example</h3>
+<p>The <a href="https://www.oscars.org">Academy Awards</a> website lists nominees and winners organized by category. The data is structured with nested <code>&lt;div&gt;</code> tags rather than <code>&lt;table&gt;</code> elements. Let us build a parser for it.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="im">import</span> requests</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb8-3"><a href="#cb8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4"></a>url <span class="op">=</span> <span class="st">"https://www.oscars.org/oscars/ceremonies/2024"</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb8-6"><a href="#cb8-6"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb8-7"><a href="#cb8-7"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="finding-reliable-anchors" class="level3" data-number="6.4.2">
+<h3 data-number="6.4.2" class="anchored" data-anchor-id="finding-reliable-anchors"><span class="header-section-number">6.4.2</span> Finding Reliable Anchors</h3>
+<p>The key challenge with non-tabular scraping is finding HTML elements that reliably contain your target data. Start by using the browser’s Inspector tool to examine the structure around one category:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Look for grouping elements — the structure may use classes like</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co"># "view-grouping" or similar containers for each award category</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>groupings <span class="op">=</span> soup.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"view-grouping"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(groupings)<span class="sc">}</span><span class="ss"> category groupings"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5"></a></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="co"># If the count doesn't match expectations (24 Oscar categories),</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co"># you may need to navigate to a more specific parent element</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="navigating-the-tree-for-specificity" class="level3" data-number="6.4.3">
+<h3 data-number="6.4.3" class="anchored" data-anchor-id="navigating-the-tree-for-specificity"><span class="header-section-number">6.4.3</span> Navigating the Tree for Specificity</h3>
+<p>If your initial <code>find_all</code> returns too many or too few results, you need to navigate the tree structure to find a more specific anchor. This involves going <em>up</em> to a unique parent and then searching <em>down</em> within it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Find the main content area first</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>content_area <span class="op">=</span> soup.find(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"field--name-field-award-categories"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3"></a></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="cf">if</span> content_area:</span>
+<span id="cb10-5"><a href="#cb10-5"></a>    <span class="co"># Now search only within this specific container</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a>    categories <span class="op">=</span> content_area.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"view-grouping"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7"></a>    <span class="bu">print</span>(<span class="ss">f"Categories within content area: </span><span class="sc">{</span><span class="bu">len</span>(categories)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="extracting-category-data" class="level3" data-number="6.4.4">
+<h3 data-number="6.4.4" class="anchored" data-anchor-id="extracting-category-data"><span class="header-section-number">6.4.4</span> Extracting Category Data</h3>
+<p>For each category, extract the award name and the list of nominees:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a>results <span class="op">=</span> []</span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="cf">for</span> category <span class="kw">in</span> categories:</span>
+<span id="cb11-4"><a href="#cb11-4"></a>    <span class="co"># Extract the category name</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a>    name_tag <span class="op">=</span> category.find(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"view-grouping-header"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6"></a>    <span class="cf">if</span> <span class="kw">not</span> name_tag:</span>
+<span id="cb11-7"><a href="#cb11-7"></a>        <span class="cf">continue</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a>    category_name <span class="op">=</span> name_tag.text.strip()</span>
+<span id="cb11-9"><a href="#cb11-9"></a>    </span>
+<span id="cb11-10"><a href="#cb11-10"></a>    <span class="co"># Extract individual nominees</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a>    nominees <span class="op">=</span> category.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"views-row"</span>)</span>
+<span id="cb11-12"><a href="#cb11-12"></a>    <span class="cf">for</span> nominee <span class="kw">in</span> nominees:</span>
+<span id="cb11-13"><a href="#cb11-13"></a>        nominee_name <span class="op">=</span> nominee.text.strip()</span>
+<span id="cb11-14"><a href="#cb11-14"></a>        results.append({</span>
+<span id="cb11-15"><a href="#cb11-15"></a>            <span class="st">"category"</span>: category_name,</span>
+<span id="cb11-16"><a href="#cb11-16"></a>            <span class="st">"nominee"</span>: nominee_name</span>
+<span id="cb11-17"><a href="#cb11-17"></a>        })</span>
+<span id="cb11-18"><a href="#cb11-18"></a></span>
+<span id="cb11-19"><a href="#cb11-19"></a>df <span class="op">=</span> pd.DataFrame(results)</span>
+<span id="cb11-20"><a href="#cb11-20"></a><span class="bu">print</span>(df.head(<span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="abstracting-into-functions" class="level3" data-number="6.4.5">
+<h3 data-number="6.4.5" class="anchored" data-anchor-id="abstracting-into-functions"><span class="header-section-number">6.4.5</span> Abstracting into Functions</h3>
+<p>Once your parser works for one page, abstract it into a function you can reuse:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="im">import</span> time</span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="kw">def</span> scrape_oscar_year(year, headers):</span>
+<span id="cb12-4"><a href="#cb12-4"></a>    <span class="co">"""Scrape Oscar nominees for a given ceremony year.</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="co">    </span></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co">    Parameters</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co">    ----------</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="co">    year : int</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co">        The ceremony year (e.g., 2024)</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="co">    headers : dict</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="co">        HTTP headers including User-Agent</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="co">    </span></span>
+<span id="cb12-13"><a href="#cb12-13"></a><span class="co">    Returns</span></span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="co">    -------</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a><span class="co">    pd.DataFrame</span></span>
+<span id="cb12-16"><a href="#cb12-16"></a><span class="co">        DataFrame with columns: category, nominee, year</span></span>
+<span id="cb12-17"><a href="#cb12-17"></a><span class="co">    """</span></span>
+<span id="cb12-18"><a href="#cb12-18"></a>    url <span class="op">=</span> <span class="ss">f"https://www.oscars.org/oscars/ceremonies/</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb12-19"><a href="#cb12-19"></a>    </span>
+<span id="cb12-20"><a href="#cb12-20"></a>    <span class="cf">try</span>:</span>
+<span id="cb12-21"><a href="#cb12-21"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb12-22"><a href="#cb12-22"></a>        response.raise_for_status()  <span class="co"># Raise exception for bad status codes</span></span>
+<span id="cb12-23"><a href="#cb12-23"></a>    <span class="cf">except</span> requests.RequestException <span class="im">as</span> e:</span>
+<span id="cb12-24"><a href="#cb12-24"></a>        <span class="bu">print</span>(<span class="ss">f"Error fetching </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-25"><a href="#cb12-25"></a>        <span class="cf">return</span> pd.DataFrame()</span>
+<span id="cb12-26"><a href="#cb12-26"></a>    </span>
+<span id="cb12-27"><a href="#cb12-27"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb12-28"><a href="#cb12-28"></a>    <span class="co"># ... parsing logic ...</span></span>
+<span id="cb12-29"><a href="#cb12-29"></a>    </span>
+<span id="cb12-30"><a href="#cb12-30"></a>    time.sleep(<span class="dv">1</span>)  <span class="co"># Respect the server</span></span>
+<span id="cb12-31"><a href="#cb12-31"></a>    <span class="cf">return</span> df</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="a-second-parser-colorado-legislators" class="level3" data-number="6.4.6">
+<h3 data-number="6.4.6" class="anchored" data-anchor-id="a-second-parser-colorado-legislators"><span class="header-section-number">6.4.6</span> A Second Parser: Colorado Legislators</h3>
+<p>Let us build a second parser for a very different page structure. The Colorado General Assembly website at <a href="https://leg.colorado.gov/legislators">leg.colorado.gov/legislators</a> lists all current state legislators with their names, party affiliations, districts, and chambers:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="im">import</span> requests</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb13-4"><a href="#cb13-4"></a></span>
+<span id="cb13-5"><a href="#cb13-5"></a>url <span class="op">=</span> <span class="st">"https://leg.colorado.gov/legislators"</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb13-7"><a href="#cb13-7"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb13-8"><a href="#cb13-8"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb13-9"><a href="#cb13-9"></a></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co"># Inspect the page structure — legislators are typically in repeating containers</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="co"># The exact class names may change; always verify with the Inspector</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a>containers <span class="op">=</span> soup.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"views-row"</span>)</span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(containers)<span class="sc">}</span><span class="ss"> legislator entries"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For each container, extract the relevant fields. The exact tag structure will vary, so the key skill here is using the Inspector to trace from the visible text on the page back to the HTML elements that contain it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a>records <span class="op">=</span> []</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="cf">for</span> container <span class="kw">in</span> containers:</span>
+<span id="cb14-3"><a href="#cb14-3"></a>    name_tag <span class="op">=</span> container.find(<span class="st">"a"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4"></a>    party_tag <span class="op">=</span> container.find(<span class="st">"span"</span>, class_<span class="op">=</span><span class="st">"party-initial"</span>)</span>
+<span id="cb14-5"><a href="#cb14-5"></a>    district_tag <span class="op">=</span> container.find(<span class="st">"span"</span>, class_<span class="op">=</span><span class="st">"district-number"</span>)</span>
+<span id="cb14-6"><a href="#cb14-6"></a></span>
+<span id="cb14-7"><a href="#cb14-7"></a>    <span class="cf">if</span> name_tag:</span>
+<span id="cb14-8"><a href="#cb14-8"></a>        records.append({</span>
+<span id="cb14-9"><a href="#cb14-9"></a>            <span class="st">"name"</span>: name_tag.text.strip(),</span>
+<span id="cb14-10"><a href="#cb14-10"></a>            <span class="st">"party"</span>: party_tag.text.strip() <span class="cf">if</span> party_tag <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb14-11"><a href="#cb14-11"></a>            <span class="st">"district"</span>: district_tag.text.strip() <span class="cf">if</span> district_tag <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb14-12"><a href="#cb14-12"></a>        })</span>
+<span id="cb14-13"><a href="#cb14-13"></a></span>
+<span id="cb14-14"><a href="#cb14-14"></a>df <span class="op">=</span> pd.DataFrame(records)</span>
+<span id="cb14-15"><a href="#cb14-15"></a><span class="bu">print</span>(<span class="ss">f"Extracted </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> legislators"</span>)</span>
+<span id="cb14-16"><a href="#cb14-16"></a><span class="bu">print</span>(df.groupby(<span class="st">"party"</span>).size())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This parser illustrates an important principle: start simple and iterate. Your first attempt at identifying the right containers may return too many or too few results. Compare your count against what you see on the page. If you find 100 containers but the page shows 65 legislators, you are matching extra elements — narrow your search with a more specific class or a parent container. If you find 0, the page may use different class names than you expected, or the content may be loaded dynamically with JavaScript (in which case, see <a href="ch-08-dynamic-pages.html" class="quarto-xref"><span>Chapter 8</span></a>).</p>
+<p>Note that the page may have changed since this was written — that is the fundamental challenge of web scraping. If the class names above do not match what you see in the Inspector, that is not a bug in this code; it is a feature of how the web works. The skill you are building is not memorizing specific class names but learning the <em>process</em> of inspection, hypothesis, and verification that lets you adapt to any page structure. Think of each parser as a hypothesis about the page’s structure — you test it, compare the output to what you expect, and refine until they match.</p>
+</section>
+<section id="error-handling-patterns" class="level3" data-number="6.4.7">
+<h3 data-number="6.4.7" class="anchored" data-anchor-id="error-handling-patterns"><span class="header-section-number">6.4.7</span> Error Handling Patterns</h3>
+<p>As you scrape more pages, you will encounter failures: pages that do not load, elements that are missing, or structures that do not match your expectations. A robust scraper handles these gracefully:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">def</span> safe_scrape(url, headers, parse_func):</span>
+<span id="cb15-2"><a href="#cb15-2"></a>    <span class="co">"""Scrape a URL with comprehensive error handling.</span></span>
+<span id="cb15-3"><a href="#cb15-3"></a></span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="co">    Parameters</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="co">    ----------</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="co">    url : str</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="co">        The URL to scrape</span></span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="co">    headers : dict</span></span>
+<span id="cb15-9"><a href="#cb15-9"></a><span class="co">        HTTP headers</span></span>
+<span id="cb15-10"><a href="#cb15-10"></a><span class="co">    parse_func : callable</span></span>
+<span id="cb15-11"><a href="#cb15-11"></a><span class="co">        A function that takes a BeautifulSoup object and returns data</span></span>
+<span id="cb15-12"><a href="#cb15-12"></a></span>
+<span id="cb15-13"><a href="#cb15-13"></a><span class="co">    Returns</span></span>
+<span id="cb15-14"><a href="#cb15-14"></a><span class="co">    -------</span></span>
+<span id="cb15-15"><a href="#cb15-15"></a><span class="co">    list or None</span></span>
+<span id="cb15-16"><a href="#cb15-16"></a><span class="co">        Parsed data, or None if the scrape failed</span></span>
+<span id="cb15-17"><a href="#cb15-17"></a><span class="co">    """</span></span>
+<span id="cb15-18"><a href="#cb15-18"></a>    <span class="cf">try</span>:</span>
+<span id="cb15-19"><a href="#cb15-19"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers, timeout<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb15-20"><a href="#cb15-20"></a>        response.raise_for_status()</span>
+<span id="cb15-21"><a href="#cb15-21"></a>    <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
+<span id="cb15-22"><a href="#cb15-22"></a>        <span class="bu">print</span>(<span class="ss">f"Request failed for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-23"><a href="#cb15-23"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb15-24"><a href="#cb15-24"></a></span>
+<span id="cb15-25"><a href="#cb15-25"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb15-26"><a href="#cb15-26"></a></span>
+<span id="cb15-27"><a href="#cb15-27"></a>    <span class="cf">try</span>:</span>
+<span id="cb15-28"><a href="#cb15-28"></a>        <span class="cf">return</span> parse_func(soup)</span>
+<span id="cb15-29"><a href="#cb15-29"></a>    <span class="cf">except</span> <span class="pp">AttributeError</span> <span class="im">as</span> e:</span>
+<span id="cb15-30"><a href="#cb15-30"></a>        <span class="bu">print</span>(<span class="ss">f"Parsing failed for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-31"><a href="#cb15-31"></a>        <span class="bu">print</span>(<span class="st">"The page structure may have changed — re-inspect with dev tools."</span>)</span>
+<span id="cb15-32"><a href="#cb15-32"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb15-33"><a href="#cb15-33"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb15-34"><a href="#cb15-34"></a>        <span class="bu">print</span>(<span class="ss">f"Unexpected error for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-35"><a href="#cb15-35"></a>        <span class="cf">return</span> <span class="va">None</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <code>AttributeError</code> catch is especially important: it fires when <code>.find()</code> returns <code>None</code> and you try to call <code>.text</code> on it — the single most common scraping error. By catching it explicitly, you get an informative message (“the page structure may have changed”) instead of a cryptic traceback. The broader <code>Exception</code> catch ensures your scraping loop continues even if an individual page has an unexpected problem.</p>
+<p>This pattern separates the <em>what</em> (your parsing logic in <code>parse_func</code>) from the <em>how</em> (request handling, error recovery). You can write a clean parsing function that assumes everything works, then wrap it in <code>safe_scrape</code> for production use. This is the same separation-of-concerns principle you saw with the <code>responsible_get()</code> function in <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>, and you will use it again in <a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a> when building pipelines that retrieve dozens or hundreds of pages.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>A Note on Fragility
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser’s developer tools and identify what changed. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>).</p>
+</div>
+</div>
+</section>
+</section>
+<section id="exercises" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="exercises"><span class="header-section-number">6.5</span> Exercises</h2>
+<ol type="1">
+<li><p><strong>Wikipedia table extraction.</strong> Use <code>pd.read_html()</code> to extract a table of your choice from Wikipedia (e.g., a list of countries by population, U.S. states by area, or planets in the solar system). Clean up the resulting DataFrame and create a visualization.</p></li>
+<li><p><strong>Custom parser.</strong> Write a custom BeautifulSoup parser for a non-tabular web page. Good candidates include a course catalog, a restaurant menu, or a list of elected officials. Document your element selection strategy: why did you choose these specific tags and classes?</p></li>
+<li><p><strong>Multi-page scraping.</strong> Extend your parser from Exercise 2 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use <code>time.sleep()</code> between requests, <code>try/except</code> for error handling, and a function to abstract the repeated logic.</p></li>
+<li><p><strong>Non-English Wikipedia.</strong> Use <code>pd.read_html()</code> to scrape a data table from a non-English Wikipedia edition (e.g., the French, Spanish, or Japanese Wikipedia). Does <code>read_html</code> handle non-ASCII characters correctly? What cleanup is needed compared to the English version? Write a brief analysis of any encoding issues you encounter.</p></li>
+<li><p><strong>Multi-page scraper with progress.</strong> Build a scraper that collects data across multiple pages — for example, Oscars results for five different years, or box office data for five different weeks. Include <code>time.sleep()</code> between requests, <code>try/except</code> for error handling, and a progress indicator that prints which page you are currently scraping. Save the combined results to a CSV file.</p></li>
+</ol>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Missing Manual Reference
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a refresher on writing functions, handling exceptions with <code>try/except</code>, and structuring reusable code, see <em>Missing Manual</em> Chapter 17: Scripting.</p>
+</div>
+</div>
+</section>
+<section id="social-history-and-public-interest" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">6.6</span> Social History and Public Interest</h2>
+<p>Web scraping has deep roots in data journalism. Organizations like ProPublica, The Markup, and the Investigative Reporters and Editors (IRE) have built some of their most important investigations on data scraped from public websites — court records, school inspection reports, environmental compliance databases, campaign finance disclosures. The skill of turning a web page into a dataset is, in this tradition, a form of civic empowerment: it enables citizens and journalists to analyze information that is nominally public but practically inaccessible in its raw HTML form.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Public Interest Connection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Turning a web page into a dataset is a form of <strong>oversight</strong> (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>). When government agencies publish information as web pages but not as downloadable data, scraping bridges the gap between nominal transparency and practical accountability. The ability to parse a legislative directory into a DataFrame enables analysis of representation, diversity, and political geography that the agency itself may not provide.</p>
+</div>
+</div>
+<p>The Colorado General Assembly website (<a href="https://leg.colorado.gov">leg.colorado.gov</a>) provides a concrete example. Biographical information about legislators — their districts, party affiliations, committee assignments, and contact information — is published on the web, but not in a structured format you can download and analyze. Scraping this data into a DataFrame enables research on representation, diversity, and legislative behavior that would be impossible otherwise.</p>
+</section>
+<section id="common-issues-to-debug" class="level2" data-number="6.7">
+<h2 data-number="6.7" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">6.7</span> Common Issues to Debug</h2>
+<ul>
+<li><strong>Multiple tables on a page</strong>: <code>read_html</code> and <code>find_all("table")</code> return all tables, including navigation elements. Inspect each to find the one with your data.</li>
+<li><strong>Character encoding</strong>: Watch for <code>\xa0</code> (non-breaking spaces) and other Unicode characters in names and text. Use <code>.strip()</code> and <code>.replace('\xa0', ' ')</code>.</li>
+<li><strong>Elements that look unique but are not</strong>: Always verify your <code>find_all</code> count against the expected number of results before building your parser.</li>
+<li><strong>Dynamic content</strong>: If <code>requests</code> + BeautifulSoup returns a nearly-empty page, the content may be loaded by JavaScript. See <a href="ch-08-dynamic-pages.html" class="quarto-xref"><span>Chapter 8</span></a> for Selenium-based solutions.</li>
+</ul>
+</section>
+<section id="key-takeaways" class="level2" data-number="6.8">
+<h2 data-number="6.8" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">6.8</span> Key Takeaways</h2>
+<p>HTML scraping follows a consistent pattern: retrieve the page, inspect it with developer tools, identify your target elements, extract the data, and convert it to a DataFrame. Start with <code>read_html()</code> for tables — it handles most simple cases. Fall back to manual BeautifulSoup parsing when you need more control. Write custom parsers for non-tabular data by navigating the DOM tree to find reliable anchors. Always abstract your parsing logic into functions, handle errors gracefully, and rate-limit your requests. Web pages change, so code defensively.</p>
+</section>
+<section id="further-reading" class="level2" data-number="6.9">
+<h2 data-number="6.9" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">6.9</span> Further Reading</h2>
+<ul>
+<li>pandas <code>read_html</code> documentation: <a href="https://pandas.pydata.org/docs/reference/api/pandas.read_html.html" class="uri">https://pandas.pydata.org/docs/reference/api/pandas.read_html.html</a></li>
+<li><span class="citation" data-cites="mitchell2018web">@mitchell2018web</span> — Chapters 2–5 on HTML scraping patterns</li>
+<li><span class="citation" data-cites="vandenbroucke2018practical">@vandenbroucke2018practical</span> — best practices for production web scraping</li>
+</ul>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./ch-05-protocols.html" class="pagination-link" aria-label="Web Architecture and Protocols">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./ch-07-archives.html" class="pagination-link" aria-label="Archived Web Pages and the Wayback Machine">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb16-1"><a href="#cb16-1"></a><span class="fu"># Parsing Static Web Pages {#sec-static-pages}</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a></span>
+<span id="cb16-3"><a href="#cb16-3"></a>::: {.callout-tip}</span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="fu">## Learning Objectives</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="ss">- </span>Use browser developer tools to identify HTML elements containing target data</span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="ss">- </span>Extract data from HTML tables manually using BeautifulSoup's tag navigation</span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="ss">- </span>Use <span class="in">`pandas.read_html()`</span> as a shortcut for well-structured tables</span>
+<span id="cb16-8"><a href="#cb16-8"></a><span class="ss">- </span>Write a custom HTML parser for non-tabular data using DOM tree navigation</span>
+<span id="cb16-9"><a href="#cb16-9"></a><span class="ss">- </span>Abstract repeated scraping logic into reusable functions with error handling</span>
+<span id="cb16-10"><a href="#cb16-10"></a>:::</span>
+<span id="cb16-11"><a href="#cb16-11"></a></span>
+<span id="cb16-12"><a href="#cb16-12"></a><span class="fu">## From HTML to Data</span></span>
+<span id="cb16-13"><a href="#cb16-13"></a></span>
+<span id="cb16-14"><a href="#cb16-14"></a>The overall goal of web scraping is converting data from one structured format — HTML, the language of web pages — into another structured format suitable for analysis: typically a pandas DataFrame, a CSV file, or a JSON document. This chapter teaches three strategies for that conversion, each appropriate for different situations and progressively more general.</span>
+<span id="cb16-15"><a href="#cb16-15"></a></span>
+<span id="cb16-16"><a href="#cb16-16"></a>HTML is essentially a dialect of XML (which you learned to parse in @sec-data-formats), so the BeautifulSoup skills you already have transfer directly. The difference is that real-world HTML is far messier than the clean XML examples from the previous chapter. Web pages contain navigation bars, advertisements, tracking scripts, and deeply nested <span class="in">`&lt;div&gt;`</span> tags that obscure the data you care about. Learning to cut through this noise is the core skill of this chapter.</span>
+<span id="cb16-17"><a href="#cb16-17"></a></span>
+<span id="cb16-18"><a href="#cb16-18"></a><span class="fu">## Strategy 1: Manual Table Parsing</span></span>
+<span id="cb16-19"><a href="#cb16-19"></a></span>
+<span id="cb16-20"><a href="#cb16-20"></a>Many interesting datasets live in HTML tables — economic data, sports statistics, legislative records, demographic breakdowns. Let us extract box office revenue data from <span class="co">[</span><span class="ot">The Numbers</span><span class="co">](https://www.the-numbers.com)</span>, a popular source of movie financial data.</span>
+<span id="cb16-21"><a href="#cb16-21"></a></span>
+<span id="cb16-22"><a href="#cb16-22"></a><span class="fu">### Retrieving and Inspecting</span></span>
+<span id="cb16-23"><a href="#cb16-23"></a></span>
+<span id="cb16-24"><a href="#cb16-24"></a><span class="in">```python</span></span>
+<span id="cb16-25"><a href="#cb16-25"></a><span class="im">import</span> requests</span>
+<span id="cb16-26"><a href="#cb16-26"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb16-27"><a href="#cb16-27"></a></span>
+<span id="cb16-28"><a href="#cb16-28"></a>url <span class="op">=</span> <span class="st">"https://www.the-numbers.com/box-office-chart-weekly-2018-christmas"</span></span>
+<span id="cb16-29"><a href="#cb16-29"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb16-30"><a href="#cb16-30"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb16-31"><a href="#cb16-31"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb16-32"><a href="#cb16-32"></a><span class="in">```</span></span>
+<span id="cb16-33"><a href="#cb16-33"></a></span>
+<span id="cb16-34"><a href="#cb16-34"></a>Before writing parsing code, inspect the page in your browser's developer tools. Right-click on the table and select "Inspect" to see the HTML structure. You are looking for the <span class="in">`&lt;table&gt;`</span> tag and, within it, <span class="in">`&lt;tr&gt;`</span> (table row) and <span class="in">`&lt;td&gt;`</span> (table data) tags.</span>
+<span id="cb16-35"><a href="#cb16-35"></a></span>
+<span id="cb16-36"><a href="#cb16-36"></a><span class="in">```python</span></span>
+<span id="cb16-37"><a href="#cb16-37"></a><span class="co"># Find all tables on the page</span></span>
+<span id="cb16-38"><a href="#cb16-38"></a>tables <span class="op">=</span> soup.find_all(<span class="st">"table"</span>)</span>
+<span id="cb16-39"><a href="#cb16-39"></a><span class="bu">print</span>(<span class="ss">f"Number of tables found: </span><span class="sc">{</span><span class="bu">len</span>(tables)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-40"><a href="#cb16-40"></a><span class="co"># Often there are navigation tables mixed in with data tables</span></span>
+<span id="cb16-41"><a href="#cb16-41"></a></span>
+<span id="cb16-42"><a href="#cb16-42"></a><span class="co"># The main data table is usually the largest one</span></span>
+<span id="cb16-43"><a href="#cb16-43"></a><span class="co"># Inspect each to find the right one</span></span>
+<span id="cb16-44"><a href="#cb16-44"></a><span class="cf">for</span> i, table <span class="kw">in</span> <span class="bu">enumerate</span>(tables):</span>
+<span id="cb16-45"><a href="#cb16-45"></a>    rows <span class="op">=</span> table.find_all(<span class="st">"tr"</span>)</span>
+<span id="cb16-46"><a href="#cb16-46"></a>    <span class="bu">print</span>(<span class="ss">f"Table </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span><span class="bu">len</span>(rows)<span class="sc">}</span><span class="ss"> rows"</span>)</span>
+<span id="cb16-47"><a href="#cb16-47"></a><span class="in">```</span></span>
+<span id="cb16-48"><a href="#cb16-48"></a></span>
+<span id="cb16-49"><a href="#cb16-49"></a><span class="fu">### Extracting Row Data</span></span>
+<span id="cb16-50"><a href="#cb16-50"></a></span>
+<span id="cb16-51"><a href="#cb16-51"></a>Once you have identified the correct table, iterate through its rows and extract the text from each cell:</span>
+<span id="cb16-52"><a href="#cb16-52"></a></span>
+<span id="cb16-53"><a href="#cb16-53"></a><span class="in">```python</span></span>
+<span id="cb16-54"><a href="#cb16-54"></a><span class="co"># Assuming the data table is tables[1] (verify by inspection)</span></span>
+<span id="cb16-55"><a href="#cb16-55"></a>data_table <span class="op">=</span> tables[<span class="dv">1</span>]</span>
+<span id="cb16-56"><a href="#cb16-56"></a>rows <span class="op">=</span> data_table.find_all(<span class="st">"tr"</span>)</span>
+<span id="cb16-57"><a href="#cb16-57"></a></span>
+<span id="cb16-58"><a href="#cb16-58"></a><span class="co"># Inspect the first row (headers)</span></span>
+<span id="cb16-59"><a href="#cb16-59"></a>header_row <span class="op">=</span> rows[<span class="dv">0</span>]</span>
+<span id="cb16-60"><a href="#cb16-60"></a><span class="bu">print</span>(header_row.text)</span>
+<span id="cb16-61"><a href="#cb16-61"></a></span>
+<span id="cb16-62"><a href="#cb16-62"></a><span class="co"># Inspect a data row</span></span>
+<span id="cb16-63"><a href="#cb16-63"></a>data_row <span class="op">=</span> rows[<span class="dv">1</span>]</span>
+<span id="cb16-64"><a href="#cb16-64"></a><span class="bu">print</span>(data_row.text)</span>
+<span id="cb16-65"><a href="#cb16-65"></a><span class="co"># You'll see newline characters between cell values</span></span>
+<span id="cb16-66"><a href="#cb16-66"></a></span>
+<span id="cb16-67"><a href="#cb16-67"></a><span class="co"># Clean extraction: split text on newlines and filter empties</span></span>
+<span id="cb16-68"><a href="#cb16-68"></a>cells <span class="op">=</span> [cell.strip() <span class="cf">for</span> cell <span class="kw">in</span> data_row.text.split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>) <span class="cf">if</span> cell.strip()]</span>
+<span id="cb16-69"><a href="#cb16-69"></a><span class="bu">print</span>(cells)</span>
+<span id="cb16-70"><a href="#cb16-70"></a><span class="in">```</span></span>
+<span id="cb16-71"><a href="#cb16-71"></a></span>
+<span id="cb16-72"><a href="#cb16-72"></a><span class="fu">### Building the DataFrame</span></span>
+<span id="cb16-73"><a href="#cb16-73"></a></span>
+<span id="cb16-74"><a href="#cb16-74"></a><span class="in">```python</span></span>
+<span id="cb16-75"><a href="#cb16-75"></a><span class="co"># Loop through all rows, extract cleaned cell data</span></span>
+<span id="cb16-76"><a href="#cb16-76"></a>all_rows <span class="op">=</span> []</span>
+<span id="cb16-77"><a href="#cb16-77"></a><span class="cf">for</span> row <span class="kw">in</span> rows:</span>
+<span id="cb16-78"><a href="#cb16-78"></a>    cells <span class="op">=</span> [cell.strip() <span class="cf">for</span> cell <span class="kw">in</span> row.text.split(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>) <span class="cf">if</span> cell.strip()]</span>
+<span id="cb16-79"><a href="#cb16-79"></a>    <span class="cf">if</span> cells:  <span class="co"># Skip empty rows</span></span>
+<span id="cb16-80"><a href="#cb16-80"></a>        all_rows.append(cells)</span>
+<span id="cb16-81"><a href="#cb16-81"></a></span>
+<span id="cb16-82"><a href="#cb16-82"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb16-83"><a href="#cb16-83"></a></span>
+<span id="cb16-84"><a href="#cb16-84"></a><span class="co"># First row as headers, rest as data</span></span>
+<span id="cb16-85"><a href="#cb16-85"></a>df <span class="op">=</span> pd.DataFrame(all_rows[<span class="dv">1</span>:], columns<span class="op">=</span>all_rows[<span class="dv">0</span>])</span>
+<span id="cb16-86"><a href="#cb16-86"></a><span class="bu">print</span>(df.head())</span>
+<span id="cb16-87"><a href="#cb16-87"></a><span class="in">```</span></span>
+<span id="cb16-88"><a href="#cb16-88"></a></span>
+<span id="cb16-89"><a href="#cb16-89"></a>This manual approach gives you complete control over the extraction process. The tradeoff is that it requires more code and careful attention to the specific HTML structure of each page.</span>
+<span id="cb16-90"><a href="#cb16-90"></a></span>
+<span id="cb16-91"><a href="#cb16-91"></a><span class="fu">## Strategy 2: `pandas.read_html()`</span></span>
+<span id="cb16-92"><a href="#cb16-92"></a></span>
+<span id="cb16-93"><a href="#cb16-93"></a>For well-structured HTML tables, pandas provides a powerful shortcut. The <span class="in">`read_html()`</span> function finds all tables on a page and converts each one to a DataFrame:</span>
+<span id="cb16-94"><a href="#cb16-94"></a></span>
+<span id="cb16-95"><a href="#cb16-95"></a><span class="in">```python</span></span>
+<span id="cb16-96"><a href="#cb16-96"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb16-97"><a href="#cb16-97"></a></span>
+<span id="cb16-98"><a href="#cb16-98"></a><span class="co"># Point read_html directly at a URL — no requests or BeautifulSoup needed</span></span>
+<span id="cb16-99"><a href="#cb16-99"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/wiki/2018_in_film"</span></span>
+<span id="cb16-100"><a href="#cb16-100"></a>tables <span class="op">=</span> pd.read_html(url)</span>
+<span id="cb16-101"><a href="#cb16-101"></a></span>
+<span id="cb16-102"><a href="#cb16-102"></a><span class="bu">print</span>(<span class="ss">f"Number of tables found: </span><span class="sc">{</span><span class="bu">len</span>(tables)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-103"><a href="#cb16-103"></a><span class="co"># Wikipedia pages often have many tables</span></span>
+<span id="cb16-104"><a href="#cb16-104"></a><span class="in">```</span></span>
+<span id="cb16-105"><a href="#cb16-105"></a></span>
+<span id="cb16-106"><a href="#cb16-106"></a>You can specify which row contains the column headers and select the table you want by index:</span>
+<span id="cb16-107"><a href="#cb16-107"></a></span>
+<span id="cb16-108"><a href="#cb16-108"></a><span class="in">```python</span></span>
+<span id="cb16-109"><a href="#cb16-109"></a><span class="co"># The highest-grossing films table might be at index 3 (verify by inspection)</span></span>
+<span id="cb16-110"><a href="#cb16-110"></a>films_df <span class="op">=</span> pd.read_html(url, header<span class="op">=</span><span class="dv">0</span>)[<span class="dv">3</span>]</span>
+<span id="cb16-111"><a href="#cb16-111"></a><span class="bu">print</span>(films_df.head())</span>
+<span id="cb16-112"><a href="#cb16-112"></a><span class="in">```</span></span>
+<span id="cb16-113"><a href="#cb16-113"></a></span>
+<span id="cb16-114"><a href="#cb16-114"></a>The <span class="in">`read_html`</span> function is remarkably powerful for its simplicity, but it has limitations. It struggles with tables that use <span class="in">`colspan`</span> or <span class="in">`rowspan`</span> attributes to merge cells — for example, a table where "Disney" spans two rows to cover multiple films. In those cases, you may need to fall back to manual parsing or clean up the DataFrame after extraction.</span>
+<span id="cb16-115"><a href="#cb16-115"></a></span>
+<span id="cb16-116"><a href="#cb16-116"></a><span class="fu">### Cleaning Up read_html Results</span></span>
+<span id="cb16-117"><a href="#cb16-117"></a></span>
+<span id="cb16-118"><a href="#cb16-118"></a>In practice, <span class="in">`read_html`</span> rarely produces a perfect DataFrame. Column names may contain whitespace or be split across multiple header rows. Numeric columns often parse as strings because of dollar signs, commas, or percentage symbols. Merged cells create NaN values that need to be filled. Here is a typical cleanup workflow:</span>
+<span id="cb16-119"><a href="#cb16-119"></a></span>
+<span id="cb16-120"><a href="#cb16-120"></a><span class="in">```python</span></span>
+<span id="cb16-121"><a href="#cb16-121"></a><span class="co"># Retrieve and extract the table</span></span>
+<span id="cb16-122"><a href="#cb16-122"></a>tables <span class="op">=</span> pd.read_html(url, header<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb16-123"><a href="#cb16-123"></a>df <span class="op">=</span> tables[<span class="dv">3</span>]  <span class="co"># Verify the correct index by inspection</span></span>
+<span id="cb16-124"><a href="#cb16-124"></a></span>
+<span id="cb16-125"><a href="#cb16-125"></a><span class="co"># Rename columns to something usable</span></span>
+<span id="cb16-126"><a href="#cb16-126"></a>df.columns <span class="op">=</span> [col.strip().lower().replace(<span class="st">" "</span>, <span class="st">"_"</span>) <span class="cf">for</span> col <span class="kw">in</span> df.columns]</span>
+<span id="cb16-127"><a href="#cb16-127"></a></span>
+<span id="cb16-128"><a href="#cb16-128"></a><span class="co"># Drop rows that repeat the header (common in long Wikipedia tables)</span></span>
+<span id="cb16-129"><a href="#cb16-129"></a>df <span class="op">=</span> df[df.iloc[:, <span class="dv">0</span>] <span class="op">!=</span> df.columns[<span class="dv">0</span>]]</span>
+<span id="cb16-130"><a href="#cb16-130"></a></span>
+<span id="cb16-131"><a href="#cb16-131"></a><span class="co"># Convert numeric columns that parsed as strings</span></span>
+<span id="cb16-132"><a href="#cb16-132"></a>df[<span class="st">"worldwide_gross"</span>] <span class="op">=</span> pd.to_numeric(</span>
+<span id="cb16-133"><a href="#cb16-133"></a>    df[<span class="st">"worldwide_gross"</span>].<span class="bu">str</span>.replace(<span class="vs">r"</span><span class="pp">[</span><span class="ch">\$</span><span class="pp">,]</span><span class="vs">"</span>, <span class="st">""</span>, regex<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb16-134"><a href="#cb16-134"></a>    errors<span class="op">=</span><span class="st">"coerce"</span></span>
+<span id="cb16-135"><a href="#cb16-135"></a>)</span>
+<span id="cb16-136"><a href="#cb16-136"></a></span>
+<span id="cb16-137"><a href="#cb16-137"></a><span class="co"># Fill NaN values from merged cells (forward-fill)</span></span>
+<span id="cb16-138"><a href="#cb16-138"></a>df[<span class="st">"studio"</span>] <span class="op">=</span> df[<span class="st">"studio"</span>].fillna(method<span class="op">=</span><span class="st">"ffill"</span>)</span>
+<span id="cb16-139"><a href="#cb16-139"></a></span>
+<span id="cb16-140"><a href="#cb16-140"></a><span class="bu">print</span>(df.dtypes)</span>
+<span id="cb16-141"><a href="#cb16-141"></a><span class="bu">print</span>(df.head())</span>
+<span id="cb16-142"><a href="#cb16-142"></a><span class="in">```</span></span>
+<span id="cb16-143"><a href="#cb16-143"></a></span>
+<span id="cb16-144"><a href="#cb16-144"></a>The <span class="in">`errors="coerce"`</span> argument in <span class="in">`pd.to_numeric()`</span> is essential: it converts unparseable values to NaN instead of raising an error, which lets your cleanup pipeline continue even when some cells contain unexpected text. The forward-fill (<span class="in">`ffill`</span>) operation handles the common Wikipedia pattern where a studio name spans multiple rows — the name appears once, and subsequent rows are blank until the next studio. You should expect to spend as much time cleaning <span class="in">`read_html`</span> output as you spent extracting it — this is normal and not a sign that something went wrong. The function handles the hard part (parsing HTML tables); the cleanup is your job.</span>
+<span id="cb16-145"><a href="#cb16-145"></a></span>
+<span id="cb16-146"><a href="#cb16-146"></a><span class="fu">## Strategy 3: Writing a Custom Parser</span></span>
+<span id="cb16-147"><a href="#cb16-147"></a></span>
+<span id="cb16-148"><a href="#cb16-148"></a>Many web pages present structured data without using HTML tables. Award nominees, product listings, news articles, and directory entries are often structured with <span class="in">`&lt;div&gt;`</span> tags and CSS classes. Extracting this data requires navigating the HTML tree to find the right containers.</span>
+<span id="cb16-149"><a href="#cb16-149"></a></span>
+<span id="cb16-150"><a href="#cb16-150"></a><span class="fu">### The Oscars Example</span></span>
+<span id="cb16-151"><a href="#cb16-151"></a></span>
+<span id="cb16-152"><a href="#cb16-152"></a>The <span class="co">[</span><span class="ot">Academy Awards</span><span class="co">](https://www.oscars.org)</span> website lists nominees and winners organized by category. The data is structured with nested <span class="in">`&lt;div&gt;`</span> tags rather than <span class="in">`&lt;table&gt;`</span> elements. Let us build a parser for it.</span>
+<span id="cb16-153"><a href="#cb16-153"></a></span>
+<span id="cb16-154"><a href="#cb16-154"></a><span class="in">```python</span></span>
+<span id="cb16-155"><a href="#cb16-155"></a><span class="im">import</span> requests</span>
+<span id="cb16-156"><a href="#cb16-156"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb16-157"><a href="#cb16-157"></a></span>
+<span id="cb16-158"><a href="#cb16-158"></a>url <span class="op">=</span> <span class="st">"https://www.oscars.org/oscars/ceremonies/2024"</span></span>
+<span id="cb16-159"><a href="#cb16-159"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb16-160"><a href="#cb16-160"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb16-161"><a href="#cb16-161"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb16-162"><a href="#cb16-162"></a><span class="in">```</span></span>
+<span id="cb16-163"><a href="#cb16-163"></a></span>
+<span id="cb16-164"><a href="#cb16-164"></a><span class="fu">### Finding Reliable Anchors</span></span>
+<span id="cb16-165"><a href="#cb16-165"></a></span>
+<span id="cb16-166"><a href="#cb16-166"></a>The key challenge with non-tabular scraping is finding HTML elements that reliably contain your target data. Start by using the browser's Inspector tool to examine the structure around one category:</span>
+<span id="cb16-167"><a href="#cb16-167"></a></span>
+<span id="cb16-168"><a href="#cb16-168"></a><span class="in">```python</span></span>
+<span id="cb16-169"><a href="#cb16-169"></a><span class="co"># Look for grouping elements — the structure may use classes like</span></span>
+<span id="cb16-170"><a href="#cb16-170"></a><span class="co"># "view-grouping" or similar containers for each award category</span></span>
+<span id="cb16-171"><a href="#cb16-171"></a>groupings <span class="op">=</span> soup.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"view-grouping"</span>)</span>
+<span id="cb16-172"><a href="#cb16-172"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(groupings)<span class="sc">}</span><span class="ss"> category groupings"</span>)</span>
+<span id="cb16-173"><a href="#cb16-173"></a></span>
+<span id="cb16-174"><a href="#cb16-174"></a><span class="co"># If the count doesn't match expectations (24 Oscar categories),</span></span>
+<span id="cb16-175"><a href="#cb16-175"></a><span class="co"># you may need to navigate to a more specific parent element</span></span>
+<span id="cb16-176"><a href="#cb16-176"></a><span class="in">```</span></span>
+<span id="cb16-177"><a href="#cb16-177"></a></span>
+<span id="cb16-178"><a href="#cb16-178"></a><span class="fu">### Navigating the Tree for Specificity</span></span>
+<span id="cb16-179"><a href="#cb16-179"></a></span>
+<span id="cb16-180"><a href="#cb16-180"></a>If your initial <span class="in">`find_all`</span> returns too many or too few results, you need to navigate the tree structure to find a more specific anchor. This involves going *up* to a unique parent and then searching *down* within it:</span>
+<span id="cb16-181"><a href="#cb16-181"></a></span>
+<span id="cb16-182"><a href="#cb16-182"></a><span class="in">```python</span></span>
+<span id="cb16-183"><a href="#cb16-183"></a><span class="co"># Find the main content area first</span></span>
+<span id="cb16-184"><a href="#cb16-184"></a>content_area <span class="op">=</span> soup.find(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"field--name-field-award-categories"</span>)</span>
+<span id="cb16-185"><a href="#cb16-185"></a></span>
+<span id="cb16-186"><a href="#cb16-186"></a><span class="cf">if</span> content_area:</span>
+<span id="cb16-187"><a href="#cb16-187"></a>    <span class="co"># Now search only within this specific container</span></span>
+<span id="cb16-188"><a href="#cb16-188"></a>    categories <span class="op">=</span> content_area.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"view-grouping"</span>)</span>
+<span id="cb16-189"><a href="#cb16-189"></a>    <span class="bu">print</span>(<span class="ss">f"Categories within content area: </span><span class="sc">{</span><span class="bu">len</span>(categories)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-190"><a href="#cb16-190"></a><span class="in">```</span></span>
+<span id="cb16-191"><a href="#cb16-191"></a></span>
+<span id="cb16-192"><a href="#cb16-192"></a><span class="fu">### Extracting Category Data</span></span>
+<span id="cb16-193"><a href="#cb16-193"></a></span>
+<span id="cb16-194"><a href="#cb16-194"></a>For each category, extract the award name and the list of nominees:</span>
+<span id="cb16-195"><a href="#cb16-195"></a></span>
+<span id="cb16-196"><a href="#cb16-196"></a><span class="in">```python</span></span>
+<span id="cb16-197"><a href="#cb16-197"></a>results <span class="op">=</span> []</span>
+<span id="cb16-198"><a href="#cb16-198"></a></span>
+<span id="cb16-199"><a href="#cb16-199"></a><span class="cf">for</span> category <span class="kw">in</span> categories:</span>
+<span id="cb16-200"><a href="#cb16-200"></a>    <span class="co"># Extract the category name</span></span>
+<span id="cb16-201"><a href="#cb16-201"></a>    name_tag <span class="op">=</span> category.find(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"view-grouping-header"</span>)</span>
+<span id="cb16-202"><a href="#cb16-202"></a>    <span class="cf">if</span> <span class="kw">not</span> name_tag:</span>
+<span id="cb16-203"><a href="#cb16-203"></a>        <span class="cf">continue</span></span>
+<span id="cb16-204"><a href="#cb16-204"></a>    category_name <span class="op">=</span> name_tag.text.strip()</span>
+<span id="cb16-205"><a href="#cb16-205"></a>    </span>
+<span id="cb16-206"><a href="#cb16-206"></a>    <span class="co"># Extract individual nominees</span></span>
+<span id="cb16-207"><a href="#cb16-207"></a>    nominees <span class="op">=</span> category.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"views-row"</span>)</span>
+<span id="cb16-208"><a href="#cb16-208"></a>    <span class="cf">for</span> nominee <span class="kw">in</span> nominees:</span>
+<span id="cb16-209"><a href="#cb16-209"></a>        nominee_name <span class="op">=</span> nominee.text.strip()</span>
+<span id="cb16-210"><a href="#cb16-210"></a>        results.append({</span>
+<span id="cb16-211"><a href="#cb16-211"></a>            <span class="st">"category"</span>: category_name,</span>
+<span id="cb16-212"><a href="#cb16-212"></a>            <span class="st">"nominee"</span>: nominee_name</span>
+<span id="cb16-213"><a href="#cb16-213"></a>        })</span>
+<span id="cb16-214"><a href="#cb16-214"></a></span>
+<span id="cb16-215"><a href="#cb16-215"></a>df <span class="op">=</span> pd.DataFrame(results)</span>
+<span id="cb16-216"><a href="#cb16-216"></a><span class="bu">print</span>(df.head(<span class="dv">10</span>))</span>
+<span id="cb16-217"><a href="#cb16-217"></a><span class="in">```</span></span>
+<span id="cb16-218"><a href="#cb16-218"></a></span>
+<span id="cb16-219"><a href="#cb16-219"></a><span class="fu">### Abstracting into Functions</span></span>
+<span id="cb16-220"><a href="#cb16-220"></a></span>
+<span id="cb16-221"><a href="#cb16-221"></a>Once your parser works for one page, abstract it into a function you can reuse:</span>
+<span id="cb16-222"><a href="#cb16-222"></a></span>
+<span id="cb16-223"><a href="#cb16-223"></a><span class="in">```python</span></span>
+<span id="cb16-224"><a href="#cb16-224"></a><span class="im">import</span> time</span>
+<span id="cb16-225"><a href="#cb16-225"></a></span>
+<span id="cb16-226"><a href="#cb16-226"></a><span class="kw">def</span> scrape_oscar_year(year, headers):</span>
+<span id="cb16-227"><a href="#cb16-227"></a>    <span class="co">"""Scrape Oscar nominees for a given ceremony year.</span></span>
+<span id="cb16-228"><a href="#cb16-228"></a><span class="co">    </span></span>
+<span id="cb16-229"><a href="#cb16-229"></a><span class="co">    Parameters</span></span>
+<span id="cb16-230"><a href="#cb16-230"></a><span class="co">    ----------</span></span>
+<span id="cb16-231"><a href="#cb16-231"></a><span class="co">    year : int</span></span>
+<span id="cb16-232"><a href="#cb16-232"></a><span class="co">        The ceremony year (e.g., 2024)</span></span>
+<span id="cb16-233"><a href="#cb16-233"></a><span class="co">    headers : dict</span></span>
+<span id="cb16-234"><a href="#cb16-234"></a><span class="co">        HTTP headers including User-Agent</span></span>
+<span id="cb16-235"><a href="#cb16-235"></a><span class="co">    </span></span>
+<span id="cb16-236"><a href="#cb16-236"></a><span class="co">    Returns</span></span>
+<span id="cb16-237"><a href="#cb16-237"></a><span class="co">    -------</span></span>
+<span id="cb16-238"><a href="#cb16-238"></a><span class="co">    pd.DataFrame</span></span>
+<span id="cb16-239"><a href="#cb16-239"></a><span class="co">        DataFrame with columns: category, nominee, year</span></span>
+<span id="cb16-240"><a href="#cb16-240"></a><span class="co">    """</span></span>
+<span id="cb16-241"><a href="#cb16-241"></a>    url <span class="op">=</span> <span class="ss">f"https://www.oscars.org/oscars/ceremonies/</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb16-242"><a href="#cb16-242"></a>    </span>
+<span id="cb16-243"><a href="#cb16-243"></a>    <span class="cf">try</span>:</span>
+<span id="cb16-244"><a href="#cb16-244"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb16-245"><a href="#cb16-245"></a>        response.raise_for_status()  <span class="co"># Raise exception for bad status codes</span></span>
+<span id="cb16-246"><a href="#cb16-246"></a>    <span class="cf">except</span> requests.RequestException <span class="im">as</span> e:</span>
+<span id="cb16-247"><a href="#cb16-247"></a>        <span class="bu">print</span>(<span class="ss">f"Error fetching </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-248"><a href="#cb16-248"></a>        <span class="cf">return</span> pd.DataFrame()</span>
+<span id="cb16-249"><a href="#cb16-249"></a>    </span>
+<span id="cb16-250"><a href="#cb16-250"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb16-251"><a href="#cb16-251"></a>    <span class="co"># ... parsing logic ...</span></span>
+<span id="cb16-252"><a href="#cb16-252"></a>    </span>
+<span id="cb16-253"><a href="#cb16-253"></a>    time.sleep(<span class="dv">1</span>)  <span class="co"># Respect the server</span></span>
+<span id="cb16-254"><a href="#cb16-254"></a>    <span class="cf">return</span> df</span>
+<span id="cb16-255"><a href="#cb16-255"></a><span class="in">```</span></span>
+<span id="cb16-256"><a href="#cb16-256"></a></span>
+<span id="cb16-257"><a href="#cb16-257"></a><span class="fu">### A Second Parser: Colorado Legislators</span></span>
+<span id="cb16-258"><a href="#cb16-258"></a></span>
+<span id="cb16-259"><a href="#cb16-259"></a>Let us build a second parser for a very different page structure. The Colorado General Assembly website at <span class="co">[</span><span class="ot">leg.colorado.gov/legislators</span><span class="co">](https://leg.colorado.gov/legislators)</span> lists all current state legislators with their names, party affiliations, districts, and chambers:</span>
+<span id="cb16-260"><a href="#cb16-260"></a></span>
+<span id="cb16-261"><a href="#cb16-261"></a><span class="in">```python</span></span>
+<span id="cb16-262"><a href="#cb16-262"></a><span class="im">import</span> requests</span>
+<span id="cb16-263"><a href="#cb16-263"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb16-264"><a href="#cb16-264"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb16-265"><a href="#cb16-265"></a></span>
+<span id="cb16-266"><a href="#cb16-266"></a>url <span class="op">=</span> <span class="st">"https://leg.colorado.gov/legislators"</span></span>
+<span id="cb16-267"><a href="#cb16-267"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb16-268"><a href="#cb16-268"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb16-269"><a href="#cb16-269"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb16-270"><a href="#cb16-270"></a></span>
+<span id="cb16-271"><a href="#cb16-271"></a><span class="co"># Inspect the page structure — legislators are typically in repeating containers</span></span>
+<span id="cb16-272"><a href="#cb16-272"></a><span class="co"># The exact class names may change; always verify with the Inspector</span></span>
+<span id="cb16-273"><a href="#cb16-273"></a>containers <span class="op">=</span> soup.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"views-row"</span>)</span>
+<span id="cb16-274"><a href="#cb16-274"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(containers)<span class="sc">}</span><span class="ss"> legislator entries"</span>)</span>
+<span id="cb16-275"><a href="#cb16-275"></a><span class="in">```</span></span>
+<span id="cb16-276"><a href="#cb16-276"></a></span>
+<span id="cb16-277"><a href="#cb16-277"></a>For each container, extract the relevant fields. The exact tag structure will vary, so the key skill here is using the Inspector to trace from the visible text on the page back to the HTML elements that contain it:</span>
+<span id="cb16-278"><a href="#cb16-278"></a></span>
+<span id="cb16-279"><a href="#cb16-279"></a><span class="in">```python</span></span>
+<span id="cb16-280"><a href="#cb16-280"></a>records <span class="op">=</span> []</span>
+<span id="cb16-281"><a href="#cb16-281"></a><span class="cf">for</span> container <span class="kw">in</span> containers:</span>
+<span id="cb16-282"><a href="#cb16-282"></a>    name_tag <span class="op">=</span> container.find(<span class="st">"a"</span>)</span>
+<span id="cb16-283"><a href="#cb16-283"></a>    party_tag <span class="op">=</span> container.find(<span class="st">"span"</span>, class_<span class="op">=</span><span class="st">"party-initial"</span>)</span>
+<span id="cb16-284"><a href="#cb16-284"></a>    district_tag <span class="op">=</span> container.find(<span class="st">"span"</span>, class_<span class="op">=</span><span class="st">"district-number"</span>)</span>
+<span id="cb16-285"><a href="#cb16-285"></a></span>
+<span id="cb16-286"><a href="#cb16-286"></a>    <span class="cf">if</span> name_tag:</span>
+<span id="cb16-287"><a href="#cb16-287"></a>        records.append({</span>
+<span id="cb16-288"><a href="#cb16-288"></a>            <span class="st">"name"</span>: name_tag.text.strip(),</span>
+<span id="cb16-289"><a href="#cb16-289"></a>            <span class="st">"party"</span>: party_tag.text.strip() <span class="cf">if</span> party_tag <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb16-290"><a href="#cb16-290"></a>            <span class="st">"district"</span>: district_tag.text.strip() <span class="cf">if</span> district_tag <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb16-291"><a href="#cb16-291"></a>        })</span>
+<span id="cb16-292"><a href="#cb16-292"></a></span>
+<span id="cb16-293"><a href="#cb16-293"></a>df <span class="op">=</span> pd.DataFrame(records)</span>
+<span id="cb16-294"><a href="#cb16-294"></a><span class="bu">print</span>(<span class="ss">f"Extracted </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> legislators"</span>)</span>
+<span id="cb16-295"><a href="#cb16-295"></a><span class="bu">print</span>(df.groupby(<span class="st">"party"</span>).size())</span>
+<span id="cb16-296"><a href="#cb16-296"></a><span class="in">```</span></span>
+<span id="cb16-297"><a href="#cb16-297"></a></span>
+<span id="cb16-298"><a href="#cb16-298"></a>This parser illustrates an important principle: start simple and iterate. Your first attempt at identifying the right containers may return too many or too few results. Compare your count against what you see on the page. If you find 100 containers but the page shows 65 legislators, you are matching extra elements — narrow your search with a more specific class or a parent container. If you find 0, the page may use different class names than you expected, or the content may be loaded dynamically with JavaScript (in which case, see @sec-dynamic-pages).</span>
+<span id="cb16-299"><a href="#cb16-299"></a></span>
+<span id="cb16-300"><a href="#cb16-300"></a>Note that the page may have changed since this was written — that is the fundamental challenge of web scraping. If the class names above do not match what you see in the Inspector, that is not a bug in this code; it is a feature of how the web works. The skill you are building is not memorizing specific class names but learning the *process* of inspection, hypothesis, and verification that lets you adapt to any page structure. Think of each parser as a hypothesis about the page's structure — you test it, compare the output to what you expect, and refine until they match.</span>
+<span id="cb16-301"><a href="#cb16-301"></a></span>
+<span id="cb16-302"><a href="#cb16-302"></a><span class="fu">### Error Handling Patterns</span></span>
+<span id="cb16-303"><a href="#cb16-303"></a></span>
+<span id="cb16-304"><a href="#cb16-304"></a>As you scrape more pages, you will encounter failures: pages that do not load, elements that are missing, or structures that do not match your expectations. A robust scraper handles these gracefully:</span>
+<span id="cb16-305"><a href="#cb16-305"></a></span>
+<span id="cb16-306"><a href="#cb16-306"></a><span class="in">```python</span></span>
+<span id="cb16-307"><a href="#cb16-307"></a><span class="kw">def</span> safe_scrape(url, headers, parse_func):</span>
+<span id="cb16-308"><a href="#cb16-308"></a>    <span class="co">"""Scrape a URL with comprehensive error handling.</span></span>
+<span id="cb16-309"><a href="#cb16-309"></a></span>
+<span id="cb16-310"><a href="#cb16-310"></a><span class="co">    Parameters</span></span>
+<span id="cb16-311"><a href="#cb16-311"></a><span class="co">    ----------</span></span>
+<span id="cb16-312"><a href="#cb16-312"></a><span class="co">    url : str</span></span>
+<span id="cb16-313"><a href="#cb16-313"></a><span class="co">        The URL to scrape</span></span>
+<span id="cb16-314"><a href="#cb16-314"></a><span class="co">    headers : dict</span></span>
+<span id="cb16-315"><a href="#cb16-315"></a><span class="co">        HTTP headers</span></span>
+<span id="cb16-316"><a href="#cb16-316"></a><span class="co">    parse_func : callable</span></span>
+<span id="cb16-317"><a href="#cb16-317"></a><span class="co">        A function that takes a BeautifulSoup object and returns data</span></span>
+<span id="cb16-318"><a href="#cb16-318"></a></span>
+<span id="cb16-319"><a href="#cb16-319"></a><span class="co">    Returns</span></span>
+<span id="cb16-320"><a href="#cb16-320"></a><span class="co">    -------</span></span>
+<span id="cb16-321"><a href="#cb16-321"></a><span class="co">    list or None</span></span>
+<span id="cb16-322"><a href="#cb16-322"></a><span class="co">        Parsed data, or None if the scrape failed</span></span>
+<span id="cb16-323"><a href="#cb16-323"></a><span class="co">    """</span></span>
+<span id="cb16-324"><a href="#cb16-324"></a>    <span class="cf">try</span>:</span>
+<span id="cb16-325"><a href="#cb16-325"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers, timeout<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb16-326"><a href="#cb16-326"></a>        response.raise_for_status()</span>
+<span id="cb16-327"><a href="#cb16-327"></a>    <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
+<span id="cb16-328"><a href="#cb16-328"></a>        <span class="bu">print</span>(<span class="ss">f"Request failed for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-329"><a href="#cb16-329"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb16-330"><a href="#cb16-330"></a></span>
+<span id="cb16-331"><a href="#cb16-331"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb16-332"><a href="#cb16-332"></a></span>
+<span id="cb16-333"><a href="#cb16-333"></a>    <span class="cf">try</span>:</span>
+<span id="cb16-334"><a href="#cb16-334"></a>        <span class="cf">return</span> parse_func(soup)</span>
+<span id="cb16-335"><a href="#cb16-335"></a>    <span class="cf">except</span> <span class="pp">AttributeError</span> <span class="im">as</span> e:</span>
+<span id="cb16-336"><a href="#cb16-336"></a>        <span class="bu">print</span>(<span class="ss">f"Parsing failed for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-337"><a href="#cb16-337"></a>        <span class="bu">print</span>(<span class="st">"The page structure may have changed — re-inspect with dev tools."</span>)</span>
+<span id="cb16-338"><a href="#cb16-338"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb16-339"><a href="#cb16-339"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb16-340"><a href="#cb16-340"></a>        <span class="bu">print</span>(<span class="ss">f"Unexpected error for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-341"><a href="#cb16-341"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb16-342"><a href="#cb16-342"></a><span class="in">```</span></span>
+<span id="cb16-343"><a href="#cb16-343"></a></span>
+<span id="cb16-344"><a href="#cb16-344"></a>The <span class="in">`AttributeError`</span> catch is especially important: it fires when <span class="in">`.find()`</span> returns <span class="in">`None`</span> and you try to call <span class="in">`.text`</span> on it — the single most common scraping error. By catching it explicitly, you get an informative message ("the page structure may have changed") instead of a cryptic traceback. The broader <span class="in">`Exception`</span> catch ensures your scraping loop continues even if an individual page has an unexpected problem.</span>
+<span id="cb16-345"><a href="#cb16-345"></a></span>
+<span id="cb16-346"><a href="#cb16-346"></a>This pattern separates the *what* (your parsing logic in `parse_func`) from the *how* (request handling, error recovery). You can write a clean parsing function that assumes everything works, then wrap it in <span class="in">`safe_scrape`</span> for production use. This is the same separation-of-concerns principle you saw with the <span class="in">`responsible_get()`</span> function in @sec-ethics, and you will use it again in @sec-archives when building pipelines that retrieve dozens or hundreds of pages.</span>
+<span id="cb16-347"><a href="#cb16-347"></a></span>
+<span id="cb16-348"><a href="#cb16-348"></a>::: {.callout-warning}</span>
+<span id="cb16-349"><a href="#cb16-349"></a><span class="fu">## A Note on Fragility</span></span>
+<span id="cb16-350"><a href="#cb16-350"></a>Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).</span>
+<span id="cb16-351"><a href="#cb16-351"></a>:::</span>
+<span id="cb16-352"><a href="#cb16-352"></a></span>
+<span id="cb16-353"><a href="#cb16-353"></a><span class="fu">## Exercises</span></span>
+<span id="cb16-354"><a href="#cb16-354"></a></span>
+<span id="cb16-355"><a href="#cb16-355"></a><span class="ss">1. </span>**Wikipedia table extraction.** Use <span class="in">`pd.read_html()`</span> to extract a table of your choice from Wikipedia (e.g., a list of countries by population, U.S. states by area, or planets in the solar system). Clean up the resulting DataFrame and create a visualization.</span>
+<span id="cb16-356"><a href="#cb16-356"></a></span>
+<span id="cb16-357"><a href="#cb16-357"></a><span class="ss">2. </span>**Custom parser.** Write a custom BeautifulSoup parser for a non-tabular web page. Good candidates include a course catalog, a restaurant menu, or a list of elected officials. Document your element selection strategy: why did you choose these specific tags and classes?</span>
+<span id="cb16-358"><a href="#cb16-358"></a></span>
+<span id="cb16-359"><a href="#cb16-359"></a><span class="ss">3. </span>**Multi-page scraping.** Extend your parser from Exercise 2 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use <span class="in">`time.sleep()`</span> between requests, <span class="in">`try/except`</span> for error handling, and a function to abstract the repeated logic.</span>
+<span id="cb16-360"><a href="#cb16-360"></a></span>
+<span id="cb16-361"><a href="#cb16-361"></a><span class="ss">4. </span>**Non-English Wikipedia.** Use <span class="in">`pd.read_html()`</span> to scrape a data table from a non-English Wikipedia edition (e.g., the French, Spanish, or Japanese Wikipedia). Does <span class="in">`read_html`</span> handle non-ASCII characters correctly? What cleanup is needed compared to the English version? Write a brief analysis of any encoding issues you encounter.</span>
+<span id="cb16-362"><a href="#cb16-362"></a></span>
+<span id="cb16-363"><a href="#cb16-363"></a><span class="ss">5. </span>**Multi-page scraper with progress.** Build a scraper that collects data across multiple pages — for example, Oscars results for five different years, or box office data for five different weeks. Include <span class="in">`time.sleep()`</span> between requests, <span class="in">`try/except`</span> for error handling, and a progress indicator that prints which page you are currently scraping. Save the combined results to a CSV file.</span>
+<span id="cb16-364"><a href="#cb16-364"></a></span>
+<span id="cb16-365"><a href="#cb16-365"></a>::: {.callout-tip}</span>
+<span id="cb16-366"><a href="#cb16-366"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb16-367"><a href="#cb16-367"></a>For a refresher on writing functions, handling exceptions with <span class="in">`try/except`</span>, and structuring reusable code, see *Missing Manual* Chapter 17: Scripting.</span>
+<span id="cb16-368"><a href="#cb16-368"></a>:::</span>
+<span id="cb16-369"><a href="#cb16-369"></a></span>
+<span id="cb16-370"><a href="#cb16-370"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb16-371"><a href="#cb16-371"></a></span>
+<span id="cb16-372"><a href="#cb16-372"></a>Web scraping has deep roots in data journalism. Organizations like ProPublica, The Markup, and the Investigative Reporters and Editors (IRE) have built some of their most important investigations on data scraped from public websites — court records, school inspection reports, environmental compliance databases, campaign finance disclosures. The skill of turning a web page into a dataset is, in this tradition, a form of civic empowerment: it enables citizens and journalists to analyze information that is nominally public but practically inaccessible in its raw HTML form.</span>
+<span id="cb16-373"><a href="#cb16-373"></a></span>
+<span id="cb16-374"><a href="#cb16-374"></a>::: {.callout-note}</span>
+<span id="cb16-375"><a href="#cb16-375"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb16-376"><a href="#cb16-376"></a>Turning a web page into a dataset is a form of **oversight** (@sec-post-api). When government agencies publish information as web pages but not as downloadable data, scraping bridges the gap between nominal transparency and practical accountability. The ability to parse a legislative directory into a DataFrame enables analysis of representation, diversity, and political geography that the agency itself may not provide.</span>
+<span id="cb16-377"><a href="#cb16-377"></a>:::</span>
+<span id="cb16-378"><a href="#cb16-378"></a></span>
+<span id="cb16-379"><a href="#cb16-379"></a>The Colorado General Assembly website (<span class="co">[</span><span class="ot">leg.colorado.gov</span><span class="co">](https://leg.colorado.gov)</span>) provides a concrete example. Biographical information about legislators — their districts, party affiliations, committee assignments, and contact information — is published on the web, but not in a structured format you can download and analyze. Scraping this data into a DataFrame enables research on representation, diversity, and legislative behavior that would be impossible otherwise.</span>
+<span id="cb16-380"><a href="#cb16-380"></a></span>
+<span id="cb16-381"><a href="#cb16-381"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb16-382"><a href="#cb16-382"></a></span>
+<span id="cb16-383"><a href="#cb16-383"></a><span class="ss">- </span>**Multiple tables on a page**: <span class="in">`read_html`</span> and <span class="in">`find_all("table")`</span> return all tables, including navigation elements. Inspect each to find the one with your data.</span>
+<span id="cb16-384"><a href="#cb16-384"></a><span class="ss">- </span>**Character encoding**: Watch for <span class="in">`\xa0`</span> (non-breaking spaces) and other Unicode characters in names and text. Use <span class="in">`.strip()`</span> and <span class="in">`.replace('\xa0', ' ')`</span>.</span>
+<span id="cb16-385"><a href="#cb16-385"></a><span class="ss">- </span>**Elements that look unique but are not**: Always verify your <span class="in">`find_all`</span> count against the expected number of results before building your parser.</span>
+<span id="cb16-386"><a href="#cb16-386"></a><span class="ss">- </span>**Dynamic content**: If <span class="in">`requests`</span> + BeautifulSoup returns a nearly-empty page, the content may be loaded by JavaScript. See @sec-dynamic-pages for Selenium-based solutions.</span>
+<span id="cb16-387"><a href="#cb16-387"></a></span>
+<span id="cb16-388"><a href="#cb16-388"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb16-389"><a href="#cb16-389"></a></span>
+<span id="cb16-390"><a href="#cb16-390"></a>HTML scraping follows a consistent pattern: retrieve the page, inspect it with developer tools, identify your target elements, extract the data, and convert it to a DataFrame. Start with <span class="in">`read_html()`</span> for tables — it handles most simple cases. Fall back to manual BeautifulSoup parsing when you need more control. Write custom parsers for non-tabular data by navigating the DOM tree to find reliable anchors. Always abstract your parsing logic into functions, handle errors gracefully, and rate-limit your requests. Web pages change, so code defensively.</span>
+<span id="cb16-391"><a href="#cb16-391"></a></span>
+<span id="cb16-392"><a href="#cb16-392"></a><span class="fu">## Further Reading</span></span>
+<span id="cb16-393"><a href="#cb16-393"></a></span>
+<span id="cb16-394"><a href="#cb16-394"></a><span class="ss">- </span>pandas <span class="in">`read_html`</span> documentation: <span class="ot">&lt;https://pandas.pydata.org/docs/reference/api/pandas.read_html.html&gt;</span></span>
+<span id="cb16-395"><a href="#cb16-395"></a><span class="ss">- </span>@mitchell2018web — Chapters 2–5 on HTML scraping patterns</span>
+<span id="cb16-396"><a href="#cb16-396"></a><span class="ss">- </span>@vandenbroucke2018practical — best practices for production web scraping</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
