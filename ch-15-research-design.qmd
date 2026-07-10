@@ -57,7 +57,7 @@ Web data is not a random sample of anything. It is a convenience sample shaped b
 
 Web data is messy. Scrapers fail silently, APIs return incomplete results, and the same information can appear in different formats across sources. Build validation into your pipeline:
 
-```python
+```{python}
 def validate_dataset(df, expected_columns, min_rows=10):
     """Basic validation checks for a scraped dataset.
     
@@ -127,7 +127,7 @@ In all cases, the visualizations you create with matplotlib and seaborn are not 
 
 Consider the difference between a default plot and one designed to communicate a finding. A default `plt.plot()` call with no labels, no title, and no context forces the reader to guess what they are looking at. A well-designed figure makes its argument legible at a glance: the title states a claim, the annotations connect data patterns to real-world causes, and the axis labels include units so the reader can evaluate the evidence independently.
 
-```python
+```{python}
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import pandas as pd

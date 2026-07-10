@@ -17,7 +17,7 @@ This chapter treats LLMs as another API to learn: the same patterns of authentic
 
 ## The OpenAI API
 
-```python
+```{python}
 # Install: pip install openai
 from openai import OpenAI
 
@@ -28,7 +28,7 @@ client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 ### Basic Chat Completion
 
-```python
+```{python}
 response = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[
@@ -46,7 +46,7 @@ print(answer)
 
 The `system` message sets the assistant's behavior. The `user` message is your input. The `assistant` message lets you simulate prior conversation turns:
 
-```python
+```{python}
 response = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[
@@ -62,7 +62,7 @@ response = client.chat.completions.create(
 
 For research applications, you typically want structured data, not free text. Use few-shot prompting — providing examples of the desired input-output format:
 
-```python
+```{python}
 prompt = """Classify the following bill summary into one of these categories: 
 education, healthcare, environment, taxation, criminal_justice, other.
 
@@ -94,7 +94,7 @@ print(f"Category: {category}")
 
 Embeddings are vector representations that encode the semantic meaning of text. You can use them to measure document similarity:
 
-```python
+```{python}
 def get_embedding(text, model="text-embedding-3-small"):
     """Get the embedding vector for a text string."""
     response = client.embeddings.create(input=text, model=model)
@@ -135,7 +135,7 @@ Let us apply these tools to a concrete web data science task. Suppose you have s
 
 ### Step 1: Classifying Bills
 
-```python
+```{python}
 def classify_bill(summary, client):
     """Classify a bill summary into a policy category.
     
@@ -188,7 +188,7 @@ time.sleep(1)  # Rate limit between API calls
 
 You can use few-shot prompting to extract multiple fields at once:
 
-```python
+```{python}
 import json
 
 extraction_prompt = """Extract the following fields from this bill summary as JSON:
@@ -224,7 +224,7 @@ except json.JSONDecodeError:
 
 Embeddings let you move beyond keyword matching to semantic similarity. Two bills about "school funding" and "educational resource allocation" would have low keyword overlap but high embedding similarity:
 
-```python
+```{python}
 import numpy as np
 from scipy.spatial.distance import cosine
 
@@ -265,7 +265,7 @@ plt.show()
 
 Sometimes a general model does not produce consistent results for your specific task. Fine-tuning lets you train the model on your own examples:
 
-```python
+```{python}
 # Prepare training data in JSONL format
 # Each line is a complete conversation demonstrating the desired behavior
 training_data = [
@@ -315,7 +315,7 @@ Fine-tuning takes time (minutes to hours depending on dataset size). You can che
 
 LLM API calls cost money. Before running a large batch, estimate the cost:
 
-```python
+```{python}
 # Rough cost estimation for GPT-4o-mini
 # Input: ~$0.15 per 1M tokens; Output: ~$0.60 per 1M tokens
 # A typical bill summary is ~200 tokens; a classification response is ~5 tokens
@@ -343,7 +343,7 @@ This documentation burden connects to the broader norms of scientific reproducib
 
 Anthropic's Claude provides an alternative LLM API with a similar interface:
 
-```python
+```{python}
 # Install: pip install anthropic
 from anthropic import Anthropic
 
@@ -364,7 +364,7 @@ print(response.content[0].text)
 
 When you use LLMs for research tasks like content classification, a critical question is whether your results depend on which model you chose. The answer, almost always, is yes — and the degree of that dependence matters for the credibility of your findings. You can test this directly by sending the same prompt to both APIs and comparing their responses.
 
-```python
+```{python}
 # Send the same classification prompt to both models
 bill_text = "Establishes new emission standards for power plants operating in Colorado."
 

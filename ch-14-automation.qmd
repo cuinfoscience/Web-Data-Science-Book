@@ -33,7 +33,7 @@ This chapter teaches you how to build that infrastructure from the tools you alr
 
 Let us convert a Rotten Tomatoes score scraper from notebook format to a standalone script. The key changes: remove interactive exploration, add a `main()` function, handle imports and configuration at the top, and write output to a file.
 
-```python
+```{python}
 # scraper.py — Rotten Tomatoes Score Scraper
 """Scrape Rotten Tomatoes audience and critic scores for a film."""
 
@@ -113,7 +113,7 @@ Notice the headless Chrome configuration: `--headless` runs the browser without 
 
 Before deploying your script to GitHub Actions, always test it locally from the command line. Running a script in the terminal is different from running cells in a notebook — import errors, missing dependencies, and file path issues that were invisible in Jupyter will surface immediately.
 
-```python
+```{python}
 # From your terminal, run the script directly:
 # $ python scraper.py
 # Saved scores at 2024-11-15T14:23:07.482361
@@ -269,7 +269,7 @@ Even with validation in place, your scraper will occasionally fail due to circum
 
 The simplest approach is to wrap your scraping logic in a try/except block that logs the error and exits gracefully rather than raising an unhandled exception:
 
-```python
+```{python}
 import sys
 import traceback
 
@@ -292,7 +292,7 @@ This pattern ensures that a single failed scrape does not corrupt your data file
 
 After running your scraper for a period, you will have accumulated data to analyze:
 
-```python
+```{python}
 import pandas as pd
 
 df = pd.read_csv("scores.csv")

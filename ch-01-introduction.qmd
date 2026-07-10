@@ -44,7 +44,7 @@ The Anaconda distribution of Python provides a curated collection of scientific 
 
 After installation, open a terminal (macOS/Linux) or Anaconda Prompt (Windows) and update your installation:
 
-```python
+```{python}
 # Run these commands in a terminal, not in Python
 # conda update conda
 # conda install anaconda=2024.06
@@ -61,7 +61,7 @@ Jupyter Notebooks are interactive computing environments that keep your code, do
 
 A notebook consists of cells. **Code cells** contain Python that you can execute with Shift+Enter. **Markdown cells** contain formatted text for documentation. The ability to interleave code with narrative explanation makes notebooks ideal for the kind of exploratory, iterative work that characterizes web data science.
 
-```python
+```{python}
 # This is a code cell. When you run it, Python executes the code
 # and displays any output below the cell.
 print("Hello, web data science!")
@@ -77,14 +77,14 @@ For a thorough introduction to Jupyter Notebooks — cell types, execution order
 
 This book uses several Python libraries extensively. Install them now if they are not already available in your Anaconda distribution:
 
-```python
+```{python}
 # Run in a terminal:
 # pip install requests beautifulsoup4 pandas matplotlib seaborn
 ```
 
 Throughout this book, you will install additional libraries as needed for specific chapters. For now, confirm that the core libraries import without error:
 
-```python
+```{python}
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -99,7 +99,7 @@ Let us preview the loop that structures every chapter in this book: **retrieve**
 
 The `requests` library lets you make HTTP requests — the same kind of request your browser makes when you type a URL. Here you will retrieve the Wikipedia article for the University of Colorado Boulder:
 
-```python
+```{python}
 import requests
 
 # Retrieve the page
@@ -114,7 +114,7 @@ print(len(response.text))    # Number of characters in the HTML
 
 The `response` object contains everything the server sent back: a status code indicating success or failure, headers with metadata about the response, and the body of the document as a text string. You can inspect the first 500 characters of the HTML:
 
-```python
+```{python}
 print(response.text[:500])
 # You'll see raw HTML: <!DOCTYPE html>, <head>, <title>, etc.
 ```
@@ -123,7 +123,7 @@ This is raw HTML — not yet useful for analysis. In @sec-data-formats and @sec-
 
 You can also retrieve data in JSON format from an API. Here is a request to the Wikimedia pageviews API, which returns the number of times a Wikipedia article was viewed on a given day:
 
-```python
+```{python}
 import requests
 
 api_url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
@@ -144,7 +144,7 @@ Notice two things. First, you included a custom `User-Agent` header identifying 
 
 The `data["items"]` key contains a list of dictionaries, one per day, each with fields like `timestamp`, `views`, `article`, and `project`. This is exactly the kind of structure that pandas can convert into a DataFrame with a single call:
 
-```python
+```{python}
 import pandas as pd
 
 # Convert the list of dictionaries into a DataFrame
@@ -176,7 +176,7 @@ The DataFrame also gives you immediate analytical power. You can compute summary
 
 Once you have data in a DataFrame, save it to disk. This is not optional — it is a core practice of responsible web data science:
 
-```python
+```{python}
 # Save to CSV
 df.to_csv("cu_boulder_pageviews.csv", index=False)
 

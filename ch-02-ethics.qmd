@@ -46,7 +46,7 @@ Beyond legal requirements, the web has developed a set of community norms for re
 
 A `robots.txt` file lives at the root of a website (e.g., `https://example.com/robots.txt`) and specifies which parts of the site automated agents are permitted or forbidden from accessing. It uses a simple syntax:
 
-```python
+```{python}
 import requests
 
 # Retrieve robots.txt for Wikipedia
@@ -60,7 +60,7 @@ print(response.text[:500])
 
 The key directives are `User-agent` (which crawler the rule applies to), `Disallow` (paths that should not be accessed), `Allow` (exceptions to disallow rules), and `Crawl-delay` (requested time between requests). You can parse these programmatically:
 
-```python
+```{python}
 from urllib.robotparser import RobotFileParser
 
 rp = RobotFileParser()
@@ -82,7 +82,7 @@ Two important caveats. First, `robots.txt` is a norm, not a law. Violating it is
 
 Different organizations have dramatically different approaches to automated access, and their `robots.txt` files reveal these philosophies. Compare three major sites:
 
-```python
+```{python}
 import requests
 
 sites = {
@@ -107,7 +107,7 @@ These differences are not arbitrary. They reflect each organization's relationsh
 
 When your code makes requests to a web server, the server sees metadata about the request including the `User-Agent` header, which identifies who is making the request. By default, the `requests` library sends a generic User-Agent string. You should replace it with one that identifies you and provides contact information:
 
-```python
+```{python}
 import requests
 
 headers = {
@@ -123,7 +123,7 @@ This practice serves two purposes: it lets site operators contact you if your sc
 
 Making hundreds of requests per second to a web server can degrade its performance for other users — effectively mounting a denial-of-service attack on a site you are trying to study. Always space out your requests:
 
-```python
+```{python}
 import time
 import requests
 
@@ -141,7 +141,7 @@ A good default is one request per second. If the site's `robots.txt` specifies a
 
 The principles above — custom User-Agent, rate limiting, error handling — appear in every scraping project. Rather than implementing them ad hoc each time, you can wrap them into a reusable function:
 
-```python
+```{python}
 import requests
 import time
 import logging

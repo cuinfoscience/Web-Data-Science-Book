@@ -19,7 +19,7 @@ The [Internet Archive](https://archive.org), founded by Brewster Kahle in 1996, 
 
 The simplest way to check whether the Wayback Machine has a snapshot of a URL is the Availability API:
 
-```python
+```{python}
 import requests
 
 url = "https://www.cnn.com"
@@ -41,7 +41,7 @@ else:
 
 The API returns the closest snapshot to your requested timestamp. You can then retrieve and parse that historical page just as you would a current page:
 
-```python
+```{python}
 from bs4 import BeautifulSoup
 
 # Retrieve the archived page
@@ -58,7 +58,7 @@ print(f"Number of links on CNN in August 2000: {len(links)}")
 
 A single historical snapshot is interesting; comparing snapshots across time is where the real research value lies. Let us retrieve CNN's homepage at three different points in history and see how the web has evolved:
 
-```python
+```{python}
 import requests
 from bs4 import BeautifulSoup
 
@@ -93,7 +93,7 @@ for ts in timestamps:
     time.sleep(2)  # Be respectful of the Archive
 ```
 
-```python
+```{python}
 import pandas as pd
 
 comparison = pd.DataFrame(stats)
@@ -114,7 +114,7 @@ Note the importance of the `time.sleep(2)` call in the loop above. The Internet 
 
 The Availability API finds one snapshot near a date. The CDX Server API lets you query the entire history of snapshots for a URL, which is essential for longitudinal research:
 
-```python
+```{python}
 import requests
 import pandas as pd
 
@@ -140,7 +140,7 @@ print(f"Date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
 
 You can visualize how frequently the page was captured and how its size changed over time:
 
-```python
+```{python}
 import matplotlib.pyplot as plt
 
 fig, axes = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
@@ -163,7 +163,7 @@ plt.show()
 
 The raw CDX data often includes failed requests, redirects, and duplicate captures that can skew your analysis. Filtering to only successful captures (status code 200) and analyzing trends gives you a cleaner picture:
 
-```python
+```{python}
 # Filter to successful captures only
 df_ok = df[df["statuscode"] == "200"].copy()
 print(f"Successful captures: {len(df_ok)} out of {len(df)} total")
@@ -180,7 +180,7 @@ yearly = df_ok.resample("YS").agg(mean_size=("length", "mean"))
 print(yearly.tail(10))
 ```
 
-```python
+```{python}
 fig, axes = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
 
 quarterly["captures"].plot(ax=axes[0])
@@ -205,7 +205,7 @@ A current research project explores how social media platforms' terms of service
 
 ### Generating Date Ranges
 
-```python
+```{python}
 import pandas as pd
 
 # Generate quarterly dates from 2005 to 2024
@@ -215,7 +215,7 @@ print(f"Querying {len(dates)} time points")
 
 ### Retrieving Historical Content
 
-```python
+```{python}
 import time
 from datetime import datetime
 
@@ -268,7 +268,7 @@ def get_wayback_content(url, date, headers=None):
 
 Once you have collected historical content, save it so you do not need to re-scrape:
 
-```python
+```{python}
 import json
 
 # After collecting data into a list called 'results':
@@ -284,7 +284,7 @@ with open("fb_tos_history.json", "r") as f:
 
 To measure how much a document changed between versions, you can use a bag-of-words approach. This technique represents each document as a vector of word frequencies, ignoring word order, and then measures the similarity between vectors.
 
-```python
+```{python}
 from gensim.utils import simple_preprocess
 from nltk.corpus import stopwords
 import nltk
@@ -309,7 +309,7 @@ print(f"Version 2 tokens: {len(doc_v2)}")
 
 Using gensim's dictionary and bag-of-words tools, you can build a corpus and compute similarity:
 
-```python
+```{python}
 from gensim import corpora, similarities
 
 # Build a dictionary mapping words to IDs
@@ -330,7 +330,7 @@ print(f"Similarity between versions: {sims[1]:.3f}")
 
 The bag-of-words similarity measure tells you how similar two documents are, but plotting similarity between *consecutive* versions over time creates a "change timeline" — a visual record of when and how much a document evolved:
 
-```python
+```{python}
 from gensim import corpora, similarities
 from gensim.utils import simple_preprocess
 from nltk.corpus import stopwords

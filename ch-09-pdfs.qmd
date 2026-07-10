@@ -26,7 +26,7 @@ When governments publish meeting minutes, budgets, and regulatory filings only a
 
 The `pypdf` library provides page-level text extraction and metadata access:
 
-```python
+```{python}
 # Install if needed:
 # pip install pypdf
 
@@ -42,7 +42,7 @@ print(f"Metadata: {reader.metadata}")
 
 ### Extracting Text
 
-```python
+```{python}
 # Extract text from the first page
 page = reader.pages[0]
 text = page.extract_text()
@@ -53,7 +53,7 @@ The output will likely be messy: line breaks may not correspond to paragraph bou
 
 ### Cleanup Strategies
 
-```python
+```{python}
 import re
 
 def clean_page_text(raw_text):
@@ -90,7 +90,7 @@ Regular expressions are your primary tool for imposing structure on the messy te
 
 Each pattern targets a specific kind of structured information that appears in unstructured text. Learning to recognize these patterns and adapt them to your specific documents is a skill that improves with practice. No single regex will work across all PDFs, but these five cover a wide range of common scenarios.
 
-```python
+```{python}
 import re
 
 # 1. Dates in slash-separated format (e.g., "1/15/2024", "12/03/23")
@@ -131,7 +131,7 @@ Boulder's City Council publishes signed minutes of its public meetings [online](
 
 ### Measuring Council Attendance
 
-```python
+```{python}
 import os
 from pypdf import PdfReader
 
@@ -171,7 +171,7 @@ def extract_attendance(pdf_path):
 
 ### Building the Pipeline
 
-```python
+```{python}
 import time
 
 results = []
@@ -192,7 +192,7 @@ print(df.head())
 
 ### Visualizing Trends
 
-```python
+```{python}
 import matplotlib.pyplot as plt
 
 plt.figure(figsize=(12, 5))
@@ -210,7 +210,7 @@ One of the most civically valuable pieces of information buried in meeting minut
 
 The challenge is that different municipalities format public comment sections differently, and even within the same city, the format may shift over time as clerks change or recording practices evolve. You are looking for patterns — section headers like "PUBLIC COMMENT" or "PUBLIC HEARING," followed by names or numbered items indicating individual speakers. This is the kind of work where you iterate: try a pattern on one document, inspect the results manually, refine the pattern, test it on a second document, and adjust again. Start by printing the raw text of several public comment sections to understand the format before writing any extraction code.
 
-```python
+```{python}
 def count_public_comments(text):
     """Count the number of public comment speakers in meeting text.
 
@@ -247,7 +247,7 @@ def count_public_comments(text):
     return max(spoke_count, numbered_count)
 ```
 
-```python
+```{python}
 # Apply across all meeting files
 comment_counts = []
 for pdf_file in pdf_files:
@@ -319,7 +319,7 @@ PDFs are designed for visual fidelity, not data extraction. PyPDF gives you page
 
 When you work with PDFs at scale — processing dozens or hundreds of documents from the same source — you need a structured pipeline. Here is a pattern that works for most government document collections:
 
-```python
+```{python}
 import os
 import re
 import pandas as pd
@@ -420,7 +420,7 @@ PyPDF handles text-based PDFs well but struggles with two common scenarios:
 
 **Tables in PDFs**: PyPDF extracts tables as streams of text, losing the column-row structure. For tabular PDF data, use `pdfplumber`, which preserves spatial relationships:
 
-```python
+```{python}
 # pip install pdfplumber
 import pdfplumber
 

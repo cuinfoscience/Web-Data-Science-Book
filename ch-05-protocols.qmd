@@ -54,7 +54,7 @@ Every computer on a public network has an IP address — a numerical identifier 
 
 You can find your own computer's IP address programmatically:
 
-```python
+```{python}
 import socket
 
 # Your computer's hostname on the local network
@@ -68,7 +68,7 @@ print(f"Local IP: {local_ip}")
 
 To see your *public* IP address (as seen by servers on the internet), you can query an external service:
 
-```python
+```{python}
 import requests
 
 response = requests.get("https://api.ipify.org?format=json")
@@ -80,7 +80,7 @@ print(response.json())
 
 When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers. You can trace this path using the `scapy` library:
 
-```python
+```{python}
 from scapy.all import traceroute
 
 # Trace the path to Wikipedia
@@ -90,7 +90,7 @@ result, unans = traceroute("en.wikipedia.org", maxttl=20)
 
 Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:
 
-```python
+```{python}
 import requests
 
 def geolocate_ip(ip):
@@ -111,7 +111,7 @@ print(f"{location['city']}, {location['country']}")
 
 The Domain Name System translates human-readable domain names (like `en.wikipedia.org`) into IP addresses that computers can route to. You can perform DNS lookups programmatically with the `dnspython` library:
 
-```python
+```{python}
 import dns.resolver
 
 # Look up the IP address for Wikipedia
@@ -149,7 +149,7 @@ The status codes you will encounter most often:
 
 When a request fails, the status code tells you *what* went wrong, but diagnosing *why* requires looking at the full response. A diagnostic function can help:
 
-```python
+```{python}
 import requests
 
 def diagnose_request(url, headers=None):
@@ -176,7 +176,7 @@ diagnose_request("https://en.wikipedia.org/wiki/Nonexistent_Page_12345")
 
 The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a `User-Agent` header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:
 
-```python
+```{python}
 import time
 
 def get_with_backoff(url, headers=None, max_retries=3):
@@ -200,7 +200,7 @@ Understanding status codes in context makes debugging much faster. A 403 from th
 
 Let us retrieve data from the Wikimedia pageviews API. This API requires a meaningful `User-Agent` header — if you send the default `requests` User-Agent, you will get a 403 error:
 
-```python
+```{python}
 import requests
 
 article = "University_of_Colorado_Boulder"
@@ -224,7 +224,7 @@ data = response.json()
 
 Now convert the response to a DataFrame and plot it:
 
-```python
+```{python}
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -251,7 +251,7 @@ scheme://userinfo@host:port/path?query#fragment
 
 Never write regular expressions to parse URLs. Use the `urllib.parse` module instead:
 
-```python
+```{python}
 from urllib.parse import urlparse, parse_qs
 
 url = "https://api.census.gov/data/2022/acs/acs5?get=NAME,B01001_001E&for=place:07850&in=state:08"
@@ -274,7 +274,7 @@ Understanding URL structure is essential for constructing API requests. In @sec-
 
 While you can construct URLs with f-strings, this approach breaks when values contain special characters like spaces, ampersands, or non-ASCII text. The `urllib.parse` module provides tools for building URLs safely:
 
-```python
+```{python}
 from urllib.parse import urlencode
 
 # Build a Wikimedia API URL from components
@@ -297,7 +297,7 @@ print(query_string)
 
 The `requests` library also accepts a `params` dictionary that handles URL encoding automatically — this is the preferred approach for API calls:
 
-```python
+```{python}
 response = requests.get(base_url, params=params, headers=headers)
 print(response.url)  # Shows the full URL that was actually requested
 ```

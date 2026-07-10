@@ -24,7 +24,7 @@ Most government APIs require an API key — a unique string that identifies your
 
 ### Environment Variables
 
-```python
+```{python}
 import os
 
 # Set in your terminal before launching Jupyter:
@@ -42,7 +42,7 @@ if not census_key:
 
 ### Configuration Files
 
-```python
+```{python}
 import json
 
 # Create a file called 'api_keys.json' with your keys
@@ -70,7 +70,7 @@ The Census Bureau provides access to an enormous range of demographic, economic,
 
 The Census API organizes variables into groups. Each group has a code (like `B25034` for "Year Structure Built") and contains multiple variables representing different breakdowns:
 
-```python
+```{python}
 import requests
 import pandas as pd
 
@@ -102,7 +102,7 @@ A practical tip: when you find a variable that looks right, always retrieve it f
 
 Census data is organized geographically using FIPS codes. Colorado is state `08`; Boulder is place `07850`; Longmont is place `45970`. You can find FIPS codes at [census.gov/library/reference/code-lists](https://www.census.gov/library/reference/code-lists/ansi.html).
 
-```python
+```{python}
 api_url = "https://api.census.gov/data/2022/acs/acs5"
 
 # Housing age distribution for Boulder, CO
@@ -130,7 +130,7 @@ print(df)
 
 You can pass multiple FIPS codes to compare locations side by side:
 
-```python
+```{python}
 # Compare Boulder and Longmont
 params["for"] = "place:07850,45970"
 
@@ -163,7 +163,7 @@ The Federal Reserve Bank of St. Louis maintains FRED (Federal Reserve Economic D
 
 FRED organizes data by "series" — each series is a specific time series with a unique ID. The easiest way to find series IDs is to search the [FRED website](https://fred.stlouisfed.org/) interactively. For example, searching for "median household income Boulder County" will lead you to the series `MHIBS08013A052NCEN`.
 
-```python
+```{python}
 # Retrieve median household income for Boulder County
 url = "https://api.stlouisfed.org/fred/series/observations"
 
@@ -187,7 +187,7 @@ print(df_income.head())
 
 The real power of FRED emerges when you combine multiple series to tell a richer story:
 
-```python
+```{python}
 # Also get CPI data for comparison
 params_cpi = {
     "series_id": "CPIAUCSL",  # Consumer Price Index, All Urban Consumers
@@ -214,7 +214,7 @@ df_merged = pd.merge_asof(
 
 FRED can compute transformations before returning data, saving you work:
 
-```python
+```{python}
 # Get CPI as year-over-year percent change
 params_transform = {
     "series_id": "CPIAUCSL",
@@ -245,7 +245,7 @@ Other available transformations include `chg` (change from previous value), `log
 
 National economic indicators often mask significant regional variation. The Denver metro area, for instance, experienced housing cost increases that diverged sharply from the national average during the post-pandemic period. FRED provides regional CPI series that let you measure this divergence directly.
 
-```python
+```{python}
 # Retrieve Denver metro CPI and national CPI
 denver_params = {
     "series_id": "CUURS49BSA0",  # CPI, Denver-Aurora-Lakewood
@@ -293,7 +293,7 @@ What drives local inflation to diverge from national trends? Housing costs are o
 
 The Federal Election Commission provides campaign finance data through a free API. This data enables accountability journalism and research on the influence of money in politics:
 
-```python
+```{python}
 fec_key = keys["fec"]
 
 # Search for a candidate
@@ -318,7 +318,7 @@ for candidate in data["results"]:
 
 ### Getting Campaign Finance Data
 
-```python
+```{python}
 # Get committee (campaign) information for a candidate
 candidate_id = "P80000722"  # Biden's presidential committee
 
@@ -341,7 +341,7 @@ for result in data["results"]:
 
 The most compelling analyses often integrate data from multiple government sources to tell a story that no single dataset can tell alone. Census data provides snapshots of demographic and housing characteristics; FRED provides economic time series that capture the conditions under which those characteristics formed. Combining them reveals the relationship between macro-level economic forces and community-level outcomes.
 
-```python
+```{python}
 # Census: housing vintage by decade for Boulder
 housing_params = {
     "get": "NAME,B25034_001E,B25034_002E,B25034_003E,B25034_004E,"

@@ -21,7 +21,7 @@ Many interesting datasets live in HTML tables — economic data, sports statisti
 
 ### Retrieving and Inspecting
 
-```python
+```{python}
 import requests
 from bs4 import BeautifulSoup
 
@@ -33,7 +33,7 @@ soup = BeautifulSoup(response.text, "html.parser")
 
 Before writing parsing code, inspect the page in your browser's developer tools. Right-click on the table and select "Inspect" to see the HTML structure. You are looking for the `<table>` tag and, within it, `<tr>` (table row) and `<td>` (table data) tags.
 
-```python
+```{python}
 # Find all tables on the page
 tables = soup.find_all("table")
 print(f"Number of tables found: {len(tables)}")
@@ -50,7 +50,7 @@ for i, table in enumerate(tables):
 
 Once you have identified the correct table, iterate through its rows and extract the text from each cell:
 
-```python
+```{python}
 # Assuming the data table is tables[1] (verify by inspection)
 data_table = tables[1]
 rows = data_table.find_all("tr")
@@ -71,7 +71,7 @@ print(cells)
 
 ### Building the DataFrame
 
-```python
+```{python}
 # Loop through all rows, extract cleaned cell data
 all_rows = []
 for row in rows:
@@ -92,7 +92,7 @@ This manual approach gives you complete control over the extraction process. The
 
 For well-structured HTML tables, pandas provides a powerful shortcut. The `read_html()` function finds all tables on a page and converts each one to a DataFrame:
 
-```python
+```{python}
 import pandas as pd
 
 # Point read_html directly at a URL — no requests or BeautifulSoup needed
@@ -105,7 +105,7 @@ print(f"Number of tables found: {len(tables)}")
 
 You can specify which row contains the column headers and select the table you want by index:
 
-```python
+```{python}
 # The highest-grossing films table might be at index 3 (verify by inspection)
 films_df = pd.read_html(url, header=0)[3]
 print(films_df.head())
@@ -117,7 +117,7 @@ The `read_html` function is remarkably powerful for its simplicity, but it has l
 
 In practice, `read_html` rarely produces a perfect DataFrame. Column names may contain whitespace or be split across multiple header rows. Numeric columns often parse as strings because of dollar signs, commas, or percentage symbols. Merged cells create NaN values that need to be filled. Here is a typical cleanup workflow:
 
-```python
+```{python}
 # Retrieve and extract the table
 tables = pd.read_html(url, header=0)
 df = tables[3]  # Verify the correct index by inspection
@@ -151,7 +151,7 @@ Many web pages present structured data without using HTML tables. Award nominees
 
 The [Academy Awards](https://www.oscars.org) website lists nominees and winners organized by category. The data is structured with nested `<div>` tags rather than `<table>` elements. Let us build a parser for it.
 
-```python
+```{python}
 import requests
 from bs4 import BeautifulSoup
 
@@ -165,7 +165,7 @@ soup = BeautifulSoup(response.text, "html.parser")
 
 The key challenge with non-tabular scraping is finding HTML elements that reliably contain your target data. Start by using the browser's Inspector tool to examine the structure around one category:
 
-```python
+```{python}
 # Look for grouping elements — the structure may use classes like
 # "view-grouping" or similar containers for each award category
 groupings = soup.find_all("div", class_="view-grouping")
@@ -179,7 +179,7 @@ print(f"Found {len(groupings)} category groupings")
 
 If your initial `find_all` returns too many or too few results, you need to navigate the tree structure to find a more specific anchor. This involves going *up* to a unique parent and then searching *down* within it:
 
-```python
+```{python}
 # Find the main content area first
 content_area = soup.find("div", class_="field--name-field-award-categories")
 
@@ -193,7 +193,7 @@ if content_area:
 
 For each category, extract the award name and the list of nominees:
 
-```python
+```{python}
 results = []
 
 for category in categories:
@@ -220,7 +220,7 @@ print(df.head(10))
 
 Once your parser works for one page, abstract it into a function you can reuse:
 
-```python
+```{python}
 import time
 
 def scrape_oscar_year(year, headers):
@@ -258,7 +258,7 @@ def scrape_oscar_year(year, headers):
 
 Let us build a second parser for a very different page structure. The Colorado General Assembly website at [leg.colorado.gov/legislators](https://leg.colorado.gov/legislators) lists all current state legislators with their names, party affiliations, districts, and chambers:
 
-```python
+```{python}
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -276,7 +276,7 @@ print(f"Found {len(containers)} legislator entries")
 
 For each container, extract the relevant fields. The exact tag structure will vary, so the key skill here is using the Inspector to trace from the visible text on the page back to the HTML elements that contain it:
 
-```python
+```{python}
 records = []
 for container in containers:
     name_tag = container.find("a")
@@ -303,7 +303,7 @@ Note that the page may have changed since this was written — that is the funda
 
 As you scrape more pages, you will encounter failures: pages that do not load, elements that are missing, or structures that do not match your expectations. A robust scraper handles these gracefully:
 
-```python
+```{python}
 def safe_scrape(url, headers, parse_func):
     """Scrape a URL with comprehensive error handling.
 

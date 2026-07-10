@@ -23,7 +23,7 @@ This chapter teaches you to parse both formats, building the foundational skills
 
 XML organizes data as a hierarchy of nested tags. Each tag can contain text, attributes, and child tags. Here is a simplified example of Congressional member data:
 
-```python
+```{python}
 house_raw = """<?xml version="1.0" encoding="UTF-8"?>
 <congress session="118">
   <chamber name="House">
@@ -49,7 +49,7 @@ This is still just a string. To search and navigate it, you need to parse it int
 
 ### Parsing with BeautifulSoup
 
-```python
+```{python}
 from bs4 import BeautifulSoup
 
 soup = BeautifulSoup(house_raw, "xml")
@@ -61,7 +61,7 @@ print(soup.congress.chamber.member)
 
 The power of BeautifulSoup is in its search methods. The `.find()` method returns the first tag matching your criteria. The `.find_all()` method returns all matching tags as a list:
 
-```python
+```{python}
 # Find all member tags
 members = soup.find_all("member")
 print(len(members))  # 2
@@ -82,7 +82,7 @@ Notice the use of `.find("first-name")` rather than `.first-name` as a Python at
 
 A common pattern is extracting all values for a particular tag and then analyzing the distribution:
 
-```python
+```{python}
 # Count party affiliations
 parties = [m.find("party").text for m in soup.find_all("member")]
 print(parties)
@@ -97,7 +97,7 @@ print(party_counts)
 
 The `.contents` method gives you a list of a tag's direct children, which is useful for exploring unfamiliar XML structures:
 
-```python
+```{python}
 first_member = soup.find("member")
 print(first_member.contents)
 # A list of child tags and whitespace strings
@@ -107,7 +107,7 @@ print(first_member.contents)
 
 Let us retrieve and parse actual Congressional member data. The [clerk.house.gov](https://clerk.house.gov) website publishes member data in XML format:
 
-```python
+```{python}
 import requests
 from bs4 import BeautifulSoup
 
@@ -134,7 +134,7 @@ print(Counter(parties))
 
 Counting party affiliations is useful, but the real power of parsing XML comes from converting it into a DataFrame for systematic analysis. The pattern is straightforward: use `find_all()` to get all records, extract the fields you need from each one, build a list of dictionaries, and pass it to `pd.DataFrame()`:
 
-```python
+```{python}
 import pandas as pd
 
 # Extract structured data from each member
@@ -157,7 +157,7 @@ print(df.head())
 
 With the full Congressional dataset, you can now perform real analysis:
 
-```python
+```{python}
 # Party breakdown
 print(df.groupby("party").size())
 
@@ -177,7 +177,7 @@ Once the data is in a DataFrame, you have the full power of pandas at your dispo
 
 JSON maps onto two Python data structures you already know. A JSON **array** is a Python **list** — ordered, indexed by position:
 
-```python
+```{python}
 classroom = ["Alice", "Bob", "Carol"]
 print(classroom[0])   # "Alice"
 print(len(classroom))  # 3
@@ -185,7 +185,7 @@ print(len(classroom))  # 3
 
 A JSON **object** is a Python **dictionary** — unordered, accessed by key:
 
-```python
+```{python}
 state = {
     "name": "Colorado",
     "capital": "Denver",
@@ -199,7 +199,7 @@ print(state.keys())         # dict_keys(['name', 'capital', 'population'])
 
 Real-world JSON data nests these structures inside each other. A dictionary can contain lists, lists can contain dictionaries, and the nesting can go several levels deep:
 
-```python
+```{python}
 schools = {
     "School 1": {
         "Classroom A": ["Alice", "Bob"],
@@ -221,7 +221,7 @@ The skill of navigating nested structures — working from the outside in, one k
 
 The most common JSON pattern you will encounter in web data is a list of dictionaries, where each dictionary represents a record and each key-value pair represents a field:
 
-```python
+```{python}
 census_data = [
     {"state": "Colorado", "year": 2020, "population": 5773714},
     {"state": "Colorado", "year": 2010, "population": 5029196},
@@ -234,7 +234,7 @@ print(census_data[0]["population"])  # 5773714
 
 This pattern converts directly into a pandas DataFrame:
 
-```python
+```{python}
 import pandas as pd
 
 df = pd.DataFrame(census_data)
@@ -251,7 +251,7 @@ This list-of-dictionaries-to-DataFrame pipeline is the standard way to convert A
 
 When you receive JSON data from the web (as a string), you need to parse it into Python objects:
 
-```python
+```{python}
 import json
 
 # Parse a JSON string into a Python object
@@ -267,7 +267,7 @@ print(json_output)
 
 When working with `requests`, the `.json()` method on a response object does this parsing for you automatically:
 
-```python
+```{python}
 response = requests.get("https://api.example.com/data")
 data = response.json()  # Equivalent to json.loads(response.text)
 ```
@@ -276,7 +276,7 @@ data = response.json()  # Equivalent to json.loads(response.text)
 
 Here is a simplified version of a social media post object, similar to what Twitter's API used to return:
 
-```python
+```{python}
 tweet = {
     "id": 266031293945503744,
     "text": "Four more years.",
@@ -311,7 +311,7 @@ print(len(tweet["entities"]["user_mentions"]))  # 0
 
 The Twitter example above is only two levels deep. Real API responses often nest data three or four levels down, and the path to the data you need is not always obvious. Let us work through a live example using the Open-Meteo weather API, which returns a forecast for Boulder, Colorado:
 
-```python
+```{python}
 import requests
 
 url = "https://api.open-meteo.com/v1/forecast"
@@ -344,7 +344,7 @@ print(f"Elevation: {elevation} meters")
 
 The strategy is always the same: start with `type()` and `.keys()` at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:
 
-```python
+```{python}
 import pandas as pd
 import matplotlib.pyplot as plt
 

@@ -22,14 +22,14 @@ The solution is to use a tool that can execute JavaScript: a real web browser, c
 
 Selenium requires two components: the `selenium` Python library and a browser driver that lets Python control a specific browser.
 
-```python
+```{python}
 # Install from a terminal:
 # pip install selenium webdriver-manager
 ```
 
 The `webdriver_manager` library automatically downloads and configures the correct driver for your browser:
 
-```python
+```{python}
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -49,7 +49,7 @@ When you create the `driver`, a browser window opens. This is your programmable 
 
 ## Navigating and Finding Elements
 
-```python
+```{python}
 # Navigate to a website
 driver.get("https://xkcd.com")
 
@@ -73,7 +73,7 @@ The `find_element` method (singular) returns the first matching element. The `fi
 
 xkcd is famous for its hidden alt-text messages. You can extract element attributes:
 
-```python
+```{python}
 # Find the comic image
 img = driver.find_element(By.XPATH, "//div[@id='comic']//img")
 
@@ -88,7 +88,7 @@ Selenium can simulate clicks, keyboard input, and scrolling — anything a human
 
 ### Clicking
 
-```python
+```{python}
 # Click the "Random" button to navigate to a random comic
 random_button = driver.find_element(By.XPATH, "//ul[@class='comicNav']//a[contains(text(),'Random')]")
 random_button.click()
@@ -103,7 +103,7 @@ print(f"Random comic title: {img.get_attribute('title')}")
 
 ### Typing and Searching
 
-```python
+```{python}
 from selenium.webdriver.common.keys import Keys
 
 # Navigate to Google
@@ -125,7 +125,7 @@ time.sleep(2)  # Wait for results
 
 Some pages load content as you scroll (infinite scroll). You can simulate this:
 
-```python
+```{python}
 from selenium.webdriver.common.keys import Keys
 
 body = driver.find_element(By.TAG_NAME, "body")
@@ -140,7 +140,7 @@ for i in range(5):
 
 The `time.sleep()` calls in the examples above are a crude approach to waiting for content to load. A better strategy is *explicit waits*, which pause execution until a specific condition is met:
 
-```python
+```{python}
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -169,7 +169,7 @@ Use these instead of `time.sleep()` whenever possible. The combination of `WebDr
 
 Many modern websites load content progressively as you scroll — social media feeds, image galleries, and product listings all use this pattern. The technique for scraping these pages involves scrolling to the bottom, waiting for new content to load, and repeating until no more content appears:
 
-```python
+```{python}
 def scrape_infinite_scroll(driver, max_scrolls=20, scroll_pause=2):
     """Scroll an infinite-scroll page and collect all loaded content."""
     last_height = driver.execute_script("return document.body.scrollHeight")
@@ -199,7 +199,7 @@ A practical consideration: infinite scroll pages can contain thousands of items,
 
 Once the page is fully rendered in the browser, you can extract the complete HTML and parse it with the familiar BeautifulSoup tools:
 
-```python
+```{python}
 from bs4 import BeautifulSoup
 
 # Get the fully-rendered page source from Selenium
@@ -219,13 +219,13 @@ The workflow is always the same: use Selenium to get the page into the state you
 
 When you are done, close the browser window:
 
-```python
+```{python}
 driver.quit()
 ```
 
 After calling `quit()`, any subsequent calls to the driver will raise an error. Use `try/finally` blocks to ensure cleanup:
 
-```python
+```{python}
 try:
     driver.get("https://example.com")
     # ... scraping logic ...
@@ -246,7 +246,7 @@ This fragility reinforces a principle from @sec-post-api: when an API is availab
 
 For production scraping, you do not need a visible browser window. Headless mode runs the browser without a graphical interface, which is faster and can run on servers without a display:
 
-```python
+```{python}
 from selenium.webdriver.chrome.options import Options
 
 options = Options()
@@ -314,7 +314,7 @@ The modern web is dynamic: JavaScript renders content after the initial HTML loa
 
 Here is a complete workflow that demonstrates the typical pattern for scraping a dynamically-rendered page. We will automate a multi-page interaction: navigating to a website, performing a search, waiting for results to load, extracting the data, and repeating across multiple pages.
 
-```python
+```{python}
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
