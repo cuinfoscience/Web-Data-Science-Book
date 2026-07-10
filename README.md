@@ -1,6 +1,6 @@
 # Web Data Science
 
-A Quarto textbook for **INFO 4613 / 5613: Web Data Science** at the University of Colorado Boulder, Department of Information Science.
+A Quarto textbook for **INFO 4617 / 5617: Web Data Science** at the University of Colorado Boulder, Department of Information Science.
 
 This book teaches advanced undergraduates and master's students how to retrieve, parse, and analyze data from the web using Python. It covers static and dynamic web scraping, structured data formats (XML, JSON), the protocol stack (TCP/IP, DNS, HTTP), document extraction (HTML, archived pages, PDFs), and authenticated APIs (Wikipedia, U.S. Census, FRED, FEC, Reddit, Spotify, Bluesky, Mastodon, OpenAI, Anthropic), along with automation via GitHub Actions and a capstone treatment of research design.
 
@@ -144,4 +144,4 @@ This book is released under the [MIT License](LICENSE). You are free to use, mod
 
 ## Acknowledgements
 
-This book grew out of the INFO 4871/4613 Web Data Science course at the University of Colorado Boulder. It has benefited from the questions, frustrations, and insights of many cohorts of students. The author also gratefully acknowledges the journalists, researchers, and civic technologists whose work demonstrates why web data fluency matters for the public interest.
+This book grew out of the INFO 4871/5871 Web Data Science course at the University of Colorado Boulder. It has benefited from the questions, frustrations, and insights of many cohorts of students. The author also gratefully acknowledges the journalists, researchers, and civic technologists whose work demonstrates why web data fluency matters for the public interest.
