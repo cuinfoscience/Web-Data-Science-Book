@@ -19,13 +19,25 @@ This chapter establishes a decision framework that you should revisit before eve
 
 ### The Computer Fraud and Abuse Act
 
-The [Computer Fraud and Abuse Act](https://en.wikipedia.org/wiki/Computer_Fraud_and_Abuse_Act) (CFAA) was passed in 1984 in response to growing concerns about computer crime. Its key provision prohibits "unauthorized access" to computer systems, but what counts as "unauthorized" in the context of web scraping has been a matter of ongoing litigation.
+The [Computer Fraud and Abuse Act](https://en.wikipedia.org/wiki/Computer_Fraud_and_Abuse_Act) (CFAA) was enacted in 1986, expanding a narrower 1984 predecessor statute, in response to growing concerns about computer crime. Its key provision prohibits "unauthorized access" to computer systems, but what counts as "unauthorized" in the context of web scraping has been a matter of ongoing litigation.
 
-The landmark case *hiQ Labs v. LinkedIn* (2022) tested whether scraping publicly accessible data constitutes unauthorized access. hiQ, a data analytics company, scraped public LinkedIn profiles to build workforce analytics products. LinkedIn sent a cease-and-desist letter and blocked hiQ's access. The Ninth Circuit ultimately held that scraping publicly accessible data does not violate the CFAA, since the data was not behind an authentication barrier. However, this ruling is narrow in scope — it applies to public-facing data and does not address data behind logins.
+Two cases define the modern boundaries. In *Van Buren v. United States* (2021), the Supreme Court narrowed the CFAA's "exceeds authorized access" provision: the Court adopted a "gates-up-or-down" reading under which the statute targets accessing systems or areas of systems you are not entitled to enter — not misusing information you were allowed to see. Before *Van Buren*, violating a website's stated terms could plausibly be framed as a federal crime; after it, that theory is much harder to sustain.
 
-The case of *Sandvig v. Barr* challenged the CFAA's application to researchers who violated a website's Terms of Service in order to conduct audit studies of algorithmic discrimination. The concern was that the CFAA criminalized legitimate research. This case illustrates the tension between researchers' need for data and platforms' desire to control how their systems are studied.
+The second is *hiQ Labs v. LinkedIn*, and its full arc is instructive. hiQ, a data analytics company, scraped public LinkedIn profiles to build workforce analytics products; LinkedIn sent a cease-and-desist letter and blocked hiQ's access. The Ninth Circuit held in 2019 — and, after the Supreme Court sent the case back for reconsideration in light of *Van Buren*, held again in 2022 — that scraping publicly accessible data likely does not violate the CFAA, since no authentication "gate" was bypassed. But that is not the end of the story: later in 2022, hiQ *lost* on LinkedIn's breach-of-contract claim — it had continued scraping after agreeing to the Terms of Service and receiving the cease-and-desist — and the case settled with hiQ agreeing to stop. The lesson is precise: the CFAA probably does not criminalize scraping public pages, but contract law can still make it costly.
+
+The case of *Sandvig v. Barr* challenged the CFAA's application to researchers who violated a website's Terms of Service in order to conduct audit studies of algorithmic discrimination. In 2020, a federal district court held that merely violating Terms of Service does not constitute a CFAA crime — a meaningful, if limited, protection for research. The case illustrates the tension between researchers' need for data and platforms' desire to control how their systems are studied.
 
 The key takeaway: the legal landscape is unsettled and varies by jurisdiction. "It's technically possible" is not the same as "it's legal," and "it's legal" is not the same as "it's ethical."
+
+### The Current Landscape: Scraping, AI, and State Privacy Law
+
+The legal terrain has kept shifting since these landmark cases, and as of mid-2026 three developments matter most for your work.
+
+First, courts have continued to treat scraping of *public, logged-out* content skeptically as a target for platform lawsuits. In early 2024, Meta's breach-of-contract claims against the data broker Bright Data failed in federal court because the scraping at issue collected only publicly available data without logging in; a parallel suit by X Corp. against the same company was dismissed later that year, with the court warning against letting platforms use contract law to claim exclusive ownership of public web data. These are trial-court rulings, not nationwide rules — but the direction is consistent with *hiQ*: authentication barriers and contractual relationships, not public visibility, are where legal risk concentrates.
+
+Second, generative AI has opened a new front. *The New York Times v. OpenAI and Microsoft* (filed 2023) and a wave of similar suits ask whether scraping copyrighted content to train AI models is infringement or fair use. Whatever the outcomes, the litigation has already changed the web: publishers have hardened their sites against crawlers, added AI-specific directives to `robots.txt`, and signed exclusive licensing deals — enclosure dynamics you will recognize from @sec-post-api.
+
+Third, U.S. states have filled part of the federal privacy vacuum. California's CCPA/CPRA came first, and by 2026 more than a dozen states — including Colorado, whose Colorado Privacy Act applies to data about Colorado residents — have comprehensive privacy statutes with GDPR-like concepts: personal data rights, purpose limitation, and obligations on data processors. If your scraped dataset contains personal information about residents of these states, these laws can apply to you even as a student researcher. The practical implication is the same one this chapter keeps returning to: collect the minimum you need, and treat personal data as a liability, not an asset.
 
 ### Terms of Service as Quasi-Law
 
@@ -52,10 +64,13 @@ import requests
 # Retrieve robots.txt for Wikipedia
 response = requests.get("https://en.wikipedia.org/robots.txt")
 print(response.text[:500])
-# You'll see directives like:
+# The generic rules (as of mid-2026) include directives like:
 # User-agent: *
+# Allow: /w/api.php?action=mobileview&
+# Allow: /w/load.php?
 # Disallow: /w/
-# Allow: /w/api.php
+# Disallow: /api/
+# Disallow: /wiki/Special:
 ```
 
 The key directives are `User-agent` (which crawler the rule applies to), `Disallow` (paths that should not be accessed), `Allow` (exceptions to disallow rules), and `Crawl-delay` (requested time between requests). You can parse these programmatically:
@@ -67,13 +82,28 @@ rp = RobotFileParser()
 rp.set_url("https://en.wikipedia.org/robots.txt")
 rp.read()
 
-# Can a generic crawler access the main API?
-print(rp.can_fetch("*", "https://en.wikipedia.org/w/api.php"))
-# True — the API is explicitly allowed
+# Can a generic crawler fetch an encyclopedia article?
+print(rp.can_fetch("*", "https://en.wikipedia.org/wiki/Python_(programming_language)"))
+# True — article pages under /wiki/ are open to crawlers
 
-# Can it access the edit interface?
-print(rp.can_fetch("*", "https://en.wikipedia.org/w/index.php?action=edit"))
-# Check the result — many edit paths are restricted
+# Can it fetch the dynamic pages under /w/, including the API?
+print(rp.can_fetch("*", "https://en.wikipedia.org/w/api.php"))
+# False — /w/ is disallowed for crawlers, with only narrow exceptions
+
+# Can it fetch special/internal pages?
+print(rp.can_fetch("*", "https://en.wikipedia.org/wiki/Special:Search"))
+# False — Special: pages are disallowed
+```
+
+The second result deserves a pause, because it teaches an important nuance. Wikipedia *wants* programmatic users on its API — @sec-wikipedia is built on it — yet `robots.txt` disallows `/w/` paths. The two facts are not in conflict: `robots.txt` addresses *crawlers* that discover and fetch pages by following links, and Wikipedia would rather crawlers index its stable article URLs than its infinite space of dynamic, server-intensive `/w/` URLs. Deliberate API clients are governed by a different set of norms — the Wikimedia User-Agent policy and API etiquette guidelines — that you will follow in @sec-wikipedia. The general lesson: `robots.txt` tells you how a site wants *automated page-fetching* to behave, and it is one input among several (Terms of Service, API documentation, rate-limit guidance) rather than the complete rulebook.
+
+If a site declares a `Crawl-delay`, you can read it programmatically and respect it:
+
+```{python}
+delay = rp.crawl_delay("*")
+print(delay)
+# None if the site declares no crawl delay; otherwise seconds between requests
+wait = delay if delay is not None else 1.0  # Fall back to a polite default
 ```
 
 Two important caveats. First, `robots.txt` is a norm, not a law. Violating it is not illegal (in most jurisdictions), but it is disrespectful of the site operator's wishes and may result in your IP being blocked. Second, if a site does not have a `robots.txt` file (the request returns a 404), that means there are no crawling restrictions — not that you should crawl aggressively.
@@ -99,7 +129,7 @@ for name, url in sites.items():
     print(f"{name}: {len(lines)} lines, {disallow_count} Disallow rules, {allow_count} Allow rules")
 ```
 
-Wikipedia's `robots.txt` is relatively permissive — it restricts access to editing interfaces and internal administration pages but explicitly allows its API (`Allow: /w/api.php`). This reflects Wikipedia's organizational commitment to openness: the data exists to be shared. Reddit's file is more complex, restricting many URL patterns (user profiles, search results, sorted listings) while permitting basic page access. The New York Times is more restrictive still, blocking large sections of the site from automated access — reflecting the fact that its content is a commercial product.
+Wikipedia's `robots.txt` is permissive where it matters most — the encyclopedia articles under `/wiki/` are open to crawlers — while restricting dynamic pages, editing interfaces, and internal administration paths under `/w/` and `Special:`. Programmatic access to its data happens instead through the API and public database dumps, governed by their own etiquette policies. This division of labor reflects Wikipedia's organizational commitment to openness: the data exists to be shared, through channels designed for sharing it. Reddit's file is more complex, restricting many URL patterns (user profiles, search results, sorted listings) while permitting basic page access. The New York Times is more restrictive still, blocking large sections of the site from automated access — reflecting the fact that its content is a commercial product.
 
 These differences are not arbitrary. They reflect each organization's relationship with automated access: Wikipedia encourages it as part of its mission, Reddit tolerates it within limits, and the Times treats its content as proprietary. Reading `robots.txt` before you scrape tells you not just what is permitted but what kind of organization you are dealing with.
 
@@ -118,6 +148,11 @@ response = requests.get("https://example.com", headers=headers)
 ```
 
 This practice serves two purposes: it lets site operators contact you if your scraping causes problems, and it signals that you are a responsible actor rather than a malicious bot. Some APIs (including the Wikimedia API you used in @sec-introduction) require a meaningful User-Agent and will return errors or impose stricter rate limits if you do not provide one.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a deeper introduction to HTTP requests, headers, and status codes — the machinery beneath every example in this chapter — see *Missing Manual* Chapter 24: HTTP and Web APIs.
+:::
 
 ## Rate Limiting
 
@@ -171,18 +206,20 @@ def responsible_get(url, headers=None, delay=1.0):
 
     try:
         response = requests.get(url, headers=default_headers, timeout=30)
+        response.raise_for_status()  # Treat 4xx/5xx statuses as failures
         logging.info(f"{response.status_code} {url}")
         time.sleep(delay)
         return response
-    except requests.exceptions.ConnectionError:
-        logging.error(f"Connection failed: {url}")
+    except requests.exceptions.HTTPError as e:
+        logging.error(f"HTTP error: {e}")
+        time.sleep(delay)  # A failed request still counts against the server
         return None
-    except requests.exceptions.Timeout:
-        logging.error(f"Request timed out: {url}")
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Request failed ({type(e).__name__}): {url}")
         return None
 ```
 
-Every design choice in this function reflects a principle from this chapter. The default User-Agent identifies you and provides contact information, so site operators can reach you if your scraping causes problems. The configurable delay enforces rate limiting by default — you have to explicitly override it, which makes aggressive scraping a conscious decision rather than an oversight. The `try/except` blocks handle the two most common network failures gracefully, logging the error instead of crashing your entire scraping run. The `timeout` parameter prevents your script from hanging indefinitely on an unresponsive server.
+Every design choice in this function reflects a principle from this chapter. The default User-Agent identifies you and provides contact information, so site operators can reach you if your scraping causes problems. The configurable delay enforces rate limiting by default — you have to explicitly override it, which makes aggressive scraping a conscious decision rather than an oversight. The `raise_for_status()` call ensures that a `404 Not Found` or `403 Forbidden` is treated as the failure it is, rather than silently passed downstream to your parser. The `except` blocks handle both HTTP errors and the whole family of network failures (`ConnectionError`, `Timeout`, `SSLError`, and other `RequestException` subtypes) gracefully, logging the error instead of crashing your entire scraping run. The `timeout` parameter prevents your script from hanging indefinitely on an unresponsive server. And if a site declares a `Crawl-delay` in its `robots.txt`, pass that value as `delay` so your tool honors the site's own stated preference.
 
 You will use variations of this pattern in @sec-static-pages when scraping HTML tables, in @sec-archives when retrieving historical snapshots, and throughout the API chapters. Building responsible defaults into your tools is more reliable than remembering to add them each time.
 
@@ -221,6 +258,8 @@ The line is not always clear. Scraping aggregated, anonymous data (like Wikipedi
 4. **Rate limiting experiment.** Using `time.time()` to measure elapsed time, write a loop that makes five requests to a public website with a one-second delay between each. Then modify the delay to two seconds. Confirm that your actual request timing matches your intended rate.
 
 5. **Personal robots.txt audit.** Retrieve `robots.txt` for a website you use daily but have never scraped. Read the `Disallow` rules carefully. Then find and read the site's Terms of Service (look for links in the footer). Write a 300-word analysis: if you wanted to collect data from this site for a class project, what would `robots.txt`, the Terms of Service, and the five-question ethical framework each permit and restrict? Where do these three sources of guidance agree, and where do they conflict?
+
+6. **Graduate extension (INFO 5617).** Read @fiesler2020no alongside the EFF's CFAA explainer and a summary of *Van Buren v. United States*. Then write a two-page memo advising a university research team that wants to collect public data from three platforms of your choosing. For each platform, make an explicit determination on four dimensions: CFAA exposure after *Van Buren*, Terms of Service and contract risk after *hiQ*, `robots.txt` guidance, and whether the project likely requires IRB review. Conclude with a collection protocol the team should follow.
 
 ::: {.callout-note}
 ## Public Interest Connection
