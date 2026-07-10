@@ -69,7 +69,7 @@ web-data-science/
 
 ## Companion Resources
 
-- **Missing Manual for Information Scientists**: https://www.brianckeegan.com/ParatechnicalComputingHandbook/book/
+- **Missing Manual for Information Scientists**: https://cuinfoscience.github.io/INFO-Missing-Manual/
   - Referenced throughout for foundational computing skills (Jupyter, debugging, regex, scripting, version control, secrets management, etc.)
 - **Course notebooks**: The original Jupyter notebooks from INFO 4871 (Fall 2024) are the primary source material for tutorial content.
 - **JRC paper**: Keegan (2026), "Public interest data infrastructuring" — provides the theoretical framework for Chapter 3 and the public interest thread throughout.

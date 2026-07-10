@@ -101,7 +101,7 @@ Web-Data-Science-Book/
 
 ## Companion Resource: The Missing Manual
 
-The book references the *[Missing Manual for Information Scientists](https://www.brianckeegan.com/ParatechnicalComputingHandbook/book/)* throughout for foundational computing skills (Jupyter, debugging, regex, scripting, version control, secrets management, and more). The two books are designed to complement each other: this book focuses on web-data-specific techniques while delegating general computing skills to the *Missing Manual*.
+The book references the *[Missing Manual for Information Scientists](https://cuinfoscience.github.io/INFO-Missing-Manual/)* throughout for foundational computing skills (Jupyter, debugging, regex, scripting, version control, secrets management, and more). The two books are designed to complement each other: this book focuses on web-data-specific techniques while delegating general computing skills to the *Missing Manual*.
 
 ## Pedagogical Approach
 
