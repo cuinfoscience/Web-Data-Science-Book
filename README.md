@@ -37,6 +37,7 @@ The book is organized into four parts plus appendices:
 15. Research Design with Web Data
 
 **Appendices**
+- Companion Notebooks
 - AI Coauthorship and Responsible Disclosure
 - Where to Go from Here
 
@@ -48,15 +49,15 @@ This book is written in [Quarto](https://quarto.org/). To build it locally:
 
 - [Quarto 1.4+](https://quarto.org/docs/get-started/)
 - Python 3.10+ (the [Anaconda](https://www.anaconda.com/download) distribution is recommended)
-- LaTeX (for PDF output) — install via [TinyTeX](https://yihui.org/tinytex/) with `quarto install tinytex`
+- Jupyter (`pip install jupyter`) — Quarto uses it to process the book's executable code cells
 
 ### Python dependencies
 
 The code blocks in the book reference these libraries. Most students will not need all of them at once; install as you work through each chapter:
 
 ```bash
-pip install requests beautifulsoup4 pandas matplotlib seaborn \
-            selenium webdriver-manager pypdf gensim nltk \
+pip install requests beautifulsoup4 lxml pandas numpy scipy \
+            matplotlib seaborn selenium pypdf gensim nltk \
             scapy dnspython praw spotipy atproto Mastodon.py \
             openai anthropic
 ```
@@ -67,15 +68,14 @@ pip install requests beautifulsoup4 pandas matplotlib seaborn \
 # Preview the book locally (live reload)
 quarto preview
 
-# Render all configured formats
+# Render the book (HTML)
 quarto render
-
-# Render HTML only
-quarto render --to html
-
-# Render PDF only
-quarto render --to pdf
 ```
+
+The book is currently configured for HTML output plus downloadable
+companion notebooks. PDF output via LaTeX is a possible future addition;
+it would require `quarto install tinytex` and a `pdf` entry under
+`format:` in `_quarto.yml`.
 
 By default, code blocks are not executed (`eval: false` in `_quarto.yml`). Students are expected to run code themselves in Jupyter Notebooks. This design choice reflects a pedagogical commitment: running code, encountering errors, and debugging them is where the learning happens.
 
@@ -89,13 +89,15 @@ Web-Data-Science-Book/
 ├── ch-02-ethics.qmd
 ├── ...
 ├── ch-15-research-design.qmd
+├── appendix-notebooks.qmd       # Index of companion notebooks
 ├── appendix-ai-disclosure.qmd
 ├── appendix-further.qmd
+├── notebooks/                   # Companion Jupyter notebooks (generated)
+├── tools/                       # Maintenance scripts (notebook generation)
 ├── references.bib               # BibTeX bibliography
 ├── book/                        # Rendered book output
 ├── claude.md                    # Editorial guidelines for AI-assisted authoring
-├── CLAUDE_CODE_EXPANSION_PROMPT.md  # Chapter expansion instructions
-├── LICENSE                      # MIT
+├── LICENSE                      # CC BY-NC-SA 4.0
 └── README.md
 ```
 
@@ -111,7 +113,7 @@ Each chapter follows a consistent structure:
 2. **Conceptual motivation** — why this matters
 3. **Library/framework introduction** — what tools you will use
 4. **Guided tutorial** with narrative code blocks
-5. **Exercises** (4–5 per chapter, graduated from guided to open-ended)
+5. **Exercises** (5 per chapter, graduated from guided to open-ended, plus a graduate extension for INFO 5617 students)
 6. **Social history and public interest** sidebar
 7. **Common debugging issues**
 8. **Key takeaways**
@@ -140,7 +142,7 @@ If you use this book in teaching or research, please cite:
 
 ## License
 
-This book is released under the [MIT License](LICENSE). You are free to use, modify, and distribute the materials, including for teaching at other institutions, with appropriate attribution.
+This book is released under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](LICENSE) (CC BY-NC-SA 4.0). You are free to share and adapt the materials — including for teaching at other institutions — with attribution, for noncommercial purposes, under the same license terms.
 
 ## Acknowledgements
 

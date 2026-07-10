@@ -10,22 +10,21 @@ This is a Quarto book for an upper-division undergraduate and master's-level cou
 # Preview the book locally
 quarto preview
 
-# Render all formats
+# Render the book (HTML is the only configured format)
 quarto render
 
-# Render HTML only
-quarto render --to html
-
-# Render PDF only (requires LaTeX)
-quarto render --to pdf
+# Regenerate the companion notebooks after editing chapter code
+python tools/make_notebooks.py
 ```
+
+PDF output is not currently configured; adding it would require TinyTeX and a `pdf` entry under `format:` in `_quarto.yml`.
 
 ### Dependencies
 
 - Quarto 1.4+
 - Python 3.10+ via Anaconda
 - Jupyter (for rendering .qmd files with Python code)
-- Key Python libraries: requests, beautifulsoup4, pandas, matplotlib, seaborn, selenium, pypdf, praw, spotipy, atproto, Mastodon.py, openai, anthropic, gensim, nltk, scapy, dnspython
+- Key Python libraries: requests, beautifulsoup4, lxml, pandas, numpy, scipy, matplotlib, seaborn, selenium, pypdf, praw, spotipy, atproto, Mastodon.py, openai, anthropic, gensim, nltk, scapy, dnspython
 
 ## Editorial Voice and Style
 
@@ -38,7 +37,7 @@ quarto render --to pdf
   2. Conceptual introduction with motivation
   3. Library/framework introduction
   4. Guided tutorial with narrative code blocks
-  5. Exercises (3–5 per chapter, graduated difficulty)
+  5. Exercises (5 per chapter, graduated difficulty, plus a final "Graduate extension (INFO 5617)" exercise)
   6. Social history / public interest data science sidebar
   7. Common debugging issues
   8. Key takeaways
@@ -51,7 +50,8 @@ quarto render --to pdf
   - `.callout-note` — Connections to the post-API age framework (openness, oversight, ownership)
   - `.callout-important` — Critical debugging or setup steps
 - **Data sources**: Use the specific sources from the course notebooks (leg.colorado.gov, the-numbers.com, Wikipedia, Boulder City Council PDFs, etc.). These may change; document the specific URLs and dates accessed.
-- **Exercises**: 3–5 per chapter. Graduate from guided application to open-ended exploration. At least one exercise per chapter should involve a data source not used in the tutorial.
+- **Exercises**: 5 per chapter, graduated from guided application to open-ended exploration, plus one **Graduate extension (INFO 5617)** exercise as the final numbered item — a scholarly reading paired with an open-ended, rigorous task for the 5000-level section. At least one exercise per chapter should involve a data source not used in the tutorial.
+- **Companion notebooks**: every chapter has a generated Jupyter notebook in `notebooks/` (regenerate with `python tools/make_notebooks.py` after editing chapter code; see the Companion Notebooks appendix).
 - **Word count target**: ~3,000 words per chapter (soft target; tutorial-heavy chapters may run to 4,000–5,000 including code blocks).
 
 ## File Structure
