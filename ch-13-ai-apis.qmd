@@ -42,6 +42,11 @@ answer = response.choices[0].message.content
 print(answer)
 ```
 
+::: {.callout-tip}
+## Model Names Rotate
+Provider model lineups turn over every few months. The names used in this chapter — `gpt-4o-mini`, `gpt-4o`, and `claude-sonnet-4-20250514` — were current when this book was written; check the providers' model pages for what is current when you read it. For research code, pin the exact dated version and record it in your documentation — the reproducibility section later in this chapter explains why this matters.
+:::
+
 ### Customizing Roles
 
 The `system` message sets the assistant's behavior. The `user` message is your input. The `assistant` message lets you simulate prior conversation turns:
@@ -170,6 +175,8 @@ def classify_bill(summary, client):
     return response.choices[0].message.content.strip().lower()
 
 # Apply across a list of bills
+import time
+
 bills = [
     {"id": "HB24-1001", "summary": "Increases funding for K-12 teacher salaries..."},
     {"id": "HB24-1042", "summary": "Establishes new emission standards for power plants..."},
@@ -179,9 +186,7 @@ bills = [
 for bill in bills:
     bill["category"] = classify_bill(bill["summary"], client)
     print(f"{bill['id']}: {bill['category']}")
-
-import time
-time.sleep(1)  # Rate limit between API calls
+    time.sleep(1)  # Rate limit between API calls
 ```
 
 ### Step 2: Extracting Structured Information
@@ -219,6 +224,49 @@ except json.JSONDecodeError:
     print("Failed to parse response as JSON")
     print(response.choices[0].message.content)
 ```
+
+### Structured Outputs: Letting the API Enforce the Format
+
+The `try/except` pattern above treats malformed JSON as a fact of life. It remains a good fallback — and it teaches you exactly what can go wrong — but for production work, current best practice is to have the API enforce the format for you. OpenAI's **Structured Outputs** feature accepts a JSON Schema and guarantees that the response conforms to it:
+
+```{python}
+# Define the schema the response must follow
+bill_schema = {
+    "name": "bill_classification",
+    "strict": True,
+    "schema": {
+        "type": "object",
+        "properties": {
+            "category": {
+                "type": "string",
+                "enum": ["education", "healthcare", "environment", "taxation",
+                         "criminal_justice", "transportation", "housing",
+                         "labor", "technology", "other"]
+            },
+            "fiscal_impact": {"type": "string", "enum": ["yes", "no", "unclear"]}
+        },
+        "required": ["category", "fiscal_impact"],
+        "additionalProperties": False
+    }
+}
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "Classify this Colorado bill summary."},
+        {"role": "user", "content": bills[0]["summary"]}
+    ],
+    response_format={"type": "json_schema", "json_schema": bill_schema},
+    temperature=0
+)
+
+# The response is guaranteed to parse and to match the schema
+result = json.loads(response.choices[0].message.content)
+print(result)
+# {'category': 'education', 'fiscal_impact': 'yes'}
+```
+
+A lighter-weight option, `response_format={"type": "json_object"}` (JSON mode), guarantees syntactically valid JSON without enforcing a particular schema. Anthropic's API achieves the same guarantee through tool use: you define a "tool" whose input schema is your desired output structure, and the model's tool call is constrained to match it — see the Anthropic tool-use documentation for details. Either way, schema enforcement eliminates a whole class of parsing failures. Keep the `try/except` fallback in your repertoire for providers and models that offer no such guarantee.
 
 ### Step 3: Measuring Similarity with Embeddings
 
@@ -333,7 +381,7 @@ Use `gpt-4o-mini` for development and testing. Switch to `gpt-4o` only when you 
 
 ## Reproducibility and Documentation
 
-LLM-based research faces reproducibility challenges that are fundamentally different from those of traditional computational methods. When you write a Python script to parse HTML, anyone with the same input file will get the same output. LLMs break this guarantee in multiple ways. Even with `temperature=0`, model outputs can vary slightly between calls due to floating-point non-determinism in the inference process. More significantly, model versions change over time: a prompt that works reliably with GPT-4 in early 2024 may produce different results with the same model name in late 2024, because the underlying weights have been updated. And when a model is deprecated entirely — as GPT-3.5 eventually will be — exact replication becomes impossible. These properties do not disqualify LLMs as research tools, but they demand a level of documentation that most researchers are not yet accustomed to providing.
+LLM-based research faces reproducibility challenges that are fundamentally different from those of traditional computational methods. When you write a Python script to parse HTML, anyone with the same input file will get the same output. LLMs break this guarantee in multiple ways. Even with `temperature=0`, model outputs can vary slightly between calls due to floating-point non-determinism in the inference process. More significantly, model versions change over time: a prompt that works reliably with GPT-4 in early 2024 may produce different results with the same model name in late 2024, because the underlying weights have been updated. And when a model is retired entirely — as happened to the original GPT-3 models in early 2024 — exact replication becomes impossible. These properties do not disqualify LLMs as research tools, but they demand a level of documentation that most researchers are not yet accustomed to providing.
 
 At a minimum, every research project that uses LLM APIs should record the following for each API call: the exact model name and version (e.g., `gpt-4o-mini-2024-07-18`, not just `gpt-4o-mini`), the complete prompt text including the system message, all generation parameters (`temperature`, `max_tokens`, `top_p`, `frequency_penalty`), the date and time of the API call, and any post-processing or validation steps applied to the output. Store this metadata alongside your results, not in a methods section written months later from memory. A simple practice is to log each API call to a JSONL file that includes both the request parameters and the full response object — this creates an audit trail that supports both reproducibility and debugging.
 
@@ -423,13 +471,15 @@ For a deeper understanding of how language models work internally — tokens, em
 
 5. **Hierarchical clustering.** Generate embeddings for 30 Wikipedia article titles spanning three different topic areas (10 per topic). Use `scipy.cluster.hierarchy` to create a dendrogram. Do the embeddings cluster by topic? How does the clustering compare to your intuitive groupings?
 
+6. **Graduate extension (INFO 5617).** Read @ziems2024can, which evaluates whether LLMs can serve as annotators for computational social science. Design and run a small validation study of your own: choose a classification task relevant to your research interests, classify 50 items with an LLM, and independently hand-code 25 of them before looking at the model's labels. Report your agreement rate (ideally alongside a chance-corrected measure such as Cohen's kappa), characterize any systematic patterns in the disagreements, and assess whether the paper's claims about zero-shot annotation hold for your task.
+
 ## Social History and Public Interest
 
 LLMs have accelerated the enclosure dynamics described in @sec-post-api — the enormous value of user-generated content as training data has given platforms new incentives to restrict access. At the same time, LLMs provide researchers with powerful analytical tools that can partially offset restricted data access: if you can retrieve even a small sample of text, LLMs can help you code, classify, and extract information from it at scales that would be impossible manually [@ziems2024can].
 
 The key challenge is reproducibility. LLM outputs are non-deterministic (even with `temperature=0`, there is some variation), model versions change, and the cost structure means that replication requires financial investment. These properties require new norms for documentation and disclosure — see @sec-appendix-ai-disclosure.
 
-There is also a cost-based access inequality shaping who can use these tools for research. GPT-4-class models cost orders of magnitude more per token than GPT-3.5-class models, creating a tier system where well-funded labs can afford the most capable models while under-resourced researchers are limited to cheaper, less capable alternatives. Open-weight models like LLaMA, Mistral, and Qwen represent a partial counterbalance — their weights are freely available for download and local inference. But running these models requires significant GPU infrastructure, creating a different kind of barrier rooted in compute rather than API fees. The result is a landscape where access to the most capable AI tools is stratified by institutional resources, raising questions about whose research questions get answered and whose analytical methods are considered state-of-the-art.
+There is also a cost-based access inequality shaping who can use these tools for research. Flagship models cost more than an order of magnitude more per token than the same providers' small models — GPT-4o versus GPT-4o-mini, for example — creating a tier system where well-funded labs can afford the most capable models while under-resourced researchers are limited to cheaper, less capable alternatives. Open-weight models like LLaMA, Mistral, and Qwen represent a partial counterbalance — their weights are freely available for download and local inference. But running these models requires significant GPU infrastructure, creating a different kind of barrier rooted in compute rather than API fees. The result is a landscape where access to the most capable AI tools is stratified by institutional resources, raising questions about whose research questions get answered and whose analytical methods are considered state-of-the-art.
 
 ::: {.callout-note}
 ## Public Interest Connection
