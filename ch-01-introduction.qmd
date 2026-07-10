@@ -23,7 +23,7 @@ Working with web data requires not just technical fluency but a professional dis
 
 **Growth mindset** means understanding that ability develops through effort. You will encounter libraries you have never used, error messages you do not understand, and web pages that resist your parsing attempts. This is normal. The goal is continual improvement, not instant mastery. Treat each frustration as a learning signal, not evidence of inadequacy.
 
-**Computational thinking** is the disciplined approach that computer scientists bring to problems: decomposing large tasks into smaller pieces, recognizing patterns across examples, abstracting away inessential details, and specifying unambiguous sequences of steps. When you face a complex scraping task, you will practice breaking it into retrieve, parse, clean, and analyze stages — each with clear inputs and outputs.
+**Computational thinking** is the disciplined approach that computer scientists bring to problems: decomposing large tasks into smaller pieces, recognizing patterns across examples, abstracting away inessential details, and specifying unambiguous sequences of steps [@wing2006computational]. When you face a complex scraping task, you will practice breaking it into retrieve, parse, clean, and analyze stages — each with clear inputs and outputs.
 
 **The hacker ethic** emphasizes sharing, openness, creativity, and a bias toward action. The open-source libraries you will use throughout this book exist because communities of developers chose to share their work. You should approach problems with curiosity, experiment freely, and share what you learn.
 
@@ -49,6 +49,16 @@ After installation, open a terminal (macOS/Linux) or Anaconda Prompt (Windows) a
 # conda update conda
 # conda install anaconda=2024.06
 ```
+
+Anaconda's default `base` environment is fine for your first session, but as you accumulate projects, their library requirements will eventually conflict. The `conda` package manager solves this with *environments*: isolated Python installations, each with its own set of packages. Create one for this book and activate it whenever you sit down to work:
+
+```{python}
+# Run these commands in a terminal, not in Python
+# conda create -n webdata python=3.11
+# conda activate webdata
+```
+
+Giving each project its own environment is a reproducibility practice, not just tidiness: it records exactly which Python and package versions your analysis ran against, so you — or someone replicating your work — can recreate the same setup on another machine months later.
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -185,7 +195,7 @@ df = pd.read_csv("cu_boulder_pageviews.csv")
 print(f"Loaded {len(df)} rows from disk.")
 ```
 
-Serialization — saving your data to a file — matters for three reasons. First, courtesy: every API call consumes server resources, and re-requesting data you already have is wasteful. Second, reproducibility: if you save the data you retrieved on a specific date, your analysis can be reproduced even if the API changes or goes offline. Third, the data itself may change — Wikipedia pageview counts are finalized after a short delay, and an article's content can be edited at any moment. The version you retrieved is a snapshot, and saving it preserves that snapshot. You will explore JSON serialization for more complex data structures in @sec-archives.
+Serialization — saving your data to a file — matters for three reasons. First, courtesy: every API call consumes server resources, and re-requesting data you already have is wasteful. Second, reproducibility: if you save the data you retrieved on a specific date, your analysis can be reproduced even if the API changes or goes offline. Third, the data itself may change — Wikipedia pageview counts are finalized after a short delay, and an article's content can be edited at any moment. The version you retrieved is a snapshot, and saving it preserves that snapshot. You will explore JSON serialization for more complex data structures in @sec-data-formats.
 
 ## Documentation as Professional Practice
 
@@ -196,7 +206,7 @@ Bookmark the documentation for the libraries you will use throughout this book:
 - **requests**: [requests.readthedocs.io](https://requests.readthedocs.io/)
 - **BeautifulSoup**: [crummy.com/software/BeautifulSoup/bs4/doc](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
 - **pandas**: [pandas.pydata.org/docs](https://pandas.pydata.org/docs/)
-- **matplotlib**: [matplotlib.org/stable/contents.html](https://matplotlib.org/stable/contents.html)
+- **matplotlib**: [matplotlib.org/stable](https://matplotlib.org/stable/)
 
 When you encounter an error or do not know how to do something, start with the official documentation. If that does not help, search for the specific error message. When asking for help — from a classmate, an instructor, or an AI tool — "it's not working" is not an actionable request. Describe what you tried, what you expected to happen, what actually happened, and what the error message says.
 
@@ -216,6 +226,8 @@ For strategies on asking effective technical questions and reading official docu
 4. **POST vs. GET.** Read the `requests` library documentation and find the method for making a POST request. In a Markdown cell, explain how POST differs from GET and describe a scenario where you would use each. What kind of data does a POST request typically send, and why would an API require it instead of GET?
 
 5. **Multi-article comparison.** Retrieve daily pageview data for three Wikipedia articles of your choice over the same month. Save each to a separate CSV file using `df.to_csv()`. Load all three back with `pd.read_csv()` and create a single plot with all three time series on the same axes, with a legend identifying each article. Which article had the most variable traffic, and can you hypothesize why?
+
+6. **Graduate extension (INFO 5617).** Read the computational social science manifesto by @lazer2009computational — a short, field-defining argument about what digital trace data makes possible. Identify three specific claims the authors make about the promise or the perils of studying society through digital traces, such as claims about data access, privacy, or the capacity of academic institutions to compete with industry. For each claim, write a paragraph connecting it to a concrete technique or data source covered in this book's table of contents, and assess whether the claim has held up in the years since publication. Submit your response as a Jupyter Notebook that uses Markdown cells for the written analysis.
 
 ## Social History and Public Interest
 
