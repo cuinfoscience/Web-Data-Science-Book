@@ -11,7 +11,7 @@
 
 ## The Web's Filing Cabinets
 
-PDFs are everywhere in institutional record-keeping: city council meeting minutes, legislative bill texts, financial reports, court filings, academic papers, and environmental impact assessments. They are the format of choice for "official" documents precisely because they preserve visual layout across different devices and printers. But that design priority — visual fidelity over semantic structure — makes them hostile to programmatic data extraction.
+PDFs are everywhere in institutional record-keeping: city council meeting minutes, legislative bill texts, financial reports, court filings, academic papers, and environmental impact assessments. They are the format of choice for "official" documents precisely because they preserve visual layout across different devices and printers. But that design priority — visual fidelity over semantic structure — makes them hostile to programmatic data extraction. The records locked inside them are what @salganik2018bit calls *readymade* data: created by institutions for administrative purposes rather than for research, but repurposable — with effort — to answer questions their creators never anticipated.
 
 When you read a PDF, you see paragraphs, tables, headers, and page numbers. When a computer reads a PDF, it sees a sequence of drawing instructions: place this character at coordinates (x, y), draw a line from here to there, embed this image at this location. Text extraction from PDFs is *reconstruction*, not reading — the computer must infer the logical structure from the spatial layout.
 
@@ -67,22 +67,28 @@ def clean_page_text(raw_text):
     Returns
     -------
     str
-        Cleaned text with normalized whitespace
+        Cleaned text with normalized spacing, line breaks preserved
     """
-    # Normalize whitespace
-    text = re.sub(r'\s+', ' ', raw_text)
-    
     # Remove page numbers (common patterns)
-    text = re.sub(r'Page \d+ of \d+', '', text)
-    
+    text = re.sub(r'Page \d+ of \d+', '', raw_text)
+
     # Remove common headers/footers (customize per document)
     text = re.sub(r'CITY COUNCIL MEETING MINUTES', '', text)
-    
-    return text.strip()
+
+    # Collapse runs of spaces and tabs — but NOT newlines. Line
+    # structure is real information in extracted PDF text (headings
+    # sit on their own lines), so we keep it
+    text = re.sub(r'[ \t]+', ' ', text)
+
+    # Strip each line and drop lines left empty by the removals above
+    lines = [line.strip() for line in text.split('\n')]
+    return '\n'.join(line for line in lines if line)
 
 cleaned = clean_page_text(text)
 print(cleaned[:300])
 ```
+
+The most important choice in this function is what *not* to collapse. A tempting one-liner is `re.sub(r'\s+', ' ', raw_text)`, which normalizes all whitespace in a single pass — but `\s` matches newlines too, and flattening the page into one long line destroys structure you will need later. Section headings, for example, are recognizable precisely because they sit alone on their own lines; erase the newlines and no heading detector can find them. Collapsing only spaces and tabs (`[ \t]+`) tidies the text while keeping its shape.
 
 ### Regular Expressions for PDF Text
 
@@ -105,12 +111,16 @@ amounts = re.findall(dollar_pattern, cleaned)
 
 # 3. Repeating headers that PDF extraction duplicates on every page
 header_pattern = r'CITY COUNCIL.*?MINUTES'
-cleaned_text = re.sub(header_pattern, '', cleaned)
+cleaned = re.sub(header_pattern, '', cleaned)
 
-# 4. Section headings in ALL CAPS (at least 6 characters, start of line)
-heading_pattern = r'^[A-Z][A-Z\s]{5,}$'
+# 4. Section headings in ALL CAPS on their own line (at least 6
+#    characters, allowing digits and light punctuation for headings
+#    like "AGENDA ITEM 5A"). The class matches a literal space, not
+#    \s — \s would match newlines too, letting a single match
+#    swallow several consecutive heading lines
+heading_pattern = r'^[A-Z][A-Z0-9 .:&-]{5,}$'
 headings = re.findall(heading_pattern, cleaned, re.MULTILINE)
-# Returns: ['PUBLIC COMMENT', 'CONSENT AGENDA', 'ADJOURNMENT', ...]
+# Returns: ['CALL TO ORDER', 'PUBLIC COMMENT', 'CONSENT AGENDA', 'ADJOURNMENT', ...]
 
 # 5. Email addresses embedded in document text
 email_pattern = r'[\w.+-]+@[\w-]+\.[\w.-]+'
@@ -139,41 +149,58 @@ from pypdf import PdfReader
 pdf_dir = "council_minutes/"
 pdf_files = sorted([f for f in os.listdir(pdf_dir) if f.endswith(".pdf")])
 
+def split_names(match):
+    """Split a regex match of comma-separated names into a clean list."""
+    if not match:
+        return []
+    return [name.strip() for name in match.group(1).split(",") if name.strip()]
+
 def extract_attendance(pdf_path):
     """Extract council member attendance from a meeting minutes PDF.
-    
+
     Parameters
     ----------
     pdf_path : str
         Path to the PDF file
-    
+
     Returns
     -------
     dict
-        Dictionary with 'date', 'present', 'absent' counts
+        Dictionary with 'file', 'date', 'present', and 'absent' —
+        the last two are lists of council member names
     """
     reader = PdfReader(pdf_path)
-    
+
     # Attendance is typically on the first page
     first_page_text = reader.pages[0].extract_text()
-    
-    # Count members listed as present vs. absent
-    # This regex pattern will need to be adapted to the specific format
-    present = len(re.findall(r'(?:Present|PRESENT):.*?(?=Absent|ABSENT|$)', 
-                              first_page_text, re.DOTALL))
-    
+
+    # Cheap date extraction: filenames like council_minutes_2024_01.pdf
+    # encode the year and month — parse them rather than the PDF text
+    date_match = re.search(r'(\d{4})[_-](\d{2})', os.path.basename(pdf_path))
+    meeting_date = f"{date_match.group(1)}-{date_match.group(2)}" if date_match else None
+
+    # Names follow "Present:" — capture up to "Absent:" if it appears
+    # on the same line, otherwise up to the end of the line
+    present_match = re.search(r'Present:\s*(.*?)\s*(?:Absent:|$)',
+                              first_page_text, re.IGNORECASE | re.MULTILINE)
+
+    # Names after "Absent:" run to the end of that line
+    absent_match = re.search(r'Absent:\s*(.*)$',
+                             first_page_text, re.IGNORECASE | re.MULTILINE)
+
     return {
         "file": os.path.basename(pdf_path),
-        "pages": len(reader.pages),
-        "first_page_length": len(first_page_text)
+        "date": meeting_date,
+        "present": split_names(present_match),
+        "absent": split_names(absent_match),
     }
 ```
+
+Be honest with yourself about what this function can and cannot do. It assumes the clerk wrote a line beginning "Present:" followed by comma-separated names — a format that holds for many Boulder minutes, but not all. Name formats vary ("Council Member Smith" versus "Smith," with or without titles), some documents separate names with semicolons or line breaks, and minutes where everyone attended often read "Absent: None," which this code will dutifully report as a council member named None. Treat the output as a first draft: spot-check it against a handful of PDFs, patch the patterns to match the formats you actually encounter, and document the failure cases you decide not to handle.
 
 ### Building the Pipeline
 
 ```{python}
-import time
-
 results = []
 for pdf_file in pdf_files:
     try:
@@ -187,6 +214,10 @@ for pdf_file in pdf_files:
 import pandas as pd
 
 df = pd.DataFrame(results)
+
+# Turn the name lists into counts for analysis
+df["n_present"] = df["present"].apply(len)
+df["n_absent"] = df["absent"].apply(len)
 print(df.head())
 ```
 
@@ -196,10 +227,10 @@ print(df.head())
 import matplotlib.pyplot as plt
 
 plt.figure(figsize=(12, 5))
-plt.bar(range(len(df)), df["first_page_length"])
+plt.bar(range(len(df)), df["n_present"])
 plt.xlabel("Meeting")
-plt.ylabel("First Page Text Length")
-plt.title("Boulder City Council Meeting Minutes: First Page Length Over Time")
+plt.ylabel("Council Members Present")
+plt.title("Boulder City Council Attendance Over Time")
 plt.tight_layout()
 plt.show()
 ```
@@ -274,46 +305,6 @@ plt.show()
 What does this data reveal? Spikes in public comment frequency often correspond to controversial agenda items — a proposed development project, a change in policing policy, or a budget reallocation. Periods of low participation may indicate either public satisfaction or public disengagement. Neither interpretation is self-evident from the data alone, which is why combining extracted counts with knowledge of the agenda (also extractable from the same PDFs) produces richer analysis.
 
 This kind of measurement is inherently imperfect. Your regex patterns will miss some speakers and occasionally count non-speakers. But even approximate counts, applied consistently across dozens of meetings, reveal patterns that would be invisible to someone reading a single set of minutes. The imprecision of PDF extraction is the price of scale — and scale is what transforms individual documents into a dataset.
-
-## Exercises
-
-1. **Find and extract.** Locate a set of PDF documents from a government source — city council agendas, regulatory filings, or budget summaries. Extract a consistent data element across at least ten documents and build a DataFrame.
-
-2. **Extraction quality comparison.** Compare the text extraction quality of PyPDF on three different types of PDFs: a text-based report, a document with complex tables, and a slide deck exported to PDF. What works well and what fails?
-
-3. **Clean and visualize.** Write a function that takes a path to a PDF and returns a dictionary of extracted metadata and key content fields. Apply it across a corpus of at least five related documents and create a visualization showing how a measurable quantity changes over time.
-
-4. **Government PDF pipeline.** Choose a government agency that publishes PDF documents regularly (meeting minutes, inspection reports, court records, or budget documents). Download at least five PDFs from the same source, write a pipeline that extracts a consistent data element from each, build a DataFrame, and create a visualization showing how that element varies across documents.
-
-5. **Tool comparison.** Install `pdfplumber` alongside `pypdf`. Extract text from the same PDF using both tools. Compare the quality of text extraction — line breaks, whitespace handling, table detection. Which tool handles your specific PDF better, and why?
-
-## Social History and Public Interest
-
-The PDF format was created by Adobe in 1993 to solve a real problem: documents needed to look the same regardless of what printer or screen displayed them. But the format's emphasis on visual fidelity came at the cost of semantic accessibility. Organizations like DocumentCloud, MuckRock, and the Sunlight Foundation have built tools to extract structured data from the flood of PDFs that government agencies produce — bridging the gap between nominally public records and practically accessible data.
-
-DocumentCloud, built by ProPublica and IRE (Investigative Reporters and Editors), emerged as a platform where journalists could upload, analyze, annotate, and share document collections. It has been used in investigations of police misconduct records, corporate fraud filings, and government secrecy — cases where the raw documents are public but the volume makes manual analysis impractical. DocumentCloud's contribution was not just technical but organizational: it created a shared infrastructure where one journalist's document processing work could benefit others investigating the same institutions.
-
-MuckRock took a different approach to the document access problem by automating the Freedom of Information Act (FOIA) request process itself. The platform helped journalists and citizens file thousands of public records requests, tracked agency response times, and published the results openly. The Sunlight Foundation, active from 2006 to 2020, advocated for government agencies to publish documents in machine-readable formats rather than PDFs in the first place — arguing that true transparency requires not just publication but *usability*. Together, these tools and organizations represent the infrastructure of transparency: community-built resources that bridge the gap between nominally public documents and practically accessible data. Their work embodies the **ownership** value from @sec-post-api — the idea that public records belong to the public, and that technical barriers to access are themselves a form of enclosure that undermines democratic accountability.
-
-The Boulder City Council case illustrates this tension at the local level. The same meeting information could be published as structured data (allowing citizens to easily track attendance, voting patterns, and public comment frequency) or as scanned PDFs (requiring significant technical effort to analyze). The format choice is itself a policy decision with consequences for transparency and accountability. When you build a pipeline that extracts structured data from PDFs, you are not just doing data science — you are doing the work that these organizations have championed for decades.
-
-## Common Issues to Debug
-
-- **Garbled text from scanned PDFs**: PyPDF extracts text only from PDFs that have a text layer. Truly scanned documents require OCR tools like Tesseract.
-- **Table data extracted as a text stream**: PyPDF is not a table extraction tool. For tabular data in PDFs, consider `pdfplumber` or `camelot`.
-- **Regular expressions that work on one document but fail on another**: PDF formatting varies even within documents from the same source. Test your patterns on multiple files.
-- **Encoding issues**: Some PDFs use non-standard character encodings. Use `.encode('utf-8', errors='replace')` if needed.
-
-## Key Takeaways
-
-PDFs are designed for visual fidelity, not data extraction. PyPDF gives you page-level text as a starting point; string methods and regex let you clean and structure what you extract; and function abstractions let you process many documents consistently. Expect messiness — PDF extraction is reconstruction, not reading. The broader lesson connects to @sec-post-api: when institutions publish data only in PDF form, they create a practical barrier to the analysis that nominally public records are meant to enable.
-
-## Further Reading
-
-- PyPDF documentation: <https://pypdf.readthedocs.io/>
-- pdfplumber (for table extraction): <https://github.com/jsvine/pdfplumber>
-- Python `re` module: <https://docs.python.org/3/library/re.html>
-- DocumentCloud: <https://www.documentcloud.org/>
 
 ## Building a Reusable PDF Pipeline
 
@@ -405,7 +396,7 @@ def extract_meeting_info(filepath, text):
 analyzer = PDFCorpusAnalyzer(
     "council_minutes/",
     cleanup_patterns=[
-        (r'\s+', ' '),                  # Normalize whitespace
+        (r'[ \t]+', ' '),               # Collapse spaces/tabs, keep line breaks
         (r'Page \d+ of \d+', ''),       # Remove page numbers
     ]
 )
@@ -433,3 +424,45 @@ with pdfplumber.open("report.pdf") as pdf:
 ```
 
 **Scanned PDFs**: If the PDF was created by scanning a physical document (no text layer), PyPDF will extract empty or garbled text. You need OCR (Optical Character Recognition). The Tesseract OCR engine, accessible through the `pytesseract` library, can process scanned pages, though accuracy varies with scan quality.
+
+## Exercises
+
+1. **Find and extract.** Locate a set of PDF documents from a government source — city council agendas, regulatory filings, or budget summaries. Extract a consistent data element across at least ten documents and build a DataFrame.
+
+2. **Extraction quality comparison.** Compare the text extraction quality of PyPDF on three different types of PDFs: a text-based report, a document with complex tables, and a slide deck exported to PDF. What works well and what fails?
+
+3. **Tables, not text.** Find a government PDF that contains a budget or financial table — a city budget summary, a department expenditure report, or a school district financial statement. First extract the page with `pypdf` and observe what happens to the table's structure. Then extract the same table with `pdfplumber`'s `extract_table()` and build a proper DataFrame with numeric columns. Briefly describe what spatial information `pdfplumber` uses that plain text extraction throws away, and when that extra dependency is worth it.
+
+4. **Topic tracking.** Download a year's worth of city council meeting minutes (roughly 12–24 PDFs). Choose a topic term relevant to local politics — "housing," "police," "flood," "budget" — and count how often it appears in each meeting's extracted text. Plot the frequency over time and identify the meetings where the topic spiked. For a measure more robust than raw counts, apply the bag-of-words preprocessing from @sec-archives (tokenization, stopword removal) before counting, and normalize by each document's length. What events or agenda items explain the spikes?
+
+5. **Tool comparison.** Install `pdfplumber` alongside `pypdf`. Extract text from the same PDF using both tools. Compare the quality of text extraction — line breaks, whitespace handling, table detection. Which tool handles your specific PDF better, and why?
+
+6. **Graduate extension (INFO 5617).** Sample at least ten municipal-meeting PDFs from each of two different cities and quantify extraction quality across the two corpora: characters extracted per page, the share of pages yielding little or no text, and whether any documents are scanned images that would require OCR. Then write a data-quality memo organized around the datasheet categories of @gebru2021datasheets — motivation, composition, collection process, preprocessing, and recommended uses — documenting what a downstream researcher would need to know before trusting analyses built on these extractions.
+
+## Social History and Public Interest
+
+The PDF format was created by Adobe in 1993 to solve a real problem: documents needed to look the same regardless of what printer or screen displayed them. But the format's emphasis on visual fidelity came at the cost of semantic accessibility. Organizations like DocumentCloud, MuckRock, and the Sunlight Foundation have built tools to extract structured data from the flood of PDFs that government agencies produce — bridging the gap between nominally public records and practically accessible data.
+
+DocumentCloud, built by ProPublica and IRE (Investigative Reporters and Editors), emerged as a platform where journalists could upload, analyze, annotate, and share document collections. It has been used in investigations of police misconduct records, corporate fraud filings, and government secrecy — cases where the raw documents are public but the volume makes manual analysis impractical. DocumentCloud's contribution was not just technical but organizational: it created a shared infrastructure where one journalist's document processing work could benefit others investigating the same institutions.
+
+MuckRock took a different approach to the document access problem by automating the Freedom of Information Act (FOIA) request process itself. The platform helped journalists and citizens file thousands of public records requests, tracked agency response times, and published the results openly. The Sunlight Foundation, active from 2006 to 2020, advocated for government agencies to publish documents in machine-readable formats rather than PDFs in the first place — arguing that true transparency requires not just publication but *usability*. Together, these tools and organizations represent the infrastructure of transparency: community-built resources that bridge the gap between nominally public documents and practically accessible data. Their work embodies the **ownership** value from @sec-post-api — the idea that public records belong to the public, and that technical barriers to access are themselves a form of enclosure that undermines democratic accountability.
+
+The Boulder City Council case illustrates this tension at the local level. The same meeting information could be published as structured data (allowing citizens to easily track attendance, voting patterns, and public comment frequency) or as scanned PDFs (requiring significant technical effort to analyze). The format choice is itself a policy decision with consequences for transparency and accountability. When you build a pipeline that extracts structured data from PDFs, you are not just doing data science — you are doing the work that these organizations have championed for decades.
+
+## Common Issues to Debug
+
+- **Garbled text from scanned PDFs**: PyPDF extracts text only from PDFs that have a text layer. Truly scanned documents require OCR tools like Tesseract.
+- **Table data extracted as a text stream**: PyPDF is not a table extraction tool. For tabular data in PDFs, consider `pdfplumber` or `camelot`.
+- **Regular expressions that work on one document but fail on another**: PDF formatting varies even within documents from the same source. Test your patterns on multiple files.
+- **Encoding issues**: Some PDFs use non-standard character encodings. Use `.encode('utf-8', errors='replace')` if needed.
+
+## Key Takeaways
+
+PDFs are designed for visual fidelity, not data extraction. PyPDF gives you page-level text as a starting point; string methods and regex let you clean and structure what you extract; and function abstractions let you process many documents consistently. Expect messiness — PDF extraction is reconstruction, not reading. The broader lesson connects to @sec-post-api: when institutions publish data only in PDF form, they create a practical barrier to the analysis that nominally public records are meant to enable.
+
+## Further Reading
+
+- PyPDF documentation: <https://pypdf.readthedocs.io/>
+- pdfplumber (for table extraction): <https://github.com/jsvine/pdfplumber>
+- Python `re` module: <https://docs.python.org/3/library/re.html>
+- DocumentCloud: <https://www.documentcloud.org/>
