@@ -10,6 +10,12 @@
 - Apply the values of openness, oversight, and ownership to your own research practice
 :::
 
+::: {.callout-tip}
+## Companion Notebook
+Run this chapter's code as you read: download the [companion notebook](notebooks/ch-15-research-design.ipynb) (see @sec-appendix-notebooks for all of them).
+:::
+
+
 ## Technical Skill Is Not Enough
 
 You now command a substantial technical toolkit: you can scrape static and dynamic web pages, parse PDFs, query APIs for platforms from Wikipedia to Spotify to the Federal Reserve, apply NLP and LLM-based analysis, and automate your data collection with GitHub Actions. These are powerful capabilities. But technical skill without research design produces data, not knowledge.
@@ -43,9 +49,45 @@ Notice that limitations are not an afterthought — they are a core component of
 | Network analysis | Link extraction (@sec-wikipedia), social graphs (@sec-social) | How connected are Wikipedia articles about climate change? |
 | Natural experiment | Event-triggered collection (@sec-automation) | How did a policy change affect web search patterns? |
 
+## Common Research Designs with Web Data
+
+The table above compresses a lot of decisions into single rows. Four of these designs come up so often in web data science that they deserve a closer look; choosing among them depends on your question, your data source, and the claims you want to make.
+
+### Longitudinal Tracking
+
+**Question type**: How does X change over time?
+
+You observed something on the web and want to track how it evolves — the content of a policy document, the composition of a playlist, the frequency of a term in news coverage, or the price of a product. Longitudinal tracking requires either archival data (the Wayback Machine in @sec-archives) or forward-looking automated collection (GitHub Actions in @sec-automation).
+
+**Design considerations**: The Wayback Machine captures snapshots opportunistically, not on a fixed schedule, so your temporal resolution is uneven. Automated scrapers give you consistent intervals but require maintenance. In both cases, you need to account for changes in the underlying structure (a website redesign, an API version change) that might affect your measurements without reflecting genuine change in the phenomenon you are studying.
+
+### Cross-Sectional Snapshot
+
+**Question type**: How does X vary across cases at a point in time?
+
+You want to compare legislative activity across states, subreddit moderation policies across communities, or audio features across genres. Cross-sectional designs collect data at one point in time and analyze variation across units.
+
+**Design considerations**: The main threat is selection bias — you are limited to the platforms, communities, and data sources that exist and are accessible. If a platform's API does not expose the variable you need, you cannot include it. If a community is private or a government website does not publish the data you want, it is missing from your sample.
+
+### Content Analysis
+
+**Question type**: What is the substantive content of a corpus?
+
+You have collected a body of text — scraped web pages, PDF documents, social media posts — and want to characterize what it contains. Content analysis can be manual (human coding), automated (NLP in @sec-archives, LLM-assisted coding in @sec-ai-apis), or a combination.
+
+**Design considerations**: The reliability of automated coding should be validated against manual coding on a random sample. LLM-based classification is powerful but non-deterministic — run the same prompt twice and you may get different results. Always report inter-coder reliability or human-AI agreement rates.
+
+### Natural Experiments
+
+**Question type**: What was the causal effect of an event or policy change?
+
+Sometimes external events — a platform policy change, a natural disaster, a legislative decision — create natural variation that allows you to estimate causal effects. For example, you might compare Wikipedia editing behavior before and after a major news event, or Reddit community dynamics before and after a moderation policy change.
+
+**Design considerations**: Causal claims from observational data are always tentative. You need a clear "treatment" event, a defensible comparison group, and controls for confounding variables. Web data makes it easy to observe change but does not, by itself, establish causation.
+
 ## Sampling and Representativeness
 
-Web data is not a random sample of anything. It is a convenience sample shaped by who uses the platform, what the API exposes, and what your scraper can reach. Understanding these biases is essential for interpreting your findings.
+Whichever design you choose, it inherits a common problem: web data is not a random sample of anything. It is a convenience sample shaped by who uses the platform, what the API exposes, and what your scraper can reach. Understanding these biases is essential for interpreting your findings.
 
 **Who is missing?** Reddit users skew young, male, and American. Wikipedia editors skew educated, male, and from the Global North. Bluesky's early adopters skew toward journalists and technologists. The data you retrieve from any platform reflects its user base, not the broader population.
 
@@ -53,11 +95,31 @@ Web data is not a random sample of anything. It is a convenience sample shaped b
 
 **What has been lost?** Longitudinal studies face the erosion problem from @sec-post-api. Articles are deleted, accounts are suspended, pages are redesigned. The data available today may not be available tomorrow, and the data available yesterday may already be gone.
 
+Methodologists group many of these concerns under the formal term **construct validity**: the degree to which the thing you can measure (pageviews, posts, search queries) actually corresponds to the concept you claim to study (attention, public opinion, illness) [@salganik2018bit]. Whenever this book asks "does your variable actually measure what you claim?", it is asking about construct validity — and weak construct validity is the most common flaw in web data research.
+
+The canonical cautionary tale is Google Flu Trends, which promised to estimate influenza prevalence from search queries and instead overestimated it by roughly a factor of two for more than a hundred consecutive weeks [@lazer2014parable]. Part of the failure was *big data hubris* — treating a large behavioral dataset as a substitute for, rather than a supplement to, traditional measurement. The rest was *algorithm dynamics*: Google kept redesigning its search and suggestion features, so the measurement instrument drifted underneath the model even as the underlying phenomenon stayed put. Every automated collector you build (@sec-automation) is exposed to both failure modes.
+
+## Human Subjects and the IRB
+
+If your research involves data about people — and most web data does — you need to know when it counts as **human subjects research**. This is not a question you get to answer for yourself, and the answer is less intuitive than many researchers expect.
+
+Under the Common Rule, the federal regulation governing research ethics in the United States, human subjects research involves obtaining information about living individuals through interaction or intervention, or obtaining their **identifiable private information**. Scraped web data complicates every clause of that definition. A public post is not exactly private, but the person who wrote it did not expect it to land in a research dataset [@fiesler2020no]. A username is not exactly identifiable, but linking it across platforms often makes it so.
+
+Three principles should guide you:
+
+- **Publicly available does not mean automatically exempt.** "It was on the public web" is a statement about access, not about ethics or regulation. Institutional Review Boards (IRBs) frequently determine that analyses of scraped public data are "not human subjects research" or qualify for an exemption — but that determination belongs to the IRB, not to the researcher. If you catch yourself reasoning "this is obviously fine, so I will not ask," you have identified exactly the moment to ask.
+- **Platform terms of service are not an ethics review.** Complying with a ToS is a legal and contractual matter, as discussed in @sec-ethics; it neither substitutes for nor settles the human subjects question.
+- **Data minimization and de-identification are default practice, not extra credit.** Collect only the fields your question requires, strip or hash identifiers you do not need, and store anything sensitive separately from your analysis dataset. These habits shrink both the ethical risk and the consequences of any future leak.
+
+Consult your IRB early whenever your design involves interacting with users (even sending messages from a research account), collecting from private or semi-private spaces (closed groups, invite-only servers), identifying specific individuals, or measuring sensitive attributes such as health, sexuality, immigration status, or political affiliation.
+
+Expectations differ by context. For a class project in this course, your instructor and your campus's guidance on student research are the right checkpoints. For research you intend to publish, graduate students should engage the IRB early — a determination request is usually a short form, and "our IRB reviewed the protocol and determined it was not human subjects research" is a sentence reviewers like to see. The ethics chapter of @salganik2018bit (and its historical appendix) is the best single treatment of these questions, @fiesler2020no documents how poorly platform rules align with either law or ethics, and @sec-ethics covers the legal landscape in more depth.
+
 ## Data Quality and Validation
 
 Web data is messy. Scrapers fail silently, APIs return incomplete results, and the same information can appear in different formats across sources. Build validation into your pipeline:
 
-```python
+```{python}
 def validate_dataset(df, expected_columns, min_rows=10):
     """Basic validation checks for a scraped dataset.
     
@@ -108,144 +170,14 @@ def validate_dataset(df, expected_columns, min_rows=10):
 
 A reproducible research pipeline means that someone else — or you, six months from now — can re-run your code and get the same results. This requires:
 
-- **Version control**: Your code, configuration, and documentation should be in a git repository. See *Missing Manual* Chapter 26.
+- **Version control**: Your code, configuration, and documentation should be in a git repository (more on this below).
 - **Data documentation**: For each dataset, record what it contains, how it was collected, when it was collected, and what its known quality issues are [@gebru2021datasheets].
 - **Environment specification**: A `requirements.txt` or `environment.yml` file that pins the exact versions of your dependencies.
 - **Collection parameters**: Document not just what data you collected but how: the API endpoints, query parameters, rate limiting, date ranges, and any filters you applied.
 
-## Communicating Findings
-
-Web data science serves different audiences, each with different expectations:
-
-- **Academic papers** require methodological precision, explicit limitations, and engagement with prior scholarship. Your data collection methods should be replicable from the description alone.
-- **Policy briefs** need actionable findings, clear implications, and accessible language. Lead with the "so what?" rather than the methodology.
-- **Data journalism** demands narrative structure, visual evidence, and accountability framing. The question is not just "what did you find?" but "what should the public know?"
-
-In all cases, the visualizations you create with matplotlib and seaborn are not decorations — they are arguments. Every axis label, every color choice, every title should serve your analytical purpose.
-
-### Visualization as Argument
-
-Consider the difference between a default plot and one designed to communicate a finding. A default `plt.plot()` call with no labels, no title, and no context forces the reader to guess what they are looking at. A well-designed figure makes its argument legible at a glance: the title states a claim, the annotations connect data patterns to real-world causes, and the axis labels include units so the reader can evaluate the evidence independently.
-
-```python
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import pandas as pd
-
-# Suppose you have monthly Wikipedia pageviews for "Affordable Care Act"
-# with columns: 'month' (datetime) and 'pageviews' (int)
-df = pd.read_csv('aca_pageviews.csv', parse_dates=['month'])
-
-fig, ax = plt.subplots(figsize=(10, 5))
-ax.plot(df['month'], df['pageviews'], color='#2c3e50', linewidth=1.5)
-
-# Annotate key events with vertical lines and text
-ax.axvline(pd.Timestamp('2017-07-28'), color='#e74c3c', linestyle='--', alpha=0.7)
-ax.text(pd.Timestamp('2017-08-15'), df['pageviews'].max() * 0.92,
-        '"Skinny repeal"\nvote fails',
-        fontsize=9, color='#e74c3c')
-
-ax.axvline(pd.Timestamp('2020-03-11'), color='#2980b9', linestyle='--', alpha=0.7)
-ax.text(pd.Timestamp('2020-04-01'), df['pageviews'].max() * 0.78,
-        'WHO declares\nCOVID-19 pandemic',
-        fontsize=9, color='#2980b9')
-
-# Labels that include units and a title that states a finding
-ax.set_title('Public attention to the ACA spikes around legislative and health crises',
-             fontsize=12, fontweight='bold')
-ax.set_xlabel('Month')
-ax.set_ylabel('Monthly pageviews (thousands)')
-ax.xaxis.set_major_locator(mdates.YearLocator())
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-
-plt.tight_layout()
-plt.savefig('aca_pageviews_annotated.png', dpi=150)
-# plt.show()
-```
-
-Notice that the title does not say "Wikipedia Pageviews for Affordable Care Act Over Time" — that merely describes the axes. Instead, it states a finding: public attention spikes around legislative and health crises. The annotations connect specific peaks to specific events, transforming a line chart into an argument about the relationship between political events and public information-seeking behavior. The clean axis formatting and removal of chart junk (top and right spines) keep the reader's attention on the data rather than on visual noise. When you build a figure, ask yourself: if a reader saw only this image and its title, would they understand the claim you are making?
-
-## Public Interest Framing
-
-As you design your research, return to the values introduced in @sec-post-api:
-
-- **Openness**: Will you publish your code, data (to the extent ethically permissible), and methods so others can evaluate and build on your work?
-- **Oversight**: Does your research contribute to independent accountability — helping citizens, journalists, or policymakers understand systems that affect them?
-- **Ownership**: Are you building infrastructure (datasets, tools, pipelines) that others can use, or are you extracting value from public resources without contributing back?
-
-These questions do not have formulaic answers. But asking them is itself a practice of responsible web data science.
-
-### Data Journalism as a Model
-
-Some of the most compelling examples of web data science in practice come not from academia but from data journalism. Consider ProPublica's "Dollars for Docs" investigation: it began with a straightforward question — which doctors receive payments from pharmaceutical companies? — and pursued it by scraping publicly available but practically inaccessible disclosure databases maintained by drug manufacturers. The team cleaned, standardized, and linked records across companies, then published a searchable database that allowed local journalists across the country to investigate payment patterns in their own communities. The project moved from question to data collection to analysis to public accountability, following the same arc that a strong research proposal describes.
-
-Academic researchers can learn several things from this model. Data journalists are accountable to an audience that will scrutinize their methods and challenge their conclusions. This pressure produces methodological transparency: the best data journalism outlets publish their code, describe their scraping and cleaning procedures, and explain the limitations of their data. They also structure their findings as narratives rather than tables of regression coefficients, making complex analyses accessible to non-specialist readers without sacrificing rigor. The journalistic commitment to showing your work — publishing the underlying data, linking to source documents, and explaining analytical choices — aligns directly with the reproducibility standards discussed earlier in this chapter.
-
-The practitioners who do this work well — computational social scientists, civic technologists, data journalists — share a common profile: they combine data fluency with deep domain expertise. They understand not just how to scrape a website or query an API but why the data matters, who it affects, and what questions it can and cannot answer. This integration of technical and substantive knowledge is precisely what this book aims to develop. The tools you have learned are necessary but not sufficient; pairing them with domain knowledge, ethical reflection, and a commitment to public accountability is what transforms data collection into genuine contribution.
-
-## Exercises
-
-1. **Research proposal.** Write a 1,500-word research proposal for a web data science project. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.
-
-2. **Validity threats.** Identify three potential threats to validity in a hypothetical study that uses scraped social media data to measure public opinion. For each threat, propose a mitigation strategy.
-
-3. **Data documentation.** Take a dataset you collected in an earlier chapter and write a "datasheet" following @gebru2021datasheets: what does each variable measure, how was it collected, what are the known quality issues, and how should it be cited?
-
-4. **Data limitations assessment.** Choose a dataset you collected in an earlier chapter. Write a 500-word assessment of its limitations, covering: sampling bias (what is included and excluded?), measurement validity (does your variable actually measure what you claim?), temporal scope (what period does the data cover, and what might have changed?), and platform constraints (how does the platform's design shape the data you can collect?).
-
-5. **Multi-method design.** Design a research study that combines at least three techniques from this book (e.g., API data collection, web scraping, PDF extraction, text analysis, or automated collection). Write a one-page methods section that describes your data sources, collection procedures, analysis plan, and anticipated limitations. This should read like a methods section in an academic paper.
-
-## Key Takeaways
-
-Technical skill without research design produces data, not knowledge. Every project needs a clear question, a defensible data collection strategy, honest assessment of limitations, and responsible communication of findings. The web is the richest data source humanity has ever created; using it well is both a technical and an ethical challenge. The skills in this book — scraping, API access, PDF extraction, NLP, LLM analysis, automation — are means, not ends. The end is producing knowledge that serves openness, oversight, and ownership.
-
-## Further Reading
-
-- @salganik2018bit — comprehensive treatment of digital-age research design
-- @gebru2021datasheets — a framework for documenting datasets
-- @lazer2020computational — obstacles and opportunities in computational social science
-- @vanatteveldt2022computational — methods for computational analysis of communication
-- @rogers2019doing — qualitative and critical approaches to digital methods
-
-## Common Research Designs with Web Data
-
-The technical toolkit in this book supports several distinct research designs. Choosing the right one depends on your question, your data source, and the claims you want to make.
-
-### Longitudinal Tracking
-
-**Question type**: How does X change over time?
-
-You observed something on the web and want to track how it evolves — the content of a policy document, the composition of a playlist, the frequency of a term in news coverage, or the price of a product. Longitudinal tracking requires either archival data (the Wayback Machine in @sec-archives) or forward-looking automated collection (GitHub Actions in @sec-automation).
-
-**Design considerations**: The Wayback Machine captures snapshots opportunistically, not on a fixed schedule, so your temporal resolution is uneven. Automated scrapers give you consistent intervals but require maintenance. In both cases, you need to account for changes in the underlying structure (a website redesign, an API version change) that might affect your measurements without reflecting genuine change in the phenomenon you are studying.
-
-### Cross-Sectional Snapshot
-
-**Question type**: How does X vary across cases at a point in time?
-
-You want to compare legislative activity across states, subreddit moderation policies across communities, or audio features across genres. Cross-sectional designs collect data at one point in time and analyze variation across units.
-
-**Design considerations**: The main threat is selection bias — you are limited to the platforms, communities, and data sources that exist and are accessible. If a platform's API does not expose the variable you need, you cannot include it. If a community is private or a government website does not publish the data you want, it is missing from your sample.
-
-### Content Analysis
-
-**Question type**: What is the substantive content of a corpus?
-
-You have collected a body of text — scraped web pages, PDF documents, social media posts — and want to characterize what it contains. Content analysis can be manual (human coding), automated (NLP in @sec-archives, LLM-assisted coding in @sec-ai-apis), or a combination.
-
-**Design considerations**: The reliability of automated coding should be validated against manual coding on a random sample. LLM-based classification is powerful but non-deterministic — run the same prompt twice and you may get different results. Always report inter-coder reliability or human-AI agreement rates.
-
-### Natural Experiments
-
-**Question type**: What was the causal effect of an event or policy change?
-
-Sometimes external events — a platform policy change, a natural disaster, a legislative decision — create natural variation that allows you to estimate causal effects. For example, you might compare Wikipedia editing behavior before and after a major news event, or Reddit community dynamics before and after a moderation policy change.
-
-**Design considerations**: Causal claims from observational data are always tentative. You need a clear "treatment" event, a defensible comparison group, and controls for confounding variables. Web data makes it easy to observe change but does not, by itself, establish causation.
-
 ## Managing the Research Process
+
+These principles become concrete when you organize an actual project. Two habits — disciplined version control and systematic documentation — separate projects that can be revisited, audited, and extended from projects that become black boxes the moment you stop working on them.
 
 ### Version Control for Research Projects
 
@@ -273,7 +205,7 @@ my-project/
 
 ::: {.callout-tip}
 ## Missing Manual Reference
-For a complete guide to version control with Git and GitHub — commits, branches, pull requests, and collaboration workflows — see *Missing Manual* Chapter 26: Version Control.
+For a complete guide to version control with Git and GitHub — commits, branches, pull requests, and collaboration workflows — see *Missing Manual* Chapter 31: Version Control.
 :::
 
 ### Data Documentation
@@ -286,3 +218,120 @@ For every dataset you create, write a datasheet [@gebru2021datasheets] that answ
 - **Ethics**: Does the data contain personally identifiable information? Was it collected in accordance with the platform's terms? Are there privacy risks if the dataset is shared?
 
 This documentation is not busywork — it is the difference between a dataset that can be used by others (including future-you) and one that is a black box.
+
+## Communicating Findings
+
+Web data science serves different audiences, each with different expectations:
+
+- **Academic papers** require methodological precision, explicit limitations, and engagement with prior scholarship. Your data collection methods should be replicable from the description alone.
+- **Policy briefs** need actionable findings, clear implications, and accessible language. Lead with the "so what?" rather than the methodology.
+- **Data journalism** demands narrative structure, visual evidence, and accountability framing. The question is not just "what did you find?" but "what should the public know?"
+
+In all cases, the visualizations you create with matplotlib and seaborn are not decorations — they are arguments. Every axis label, every color choice, every title should serve your analytical purpose.
+
+### Visualization as Argument
+
+Consider the difference between a default plot and one designed to communicate a finding. A default `plt.plot()` call with no labels, no title, and no context forces the reader to guess what they are looking at. A well-designed figure makes its argument legible at a glance: the title states a claim, the annotations connect data patterns to real-world causes, and the axis labels include units so the reader can evaluate the evidence independently.
+
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import pandas as pd
+
+# Suppose you have monthly Wikipedia pageviews for "Affordable Care Act"
+# with columns: 'month' (datetime) and 'pageviews' (int)
+df = pd.read_csv('aca_pageviews.csv', parse_dates=['month'])
+
+# Scale raw counts to thousands so the data matches the axis label below
+pageviews_k = df['pageviews'] / 1000
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(df['month'], pageviews_k, color='#2c3e50', linewidth=1.5)
+
+# Annotate key events with vertical lines and text
+ax.axvline(pd.Timestamp('2017-07-28'), color='#e74c3c', linestyle='--', alpha=0.7)
+ax.text(pd.Timestamp('2017-08-15'), pageviews_k.max() * 0.92,
+        '"Skinny repeal"\nvote fails',
+        fontsize=9, color='#e74c3c')
+
+ax.axvline(pd.Timestamp('2020-03-11'), color='#2980b9', linestyle='--', alpha=0.7)
+ax.text(pd.Timestamp('2020-04-01'), pageviews_k.max() * 0.78,
+        'WHO declares\nCOVID-19 pandemic',
+        fontsize=9, color='#2980b9')
+
+# Labels that include units and a title that states a finding
+ax.set_title('Public attention to the ACA spikes around legislative and health crises',
+             fontsize=12, fontweight='bold')
+ax.set_xlabel('Month')
+ax.set_ylabel('Monthly pageviews (thousands)')
+ax.xaxis.set_major_locator(mdates.YearLocator())
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+
+plt.tight_layout()
+plt.savefig('aca_pageviews_annotated.png', dpi=150)
+# plt.show()
+```
+
+Notice that the title does not say "Wikipedia Pageviews for Affordable Care Act Over Time" — that merely describes the axes. Instead, it states a finding: public attention spikes around legislative and health crises. The annotations connect specific peaks to specific events, transforming a line chart into an argument about the relationship between political events and public information-seeking behavior. The clean axis formatting and removal of chart junk (top and right spines) keep the reader's attention on the data rather than on visual noise. When you build a figure, ask yourself: if a reader saw only this image and its title, would they understand the claim you are making?
+
+::: {.callout-note}
+## Public Interest Connection
+Research design is where the values of @sec-post-api stop being abstractions and become decisions. **Openness** is a design choice: a pipeline built for reproducibility — pinned environments, documented collection parameters, archived raw data — stays verifiable even as the platforms beneath it erode. **Oversight** is a question choice: studies designed around accountability questions serve publics, not just literatures. **Ownership** is an infrastructure choice: collecting into datasets and tools that others can reuse means your project outlives your paper.
+:::
+
+## Social History and Public Interest
+
+Every data source in this book carries a social history — someone fought to make it public, keep it public, or archive it before it vanished. As you design your own research, return to the values introduced in @sec-post-api:
+
+- **Openness**: Will you publish your code, data (to the extent ethically permissible), and methods so others can evaluate and build on your work?
+- **Oversight**: Does your research contribute to independent accountability — helping citizens, journalists, or policymakers understand systems that affect them?
+- **Ownership**: Are you building infrastructure (datasets, tools, pipelines) that others can use, or are you extracting value from public resources without contributing back?
+
+These questions do not have formulaic answers. But asking them is itself a practice of responsible web data science.
+
+### Data Journalism as a Model
+
+Some of the most compelling examples of web data science in practice come not from academia but from data journalism. Consider ProPublica's "Dollars for Docs" investigation: it began with a straightforward question — which doctors receive payments from pharmaceutical companies? — and pursued it by scraping publicly available but practically inaccessible disclosure databases maintained by drug manufacturers. The team cleaned, standardized, and linked records across companies, then published a searchable database that allowed local journalists across the country to investigate payment patterns in their own communities. The project moved from question to data collection to analysis to public accountability, following the same arc that a strong research proposal describes.
+
+Academic researchers can learn several things from this model. Data journalists are accountable to an audience that will scrutinize their methods and challenge their conclusions. This pressure produces methodological transparency: the best data journalism outlets publish their code, describe their scraping and cleaning procedures, and explain the limitations of their data. They also structure their findings as narratives rather than tables of regression coefficients, making complex analyses accessible to non-specialist readers without sacrificing rigor. The journalistic commitment to showing your work — publishing the underlying data, linking to source documents, and explaining analytical choices — aligns directly with the reproducibility standards discussed earlier in this chapter.
+
+The practitioners who do this work well — computational social scientists, civic technologists, data journalists — share a common profile: they combine data fluency with deep domain expertise. They understand not just how to scrape a website or query an API but why the data matters, who it affects, and what questions it can and cannot answer. This integration of technical and substantive knowledge is precisely what this book aims to develop. The tools you have learned are necessary but not sufficient; pairing them with domain knowledge, ethical reflection, and a commitment to public accountability is what transforms data collection into genuine contribution.
+
+## Exercises
+
+1. **Research proposal.** Write a 1,500-word research proposal for a web data science project. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.
+
+2. **Validity threats.** Identify three potential threats to validity in a hypothetical study that uses scraped social media data to measure public opinion. For each threat, propose a mitigation strategy.
+
+3. **Data documentation.** Take a dataset you collected in an earlier chapter and write a "datasheet" following @gebru2021datasheets: what does each variable measure, how was it collected, what are the known quality issues, and how should it be cited?
+
+4. **Data limitations assessment.** Choose a dataset you collected in an earlier chapter. Write a 500-word assessment of its limitations, covering: sampling bias (what is included and excluded?), measurement validity (does your variable actually measure what you claim?), temporal scope (what period does the data cover, and what might have changed?), and platform constraints (how does the platform's design shape the data you can collect?).
+
+5. **Multi-method design.** Design a research study that combines at least three techniques from this book (e.g., API data collection, web scraping, PDF extraction, text analysis, or automated collection). Write a one-page methods section that describes your data sources, collection procedures, analysis plan, and anticipated limitations. This should read like a methods section in an academic paper.
+
+6. **Graduate extension (INFO 5617).** Write a complete pre-registration-style research design of two to three pages for a study you could actually execute. Specify the research question, data sources, sampling frame, and measurement strategy, making an explicit construct validity argument for each measure [@salganik2018bit]. Then confront the threats: enumerate the validity risks (including algorithm dynamics [@lazer2014parable]), sketch the IRB determination you would request and why, and write a contingency plan for the platform-erosion scenarios of @sec-post-api. The discipline of specifying everything before collecting anything is the point — a design you cannot write down is a design you have not finished.
+
+## Common Pitfalls
+
+Research design failures are harder to debug than code failures — there is no traceback, just a dataset that cannot answer your question. Watch for these:
+
+- **Collecting before defining the unit of analysis.** Is a row of your dataset a post, a user, a day, or a community? Deciding after collection usually means collecting again.
+- **Sampling on the dependent variable.** Studying only viral posts to learn what makes posts go viral tells you nothing without the posts that never took off.
+- **Ignoring bot and spam contamination.** On many platforms, automated accounts generate a substantial share of raw activity; skipping this filter means measuring bots while making claims about people.
+- **Survivorship bias in longitudinal scrapes.** The accounts, pages, and posts still visible at collection time are the survivors; deleted and suspended content is invisible precisely because something happened to it.
+- **Changing instrumentation mid-collection.** Editing your scraper's selectors, query parameters, or sampling logic partway through a collection creates artificial discontinuities that look like real change — the algorithm dynamics problem, self-inflicted.
+- **Validating only at analysis time.** If your first quality check happens months after collection began, so does your discovery that a site redesign in June silently emptied half your columns.
+
+## Key Takeaways
+
+Technical skill without research design produces data, not knowledge. Every project needs a clear question, a defensible data collection strategy, honest assessment of limitations, and responsible communication of findings. The web is the richest data source humanity has ever created; using it well is both a technical and an ethical challenge. The skills in this book — scraping, API access, PDF extraction, NLP, LLM analysis, automation — are means, not ends. The end is producing knowledge that serves openness, oversight, and ownership.
+
+## Further Reading
+
+- @salganik2018bit — comprehensive treatment of digital-age research design
+- @gebru2021datasheets — a framework for documenting datasets
+- @lazer2020computational — obstacles and opportunities in computational social science
+- @vanatteveldt2022computational — methods for computational analysis of communication
+- @rogers2019doing — qualitative and critical approaches to digital methods

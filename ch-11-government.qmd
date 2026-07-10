@@ -10,6 +10,12 @@
 - Combine data from multiple government APIs to build richer analytical datasets
 :::
 
+::: {.callout-tip}
+## Companion Notebook
+Run this chapter's code as you read: download the [companion notebook](notebooks/ch-11-government.ipynb) (see @sec-appendix-notebooks for all of them).
+:::
+
+
 ## Public Data by Mandate
 
 Government APIs exist because of democratic commitments to transparency, not because of business strategy. The Census Bureau is constitutionally mandated to count the population. The Federal Reserve is required to publish economic data. The Federal Election Commission must disclose campaign finance records. As a result, these APIs embody the **openness** value described in @sec-post-api: public data, freely accessible, maintained by public mandate rather than platform goodwill.
@@ -20,34 +26,53 @@ These APIs also tend to be more *stable* than commercial offerings — governmen
 
 Most government APIs require an API key — a unique string that identifies your application, tracks your usage, and enforces rate limits. Proper key management is a professional practice that applies to every authenticated API in this book and beyond.
 
-**Never hardcode API keys in your notebooks.** If you share your notebook (on GitHub, in a class submission, with a collaborator), your key goes with it. Instead, use one of these approaches:
+::: {.callout-important}
+## Get Your Keys First
+This chapter's tutorial uses three APIs, and each requires its own free key. Request all three now — approval is usually fast, but you cannot run any of the code below without them:
+
+- **Census Bureau**: <https://api.census.gov/data/key_signup.html>
+- **FRED**: <https://fred.stlouisfed.org/docs/api/api_key.html>
+- **FEC**: <https://api.open.fec.gov/developers/> (the signup form is at the top of the page)
+
+Store each key as an environment variable, as shown below. For the mechanics of setting environment variables on your operating system, see *Missing Manual* Chapter 34: Environment Variables and Secrets.
+:::
+
+**Never hardcode API keys in your notebooks.** If you share your notebook (on GitHub, in a class submission, with a collaborator), your key goes with it. Instead, store your keys as environment variables and read them at the top of your notebook:
 
 ### Environment Variables
 
-```python
+```{python}
 import os
 
 # Set in your terminal before launching Jupyter:
 #   export CENSUS_API_KEY="your-key-here"     (macOS/Linux)
 #   set CENSUS_API_KEY=your-key-here          (Windows)
+# ...and likewise for FRED_API_KEY and FEC_API_KEY
 
 census_key = os.environ.get("CENSUS_API_KEY")
-if not census_key:
-    raise ValueError(
-        "CENSUS_API_KEY not found. "
-        "Get a key at https://api.census.gov/data/key_signup.html "
-        "and set it as an environment variable."
-    )
+fred_key = os.environ.get("FRED_API_KEY")
+fec_key = os.environ.get("FEC_API_KEY")
+
+# Fail fast with a helpful message if any key is missing
+for name, key in [("CENSUS_API_KEY", census_key),
+                  ("FRED_API_KEY", fred_key),
+                  ("FEC_API_KEY", fec_key)]:
+    if not key:
+        raise ValueError(
+            f"{name} not found. Sign up for a free key (see the "
+            "callout above) and set it as an environment variable "
+            "before launching Jupyter."
+        )
 ```
 
-### Configuration Files
+Every code block in the rest of this chapter assumes these three variables — `census_key`, `fred_key`, and `fec_key` — are defined.
 
-```python
+::: {.callout-tip}
+## Alternative: A JSON Configuration File
+Some projects keep keys in a local configuration file instead of environment variables. Create a file called `api_keys.json` containing `{"census": "your-key", "fred": "your-key", "fec": "your-key"}`, add it to your `.gitignore` **before your first commit**, and load it into the same variable names:
+
+```{python}
 import json
-
-# Create a file called 'api_keys.json' with your keys
-# IMPORTANT: Add 'api_keys.json' to your .gitignore file!
-# Contents: {"census": "your-key", "fred": "your-key", "fec": "your-key"}
 
 with open("api_keys.json") as f:
     keys = json.load(f)
@@ -57,9 +82,12 @@ fred_key = keys["fred"]
 fec_key = keys["fec"]
 ```
 
+Because both approaches end with the same `census_key`, `fred_key`, and `fec_key` variables, every downstream code block in this chapter works unchanged either way.
+:::
+
 ::: {.callout-tip}
 ## Missing Manual Reference
-For a comprehensive guide to API keys, environment variables, `.env` files, and secrets management, see *Missing Manual* Chapter 29: Environment Variables and Secrets.
+For a comprehensive guide to API keys, environment variables, `.env` files, and secrets management, see *Missing Manual* Chapter 34: Environment Variables and Secrets.
 :::
 
 ## U.S. Census Bureau API
@@ -70,7 +98,7 @@ The Census Bureau provides access to an enormous range of demographic, economic,
 
 The Census API organizes variables into groups. Each group has a code (like `B25034` for "Year Structure Built") and contains multiple variables representing different breakdowns:
 
-```python
+```{python}
 import requests
 import pandas as pd
 
@@ -102,8 +130,10 @@ A practical tip: when you find a variable that looks right, always retrieve it f
 
 Census data is organized geographically using FIPS codes. Colorado is state `08`; Boulder is place `07850`; Longmont is place `45970`. You can find FIPS codes at [census.gov/library/reference/code-lists](https://www.census.gov/library/reference/code-lists/ansi.html).
 
-```python
-api_url = "https://api.census.gov/data/2022/acs/acs5"
+```{python}
+# Give each API's endpoint its own clearly named variable -- a generic
+# name like `url` invites bugs when you move between APIs in one notebook
+census_url = "https://api.census.gov/data/2022/acs/acs5"
 
 # Housing age distribution for Boulder, CO
 params = {
@@ -113,7 +143,7 @@ params = {
     "key": census_key
 }
 
-response = requests.get(api_url, params=params)
+response = requests.get(census_url, params=params)
 data = response.json()
 
 # First row is column headers, remaining rows are data
@@ -130,11 +160,11 @@ print(df)
 
 You can pass multiple FIPS codes to compare locations side by side:
 
-```python
+```{python}
 # Compare Boulder and Longmont
 params["for"] = "place:07850,45970"
 
-response = requests.get(api_url, params=params)
+response = requests.get(census_url, params=params)
 data = response.json()
 df_compare = pd.DataFrame(data[1:], columns=data[0])
 df_compare[numeric_cols] = df_compare[numeric_cols].apply(pd.to_numeric)
@@ -161,19 +191,19 @@ The Federal Reserve Bank of St. Louis maintains FRED (Federal Reserve Economic D
 
 ### Finding Series IDs
 
-FRED organizes data by "series" — each series is a specific time series with a unique ID. The easiest way to find series IDs is to search the [FRED website](https://fred.stlouisfed.org/) interactively. For example, searching for "median household income Boulder County" will lead you to the series `MHIBS08013A052NCEN`.
+FRED organizes data by "series" — each series is a specific time series with a unique ID. The easiest way to find series IDs is to search the [FRED website](https://fred.stlouisfed.org/) interactively. For example, searching for "median household income Boulder County" will lead you to the series `MHICO08013A052NCEN`, an annual estimate from the Census Bureau's Small Area Income and Poverty Estimates (SAIPE) program. Once you know to look, the ID is legible: it embeds the state postal abbreviation (`CO`) and Boulder County's FIPS code (`08013`).
 
-```python
-# Retrieve median household income for Boulder County
-url = "https://api.stlouisfed.org/fred/series/observations"
+```{python}
+# Retrieve median household income for Boulder County (SAIPE)
+fred_url = "https://api.stlouisfed.org/fred/series/observations"
 
 params = {
-    "series_id": "MHIBS08013A052NCEN",
+    "series_id": "MHICO08013A052NCEN",
     "api_key": fred_key,
     "file_type": "json"
 }
 
-response = requests.get(url, params=params)
+response = requests.get(fred_url, params=params)
 data = response.json()
 
 df_income = pd.DataFrame(data["observations"])
@@ -187,7 +217,7 @@ print(df_income.head())
 
 The real power of FRED emerges when you combine multiple series to tell a richer story:
 
-```python
+```{python}
 # Also get CPI data for comparison
 params_cpi = {
     "series_id": "CPIAUCSL",  # Consumer Price Index, All Urban Consumers
@@ -196,7 +226,7 @@ params_cpi = {
     "observation_start": "2000-01-01"
 }
 
-response_cpi = requests.get(url, params=params_cpi)
+response_cpi = requests.get(fred_url, params=params_cpi)
 df_cpi = pd.DataFrame(response_cpi.json()["observations"])
 df_cpi["date"] = pd.to_datetime(df_cpi["date"])
 df_cpi["cpi"] = pd.to_numeric(df_cpi["value"], errors="coerce")
@@ -214,7 +244,7 @@ df_merged = pd.merge_asof(
 
 FRED can compute transformations before returning data, saving you work:
 
-```python
+```{python}
 # Get CPI as year-over-year percent change
 params_transform = {
     "series_id": "CPIAUCSL",
@@ -224,7 +254,7 @@ params_transform = {
     "observation_start": "2020-01-01"
 }
 
-response = requests.get(url, params=params_transform)
+response = requests.get(fred_url, params=params_transform)
 df_inflation = pd.DataFrame(response.json()["observations"])
 df_inflation["date"] = pd.to_datetime(df_inflation["date"])
 df_inflation["inflation_pct"] = pd.to_numeric(df_inflation["value"], errors="coerce")
@@ -245,10 +275,12 @@ Other available transformations include `chg` (change from previous value), `log
 
 National economic indicators often mask significant regional variation. The Denver metro area, for instance, experienced housing cost increases that diverged sharply from the national average during the post-pandemic period. FRED provides regional CPI series that let you measure this divergence directly.
 
-```python
+Two details matter when you set up this comparison. First, the regional series `CUURS49BSA0` is *not* seasonally adjusted, while the workhorse national series `CPIAUCSL` *is* — so for an apples-to-apples year-over-year comparison, use the not-seasonally-adjusted national series `CPIAUCNS` instead (year-over-year percent changes largely wash out seasonal effects on their own). Second, the BLS publishes the Denver-area CPI bimonthly rather than monthly, so gaps between observations are expected, not a bug in your code.
+
+```{python}
 # Retrieve Denver metro CPI and national CPI
 denver_params = {
-    "series_id": "CUURS49BSA0",  # CPI, Denver-Aurora-Lakewood
+    "series_id": "CUURS49BSA0",  # CPI, Denver-Aurora-Lakewood (not seasonally adjusted)
     "api_key": fred_key,
     "file_type": "json",
     "units": "pc1",              # Year-over-year percent change
@@ -256,15 +288,15 @@ denver_params = {
 }
 
 national_params = {
-    "series_id": "CPIAUCSL",     # CPI, All Urban Consumers (national)
+    "series_id": "CPIAUCNS",     # CPI, All Urban Consumers (national, not seasonally adjusted)
     "api_key": fred_key,
     "file_type": "json",
     "units": "pc1",
     "observation_start": "2019-01-01"
 }
 
-df_denver = pd.DataFrame(requests.get(url, params=denver_params).json()["observations"])
-df_national = pd.DataFrame(requests.get(url, params=national_params).json()["observations"])
+df_denver = pd.DataFrame(requests.get(fred_url, params=denver_params).json()["observations"])
+df_national = pd.DataFrame(requests.get(fred_url, params=national_params).json()["observations"])
 
 df_denver["date"] = pd.to_datetime(df_denver["date"])
 df_denver["denver_cpi"] = pd.to_numeric(df_denver["value"], errors="coerce")
@@ -293,11 +325,9 @@ What drives local inflation to diverge from national trends? Housing costs are o
 
 The Federal Election Commission provides campaign finance data through a free API. This data enables accountability journalism and research on the influence of money in politics:
 
-```python
-fec_key = keys["fec"]
-
+```{python}
 # Search for a candidate
-url = "https://api.open.fec.gov/v1/candidates/search/"
+fec_search_url = "https://api.open.fec.gov/v1/candidates/search/"
 params = {
     "q": "Biden",
     "office": "P",
@@ -306,7 +336,7 @@ params = {
     "per_page": 5
 }
 
-response = requests.get(url, params=params)
+response = requests.get(fec_search_url, params=params)
 data = response.json()
 
 for candidate in data["results"]:
@@ -318,17 +348,19 @@ for candidate in data["results"]:
 
 ### Getting Campaign Finance Data
 
-```python
-# Get committee (campaign) information for a candidate
-candidate_id = "P80000722"  # Biden's presidential committee
+FEC identifiers follow a convention worth learning: candidate IDs begin with a letter for the office sought (`P` for president, `S` for Senate, `H` for House), while committee IDs begin with `C`. The ID below is therefore a *candidate* ID, and this endpoint returns that candidate's financial totals, aggregated across their authorized committees.
 
-url = f"https://api.open.fec.gov/v1/candidate/{candidate_id}/totals/"
+```{python}
+# Get financial totals for a candidate
+candidate_id = "P80000722"  # Biden's candidate ID ("P" = presidential)
+
+fec_totals_url = f"https://api.open.fec.gov/v1/candidate/{candidate_id}/totals/"
 params = {
     "api_key": fec_key,
     "election_year": 2024
 }
 
-response = requests.get(url, params=params)
+response = requests.get(fec_totals_url, params=params)
 data = response.json()
 
 for result in data["results"]:
@@ -341,7 +373,13 @@ for result in data["results"]:
 
 The most compelling analyses often integrate data from multiple government sources to tell a story that no single dataset can tell alone. Census data provides snapshots of demographic and housing characteristics; FRED provides economic time series that capture the conditions under which those characteristics formed. Combining them reveals the relationship between macro-level economic forces and community-level outcomes.
 
-```python
+```{python}
+# Define each endpoint explicitly so this block stands on its own --
+# reusing a leftover `url` variable from an earlier section is a
+# classic source of silent bugs in long notebooks
+census_url = "https://api.census.gov/data/2022/acs/acs5"
+fred_url = "https://api.stlouisfed.org/fred/series/observations"
+
 # Census: housing vintage by decade for Boulder
 housing_params = {
     "get": "NAME,B25034_001E,B25034_002E,B25034_003E,B25034_004E,"
@@ -350,12 +388,22 @@ housing_params = {
     "in": "state:08",
     "key": census_key
 }
-response = requests.get("https://api.census.gov/data/2022/acs/acs5",
-                         params=housing_params)
+response = requests.get(census_url, params=housing_params)
 housing_data = response.json()
 
+def census_int(value):
+    """Convert a Census API value to int, or None if unavailable.
+
+    The Census API reports suppressed or unavailable values with
+    sentinel codes such as -666666666 rather than nulls, so never
+    trust a bare int() conversion.
+    """
+    if value is None or str(value).startswith("-6666"):
+        return None
+    return int(value)
+
 decades = ["2020+", "2010s", "2000s", "1990s", "1980s", "1970s"]
-counts = [int(housing_data[1][i]) for i in range(2, 8)]
+counts = [census_int(housing_data[1][i]) for i in range(2, 8)]
 
 # FRED: 30-year mortgage rates (annual average)
 mortgage_params = {
@@ -366,7 +414,7 @@ mortgage_params = {
     "observation_start": "1970-01-01"
 }
 df_mortgage = pd.DataFrame(
-    requests.get(url, params=mortgage_params).json()["observations"]
+    requests.get(fred_url, params=mortgage_params).json()["observations"]
 )
 df_mortgage["date"] = pd.to_datetime(df_mortgage["date"])
 df_mortgage["rate"] = pd.to_numeric(df_mortgage["value"], errors="coerce")
@@ -400,6 +448,8 @@ The juxtaposition is revealing. Decades with low mortgage rates tend to correspo
 
 5. **County-level analysis.** Retrieve a Census variable of your choice for all counties in Colorado using `for=county:*&in=state:08`. Create a ranked bar chart of the top 20 counties. Write a brief analysis of the geographic patterns you observe.
 
+6. **Graduate extension (INFO 5617).** Read @lazer2020computational on the obstacles and opportunities facing computational social science. Then design and execute a small study that combines data from at least two of this chapter's government APIs to examine one obstacle or opportunity the paper raises — for example, the promise and difficulty of linking administrative data across agencies and geographic units. Write a formal limitations section that addresses measurement (what your variables actually capture) and coverage (which people, places, or time periods your linked data misses). The goal is not a definitive finding but a defensible design that takes the paper's warnings seriously.
+
 ::: {.callout-note}
 ## Public Interest Connection
 Government data APIs embody the value of **openness** from @sec-post-api — they exist because of democratic commitments to transparency. But government data infrastructure is not immune to erosion. Datasets are occasionally withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. The fragility of government data infrastructure is itself a public interest concern.
@@ -417,9 +467,9 @@ The FEC's public disclosure requirements enable some of the most important accou
 
 - **Census variable codes**: The naming convention is opaque. Bookmark the variable catalog and use it as a reference. Variables ending in `E` are estimates; those ending in `M` are margins of error.
 - **FIPS codes**: Geographic identifiers like `08` (Colorado) and `07850` (Boulder) are strings, not integers. Do not strip leading zeros.
-- **FRED series IDs**: These are alphanumeric strings with no consistent pattern. Use the FRED website search to find them, then copy the ID into your code.
-- **API key exposure**: The most common mistake. Add `api_keys.json` to `.gitignore` *before* your first commit, or the key will persist in your git history even after deletion.
-- **Rate limiting**: Government APIs generally have generous limits (several hundred requests per minute), but stay well within them, especially during automated collection.
+- **FRED series IDs**: These are alphanumeric strings; some families follow a pattern (like the SAIPE income series earlier in this chapter), but many do not. Use the FRED website search to find them, then copy the ID into your code exactly.
+- **API key exposure**: The most common mistake. Environment variables never enter your repository; if you use the JSON-file alternative, add `api_keys.json` to `.gitignore` *before* your first commit, or the key will persist in your git history even after deletion.
+- **Rate limiting**: Limits vary by agency. As of mid-2026, the Census API publishes no hard limit for keyed users (but expects polite use), FRED allows roughly 120 requests per minute, and the FEC allows 1,000 requests per hour with an upgraded key available on request. Check each API's documentation for current figures, and stay well within them, especially during automated collection.
 
 ## Key Takeaways
 

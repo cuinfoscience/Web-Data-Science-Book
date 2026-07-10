@@ -2,12 +2,18 @@
 
 ::: {.callout-tip}
 ## Learning Objectives
-- Explain OAuth authentication flows and implement authenticated API access
+- Explain how OAuth-based authentication grants applications scoped access to platform data
 - Retrieve and analyze subreddit metadata, submissions, comment trees, and user histories from Reddit
-- Retrieve artist, album, track, and audio feature data from Spotify
+- Retrieve artist, album, track, and playlist metadata from Spotify
 - Access decentralized social network data from Bluesky and Mastodon
 - Compare API design patterns across platforms and assess research implications of different access models
 :::
+
+::: {.callout-tip}
+## Companion Notebook
+Run this chapter's code as you read: download the [companion notebook](notebooks/ch-12-social.ipynb) (see @sec-appendix-notebooks for all of them).
+:::
+
 
 ## Platforms, Data, and Power
 
@@ -15,13 +21,20 @@ Social and media platform APIs mediate access to an enormous share of public dis
 
 This chapter teaches authenticated API access through four platforms that represent different points on the spectrum from proprietary to open: Reddit (PRAW), Spotify (spotipy), Bluesky (AT Protocol), and Mastodon (Mastodon.py). Pay attention to the structural differences — they embody the tensions between enclosure and openness discussed in @sec-post-api.
 
+::: {.callout-warning}
+## Social Data Is People Data
+Everything you retrieve in this chapter — posts, comments, profiles, listening patterns — was produced by people, most of whom never imagined their activity in a research dataset. Before collecting, revisit @sec-ethics: check the platform's Terms of Service, consider whether your project needs IRB review, collect the minimum you need, and never gather private or direct-message content. When you report findings, avoid quoting posts verbatim in ways that let a search engine re-identify the author.
+:::
+
 ## Reddit via PRAW
 
 Reddit provides a free API tier for non-commercial use (100 queries per minute). The PRAW (Python Reddit API Wrapper) library simplifies authentication and data retrieval.
 
 ### Authentication
 
-```python
+Reddit's API uses **OAuth2**, the authorization standard behind most platform APIs. The core idea: instead of sending your password with every request, your application exchanges its credentials for a scoped, revocable token. OAuth2 comes in several *flows* for different situations. The **client credentials** flow used below authenticates your *application* and grants read-only access to public data — sufficient for research collection. The **authorization code** flow additionally asks a *user* to grant your app permission to act on their behalf (post, vote, read private feeds); you will not need it in this chapter, but you will recognize it from every "Sign in with Google" dialog you have ever clicked through.
+
+```{python}
 # Install: pip install praw
 import praw
 
@@ -31,15 +44,22 @@ reddit = praw.Reddit(
     user_agent="WebDataScience/1.0 by u/your_username"
 )
 
-# Verify authentication
-print(f"Authenticated as: {reddit.user.me()}")
+# Verify the client is working: with app-only credentials, PRAW
+# operates in read-only mode
+print(f"Read-only mode: {reddit.read_only}")
+# Read-only mode: True
 ```
 
-You will need to create a Reddit app at <https://www.reddit.com/prefs/apps/> and obtain your client ID and secret. Store these in a separate file, not in your notebook.
+You will need to create a Reddit app at <https://www.reddit.com/prefs/apps/> and obtain your client ID and secret. Store them in environment variables (or a credentials file excluded from version control), never directly in your notebook.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For patterns for storing and loading API credentials safely — environment variables, `.env` files, and what belongs in `.gitignore` — see *Missing Manual* Chapter 34: Environment Variables and Secrets.
+:::
 
 ### Exploring Subreddits
 
-```python
+```{python}
 import pandas as pd
 from datetime import datetime
 
@@ -50,14 +70,14 @@ print(f"Subscribers: {subreddit.subscribers:,}")
 print(f"Created: {datetime.fromtimestamp(subreddit.created_utc)}")
 print(f"Description: {subreddit.public_description[:200]}")
 
-# Subreddit rules
+# Subreddit rules (PRAW returns Rule objects; use attribute access)
 for rule in subreddit.rules:
-    print(f"- {rule['short_name']}")
+    print(f"- {rule.short_name}")
 ```
 
 ### Retrieving Submissions
 
-```python
+```{python}
 # Get the top 25 submissions
 submissions = []
 for submission in subreddit.top(limit=25, time_filter="week"):
@@ -85,9 +105,11 @@ plt.show()
 
 ### Comment Trees
 
-```python
-# Get a submission and its comments
-submission = reddit.submission(url="https://www.reddit.com/r/AskReddit/...")
+```{python}
+# Take the current top submission from the subreddit's hot listing.
+# (You can also pass any thread URL from your browser via
+# reddit.submission(url="https://www.reddit.com/r/.../comments/..."))
+submission = next(subreddit.hot(limit=1))
 submission.comments.replace_more(limit=0)  # Flatten the tree
 
 comments = []
@@ -107,7 +129,7 @@ print(f"Total comments: {len(df_comments)}")
 
 With the comment tree flattened into a DataFrame, you can start asking quantitative questions about how engagement varies with comment structure and position. One natural question: do deeper comments — replies to replies to replies — receive less attention than top-level responses? The `depth` field PRAW provides makes this straightforward to investigate.
 
-```python
+```{python}
 import matplotlib.pyplot as plt
 
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
@@ -129,7 +151,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-```python
+```{python}
 # Summary statistics by depth
 depth_summary = df_comments.groupby("depth").agg(
     mean_score=("score", "mean"),
@@ -158,9 +180,9 @@ Reddit's 2023 API pricing changes — from free to $0.24 per 1,000 calls — and
 
 ## Spotify via spotipy
 
-Spotify provides rich metadata and audio analysis data through its API:
+Spotify's API provides metadata about artists, albums, tracks, and playlists — a window into the catalog and popularity dynamics of the world's largest music streaming platform:
 
-```python
+```{python}
 # Install: pip install spotipy
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -172,9 +194,14 @@ auth = SpotifyClientCredentials(
 sp = spotipy.Spotify(auth_manager=auth)
 ```
 
+::: {.callout-warning}
+## A Shrinking API
+In November 2024, Spotify removed several popular endpoints for newly created apps — including audio features, audio analysis, related artists, recommendations, and access to Spotify-owned editorial playlists. Applications registered before the change kept their access; new apps (including yours, if you register one for this course) receive a `403 Forbidden` from those endpoints. The examples in this section use only endpoints available to new apps as of mid-2026 — but check the [Spotify developer documentation](https://developer.spotify.com/documentation/web-api) for the current state before building a project around any of them.
+:::
+
 ### Searching and Exploring
 
-```python
+```{python}
 # Search for an artist
 results = sp.search(q="Queen", type="artist", limit=5)
 for artist in results["artists"]["items"]:
@@ -186,29 +213,18 @@ queen_id = results["artists"]["items"][0]["id"]
 # Get top tracks
 top_tracks = sp.artist_top_tracks(queen_id)
 for track in top_tracks["tracks"][:5]:
-    print(f"  {track['name']} ({track['album']['name']})")
+    print(f"  {track['name']} ({track['album']['name']}) — popularity {track['popularity']}")
 ```
 
-### Audio Features
+Every artist and track carries a **popularity** score (0–100), Spotify's algorithmic measure derived from recent play counts. Artists also carry genre labels and follower counts. These fields support a surprising range of research questions about attention, catalog structure, and cultural markets.
 
-One of the most powerful features of the Spotify API is access to audio analysis data:
+### Comparing Artists with Catalog Metadata
 
-```python
-# Get audio features for top tracks
-track_ids = [t["id"] for t in top_tracks["tracks"][:10]]
-features = sp.audio_features(track_ids)
+Metadata becomes revealing when you compare artists. Let us build a profile from three available endpoints — artist metadata, top tracks, and the album catalog — and compare two very different musicians:
 
-df_features = pd.DataFrame(features)
-print(df_features[["danceability", "energy", "tempo", "valence"]].describe())
-```
-
-### Comparing Artists by Audio Profile
-
-Audio features become especially revealing when you compare artists across genres. Spotify's numerical representations of musical characteristics let you quantify differences that listeners perceive intuitively. Let us retrieve audio features for two contrasting artists — one from classical music and one from electronic dance music — and see whether the API's features capture the distinction.
-
-```python
-def get_artist_audio_profile(sp, artist_name):
-    """Retrieve mean audio features for an artist's top tracks.
+```{python}
+def get_artist_profile(sp, artist_name):
+    """Build a metadata profile for an artist from public catalog data.
 
     Parameters
     ----------
@@ -220,64 +236,79 @@ def get_artist_audio_profile(sp, artist_name):
     Returns
     -------
     dict
-        Mean values for key audio features
+        Artist metadata, top-track popularity, and album release years
     """
     results = sp.search(q=artist_name, type="artist", limit=1)
-    artist_id = results["artists"]["items"][0]["id"]
+    artist = results["artists"]["items"][0]
 
-    top_tracks = sp.artist_top_tracks(artist_id)
-    track_ids = [t["id"] for t in top_tracks["tracks"][:10]]
-    features = sp.audio_features(track_ids)
+    top_tracks = sp.artist_top_tracks(artist["id"])
+    albums = sp.artist_albums(artist["id"], include_groups="album", limit=50)
 
-    df = pd.DataFrame(features)
-    return df[["danceability", "energy", "valence", "tempo"]].mean().to_dict()
+    return {
+        "name": artist["name"],
+        "followers": artist["followers"]["total"],
+        "artist_popularity": artist["popularity"],
+        "genres": artist["genres"],
+        "top_track_popularity": [t["popularity"] for t in top_tracks["tracks"]],
+        "album_years": sorted({a["release_date"][:4] for a in albums["items"]}),
+    }
 
-# Compare two contrasting artists
-profile_classical = get_artist_audio_profile(sp, "Yo-Yo Ma")
-profile_electronic = get_artist_audio_profile(sp, "Daft Punk")
+profile_classical = get_artist_profile(sp, "Yo-Yo Ma")
+profile_electronic = get_artist_profile(sp, "Daft Punk")
 
-comparison = pd.DataFrame({
-    "Yo-Yo Ma": profile_classical,
-    "Daft Punk": profile_electronic
-})
-print(comparison)
+for p in (profile_classical, profile_electronic):
+    print(f"{p['name']}: popularity {p['artist_popularity']}, "
+          f"{p['followers']:,} followers, "
+          f"albums {p['album_years'][0]}–{p['album_years'][-1]}")
 ```
 
-```python
+```{python}
 import numpy as np
 
-# Grouped bar chart comparing audio profiles
-features_to_plot = ["danceability", "energy", "valence"]
-x = np.arange(len(features_to_plot))
-width = 0.35
-
+# Compare the popularity distributions of each artist's top tracks
 fig, ax = plt.subplots(figsize=(8, 5))
-bars1 = ax.bar(x - width/2, [profile_classical[f] for f in features_to_plot],
-               width, label="Yo-Yo Ma", color="#4C72B0")
-bars2 = ax.bar(x + width/2, [profile_electronic[f] for f in features_to_plot],
-               width, label="Daft Punk", color="#DD8452")
-
-ax.set_ylabel("Mean Feature Value (0-1)")
-ax.set_title("Audio Feature Comparison: Classical vs. Electronic")
-ax.set_xticks(x)
-ax.set_xticklabels([f.capitalize() for f in features_to_plot])
-ax.legend()
-ax.set_ylim(0, 1)
+ax.boxplot(
+    [profile_classical["top_track_popularity"],
+     profile_electronic["top_track_popularity"]],
+    tick_labels=[profile_classical["name"], profile_electronic["name"]]
+)
+ax.set_ylabel("Track Popularity (0–100)")
+ax.set_title("Top-Track Popularity by Artist")
 plt.tight_layout()
 plt.show()
 ```
 
-The differences are stark. Daft Punk's tracks score high on danceability and energy — characteristics that define electronic dance music — while Yo-Yo Ma's cello performances register low on both dimensions. Valence, Spotify's measure of musical positivity, may be more surprising: classical pieces often score in the middle range, neither clearly "happy" nor "sad" by the algorithm's standards, while electronic tracks tend toward higher valence.
+Even without audio analysis, the catalog tells stories: Daft Punk's compact discography of studio albums contrasts with Yo-Yo Ma's decades-long recording career spanning dozens of releases; their popularity scores reveal how streaming-era attention concentrates on some catalogs and spreads thin across others.
 
-This kind of comparison scales naturally. You could extend it to dozens of artists, building a feature matrix that maps the audio landscape of an entire genre or era. Clustering algorithms applied to these profiles can reveal subgenre structure that mirrors musicological categories — or, more interestingly, identifies groupings that cut across traditional genre boundaries.
+For playlist-based questions, `sp.playlist_tracks()` retrieves the contents of any *user-created* public playlist (Spotify-owned editorial playlists are no longer accessible to new apps):
 
-These audio features are not ground truth about music — they are Spotify's proprietary algorithmic interpretations. Tempo is measured in beats per minute and is relatively objective; danceability and valence are learned from training data and reflect particular cultural assumptions about what makes music "danceable" or "positive." When you use these features in research, you are analyzing Spotify's model of music as much as you are analyzing the music itself. This is a recurring theme in web data science: the data you collect from platforms is always mediated by the platform's own interpretive layer.
+```{python}
+# Retrieve tracks from a user-created public playlist by its ID
+playlist_id = "spotify_playlist_id_here"  # From the playlist's share link
+items = sp.playlist_tracks(playlist_id, limit=100)["items"]
+
+tracks = pd.DataFrame([{
+    "name": it["track"]["name"],
+    "artist": it["track"]["artists"][0]["name"],
+    "popularity": it["track"]["popularity"],
+    "duration_min": it["track"]["duration_ms"] / 60000,
+    "release_year": int(it["track"]["album"]["release_date"][:4]),
+} for it in items if it["track"] is not None])
+
+print(tracks.describe())
+```
+
+### The Audio Features Story: An Enclosure Case Study
+
+For more than a decade, the Spotify API's signature research offering was **audio features**: algorithmic scores for every track's danceability, energy, valence (musical positivity), tempo, and more. Hundreds of published studies used them to map genres, model hit prediction, and study the emotional texture of playlists. The November 2024 deprecation cut new applications off from all of it — right as generative AI made music data newly valuable, and without a stated research alternative. It is @sec-post-api's **enclosure** pattern in miniature: a rich, freely available data resource, withdrawn by unilateral platform decision, with the accumulated literature now resting on measurements that new researchers cannot reproduce.
+
+The episode also carries a methodological lesson that outlives the endpoints. Audio features were never ground truth about music — they were Spotify's proprietary algorithmic interpretations, learned from training data and reflecting particular cultural assumptions about what makes music "danceable" or "positive." The same holds for the popularity scores you *can* still retrieve: they are engagement-weighted, region-influenced, and recomputed on Spotify's schedule. When you analyze platform data, you are always analyzing the platform's model of the world as much as the world itself.
 
 ## Bluesky via AT Protocol
 
 Bluesky, built on the AT Protocol, represents a structural alternative to proprietary platforms. Its open protocol means that API access is an architectural feature, not a business decision:
 
-```python
+```{python}
 # Install: pip install atproto
 from atproto import Client
 
@@ -297,98 +328,42 @@ for item in timeline.feed:
     print(f"@{post.author.handle}: {post.record.text[:80]}")
 ```
 
-The key difference from Reddit and Spotify: Bluesky's protocol is designed so that no single company controls API access. Your identity, social graph, and data are portable across any service that implements the AT Protocol.
+Note the authentication style: an **app password** generated in Bluesky's settings, distinct from your account password and revocable at any time — the same delegated-credential principle as OAuth, implemented more simply.
 
-## Mastodon via Mastodon.py
+Any account's public posts are available through `get_author_feed`:
 
-Mastodon is a decentralized social network built on the ActivityPub protocol. Each server (instance) hosts its own API [@diener2026mastodonpy]:
-
-```python
-# Install: pip install Mastodon.py
-from mastodon import Mastodon
-
-# Register your app (one-time setup)
-# Mastodon.create_app(
-#     "WebDataScience",
-#     api_base_url="https://mastodon.social",
-#     to_file="app_cred.secret"
-# )
-
-mastodon = Mastodon(
-    client_id="app_cred.secret",
-    api_base_url="https://mastodon.social"
+```{python}
+# Retrieve a user's recent posts (public data; any handle works)
+feed = client.app.bsky.feed.get_author_feed(
+    {"actor": "bsky.app", "limit": 50}
 )
 
-# mastodon.log_in("your-email", "your-password", to_file="user_cred.secret")
-mastodon = Mastodon(access_token="user_cred.secret", api_base_url="https://mastodon.social")
+posts = []
+for item in feed.feed:
+    post = item.post
+    posts.append({
+        "text": post.record.text,
+        "created_at": post.record.created_at,
+        "likes": post.like_count,
+        "reposts": post.repost_count,
+        "is_reply": post.record.reply is not None,
+    })
 
-# Get the public timeline
-timeline = mastodon.timeline_public(limit=10)
-for toot in timeline:
-    print(f"@{toot['account']['username']}: {toot['content'][:80]}")
+df_posts = pd.DataFrame(posts)
+print(f"Posts retrieved: {len(df_posts)}")
+print(f"Replies: {df_posts['is_reply'].mean():.0%}")
 ```
 
-## Exercises
-
-1. **Reddit analysis.** Compare two subreddits on the same broad topic (e.g., r/science and r/askscience). How do submission patterns, comment engagement, and moderation structures differ?
-
-2. **Audio features.** Using spotipy, analyze the audio features of a playlist or an artist's full discography. How do tempo, energy, and danceability vary across albums or over the artist's career?
-
-3. **Open vs. closed.** Attempt to retrieve the same type of information (user profile, social graph, recent posts) from both Bluesky and Reddit. Compare the ease of access, the richness of the data, and the authentication requirements. What does this comparison tell you about platform governance?
-
-4. **Genre fingerprints.** Choose two Spotify playlists representing different genres (e.g., country vs. electronic). Retrieve audio features for the tracks in each playlist using `sp.playlist_tracks()` and `sp.audio_features()`. Create overlapping distribution plots (using histograms or kernel density estimates) comparing danceability, energy, and valence across genres. Can you distinguish the genres algorithmically based on audio features alone?
-
-5. **Bluesky analysis.** Retrieve the 50 most recent posts from a Bluesky account of your choice using the AT Protocol SDK. Compute summary statistics: average post length, posting frequency (posts per day), fraction of posts that are replies vs. original posts, and the most common words used. How does this activity profile compare to what you might expect from the same account on Twitter/X? What limitations of the AT Protocol API did you encounter during data collection?
-
-## Social History and Public Interest
-
-The contrast between Reddit, Spotify, Bluesky, and Mastodon illustrates the governance spectrum described in @sec-post-api. Reddit's 2023 changes demonstrate how a platform can unilaterally restrict access that researchers depended on. Spotify's API represents a productive commercial arrangement — rich data in exchange for engagement. Bluesky and Mastodon represent structural alternatives where open protocols make enclosure architecturally harder.
-
-The PRAW library and Mastodon.py continue to work because their platforms maintain documented APIs. But the history of Twitter's API — which went from the most important data source in computational social science to essentially inaccessible within a year of its acquisition — is a reminder that platform goodwill is not infrastructure.
-
-The Fediverse offers two distinct architectural responses to this problem. ActivityPub, the protocol underlying Mastodon, creates a federated network where each instance is independently operated but can communicate with others — much like email servers. No single company controls the protocol, so no single company can revoke access. The AT Protocol, which powers Bluesky, takes a different approach centered on portable identity: your account data, social graph, and content can move between providers, preventing the lock-in that makes platform migration so costly. Both represent structural alternatives to centralized platforms, distributing control rather than concentrating it. This is the architectural embodiment of **ownership** (@sec-post-api) — users and communities, not corporations, control the infrastructure. For researchers, these open protocols mean that data access is a design feature rather than a business concession, offering more durable foundations for longitudinal research than any corporate API ever could. The trade-off is fragmentation: collecting comprehensive data from a federated network requires engaging with multiple instances, each with its own norms, moderation policies, and technical configurations. Decentralization solves the single-point-of-failure problem but introduces new challenges for research design that centralized platforms never posed.
-
-## Common Issues to Debug
-
-- **PRAW `OAuthException`**: Double-check your `client_id`, `client_secret`, and `user_agent`. The user_agent must be unique and descriptive.
-- **Spotify client credentials vs. authorization code**: Client credentials flow cannot access user-specific data like listening history. It works for public search, artist, and track data.
-- **Bluesky `atproto` SDK**: Still pre-1.0; API may change between versions. Check the changelog before upgrading.
-- **Mastodon instance differences**: Different instances have different rate limits, rules, and may block automated access. Always register your app properly.
-
-## Key Takeaways
-
-Platform APIs provide access to behavioral data at unprecedented scale, but that access is conditional, costly, and fragile. The pattern across all four platforms is the same: authenticate, construct requests, parse nested JSON, convert to DataFrames. The difference is in governance: who controls the data, on what terms, and what happens when they change the rules. Build skills across both proprietary and open platforms so that the closure of any single source does not shut down your research.
-
-## Further Reading
-
-- PRAW documentation: <https://praw.readthedocs.io/>
-- spotipy documentation: <https://spotipy.readthedocs.io/>
-- AT Protocol SDK: <https://atproto.blue/>
-- Mastodon.py documentation: <https://mastodonpy.readthedocs.io/>
-- @baumgartner2020pushshift — the Pushshift Reddit dataset
-- @diener2026mastodonpy — the Mastodon.py library
-
-## Comparing Platform Architectures
-
-The four platforms in this chapter represent fundamentally different governance architectures, and these differences shape what data is available, on what terms, and how durable the access is.
-
-| Platform | Protocol | Authentication | Rate Limit (free) | Data Ownership |
-|----------|----------|----------------|-------------------|----------------|
-| Reddit | Proprietary REST API | OAuth2 | 100 QPM | Platform-controlled |
-| Spotify | Proprietary REST API | OAuth2 / Client Credentials | ~180 RPM | Platform-controlled |
-| Bluesky | AT Protocol (open) | App password | Generous, per-PDS | User-portable |
-| Mastodon | ActivityPub (open) | OAuth2, per-instance | Varies by instance | Instance-governed |
-
-The structural difference matters: Reddit and Spotify can unilaterally change their API terms because they control both the platform and the protocol. Bluesky and Mastodon cannot — or at least, no single entity can — because the protocols are open standards that anyone can implement. This is the architectural embodiment of the **ownership** value from @sec-post-api.
+The key difference from Reddit and Spotify: Bluesky's protocol is designed so that no single company controls API access. Your identity, social graph, and data are portable across any service that implements the AT Protocol.
 
 ### Building a Bluesky Social Network
 
 The AT Protocol makes social graph data directly accessible, enabling network analysis that would be difficult on more restricted platforms:
 
-```python
+```{python}
 def get_social_graph(client, handle, direction="followers", limit=100):
     """Get followers or following for a Bluesky user.
-    
+
     Parameters
     ----------
     client : atproto.Client
@@ -399,7 +374,7 @@ def get_social_graph(client, handle, direction="followers", limit=100):
         'followers' or 'following'
     limit : int
         Maximum number of accounts to retrieve
-    
+
     Returns
     -------
     list
@@ -407,7 +382,7 @@ def get_social_graph(client, handle, direction="followers", limit=100):
     """
     results = []
     cursor = None
-    
+
     while len(results) < limit:
         if direction == "followers":
             response = client.app.bsky.graph.get_followers(
@@ -419,18 +394,18 @@ def get_social_graph(client, handle, direction="followers", limit=100):
                 {"actor": handle, "limit": 50, "cursor": cursor}
             )
             accounts = response.follows
-        
+
         for account in accounts:
             results.append({
                 "handle": account.handle,
                 "display_name": account.display_name or "",
                 "description": (account.description or "")[:100]
             })
-        
+
         cursor = response.cursor
         if not cursor or not accounts:
             break
-    
+
     return results[:limit]
 
 # Get followers for a user
@@ -447,11 +422,46 @@ mutuals = follower_handles & following_handles
 print(f"Mutual connections: {len(mutuals)}")
 ```
 
-### Mastodon: Working Across Instances
+## Mastodon via Mastodon.py
+
+Mastodon is a decentralized social network built on the ActivityPub protocol. Each server (instance) hosts its own API [@diener2026mastodonpy]:
+
+```{python}
+# Install: pip install Mastodon.py
+from mastodon import Mastodon
+
+# One-time setup: register an app on your home instance, then log in.
+# Both calls save credentials to local files you should .gitignore.
+# Mastodon.create_app(
+#     "WebDataScience",
+#     api_base_url="https://mastodon.social",
+#     to_file="app_cred.secret"
+# )
+# Mastodon(client_id="app_cred.secret").log_in(
+#     "your-email", "your-password", to_file="user_cred.secret"
+# )
+
+# In every session afterward, authenticate with the saved token
+mastodon = Mastodon(
+    access_token="user_cred.secret",
+    api_base_url="https://mastodon.social"
+)
+
+# Get the public timeline
+from bs4 import BeautifulSoup
+
+timeline = mastodon.timeline_public(limit=10)
+for toot in timeline:
+    # Statuses arrive as HTML; strip tags before analysis
+    text = BeautifulSoup(toot["content"], "html.parser").get_text()
+    print(f"@{toot['account']['username']}: {text[:80]}")
+```
+
+### Working Across Instances
 
 A key difference between Mastodon and centralized platforms is that there is no single API endpoint for "all of Mastodon." Each instance maintains its own API, and you can only directly access the data on instances you authenticate with. This federated architecture means that comprehensive data collection requires accessing multiple instances — a fundamentally different research design challenge:
 
-```python
+```{python}
 # Search for accounts across the instance you're connected to
 results = mastodon.account_search("data science", limit=10)
 for account in results:
@@ -464,12 +474,69 @@ user_id = results[0]["id"]
 statuses = mastodon.account_statuses(user_id, limit=20)
 
 for status in statuses[:5]:
-    # Strip HTML tags from content
-    from bs4 import BeautifulSoup
+    # created_at is a datetime object; content is HTML
     text = BeautifulSoup(status["content"], "html.parser").get_text()
-    print(f"  [{status['created_at'][:10]}] {text[:100]}")
+    print(f"  [{status['created_at'].date()}] {text[:100]}")
 
 # Track a hashtag
 tagged = mastodon.timeline_hashtag("datascience", limit=20)
 print(f"\nRecent posts tagged #datascience: {len(tagged)}")
 ```
+
+## Comparing Platform Architectures
+
+The four platforms in this chapter represent fundamentally different governance architectures, and these differences shape what data is available, on what terms, and how durable the access is.
+
+| Platform | Protocol | Authentication | Rate Limit (free) | Data Ownership |
+|----------|----------|----------------|-------------------|----------------|
+| Reddit | Proprietary REST API | OAuth2 | 100 QPM | Platform-controlled |
+| Spotify | Proprietary REST API | OAuth2 / Client Credentials | ~180 RPM | Platform-controlled |
+| Bluesky | AT Protocol (open) | App password | Generous, per-PDS | User-portable |
+| Mastodon | ActivityPub (open) | OAuth2, per-instance | Varies by instance | Instance-governed |
+
+The structural difference matters: Reddit and Spotify can unilaterally change their API terms because they control both the platform and the protocol. Bluesky and Mastodon cannot — or at least, no single entity can — because the protocols are open standards that anyone can implement. This is the architectural embodiment of the **ownership** value from @sec-post-api.
+
+## Exercises
+
+1. **Reddit analysis.** Compare two subreddits on the same broad topic (e.g., r/science and r/askscience). How do submission patterns, comment engagement, and moderation structures differ?
+
+2. **Discography metadata.** Using spotipy, analyze an artist's full discography with `sp.artist_albums()` and `sp.album_tracks()`. How has their release cadence changed over their career? Do older or newer releases hold higher popularity scores today? What does that pattern suggest about how streaming shapes attention to back catalogs?
+
+3. **Open vs. closed.** Attempt to retrieve the same type of information (user profile, social graph, recent posts) from both Bluesky and Reddit. Compare the ease of access, the richness of the data, and the authentication requirements. What does this comparison tell you about platform governance?
+
+4. **Playlist fingerprints.** Choose two user-created public Spotify playlists representing different genres (e.g., country vs. electronic — note that Spotify-owned editorial playlists are not accessible to new apps). Retrieve their contents with `sp.playlist_tracks()` and compare the playlists on available metadata: track popularity, duration, release year, and the number of distinct artists. Create overlapping distribution plots for at least two of these measures. How well can you distinguish the genres from metadata alone — and what would you be missing without audio analysis?
+
+5. **Bluesky analysis.** Retrieve the 50 most recent posts from a Bluesky account of your choice using `get_author_feed` (demonstrated in this chapter). Compute summary statistics: average post length, posting frequency (posts per day), fraction of posts that are replies vs. original posts, and the most common words used. How does this activity profile compare to what you might expect from the same account on Twitter/X? What limitations of the AT Protocol API did you encounter during data collection?
+
+6. **Graduate extension (INFO 5617).** Read @bruns2019after and @davidson2023platform. Then design (do not execute) a measurement plan for studying the same construct — for example, cross-partisan interaction, or the spread of health misinformation — on one proprietary platform and one federated platform from this chapter. For each: specify the endpoints and fields you would use, the sampling frame, what the platform's access rules prevent you from observing, and how those constraints could bias your conclusions. Conclude with an assessment of whether the two platforms' results would be comparable at all.
+
+## Social History and Public Interest
+
+The contrast between Reddit, Spotify, Bluesky, and Mastodon illustrates the governance spectrum described in @sec-post-api. Reddit's 2023 changes demonstrate how a platform can unilaterally restrict access that researchers depended on. Spotify's trajectory — rich audio analysis data for a decade, then a 2024 deprecation that cut off new research applications — shows that even "productive commercial arrangements" narrow when the business calculus shifts. Bluesky and Mastodon represent structural alternatives where open protocols make enclosure architecturally harder.
+
+The PRAW library and Mastodon.py continue to work because their platforms maintain documented APIs. But the history of Twitter's API — which went from the most important data source in computational social science to essentially inaccessible within a year of its acquisition — is a reminder that platform goodwill is not infrastructure.
+
+The Fediverse offers two distinct architectural responses to this problem. ActivityPub, the protocol underlying Mastodon, creates a federated network where each instance is independently operated but can communicate with others — much like email servers. No single company controls the protocol, so no single company can revoke access. The AT Protocol, which powers Bluesky, takes a different approach centered on portable identity: your account data, social graph, and content can move between providers, preventing the lock-in that makes platform migration so costly. Both represent structural alternatives to centralized platforms, distributing control rather than concentrating it. This is the architectural embodiment of **ownership** (@sec-post-api) — users and communities, not corporations, control the infrastructure. For researchers, these open protocols mean that data access is a design feature rather than a business concession, offering more durable foundations for longitudinal research than any corporate API ever could. The trade-off is fragmentation: collecting comprehensive data from a federated network requires engaging with multiple instances, each with its own norms, moderation policies, and technical configurations. Decentralization solves the single-point-of-failure problem but introduces new challenges for research design that centralized platforms never posed.
+
+## Common Issues to Debug
+
+- **PRAW `OAuthException`**: Double-check your `client_id`, `client_secret`, and `user_agent`. The user_agent must be unique and descriptive.
+- **Spotify `403 Forbidden` on audio features, recommendations, or related artists**: These endpoints were deprecated for apps created after November 2024. This is not a bug in your code — the access no longer exists for new apps.
+- **Spotify client credentials vs. authorization code**: Client credentials flow cannot access user-specific data like listening history. It works for public search, artist, album, track, and user-created playlist data.
+- **Bluesky `atproto` SDK**: Still evolving; API may change between versions. Check the changelog before upgrading.
+- **Mastodon instance differences**: Different instances have different rate limits, rules, and may block automated access. Always register your app properly.
+- **Mastodon HTML content**: Status `content` fields arrive as HTML and `created_at` fields as `datetime` objects — strip tags with BeautifulSoup and use datetime methods rather than string slicing.
+
+## Key Takeaways
+
+Platform APIs provide access to behavioral data at unprecedented scale, but that access is conditional, costly, and fragile. The pattern across all four platforms is the same: authenticate, construct requests, parse nested JSON, convert to DataFrames. The difference is in governance: who controls the data, on what terms, and what happens when they change the rules. Build skills across both proprietary and open platforms so that the closure of any single source does not shut down your research.
+
+## Further Reading
+
+- PRAW documentation: <https://praw.readthedocs.io/>
+- spotipy documentation: <https://spotipy.readthedocs.io/>
+- AT Protocol SDK: <https://atproto.blue/>
+- Mastodon.py documentation: <https://mastodonpy.readthedocs.io/>
+- @baumgartner2020pushshift — the Pushshift Reddit dataset
+- @diener2026mastodonpy — the Mastodon.py library
+- @bruns2019after — platforms versus scholarly research after the APIcalypse

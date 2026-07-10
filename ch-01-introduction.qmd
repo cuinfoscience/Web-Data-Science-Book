@@ -9,6 +9,12 @@
 - Adopt the dispositions — growth mindset, computational thinking, hacker ethic, and scientific norms — that distinguish effective practitioners
 :::
 
+::: {.callout-tip}
+## Companion Notebook
+Run this chapter's code as you read: download the [companion notebook](notebooks/ch-01-introduction.ipynb) (see @sec-appendix-notebooks for all of them).
+:::
+
+
 ## Why Web Data Science?
 
 The web is the largest, most dynamic, and most contested data source ever created. Every day, government agencies publish legislative records, researchers share datasets, journalists file stories, and billions of people generate behavioral traces on social platforms. This data can answer questions that matter: How does misinformation spread during elections? How have housing costs changed in your community? How do online communities govern themselves? How are platforms shaping public discourse?
@@ -23,7 +29,7 @@ Working with web data requires not just technical fluency but a professional dis
 
 **Growth mindset** means understanding that ability develops through effort. You will encounter libraries you have never used, error messages you do not understand, and web pages that resist your parsing attempts. This is normal. The goal is continual improvement, not instant mastery. Treat each frustration as a learning signal, not evidence of inadequacy.
 
-**Computational thinking** is the disciplined approach that computer scientists bring to problems: decomposing large tasks into smaller pieces, recognizing patterns across examples, abstracting away inessential details, and specifying unambiguous sequences of steps. When you face a complex scraping task, you will practice breaking it into retrieve, parse, clean, and analyze stages — each with clear inputs and outputs.
+**Computational thinking** is the disciplined approach that computer scientists bring to problems: decomposing large tasks into smaller pieces, recognizing patterns across examples, abstracting away inessential details, and specifying unambiguous sequences of steps [@wing2006computational]. When you face a complex scraping task, you will practice breaking it into retrieve, parse, clean, and analyze stages — each with clear inputs and outputs.
 
 **The hacker ethic** emphasizes sharing, openness, creativity, and a bias toward action. The open-source libraries you will use throughout this book exist because communities of developers chose to share their work. You should approach problems with curiosity, experiment freely, and share what you learn.
 
@@ -44,11 +50,21 @@ The Anaconda distribution of Python provides a curated collection of scientific 
 
 After installation, open a terminal (macOS/Linux) or Anaconda Prompt (Windows) and update your installation:
 
-```python
+```{python}
 # Run these commands in a terminal, not in Python
 # conda update conda
 # conda install anaconda=2024.06
 ```
+
+Anaconda's default `base` environment is fine for your first session, but as you accumulate projects, their library requirements will eventually conflict. The `conda` package manager solves this with *environments*: isolated Python installations, each with its own set of packages. Create one for this book and activate it whenever you sit down to work:
+
+```{python}
+# Run these commands in a terminal, not in Python
+# conda create -n webdata python=3.11
+# conda activate webdata
+```
+
+Giving each project its own environment is a reproducibility practice, not just tidiness: it records exactly which Python and package versions your analysis ran against, so you — or someone replicating your work — can recreate the same setup on another machine months later.
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -61,7 +77,7 @@ Jupyter Notebooks are interactive computing environments that keep your code, do
 
 A notebook consists of cells. **Code cells** contain Python that you can execute with Shift+Enter. **Markdown cells** contain formatted text for documentation. The ability to interleave code with narrative explanation makes notebooks ideal for the kind of exploratory, iterative work that characterizes web data science.
 
-```python
+```{python}
 # This is a code cell. When you run it, Python executes the code
 # and displays any output below the cell.
 print("Hello, web data science!")
@@ -77,14 +93,14 @@ For a thorough introduction to Jupyter Notebooks — cell types, execution order
 
 This book uses several Python libraries extensively. Install them now if they are not already available in your Anaconda distribution:
 
-```python
+```{python}
 # Run in a terminal:
 # pip install requests beautifulsoup4 pandas matplotlib seaborn
 ```
 
 Throughout this book, you will install additional libraries as needed for specific chapters. For now, confirm that the core libraries import without error:
 
-```python
+```{python}
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -99,7 +115,7 @@ Let us preview the loop that structures every chapter in this book: **retrieve**
 
 The `requests` library lets you make HTTP requests — the same kind of request your browser makes when you type a URL. Here you will retrieve the Wikipedia article for the University of Colorado Boulder:
 
-```python
+```{python}
 import requests
 
 # Retrieve the page
@@ -114,7 +130,7 @@ print(len(response.text))    # Number of characters in the HTML
 
 The `response` object contains everything the server sent back: a status code indicating success or failure, headers with metadata about the response, and the body of the document as a text string. You can inspect the first 500 characters of the HTML:
 
-```python
+```{python}
 print(response.text[:500])
 # You'll see raw HTML: <!DOCTYPE html>, <head>, <title>, etc.
 ```
@@ -123,7 +139,7 @@ This is raw HTML — not yet useful for analysis. In @sec-data-formats and @sec-
 
 You can also retrieve data in JSON format from an API. Here is a request to the Wikimedia pageviews API, which returns the number of times a Wikipedia article was viewed on a given day:
 
-```python
+```{python}
 import requests
 
 api_url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
@@ -144,7 +160,7 @@ Notice two things. First, you included a custom `User-Agent` header identifying 
 
 The `data["items"]` key contains a list of dictionaries, one per day, each with fields like `timestamp`, `views`, `article`, and `project`. This is exactly the kind of structure that pandas can convert into a DataFrame with a single call:
 
-```python
+```{python}
 import pandas as pd
 
 # Convert the list of dictionaries into a DataFrame
@@ -176,7 +192,7 @@ The DataFrame also gives you immediate analytical power. You can compute summary
 
 Once you have data in a DataFrame, save it to disk. This is not optional — it is a core practice of responsible web data science:
 
-```python
+```{python}
 # Save to CSV
 df.to_csv("cu_boulder_pageviews.csv", index=False)
 
@@ -185,7 +201,7 @@ df = pd.read_csv("cu_boulder_pageviews.csv")
 print(f"Loaded {len(df)} rows from disk.")
 ```
 
-Serialization — saving your data to a file — matters for three reasons. First, courtesy: every API call consumes server resources, and re-requesting data you already have is wasteful. Second, reproducibility: if you save the data you retrieved on a specific date, your analysis can be reproduced even if the API changes or goes offline. Third, the data itself may change — Wikipedia pageview counts are finalized after a short delay, and an article's content can be edited at any moment. The version you retrieved is a snapshot, and saving it preserves that snapshot. You will explore JSON serialization for more complex data structures in @sec-archives.
+Serialization — saving your data to a file — matters for three reasons. First, courtesy: every API call consumes server resources, and re-requesting data you already have is wasteful. Second, reproducibility: if you save the data you retrieved on a specific date, your analysis can be reproduced even if the API changes or goes offline. Third, the data itself may change — Wikipedia pageview counts are finalized after a short delay, and an article's content can be edited at any moment. The version you retrieved is a snapshot, and saving it preserves that snapshot. You will explore JSON serialization for more complex data structures in @sec-data-formats.
 
 ## Documentation as Professional Practice
 
@@ -196,13 +212,13 @@ Bookmark the documentation for the libraries you will use throughout this book:
 - **requests**: [requests.readthedocs.io](https://requests.readthedocs.io/)
 - **BeautifulSoup**: [crummy.com/software/BeautifulSoup/bs4/doc](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
 - **pandas**: [pandas.pydata.org/docs](https://pandas.pydata.org/docs/)
-- **matplotlib**: [matplotlib.org/stable/contents.html](https://matplotlib.org/stable/contents.html)
+- **matplotlib**: [matplotlib.org/stable](https://matplotlib.org/stable/)
 
 When you encounter an error or do not know how to do something, start with the official documentation. If that does not help, search for the specific error message. When asking for help — from a classmate, an instructor, or an AI tool — "it's not working" is not an actionable request. Describe what you tried, what you expected to happen, what actually happened, and what the error message says.
 
 ::: {.callout-tip}
 ## Missing Manual Reference
-For strategies on asking effective technical questions and reading official documentation, see *Missing Manual* Chapter 2: Asking Technical Questions and Chapter 4: Reading Official Documentation.
+For strategies on asking effective technical questions and reading official documentation, see *Missing Manual* Chapter 2: Asking Technical Questions and Chapter 5: Reading Official Documentation.
 :::
 
 ## Exercises
@@ -216,6 +232,8 @@ For strategies on asking effective technical questions and reading official docu
 4. **POST vs. GET.** Read the `requests` library documentation and find the method for making a POST request. In a Markdown cell, explain how POST differs from GET and describe a scenario where you would use each. What kind of data does a POST request typically send, and why would an API require it instead of GET?
 
 5. **Multi-article comparison.** Retrieve daily pageview data for three Wikipedia articles of your choice over the same month. Save each to a separate CSV file using `df.to_csv()`. Load all three back with `pd.read_csv()` and create a single plot with all three time series on the same axes, with a legend identifying each article. Which article had the most variable traffic, and can you hypothesize why?
+
+6. **Graduate extension (INFO 5617).** Read the computational social science manifesto by @lazer2009computational — a short, field-defining argument about what digital trace data makes possible. Identify three specific claims the authors make about the promise or the perils of studying society through digital traces, such as claims about data access, privacy, or the capacity of academic institutions to compete with industry. For each claim, write a paragraph connecting it to a concrete technique or data source covered in this book's table of contents, and assess whether the claim has held up in the years since publication. Submit your response as a Jupyter Notebook that uses Markdown cells for the written analysis.
 
 ## Social History and Public Interest
 

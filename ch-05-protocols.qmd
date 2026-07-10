@@ -9,6 +9,12 @@
 - Make an API call and convert the response to a time series visualization
 :::
 
+::: {.callout-tip}
+## Companion Notebook
+Run this chapter's code as you read: download the [companion notebook](notebooks/ch-05-protocols.ipynb) (see @sec-appendix-notebooks for all of them).
+:::
+
+
 ## What Happens When You Load a Web Page?
 
 When you type a URL into your browser and press Enter, a remarkable sequence of operations unfolds in milliseconds. Your browser resolves the domain name to an IP address, opens a connection to a remote server, sends a request formatted in a specific protocol, receives a response, and renders the result on your screen. Understanding this sequence transforms web data collection from magic into engineering.
@@ -54,7 +60,7 @@ Every computer on a public network has an IP address — a numerical identifier 
 
 You can find your own computer's IP address programmatically:
 
-```python
+```{python}
 import socket
 
 # Your computer's hostname on the local network
@@ -66,9 +72,11 @@ local_ip = socket.gethostbyname(hostname)
 print(f"Local IP: {local_ip}")
 ```
 
+Be aware that on many Linux and macOS systems this lookup returns a loopback address like `127.0.0.1` or `127.0.1.1` — an address that simply means "this machine" — rather than your network-assigned IP, so the public-IP query below is the more reliable way to see how the internet identifies you.
+
 To see your *public* IP address (as seen by servers on the internet), you can query an external service:
 
-```python
+```{python}
 import requests
 
 response = requests.get("https://api.ipify.org?format=json")
@@ -80,7 +88,7 @@ print(response.json())
 
 When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers. You can trace this path using the `scapy` library:
 
-```python
+```{python}
 from scapy.all import traceroute
 
 # Trace the path to Wikipedia
@@ -90,7 +98,7 @@ result, unans = traceroute("en.wikipedia.org", maxttl=20)
 
 Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:
 
-```python
+```{python}
 import requests
 
 def geolocate_ip(ip):
@@ -104,14 +112,14 @@ print(f"{location['city']}, {location['country']}")
 ```
 
 ::: {.callout-important}
-`scapy` requires root/administrator access to send and receive raw network packets. On macOS or Linux, you may need to run `sudo jupyter notebook` from the terminal. On Windows, launch Anaconda Prompt as Administrator. See the Chapter 4 notebook for platform-specific instructions.
+`scapy` requires root/administrator privileges to send and receive raw network packets. On macOS or Linux, you may need to run `sudo jupyter notebook` from the terminal. On Windows, install the [Npcap](https://npcap.com/) packet-capture driver and launch Anaconda Prompt as Administrator. If you cannot get packet capture working on your machine, read along instead — nothing later in this book depends on it.
 :::
 
 ## DNS: The Address Book
 
 The Domain Name System translates human-readable domain names (like `en.wikipedia.org`) into IP addresses that computers can route to. You can perform DNS lookups programmatically with the `dnspython` library:
 
-```python
+```{python}
 import dns.resolver
 
 # Look up the IP address for Wikipedia
@@ -120,13 +128,13 @@ for answer in answers:
     print(f"IP address: {answer}")
 ```
 
-Domain names have a hierarchical structure: `subdomain.domain.top-level-domain`. The top-level domains (`.com`, `.org`, `.edu`) are managed by ICANN. The domain (`wikipedia`) is registered by the organization. Subdomains (`en`, `es`, `m`) are controlled by the domain owner and do not require separate registration.
+Domain names have a hierarchical structure: `subdomain.domain.top-level-domain`. Each top-level domain (`.com`, `.org`, `.edu`) is operated by a registry organization — Verisign runs `.com`, for example — under the coordination of ICANN, the nonprofit that oversees the internet's naming system. The domain (`wikipedia`) is registered by the organization. Subdomains (`en`, `es`, `m`) are controlled by the domain owner and do not require separate registration.
 
 ### The Structure of Domain Names
 
 Understanding this hierarchy helps you navigate the web programmatically. Consider two examples:
 
-- `en.wikipedia.org` — The TLD is `.org` (a generic TLD for organizations). The domain is `wikipedia` (registered by the Wikimedia Foundation). The subdomain `en` indicates the English-language edition. Other subdomains like `es`, `de`, or `m` (mobile) are all controlled by Wikipedia and do not require separate registration. The API lives at a different subdomain entirely: `wikimedia.org`.
+- `en.wikipedia.org` — The TLD is `.org` (a generic TLD for organizations). The domain is `wikipedia` (registered by the Wikimedia Foundation). The subdomain `en` indicates the English-language edition. Other subdomains like `es`, `de`, or `m` (mobile) are all controlled by Wikipedia and do not require separate registration. The pageviews API you will use later in this chapter lives at `wikimedia.org` — not a subdomain of `wikipedia.org` but a separate registered domain that the Wikimedia Foundation also operates.
 
 - `api.census.gov` — The TLD is `.gov` (restricted to U.S. government entities). The domain is `census`. The subdomain `api` indicates this is the programmatic access point rather than the public-facing website at `www.census.gov`.
 
@@ -149,7 +157,7 @@ The status codes you will encounter most often:
 
 When a request fails, the status code tells you *what* went wrong, but diagnosing *why* requires looking at the full response. A diagnostic function can help:
 
-```python
+```{python}
 import requests
 
 def diagnose_request(url, headers=None):
@@ -176,7 +184,7 @@ diagnose_request("https://en.wikipedia.org/wiki/Nonexistent_Page_12345")
 
 The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a `User-Agent` header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:
 
-```python
+```{python}
 import time
 
 def get_with_backoff(url, headers=None, max_retries=3):
@@ -200,7 +208,7 @@ Understanding status codes in context makes debugging much faster. A 403 from th
 
 Let us retrieve data from the Wikimedia pageviews API. This API requires a meaningful `User-Agent` header — if you send the default `requests` User-Agent, you will get a 403 error:
 
-```python
+```{python}
 import requests
 
 article = "University_of_Colorado_Boulder"
@@ -224,7 +232,7 @@ data = response.json()
 
 Now convert the response to a DataFrame and plot it:
 
-```python
+```{python}
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -241,6 +249,49 @@ plt.tight_layout()
 plt.show()
 ```
 
+### Connections, Sessions, and Retries
+
+Every bare `requests.get()` call does more work than it appears to: it opens a fresh TCP connection to the server, performs the TLS handshake, sends the request, and tears the connection back down. For a single request, that overhead is negligible. But the chapters ahead will have you making dozens or hundreds of requests to the same host — one per Wikipedia article, one per bill, one per archived page — and paying the connection setup cost every time is wasteful for both you and the server.
+
+A `requests.Session` object fixes this. A Session keeps the underlying connection open and reuses it for subsequent requests to the same host, and it remembers headers, so you set your `User-Agent` once instead of passing it to every call. A Session can also carry a retry policy: rather than hand-rolling backoff logic like the `get_with_backoff()` function you wrote earlier, you can mount a `Retry` configuration that automatically retries rate limits and transient server errors with exponentially increasing delays — and it honors any `Retry-After` header the server sends:
+
+```{python}
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+# Create a session with persistent headers
+session = requests.Session()
+session.headers.update(
+    {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+)
+
+# Retry up to 3 times on rate limits and server errors,
+# waiting 1s, 2s, then 4s between attempts
+retries = Retry(
+    total=3,
+    backoff_factor=1,
+    status_forcelist=[429, 500, 502, 503, 504],
+)
+session.mount("https://", HTTPAdapter(max_retries=retries))
+
+# Use the session exactly like the requests module itself
+articles = ["Python_(programming_language)", "Web_scraping", "Data_science"]
+for article in articles:
+    url = f"https://en.wikipedia.org/wiki/{article}"
+    response = session.get(url)  # Connection reused; headers already set
+    print(article, response.status_code, len(response.text))
+# Python_(programming_language) 200 812394
+# Web_scraping 200 145207
+# Data_science 200 291846
+```
+
+The setup costs six lines, and everything after that behaves exactly like the `requests.get()` calls you already know — `session.get()` returns the same `Response` object with the same `.json()`, `.text`, and `.status_code`.
+
+::: {.callout-tip}
+A `for` loop around `requests.get()` is your cue to create a `Session` first. The scraping and API chapters ahead (@sec-static-pages, @sec-wikipedia, @sec-government) all involve exactly this kind of loop over many URLs at the same host, and this pattern carries over unchanged.
+:::
+
 ## URLs: Anatomy and Parsing
 
 URLs (Uniform Resource Locators) have a well-defined structure:
@@ -251,7 +302,7 @@ scheme://userinfo@host:port/path?query#fragment
 
 Never write regular expressions to parse URLs. Use the `urllib.parse` module instead:
 
-```python
+```{python}
 from urllib.parse import urlparse, parse_qs
 
 url = "https://api.census.gov/data/2022/acs/acs5?get=NAME,B01001_001E&for=place:07850&in=state:08"
@@ -272,37 +323,63 @@ Understanding URL structure is essential for constructing API requests. In @sec-
 
 ### Building URLs Programmatically
 
-While you can construct URLs with f-strings, this approach breaks when values contain special characters like spaces, ampersands, or non-ASCII text. The `urllib.parse` module provides tools for building URLs safely:
+Web APIs expect the values you supply in one of two places, and you need to recognize which pattern you are dealing with before you can build the URL correctly.
 
-```python
-from urllib.parse import urlencode
+**Path-segment APIs** embed each value at a fixed position in the URL's path. The Wikimedia pageviews endpoint you used earlier works this way: project, access method, agent, article, granularity, and date range are all path segments in a required order. Build these URLs with an f-string over the components — but URL-encode any component that might contain special characters using `urllib.parse.quote`, because a stray slash or space inside a path segment produces a URL the server cannot route:
 
-# Build a Wikimedia API URL from components
-base_url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
+```{python}
+from urllib.parse import quote
+
+# Each value occupies a fixed position in the path
+project = "en.wikipedia"
+access = "all-access"
+agent = "all-agents"
 article = "University of Colorado Boulder"  # Note the spaces
 
-# urlencode handles special characters automatically
+# Wikipedia titles replace spaces with underscores; quote() percent-encodes
+# anything else that would break a path segment (slashes, question marks)
+encoded_article = quote(article.replace(" ", "_"), safe="")
+print(encoded_article)
+# University_of_Colorado_Boulder
+
+url = (
+    "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
+    f"/{project}/{access}/{agent}/{encoded_article}/daily/20240101/20240131"
+)
+print(url)
+# https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/University_of_Colorado_Boulder/daily/20240101/20240131
+```
+
+The encoding matters more than this example suggests: a band like "AC/DC" has a slash in its article title, and `quote("AC/DC", safe="")` correctly produces `AC%2FDC`. Paste the raw title into your f-string instead, and the API would interpret the slash as a path separator and return a 404.
+
+**Query-parameter APIs** instead accept `key=value` pairs after a `?`, where order does not matter and many parameters are optional. The MediaWiki Action API — Wikipedia's general-purpose API, which you will explore in @sec-wikipedia — works this way. The `urlencode` function converts a dictionary into a properly escaped query string:
+
+```{python}
+from urllib.parse import urlencode
+
+base_url = "https://en.wikipedia.org/w/api.php"
 params = {
-    "project": "en.wikipedia",
-    "access": "all-access",
-    "agent": "all-agents",
-    "granularity": "daily",
-    "start": "20240101",
-    "end": "20240131",
+    "action": "query",
+    "format": "json",
+    "titles": "University of Colorado Boulder",
+    "prop": "info",
 }
+
 query_string = urlencode(params)
 print(query_string)
-# project=en.wikipedia&access=all-access&agent=all-agents&...
+# action=query&format=json&titles=University+of+Colorado+Boulder&prop=info
 ```
 
-The `requests` library also accepts a `params` dictionary that handles URL encoding automatically — this is the preferred approach for API calls:
+For query-parameter APIs, the `requests` library can do this encoding for you: pass the dictionary as the `params` argument. This is the preferred approach for API calls:
 
-```python
+```{python}
 response = requests.get(base_url, params=params, headers=headers)
-print(response.url)  # Shows the full URL that was actually requested
+print(response.url)  # The full URL that requests actually built
+# https://en.wikipedia.org/w/api.php?action=query&format=json&titles=University+of+Colorado+Boulder&prop=info
+print(response.status_code)  # 200
 ```
 
-Using `params` instead of manually constructing query strings prevents a category of bugs where special characters in your search terms break the URL. An article title like "Guns N' Roses" or a search query with an ampersand would silently corrupt a hand-built URL; `urlencode` and the `params` argument handle these cases correctly. You will appreciate this distinction especially in @sec-wikipedia and @sec-government, where article titles and variable names frequently contain characters that require encoding.
+How do you know which pattern an API expects? Read its documentation — but the URL itself usually tells you. Values between slashes are path segments: build the URL with an f-string and `quote()` each component. Values after a `?` are query parameters: pass a dictionary via `params=` and let `requests` handle the escaping. REST-style endpoints that return one specific resource (like pageviews for one article) tend to use path segments; APIs with many optional settings (like the Action API's dozens of parameters) tend to use query strings. Mixing them up is a classic source of confusing 404s — query-encoding values that an API expects in its path sends the server a URL it cannot route. You will appreciate this distinction especially in @sec-wikipedia and @sec-government, where article titles and variable names frequently contain characters that require encoding.
 
 ## Exercises
 
@@ -315,6 +392,8 @@ Using `params` instead of manually constructing query strings prevents a categor
 4. **Network tab analysis.** Pick a website you visit frequently. Reload it with the browser's Network tab open and recording. Count and categorize all requests into types: HTML documents, CSS stylesheets, JavaScript files, images, fonts, and tracking/analytics scripts. What fraction of requests serve actual content vs. tracking and advertising? Write a brief analysis of what this reveals about the site's business model.
 
 5. **URL diagnostic function.** Write a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the URL redirected (and if so, to where). Test it on at least five URLs: a working page, a 404, a redirecting URL, an API endpoint, and a site that blocks automated access. Summarize the patterns you observe.
+
+6. **Graduate extension (INFO 5617).** Choose a website you might plausibly study in your own research and profile its delivery infrastructure. Use the browser's Network tab to record the time to first byte, the full redirect chain, and evidence of CDN involvement (inspect the `Server`, `Via`, and similar response headers), then run `traceroute` (or `scapy`'s traceroute) to the same host and geolocate a few of the hops. Write a 500-word memo connecting these protocol-level observations to research-infrastructure concerns: where does "the" site actually live, how stable are measurements of it likely to be across time and vantage points, and what would an automated collection pipeline need to handle — redirects, rate limits, geographically varying responses — to gather data from it reliably?
 
 ## Social History and Public Interest
 

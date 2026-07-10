@@ -9,11 +9,17 @@
 - Handle common edge cases in structured data parsing
 :::
 
+::: {.callout-tip}
+## Companion Notebook
+Run this chapter's code as you read: download the [companion notebook](notebooks/ch-04-data-formats.ipynb) (see @sec-appendix-notebooks for all of them).
+:::
+
+
 ## Why Data Formats Matter
 
 Before you can extract data from the web, you need to understand how data is structured on the web. Every web page, every API response, every data feed uses a format that organizes information in a specific way. The two dominant formats you will encounter are XML (Extensible Markup Language) and JSON (JavaScript Object Notation).
 
-XML is the older format, born from the document-centric web of the 1990s. It represents data as a tree of nested tags — a structure you will recognize when you encounter HTML in @sec-static-pages, since HTML is essentially a specific vocabulary of XML. JSON is the newer, lighter format that rose with Web 2.0 and the API economy. It maps directly onto Python's native data structures — lists and dictionaries — making it especially natural to work with programmatically.
+XML is the older format, born from the document-centric web of the 1990s. It represents data as a tree of nested tags — a structure you will recognize when you encounter HTML in @sec-static-pages. HTML and XML are siblings rather than parent and child: both descend from an older markup standard called SGML, and the HTML you find in the wild is *not* well-formed XML (only the stricter XHTML dialect is). That looseness is precisely why the forgiving HTML parsers you will meet in @sec-static-pages exist. JSON is the newer, lighter format that rose with Web 2.0 and the API economy. It maps directly onto Python's native data structures — lists and dictionaries — making it especially natural to work with programmatically.
 
 This chapter teaches you to parse both formats, building the foundational skills that every subsequent chapter depends on.
 
@@ -21,68 +27,96 @@ This chapter teaches you to parse both formats, building the foundational skills
 
 ### The Tree Structure
 
-XML organizes data as a hierarchy of nested tags. Each tag can contain text, attributes, and child tags. Here is a simplified example of Congressional member data:
+XML organizes data as a hierarchy of nested tags. Each tag can contain text, attributes, and child tags. Here is a simplified example of Congressional member data, using the same tag names as the real U.S. House data feed you will retrieve later in this chapter:
 
-```python
+```{python}
 house_raw = """<?xml version="1.0" encoding="UTF-8"?>
-<congress session="118">
-  <chamber name="House">
+<MemberData publish-date="July 1, 2026">
+  <members>
     <member>
-      <first-name>Nancy</first-name>
-      <last-name>Pelosi</last-name>
-      <party>D</party>
-      <state>CA</state>
-      <district>11</district>
+      <statedistrict>CO02</statedistrict>
+      <member-info>
+        <firstname>Joe</firstname>
+        <lastname>Neguse</lastname>
+        <party>D</party>
+        <state postal-code="CO">
+          <state-fullname>Colorado</state-fullname>
+        </state>
+        <district>2nd</district>
+      </member-info>
     </member>
     <member>
-      <first-name>Kevin</first-name>
-      <last-name>McCarthy</last-name>
-      <party>R</party>
-      <state>CA</state>
-      <district>20</district>
+      <statedistrict>CO03</statedistrict>
+      <member-info>
+        <firstname>Jeff</firstname>
+        <lastname>Hurd</lastname>
+        <party>R</party>
+        <state postal-code="CO">
+          <state-fullname>Colorado</state-fullname>
+        </state>
+        <district>3rd</district>
+      </member-info>
     </member>
-  </chamber>
-</congress>"""
+  </members>
+</MemberData>"""
 ```
 
 This is still just a string. To search and navigate it, you need to parse it into a data structure that understands the tree relationships. That is what BeautifulSoup does.
 
 ### Parsing with BeautifulSoup
 
-```python
+```{python}
 from bs4 import BeautifulSoup
 
 soup = BeautifulSoup(house_raw, "xml")
 
-# Navigate the tree: congress > chamber > first member > first-name
-print(soup.congress.chamber.member)
+# Navigate the tree: members > first member
+print(soup.members.member)
 # Returns the first <member> tag and all its children
 ```
 
-The power of BeautifulSoup is in its search methods. The `.find()` method returns the first tag matching your criteria. The `.find_all()` method returns all matching tags as a list:
+::: {.callout-important}
+BeautifulSoup's `"xml"` parser is not built in — it is provided by the `lxml` package. Anaconda includes `lxml` by default, but if you see a `bs4.FeatureNotFound` error in another environment, install it with `pip install lxml` and restart your kernel.
+:::
 
-```python
+The power of BeautifulSoup is in its search methods. The `.find()` method returns the first tag matching your criteria — searching all descendants, no matter how deeply nested. The `.find_all()` method returns all matching tags as a list:
+
+```{python}
 # Find all member tags
 members = soup.find_all("member")
 print(len(members))  # 2
 
 # Access text inside a tag
 for member in members:
-    first = member.find("first-name").text
-    last = member.find("last-name").text
+    first = member.find("firstname").text
+    last = member.find("lastname").text
     party = member.find("party").text
     print(f"{first} {last} ({party})")
-# Nancy Pelosi (D)
-# Kevin McCarthy (R)
+# Joe Neguse (D)
+# Jeff Hurd (R)
 ```
 
-Notice the use of `.find("first-name")` rather than `.first-name` as a Python attribute. Hyphenated tag names break Python's dot notation, so you must use the `.find()` method for them.
+Notice that `member.find("firstname")` works even though `<firstname>` sits inside a nested `<member-info>` block — `.find()` searches the entire subtree beneath a tag. Also notice which names you can reach with dot notation. Shortcuts like `soup.members.member` only work for tag names that are valid Python identifiers; hyphenated names like `<member-info>` and `<state-fullname>` break dot notation (Python would read `soup.member-info` as subtraction), so you must use `.find()` for them.
+
+XML tags can also carry **attributes** — key-value pairs inside the opening tag itself. In this schema, the `<state>` tag stores the two-letter postal code as an attribute and spells out the full state name in a child tag. BeautifulSoup exposes attributes through dictionary-style bracket notation:
+
+```{python}
+# Attributes are accessed with brackets, text with .text
+state_tag = soup.find("state")
+print(state_tag["postal-code"])               # CO
+print(state_tag.find("state-fullname").text)  # Colorado
+
+# The root tag's attribute records when the file was published
+print(soup.find("MemberData")["publish-date"])  # July 1, 2026
+```
+
+Text lives *between* an opening and closing tag and is read with `.text`; attributes live *inside* the opening tag and are read with brackets. Real-world XML uses both, and figuring out which one holds the value you need is half the parsing battle.
 
 ### Extracting and Counting
 
 A common pattern is extracting all values for a particular tag and then analyzing the distribution:
 
-```python
+```{python}
 # Count party affiliations
 parties = [m.find("party").text for m in soup.find_all("member")]
 print(parties)
@@ -97,7 +131,7 @@ print(party_counts)
 
 The `.contents` method gives you a list of a tag's direct children, which is useful for exploring unfamiliar XML structures:
 
-```python
+```{python}
 first_member = soup.find("member")
 print(first_member.contents)
 # A list of child tags and whitespace strings
@@ -105,9 +139,9 @@ print(first_member.contents)
 
 ### Working with Real XML
 
-Let us retrieve and parse actual Congressional member data. The [clerk.house.gov](https://clerk.house.gov) website publishes member data in XML format:
+Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at [clerk.house.gov](https://clerk.house.gov) in XML format. Its structure is exactly what the synthetic example prepared you for: a root `<MemberData>` tag with a `publish-date` attribute, containing a `<members>` tag, containing one `<member>` per representative, each with the biographical details nested inside `<member-info>` (plus a `<committee-assignments>` block we will ignore here):
 
-```python
+```{python}
 import requests
 from bs4 import BeautifulSoup
 
@@ -115,9 +149,14 @@ url = "https://clerk.house.gov/xml/lists/MemberData.xml"
 response = requests.get(url)
 soup = BeautifulSoup(response.text, "xml")
 
+# When was this snapshot published?
+print(soup.find("MemberData")["publish-date"])
+# July 1, 2026
+
 # Find all members
 members = soup.find_all("member")
 print(f"Total members found: {len(members)}")
+# Total members found: 441
 
 # Extract party information
 parties = []
@@ -128,46 +167,72 @@ for m in members:
 
 from collections import Counter
 print(Counter(parties))
+# Counter({'R': 223, 'D': 218})
 ```
+
+Why 441 rather than 435? The file includes the six non-voting delegates and resident commissioner alongside the 435 voting representatives. Your exact counts will also drift as members resign and seats are filled — which is why the `publish-date` attribute matters. Record it alongside your data so your analysis documents exactly which snapshot of Congress it describes.
 
 ### From XML to DataFrame
 
 Counting party affiliations is useful, but the real power of parsing XML comes from converting it into a DataFrame for systematic analysis. The pattern is straightforward: use `find_all()` to get all records, extract the fields you need from each one, build a list of dictionaries, and pass it to `pd.DataFrame()`:
 
-```python
+```{python}
 import pandas as pd
 
 # Extract structured data from each member
 records = []
 for m in soup.find_all("member"):
+    state_tag = m.find("state")  # postal code is an attribute, not text
     record = {
-        "first_name": m.find("first-name").text if m.find("first-name") else None,
-        "last_name": m.find("last-name").text if m.find("last-name") else None,
+        "first_name": m.find("firstname").text if m.find("firstname") else None,
+        "last_name": m.find("lastname").text if m.find("lastname") else None,
         "party": m.find("party").text if m.find("party") else None,
-        "state": m.find("state").text if m.find("state") else None,
+        "state": state_tag["postal-code"] if state_tag else None,
+        "district": m.find("district").text if m.find("district") else None,
     }
     records.append(record)
 
 df = pd.DataFrame(records)
 print(df.head())
-#   first_name  last_name party state
-# 0      Nancy     Pelosi     D    CA
-# 1      Kevin   McCarthy     R    CA
+#   first_name last_name party state  district
+# 0   Nicholas    Begich     R    AK  At Large
+# 1      Barry     Moore     R    AL       1st
+# 2    Shomari   Figures     D    AL       2nd
+# 3       Mike    Rogers     R    AL       3rd
+# 4     Robert  Aderholt     R    AL       4th
 ```
+
+Note the `state` field: because the postal code is stored as an attribute of the `<state>` tag rather than as its text, we grab the tag once with `.find("state")` and then use bracket notation — the same pattern you practiced on the synthetic example. The `district` column contains strings like `"1st"` and `"At Large"` rather than numbers, a reminder that XML gives you text and any type conversion is your job.
 
 With the full Congressional dataset, you can now perform real analysis:
 
-```python
+```{python}
 # Party breakdown
 print(df.groupby("party").size())
+# party
+# D    218
+# R    223
+# dtype: int64
 
 # Top 10 states by number of representatives
 print(df.groupby("state").size().sort_values(ascending=False).head(10))
+# state
+# CA    52
+# TX    38
+# FL    28
+# NY    26
+# IL    17
+# PA    17
+# OH    15
+# GA    14
+# NC    14
+# MI    13
+# dtype: int64
 ```
 
 This `find_all` → extract fields → list of dictionaries → DataFrame pipeline is the fundamental pattern of this book. You will use it to parse HTML tables in @sec-static-pages, extract data from archived web pages in @sec-archives, and process PDF text in @sec-pdfs. The data source changes, the tag names change, but the pipeline stays the same. Once you internalize this pattern, every new parsing challenge becomes a question of "what tags contain the data I need?" rather than "how do I get data into a DataFrame?"
 
-The conditional checks (`if m.find("first-name") else None`) protect against missing tags — a common issue with real-world XML where not every record contains every field. Without these checks, a single missing tag would crash your entire extraction loop with an `AttributeError`.
+The conditional checks (`if m.find("firstname") else None`) protect against missing tags — a common issue with real-world XML where not every record contains every field. Without these checks, a single missing tag would crash your entire extraction loop with an `AttributeError`.
 
 Once the data is in a DataFrame, you have the full power of pandas at your disposal. You can filter members by state (`df[df["state"] == "CO"]`), compute cross-tabulations of party by state (`pd.crosstab(df["state"], df["party"])`), or merge Congressional data with external datasets like election results or demographic information. The DataFrame is the universal intermediate format — regardless of whether your data started as XML, JSON, HTML, or PDF text, getting it into a DataFrame is the step that unlocks analysis. This chapter introduces the pattern with XML; the chapters that follow apply it to every other data source on the web.
 
@@ -177,7 +242,7 @@ Once the data is in a DataFrame, you have the full power of pandas at your dispo
 
 JSON maps onto two Python data structures you already know. A JSON **array** is a Python **list** — ordered, indexed by position:
 
-```python
+```{python}
 classroom = ["Alice", "Bob", "Carol"]
 print(classroom[0])   # "Alice"
 print(len(classroom))  # 3
@@ -185,7 +250,7 @@ print(len(classroom))  # 3
 
 A JSON **object** is a Python **dictionary** — unordered, accessed by key:
 
-```python
+```{python}
 state = {
     "name": "Colorado",
     "capital": "Denver",
@@ -199,7 +264,7 @@ print(state.keys())         # dict_keys(['name', 'capital', 'population'])
 
 Real-world JSON data nests these structures inside each other. A dictionary can contain lists, lists can contain dictionaries, and the nesting can go several levels deep:
 
-```python
+```{python}
 schools = {
     "School 1": {
         "Classroom A": ["Alice", "Bob"],
@@ -221,7 +286,7 @@ The skill of navigating nested structures — working from the outside in, one k
 
 The most common JSON pattern you will encounter in web data is a list of dictionaries, where each dictionary represents a record and each key-value pair represents a field:
 
-```python
+```{python}
 census_data = [
     {"state": "Colorado", "year": 2020, "population": 5773714},
     {"state": "Colorado", "year": 2010, "population": 5029196},
@@ -234,7 +299,7 @@ print(census_data[0]["population"])  # 5773714
 
 This pattern converts directly into a pandas DataFrame:
 
-```python
+```{python}
 import pandas as pd
 
 df = pd.DataFrame(census_data)
@@ -251,7 +316,7 @@ This list-of-dictionaries-to-DataFrame pipeline is the standard way to convert A
 
 When you receive JSON data from the web (as a string), you need to parse it into Python objects:
 
-```python
+```{python}
 import json
 
 # Parse a JSON string into a Python object
@@ -267,7 +332,7 @@ print(json_output)
 
 When working with `requests`, the `.json()` method on a response object does this parsing for you automatically:
 
-```python
+```{python}
 response = requests.get("https://api.example.com/data")
 data = response.json()  # Equivalent to json.loads(response.text)
 ```
@@ -276,7 +341,7 @@ data = response.json()  # Equivalent to json.loads(response.text)
 
 Here is a simplified version of a social media post object, similar to what Twitter's API used to return:
 
-```python
+```{python}
 tweet = {
     "id": 266031293945503744,
     "text": "Four more years.",
@@ -311,7 +376,7 @@ print(len(tweet["entities"]["user_mentions"]))  # 0
 
 The Twitter example above is only two levels deep. Real API responses often nest data three or four levels down, and the path to the data you need is not always obvious. Let us work through a live example using the Open-Meteo weather API, which returns a forecast for Boulder, Colorado:
 
-```python
+```{python}
 import requests
 
 url = "https://api.open-meteo.com/v1/forecast"
@@ -344,7 +409,7 @@ print(f"Elevation: {elevation} meters")
 
 The strategy is always the same: start with `type()` and `.keys()` at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:
 
-```python
+```{python}
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -392,9 +457,11 @@ For more on data file formats including CSV, TSV, and other common structures, s
 
 3. **XML vs. JSON comparison.** Find a data source that provides the same information in both XML and JSON formats (e.g., a government API or data service). Retrieve both versions and compare: how does the structure differ? Which is easier to parse in Python? Which contains more metadata?
 
-4. **Reusable extraction function.** Write a function `xml_to_dataframe(soup, tag_name, fields)` that takes a BeautifulSoup object, the name of the repeating tag (e.g., `"member"`), and a list of child tag names to extract (e.g., `["first-name", "last-name", "party"]`). The function should return a DataFrame. Test it on the Congressional XML from this chapter, then try it on an RSS feed (where the repeating tag is `"item"` and the fields might be `["title", "link", "pubDate"]`).
+4. **Reusable extraction function.** Write a function `xml_to_dataframe(soup, tag_name, fields)` that takes a BeautifulSoup object, the name of the repeating tag (e.g., `"member"`), and a list of child tag names to extract (e.g., `["firstname", "lastname", "party"]`). The function should return a DataFrame. Test it on the Congressional XML from this chapter, then try it on an RSS feed (where the repeating tag is `"item"` and the fields might be `["title", "link", "pubDate"]`).
 
 5. **Weather data analysis.** Retrieve a 7-day forecast from the Open-Meteo API for Boulder, CO using the URL pattern from this chapter. Navigate the nested JSON response, build a DataFrame with dates and both high and low temperatures, and create a plot showing both temperature series. Add a horizontal line at 0°C and annotate any days where the low drops below freezing.
+
+6. **Graduate extension (INFO 5617).** Select a public XML or JSON dataset in the wild — a data.gov feed, an SEC EDGAR filing, a city open-data API, or something from your own research area. Write a datasheet-style critique of it in the spirit of @gebru2021datasheets: what does the schema and its documentation tell you (or fail to tell you) about how the data was collected, what its fields mean, and what uses it was designed for? Evaluate concrete design choices — attributes versus child tags, nesting depth, naming conventions, the presence or absence of a published schema — and how each helps or hinders a researcher trying to reuse the data. Conclude with two specific recommendations the publisher could adopt to improve interoperability and documentation.
 
 ## Social History and Public Interest
 

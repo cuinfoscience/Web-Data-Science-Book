@@ -10,6 +10,12 @@
 - Assess the maintenance commitments of sustained data collection
 :::
 
+::: {.callout-tip}
+## Companion Notebook
+Run this chapter's code as you read: download the [companion notebook](notebooks/ch-14-automation.ipynb) (see @sec-appendix-notebooks for all of them).
+:::
+
+
 ## From Exploration to Production
 
 Interactive notebooks are for exploration; production data collection requires automation. This chapter moves from the interactive scraping techniques of Parts II and III into scheduled, unattended data pipelines that run in the cloud.
@@ -18,7 +24,7 @@ The progression is: **notebook** (where you develop and test your code) → **sc
 
 ::: {.callout-tip}
 ## Missing Manual Reference
-For a full treatment of converting notebooks to scripts, command-line arguments, and `if __name__ == "__main__"` patterns, see *Missing Manual* Chapter 17: Scripting. For version control with Git, see *Missing Manual* Chapter 26: Version Control.
+For a full treatment of converting notebooks to scripts, command-line arguments, and `if __name__ == "__main__"` patterns, see *Missing Manual* Chapter 17: Scripting. For version control with Git, see *Missing Manual* Chapter 31: Version Control.
 :::
 
 ## Why Automate?
@@ -33,18 +39,23 @@ This chapter teaches you how to build that infrastructure from the tools you alr
 
 Let us convert a Rotten Tomatoes score scraper from notebook format to a standalone script. The key changes: remove interactive exploration, add a `main()` function, handle imports and configuration at the top, and write output to a file.
 
-```python
+```{python}
 # scraper.py — Rotten Tomatoes Score Scraper
 """Scrape Rotten Tomatoes audience and critic scores for a film."""
 
 import csv
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+
+# Fixed CSV schema, used for both the header and every appended row
+FIELDNAMES = ["timestamp", "url", "critic_score", "audience_score"]
 
 def get_scores(url):
     """Retrieve audience and critic scores from a Rotten Tomatoes page.
@@ -69,16 +80,23 @@ def get_scores(url):
     
     try:
         driver.get(url)
+        # Wait for the score elements to render -- reading page_source
+        # immediately on a JS-heavy page yields intermittent empty scores
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.TAG_NAME, "score-icon-critic-deprecated")
+            )
+        )
         soup = BeautifulSoup(driver.page_source, "html.parser")
-        
-        # Extract scores from metadata tags
+
+        # Extract scores from the page's custom score elements
         scores = {}
         for tag in soup.find_all("score-icon-critic-deprecated"):
             scores["critic_score"] = tag.get("percentage", "")
         for tag in soup.find_all("score-icon-audience-deprecated"):
             scores["audience_score"] = tag.get("percentage", "")
-        
-        scores["timestamp"] = datetime.utcnow().isoformat()
+
+        scores["timestamp"] = datetime.now(timezone.utc).isoformat()
         scores["url"] = url
         return scores
     finally:
@@ -88,9 +106,9 @@ def get_scores(url):
 def save_scores(scores, filepath="scores.csv"):
     """Append scores to a CSV file, creating it if needed."""
     file_exists = os.path.exists(filepath)
-    
+
     with open(filepath, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=scores.keys())
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         if not file_exists:
             writer.writeheader()
         writer.writerow(scores)
@@ -109,23 +127,25 @@ if __name__ == "__main__":
 
 Notice the headless Chrome configuration: `--headless` runs the browser without a visible window, `--no-sandbox` and `--disable-dev-shm-usage` are required for running in CI/CD environments like GitHub Actions.
 
+Two other design choices deserve a comment. First, the CSV schema is pinned in the `FIELDNAMES` constant rather than derived from `scores.keys()`: a fixed schema keeps the column order stable across every run, whereas a keys-derived header locks in whatever the first run happened to produce — and a later scrape with a missing or extra key would then corrupt or crash the append. Second, the elements this scraper targets — `score-icon-critic-deprecated` and its audience twin — are not metadata tags but custom web-component elements defined by Rotten Tomatoes' front-end code. The `-deprecated` suffix is a broad hint that these element names change frequently, and when they do, the scraper will start returning empty results. That fragility is exactly why @sec-dynamic-pages emphasized inspecting the live page in your browser's developer tools: when the site changes, the fix starts there, not in this book.
+
 ### Testing Your Script Locally
 
 Before deploying your script to GitHub Actions, always test it locally from the command line. Running a script in the terminal is different from running cells in a notebook — import errors, missing dependencies, and file path issues that were invisible in Jupyter will surface immediately.
 
-```python
+```{python}
 # From your terminal, run the script directly:
 # $ python scraper.py
-# Saved scores at 2024-11-15T14:23:07.482361
+# Saved scores at 2024-11-15T14:23:07.482361+00:00
 
 # Verify the output file was created and contains data:
 # $ head scores.csv
 # timestamp,url,critic_score,audience_score
-# 2024-11-15T14:23:07.482361,https://www.rottentomatoes.com/m/the_wild_robot,97,95
+# 2024-11-15T14:23:07.482361+00:00,https://www.rottentomatoes.com/m/the_wild_robot,97,95
 
 # Check the file size to confirm it is not empty:
 # $ ls -la scores.csv
-# -rw-r--r--  1 user  staff  142 Nov 15 14:23 scores.csv
+# -rw-r--r--  1 user  staff  148 Nov 15 14:23 scores.csv
 ```
 
 Debugging a Python script on your own machine is straightforward: you can add `print()` statements, inspect variables, and re-run instantly. Debugging the same script inside a GitHub Actions YAML workflow is far more painful — each attempt requires a commit, a push, and waiting for the runner to spin up, install dependencies, and execute. The few minutes you spend testing locally will save you hours of frustrating CI debugging later. If the script runs cleanly on your machine and produces the expected output file, you can be reasonably confident it will work in the Actions environment, provided the dependencies match.
@@ -142,6 +162,9 @@ on:
   schedule:
     - cron: "0 */6 * * *"  # Every 6 hours
   workflow_dispatch:  # Allow manual triggering
+
+permissions:
+  contents: write  # The commit-and-push step below needs write access
 
 jobs:
   scrape:
@@ -170,8 +193,11 @@ jobs:
           git config user.email "actions@github.com"
           git add scores.csv
           git diff --staged --quiet || git commit -m "Update scores $(date -u)"
+          git pull --rebase origin main  # Integrate any commits pushed since checkout
           git push
 ```
+
+Do not skip the `permissions` block: the automatic `GITHUB_TOKEN` that workflows use to authenticate is often read-only by default, and without `contents: write` the final `git push` step fails with a 403 error.
 
 ### Python-Free Scraping
 
@@ -185,25 +211,30 @@ on:
   schedule:
     - cron: "0 12 * * *"  # Daily at noon UTC
 
+permissions:
+  contents: write  # Required for the push step below
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Fetch top pages
         run: |
+          mkdir -p data  # curl writes the file but will not create the directory
           DATE=$(date -u -d "yesterday" +%Y/%m/%d)
           curl -s "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/$DATE" \
             -H "User-Agent: WebDataScience/1.0" \
             -o "data/top_pages_$(date -u -d yesterday +%Y%m%d).json"
-      
+
       - name: Commit results
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
           git add data/
           git diff --staged --quiet || git commit -m "Top pages $(date -u -d yesterday +%Y-%m-%d)"
+          git pull --rebase origin main  # Integrate any commits pushed since checkout
           git push
 ```
 
@@ -235,7 +266,7 @@ For authenticated APIs (like Spotify from @sec-social), store credentials as Git
 
 ::: {.callout-tip}
 ## Missing Manual Reference
-For a full treatment of automation with GitHub Actions, cron syntax, and CI/CD concepts, see *Missing Manual* Chapter 28: Automation. For secrets management, see *Missing Manual* Chapter 29: Environment Variables and Secrets.
+For a full treatment of automation with GitHub Actions, cron syntax, and CI/CD concepts, see *Missing Manual* Chapter 33: Automation. For secrets management, see *Missing Manual* Chapter 34: Environment Variables and Secrets.
 :::
 
 ### Monitoring and Debugging Actions
@@ -269,7 +300,7 @@ Even with validation in place, your scraper will occasionally fail due to circum
 
 The simplest approach is to wrap your scraping logic in a try/except block that logs the error and exits gracefully rather than raising an unhandled exception:
 
-```python
+```{python}
 import sys
 import traceback
 
@@ -288,11 +319,36 @@ def main():
 
 This pattern ensures that a single failed scrape does not corrupt your data file. The error is logged, the workflow step is marked as failed, and the next scheduled run will try again. Over a multi-week collection period, you should expect a small number of failures — the important thing is that they are visible, documented, and do not cascade into data loss.
 
+### Hardening the Workflow
+
+A few more lines of YAML make a scheduled workflow noticeably more robust. A `timeout-minutes` limit kills a hung job (a stalled Selenium session would otherwise occupy the runner for the six-hour default), a `concurrency` group prevents a delayed run from overlapping with the next scheduled one, and caching pip's downloads speeds up every run:
+
+```yaml
+# Additions to .github/workflows/scraper-action.yml
+concurrency:
+  group: rt-scraper
+  cancel-in-progress: false  # Let the current run finish; queue the next one
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15  # Fail fast instead of hanging for the 6-hour default
+    steps:
+      # ... after the setup-python step ...
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+```
+
+Inside the scraper itself, the single biggest reliability improvement is retrying failed requests with exponential backoff. You already know this pattern — @sec-protocols introduced retries and backoff for exactly this situation — so apply it in your scraping functions rather than letting one transient 503 waste an entire scheduled run. A scraper that retries a couple of times with increasing delays will ride out the vast majority of momentary network and server hiccups that would otherwise appear as gaps in your time series.
+
 ## Step 3: Analyze Collected Data
 
 After running your scraper for a period, you will have accumulated data to analyze:
 
-```python
+```{python}
 import pandas as pd
 
 df = pd.read_csv("scores.csv")
@@ -322,6 +378,8 @@ plt.show()
 
 5. **Staleness monitor.** Write a `check_freshness.py` script that reads your CSV file, checks whether the most recent timestamp is less than 24 hours old, and prints a warning if the data is stale. Add it as a step in your GitHub Actions workflow that runs after the scraping step. Test it by temporarily disabling the scraper and verifying the freshness check fails.
 
+6. **Graduate extension (INFO 5617).** Deploy a scheduled collector of your own design and keep it running for at least two weeks. Then write an infrastructure post-mortem in the spirit of the "good enough practices" described by @wilson2017good: quantify how many scheduled runs were missed or delayed, categorize every failure (selector drift, rate limiting, runner environment changes, silent successes), and measure any drift in the collected data itself over the window. Conclude with the two or three changes that would most improve reliability if the pipeline had to run for six months. The deliverable is the post-mortem, not the scraper.
+
 ::: {.callout-note}
 ## Public Interest Connection
 Automated data collection is how you build the independent infrastructure that @sec-post-api describes as **ownership**. A GitHub Actions scraper does not depend on platform goodwill — it runs on your terms, on your schedule, collecting data you control. But ownership comes with responsibility: the ongoing labor of monitoring, maintaining, and updating your scrapers is itself a form of stewardship.
@@ -339,7 +397,7 @@ The Internet Archive's Wayback Machine is perhaps the most ambitious automated d
 
 - **YAML indentation errors**: YAML is whitespace-sensitive. Use a YAML validator before committing.
 - **GitHub Actions runner environment**: The Ubuntu runner may differ from your local setup. Pin Python and Chrome versions explicitly.
-- **Git conflicts**: If the Action runs while you are also pushing changes, you will get merge conflicts. Add `git pull` before `git push` in your workflow.
+- **Git conflicts**: If the Action runs while you are also pushing changes, you will get merge conflicts. This is why the workflow examples in this chapter run `git pull --rebase` before `git push`.
 - **Cron syntax**: The five fields are `minute hour day-of-month month day-of-week`. Use [crontab.guru](https://crontab.guru/) to verify your schedule.
 - **Stale ChromeDriver**: Selenium requires a ChromeDriver version that matches your Chrome version. The `browser-actions/setup-chrome@v1` action in GitHub Actions handles this automatically, but local setups may drift. Use `webdriver-manager` for automatic local driver management.
 

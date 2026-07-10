@@ -9,6 +9,12 @@
 - Write raw API requests from documentation rather than relying on wrapper functions
 :::
 
+::: {.callout-tip}
+## Companion Notebook
+Run this chapter's code as you read: download the [companion notebook](notebooks/ch-10-wikipedia.ipynb) (see @sec-appendix-notebooks for all of them).
+:::
+
+
 ## What Is an API?
 
 An API (Application Programming Interface) is a contract between a client and a server that specifies what data you can request, what parameters you can pass, and in what format you will receive the response. Unlike web scraping, where you reverse-engineer the HTML structure of a page designed for human readers, APIs provide structured, documented, and intentional access to data. They return clean JSON rather than cluttered HTML. They offer stable endpoints rather than fragile CSS selectors. And they come with documentation that tells you exactly what is available and how to ask for it.
@@ -21,13 +27,18 @@ This chapter marks the transition from document scraping (Part II) to API-based 
 
 Wikipedia's [MediaWiki API](https://www.mediawiki.org/wiki/API:Main_page) is pedagogically ideal for learning API access. It is free, requires no authentication beyond a User-Agent header, has comprehensive documentation, and provides data rich enough to support diverse research designs — from content analysis to network mapping to event detection. It is also an example of what @sec-post-api describes as **openness**: a mission-driven organization that maintains free, well-documented data access by design.
 
+::: {.callout-note}
+## Public Interest Connection
+Wikipedia is the counter-example to the enclosure story of @sec-post-api. While commercial platforms restricted, repriced, or shut down their APIs, Wikipedia kept its API open, licensed its content for free reuse, and published complete database dumps for anyone to download. That combination — open API, open license, public dumps — is why this book uses Wikipedia as its teaching platform for API fundamentals: nothing you learn here sits at the mercy of a pricing change or a corporate pivot.
+:::
+
 We will use the English Wikipedia article for [Elizabeth II](https://en.wikipedia.org/wiki/Elizabeth_II) as our primary case study. The article has a rich editing history with dramatic spikes around major events, making it ideal for demonstrating how to extract and analyze temporal patterns from API data.
 
 ## The Anatomy of an API Call
 
 Every MediaWiki API request follows the same structure: a base URL, an `action` parameter specifying what you want to do, additional parameters narrowing your request, and a `format` parameter specifying the response format. Let us trace through a simple example:
 
-```python
+```{python}
 import requests
 
 url = "https://en.wikipedia.org/w/api.php"
@@ -39,17 +50,20 @@ params = {
     "format": "json"           # Return the response as JSON
 }
 
-headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+# Define this once near the top of your script and reuse it everywhere
+HEADERS = {"User-Agent": "WebDataScience/1.0 (INFO 4617; brian.keegan@colorado.edu)"}
 
-response = requests.get(url, params=params, headers=headers)
+response = requests.get(url, params=params, headers=HEADERS)
 data = response.json()
 
 print(data)
 ```
 
+The `HEADERS` constant deserves a comment before we go further. The [Wikimedia User-Agent policy](https://foundation.wikimedia.org/wiki/Policy:User-Agent_policy) asks every client to identify itself with a descriptive User-Agent string that includes contact information — anonymous or generic user agents may be throttled or blocked outright. Define it once as a module-level constant, and every function you write in this chapter can use it as a default.
+
 The response is a nested JSON structure. You navigate it one level at a time:
 
-```python
+```{python}
 # The data lives inside data > query > pages > {page_id}
 pages = data["query"]["pages"]
 
@@ -66,18 +80,18 @@ This nested navigation pattern — `data["query"]["pages"][page_id]` — is cons
 
 ::: {.callout-tip}
 ## Missing Manual Reference
-For strategies on reading and navigating unfamiliar API documentation, see *Missing Manual* Chapter 4: Reading Official Documentation.
+For strategies on reading and navigating unfamiliar API documentation, see *Missing Manual* Chapter 5: Reading Official Documentation.
 :::
 
 ## Getting Revisions
 
 Every edit ever made to a Wikipedia article is recorded and accessible through the API. The revisions endpoint returns metadata about each edit: who made it, when, how much the article size changed, and what edit summary they left.
 
-```python
+```{python}
 import requests
 import pandas as pd
 
-def get_revisions(title, headers=None):
+def get_revisions(title, headers=HEADERS):
     """Get all revisions for a Wikipedia article.
     
     Parameters
@@ -85,7 +99,7 @@ def get_revisions(title, headers=None):
     title : str
         The article title (e.g., 'Elizabeth_II')
     headers : dict, optional
-        HTTP headers including User-Agent
+        HTTP headers; defaults to the module-level HEADERS
     
     Returns
     -------
@@ -107,6 +121,7 @@ def get_revisions(title, headers=None):
     
     while True:
         response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()  # Stop on HTTP errors
         data = response.json()
         
         # Navigate the nested response
@@ -124,8 +139,7 @@ def get_revisions(title, headers=None):
     
     return pd.DataFrame(all_revisions)
 
-headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
-df_revisions = get_revisions("Elizabeth_II", headers=headers)
+df_revisions = get_revisions("Elizabeth_II")
 print(f"Total revisions: {len(df_revisions)}")
 ```
 
@@ -135,9 +149,11 @@ The MediaWiki API limits the number of results returned per request. When more r
 
 The critical mistake newcomers make is forgetting to check for continuation. Without the `while True` loop and `"continue"` check, you only get the first batch of results — potentially a small fraction of the total dataset.
 
+Two smaller details in `get_revisions()` are worth adopting as habits. The `response.raise_for_status()` call makes HTTP failures loud: if the server returns an error status, your code stops with an informative exception instead of failing confusingly when you try to parse the JSON. And for bulk jobs, API etiquette suggests adding `"maxlag": 5` to your parameters, which tells overloaded Wikimedia servers to refuse your request with a retryable error so that automated traffic yields to human readers.
+
 ### Analyzing Revision History
 
-```python
+```{python}
 # Convert timestamps to datetime
 df_revisions["timestamp"] = pd.to_datetime(df_revisions["timestamp"])
 
@@ -158,7 +174,7 @@ plt.show()
 
 You can also analyze who edits the article:
 
-```python
+```{python}
 # Top editors by number of revisions
 top_editors = df_revisions["user"].value_counts().head(10)
 print(top_editors)
@@ -172,8 +188,8 @@ print(f"Top 10 editors account for {top10_share:.1%} of all edits")
 
 The Wikimedia REST API (separate from the MediaWiki Action API) provides article pageview data — how many times an article was accessed across web and mobile platforms:
 
-```python
-def get_pageviews(title, start="20230101", end="20231231", headers=None):
+```{python}
+def get_pageviews(title, start="20230101", end="20231231", headers=HEADERS):
     """Get daily pageviews for a Wikipedia article.
     
     Parameters
@@ -183,8 +199,8 @@ def get_pageviews(title, start="20230101", end="20231231", headers=None):
     start, end : str
         Date range in YYYYMMDD format
     headers : dict, optional
-        HTTP headers
-    
+        HTTP headers; defaults to the module-level HEADERS
+
     Returns
     -------
     pd.DataFrame
@@ -196,13 +212,14 @@ def get_pageviews(title, start="20230101", end="20231231", headers=None):
     )
     
     response = requests.get(url, headers=headers)
+    response.raise_for_status()  # Stop on HTTP errors
     data = response.json()
-    
+
     df = pd.DataFrame(data["items"])
     df["timestamp"] = pd.to_datetime(df["timestamp"], format="%Y%m%d00")
     return df
 
-views = get_pageviews("Elizabeth_II", start="20220101", end="20221231", headers=headers)
+views = get_pageviews("Elizabeth_II", start="20220101", end="20221231")
 
 plt.figure(figsize=(14, 5))
 plt.plot(views["timestamp"], views["views"])
@@ -218,8 +235,8 @@ plt.show()
 
 The API exposes the internal structure of Wikipedia — the web of connections between articles:
 
-```python
-def get_outlinks(title, headers=None):
+```{python}
+def get_outlinks(title, headers=HEADERS):
     """Get all internal wikilinks from an article."""
     url = "https://en.wikipedia.org/w/api.php"
     params = {
@@ -233,6 +250,7 @@ def get_outlinks(title, headers=None):
     all_links = []
     while True:
         response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()  # Stop on HTTP errors
         data = response.json()
         
         pages = data["query"]["pages"]
@@ -247,15 +265,15 @@ def get_outlinks(title, headers=None):
     
     return all_links
 
-outlinks = get_outlinks("Elizabeth_II", headers=headers)
+outlinks = get_outlinks("Elizabeth_II")
 print(f"Outgoing wikilinks: {len(outlinks)}")
 print(f"First 10: {outlinks[:10]}")
 ```
 
 You can do the same for external links (URLs that point outside Wikipedia), interlanguage links (corresponding articles in other language editions), and category memberships:
 
-```python
-def get_categories(title, headers=None):
+```{python}
+def get_categories(title, headers=HEADERS):
     """Get all categories an article belongs to."""
     url = "https://en.wikipedia.org/w/api.php"
     params = {
@@ -269,6 +287,7 @@ def get_categories(title, headers=None):
     all_categories = []
     while True:
         response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()  # Stop on HTTP errors
         data = response.json()
         
         pages = data["query"]["pages"]
@@ -283,7 +302,7 @@ def get_categories(title, headers=None):
     
     return all_categories
 
-categories = get_categories("Elizabeth_II", headers=headers)
+categories = get_categories("Elizabeth_II")
 print(f"Categories: {len(categories)}")
 for cat in categories[:10]:
     print(f"  {cat}")
@@ -293,8 +312,8 @@ for cat in categories[:10]:
 
 One of the most revealing structural features of Wikipedia is which articles exist in which languages. The `langlinks` property tells you how many of Wikipedia's 300+ language editions have a corresponding article for a given topic — and which languages those are.
 
-```python
-def get_langlinks(title, headers=None):
+```{python}
+def get_langlinks(title, headers=HEADERS):
     """Get all interlanguage links for an article.
 
     Parameters
@@ -302,7 +321,7 @@ def get_langlinks(title, headers=None):
     title : str
         Article title
     headers : dict, optional
-        HTTP headers including User-Agent
+        HTTP headers; defaults to the module-level HEADERS
 
     Returns
     -------
@@ -321,6 +340,7 @@ def get_langlinks(title, headers=None):
     all_links = []
     while True:
         response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()  # Stop on HTTP errors
         data = response.json()
 
         pages = data["query"]["pages"]
@@ -335,7 +355,7 @@ def get_langlinks(title, headers=None):
 
     return pd.DataFrame(all_links)
 
-langs = get_langlinks("Elizabeth_II", headers=headers)
+langs = get_langlinks("Elizabeth_II")
 print(f"Article exists in {len(langs)} language editions")
 print(langs["lang"].head(20))
 ```
@@ -346,8 +366,8 @@ The number of language editions an article appears in is itself a measure of glo
 
 You can also retrieve the editing history of individual Wikipedia users, which is useful for studying editor behavior and community dynamics:
 
-```python
-def get_user_contributions(username, limit=50, headers=None):
+```{python}
+def get_user_contributions(username, limit=50, headers=HEADERS):
     """Get recent contributions by a Wikipedia user."""
     url = "https://en.wikipedia.org/w/api.php"
     params = {
@@ -360,25 +380,26 @@ def get_user_contributions(username, limit=50, headers=None):
     }
     
     response = requests.get(url, params=params, headers=headers)
+    response.raise_for_status()  # Stop on HTTP errors
     data = response.json()
     return pd.DataFrame(data["query"]["usercontribs"])
 
 # Get contributions from a prolific editor
-contribs = get_user_contributions("Drmies", limit=100, headers=headers)
+contribs = get_user_contributions("Drmies", limit=100)
 print(f"Recent edits: {len(contribs)}")
 print(contribs[["title", "timestamp", "sizediff"]].head())
 ```
 
 ## Writing Raw API Requests from Documentation
 
-The functions above packaged API requests for you. But the transferable skill is writing requests from scratch using only the documentation. Here is the process:
+The functions above packaged API requests for you. (Production code often goes a step further and uses wrapper libraries like `mwclient` or `pywikibot`, which handle continuation, throttling, and errors automatically — this chapter teaches raw requests deliberately so that you understand exactly what those wrappers do on your behalf.) But the transferable skill is writing requests from scratch using only the documentation. Here is the process:
 
 1. Go to the [MediaWiki API documentation](https://www.mediawiki.org/wiki/API:Main_page)
 2. Find an endpoint you have not used (e.g., `action=query&list=search`)
 3. Read its parameters: what is required, what is optional, what values are accepted
 4. Construct a request, make it, and inspect the response structure
 
-```python
+```{python}
 # Example: search Wikipedia for articles about "web scraping"
 url = "https://en.wikipedia.org/w/api.php"
 params = {
@@ -390,7 +411,7 @@ params = {
     "format": "json"
 }
 
-response = requests.get(url, params=params, headers=headers)
+response = requests.get(url, params=params, headers=HEADERS)
 data = response.json()
 
 results = data["query"]["search"]
@@ -404,13 +425,13 @@ The ability to go from documentation to working code is the skill that transfers
 
 To reinforce these patterns, try applying the same functions to a different article. The [World War II](https://en.wikipedia.org/wiki/World_War_II) article is one of the most-edited on Wikipedia:
 
-```python
-ww2_revisions = get_revisions("World_War_II", headers=headers)
+```{python}
+ww2_revisions = get_revisions("World_War_II")
 print(f"World War II revisions: {len(ww2_revisions)}")
 
-ww2_views = get_pageviews("World_War_II", start="20230101", end="20231231", headers=headers)
+ww2_views = get_pageviews("World_War_II", start="20230101", end="20231231")
 
-ww2_links = get_outlinks("World_War_II", headers=headers)
+ww2_links = get_outlinks("World_War_II")
 print(f"World War II outlinks: {len(ww2_links)}")
 
 # Compare with Elizabeth II
@@ -424,9 +445,11 @@ The comparison reveals how article structure and editing dynamics vary: a biogra
 
 The real analytical power of the MediaWiki API emerges when you combine data from multiple endpoints to answer questions that no single endpoint can address. A natural question is whether editing activity and viewing activity are related: do articles get edited more during periods when they are being read more, or do edits happen independently of audience attention?
 
-```python
-# Get monthly revision counts for Elizabeth II in 2022
-df_revisions["timestamp"] = pd.to_datetime(df_revisions["timestamp"])
+```{python}
+# Get monthly revision counts for Elizabeth II in 2022.
+# Revision timestamps parse as timezone-aware UTC (their ISO strings end in "Z");
+# drop the timezone so they align with the tz-naive pageview timestamps
+df_revisions["timestamp"] = pd.to_datetime(df_revisions["timestamp"]).dt.tz_localize(None)
 monthly_revs = (df_revisions
     .set_index("timestamp")
     .loc["2022"]
@@ -435,8 +458,7 @@ monthly_revs = (df_revisions
     .reset_index(name="revisions"))
 
 # Get monthly pageviews for the same period
-views_2022 = get_pageviews("Elizabeth_II", start="20220101", end="20221231",
-                            headers=headers)
+views_2022 = get_pageviews("Elizabeth_II", start="20220101", end="20221231")
 monthly_views = (views_2022
     .set_index("timestamp")
     .resample("ME")["views"]
@@ -469,9 +491,11 @@ The September 2022 spike — corresponding to the death of Queen Elizabeth II �
 
 3. **Link network.** Retrieve the outgoing wikilinks from three articles on related topics. How much do their link sets overlap? What articles appear in all three link sets? This overlap analysis is a simple form of the network analysis described in @sec-appendix-further.
 
-4. **Raw API practice.** Using only the MediaWiki API documentation at <https://www.mediawiki.org/wiki/API:Main_page>, construct a working request for an endpoint not covered in this chapter. Good candidates include `interlanguagelinks` (how many language editions does an article have?), `extlinks` (what external websites does an article link to?), or `recentchanges` (what are the most recent edits across all of Wikipedia?). Document your process: what parameters did you choose and why?
+4. **Raw API practice.** Using only the MediaWiki API documentation at <https://www.mediawiki.org/wiki/API:Main_page>, construct a working request for an endpoint not covered in this chapter. Good candidates include `prop=extlinks` (what external websites does an article link to?), `list=recentchanges` (what are the most recent edits across all of Wikipedia?), `prop=redirects` (what alternative titles redirect to an article?), or `prop=pageviews` (the Action API's own view counts for the last 60 days — compare them against the REST endpoint you used earlier). Document your process: what parameters did you choose and why?
 
 5. **Editor network.** For a single article, identify the top 20 editors by revision count. Then use `get_user_contributions()` to find what other articles these editors work on. Do they share other editing interests, or is this article their only point of overlap?
+
+6. **Graduate extension (INFO 5617).** Read @mesgari2015sum, a systematic review of the first decade of scholarly research on Wikipedia. Choose one research stream from the review — collaboration inequality, for instance — and reproduce a miniature version of its core measurement using this chapter's helper functions, such as computing a Gini coefficient of edits per editor across three articles of your choosing. Then write a short reflection on how your measurement choices (which articles, what time window, whether anonymous editors count) would change your conclusions, and how the original studies in that stream handled the same choices.
 
 ## Social History and Public Interest
 
@@ -488,7 +512,7 @@ Wikipedia also demonstrates what sustainable, mission-driven data access looks l
 - **Pagination**: The single most common mistake. Always check for `"continue"` in the response. Without it, you get only the first batch (often 500 or fewer results out of thousands).
 - **Nested JSON navigation**: The MediaWiki API nests data several levels deep. Print `data.keys()`, then `data["query"].keys()`, then `data["query"]["pages"].keys()` to navigate step by step.
 - **URL encoding**: Article titles with spaces use underscores in the API. For titles with special characters (parentheses, accented letters), use `urllib.parse.quote()`.
-- **Rate limiting**: Wikipedia requests a meaningful User-Agent header. Without it, you may get slower responses or be blocked. The rate limit is approximately 200 requests per second for identified clients — generous, but not infinite.
+- **Rate limiting**: The MediaWiki Action API does not publish a fixed requests-per-second quota; instead, its etiquette guidelines ask clients to make requests serially (wait for each response before sending the next) and to use the `maxlag` parameter for bulk work. The REST pageviews endpoints ask clients to stay under roughly 100 requests per second, but course code should stay far below that. The practical rule: serial requests, follow `continue` tokens, and always send an informative User-Agent per the Wikimedia User-Agent policy — without one, you may be throttled or blocked.
 - **Missing pages**: If you request an article that does not exist, the page ID will be negative (e.g., `-1`). Always check for this before trying to access revision data.
 
 ## Key Takeaways

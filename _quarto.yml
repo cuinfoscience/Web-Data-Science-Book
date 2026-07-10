@@ -1,6 +1,8 @@
 project:
   type: book
   output-dir: book
+  resources:
+    - notebooks/
 
 book:
   title: "Web Data Science"
@@ -37,12 +39,12 @@ book:
       chapters:
         - ch-14-automation.qmd
         - ch-15-research-design.qmd
-    - part: "Appendices"
-      chapters:
-        - appendix-ai-disclosure.qmd
-        - appendix-further.qmd
-  
-  references: references.bib
+  appendices:
+    - appendix-notebooks.qmd
+    - appendix-ai-disclosure.qmd
+    - appendix-further.qmd
+
+bibliography: references.bib
 
 format:
   html:
