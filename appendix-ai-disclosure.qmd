@@ -1,6 +1,92 @@
 # AI Coauthorship and Responsible Disclosure {#sec-appendix-ai-disclosure}
 
-Generative AI tools are increasingly integrated into research, data analysis, and academic writing. This appendix provides practical guidance on when and how to disclose AI use in work produced for courses, publications, and professional practice.
+Generative AI tools are increasingly integrated into research, data analysis, and academic writing. This appendix does two things. First, it discloses how AI was used to write the book you are reading. Second, it offers practical guidance on when and how to disclose AI use in your own work.
+
+The order is deliberate. An appendix that asked you to disclose your methods while concealing its own would not be worth reading.
+
+## How This Book Was Made
+
+This book was drafted with substantial assistance from large language models, directed and reviewed by the author. The account below is reconstructed from the book's public Git history, which records model attribution commit by commit.
+
+### The record
+
+The repository contains 39 commits made between 15 April and 10 July 2026. Excluding merge commits, 29 of 36 commits carry a `Co-Authored-By: Claude` trailer naming the specific model that assisted:
+
+| Model | Commits |
+|---|---|
+| Claude Opus 4.6 (1M context) | 14 |
+| Claude Fable 5 | 13 |
+| Claude Opus 4.7 (1M context) | 1 |
+| Claude Sonnet 4.6 | 1 |
+
+The seven commits without attribution are the initial repository scaffolding, the first drop of chapter drafts, a committed build of the rendered HTML, and small housekeeping changes. **Attribution was not recorded for that first chapter drop**, so the Git history cannot establish how much of it was machine-drafted; the sections that followed are documented precisely.
+
+### What the AI did, in three sessions
+
+**Session 1 — drafting and expansion (15–16 April 2026).** An initial commit of 22 files established the chapters, the Quarto configuration, the bibliography, and two specification documents. Fourteen chapters were then expanded in a single sitting, each by its own commit with the message *"Expand Chapter N … to ~3,000 words."* The first landed at 11:12 and the last at 11:33 — fourteen chapters in roughly twenty minutes, all assisted by Claude Opus 4.6. The commit bodies describe what each expansion added: new subsections, worked examples, exercises, and the "social history and public interest" material that closes each chapter. This work was merged as pull request #1.
+
+**Session 2 — build and publication infrastructure (23–26 April 2026).** Claude Sonnet 4.6 and Claude Opus 4.7 assisted in replacing a committed copy of the rendered site with a GitHub Actions workflow that runs `quarto render` and publishes automatically. This removed roughly 34,000 lines of generated HTML from version control. Merged as pull request #2.
+
+**Session 3 — correction and modernization (10 July 2026).** Thirteen commits between 14:27 and 14:52, all assisted by Claude Fable 5, revised the April drafts: Chapter 3 was rewritten as full narrative prose, Chapter 2's legal landscape was updated, Chapter 12 was rebuilt around Spotify's 2024 API deprecations, code fences were converted to executable Quarto cells, and the companion notebooks and their generator (`tools/make_notebooks.py`) were added. Merged as pull request #3.
+
+### What the author did
+
+The Git history shows the human contribution concentrated in three places: writing the specifications, directing each session, and reviewing what came back.
+
+The standing specification is `claude.md` at the repository root. It fixes the book's editorial voice (second person, "experienced mentor" rather than "textbook lecturing"), its audience, its code conventions, and a chapter structure every chapter follows — learning objectives, conceptual introduction, guided tutorial, five graduated exercises plus a graduate extension, common issues, key takeaways, further reading. The models wrote against that specification; they did not invent it.
+
+The April expansion was governed by a second, more detailed document: a 285-line prompt file committed alongside the chapters and later removed from the working tree, though it remains in the history. It is worth being specific about how prescriptive it was. For each of the fourteen chapters it recorded the current word count, a target, and an itemized list of what to add — naming the subsections ("From Response to DataFrame," "Saving Your Work"), specifying how many code blocks and exercises should result, and in places supplying the exercise text verbatim. It also constrained the model's latitude directly:
+
+> Do NOT rewrite existing content unless it contains errors. ADD to what exists. Preserve all existing code blocks, cross-references (`@sec-`), callout blocks, and citation keys.
+
+So the honest characterization of that session is not "AI wrote the chapters." It is that a person decided, chapter by chapter, what each chapter still needed, and a model wrote the prose to that plan at a speed no person could match. The judgment about content was human; the drafting was not.
+
+Each session arrived as a pull request that the author reviewed and merged. The three merges are the points where a human decided the work was fit to publish.
+
+### What the correction pass found
+
+The most useful part of this disclosure is not that AI helped write the book. It is what the July session had to fix in the April drafts, because those errors are characteristic of fluent machine-generated technical prose:
+
+- **A citation to something that does not exist.** Chapter 11 referenced the FRED series `MHIBS08013A052NCEN`. There is no such series — `BS` is not a state code. It was corrected to `MHICO08013A052NCEN`.
+- **Code that reads plausibly but is wrong.** A section combining two API sources reused a `url` variable still pointing at the previous endpoint. The prose described one thing; the code did another.
+- **Confidently stated figures that were incorrect.** The FEC rate limit was given as hundreds of requests per minute; it is approximately 1,000 per hour.
+- **Examples overtaken by the web.** Chapter 12's platform code assumed API access that Spotify deprecated in 2024.
+
+None of these are typographical slips. Each reads as authoritative and each is wrong — which is precisely why they survived the initial drafting and needed a dedicated pass to catch.
+
+### Limitations you should assume are still present
+
+- **The code in this book is not executed when the book is built.** Chapters are configured `eval: false`, so rendering never verifies that any example runs. Examples were checked by human and machine review, not by the build. When something does not work for you, that is a real possibility, not a misreading.
+- **Live targets drift.** Much of the book depends on websites and APIs that change without notice. Every example was correct when written; the web makes no promise beyond that.
+- **Errors of the kind listed above are likely to remain.** One correction pass found several. It is unlikely to have found all of them.
+- **Citations warrant checking.** Machine-drafted prose can attach a real-looking source to a claim it does not support. Verify anything you intend to rely on.
+
+::: {.callout-note}
+## You are the next reviewer
+If you are reading this as a student in the course, the failure modes above are the target of the weekly textbook revisions. Finding a broken example, an unsupported claim, or an explanation that skips the step where you actually got stuck is a genuine contribution — open an issue or a pull request against the repository.
+:::
+
+### Verifying this account
+
+This disclosure is reconstructed from public data, and you can check it. From a clone of the repository:
+
+```bash
+# Every commit and its model attribution
+git log --format='%ad %s' --date=short
+
+# Which commits name an AI coauthor, and which model
+git log --format='%B' | grep -i 'Co-Authored-By: Claude' | sort | uniq -c
+
+# What the July correction pass changed, in detail
+git log --format='%B' --since=2026-07-01 --no-merges
+
+# The expansion prompt that drove the April session (removed from the
+# working tree, still in history)
+git log --diff-filter=A --format='%H' -- CLAUDE_CODE_EXPANSION_PROMPT.md |
+  tail -1 | xargs -I{} git show {}:CLAUDE_CODE_EXPANSION_PROMPT.md
+```
+
+This appendix was itself drafted with AI assistance, from the repository history described above, and reviewed by the author before merging — the same standard it asks of you.
 
 ## When Disclosure Is Required
 
@@ -25,6 +111,8 @@ An effective disclosure statement answers four questions:
 3. **What oversight?** Describe how you reviewed, verified, and modified the output (e.g., "all generated code was tested independently," "LLM classifications were validated against a 20% manual sample")
 4. **What limitations?** Note any concerns about the output's accuracy or appropriateness
 
+The disclosure that opens this appendix is a worked example of that framework: it names the models and counts their commits, describes what each session produced, identifies the human specification and review that governed them, and states plainly what is likely still wrong.
+
 ## Example Disclosure Statements
 
 **For a notebook assignment:**
@@ -48,6 +136,8 @@ Major academic publishers and funding agencies have established disclosure requi
 - **NSF** suggests disclosure of AI use in proposals and will formalize requirements in future Proposal and Award Policies and Procedures Guides.
 
 The landscape of publisher and funder policies continues to evolve. Always check the current requirements of your target journal or funding agency before submission.
+
+Note what these policies have in common with the disclosure above: AI is credited as a tool in the record, but authorship — and accountability — stays with a person.
 
 ## Core Principles
 
