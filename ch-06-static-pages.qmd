@@ -86,10 +86,7 @@ for row in rows[1:]:  # Skip the header row
     cells = row.find_all(["td", "th"])
     values = [cell.get_text(strip=True) for cell in cells]
 
-    # Guard against ragged rows: tables often embed spacer, ad, or
-    # subtotal rows with a different number of cells. Skip any row
-    # that doesn't match the header — and print it, so you can check
-    # that you aren't discarding real data.
+    # Guard against ragged rows: tables often embed spacer, ad, or subtotal rows with a different number of cells. Skip any row that doesn't match the header — and print it, so you can check that you aren't discarding real data.
     if len(values) != len(header):
         print(f"Skipping row with {len(values)} cells: {values[:3]}")
         continue
@@ -139,9 +136,7 @@ tables = pd.read_html(url, header=0)
 df = tables[3]  # Verify the correct index by inspection
 
 # Drop rows that repeat the header (common in long Wikipedia tables).
-# Do this BEFORE renaming: the embedded rows contain the *original*
-# header text, so they must be compared against the original columns —
-# after lowercasing, "Rank" in the data would never match "rank"
+# Do this BEFORE renaming: the embedded rows contain the *original* header text, so they must be compared against the original columns — after lowercasing, "Rank" in the data would never match "rank"
 df = df[df.iloc[:, 0] != df.columns[0]]
 
 # Rename columns to something usable
@@ -190,8 +185,7 @@ The key challenge with non-tabular scraping is finding HTML elements that reliab
 groupings = soup.find_all("div", class_="view-grouping")
 print(f"Found {len(groupings)} category groupings")
 
-# If the count doesn't match expectations (24 Oscar categories),
-# you may need to navigate to a more specific parent element
+# If the count doesn't match expectations (24 Oscar categories), you may need to navigate to a more specific parent element
 ```
 
 ### Navigating the Tree for Specificity
@@ -207,8 +201,7 @@ if content_area:
     categories = content_area.find_all("div", class_="view-grouping")
     print(f"Categories within content area: {len(categories)}")
 else:
-    # Guard: if the anchor is missing, fall back to an empty list so
-    # the code below still runs instead of crashing with a NameError.
+    # Guard: if the anchor is missing, fall back to an empty list so the code below still runs instead of crashing with a NameError.
     # An empty result is your cue to re-inspect the page structure.
     categories = []
     print("Content area not found — re-inspect the page in dev tools")
@@ -256,8 +249,7 @@ groupings = soup.select(".view-grouping")
 main = soup.select("#main-content")
 
 # Descendant combinators chain a whole path in one expression.
-# This single line is equivalent to the find() + find_all() pair
-# we used to narrow down to categories within the content area:
+# This single line is equivalent to the find() + find_all() pair we used to narrow down to categories within the content area:
 selected = soup.select("div.field--name-field-award-categories div.view-grouping")
 print(f"Categories via CSS selector: {len(selected)}")
 # Categories via CSS selector: 24 — same result as before
@@ -340,8 +332,7 @@ A loop like this is exactly where the principles of @sec-ethics stop being abstr
 ```{python}
 # From @sec-ethics: responsible_get() sets the course User-Agent
 # "WebDataScience/1.0 (INFO 4617; brian.keegan@colorado.edu)", waits
-# `delay` seconds after each request, and returns None on network
-# errors. Swap it in for requests.get() + time.sleep() in any loop:
+# `delay` seconds after each request, and returns None on network errors. Swap it in for requests.get() + time.sleep() in any loop:
 response = responsible_get(url, delay=1.0)
 ```
 
@@ -450,8 +441,7 @@ You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset
 **Step 1 — Choose and check.** Pick a Wikipedia article containing a data table you find interesting — countries by population, U.S. states by area, highest-grossing films. Confirm the article path is allowed by Wikipedia's `robots.txt` (you parsed it in @sec-ethics), and fetch the page with your named `HEADERS`.
 
 ```{python}
-# Step 1: Choose a Wikipedia article with a table, confirm robots.txt
-# allows it, and fetch the page with your HEADERS.
+# Step 1: Choose a Wikipedia article with a table, confirm robots.txt allows it, and fetch the page with your HEADERS.
 # Your code here
 ```
 
@@ -465,8 +455,7 @@ You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset
 **Step 3 — Extract with `read_html()`.** Run `pd.read_html()` on the cached HTML. Print how many tables it found, look at the `head()` of a few, and identify the index of the table you want.
 
 ```{python}
-# Step 3: Run pd.read_html on the cached HTML, count the tables, and
-# pick out yours.
+# Step 3: Run pd.read_html on the cached HTML, count the tables, and pick out yours.
 # Your code here
 ```
 
@@ -488,8 +477,7 @@ You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset
 **Step 6 — Look under the hood.** Parse the same cached HTML with BeautifulSoup and find your table by its class (Wikipedia data tables usually carry `class="wikitable"`). Extract the header row's text yourself with `find_all()`. Compare what you got to `read_html()`'s column names.
 
 ```{python}
-# Step 6: Parse the cached HTML with BeautifulSoup, find your table by
-# class, and extract the header row by hand.
+# Step 6: Parse the cached HTML with BeautifulSoup, find your table by class, and extract the header row by hand.
 # Your code here
 ```
 

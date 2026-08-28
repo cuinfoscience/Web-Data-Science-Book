@@ -335,8 +335,7 @@ def scrape_with_selenium(search_term, max_pages=3):
 
             # Extract data from this page
             for item in soup.find_all("div", class_="result-item"):
-                # Check that both elements exist before calling .text —
-                # the same defensive pattern you learned for static scraping
+                # Check that both elements exist before calling .text — the same defensive pattern you learned for static scraping
                 title_tag = item.find("h3")
                 desc_tag = item.find("p")
                 if title_tag is None or desc_tag is None:
@@ -383,8 +382,7 @@ You will measure the difference between what a static request sees and what a br
 **Step 1 — Fetch statically first.** Choose a JavaScript-heavy site — a news site's live section, a social feed, a site the chapter mentioned. Check its `robots.txt` (@sec-ethics), then fetch it with `requests.get()` and your `HEADERS`. Record the length of `response.text` and count a target element with BeautifulSoup (@sec-static-pages) — headlines, list items, whatever the page is made of.
 
 ```{python}
-# Step 1: Fetch your chosen page with requests, record the HTML length,
-# and count your target element with BeautifulSoup.
+# Step 1: Fetch your chosen page with requests, record the HTML length, and count your target element with BeautifulSoup.
 # Your code here
 ```
 
@@ -398,8 +396,7 @@ You will measure the difference between what a static request sees and what a br
 **Step 3 — Wait, then measure again.** Use `WebDriverWait` to wait for your target element to be present — the chapter shows the pattern — then record the length of `driver.page_source` and count the same target element, this time parsing `driver.page_source` with BeautifulSoup.
 
 ```{python}
-# Step 3: Wait for the content to load, then measure page_source length
-# and re-count the same element.
+# Step 3: Wait for the content to load, then measure page_source length and re-count the same element.
 # Your code here
 ```
 

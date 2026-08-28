@@ -80,8 +80,7 @@ def get_scores(url):
     
     try:
         driver.get(url)
-        # Wait for the score elements to render -- reading page_source
-        # immediately on a JS-heavy page yields intermittent empty scores
+        # Wait for the score elements to render -- reading page_source immediately on a JS-heavy page yields intermittent empty scores
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located(
                 (By.TAG_NAME, "score-icon-critic-deprecated")
@@ -375,40 +374,35 @@ You will take a collector you already trust and make it deployable: notebook to 
 **Step 1 — Choose and rehearse your collector.** Pick a keyless data source from an earlier chapter — Open-Meteo (@sec-data-formats) or Wikipedia pageviews (@sec-introduction) are ideal. Write a `collect()` function with a docstring that fetches the current data with your `HEADERS` and returns a dictionary of the fields you want to keep, including a UTC timestamp. Run it once to prove it works.
 
 ```{python}
-# Step 1: Write collect() -- fetch one observation from your source and
-# return a dict of fields including a UTC timestamp. Run it once.
+# Step 1: Write collect() -- fetch one observation from your source and return a dict of fields including a UTC timestamp. Run it once.
 # Your code here
 ```
 
 **Step 2 — Append safely to CSV.** Write `save_row(row, filepath)` following the chapter's pattern: a pinned `FIELDNAMES` constant, append mode, header written only when the file does not yet exist. Run collect-and-save twice and show the CSV has two rows and one header.
 
 ```{python}
-# Step 2: Write save_row() with a pinned schema, run the pipeline twice,
-# and prove the CSV grew correctly.
+# Step 2: Write save_row() with a pinned schema, run the pipeline twice, and prove the CSV grew correctly.
 # Your code here
 ```
 
 **Step 3 — Convert to a script.** Assemble the whole thing into a standalone `collector.py`: imports at top, your two functions, a `main()` that calls them, and the `if __name__ == "__main__":` guard. Write it to disk from the notebook, then verify it runs from the command line with `!python collector.py`.
 
 ```{python}
-# Step 3: Write collector.py to disk (imports, collect, save_row, main,
-# __main__ guard) and run it with !python collector.py.
+# Step 3: Write collector.py to disk (imports, collect, save_row, main, __main__ guard) and run it with !python collector.py.
 # Your code here
 ```
 
 **Step 4 — Add a freshness check.** Write `check_freshness(filepath, max_age_hours=24)`: read the CSV, parse the newest timestamp, and print a clear OK or a warning if the data is stale. Test both paths — once against your fresh file, once with the threshold set low enough to trigger the warning.
 
 ```{python}
-# Step 4: Write check_freshness() and demonstrate both the passing and
-# the failing case.
+# Step 4: Write check_freshness() and demonstrate both the passing and the failing case.
 # Your code here
 ```
 
 **Step 5 — Draft the workflow.** Write the GitHub Actions workflow YAML for this collector as a string and save it to `collect.yml`: a cron schedule (explain your chosen expression in a comment — remember Actions cron is UTC), checkout, Python setup, dependency install, running `collector.py`, running the freshness check, and committing the CSV back — following the chapter's template.
 
 ```{python}
-# Step 5: Draft the full workflow YAML, with the cron expression explained,
-# and save it to collect.yml.
+# Step 5: Draft the full workflow YAML, with the cron expression explained, and save it to collect.yml.
 # Your code here
 ```
 

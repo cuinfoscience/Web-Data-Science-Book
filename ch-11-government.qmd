@@ -131,8 +131,7 @@ A practical tip: when you find a variable that looks right, always retrieve it f
 Census data is organized geographically using FIPS codes. Colorado is state `08`; Boulder is place `07850`; Longmont is place `45970`. You can find FIPS codes at [census.gov/library/reference/code-lists](https://www.census.gov/library/reference/code-lists/ansi.html).
 
 ```{python}
-# Give each API's endpoint its own clearly named variable -- a generic
-# name like `url` invites bugs when you move between APIs in one notebook
+# Give each API's endpoint its own clearly named variable -- a generic name like `url` invites bugs when you move between APIs in one notebook
 census_url = "https://api.census.gov/data/2022/acs/acs5"
 
 # Housing age distribution for Boulder, CO
@@ -374,9 +373,7 @@ for result in data["results"]:
 The most compelling analyses often integrate data from multiple government sources to tell a story that no single dataset can tell alone. Census data provides snapshots of demographic and housing characteristics; FRED provides economic time series that capture the conditions under which those characteristics formed. Combining them reveals the relationship between macro-level economic forces and community-level outcomes.
 
 ```{python}
-# Define each endpoint explicitly so this block stands on its own --
-# reusing a leftover `url` variable from an earlier section is a
-# classic source of silent bugs in long notebooks
+# Define each endpoint explicitly so this block stands on its own -- reusing a leftover `url` variable from an earlier section is a classic source of silent bugs in long notebooks
 census_url = "https://api.census.gov/data/2022/acs/acs5"
 fred_url = "https://api.stlouisfed.org/fred/series/observations"
 
@@ -460,8 +457,7 @@ You will answer one comparative question about Colorado with two federal data so
 **Step 3 — Build and clean the DataFrame.** First row is headers, the rest is data — the same shape you handled in @sec-archives. Convert your variable to numeric, sort by it, and print the top and bottom five counties.
 
 ```{python}
-# Step 3: Build the DataFrame, convert to numeric, sort, and print the
-# extremes.
+# Step 3: Build the DataFrame, convert to numeric, sort, and print the extremes.
 # Your code here
 ```
 

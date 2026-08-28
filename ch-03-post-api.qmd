@@ -87,9 +87,7 @@ The first audit asks one question of a list of endpoints: *if I show up with no 
 import requests
 import pandas as pd
 
-# Identify yourself. @sec-ethics explains why this header matters; here it
-# is already load-bearing, because several of these hosts answer anonymous
-# library defaults differently than they answer a named client.
+# Identify yourself. @sec-ethics explains why this header matters; here it is already load-bearing, because several of these hosts answer anonymous library defaults differently than they answer a named client.
 HEADERS = {"User-Agent": "WebDataScience/1.0 (INFO 4617; you@colorado.edu)"}
 
 # Endpoints that ask for no key, no account, and no application.
@@ -388,8 +386,7 @@ You will run the chapter's access audit yourself, on today's web, and extend it 
 **Step 5 — Attribute a refusal.** Pick one endpoint that returned a non-200 and diagnose it: print the `server` and `via` headers and the first 120 characters of the body. State in a comment whether the refusal came from the platform or from something between you and it.
 
 ```{python}
-# Step 5: Diagnose one refusal -- server header, via header, body excerpt --
-# and attribute it in a comment.
+# Step 5: Diagnose one refusal -- server header, via header, body excerpt -- and attribute it in a comment.
 # Your code here
 ```
 
