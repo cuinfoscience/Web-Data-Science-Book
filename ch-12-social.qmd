@@ -496,7 +496,59 @@ The four platforms in this chapter represent fundamentally different governance 
 
 The structural difference matters: Reddit and Spotify can unilaterally change their API terms because they control both the platform and the protocol. Bluesky and Mastodon cannot — or at least, no single entity can — because the protocols are open standards that anyone can implement. This is the architectural embodiment of the **ownership** value from @sec-post-api.
 
-## Exercises
+## Recommended Exercises
+
+This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.
+
+You will profile and compare the public activity of two Bluesky accounts. Bluesky is the chapter's lowest-friction platform — a free account and an app password are all you need, with no application process. Remember the chapter's caution: social data is people data, so pick public, organizational, or public-figure accounts rather than private individuals.
+
+**Step 1 — Authenticate.** Create an app password in Bluesky's settings (never your real password — the chapter explains the difference), log in with the `atproto` `Client`, and print your own handle to confirm the session works. Keep the credential out of the notebook, loading it the way you loaded API keys in @sec-government.
+
+```{python}
+# Step 1: Log in with the atproto Client using an app password loaded
+# from an environment variable. Confirm with your handle, not the secret.
+# Your code here
+```
+
+**Step 2 — Retrieve one account's posts.** Choose your first account and retrieve its 50 most recent posts with `get_author_feed`, building the list-of-dictionaries the chapter shows: text, created_at, likes, reposts, and whether each post is a reply. Convert to a DataFrame.
+
+```{python}
+# Step 2: Retrieve 50 posts from your first account with get_author_feed
+# and build a DataFrame.
+# Your code here
+```
+
+**Step 3 — Compute an activity profile.** From the DataFrame, compute: average post length in characters, posts per day (use the first and last `created_at` to get the window), the fraction of posts that are replies, and mean likes per post.
+
+```{python}
+# Step 3: Compute post length, posting rate, reply fraction, and mean likes.
+# Your code here
+```
+
+**Step 4 — Repeat for a second account.** Pick a second account you expect to behave differently — an institution vs. a person, a news outlet vs. a researcher — and run Steps 2–3 for it. Wrap the work in a function so you write the logic once, as you learned in @sec-static-pages.
+
+```{python}
+# Step 4: Write a profile_account(handle) function and run it on your
+# second account.
+# Your code here
+```
+
+**Step 5 — Compare.** Combine the two profiles into a single two-row DataFrame, and plot one comparison you find informative — likes per post, or the distribution of post lengths for both accounts.
+
+```{python}
+# Step 5: Build the two-row comparison DataFrame and plot one comparison.
+# Your code here
+```
+
+**Step 6 — Interpret.** In four to six sentences: How do the two accounts differ, and did the numbers match your expectations? What does each account seem to use the platform *for*? What could you not measure from `get_author_feed` alone, and which of the chapter's other endpoints (or platforms) would you need for it?
+
+```{python}
+# Step 6: Write your answer here as comments, or convert this cell to Markdown.
+```
+
+## Additional Exercises
+
+These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.
 
 1. **Reddit analysis.** Compare two subreddits on the same broad topic (e.g., r/science and r/askscience). How do submission patterns, comment engagement, and moderation structures differ?
 
@@ -506,9 +558,8 @@ The structural difference matters: Reddit and Spotify can unilaterally change th
 
 4. **Playlist fingerprints.** Choose two user-created public Spotify playlists representing different genres (e.g., country vs. electronic — note that Spotify-owned editorial playlists are not accessible to new apps). Retrieve their contents with `sp.playlist_tracks()` and compare the playlists on available metadata: track popularity, duration, release year, and the number of distinct artists. Create overlapping distribution plots for at least two of these measures. How well can you distinguish the genres from metadata alone — and what would you be missing without audio analysis?
 
-5. **Bluesky analysis.** Retrieve the 50 most recent posts from a Bluesky account of your choice using `get_author_feed` (demonstrated in this chapter). Compute summary statistics: average post length, posting frequency (posts per day), fraction of posts that are replies vs. original posts, and the most common words used. How does this activity profile compare to what you might expect from the same account on Twitter/X? What limitations of the AT Protocol API did you encounter during data collection?
 
-6. **Graduate extension (INFO 5617).** Read @bruns2019after and @davidson2023platform. Then design (do not execute) a measurement plan for studying the same construct — for example, cross-partisan interaction, or the spread of health misinformation — on one proprietary platform and one federated platform from this chapter. For each: specify the endpoints and fields you would use, the sampling frame, what the platform's access rules prevent you from observing, and how those constraints could bias your conclusions. Conclude with an assessment of whether the two platforms' results would be comparable at all.
+5. **Graduate extension (INFO 5617).** Read @bruns2019after and @davidson2023platform. Then design (do not execute) a measurement plan for studying the same construct — for example, cross-partisan interaction, or the spread of health misinformation — on one proprietary platform and one federated platform from this chapter. For each: specify the endpoints and fields you would use, the sampling frame, what the platform's access rules prevent you from observing, and how those constraints could bias your conclusions. Conclude with an assessment of whether the two platforms' results would be comparable at all.
 
 ## Social History and Public Interest
 

@@ -381,7 +381,58 @@ print(response.status_code)  # 200
 
 How do you know which pattern an API expects? Read its documentation — but the URL itself usually tells you. Values between slashes are path segments: build the URL with an f-string and `quote()` each component. Values after a `?` are query parameters: pass a dictionary via `params=` and let `requests` handle the escaping. REST-style endpoints that return one specific resource (like pageviews for one article) tend to use path segments; APIs with many optional settings (like the Action API's dozens of parameters) tend to use query strings. Mixing them up is a classic source of confusing 404s — query-encoding values that an API expects in its path sends the server a URL it cannot route. You will appreciate this distinction especially in @sec-wikipedia and @sec-government, where article titles and variable names frequently contain characters that require encoding.
 
-## Exercises
+## Recommended Exercises
+
+This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.
+
+You will build a URL diagnostic tool from the protocol layers this chapter covered — DNS, HTTP status codes, headers, and redirects — and use it to profile five real URLs.
+
+**Step 1 — Take a URL apart.** Use `urlparse()` on three URLs of different shapes — a plain page, a URL with a query string, and one of the API URLs from earlier chapters. For each, print the scheme, netloc, path, and query.
+
+```{python}
+# Step 1: urlparse three different URLs and print their components.
+# Your code here
+```
+
+**Step 2 — Resolve a name.** Use `dns.resolver` to look up the A records for `en.wikipedia.org` and two other domains you choose. Print the IP addresses. Do any share an address?
+
+```{python}
+# Step 2: Resolve A records for three domains and print the IPs.
+# Your code here
+```
+
+**Step 3 — Request with named headers.** Define your `HEADERS` (@sec-ethics) and request one of the three URLs from Step 1. Print the status code and three response headers: `Content-Type`, `Server`, and `Content-Length` (or the length of `response.content` if the header is absent).
+
+```{python}
+# Step 3: Make a request with your HEADERS and print the status code and
+# three response headers.
+# Your code here
+```
+
+**Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check `response.history`, and if it redirected, print where it ended up. Include a docstring.
+
+```{python}
+# Step 4: Write diagnose_url(url) -- status, content-type, server, size,
+# and the redirect chain if any. Include a docstring.
+# Your code here
+```
+
+**Step 5 — Profile five URLs.** Run `diagnose_url()` on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an `http://` address of a site that upgrades you to `https://`), an API endpoint, and a site that blocks automated access (@sec-post-api showed you one).
+
+```{python}
+# Step 5: Diagnose five URLs -- working, 404, redirect, API, and blocked.
+# Your code here
+```
+
+**Step 6 — Interpret.** In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the blocked site, what layer refused you — and how do you know it was the site rather than your network (@sec-post-api)?
+
+```{python}
+# Step 6: Write your answer here as comments, or convert this cell to Markdown.
+```
+
+## Additional Exercises
+
+These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.
 
 1. **Browser developer tools.** Open a Wikipedia article and a commercial news site side by side, each with the Network tab open. Reload both pages and compare: how many requests does each make? What types of resources (HTML, CSS, JS, images, fonts, tracking) does each load? What does this tell you about modern web architecture?
 
@@ -391,9 +442,7 @@ How do you know which pattern an API expects? Read its documentation — but the
 
 4. **Network tab analysis.** Pick a website you visit frequently. Reload it with the browser's Network tab open and recording. Count and categorize all requests into types: HTML documents, CSS stylesheets, JavaScript files, images, fonts, and tracking/analytics scripts. What fraction of requests serve actual content vs. tracking and advertising? Write a brief analysis of what this reveals about the site's business model.
 
-5. **URL diagnostic function.** Write a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the URL redirected (and if so, to where). Test it on at least five URLs: a working page, a 404, a redirecting URL, an API endpoint, and a site that blocks automated access. Summarize the patterns you observe.
-
-6. **Graduate extension (INFO 5617).** Choose a website you might plausibly study in your own research and profile its delivery infrastructure. Use the browser's Network tab to record the time to first byte, the full redirect chain, and evidence of CDN involvement (inspect the `Server`, `Via`, and similar response headers), then run `traceroute` (or `scapy`'s traceroute) to the same host and geolocate a few of the hops. Write a 500-word memo connecting these protocol-level observations to research-infrastructure concerns: where does "the" site actually live, how stable are measurements of it likely to be across time and vantage points, and what would an automated collection pipeline need to handle — redirects, rate limits, geographically varying responses — to gather data from it reliably?
+5. **Graduate extension (INFO 5617).** Choose a website you might plausibly study in your own research and profile its delivery infrastructure. Use the browser's Network tab to record the time to first byte, the full redirect chain, and evidence of CDN involvement (inspect the `Server`, `Via`, and similar response headers), then run `traceroute` (or `scapy`'s traceroute) to the same host and geolocate a few of the hops. Write a 500-word memo connecting these protocol-level observations to research-infrastructure concerns: where does "the" site actually live, how stable are measurements of it likely to be across time and vantage points, and what would an automated collection pipeline need to handle — redirects, rate limits, geographically varying responses — to gather data from it reliably?
 
 ## Social History and Public Interest
 

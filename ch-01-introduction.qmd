@@ -221,19 +221,72 @@ When you encounter an error or do not know how to do something, start with the o
 For strategies on asking effective technical questions and reading official documentation, see *Missing Manual* Chapter 2: Asking Technical Questions and Chapter 5: Reading Official Documentation.
 :::
 
-## Exercises
+## Recommended Exercises
 
-1. **Environment check.** Create a new Jupyter Notebook. In the first cell, import `requests`, `pandas`, `matplotlib.pyplot`, and `BeautifulSoup`. In the second cell, use `requests.get()` to retrieve any web page of your choice and print the status code. In the third cell, write a Markdown cell explaining what the status code means.
+This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter.
 
-2. **Exploring the Response object.** Use the `dir()` function on a `requests.Response` object to list all its attributes and methods. Identify three attributes not discussed in this chapter and use the `help()` function or online documentation to figure out what they do. Write a brief explanation of each in a Markdown cell.
+Since this is the first chapter, the assignment is deliberately modest: prove that your environment works, then run the retrieve–parse–analyze loop once, end to end, on an article you choose.
 
-3. **Your first API call.** Using the Wikimedia pageviews API URL pattern from this chapter, retrieve the daily pageview data for a Wikipedia article of your choice over a month-long period. Convert the `data['items']` list into a pandas DataFrame and create a simple line plot of views over time using `matplotlib`.
+**Step 1 — Verify your environment.** Import `requests`, `pandas` (as `pd`), and `matplotlib.pyplot` (as `plt`). If any import fails, revisit the setup section before going further.
 
-4. **POST vs. GET.** Read the `requests` library documentation and find the method for making a POST request. In a Markdown cell, explain how POST differs from GET and describe a scenario where you would use each. What kind of data does a POST request typically send, and why would an API require it instead of GET?
+```{python}
+# Step 1: Import requests, pandas as pd, and matplotlib.pyplot as plt.
+# Your code here
+```
 
-5. **Multi-article comparison.** Retrieve daily pageview data for three Wikipedia articles of your choice over the same month. Save each to a separate CSV file using `df.to_csv()`. Load all three back with `pd.read_csv()` and create a single plot with all three time series on the same axes, with a legend identifying each article. Which article had the most variable traffic, and can you hypothesize why?
+**Step 2 — Make your first request.** Use `requests.get()` to retrieve any web page you choose. Print the status code and the length of `response.text`.
 
-6. **Graduate extension (INFO 5617).** Read the computational social science manifesto by @lazer2009computational — a short, field-defining argument about what digital trace data makes possible. Identify three specific claims the authors make about the promise or the perils of studying society through digital traces, such as claims about data access, privacy, or the capacity of academic institutions to compete with industry. For each claim, write a paragraph connecting it to a concrete technique or data source covered in this book's table of contents, and assess whether the claim has held up in the years since publication. Submit your response as a Jupyter Notebook that uses Markdown cells for the written analysis.
+```{python}
+# Step 2: Retrieve a web page and print the status code and response length.
+# Your code here
+```
+
+**Step 3 — Call the pageviews API.** Pick a Wikipedia article you are curious about. Using the pageviews API URL pattern from this chapter — including the `User-Agent` header with your email — retrieve its daily views for one full month, and parse the response with `.json()`.
+
+```{python}
+# Step 3: Build the pageviews URL for your article, request it with a
+# User-Agent header, and parse the JSON response.
+# Your code here
+```
+
+**Step 4 — Build a DataFrame.** Convert `data["items"]` into a DataFrame, and convert the `timestamp` column into a real date with `pd.to_datetime()`, as the chapter demonstrates.
+
+```{python}
+# Step 4: Convert data["items"] to a DataFrame and add a proper date column.
+# Your code here
+```
+
+**Step 5 — Plot the time series.** Create a line plot of daily views across your month, with labeled axes and a title naming the article.
+
+```{python}
+# Step 5: Plot daily views over time with labeled axes and a title.
+# Your code here
+```
+
+**Step 6 — Save and reload.** Save the DataFrame to a CSV file with `to_csv()`, then load it back with `pd.read_csv()` and print how many rows you recovered.
+
+```{python}
+# Step 6: Save the DataFrame to CSV, load it back, and print the row count.
+# Your code here
+```
+
+**Step 7 — Interpret.** In three to five sentences: What was the highest-traffic day, and can you connect it to a real-world event? What does the status code from Step 2 mean? And why did Step 6 matter — what can you now do without touching the network again?
+
+```{python}
+# Step 7: Write your answer here as comments, or convert this cell to Markdown.
+```
+
+## Additional Exercises
+
+These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.
+
+1. **Exploring the Response object.** Use the `dir()` function on a `requests.Response` object to list all its attributes and methods. Identify three attributes not discussed in this chapter and use the `help()` function or online documentation to figure out what they do. Write a brief explanation of each in a Markdown cell.
+
+2. **POST vs. GET.** Read the `requests` library documentation and find the method for making a POST request. In a Markdown cell, explain how POST differs from GET and describe a scenario where you would use each. What kind of data does a POST request typically send, and why would an API require it instead of GET?
+
+3. **Multi-article comparison.** Retrieve daily pageview data for three Wikipedia articles of your choice over the same month. Save each to a separate CSV file using `df.to_csv()`. Load all three back with `pd.read_csv()` and create a single plot with all three time series on the same axes, with a legend identifying each article. Which article had the most variable traffic, and can you hypothesize why?
+
+4. **Graduate extension (INFO 5617).** Read the computational social science manifesto by @lazer2009computational — a short, field-defining argument about what digital trace data makes possible. Identify three specific claims the authors make about the promise or the perils of studying society through digital traces, such as claims about data access, privacy, or the capacity of academic institutions to compete with industry. For each claim, write a paragraph connecting it to a concrete technique or data source covered in this book's table of contents, and assess whether the claim has held up in the years since publication. Submit your response as a Jupyter Notebook that uses Markdown cells for the written analysis.
 
 ## Social History and Public Interest
 
