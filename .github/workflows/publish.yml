@@ -5,6 +5,16 @@ on:
 
 name: Render and Publish
 
+# Two pushes to main close together used to build the gh-pages worktree from the
+# same parent commit and then race to push it. The loser failed with
+# "cannot lock ref 'refs/heads/gh-pages'" and the site silently stayed a commit
+# behind. Serialize the runs instead. cancel-in-progress is false so a build that
+# is already publishing finishes; a run still waiting is superseded by the newer
+# commit, which contains its changes anyway.
+concurrency:
+  group: publish-gh-pages
+  cancel-in-progress: false
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
