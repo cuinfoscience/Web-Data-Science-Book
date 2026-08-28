@@ -1,0 +1,96 @@
+name: Suggestion
+description: An improvement that would make the book better, but did not block you
+title: "Suggestion: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for an improvement you would like to see: a reading worth adding, a
+        clearer example, an extra exercise, a diagram.
+
+        If something actually **stopped you**, file a
+        [gap report](https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new?template=gap-report.yml)
+        instead. If something is **wrong or broken**, use
+        [Something is wrong](https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new?template=bug_report.yml).
+        Those two get priority, so put it there if it fits.
+
+  - type: dropdown
+    id: chapter
+    attributes:
+      label: Which chapter?
+      options:
+        - "Ch. 1 — Introduction to Web Data Science"
+        - "Ch. 2 — Ethics, Law, and Responsible Data Collection"
+        - "Ch. 3 — The Post-API Age"
+        - "Ch. 4 — Data Formats: XML and JSON"
+        - "Ch. 5 — Web Architecture and Protocols"
+        - "Ch. 6 — Parsing Static Web Pages"
+        - "Ch. 7 — Archived Web Pages and the Wayback Machine"
+        - "Ch. 8 — Dynamic Web Pages with Selenium"
+        - "Ch. 9 — Extracting Data from PDFs"
+        - "Ch. 10 — Introduction to APIs: Wikipedia"
+        - "Ch. 11 — Government Data APIs"
+        - "Ch. 12 — Social and Media Platform APIs"
+        - "Ch. 13 — AI and Language Model APIs"
+        - "Ch. 14 — Automating Data Collection"
+        - "Ch. 15 — Research Design with Web Data"
+        - "An appendix"
+        - "A companion notebook"
+        - "The book as a whole"
+    validations:
+      required: true
+
+  - type: input
+    id: section
+    attributes:
+      label: Which section or heading?
+      description: Leave blank if this is about a whole chapter.
+      placeholder: "Further Reading"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of suggestion?
+      options:
+        - "Add a reading or citation"
+        - "Add or improve a figure, diagram, or screenshot"
+        - "Add or strengthen an exercise"
+        - "Add an example"
+        - "Reorganize or rewrite something for clarity"
+        - "Something else"
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What would you add or change?
+      description: Be concrete. A specific suggestion is far easier to act on than a general one.
+      placeholder: |
+        Add the EFF's CFAA explainer to Further Reading. The chapter cites Van Buren
+        and hiQ but has no plain-language source for a reader who has never seen the
+        statute.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would it help?
+      description: One or two sentences. Who benefits, and how?
+      placeholder: "It gives a reader without a legal background somewhere to start before the case discussion."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched the open issues and did not find this one already suggested.
+          required: true
+        - label: This is a suggestion, not something that blocked me or something that is broken.
+          required: true

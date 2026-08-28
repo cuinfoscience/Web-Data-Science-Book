@@ -1,0 +1,105 @@
+name: Gap report
+description: Something you needed was missing or unclear, and it stopped you
+title: "Gap: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when the book **did not stop you with an error** — it just did not
+        tell you something you needed, or told you in a way you could not follow.
+
+        You do not need to know the answer. Reporting where you got stuck is the
+        whole contribution. You are reading this material for the first time, which
+        makes you the best person to notice a hole in it.
+
+  - type: dropdown
+    id: chapter
+    attributes:
+      label: Where were you?
+      description: Pick the chapter you were reading.
+      options:
+        - "Ch. 1 — Introduction to Web Data Science"
+        - "Ch. 2 — Ethics, Law, and Responsible Data Collection"
+        - "Ch. 3 — The Post-API Age"
+        - "Ch. 4 — Data Formats: XML and JSON"
+        - "Ch. 5 — Web Architecture and Protocols"
+        - "Ch. 6 — Parsing Static Web Pages"
+        - "Ch. 7 — Archived Web Pages and the Wayback Machine"
+        - "Ch. 8 — Dynamic Web Pages with Selenium"
+        - "Ch. 9 — Extracting Data from PDFs"
+        - "Ch. 10 — Introduction to APIs: Wikipedia"
+        - "Ch. 11 — Government Data APIs"
+        - "Ch. 12 — Social and Media Platform APIs"
+        - "Ch. 13 — AI and Language Model APIs"
+        - "Ch. 14 — Automating Data Collection"
+        - "Ch. 15 — Research Design with Web Data"
+        - "An appendix"
+        - "A companion notebook"
+    validations:
+      required: true
+
+  - type: input
+    id: section
+    attributes:
+      label: Which section or heading?
+      description: Copy the nearest heading, so we can find the spot.
+      placeholder: "Technical Norms: robots.txt"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of gap?
+      options:
+        - "Something was missing — I needed it and it was not there"
+        - "Something was unclear — it was there, but I could not follow it"
+        - "Not sure / both"
+    validations:
+      required: true
+
+  - type: textarea
+    id: stuck
+    attributes:
+      label: Where did you get stuck?
+      description: |
+        What were you trying to do, and what stopped you? Quote the sentence you
+        reread, or name the step you could not take. Be as specific as you can —
+        "this section is confusing" is hard to act on, but "I did not know what a
+        User-Agent was when it first appeared" is easy to fix.
+      placeholder: |
+        I was trying to run the robots.txt example. The text says to check whether a
+        page is allowed, but I did not know where to find the site's robots.txt in
+        the first place, and I could not tell whether I was supposed to open it in
+        a browser or fetch it in Python.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Who else would hit this?
+      description: One sentence. Does this stop anyone reading the chapter, or only someone doing a specific thing?
+      placeholder: "Anyone running this chapter's first code block for the first time."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would have helped?
+      description: |
+        Optional, but useful. You do not have to write the fix — just say what would
+        have unstuck you. A sentence, a diagram, an example, a link, a definition.
+      placeholder: "One sentence saying robots.txt always lives at the site root, with an example URL."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched the open issues and did not find this one already reported.
+          required: true
