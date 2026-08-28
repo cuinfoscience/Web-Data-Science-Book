@@ -7,11 +7,12 @@
 - Identify alternative data access strategies including archives, FOIA requests, data donations, and federated platforms
 - Connect contemporary data access challenges to longer traditions of public interest inquiry
 - Articulate the values of openness, oversight, and ownership as guiding principles for web data practice
+- Measure the current state of API access empirically, and distinguish a platform's refusal from your own network's
 :::
 
 ::: {.callout-tip}
 ## Companion Notebook
-This chapter's [companion notebook](https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/notebooks/ch-03-post-api.ipynb) contains the discussion and exercises for note-taking — this is a conceptual chapter with no code (see @sec-appendix-notebooks for all notebooks).
+Run this chapter's code as you read: open the [companion notebook](https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/notebooks/ch-03-post-api.ipynb) (see @sec-appendix-notebooks for all of them).
 :::
 
 
@@ -68,9 +69,229 @@ Regulation is beginning to respond. The European Union's Digital Services Act in
 
 Links rot. Roughly half the hyperlinks cited in U.S. Supreme Court opinions no longer point to the content the justices cited, and a 2024 Pew study found that about a third of webpages that existed in 2013 were gone a decade later. Platforms churn: GeoCities vanished with its era of amateur web culture; Parler went offline overnight when its hosting was pulled; Twitter became X and broke a decade of embedded links and stored identifiers. Sites redesign their HTML and silently break every scraper built against the old structure — a fragility you will experience personally in @sec-static-pages and @sec-dynamic-pages.
 
-For researchers, erosion produces a reproducibility crisis. A study built on the Twitter Academic API cannot be replicated at any price today. Papers that cite Pushshift point at an archive that no longer accepts queries. When the data underlying published findings disappears, the scientific record quietly loses its evidentiary base [@davidson2023platform]. And migration to federated platforms — Mastodon, Bluesky — solves some access problems (@sec-social) while complicating basic measurement: there is no single API endpoint for "all of Mastodon," because there is no single Mastodon.
+For researchers, erosion produces a reproducibility crisis. A study built on the Twitter Academic API cannot be replicated at any price today. Papers that cite Pushshift point at an archive that no longer accepts their queries. When the data underlying published findings disappears, the scientific record quietly loses its evidentiary base [@davidson2023platform]. And migration to federated platforms — Mastodon, Bluesky — solves some access problems (@sec-social) while complicating basic measurement: there is no single API endpoint for "all of Mastodon," because there is no single Mastodon.
 
 Erosion is also why two later chapters exist. The Wayback Machine (@sec-archives) is counter-erosion infrastructure — a deliberate institutional bet that the web is worth preserving. And automation (@sec-automation) is counter-erosion practice: if data disappears, systematic collection *now* is the only insurance for research *later*.
+
+## Auditing Access Yourself
+
+Enclosure, exemption, and erosion are claims about the world, and claims about the world can be checked. This section builds two small audits. Neither needs an API key, an account, or an application. Both are things you can re-run against any platform you care about, and both produce evidence you could put in a paper.
+
+A warning about what follows: these audits report the web as it is *today*. The outputs printed below were recorded on 28 August 2026, and yours will differ. That is the point. A chapter about disappearing access that shipped fixed numbers would be making the mistake it is warning you about.
+
+### An Access Matrix
+
+The first audit asks one question of a list of endpoints: *if I show up with no credentials, what happens?*
+
+```{python}
+import requests
+import pandas as pd
+
+# Identify yourself. @sec-ethics explains why this header matters; here it
+# is already load-bearing, because several of these hosts answer anonymous
+# library defaults differently than they answer a named client.
+HEADERS = {"User-Agent": "WebDataScience/1.0 (INFO 4617; you@colorado.edu)"}
+
+# Endpoints that ask for no key, no account, and no application.
+TARGETS = {
+    "Wikipedia":   "https://en.wikipedia.org/w/api.php?action=query&meta=siteinfo&format=json",
+    "Hacker News": "https://hacker-news.firebaseio.com/v0/topstories.json",
+    "arXiv":       "http://export.arxiv.org/api/query?search_query=all:electron&max_results=1",
+    "Mastodon":    "https://mastodon.social/api/v1/instance",
+    "Bluesky":     "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=bsky.app",
+    "Reddit":      "https://www.reddit.com/r/python/hot.json?limit=1",
+    "X (Twitter)": "https://api.twitter.com/2/tweets/search/recent?query=test",
+    "Meta Graph":  "https://graph.facebook.com/v20.0/me",
+}
+
+
+def probe(name, url):
+    """Ask one endpoint for data without credentials and describe the answer.
+
+    Returns a row rather than printing, so the results compose into a table.
+    A request that never completes is a result too, so the exception is
+    recorded instead of ending the audit.
+    """
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=20)
+    except requests.RequestException as error:
+        return {"api": name, "status": None, "verdict": "unreachable",
+                "content_type": type(error).__name__, "rate_limit": None}
+
+    if response.status_code == 200:
+        verdict = "open"
+    elif response.status_code in (401, 403):
+        verdict = "gated"
+    else:
+        verdict = "other"
+
+    return {
+        "api": name,
+        "status": response.status_code,
+        "verdict": verdict,
+        # What a host sends back is as informative as the code it sends.
+        "content_type": response.headers.get("content-type", "").split(";")[0],
+        "rate_limit": response.headers.get("x-ratelimit-limit"),
+    }
+
+
+access = pd.DataFrame([probe(name, url) for name, url in TARGETS.items()])
+access["status"] = access["status"].astype("Int64")
+print(access.to_string(index=False))
+```
+
+```
+        api  status verdict             content_type rate_limit
+  Wikipedia     200    open         application/json        NaN
+Hacker News     200    open         application/json        NaN
+      arXiv     200    open     application/atom+xml        NaN
+   Mastodon     200    open         application/json        300
+    Bluesky     200    open         application/json        NaN
+     Reddit     403   gated                text/html        NaN
+X (Twitter)     401   gated application/problem+json        NaN
+ Meta Graph     400   other         application/json        NaN
+```
+
+Five open, two gated, one refusing outright. Read the rows rather than the totals, because the useful information is in the differences.
+
+Wikipedia, Hacker News, and arXiv answer an anonymous request with data, and have done so for over a decade. They are run by a non-profit, a startup incubator, and a university consortium. None of them monetizes attention, and none has an incentive to fence the commons.
+
+Mastodon is the only host that volunteers its rate limit before you hit it. `x-ratelimit-limit: 300` states the budget up front, so a well-behaved client never has to discover the ceiling by crashing into it. That is openness as a design property rather than a press release.
+
+Reddit's row is the one to sit with. The status is 403, but the content type is `text/html` — that is not an API refusing you, it is a *web page* served where JSON should be. Reddit's public JSON endpoint was free from 2008 until the 2023 repricing described above. Today an unauthenticated request from a script gets a block page. Enclosure is not an abstraction in that row; it is a content-type header.
+
+X returns `application/problem+json` with a 401: a machine-readable "you are not authorized," which is at least an honest refusal. Meta's 400 says an access token must be used. Both are gates, but differently built ones, and knowing which you face determines whether applying for access would even help.
+
+### Reading the Failure, Not Just the Status Code
+
+Before you write down "this platform blocks unauthenticated access," rule out a more boring explanation: that something between you and the platform blocked it.
+
+This is not hypothetical. The first time this audit was run while drafting this chapter, GitHub's API returned 403 — which would have been a striking finding, since GitHub documents 60 unauthenticated requests per hour for anyone. The body explained it:
+
+```
+{"message":"GitHub access to this repository is not enabled for this session..."}
+```
+
+That was the sandbox the code was running in, not GitHub. Reporting it as enclosure would have been wrong in the specific way that makes a finding embarrassing: the measurement would have described the instrument rather than the thing measured.
+
+```{python}
+def diagnose(url):
+    """Show who actually answered, so a refusal can be attributed correctly."""
+    response = requests.get(url, headers=HEADERS, timeout=20)
+    print(f"status       {response.status_code}")
+    print(f"server       {response.headers.get('server')}")
+    print(f"via          {response.headers.get('via')}")
+    print(f"content-type {response.headers.get('content-type')}")
+    print(f"body         {response.text[:70]!r}")
+
+
+diagnose("https://www.reddit.com/r/python/hot.json?limit=1")
+```
+
+```
+status       403
+server       snooserv
+via          1.1 varnish
+content-type text/html
+body         '<body class=theme-beta><div><style>.theme-light,:root{--rem360:22.5rem'
+```
+
+`snooserv` is Reddit's own server software and `varnish` is its cache layer, so this refusal did come from Reddit. Had the `server` header named a proxy you did not choose, or the body described your own network, the correct conclusion would have been about your network instead.
+
+Three habits follow. Check `server` and `via` before attributing a block. Read the body, because a refusal usually says who is refusing. And retest from a second network when a result surprises you: campus wifi, a cloud VM, and a home connection are treated differently by the same platform, and a shared or cloud IP is far likelier to be rate-limited than a residential one.
+
+### Dead-Endpoint Forensics
+
+The second audit turns to endpoints that are no longer supposed to work. The naive expectation is that a dead API is simply unreachable. The reality is more varied, and the variety is diagnostic.
+
+```{python}
+RETIRED = {
+    "Pushshift (Reddit archive)": "https://api.pushshift.io/reddit/search/submission/?q=test&size=1",
+    "CrowdTangle (Meta)":         "https://api.crowdtangle.com/posts",
+    "Twitter API v1.1":           "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=nasa",
+}
+
+
+def autopsy(name, url):
+    """Ask a retired endpoint for data and classify how it refuses.
+
+    How an endpoint dies tells you whether anything can still be recovered
+    from it, so the manner of refusal is the finding.
+    """
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=25)
+    except requests.RequestException as error:
+        # No HTTP response at all: DNS, TLS, or the host is simply gone.
+        return {"endpoint": name, "status": None,
+                "cause": "host does not answer", "evidence": type(error).__name__}
+
+    causes = {
+        200: "still open",
+        400: "rejects the request without a token",
+        401: "still running, credentials now required",
+        403: "still running, credentials now required",
+        404: "host alive, endpoint removed",
+    }
+    return {"endpoint": name, "status": response.status_code,
+            "cause": causes.get(response.status_code, f"other ({response.status_code})"),
+            "evidence": response.text[:60].replace("\n", " ")}
+
+
+for name, url in RETIRED.items():
+    result = autopsy(name, url)
+    print(f"{result['endpoint']:<28} {str(result['status']):<6} {result['cause']}")
+    print(f"{'':<28} {'':<6} {result['evidence']}")
+```
+
+```
+Pushshift (Reddit archive)   403    still running, credentials now required
+                                    {"detail":"Not authenticated"}
+CrowdTangle (Meta)           None   host does not answer
+                                    ConnectionError
+Twitter API v1.1             400    rejects the request without a token
+                                    {"errors":[{"code":215,"message":"Bad Authentication data."}
+```
+
+Three deaths, three causes, and the differences matter.
+
+**Pushshift did not disappear.** It answers, and it answers in JSON: `{"detail":"Not authenticated"}`. The service still runs, now restricted to Reddit moderators. This is worth stating precisely, because the loss is usually described as the archive going away: "no longer accepts queries" means "no longer accepts queries *from you*." The distinction matters, because a gated service can in principle be negotiated with. A deleted one cannot.
+
+**CrowdTangle is genuinely gone.** There is no HTTP response at all, because the host does not answer. Meta shut it down in August 2024, and the shutdown was thorough: the endpoint is not returning 404, it is not resolving. This is enclosure completed, with nothing left to negotiate with.
+
+**Twitter v1.1 still parses your request** and rejects it with error code 215, "Bad Authentication data." The endpoint is alive and serving paying customers; you are simply not one of them. Repricing, not removal.
+
+The exact exception name in the `evidence` column depends on how you reach the network: a direct connection to a host that has vanished usually raises `ConnectionError`, while a machine behind a proxy raises `ProxyError` instead. Either way the `status` is `None`, and that is the part that matters — no HTTP conversation happened at all.
+
+For an endpoint in the second category, the only remaining evidence is archival. The Wayback Machine's availability API reports whether the documentation was captured before it went:
+
+```{python}
+def last_snapshot(url):
+    """Find the closest archived capture of a page.
+
+    The archive is infrastructure under constant load and answers 429 when
+    it is busy, so treat a rate-limit response as a real outcome rather than
+    a bug in your code. A shared campus or cloud IP hits this often.
+    """
+    response = requests.get("https://archive.org/wayback/available",
+                            params={"url": url}, headers=HEADERS, timeout=30)
+    if response.status_code == 429:
+        return "rate limited — wait and retry"
+    snapshot = response.json().get("archived_snapshots", {}).get("closest")
+    return snapshot["timestamp"] if snapshot else "no capture found"
+
+
+for page in ["api.pushshift.io", "www.crowdtangle.com"]:
+    print(f"{page:<24} {last_snapshot(page)}")
+```
+
+```
+api.pushshift.io         20230525131046
+www.crowdtangle.com      20240814023608
+```
+
+Those timestamps are the shutdowns themselves, written in the archival record. Pushshift's closest capture is 25 May 2023 — six weeks before Reddit's July 2023 pricing took effect and the enforcement wave cut the archive off. CrowdTangle's is 14 August 2024, the same month Meta retired it. The archive stops capturing a site shortly after the site stops being a site.
+
+@sec-archives develops this properly. The point here is narrower: when an endpoint dies, its documentation is often the only surviving description of what it used to offer, and that documentation is itself a web page subject to erosion. Archived docs are how you reconstruct what the dataset behind a five-year-old paper actually contained.
 
 ## Three Counter-Values
 
@@ -131,15 +352,30 @@ Students often arrive at this material with intuitions that the post-API age has
 
 ## Exercises
 
-1. **Timeline exercise.** Create a timeline of major API access changes from 2008 to the present. Include at least five events across at least three platforms. For each event, identify which of the three pressures (enclosure, exemption, erosion) best characterizes it.
+1. **Re-run the access matrix.** Run `probe()` against the eight endpoints in this chapter and compare your table to the one printed above. Any row that differs is a finding: note the endpoint, the old and new status, and the date. Then add three endpoints of your own for platforms you might actually study, and classify each as open, gated, or closed.
 
-2. **Framework application.** Choose a platform API change not discussed in this chapter. Write a 500-word analysis applying the enclosure/exemption/erosion framework.
+2. **Attribute a refusal.** Pick one endpoint that returned a non-200 for you and use `diagnose()` to establish who refused. Report the `server` and `via` headers and what the body says, then state whether the block came from the platform or from something between you and it. If you can, re-run the same request from a different network and report whether the answer changes.
 
-3. **Data contingency plan.** Design a research project that depends on a specific web data source. Then write a contingency plan: if your primary source disappears mid-study, what are your backup strategies? Consider at least three alternatives.
+3. **Extend the autopsy.** Find two more retired or restricted endpoints not covered here and classify each with `autopsy()`. For each, say whether it is gone, gated, or repriced, and what that implies for a researcher who needs its data: is there anyone to ask, and if so, who?
 
-4. **Public interest audit.** Identify a web data research project (published paper, journalism investigation, or civic tech tool) that was enabled by API access. Assess how the project would be affected by current access restrictions. Which of the three values — openness, oversight, or ownership — does the project embody?
+4. **Timeline exercise.** Create a timeline of major API access changes from 2008 to the present. Include at least five events across at least three platforms. For each event, identify which of the three pressures (enclosure, exemption, erosion) best characterizes it.
 
-5. **Graduate extension (INFO 5617).** Read @davidson2023platform and @perriam2020digital. Choose one platform and write a two-to-three page "state of research access" brief: what data researchers could obtain five years ago, what is available today and on what terms (cost, eligibility, restrictions), what official research-access programs exist, and which of this chapter's three pressures best explains the trajectory. Close with a concrete recommendation for a researcher starting a study of that platform this year.
+5. **Framework application.** Choose a platform API change not discussed in this chapter. Write a 500-word analysis applying the enclosure/exemption/erosion framework.
+
+6. **Data contingency plan.** Design a research project that depends on a specific web data source. Then write a contingency plan: if your primary source disappears mid-study, what are your backup strategies? Consider at least three alternatives.
+
+7. **Public interest audit.** Identify a web data research project (published paper, journalism investigation, or civic tech tool) that was enabled by API access. Assess how the project would be affected by current access restrictions. Which of the three values — openness, oversight, or ownership — does the project embody?
+
+8. **Graduate extension (INFO 5617).** Read @davidson2023platform and @perriam2020digital. Choose one platform and write a two-to-three page "state of research access" brief: what data researchers could obtain five years ago, what is available today and on what terms (cost, eligibility, restrictions), what official research-access programs exist, and which of this chapter's three pressures best explains the trajectory. Close with a concrete recommendation for a researcher starting a study of that platform this year.
+
+## Common Issues to Debug
+
+- **Every endpoint returns 403, including ones this chapter lists as open**: Something between you and the web is intercepting requests — a corporate proxy, a VPN, a locked-down campus network, or a cloud sandbox. Run `diagnose()` and read the `server` header and the body. If the refusal names your own network, the finding is about your network.
+- **An endpoint works in your browser but returns 403 in Python**: The site is treating your script differently from a browser. Check that you sent the `User-Agent` header; some hosts refuse library defaults outright. Note that this is exactly what Reddit does, and it is a finding rather than a bug.
+- **`archive.org` returns 429**: The Wayback Machine rate-limits by IP, and campus and cloud addresses are shared by many users. Wait several minutes and retry. Do not add threads to make it go faster — that makes it worse.
+- **`autopsy()` hangs instead of failing**: A host that has been shut down may drop packets rather than refuse the connection, so the request waits for the full timeout. That is why every request here passes `timeout=`. Without it, a dead host stops your notebook indefinitely.
+- **`access["status"].astype("Int64")` raises**: Use the capital-I `Int64` dtype, not `int64`. Only the capital form holds missing values, and `status` is `None` for any endpoint that never answered.
+- **Your table disagrees with the one printed above**: Expected, and worth writing down. Access changes; that is the chapter's argument. Record the date alongside the result so the observation stays interpretable later.
 
 ## Key Takeaways
 
@@ -151,6 +387,8 @@ The core argument of this chapter is that understanding *why* access is shrinkin
 - **Erosion** is infrastructural decay — link rot, platform churn, and disappearing datasets — and it makes reproducibility a design problem you must solve at collection time.
 - **Openness, oversight, and ownership** are the counter-values: document and deposit so your work resists enclosure, insist on inspectability, and prefer community-governed infrastructure.
 - The practical response is redundancy: master multiple access techniques (documents, archives, APIs, automation) so no single closure ends your research program.
+- Access is measurable, not just arguable. An unauthenticated probe tells you where a platform sits on the open-to-closed gradient today, and *how* a retired endpoint refuses — gone, gated, or repriced — tells you whether anyone is left to negotiate with.
+- Attribute refusals carefully. A 403 can come from the platform, from your network, or from something in between, and the `server` header and response body usually say which. A measurement that describes your instrument instead of your subject is worse than no measurement.
 
 ## Further Reading
 
