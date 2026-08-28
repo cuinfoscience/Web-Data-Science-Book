@@ -81,9 +81,7 @@ def clean_page_text(raw_text):
     # Remove common headers/footers (customize per document)
     text = re.sub(r'CITY COUNCIL MEETING MINUTES', '', text)
 
-    # Collapse runs of spaces and tabs — but NOT newlines. Line
-    # structure is real information in extracted PDF text (headings
-    # sit on their own lines), so we keep it
+    # Collapse runs of spaces and tabs — but NOT newlines. Line structure is real information in extracted PDF text (headings sit on their own lines), so we keep it
     text = re.sub(r'[ \t]+', ' ', text)
 
     # Strip each line and drop lines left empty by the removals above
@@ -119,11 +117,7 @@ amounts = re.findall(dollar_pattern, cleaned)
 header_pattern = r'CITY COUNCIL.*?MINUTES'
 cleaned = re.sub(header_pattern, '', cleaned)
 
-# 4. Section headings in ALL CAPS on their own line (at least 6
-#    characters, allowing digits and light punctuation for headings
-#    like "AGENDA ITEM 5A"). The class matches a literal space, not
-#    \s — \s would match newlines too, letting a single match
-#    swallow several consecutive heading lines
+# 4. Section headings in ALL CAPS on their own line (at least 6 characters, allowing digits and light punctuation for headings like "AGENDA ITEM 5A"). The class matches a literal space, not \s — \s would match newlines too, letting a single match swallow several consecutive heading lines
 heading_pattern = r'^[A-Z][A-Z0-9 .:&-]{5,}$'
 headings = re.findall(heading_pattern, cleaned, re.MULTILINE)
 # Returns: ['CALL TO ORDER', 'PUBLIC COMMENT', 'CONSENT AGENDA', 'ADJOURNMENT', ...]
@@ -180,13 +174,11 @@ def extract_attendance(pdf_path):
     # Attendance is typically on the first page
     first_page_text = reader.pages[0].extract_text()
 
-    # Cheap date extraction: filenames like council_minutes_2024_01.pdf
-    # encode the year and month — parse them rather than the PDF text
+    # Cheap date extraction: filenames like council_minutes_2024_01.pdf encode the year and month — parse them rather than the PDF text
     date_match = re.search(r'(\d{4})[_-](\d{2})', os.path.basename(pdf_path))
     meeting_date = f"{date_match.group(1)}-{date_match.group(2)}" if date_match else None
 
-    # Names follow "Present:" — capture up to "Absent:" if it appears
-    # on the same line, otherwise up to the end of the line
+    # Names follow "Present:" — capture up to "Absent:" if it appears on the same line, otherwise up to the end of the line
     present_match = re.search(r'Present:\s*(.*?)\s*(?:Absent:|$)',
                               first_page_text, re.IGNORECASE | re.MULTILINE)
 
@@ -440,16 +432,14 @@ You will build a small PDF-to-DataFrame pipeline on real government documents: d
 **Step 1 — Collect three PDFs.** Find three PDF documents from one government source — city council minutes or agendas, board meeting minutes, budget summaries. Download each with `requests` and your `HEADERS` (@sec-ethics), sleeping between downloads, and save them into a `pdfs/` directory — the caching discipline from @sec-static-pages, applied to documents.
 
 ```{python}
-# Step 1: Download three PDFs from one government source, politely,
-# into a pdfs/ directory.
+# Step 1: Download three PDFs from one government source, politely, into a pdfs/ directory.
 # Your code here
 ```
 
 **Step 2 — Open and inspect.** Open one of them with `PdfReader`. Print the number of pages and the raw extracted text of the first page.
 
 ```{python}
-# Step 2: Open one PDF with PdfReader; print the page count and the
-# raw text of page one.
+# Step 2: Open one PDF with PdfReader; print the page count and the raw text of page one.
 # Your code here
 ```
 
@@ -477,8 +467,7 @@ You will build a small PDF-to-DataFrame pipeline on real government documents: d
 **Step 6 — Visualize and inspect quality.** Plot your element's count per document. Then look at the characters-per-page figure for each document: did any document yield suspiciously little text?
 
 ```{python}
-# Step 6: Plot the element counts and compute characters per page for
-# each document.
+# Step 6: Plot the element counts and compute characters per page for each document.
 # Your code here
 ```
 

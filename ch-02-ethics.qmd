@@ -67,9 +67,7 @@ A `robots.txt` file lives at the root of a website (e.g., `https://example.com/r
 ```{python}
 import requests
 
-# Identify yourself. The next section explains why this header matters;
-# here it is already load-bearing, because Wikipedia refuses anonymous
-# library defaults with a 403.
+# Identify yourself. The next section explains why this header matters; here it is already load-bearing, because Wikipedia refuses anonymous library defaults with a 403.
 HEADERS = {
     "User-Agent": "WebDataScience/1.0 (INFO 4617; your-email@colorado.edu)"
 }
@@ -92,8 +90,7 @@ The key directives are `User-agent` (which crawler the rule applies to), `Disall
 ```{python}
 from urllib.robotparser import RobotFileParser
 
-# Hand the parser text you fetched yourself, rather than calling
-# rp.read(). The callout below explains what rp.read() does instead.
+# Hand the parser text you fetched yourself, rather than calling rp.read(). The callout below explains what rp.read() does instead.
 rp = RobotFileParser()
 rp.parse(response.text.splitlines())
 
@@ -312,24 +309,21 @@ You will audit how three websites govern automated access, using the tools this 
 **Step 2 — Fetch a robots.txt.** Retrieve `https://en.wikipedia.org/robots.txt` with your headers. Print the status code and the first 500 characters, as you printed a response body in @sec-introduction.
 
 ```{python}
-# Step 2: Fetch Wikipedia's robots.txt and print the status code and
-# the first 500 characters.
+# Step 2: Fetch Wikipedia's robots.txt and print the status code and the first 500 characters.
 # Your code here
 ```
 
 **Step 3 — Parse it properly.** Create a `RobotFileParser`, feed it the text you fetched with `rp.parse(text.splitlines())` — not `rp.read()`, for the reason the chapter explains — and test `can_fetch("*", ...)` on three URLs: an article under `/wiki/`, something under `/w/`, and a `Special:` page. Print all three results.
 
 ```{python}
-# Step 3: Parse the file with rp.parse(text.splitlines()) and test
-# can_fetch() on three different paths.
+# Step 3: Parse the file with rp.parse(text.splitlines()) and test can_fetch() on three different paths.
 # Your code here
 ```
 
 **Step 4 — Widen the comparison.** Pick two more websites you actually use. Fetch each site's `robots.txt` politely — with your headers and `time.sleep(1)` between requests — and for each file count total lines, `Disallow` rules, and `Allow` rules, following the chapter's comparison code.
 
 ```{python}
-# Step 4: Fetch robots.txt for two sites of your choice, sleeping between
-# requests, and count lines, Disallow rules, and Allow rules for each.
+# Step 4: Fetch robots.txt for two sites of your choice, sleeping between requests, and count lines, Disallow rules, and Allow rules for each.
 # Your code here
 ```
 

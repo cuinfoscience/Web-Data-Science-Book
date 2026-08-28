@@ -447,8 +447,7 @@ The real analytical power of the MediaWiki API emerges when you combine data fro
 
 ```{python}
 # Get monthly revision counts for Elizabeth II in 2022.
-# Revision timestamps parse as timezone-aware UTC (their ISO strings end in "Z");
-# drop the timezone so they align with the tz-naive pageview timestamps
+# Revision timestamps parse as timezone-aware UTC (their ISO strings end in "Z"); drop the timezone so they align with the tz-naive pageview timestamps
 df_revisions["timestamp"] = pd.to_datetime(df_revisions["timestamp"]).dt.tz_localize(None)
 monthly_revs = (df_revisions
     .set_index("timestamp")
@@ -492,8 +491,7 @@ You will build a complete profile of one Wikipedia article: who reads it, who wr
 **Step 1 — Choose an article and get its pageviews.** Pick an article on a topic that had at least one newsworthy moment in the past year. Define your `HEADERS` (@sec-ethics), then use the chapter's `get_pageviews()` (or your own version of it) to retrieve a full year of daily views. Build the DataFrame and plot the series.
 
 ```{python}
-# Step 1: Retrieve a year of daily pageviews for your article, build the
-# DataFrame, and plot it.
+# Step 1: Retrieve a year of daily pageviews for your article, build the DataFrame, and plot it.
 # Your code here
 ```
 
@@ -507,8 +505,7 @@ You will build a complete profile of one Wikipedia article: who reads it, who wr
 **Step 3 — Get the revision history.** Use the chapter's `get_revisions()` pattern — following continuation tokens so you page through the full history — and build a DataFrame of revisions with user and timestamp columns. Print the total count and the date range.
 
 ```{python}
-# Step 3: Retrieve the full revision history, handling pagination, and
-# build a revisions DataFrame.
+# Step 3: Retrieve the full revision history, handling pagination, and build a revisions DataFrame.
 # Your code here
 ```
 

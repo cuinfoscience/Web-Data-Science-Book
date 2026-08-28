@@ -31,9 +31,7 @@ import requests
 url = "https://www.cnn.com"
 timestamp = "20000815"  # August 15, 2000
 
-# Pass query arguments as a params dictionary — requests handles the
-# URL encoding, which matters here because one of the values is
-# itself a URL
+# Pass query arguments as a params dictionary — requests handles the URL encoding, which matters here because one of the values is itself a URL
 api_url = "https://archive.org/wayback/available"
 response = requests.get(api_url, params={"url": url, "timestamp": timestamp})
 data = response.json()
@@ -53,8 +51,7 @@ The API returns the closest snapshot to your requested timestamp. Before you ret
 ```{python}
 from bs4 import BeautifulSoup
 
-# Append id_ to the timestamp to request the original, unmodified
-# capture — no Wayback toolbar, no rewritten links
+# Append id_ to the timestamp to request the original, unmodified capture — no Wayback toolbar, no rewritten links
 ts = snapshot["timestamp"]
 archived_url = snapshot["url"].replace(ts, ts + "id_")
 
@@ -89,8 +86,7 @@ def get_snapshot_stats(url, timestamp, headers=None):
         if not api_data.get("archived_snapshots"):
             return None
 
-        # Fetch the original capture (id_), not the toolbar-wrapped
-        # version, so the statistics measure the page and only the page
+        # Fetch the original capture (id_), not the toolbar-wrapped version, so the statistics measure the page and only the page
         closest = api_data["archived_snapshots"]["closest"]
         snapshot_url = closest["url"].replace(
             closest["timestamp"], closest["timestamp"] + "id_"
@@ -196,8 +192,7 @@ plt.show()
 The raw CDX feed includes every capture attempt — failed requests, redirects, and duplicate captures that can skew your analysis. Because our query already filtered to status 200 and collapsed identical captures on the server side, the DataFrame arrives analysis-ready; had you omitted those parameters, the equivalent pandas filter would be `df[df["statuscode"] == "200"]`. Prefer the server-side version: it transfers less data and leaves less cleanup code to maintain.
 
 ```{python}
-# Every row is already a successful, distinct capture (filtered
-# server-side), so we can go straight to trend analysis
+# Every row is already a successful, distinct capture (filtered server-side), so we can go straight to trend analysis
 df_ok = df.set_index("timestamp")
 
 # Resample to quarterly frequency
@@ -284,8 +279,7 @@ def get_wayback_content(url, date, headers=None):
         if not api_data.get("archived_snapshots"):
             return None
 
-        # Fetch the original capture (id_) so the extracted text doesn't
-        # include the Wayback toolbar and banner
+        # Fetch the original capture (id_) so the extracted text doesn't include the Wayback toolbar and banner
         closest = api_data["archived_snapshots"]["closest"]
         snapshot_url = closest["url"].replace(
             closest["timestamp"], closest["timestamp"] + "id_"
@@ -484,8 +478,7 @@ You will reconstruct the archival history of one website you care about, then me
 **Step 2 — Build the capture DataFrame.** The first row of the response is the column headers. Build a DataFrame from the rest, convert `timestamp` with `pd.to_datetime()` (format `"%Y%m%d%H%M%S"`), and convert `length` to numeric. Print the date range and total number of captures.
 
 ```{python}
-# Step 2: Build a DataFrame of captures with real datetimes and numeric
-# lengths. Print the date range and capture count.
+# Step 2: Build a DataFrame of captures with real datetimes and numeric lengths. Print the date range and capture count.
 # Your code here
 ```
 
@@ -499,16 +492,14 @@ You will reconstruct the archival history of one website you care about, then me
 **Step 4 — Retrieve two raw captures.** Take the earliest and the most recent capture. Fetch each snapshot with the `id_` suffix on the timestamp — the chapter explains why the toolbar-wrapped version would poison your measurements — sleeping between requests, and cache both pages to local files as you did in @sec-static-pages.
 
 ```{python}
-# Step 4: Fetch the earliest and latest captures with the id_ suffix,
-# politely, and cache both to disk.
+# Step 4: Fetch the earliest and latest captures with the id_ suffix, politely, and cache both to disk.
 # Your code here
 ```
 
 **Step 5 — Measure the change.** Extract the visible text of both cached captures with BeautifulSoup, preprocess each with the chapter's `preprocess_document()` (tokenize, lowercase, remove stopwords), and compute the bag-of-words similarity between them.
 
 ```{python}
-# Step 5: Extract text from both captures, preprocess, and compute
-# their similarity.
+# Step 5: Extract text from both captures, preprocess, and compute their similarity.
 # Your code here
 ```
 

@@ -458,8 +458,7 @@ You will parse one real dataset in each format: an RSS feed (XML) and a weather 
 **Step 1 — Set up politely.** Define your `HEADERS` with a named `User-Agent` (@sec-ethics). Find an RSS feed from a news outlet you read — most sites serve one at `/rss` or `/feed` — and check the site's `robots.txt` permits fetching it.
 
 ```{python}
-# Step 1: Define HEADERS and choose an RSS feed URL you have checked
-# against the site's robots.txt.
+# Step 1: Define HEADERS and choose an RSS feed URL you have checked against the site's robots.txt.
 # Your code here
 ```
 
@@ -473,24 +472,21 @@ You will parse one real dataset in each format: an RSS feed (XML) and a weather 
 **Step 3 — Parse the tree.** Parse the response with BeautifulSoup's `"xml"` parser, use `find_all()` to collect the items, and print how many the feed contains.
 
 ```{python}
-# Step 3: Parse with the "xml" parser, find_all the repeating items,
-# and count them.
+# Step 3: Parse with the "xml" parser, find_all the repeating items, and count them.
 # Your code here
 ```
 
 **Step 4 — Extract to a DataFrame.** Loop over the items, building a list of dictionaries with each item's title, link, and publication date — the list-of-dictionaries pattern from this chapter — then convert to a DataFrame.
 
 ```{python}
-# Step 4: Build a list of dicts (title, link, pubDate) and convert
-# it to a DataFrame.
+# Step 4: Build a list of dicts (title, link, pubDate) and convert it to a DataFrame.
 # Your code here
 ```
 
 **Step 5 — Fetch nested JSON.** Retrieve the Boulder forecast from `https://api.open-meteo.com/v1/forecast?latitude=40.01&longitude=-105.27&daily=temperature_2m_max&timezone=America/Denver` and parse it with `.json()`. Print the top-level keys, then the keys under `"daily"` — map the nesting before you extract anything.
 
 ```{python}
-# Step 5: Fetch the Open-Meteo forecast, parse the JSON, and print the
-# top-level keys and the keys nested under "daily".
+# Step 5: Fetch the Open-Meteo forecast, parse the JSON, and print the top-level keys and the keys nested under "daily".
 # Your code here
 ```
 

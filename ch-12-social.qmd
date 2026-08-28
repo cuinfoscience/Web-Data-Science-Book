@@ -44,8 +44,7 @@ reddit = praw.Reddit(
     user_agent="WebDataScience/1.0 by u/your_username"
 )
 
-# Verify the client is working: with app-only credentials, PRAW
-# operates in read-only mode
+# Verify the client is working: with app-only credentials, PRAW operates in read-only mode
 print(f"Read-only mode: {reddit.read_only}")
 # Read-only mode: True
 ```
@@ -505,16 +504,14 @@ You will profile and compare the public activity of two Bluesky accounts. Bluesk
 **Step 1 — Authenticate.** Create an app password in Bluesky's settings (never your real password — the chapter explains the difference), log in with the `atproto` `Client`, and print your own handle to confirm the session works. Keep the credential out of the notebook, loading it the way you loaded API keys in @sec-government.
 
 ```{python}
-# Step 1: Log in with the atproto Client using an app password loaded
-# from an environment variable. Confirm with your handle, not the secret.
+# Step 1: Log in with the atproto Client using an app password loaded from an environment variable. Confirm with your handle, not the secret.
 # Your code here
 ```
 
 **Step 2 — Retrieve one account's posts.** Choose your first account and retrieve its 50 most recent posts with `get_author_feed`, building the list-of-dictionaries the chapter shows: text, created_at, likes, reposts, and whether each post is a reply. Convert to a DataFrame.
 
 ```{python}
-# Step 2: Retrieve 50 posts from your first account with get_author_feed
-# and build a DataFrame.
+# Step 2: Retrieve 50 posts from your first account with get_author_feed and build a DataFrame.
 # Your code here
 ```
 
@@ -528,8 +525,7 @@ You will profile and compare the public activity of two Bluesky accounts. Bluesk
 **Step 4 — Repeat for a second account.** Pick a second account you expect to behave differently — an institution vs. a person, a news outlet vs. a researcher — and run Steps 2–3 for it. Wrap the work in a function so you write the logic once, as you learned in @sec-static-pages.
 
 ```{python}
-# Step 4: Write a profile_account(handle) function and run it on your
-# second account.
+# Step 4: Write a profile_account(handle) function and run it on your second account.
 # Your code here
 ```
 

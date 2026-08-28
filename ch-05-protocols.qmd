@@ -266,8 +266,7 @@ session.headers.update(
     {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 )
 
-# Retry up to 3 times on rate limits and server errors,
-# waiting 1s, 2s, then 4s between attempts
+# Retry up to 3 times on rate limits and server errors, waiting 1s, 2s, then 4s between attempts
 retries = Retry(
     total=3,
     backoff_factor=1,
@@ -336,8 +335,7 @@ access = "all-access"
 agent = "all-agents"
 article = "University of Colorado Boulder"  # Note the spaces
 
-# Wikipedia titles replace spaces with underscores; quote() percent-encodes
-# anything else that would break a path segment (slashes, question marks)
+# Wikipedia titles replace spaces with underscores; quote() percent-encodes anything else that would break a path segment (slashes, question marks)
 encoded_article = quote(article.replace(" ", "_"), safe="")
 print(encoded_article)
 # University_of_Colorado_Boulder
@@ -404,16 +402,14 @@ You will build a URL diagnostic tool from the protocol layers this chapter cover
 **Step 3 — Request with named headers.** Define your `HEADERS` (@sec-ethics) and request one of the three URLs from Step 1. Print the status code and three response headers: `Content-Type`, `Server`, and `Content-Length` (or the length of `response.content` if the header is absent).
 
 ```{python}
-# Step 3: Make a request with your HEADERS and print the status code and
-# three response headers.
+# Step 3: Make a request with your HEADERS and print the status code and three response headers.
 # Your code here
 ```
 
 **Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check `response.history`, and if it redirected, print where it ended up. Include a docstring.
 
 ```{python}
-# Step 4: Write diagnose_url(url) -- status, content-type, server, size,
-# and the redirect chain if any. Include a docstring.
+# Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring.
 # Your code here
 ```
 

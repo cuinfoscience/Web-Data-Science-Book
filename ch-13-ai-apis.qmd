@@ -474,40 +474,35 @@ You will run a miniature human–AI agreement study: classify a small corpus you
 **Step 1 — Configure the client.** Load your API key from an environment variable (@sec-government) and create the client, following the chapter's setup. Confirm it works with a single trivial completion. Never paste the key into the notebook you submit.
 
 ```{python}
-# Step 1: Load your API key from the environment, create the client, and
-# run one test completion.
+# Step 1: Load your API key from the environment, create the client, and run one test completion.
 # Your code here
 ```
 
 **Step 2 — Assemble a corpus.** Collect 15 short text items using any earlier chapter's technique — Bluesky posts (@sec-social), Wikipedia revision comments (@sec-wikipedia), RSS headlines (@sec-data-formats). Put them in a DataFrame with an `id` and a `text` column, and save it to CSV before spending any API budget on it (@sec-introduction).
 
 ```{python}
-# Step 2: Collect 15 short texts with an earlier chapter's method, build
-# a DataFrame, and save it to CSV.
+# Step 2: Collect 15 short texts with an earlier chapter's method, build a DataFrame, and save it to CSV.
 # Your code here
 ```
 
 **Step 3 — Design the task and label by hand.** Define a classification scheme with three or four mutually exclusive labels appropriate to your corpus (e.g., news / opinion / promotion / other). Write the labels and one-sentence definitions in a comment, then classify all 15 items yourself, adding a `human_label` column. Do this *before* the model sees anything — order matters for honesty.
 
 ```{python}
-# Step 3: Define your labels in a comment and hand-label all 15 items
-# into a human_label column BEFORE running the model.
+# Step 3: Define your labels in a comment and hand-label all 15 items into a human_label column BEFORE running the model.
 # Your code here
 ```
 
 **Step 4 — Prompt the model.** Write a classification prompt using the chapter's few-shot pattern: the label set, the definitions, one example per label, and the instruction to answer with a single label only. Loop it over the corpus into a `model_label` column, keeping temperature at 0 as the chapter recommends for classification.
 
 ```{python}
-# Step 4: Write the few-shot prompt and classify all 15 items into a
-# model_label column.
+# Step 4: Write the few-shot prompt and classify all 15 items into a model_label column.
 # Your code here
 ```
 
 **Step 5 — Measure agreement.** Compute the agreement rate, and cross-tabulate `human_label` against `model_label` with `pd.crosstab()`. Pull out the disagreeing rows and read them.
 
 ```{python}
-# Step 5: Compute the agreement rate, build the crosstab, and display
-# every disagreement.
+# Step 5: Compute the agreement rate, build the crosstab, and display every disagreement.
 # Your code here
 ```
 

@@ -31,7 +31,7 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
 - **Person**: Second person ("you"). Address the reader directly as a student learning these skills.
 - **Tone**: Formal but approachable, engaging, and supportive. Think "experienced mentor explaining things clearly" rather than "textbook lecturing." Occasional humor is welcome, but keep it dry and relevant.
 - **Audience**: Advanced undergraduates and early-career master's students with some Python experience. They know loops, functions, lists, and dictionaries, but may not have experience with web protocols, APIs, or HTML parsing.
-- **Code style**: Narrative code blocks with comments. Code is set to `eval: false` globally — students run code themselves. Include expected output as comments where it helps comprehension. Use meaningful variable names and include docstrings in functions.
+- **Code style**: Narrative code blocks with comments. Code is set to `eval: false` globally — students run code themselves. Include expected output as comments where it helps comprehension. Use meaningful variable names and include docstrings in functions. **Each comment lives on one line — never hard-wrap a comment sentence across lines**; let the editor soft-wrap. This applies to the Recommended Exercises scaffold cells and every other code block.
 - **Chapter structure**: Each chapter follows a consistent pattern:
   1. Learning objectives (bulleted list in a callout)
   2. Conceptual introduction with motivation
