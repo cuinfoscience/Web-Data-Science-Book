@@ -1,0 +1,114 @@
+name: Something is wrong
+description: Code that does not run, a wrong result, a dead link, or an outdated screenshot
+title: "Broken: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when something in the book **is wrong or no longer works**.
+
+        The web changes underneath this book: sites rename their CSS classes, APIs
+        add parameters, screenshots go stale. Finding one of those is a real
+        contribution, and you do not need to know how to fix it.
+
+  - type: dropdown
+    id: chapter
+    attributes:
+      label: Where is it?
+      description: Pick the chapter.
+      options:
+        - "Ch. 1 — Introduction to Web Data Science"
+        - "Ch. 2 — Ethics, Law, and Responsible Data Collection"
+        - "Ch. 3 — The Post-API Age"
+        - "Ch. 4 — Data Formats: XML and JSON"
+        - "Ch. 5 — Web Architecture and Protocols"
+        - "Ch. 6 — Parsing Static Web Pages"
+        - "Ch. 7 — Archived Web Pages and the Wayback Machine"
+        - "Ch. 8 — Dynamic Web Pages with Selenium"
+        - "Ch. 9 — Extracting Data from PDFs"
+        - "Ch. 10 — Introduction to APIs: Wikipedia"
+        - "Ch. 11 — Government Data APIs"
+        - "Ch. 12 — Social and Media Platform APIs"
+        - "Ch. 13 — AI and Language Model APIs"
+        - "Ch. 14 — Automating Data Collection"
+        - "Ch. 15 — Research Design with Web Data"
+        - "An appendix"
+        - "A companion notebook"
+    validations:
+      required: true
+
+  - type: input
+    id: section
+    attributes:
+      label: Which section or heading?
+      description: Copy the nearest heading, so we can find the spot.
+      placeholder: "Comparing robots.txt Across Platforms"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is wrong?
+      options:
+        - "Code does not run — it raises an error"
+        - "Code runs, but the result is wrong or not what the text says"
+        - "A screenshot or figure no longer matches what I see"
+        - "A link is dead or goes to the wrong place"
+        - "A fact, name, date, or citation looks incorrect"
+        - "Something else"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect, and what happened instead?
+      description: |
+        Say what the book told you would happen, then what actually happened.
+      placeholder: |
+        The text says this prints True for the article URL. It printed False.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Paste the evidence
+      description: |
+        The code you ran and the output or error you got. Paste the whole error,
+        including the last few lines — that is usually the part that matters.
+        For a stale screenshot, describe what you see now, or attach a new one.
+      render: text
+      placeholder: |
+        >>> rp.can_fetch("*", "https://en.wikipedia.org/wiki/Python_(programming_language)")
+        False
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Python version
+      description: Run `python --version` if you are not sure. Leave blank if this is not about code.
+      placeholder: "3.11.4"
+    validations:
+      required: false
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Do you know the fix?
+      description: Optional. If you worked out what is wrong, say so. If not, leave this blank — the report is still useful.
+      placeholder: "The selector changed; the table now uses class 'wikitable sortable jquery-tablesorter'."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched the open issues and did not find this one already reported.
+          required: true
