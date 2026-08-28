@@ -296,19 +296,69 @@ When does web scraping become human subjects research? The general rule is that 
 
 The line is not always clear. Scraping aggregated, anonymous data (like Wikipedia edit counts without usernames) falls into a gray area. When in doubt, consult your institution's IRB. Many universities have expedited review processes for minimal-risk research involving publicly available data, and the process of writing an IRB protocol forces you to think carefully about privacy, consent, and data security — exactly the issues this chapter's framework addresses. The Belmont Report's principles complement the five-question framework above: respect for persons maps to consent, beneficence to proportionality and privacy, and justice to the question of who bears the risks and who receives the benefits of your research.
 
-## Exercises
+## Recommended Exercises
 
-1. **Compare robots.txt files.** Retrieve and compare `robots.txt` for five websites in the same category (e.g., five news organizations, five universities, or five social media platforms). What patterns emerge in what they allow and restrict? Write a brief analysis in a Markdown cell.
+This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or in @sec-introduction.
 
-2. **Terms of Service audit.** Read the Terms of Service for a platform you use regularly. Identify three clauses that restrict automated data collection. For each, assess whether academic research would be covered by any exceptions or fair use arguments.
+You will audit how three websites govern automated access, using the tools this chapter introduced: a named `User-Agent`, `robots.txt`, `RobotFileParser`, and polite request pacing.
 
-3. **Ethical decision framework.** Apply the five-question framework to a hypothetical scenario: a researcher wants to scrape user profiles from a dating app to study patterns in self-presentation across demographic groups. Work through each question and write a recommendation.
+**Step 1 — Identify yourself.** Define a `HEADERS` dictionary with a `User-Agent` string that names this course and includes your email, following the chapter's pattern. You will send it with every request in this exercise.
 
-4. **Rate limiting experiment.** Using `time.time()` to measure elapsed time, write a loop that makes five requests to a public website with a one-second delay between each. Then modify the delay to two seconds. Confirm that your actual request timing matches your intended rate.
+```{python}
+# Step 1: Define HEADERS with a User-Agent naming the course and your email.
+# Your code here
+```
 
-5. **Personal robots.txt audit.** Retrieve `robots.txt` for a website you use daily but have never scraped. Read the `Disallow` rules carefully. Then find and read the site's Terms of Service (look for links in the footer). Write a 300-word analysis: if you wanted to collect data from this site for a class project, what would `robots.txt`, the Terms of Service, and the five-question ethical framework each permit and restrict? Where do these three sources of guidance agree, and where do they conflict?
+**Step 2 — Fetch a robots.txt.** Retrieve `https://en.wikipedia.org/robots.txt` with your headers. Print the status code and the first 500 characters, as you printed a response body in @sec-introduction.
 
-6. **Graduate extension (INFO 5617).** Read @fiesler2020no alongside the EFF's CFAA explainer and a summary of *Van Buren v. United States*. Then write a two-page memo advising a university research team that wants to collect public data from three platforms of your choosing. For each platform, make an explicit determination on four dimensions: CFAA exposure after *Van Buren*, Terms of Service and contract risk after *hiQ*, `robots.txt` guidance, and whether the project likely requires IRB review. Conclude with a collection protocol the team should follow.
+```{python}
+# Step 2: Fetch Wikipedia's robots.txt and print the status code and
+# the first 500 characters.
+# Your code here
+```
+
+**Step 3 — Parse it properly.** Create a `RobotFileParser`, feed it the text you fetched with `rp.parse(text.splitlines())` — not `rp.read()`, for the reason the chapter explains — and test `can_fetch("*", ...)` on three URLs: an article under `/wiki/`, something under `/w/`, and a `Special:` page. Print all three results.
+
+```{python}
+# Step 3: Parse the file with rp.parse(text.splitlines()) and test
+# can_fetch() on three different paths.
+# Your code here
+```
+
+**Step 4 — Widen the comparison.** Pick two more websites you actually use. Fetch each site's `robots.txt` politely — with your headers and `time.sleep(1)` between requests — and for each file count total lines, `Disallow` rules, and `Allow` rules, following the chapter's comparison code.
+
+```{python}
+# Step 4: Fetch robots.txt for two sites of your choice, sleeping between
+# requests, and count lines, Disallow rules, and Allow rules for each.
+# Your code here
+```
+
+**Step 5 — Tabulate.** Build a DataFrame with one row per site (all three) and columns for line count, Disallow count, Allow count, and the value of `crawl_delay("*")` if the parser reports one.
+
+```{python}
+# Step 5: Build a DataFrame summarizing all three sites' robots.txt rules.
+# Your code here
+```
+
+**Step 6 — Interpret.** In four to six sentences: Which of your three sites is most restrictive, and is that what its line count alone would have suggested? (Recall the chapter's warning that length is not restrictiveness.) What does each file suggest about the organization's relationship to automated access? If you wanted to collect data from your two chosen sites for a class project, what would each file permit?
+
+```{python}
+# Step 6: Write your answer here as comments, or convert this cell to Markdown.
+```
+
+## Additional Exercises
+
+These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.
+
+1. **Terms of Service audit.** Read the Terms of Service for a platform you use regularly. Identify three clauses that restrict automated data collection. For each, assess whether academic research would be covered by any exceptions or fair use arguments.
+
+2. **Ethical decision framework.** Apply the five-question framework to a hypothetical scenario: a researcher wants to scrape user profiles from a dating app to study patterns in self-presentation across demographic groups. Work through each question and write a recommendation.
+
+3. **Rate limiting experiment.** Using `time.time()` to measure elapsed time, write a loop that makes five requests to a public website with a one-second delay between each. Then modify the delay to two seconds. Confirm that your actual request timing matches your intended rate.
+
+4. **Personal robots.txt audit.** Retrieve `robots.txt` for a website you use daily but have never scraped. Read the `Disallow` rules carefully. Then find and read the site's Terms of Service (look for links in the footer). Write a 300-word analysis: if you wanted to collect data from this site for a class project, what would `robots.txt`, the Terms of Service, and the five-question ethical framework each permit and restrict? Where do these three sources of guidance agree, and where do they conflict?
+
+5. **Graduate extension (INFO 5617).** Read @fiesler2020no alongside the EFF's CFAA explainer and a summary of *Van Buren v. United States*. Then write a two-page memo advising a university research team that wants to collect public data from three platforms of your choosing. For each platform, make an explicit determination on four dimensions: CFAA exposure after *Van Buren*, Terms of Service and contract risk after *hiQ*, `robots.txt` guidance, and whether the project likely requires IRB review. Conclude with a collection protocol the team should follow.
 
 ::: {.callout-note}
 ## Public Interest Connection

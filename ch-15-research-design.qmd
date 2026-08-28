@@ -299,9 +299,64 @@ Academic researchers can learn several things from this model. Data journalists 
 
 The practitioners who do this work well — computational social scientists, civic technologists, data journalists — share a common profile: they combine data fluency with deep domain expertise. They understand not just how to scrape a website or query an API but why the data matters, who it affects, and what questions it can and cannot answer. This integration of technical and substantive knowledge is precisely what this book aims to develop. The tools you have learned are necessary but not sufficient; pairing them with domain knowledge, ethical reflection, and a commitment to public accountability is what transforms data collection into genuine contribution.
 
-## Exercises
+## Recommended Exercises
 
-1. **Research proposal.** Write a 1,500-word research proposal for a web data science project. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.
+This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook and submit the completed notebook. This chapter's exercise is written rather than coded: each cell below asks for a few sentences, not a program. Write your answers as comments or convert the cells to Markdown — either is fine. The steps follow the proposal arc from this chapter, and each should take a paragraph at most.
+
+By the end you will have a one-page skeleton of a research design — the seed of the Final Project proposal, and of the full proposal in the Additional Exercises.
+
+**Step 1 — The question.** State one research question that web data could answer. Apply this chapter's criteria: it should be specific enough to be answerable, and it should name the *construct* you actually care about (attention, opinion, participation, price), not just a dataset you find interesting.
+
+```{python}
+# Step 1: State your research question, and name the construct it is
+# really about. Write as comments, or convert this cell to Markdown.
+```
+
+**Step 2 — The data source and access method.** Name the data source that would answer it and the specific technique from this book you would use — an API (@sec-wikipedia, @sec-government, @sec-social), scraping (@sec-static-pages, @sec-dynamic-pages), archives (@sec-archives), PDFs (@sec-pdfs), or automated collection (@sec-automation). Note what the source's access rules (@sec-ethics, @sec-post-api) permit.
+
+```{python}
+# Step 2: Name the source, the chapter technique you would use, and what
+# the access rules permit.
+```
+
+**Step 3 — The design.** Which of the chapter's four designs is this — longitudinal tracking, cross-sectional snapshot, content analysis, or a natural experiment? Say why that design fits your question, and what your unit of analysis is.
+
+```{python}
+# Step 3: Name the design, justify it, and state the unit of analysis.
+```
+
+**Step 4 — Sampling and representativeness.** Who or what is in your data, and who is missing? Apply the chapter's discussion: what population does your source actually represent, and how does that differ from the population your question is about?
+
+```{python}
+# Step 4: Describe the sample, the population it represents, and the gap
+# between that and the population your question targets.
+```
+
+**Step 5 — Measurement validity.** Make the construct-validity argument: why does the thing you can count (pageviews, posts, mentions, dollar amounts) measure the thing you care about? Name the strongest objection to that link, and one check that would strengthen it.
+
+```{python}
+# Step 5: Make the construct validity argument, name its weakest point,
+# and propose one validation check.
+```
+
+**Step 6 — Limitations and contingency.** Name the two threats most likely to undermine the study — draw on the chapter's validity discussion and the erosion scenarios of @sec-post-api — and write a one-sentence contingency for each: if the source closes or changes mid-study, what is your fallback?
+
+```{python}
+# Step 6: Two biggest threats, and a contingency plan for each.
+```
+
+**Step 7 — Ethics and human subjects.** Does this study involve people's data? Apply the chapter's IRB discussion and the framework from @sec-ethics: would it need review, what would you collect at minimum, and what would you refuse to collect?
+
+```{python}
+# Step 7: The ethical determination -- IRB or not, and the collection
+# boundaries you would set.
+```
+
+## Additional Exercises
+
+These are open-ended extensions — no scaffold, no fixed path. The first expands your skeleton from above into a full proposal.
+
+1. **Research proposal.** Write a 1,500-word research proposal for a web data science project — expanding the skeleton you built in the Recommended Exercises. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.
 
 2. **Validity threats.** Identify three potential threats to validity in a hypothetical study that uses scraped social media data to measure public opinion. For each threat, propose a mitigation strategy.
 

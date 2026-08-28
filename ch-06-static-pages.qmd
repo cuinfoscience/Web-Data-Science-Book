@@ -441,19 +441,77 @@ This pattern separates the *what* (your parsing logic in `parse_func`) from the 
 Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).
 :::
 
-## Exercises
+## Recommended Exercises
 
-1. **Wikipedia table extraction.** Use `pd.read_html()` to extract a table of your choice from Wikipedia (e.g., a list of countries by population, U.S. states by area, or planets in the solar system). Clean up the resulting DataFrame and create a visualization.
+This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.
 
-2. **Custom parser.** Write a custom BeautifulSoup parser for a non-tabular web page. Good candidates include a course catalog, a restaurant menu, or a list of elected officials. Document your element selection strategy: why did you choose these specific tags and classes?
+You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset, then look under the hood at the same page with BeautifulSoup.
 
-3. **Multi-page scraping.** Extend your parser from Exercise 2 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use `time.sleep()` between requests, `try/except` for error handling, and a function to abstract the repeated logic.
+**Step 1 — Choose and check.** Pick a Wikipedia article containing a data table you find interesting — countries by population, U.S. states by area, highest-grossing films. Confirm the article path is allowed by Wikipedia's `robots.txt` (you parsed it in @sec-ethics), and fetch the page with your named `HEADERS`.
 
-4. **Non-English Wikipedia.** Use `pd.read_html()` to scrape a data table from a non-English Wikipedia edition (e.g., the French, Spanish, or Japanese Wikipedia). Does `read_html` handle non-ASCII characters correctly? What cleanup is needed compared to the English version? Write a brief analysis of any encoding issues you encounter.
+```{python}
+# Step 1: Choose a Wikipedia article with a table, confirm robots.txt
+# allows it, and fetch the page with your HEADERS.
+# Your code here
+```
 
-5. **Cache first, parse offline.** Build a two-stage scraper. Stage one downloads the raw HTML for several pages (e.g., five Oscar ceremony years or five weekly box office charts) exactly once, saving each response to a local `cache/` directory with a filename derived from the URL slug (e.g., `cache/ceremonies-2024.html`) and sleeping between downloads. Stage two is your parser, which reads only from the cached files and never touches the network. In a short paragraph, explain why this save-then-parse pattern matters: consider politeness (how many times does each server get hit while you debug?), reproducibility (what is your analysis anchored to after the site changes?), and iteration speed.
+**Step 2 — Cache the raw HTML.** Save `response.text` to a local file before parsing anything, and re-read it from disk. Every later step should parse the cached file, not re-request the page — while you debug, Wikipedia's servers should be hit exactly once.
 
-6. **Graduate extension (INFO 5617).** Read @fiesler2020no, a study of how social media platforms' Terms of Service regulate automated data collection. Then audit two websites you might realistically scrape for a research project: locate and read each site's Terms of Service and `robots.txt`, and classify what each document says about scraping using the paper's categories. Write a ~500-word memo comparing what the two sites permit, where the ToS and `robots.txt` agree or conflict, and how you would proceed as a researcher — including what the paper's findings suggest about the gap between written policy and ethical practice.
+```{python}
+# Step 2: Save response.text to a local file, then read it back from disk.
+# Your code here
+```
+
+**Step 3 — Extract with `read_html()`.** Run `pd.read_html()` on the cached HTML. Print how many tables it found, look at the `head()` of a few, and identify the index of the table you want.
+
+```{python}
+# Step 3: Run pd.read_html on the cached HTML, count the tables, and
+# pick out yours.
+# Your code here
+```
+
+**Step 4 — Clean it.** Apply the chapter's cleanup patterns as needed: select and rename columns, strip footnote markers from values, and convert numeric columns with `pd.to_numeric()` after removing commas. Show `dtypes` before and after to prove the conversion happened.
+
+```{python}
+# Step 4: Clean the DataFrame -- columns, footnote markers, numeric types.
+# Show dtypes before and after.
+# Your code here
+```
+
+**Step 5 — Visualize.** Plot a horizontal bar chart of the top ten rows by your main numeric column, with labeled axes and a title saying what the data is and where it came from.
+
+```{python}
+# Step 5: Bar chart of the top ten rows, labeled and titled.
+# Your code here
+```
+
+**Step 6 — Look under the hood.** Parse the same cached HTML with BeautifulSoup and find your table by its class (Wikipedia data tables usually carry `class="wikitable"`). Extract the header row's text yourself with `find_all()`. Compare what you got to `read_html()`'s column names.
+
+```{python}
+# Step 6: Parse the cached HTML with BeautifulSoup, find your table by
+# class, and extract the header row by hand.
+# Your code here
+```
+
+**Step 7 — Interpret.** In four to six sentences: What did `read_html()` do for you that the manual approach made visible? What cleanup did the table need and why (footnotes, merged headers, number formatting)? If Wikipedia renamed the table's CSS class tomorrow, which of your two extraction paths would break?
+
+```{python}
+# Step 7: Write your answer here as comments, or convert this cell to Markdown.
+```
+
+## Additional Exercises
+
+These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.
+
+1. **Custom parser.** Write a custom BeautifulSoup parser for a non-tabular web page. Good candidates include a course catalog, a restaurant menu, or a list of elected officials. Document your element selection strategy: why did you choose these specific tags and classes?
+
+2. **Multi-page scraping.** Extend your parser from Exercise 2 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use `time.sleep()` between requests, `try/except` for error handling, and a function to abstract the repeated logic.
+
+3. **Non-English Wikipedia.** Use `pd.read_html()` to scrape a data table from a non-English Wikipedia edition (e.g., the French, Spanish, or Japanese Wikipedia). Does `read_html` handle non-ASCII characters correctly? What cleanup is needed compared to the English version? Write a brief analysis of any encoding issues you encounter.
+
+4. **Cache first, parse offline.** Build a two-stage scraper. Stage one downloads the raw HTML for several pages (e.g., five Oscar ceremony years or five weekly box office charts) exactly once, saving each response to a local `cache/` directory with a filename derived from the URL slug (e.g., `cache/ceremonies-2024.html`) and sleeping between downloads. Stage two is your parser, which reads only from the cached files and never touches the network. In a short paragraph, explain why this save-then-parse pattern matters: consider politeness (how many times does each server get hit while you debug?), reproducibility (what is your analysis anchored to after the site changes?), and iteration speed.
+
+5. **Graduate extension (INFO 5617).** Read @fiesler2020no, a study of how social media platforms' Terms of Service regulate automated data collection. Then audit two websites you might realistically scrape for a research project: locate and read each site's Terms of Service and `robots.txt`, and classify what each document says about scraping using the paper's categories. Write a ~500-word memo comparing what the two sites permit, where the ToS and `robots.txt` agree or conflict, and how you would proceed as a researcher — including what the paper's findings suggest about the gap between written policy and ethical practice.
 
 ::: {.callout-tip}
 ## Missing Manual Reference

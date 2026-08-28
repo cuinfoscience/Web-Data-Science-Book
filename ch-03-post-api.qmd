@@ -350,23 +350,77 @@ Students often arrive at this material with intuitions that the post-API age has
 - **"This only matters for social media research."** Enclosure logic is spreading wherever data gained AI-training value: news archives, code repositories, forums, image libraries. Government data (@sec-government) is the notable counter-current, held open by legal mandate.
 - **"Nothing can be done about it."** The counter-values are not wishful thinking: regulation is creating access obligations, archives are institutionalizing preservation, and federated platforms are growing. The constraint environment is contested, and practitioners' choices are part of the contest.
 
-## Exercises
+## Recommended Exercises
 
-1. **Re-run the access matrix.** Run `probe()` against the eight endpoints in this chapter and compare your table to the one printed above. Any row that differs is a finding: note the endpoint, the old and new status, and the date. Then add three endpoints of your own for platforms you might actually study, and classify each as open, gated, or closed.
+This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.
 
-2. **Attribute a refusal.** Pick one endpoint that returned a non-200 for you and use `diagnose()` to establish who refused. Report the `server` and `via` headers and what the body says, then state whether the block came from the platform or from something between you and it. If you can, re-run the same request from a different network and report whether the answer changes.
+You will run the chapter's access audit yourself, on today's web, and extend it to platforms you care about. Your numbers will differ from the book's; recording that difference, with a date, is the point.
 
-3. **Extend the autopsy.** Find two more retired or restricted endpoints not covered here and classify each with `autopsy()`. For each, say whether it is gone, gated, or repriced, and what that implies for a researcher who needs its data: is there anyone to ask, and if so, who?
+**Step 1 — Identify yourself.** Define the `HEADERS` dictionary with your named `User-Agent`, as in @sec-ethics.
 
-4. **Timeline exercise.** Create a timeline of major API access changes from 2008 to the present. Include at least five events across at least three platforms. For each event, identify which of the three pressures (enclosure, exemption, erosion) best characterizes it.
+```{python}
+# Step 1: Define HEADERS with your named User-Agent.
+# Your code here
+```
 
-5. **Framework application.** Choose a platform API change not discussed in this chapter. Write a 500-word analysis applying the enclosure/exemption/erosion framework.
+**Step 2 — Probe one endpoint by hand.** Request the Wikipedia endpoint from the chapter's `TARGETS` with a 20-second timeout. Print the status code and the `content-type` header. Do not build the loop yet — make one request and look at it.
 
-6. **Data contingency plan.** Design a research project that depends on a specific web data source. Then write a contingency plan: if your primary source disappears mid-study, what are your backup strategies? Consider at least three alternatives.
+```{python}
+# Step 2: Request one endpoint and print its status and content-type.
+# Your code here
+```
 
-7. **Public interest audit.** Identify a web data research project (published paper, journalism investigation, or civic tech tool) that was enabled by API access. Assess how the project would be affected by current access restrictions. Which of the three values — openness, oversight, or ownership — does the project embody?
+**Step 3 — Build the access matrix.** Write the `probe()` function from the chapter (or your own version) and run it over all eight `TARGETS`, collecting rows into a DataFrame. Remember the `Int64` dtype for the status column, and record today's date in a comment.
 
-8. **Graduate extension (INFO 5617).** Read @davidson2023platform and @perriam2020digital. Choose one platform and write a two-to-three page "state of research access" brief: what data researchers could obtain five years ago, what is available today and on what terms (cost, eligibility, restrictions), what official research-access programs exist, and which of this chapter's three pressures best explains the trajectory. Close with a concrete recommendation for a researcher starting a study of that platform this year.
+```{python}
+# Step 3: Probe all eight endpoints and collect the results into a DataFrame.
+# Record today's date -- your table is a snapshot, not a fact.
+# Your code here
+```
+
+**Step 4 — Extend it.** Add two endpoints of your own, for platforms you might actually study, and re-run the matrix with ten rows. Classify each new row as open, gated, or closed.
+
+```{python}
+# Step 4: Add two endpoints you care about and rebuild the matrix.
+# Your code here
+```
+
+**Step 5 — Attribute a refusal.** Pick one endpoint that returned a non-200 and diagnose it: print the `server` and `via` headers and the first 120 characters of the body. State in a comment whether the refusal came from the platform or from something between you and it.
+
+```{python}
+# Step 5: Diagnose one refusal -- server header, via header, body excerpt --
+# and attribute it in a comment.
+# Your code here
+```
+
+**Step 6 — Autopsy a retired endpoint.** Run the chapter's `autopsy()` against one of the three retired endpoints and classify how it refuses: gone, gated, or repriced.
+
+```{python}
+# Step 6: Autopsy one retired endpoint and classify the manner of refusal.
+# Your code here
+```
+
+**Step 7 — Interpret.** In four to six sentences: Where did your matrix differ from the book's, and what changed in between? Which of your two added platforms is more exposed to enclosure, and what evidence from the probe supports that? For the endpoint you autopsied, is there anyone left to negotiate with?
+
+```{python}
+# Step 7: Write your answer here as comments, or convert this cell to Markdown.
+```
+
+## Additional Exercises
+
+These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.
+
+1. **Extend the autopsy.** Find two more retired or restricted endpoints not covered here and classify each with `autopsy()`. For each, say whether it is gone, gated, or repriced, and what that implies for a researcher who needs its data: is there anyone to ask, and if so, who?
+
+2. **Timeline exercise.** Create a timeline of major API access changes from 2008 to the present. Include at least five events across at least three platforms. For each event, identify which of the three pressures (enclosure, exemption, erosion) best characterizes it.
+
+3. **Framework application.** Choose a platform API change not discussed in this chapter. Write a 500-word analysis applying the enclosure/exemption/erosion framework.
+
+4. **Data contingency plan.** Design a research project that depends on a specific web data source. Then write a contingency plan: if your primary source disappears mid-study, what are your backup strategies? Consider at least three alternatives.
+
+5. **Public interest audit.** Identify a web data research project (published paper, journalism investigation, or civic tech tool) that was enabled by API access. Assess how the project would be affected by current access restrictions. Which of the three values — openness, oversight, or ownership — does the project embody?
+
+6. **Graduate extension (INFO 5617).** Read @davidson2023platform and @perriam2020digital. Choose one platform and write a two-to-three page "state of research access" brief: what data researchers could obtain five years ago, what is available today and on what terms (cost, eligibility, restrictions), what official research-access programs exist, and which of this chapter's three pressures best explains the trajectory. Close with a concrete recommendation for a researcher starting a study of that platform this year.
 
 ## Common Issues to Debug
 
