@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Web Architecture and Protocols – Web Data Science</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./ch-06-static-pages.html" rel="next">
+<link href="./ch-04-data-formats.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-01-introduction.html">Foundations</a></li><li class="breadcrumb-item"><a href="./ch-05-protocols.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Web Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Web Data Science</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-02-ethics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ethics, Law, and Responsible Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-03-post-api.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">The Post-API Age</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-04-data-formats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Formats: XML and JSON</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-05-protocols.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documents</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-06-static-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-07-archives.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-08-dynamic-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-09-pdfs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">APIs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-10-wikipedia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-11-government.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Government Data APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-12-social.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Social and Media Platform APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-13-ai-apis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Practice</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-14-automation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Automating Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-15-research-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-notebooks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Companion Notebooks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-ai-disclosure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">AI Coauthorship and Responsible Disclosure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-further.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Where to Go from Here</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-happens-when-you-load-a-web-page" id="toc-what-happens-when-you-load-a-web-page" class="nav-link active" data-scroll-target="#what-happens-when-you-load-a-web-page"><span class="header-section-number">5.1</span> What Happens When You Load a Web Page?</a></li>
+  <li><a href="#the-client-server-model" id="toc-the-client-server-model" class="nav-link" data-scroll-target="#the-client-server-model"><span class="header-section-number">5.2</span> The Client-Server Model</a></li>
+  <li><a href="#browser-developer-tools" id="toc-browser-developer-tools" class="nav-link" data-scroll-target="#browser-developer-tools"><span class="header-section-number">5.3</span> Browser Developer Tools</a>
+  <ul class="collapse">
+  <li><a href="#the-inspector-tab" id="toc-the-inspector-tab" class="nav-link" data-scroll-target="#the-inspector-tab"><span class="header-section-number">5.3.1</span> The Inspector Tab</a></li>
+  <li><a href="#the-network-tab" id="toc-the-network-tab" class="nav-link" data-scroll-target="#the-network-tab"><span class="header-section-number">5.3.2</span> The Network Tab</a></li>
+  </ul></li>
+  <li><a href="#tcpip-the-transport-layer" id="toc-tcpip-the-transport-layer" class="nav-link" data-scroll-target="#tcpip-the-transport-layer"><span class="header-section-number">5.4</span> TCP/IP: The Transport Layer</a>
+  <ul class="collapse">
+  <li><a href="#traceroute" id="toc-traceroute" class="nav-link" data-scroll-target="#traceroute"><span class="header-section-number">5.4.1</span> Traceroute</a></li>
+  </ul></li>
+  <li><a href="#dns-the-address-book" id="toc-dns-the-address-book" class="nav-link" data-scroll-target="#dns-the-address-book"><span class="header-section-number">5.5</span> DNS: The Address Book</a>
+  <ul class="collapse">
+  <li><a href="#the-structure-of-domain-names" id="toc-the-structure-of-domain-names" class="nav-link" data-scroll-target="#the-structure-of-domain-names"><span class="header-section-number">5.5.1</span> The Structure of Domain Names</a></li>
+  </ul></li>
+  <li><a href="#http-the-application-layer" id="toc-http-the-application-layer" class="nav-link" data-scroll-target="#http-the-application-layer"><span class="header-section-number">5.6</span> HTTP: The Application Layer</a>
+  <ul class="collapse">
+  <li><a href="#diagnosing-http-errors" id="toc-diagnosing-http-errors" class="nav-link" data-scroll-target="#diagnosing-http-errors"><span class="header-section-number">5.6.1</span> Diagnosing HTTP Errors</a></li>
+  <li><a href="#making-api-requests-with-custom-headers" id="toc-making-api-requests-with-custom-headers" class="nav-link" data-scroll-target="#making-api-requests-with-custom-headers"><span class="header-section-number">5.6.2</span> Making API Requests with Custom Headers</a></li>
+  <li><a href="#connections-sessions-and-retries" id="toc-connections-sessions-and-retries" class="nav-link" data-scroll-target="#connections-sessions-and-retries"><span class="header-section-number">5.6.3</span> Connections, Sessions, and Retries</a></li>
+  </ul></li>
+  <li><a href="#urls-anatomy-and-parsing" id="toc-urls-anatomy-and-parsing" class="nav-link" data-scroll-target="#urls-anatomy-and-parsing"><span class="header-section-number">5.7</span> URLs: Anatomy and Parsing</a>
+  <ul class="collapse">
+  <li><a href="#building-urls-programmatically" id="toc-building-urls-programmatically" class="nav-link" data-scroll-target="#building-urls-programmatically"><span class="header-section-number">5.7.1</span> Building URLs Programmatically</a></li>
+  </ul></li>
+  <li><a href="#recommended-exercises" id="toc-recommended-exercises" class="nav-link" data-scroll-target="#recommended-exercises"><span class="header-section-number">5.8</span> Recommended Exercises</a></li>
+  <li><a href="#additional-exercises" id="toc-additional-exercises" class="nav-link" data-scroll-target="#additional-exercises"><span class="header-section-number">5.9</span> Additional Exercises</a></li>
+  <li><a href="#social-history-and-public-interest" id="toc-social-history-and-public-interest" class="nav-link" data-scroll-target="#social-history-and-public-interest"><span class="header-section-number">5.10</span> Social History and Public Interest</a></li>
+  <li><a href="#common-issues-to-debug" id="toc-common-issues-to-debug" class="nav-link" data-scroll-target="#common-issues-to-debug"><span class="header-section-number">5.11</span> Common Issues to Debug</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">5.12</span> Key Takeaways</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">5.13</span> Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-01-introduction.html">Foundations</a></li><li class="breadcrumb-item"><a href="./ch-05-protocols.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-protocols" class="quarto-section-identifier"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Describe the client-server model and trace the sequence of operations from URL to rendered page</li>
+<li>Use browser developer tools to examine page structure, HTTP requests, and response headers</li>
+<li>Explain the roles of TCP/IP, DNS, and HTTP in web communication</li>
+<li>Construct HTTP requests with custom headers using <code>requests</code> and parse URL components with <code>urllib.parse</code></li>
+<li>Make an API call and convert the response to a time series visualization</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Companion Notebook
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Run this chapter’s code as you read: open the <a href="https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/notebooks/ch-05-protocols.ipynb">companion notebook</a> (see <a href="appendix-notebooks.html" class="quarto-xref"><span>Appendix A</span></a> for all of them).</p>
+</div>
+</div>
+<section id="what-happens-when-you-load-a-web-page" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="what-happens-when-you-load-a-web-page"><span class="header-section-number">5.1</span> What Happens When You Load a Web Page?</h2>
+<p>When you type a URL into your browser and press Enter, a long sequence of operations completes in milliseconds. Your browser resolves the domain name to an IP address, opens a connection to a remote server, sends a request formatted in a specific protocol, receives a response, and renders the result on your screen. Understanding this sequence transforms web data collection from magic into engineering.</p>
+<p>This chapter walks through each layer of the stack: the <strong>client-server model</strong> that structures the conversation, <strong>TCP/IP</strong> that transports the data, <strong>DNS</strong> that resolves names to addresses, <strong>HTTP</strong> that structures requests and responses, and <strong>URLs</strong> that identify what you are asking for. You will use browser developer tools to observe this machinery in action, then use Python libraries to replicate what your browser does programmatically.</p>
+</section>
+<section id="the-client-server-model" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="the-client-server-model"><span class="header-section-number">5.2</span> The Client-Server Model</h2>
+<p>The web follows a client-server architecture. A <strong>client</strong> (your browser, your Python script) sends a <strong>request</strong> to a <strong>server</strong> (a computer hosting a website or API). The server processes the request and sends back a <strong>response</strong>. This request-response cycle is the fundamental unit of web communication, and every scraping and API operation you perform in this book is an instance of it.</p>
+<p>Your browser is a sophisticated client that handles many things automatically — resolving domain names, managing cookies, rendering HTML and CSS, executing JavaScript. When you use <code>requests.get()</code> in Python, you are acting as a much simpler client that only handles the HTTP layer. Understanding what your browser does behind the scenes will help you diagnose problems when your Python client gets different results than your browser.</p>
+</section>
+<section id="browser-developer-tools" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="browser-developer-tools"><span class="header-section-number">5.3</span> Browser Developer Tools</h2>
+<p>Before writing code to scrape a page, you should always inspect it manually using your browser’s developer tools. Every modern browser includes these tools:</p>
+<ul>
+<li><strong>Windows/Linux</strong>: Ctrl + Shift + I or F12</li>
+<li><strong>Mac</strong>: ⌘ + ⌥ + I</li>
+</ul>
+<section id="the-inspector-tab" class="level3" data-number="5.3.1">
+<h3 data-number="5.3.1" class="anchored" data-anchor-id="the-inspector-tab"><span class="header-section-number">5.3.1</span> The Inspector Tab</h3>
+<p>The Inspector shows the HTML structure of the page as a tree. You can hover over elements to highlight them on the page, expand nested tags to explore the structure, and identify the CSS selectors or element attributes you will need for scraping. Start with a simple page like a Wikipedia article — most commercial websites are full of tracking scripts and dynamic content that obscure the actual structure.</p>
+</section>
+<section id="the-network-tab" class="level3" data-number="5.3.2">
+<h3 data-number="5.3.2" class="anchored" data-anchor-id="the-network-tab"><span class="header-section-number">5.3.2</span> The Network Tab</h3>
+<p>The Network tab reveals all the HTTP requests your browser makes to load a page. When you reload a page with the Network tab open, you will see dozens or even hundreds of requests — not just for the HTML, but for CSS stylesheets, JavaScript files, images, fonts, and tracking pixels. Each request shows:</p>
+<ul>
+<li>The URL being requested</li>
+<li>The HTTP method (GET, POST, etc.)</li>
+<li>The status code of the response (200 OK, 404 Not Found, etc.)</li>
+<li>The response headers, including <code>Content-Type</code>, <code>Set-Cookie</code>, and <code>User-Agent</code></li>
+</ul>
+<p>Click on any individual request to inspect its headers. Pay particular attention to the <code>User-Agent</code> header (how your browser identifies itself) and any <code>Cookie</code> headers (session information that the server uses to recognize you).</p>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Missing Manual Reference
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a broader introduction to how HTTP and web APIs work, see <em>Missing Manual</em> Chapter 24: HTTP and Web APIs.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="tcpip-the-transport-layer" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="tcpip-the-transport-layer"><span class="header-section-number">5.4</span> TCP/IP: The Transport Layer</h2>
+<p>Every computer on a public network has an IP address — a numerical identifier that functions like a postal address. IPv4 addresses are formatted as four numbers separated by dots (e.g., <code>151.101.130.133</code>), allowing for about 4.3 billion unique addresses. IPv6 uses a longer hexadecimal format to support a vastly larger address space.</p>
+<p>You can find your own computer’s IP address programmatically:</p>
+<div id="bcb2961b" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> socket</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co"># Your computer's hostname on the local network</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>hostname <span class="op">=</span> socket.gethostname()</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="bu">print</span>(<span class="ss">f"Hostname: </span><span class="sc">{</span>hostname<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="co"># Your local IP address</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>local_ip <span class="op">=</span> socket.gethostbyname(hostname)</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="bu">print</span>(<span class="ss">f"Local IP: </span><span class="sc">{</span>local_ip<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Be aware that on many Linux and macOS systems this lookup returns a loopback address like <code>127.0.0.1</code> or <code>127.0.1.1</code> — an address that simply means “this machine” — rather than your network-assigned IP, so the public-IP query below is the more reliable way to see how the internet identifies you.</p>
+<p>To see your <em>public</em> IP address (as seen by servers on the internet), you can query an external service:</p>
+<div id="5083b6f6" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">import</span> requests</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a>response <span class="op">=</span> requests.get(<span class="st">"https://api.ipify.org?format=json"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="bu">print</span>(response.json())</span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co"># {'ip': '128.138.xxx.xxx'} — your public IP</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="traceroute" class="level3" data-number="5.4.1">
+<h3 data-number="5.4.1" class="anchored" data-anchor-id="traceroute"><span class="header-section-number">5.4.1</span> Traceroute</h3>
+<p>When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers. You can trace this path using the <code>scapy</code> library:</p>
+<div id="b43fdc57" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">from</span> scapy.<span class="bu">all</span> <span class="im">import</span> traceroute</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co"># Trace the path to Wikipedia</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co"># Note: scapy requires root/administrator access on some systems</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>result, unans <span class="op">=</span> traceroute(<span class="st">"en.wikipedia.org"</span>, maxttl<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:</p>
+<div id="1d79a953" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="im">import</span> requests</span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="kw">def</span> geolocate_ip(ip):</span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="co">"""Look up the geographic location of an IP address."""</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>    response <span class="op">=</span> requests.get(<span class="ss">f"http://ip-api.com/json/</span><span class="sc">{</span>ip<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>    <span class="cf">return</span> response.json()</span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co"># Note: ip-api.com limits you to 45 requests per minute</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>location <span class="op">=</span> geolocate_ip(<span class="st">"151.101.130.133"</span>)</span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>location[<span class="st">'city'</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>location[<span class="st">'country'</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-simple callout-important">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><code>scapy</code> requires root/administrator privileges to send and receive raw network packets. On macOS or Linux, you may need to run <code>sudo jupyter notebook</code> from the terminal. On Windows, install the <a href="https://npcap.com/">Npcap</a> packet-capture driver and launch Anaconda Prompt as Administrator. If you cannot get packet capture working on your machine, read along instead — nothing later in this book depends on it.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="dns-the-address-book" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="dns-the-address-book"><span class="header-section-number">5.5</span> DNS: The Address Book</h2>
+<p>The Domain Name System translates human-readable domain names (like <code>en.wikipedia.org</code>) into IP addresses that computers can route to. You can perform DNS lookups programmatically with the <code>dnspython</code> library:</p>
+<div id="2f979cab" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">import</span> dns.resolver</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co"># Look up the IP address for Wikipedia</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>answers <span class="op">=</span> dns.resolver.resolve(<span class="st">"en.wikipedia.org"</span>, <span class="st">"A"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="cf">for</span> answer <span class="kw">in</span> answers:</span>
+<span id="cb5-6"><a href="#cb5-6"></a>    <span class="bu">print</span>(<span class="ss">f"IP address: </span><span class="sc">{</span>answer<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Domain names have a hierarchical structure: <code>subdomain.domain.top-level-domain</code>. Each top-level domain (<code>.com</code>, <code>.org</code>, <code>.edu</code>) is operated by a registry organization — Verisign runs <code>.com</code>, for example — under the coordination of ICANN, the nonprofit that oversees the internet’s naming system. The domain (<code>wikipedia</code>) is registered by the organization. Subdomains (<code>en</code>, <code>es</code>, <code>m</code>) are controlled by the domain owner and do not require separate registration.</p>
+<section id="the-structure-of-domain-names" class="level3" data-number="5.5.1">
+<h3 data-number="5.5.1" class="anchored" data-anchor-id="the-structure-of-domain-names"><span class="header-section-number">5.5.1</span> The Structure of Domain Names</h3>
+<p>Understanding this hierarchy helps you navigate the web programmatically. Consider two examples:</p>
+<ul>
+<li><p><code>en.wikipedia.org</code> — The TLD is <code>.org</code> (a generic TLD for organizations). The domain is <code>wikipedia</code> (registered by the Wikimedia Foundation). The subdomain <code>en</code> indicates the English-language edition. Other subdomains like <code>es</code>, <code>de</code>, or <code>m</code> (mobile) are all controlled by Wikipedia and do not require separate registration. The pageviews API you will use later in this chapter lives at <code>wikimedia.org</code> — not a subdomain of <code>wikipedia.org</code> but a separate registered domain that the Wikimedia Foundation also operates.</p></li>
+<li><p><code>api.census.gov</code> — The TLD is <code>.gov</code> (restricted to U.S. government entities). The domain is <code>census</code>. The subdomain <code>api</code> indicates this is the programmatic access point rather than the public-facing website at <code>www.census.gov</code>.</p></li>
+</ul>
+<p>When you construct URLs for scraping or API calls, knowing which part of the domain identifies the service (the domain) versus which part routes you to a specific feature (the subdomain and path) helps you anticipate URL patterns. Government APIs often live at <code>api.agency.gov</code>, data portals at <code>data.agency.gov</code>, and documentation at <code>developers.agency.gov</code>. Recognizing these conventions saves you time when exploring new data sources.</p>
+</section>
+</section>
+<section id="http-the-application-layer" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="http-the-application-layer"><span class="header-section-number">5.6</span> HTTP: The Application Layer</h2>
+<p>HTTP (Hypertext Transfer Protocol) is the language that clients and servers use to communicate. A client sends a <strong>request</strong> with a method (GET, POST, PUT, DELETE), headers (metadata), and optionally a body. The server sends a <strong>response</strong> with a status code, headers, and a body.</p>
+<p>The status codes you will encounter most often:</p>
+<ul>
+<li><strong>200 OK</strong>: The request succeeded and the response body contains the data</li>
+<li><strong>301/302 Redirect</strong>: The resource has moved; follow the <code>Location</code> header</li>
+<li><strong>403 Forbidden</strong>: The server understood your request but refused to fulfill it (often a User-Agent issue)</li>
+<li><strong>404 Not Found</strong>: The resource does not exist at this URL</li>
+<li><strong>429 Too Many Requests</strong>: You are being rate-limited; slow down</li>
+<li><strong>500 Internal Server Error</strong>: Something went wrong on the server side</li>
+</ul>
+<section id="diagnosing-http-errors" class="level3" data-number="5.6.1">
+<h3 data-number="5.6.1" class="anchored" data-anchor-id="diagnosing-http-errors"><span class="header-section-number">5.6.1</span> Diagnosing HTTP Errors</h3>
+<p>When a request fails, the status code tells you <em>what</em> went wrong, but diagnosing <em>why</em> requires looking at the full response. A diagnostic function can help:</p>
+<div id="6a2fc382" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="im">import</span> requests</span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="kw">def</span> diagnose_request(url, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb6-4"><a href="#cb6-4"></a>    <span class="co">"""Print diagnostic information about an HTTP request."""</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>    <span class="cf">try</span>:</span>
+<span id="cb6-6"><a href="#cb6-6"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers, timeout<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb6-7"><a href="#cb6-7"></a>        <span class="bu">print</span>(<span class="ss">f"URL: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8"></a>        <span class="bu">print</span>(<span class="ss">f"Status: </span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9"></a>        <span class="bu">print</span>(<span class="ss">f"Content-Type: </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'Content-Type'</span>, <span class="st">'not specified'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-10"><a href="#cb6-10"></a>        <span class="bu">print</span>(<span class="ss">f"Server: </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'Server'</span>, <span class="st">'not specified'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-11"><a href="#cb6-11"></a>        <span class="bu">print</span>(<span class="ss">f"Response size: </span><span class="sc">{</span><span class="bu">len</span>(response.content)<span class="sc">:,}</span><span class="ss"> bytes"</span>)</span>
+<span id="cb6-12"><a href="#cb6-12"></a>        <span class="cf">if</span> response.history:</span>
+<span id="cb6-13"><a href="#cb6-13"></a>            <span class="bu">print</span>(<span class="ss">f"Redirected from: </span><span class="sc">{</span>response<span class="sc">.</span>history[<span class="dv">0</span>]<span class="sc">.</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-14"><a href="#cb6-14"></a>        <span class="cf">return</span> response</span>
+<span id="cb6-15"><a href="#cb6-15"></a>    <span class="cf">except</span> requests.exceptions.<span class="pp">ConnectionError</span>:</span>
+<span id="cb6-16"><a href="#cb6-16"></a>        <span class="bu">print</span>(<span class="ss">f"Connection failed: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-17"><a href="#cb6-17"></a>    <span class="cf">except</span> requests.exceptions.Timeout:</span>
+<span id="cb6-18"><a href="#cb6-18"></a>        <span class="bu">print</span>(<span class="ss">f"Request timed out: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-19"><a href="#cb6-19"></a></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co"># Test on a few URLs</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Python_(programming_language)"</span>)</span>
+<span id="cb6-22"><a href="#cb6-22"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Nonexistent_Page_12345"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a <code>User-Agent</code> header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:</p>
+<div id="99aa0731" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="im">import</span> time</span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="kw">def</span> get_with_backoff(url, headers<span class="op">=</span><span class="va">None</span>, max_retries<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb7-4"><a href="#cb7-4"></a>    <span class="co">"""Retry a request with exponential backoff on 429 errors."""</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>    <span class="cf">for</span> attempt <span class="kw">in</span> <span class="bu">range</span>(max_retries):</span>
+<span id="cb7-6"><a href="#cb7-6"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb7-7"><a href="#cb7-7"></a>        <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">429</span>:</span>
+<span id="cb7-8"><a href="#cb7-8"></a>            wait_time <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> attempt  <span class="co"># 1s, 2s, 4s</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a>            <span class="bu">print</span>(<span class="ss">f"Rate limited. Waiting </span><span class="sc">{</span>wait_time<span class="sc">}</span><span class="ss">s before retry..."</span>)</span>
+<span id="cb7-10"><a href="#cb7-10"></a>            time.sleep(wait_time)</span>
+<span id="cb7-11"><a href="#cb7-11"></a>        <span class="cf">else</span>:</span>
+<span id="cb7-12"><a href="#cb7-12"></a>            <span class="cf">return</span> response</span>
+<span id="cb7-13"><a href="#cb7-13"></a>    <span class="cf">return</span> response  <span class="co"># Return the last response even if still 429</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Exponential backoff doubles the wait time with each retry, giving the server progressively more breathing room. Many APIs include a <code>Retry-After</code> header in their 429 responses that tells you exactly how long to wait — check for it with <code>response.headers.get("Retry-After")</code> before falling back to your own backoff schedule.</p>
+<p>Understanding status codes in context makes debugging much faster. A 403 from the Wikimedia API almost always means you forgot the <code>User-Agent</code> header — the fix is a single line of code. A 403 from a news site might mean the site blocks all automated access, and no header change will help. A 404 could mean the page was deleted, the URL has a typo, or the site restructured its paths. A 500 is the server’s problem, not yours — retry after a delay. Building this diagnostic intuition takes practice, but the pattern is always the same: check the status code, inspect the response headers, read the response body for error messages, and adjust your request accordingly. This systematic approach to debugging carries through every chapter that follows.</p>
+</section>
+<section id="making-api-requests-with-custom-headers" class="level3" data-number="5.6.2">
+<h3 data-number="5.6.2" class="anchored" data-anchor-id="making-api-requests-with-custom-headers"><span class="header-section-number">5.6.2</span> Making API Requests with Custom Headers</h3>
+<p>Let us retrieve data from the Wikimedia pageviews API. This API requires a meaningful <code>User-Agent</code> header — if you send the default <code>requests</code> User-Agent, you will get a 403 error:</p>
+<div id="11613d88" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="im">import</span> requests</span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a>article <span class="op">=</span> <span class="st">"University_of_Colorado_Boulder"</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>api_url <span class="op">=</span> (</span>
+<span id="cb8-5"><a href="#cb8-5"></a>    <span class="ss">f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a>    <span class="ss">f"/en.wikipedia/all-access/all-agents/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a>)</span>
+<span id="cb8-8"><a href="#cb8-8"></a></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co"># This will likely fail with a 403</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a>response <span class="op">=</span> requests.get(api_url)</span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 403</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co"># Add a custom User-Agent header</span></span>
+<span id="cb8-14"><a href="#cb8-14"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb8-15"><a href="#cb8-15"></a>response <span class="op">=</span> requests.get(api_url, headers<span class="op">=</span>headers)</span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200</span></span>
+<span id="cb8-17"><a href="#cb8-17"></a></span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="co"># Parse the JSON response</span></span>
+<span id="cb8-19"><a href="#cb8-19"></a>data <span class="op">=</span> response.json()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now convert the response to a DataFrame and plot it:</p>
+<div id="7b2f2ea2" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb9-3"><a href="#cb9-3"></a></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co"># The pageview data is nested inside data['items']</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a>df <span class="op">=</span> pd.DataFrame(data[<span class="st">"items"</span>])</span>
+<span id="cb9-6"><a href="#cb9-6"></a>df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">00"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7"></a></span>
+<span id="cb9-8"><a href="#cb9-8"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb9-9"><a href="#cb9-9"></a>plt.plot(df[<span class="st">"timestamp"</span>], df[<span class="st">"views"</span>])</span>
+<span id="cb9-10"><a href="#cb9-10"></a>plt.title(<span class="ss">f"Daily Pageviews: </span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-11"><a href="#cb9-11"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12"></a>plt.ylabel(<span class="st">"Views"</span>)</span>
+<span id="cb9-13"><a href="#cb9-13"></a>plt.tight_layout()</span>
+<span id="cb9-14"><a href="#cb9-14"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="connections-sessions-and-retries" class="level3" data-number="5.6.3">
+<h3 data-number="5.6.3" class="anchored" data-anchor-id="connections-sessions-and-retries"><span class="header-section-number">5.6.3</span> Connections, Sessions, and Retries</h3>
+<p>Every bare <code>requests.get()</code> call does more work than it appears to: it opens a fresh TCP connection to the server, performs the TLS handshake, sends the request, and tears the connection back down. For a single request, that overhead is negligible. But the chapters ahead will have you making dozens or hundreds of requests to the same host — one per Wikipedia article, one per bill, one per archived page — and paying the connection setup cost every time is wasteful for both you and the server.</p>
+<p>A <code>requests.Session</code> object fixes this. A Session keeps the underlying connection open and reuses it for subsequent requests to the same host, and it remembers headers, so you set your <code>User-Agent</code> once instead of passing it to every call. A Session can also carry a retry policy: rather than hand-rolling backoff logic like the <code>get_with_backoff()</code> function you wrote earlier, you can mount a <code>Retry</code> configuration that automatically retries rate limits and transient server errors with exponentially increasing delays — and it honors any <code>Retry-After</code> header the server sends:</p>
+<div id="96da1322" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="im">import</span> requests</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="im">from</span> requests.adapters <span class="im">import</span> HTTPAdapter</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="im">from</span> urllib3.util.retry <span class="im">import</span> Retry</span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co"># Create a session with persistent headers</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a>session <span class="op">=</span> requests.Session()</span>
+<span id="cb10-7"><a href="#cb10-7"></a>session.headers.update(</span>
+<span id="cb10-8"><a href="#cb10-8"></a>    {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb10-9"><a href="#cb10-9"></a>)</span>
+<span id="cb10-10"><a href="#cb10-10"></a></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co"># Retry up to 3 times on rate limits and server errors, waiting 1s, 2s, then 4s between attempts</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a>retries <span class="op">=</span> Retry(</span>
+<span id="cb10-13"><a href="#cb10-13"></a>    total<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb10-14"><a href="#cb10-14"></a>    backoff_factor<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb10-15"><a href="#cb10-15"></a>    status_forcelist<span class="op">=</span>[<span class="dv">429</span>, <span class="dv">500</span>, <span class="dv">502</span>, <span class="dv">503</span>, <span class="dv">504</span>],</span>
+<span id="cb10-16"><a href="#cb10-16"></a>)</span>
+<span id="cb10-17"><a href="#cb10-17"></a>session.mount(<span class="st">"https://"</span>, HTTPAdapter(max_retries<span class="op">=</span>retries))</span>
+<span id="cb10-18"><a href="#cb10-18"></a></span>
+<span id="cb10-19"><a href="#cb10-19"></a><span class="co"># Use the session exactly like the requests module itself</span></span>
+<span id="cb10-20"><a href="#cb10-20"></a>articles <span class="op">=</span> [<span class="st">"Python_(programming_language)"</span>, <span class="st">"Web_scraping"</span>, <span class="st">"Data_science"</span>]</span>
+<span id="cb10-21"><a href="#cb10-21"></a><span class="cf">for</span> article <span class="kw">in</span> articles:</span>
+<span id="cb10-22"><a href="#cb10-22"></a>    url <span class="op">=</span> <span class="ss">f"https://en.wikipedia.org/wiki/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb10-23"><a href="#cb10-23"></a>    response <span class="op">=</span> session.get(url)  <span class="co"># Connection reused; headers already set</span></span>
+<span id="cb10-24"><a href="#cb10-24"></a>    <span class="bu">print</span>(article, response.status_code, <span class="bu">len</span>(response.text))</span>
+<span id="cb10-25"><a href="#cb10-25"></a><span class="co"># Python_(programming_language) 200 812394</span></span>
+<span id="cb10-26"><a href="#cb10-26"></a><span class="co"># Web_scraping 200 145207</span></span>
+<span id="cb10-27"><a href="#cb10-27"></a><span class="co"># Data_science 200 291846</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The setup costs six lines, and everything after that behaves exactly like the <code>requests.get()</code> calls you already know — <code>session.get()</code> returns the same <code>Response</code> object with the same <code>.json()</code>, <code>.text</code>, and <code>.status_code</code>.</p>
+<div class="callout callout-style-simple callout-tip">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-body-container">
+<p>A <code>for</code> loop around <code>requests.get()</code> is your cue to create a <code>Session</code> first. The scraping and API chapters ahead (<a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>, <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>) all involve exactly this kind of loop over many URLs at the same host, and this pattern carries over unchanged.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="urls-anatomy-and-parsing" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="urls-anatomy-and-parsing"><span class="header-section-number">5.7</span> URLs: Anatomy and Parsing</h2>
+<p>URLs (Uniform Resource Locators) have a well-defined structure:</p>
+<pre><code>scheme://userinfo@host:port/path?query#fragment</code></pre>
+<p>Never write regular expressions to parse URLs. Use the <code>urllib.parse</code> module instead:</p>
+<div id="d3092d8d" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlparse, parse_qs</span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a>url <span class="op">=</span> <span class="st">"https://api.census.gov/data/2022/acs/acs5?get=NAME,B01001_001E&amp;for=place:07850&amp;in=state:08"</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a></span>
+<span id="cb12-5"><a href="#cb12-5"></a>parsed <span class="op">=</span> urlparse(url)</span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="bu">print</span>(<span class="ss">f"Scheme: </span><span class="sc">{</span>parsed<span class="sc">.</span>scheme<span class="sc">}</span><span class="ss">"</span>)      <span class="co"># https</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="bu">print</span>(<span class="ss">f"Host: </span><span class="sc">{</span>parsed<span class="sc">.</span>netloc<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># api.census.gov</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="bu">print</span>(<span class="ss">f"Path: </span><span class="sc">{</span>parsed<span class="sc">.</span>path<span class="sc">}</span><span class="ss">"</span>)          <span class="co"># /data/2022/acs/acs5</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="bu">print</span>(<span class="ss">f"Query: </span><span class="sc">{</span>parsed<span class="sc">.</span>query<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># get=NAME,...</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a></span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="co"># Parse query parameters into a dictionary</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a>params <span class="op">=</span> parse_qs(parsed.query)</span>
+<span id="cb12-13"><a href="#cb12-13"></a><span class="bu">print</span>(params)</span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="co"># {'get': ['NAME,B01001_001E'], 'for': ['place:07850'], 'in': ['state:08']}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Understanding URL structure is essential for constructing API requests. In <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a> through <a href="ch-13-ai-apis.html" class="quarto-xref"><span>Chapter 13</span></a>, you will build URLs programmatically by assembling scheme, host, path, and query parameters.</p>
+<section id="building-urls-programmatically" class="level3" data-number="5.7.1">
+<h3 data-number="5.7.1" class="anchored" data-anchor-id="building-urls-programmatically"><span class="header-section-number">5.7.1</span> Building URLs Programmatically</h3>
+<p>Web APIs expect the values you supply in one of two places, and you need to recognize which pattern you are dealing with before you can build the URL correctly.</p>
+<p><strong>Path-segment APIs</strong> embed each value at a fixed position in the URL’s path. The Wikimedia pageviews endpoint you used earlier works this way: project, access method, agent, article, granularity, and date range are all path segments in a required order. Build these URLs with an f-string over the components — but URL-encode any component that might contain special characters using <code>urllib.parse.quote</code>, because a stray slash or space inside a path segment produces a URL the server cannot route:</p>
+<div id="e52b721e" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="im">from</span> urllib.parse <span class="im">import</span> quote</span>
+<span id="cb13-2"><a href="#cb13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co"># Each value occupies a fixed position in the path</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>project <span class="op">=</span> <span class="st">"en.wikipedia"</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>access <span class="op">=</span> <span class="st">"all-access"</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>agent <span class="op">=</span> <span class="st">"all-agents"</span></span>
+<span id="cb13-7"><a href="#cb13-7"></a>article <span class="op">=</span> <span class="st">"University of Colorado Boulder"</span>  <span class="co"># Note the spaces</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co"># Wikipedia titles replace spaces with underscores; quote() percent-encodes anything else that would break a path segment (slashes, question marks)</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a>encoded_article <span class="op">=</span> quote(article.replace(<span class="st">" "</span>, <span class="st">"_"</span>), safe<span class="op">=</span><span class="st">""</span>)</span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="bu">print</span>(encoded_article)</span>
+<span id="cb13-12"><a href="#cb13-12"></a><span class="co"># University_of_Colorado_Boulder</span></span>
+<span id="cb13-13"><a href="#cb13-13"></a></span>
+<span id="cb13-14"><a href="#cb13-14"></a>url <span class="op">=</span> (</span>
+<span id="cb13-15"><a href="#cb13-15"></a>    <span class="st">"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
+<span id="cb13-16"><a href="#cb13-16"></a>    <span class="ss">f"/</span><span class="sc">{</span>project<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>access<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>agent<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>encoded_article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
+<span id="cb13-17"><a href="#cb13-17"></a>)</span>
+<span id="cb13-18"><a href="#cb13-18"></a><span class="bu">print</span>(url)</span>
+<span id="cb13-19"><a href="#cb13-19"></a><span class="co"># https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/University_of_Colorado_Boulder/daily/20260101/20260131</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The encoding matters more than this example suggests: a band like “AC/DC” has a slash in its article title, and <code>quote("AC/DC", safe="")</code> correctly produces <code>AC%2FDC</code>. Paste the raw title into your f-string instead, and the API would interpret the slash as a path separator and return a 404.</p>
+<p><strong>Query-parameter APIs</strong> instead accept <code>key=value</code> pairs after a <code>?</code>, where order does not matter and many parameters are optional. The MediaWiki Action API — Wikipedia’s general-purpose API, which you will explore in <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a> — works this way. The <code>urlencode</code> function converts a dictionary into a properly escaped query string:</p>
+<div id="9da836a3" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlencode</span>
+<span id="cb14-2"><a href="#cb14-2"></a></span>
+<span id="cb14-3"><a href="#cb14-3"></a>base_url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>params <span class="op">=</span> {</span>
+<span id="cb14-5"><a href="#cb14-5"></a>    <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb14-6"><a href="#cb14-6"></a>    <span class="st">"format"</span>: <span class="st">"json"</span>,</span>
+<span id="cb14-7"><a href="#cb14-7"></a>    <span class="st">"titles"</span>: <span class="st">"University of Colorado Boulder"</span>,</span>
+<span id="cb14-8"><a href="#cb14-8"></a>    <span class="st">"prop"</span>: <span class="st">"info"</span>,</span>
+<span id="cb14-9"><a href="#cb14-9"></a>}</span>
+<span id="cb14-10"><a href="#cb14-10"></a></span>
+<span id="cb14-11"><a href="#cb14-11"></a>query_string <span class="op">=</span> urlencode(params)</span>
+<span id="cb14-12"><a href="#cb14-12"></a><span class="bu">print</span>(query_string)</span>
+<span id="cb14-13"><a href="#cb14-13"></a><span class="co"># action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For query-parameter APIs, the <code>requests</code> library can do this encoding for you: pass the dictionary as the <code>params</code> argument. This is the preferred approach for API calls:</p>
+<div id="83f0f0d9" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a>response <span class="op">=</span> requests.get(base_url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="bu">print</span>(response.url)  <span class="co"># The full URL that requests actually built</span></span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="co"># https://en.wikipedia.org/w/api.php?action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>How do you know which pattern an API expects? Read its documentation — but the URL itself usually tells you. Values between slashes are path segments: build the URL with an f-string and <code>quote()</code> each component. Values after a <code>?</code> are query parameters: pass a dictionary via <code>params=</code> and let <code>requests</code> handle the escaping. REST-style endpoints that return one specific resource (like pageviews for one article) tend to use path segments; APIs with many optional settings (like the Action API’s dozens of parameters) tend to use query strings. Mixing them up is a classic source of confusing 404s — query-encoding values that an API expects in its path sends the server a URL it cannot route. You will appreciate this distinction especially in <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a> and <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>, where article titles and variable names frequently contain characters that require encoding.</p>
+</section>
+</section>
+<section id="recommended-exercises" class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="recommended-exercises"><span class="header-section-number">5.8</span> Recommended Exercises</h2>
+<p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
+<p>You will build a URL diagnostic tool from the protocol layers this chapter covered — DNS, HTTP status codes, headers, and redirects — and use it to profile five real URLs.</p>
+<p><strong>Step 1 — Take a URL apart.</strong> Use <code>urlparse()</code> on three URLs of different shapes — a plain page, a URL with a query string, and one of the API URLs from earlier chapters. For each, print the scheme, netloc, path, and query.</p>
+<div id="f6242c51" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Step 1: urlparse three different URLs and print their components.</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 2 — Resolve a name.</strong> Use <code>dns.resolver</code> to look up the A records for <code>en.wikipedia.org</code> and two other domains you choose. Print the IP addresses. Do any share an address?</p>
+<div id="f93bbe21" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Step 2: Resolve A records for three domains and print the IPs.</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 3 — Request with named headers.</strong> Define your <code>HEADERS</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>) and request one of the three URLs from Step 1. Print the status code and three response headers: <code>Content-Type</code>, <code>Server</code>, and <code>Content-Length</code> (or the length of <code>response.content</code> if the header is absent).</p>
+<div id="b9de2d1a" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Step 3: Make a request with your HEADERS and print the status code and three response headers.</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 4 — Write <code>diagnose_url()</code>.</strong> Wrap Step 3 in a function <code>diagnose_url(url)</code> that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check <code>response.history</code>, and if it redirected, print where it ended up. Include a docstring.</p>
+<div id="cb981184" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring.</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 5 — Profile five URLs.</strong> Run <code>diagnose_url()</code> on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an <code>http://</code> address of a site that upgrades you to <code>https://</code>), an API endpoint, and a site that blocks automated access (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> showed you one).</p>
+<div id="377510ec" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># Step 5: Diagnose five URLs -- working, 404, redirect, API, and blocked.</span></span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 6 — Interpret.</strong> In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the blocked site, what layer refused you — and how do you know it was the site rather than your network (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>)?</p>
+<div id="d807b949" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="additional-exercises" class="level2" data-number="5.9">
+<h2 data-number="5.9" class="anchored" data-anchor-id="additional-exercises"><span class="header-section-number">5.9</span> Additional Exercises</h2>
+<p>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</p>
+<ol type="1">
+<li><p><strong>Browser developer tools.</strong> Open a Wikipedia article and a commercial news site side by side, each with the Network tab open. Reload both pages and compare: how many requests does each make? What types of resources (HTML, CSS, JS, images, fonts, tracking) does each load? What does this tell you about modern web architecture?</p></li>
+<li><p><strong>DNS exploration.</strong> Use <code>dns.resolver</code> to look up the IP addresses for five related domains (e.g., <code>google.com</code>, <code>youtube.com</code>, <code>gmail.com</code>, <code>drive.google.com</code>, <code>cloud.google.com</code>). Are any of them hosted at the same IP address? What does this tell you about Google’s infrastructure?</p></li>
+<li><p><strong>Wikimedia pageviews.</strong> Using the API pattern from this chapter, retrieve and plot daily pageview data for three related Wikipedia articles over the same time period. Identify any spikes and hypothesize about what real-world events caused them.</p></li>
+<li><p><strong>Network tab analysis.</strong> Pick a website you visit frequently. Reload it with the browser’s Network tab open and recording. Count and categorize all requests into types: HTML documents, CSS stylesheets, JavaScript files, images, fonts, and tracking/analytics scripts. What fraction of requests serve actual content vs.&nbsp;tracking and advertising? Write a brief analysis of what this reveals about the site’s business model.</p></li>
+<li><p><strong>Graduate extension (INFO 5617).</strong> Choose a website you might plausibly study in your own research and profile its delivery infrastructure. Use the browser’s Network tab to record the time to first byte, the full redirect chain, and evidence of CDN involvement (inspect the <code>Server</code>, <code>Via</code>, and similar response headers), then run <code>traceroute</code> (or <code>scapy</code>’s traceroute) to the same host and geolocate a few of the hops. Write a 500-word memo connecting these protocol-level observations to research-infrastructure concerns: where does “the” site actually live, how stable are measurements of it likely to be across time and vantage points, and what would an automated collection pipeline need to handle — redirects, rate limits, geographically varying responses — to gather data from it reliably?</p></li>
+</ol>
+</section>
+<section id="social-history-and-public-interest" class="level2" data-number="5.10">
+<h2 data-number="5.10" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">5.10</span> Social History and Public Interest</h2>
+<p>The protocols described in this chapter were designed as public infrastructure. Vint Cerf and Bob Kahn developed TCP/IP in the 1970s for DARPA, creating a transport layer engineered for resilience under attack. Tim Berners-Lee invented HTTP and URLs at CERN in 1989–1991, and made the deliberate decision to release them into the public domain. The web was born open.</p>
+<p>Browser developer tools embody this original spirit of openness. The ability to “view source” — to inspect exactly what a web server sends your browser — was a foundational feature of the web. It is what makes web data science possible. As you will see in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>, the tension between this transparency and platforms’ desire to control their data is one of the defining conflicts of the contemporary web.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Public Interest Connection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The web’s protocol stack was designed as public infrastructure — open standards documented in public RFCs, not proprietary products controlled by corporations. HTTP, HTML, DNS, and TCP/IP are all open protocols that anyone can implement. The “view source” capability and network inspection tools you learned in this chapter are features that embody <strong>openness</strong> (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>). They exist because the web’s architects believed that transparency was a feature, not a vulnerability. As platforms increasingly obfuscate their front-end code and move toward closed APIs, these tools become more important, not less.</p>
+</div>
+</div>
+</section>
+<section id="common-issues-to-debug" class="level2" data-number="5.11">
+<h2 data-number="5.11" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">5.11</span> Common Issues to Debug</h2>
+<ul>
+<li><strong><code>scapy</code> import errors</strong>: Requires <code>pcap</code> drivers. On Windows, install Npcap. On macOS, the built-in <code>libpcap</code> usually works.</li>
+<li><strong>403 from Wikimedia API</strong>: You forgot the custom <code>User-Agent</code> header.</li>
+<li><strong>DNS results varying by location</strong>: Normal — content delivery networks return different IPs based on your geographic location.</li>
+<li><strong>URL encoding issues</strong>: Use <code>urllib.parse.quote()</code> for article titles with spaces or special characters.</li>
+</ul>
+</section>
+<section id="key-takeaways" class="level2" data-number="5.12">
+<h2 data-number="5.12" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">5.12</span> Key Takeaways</h2>
+<p>The web is built on a layered stack of protocols: TCP/IP transports data, DNS resolves names to addresses, HTTP structures the conversation, and URLs identify the target. Understanding this stack transforms debugging from guesswork into systematic diagnosis. When a request fails, you can ask: can I reach the server at all? Am I resolving the right address? What status code did I get? Are my headers correct? Is my URL well-formed? This systematic approach carries through every chapter that follows.</p>
+</section>
+<section id="further-reading" class="level2" data-number="5.13">
+<h2 data-number="5.13" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">5.13</span> Further Reading</h2>
+<ul>
+<li>Mozilla Developer Network — How the Web Works: <a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works" class="uri">https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works</a></li>
+<li>Mozilla Developer Network — HTTP Overview: <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview" class="uri">https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview</a></li>
+<li><code>scapy</code> documentation: <a href="https://scapy.readthedocs.io/" class="uri">https://scapy.readthedocs.io/</a></li>
+<li><code>dnspython</code> documentation: <a href="https://dnspython.readthedocs.io/" class="uri">https://dnspython.readthedocs.io/</a></li>
+</ul>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./ch-04-data-formats.html" class="pagination-link" aria-label="Data Formats: XML and JSON">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Formats: XML and JSON</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./ch-06-static-pages.html" class="pagination-link" aria-label="Parsing Static Web Pages">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb22" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu"># Web Architecture and Protocols {#sec-protocols}</span></span>
+<span id="cb22-2"><a href="#cb22-2"></a></span>
+<span id="cb22-3"><a href="#cb22-3"></a>::: {.callout-tip}</span>
+<span id="cb22-4"><a href="#cb22-4"></a><span class="fu">## Learning Objectives</span></span>
+<span id="cb22-5"><a href="#cb22-5"></a><span class="ss">- </span>Describe the client-server model and trace the sequence of operations from URL to rendered page</span>
+<span id="cb22-6"><a href="#cb22-6"></a><span class="ss">- </span>Use browser developer tools to examine page structure, HTTP requests, and response headers</span>
+<span id="cb22-7"><a href="#cb22-7"></a><span class="ss">- </span>Explain the roles of TCP/IP, DNS, and HTTP in web communication</span>
+<span id="cb22-8"><a href="#cb22-8"></a><span class="ss">- </span>Construct HTTP requests with custom headers using <span class="in">`requests`</span> and parse URL components with <span class="in">`urllib.parse`</span></span>
+<span id="cb22-9"><a href="#cb22-9"></a><span class="ss">- </span>Make an API call and convert the response to a time series visualization</span>
+<span id="cb22-10"><a href="#cb22-10"></a>:::</span>
+<span id="cb22-11"><a href="#cb22-11"></a></span>
+<span id="cb22-12"><a href="#cb22-12"></a>::: {.callout-tip}</span>
+<span id="cb22-13"><a href="#cb22-13"></a><span class="fu">## Companion Notebook</span></span>
+<span id="cb22-14"><a href="#cb22-14"></a>Run this chapter's code as you read: open the <span class="co">[</span><span class="ot">companion notebook</span><span class="co">](https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/notebooks/ch-05-protocols.ipynb)</span> (see @sec-appendix-notebooks for all of them).</span>
+<span id="cb22-15"><a href="#cb22-15"></a>:::</span>
+<span id="cb22-16"><a href="#cb22-16"></a></span>
+<span id="cb22-17"><a href="#cb22-17"></a></span>
+<span id="cb22-18"><a href="#cb22-18"></a><span class="fu">## What Happens When You Load a Web Page?</span></span>
+<span id="cb22-19"><a href="#cb22-19"></a></span>
+<span id="cb22-20"><a href="#cb22-20"></a>When you type a URL into your browser and press Enter, a long sequence of operations completes in milliseconds. Your browser resolves the domain name to an IP address, opens a connection to a remote server, sends a request formatted in a specific protocol, receives a response, and renders the result on your screen. Understanding this sequence transforms web data collection from magic into engineering.</span>
+<span id="cb22-21"><a href="#cb22-21"></a></span>
+<span id="cb22-22"><a href="#cb22-22"></a>This chapter walks through each layer of the stack: the **client-server model** that structures the conversation, **TCP/IP** that transports the data, **DNS** that resolves names to addresses, **HTTP** that structures requests and responses, and **URLs** that identify what you are asking for. You will use browser developer tools to observe this machinery in action, then use Python libraries to replicate what your browser does programmatically.</span>
+<span id="cb22-23"><a href="#cb22-23"></a></span>
+<span id="cb22-24"><a href="#cb22-24"></a><span class="fu">## The Client-Server Model</span></span>
+<span id="cb22-25"><a href="#cb22-25"></a></span>
+<span id="cb22-26"><a href="#cb22-26"></a>The web follows a client-server architecture. A **client** (your browser, your Python script) sends a **request** to a **server** (a computer hosting a website or API). The server processes the request and sends back a **response**. This request-response cycle is the fundamental unit of web communication, and every scraping and API operation you perform in this book is an instance of it.</span>
+<span id="cb22-27"><a href="#cb22-27"></a></span>
+<span id="cb22-28"><a href="#cb22-28"></a>Your browser is a sophisticated client that handles many things automatically — resolving domain names, managing cookies, rendering HTML and CSS, executing JavaScript. When you use <span class="in">`requests.get()`</span> in Python, you are acting as a much simpler client that only handles the HTTP layer. Understanding what your browser does behind the scenes will help you diagnose problems when your Python client gets different results than your browser.</span>
+<span id="cb22-29"><a href="#cb22-29"></a></span>
+<span id="cb22-30"><a href="#cb22-30"></a><span class="fu">## Browser Developer Tools</span></span>
+<span id="cb22-31"><a href="#cb22-31"></a></span>
+<span id="cb22-32"><a href="#cb22-32"></a>Before writing code to scrape a page, you should always inspect it manually using your browser's developer tools. Every modern browser includes these tools:</span>
+<span id="cb22-33"><a href="#cb22-33"></a></span>
+<span id="cb22-34"><a href="#cb22-34"></a><span class="ss">- </span>**Windows/Linux**: Ctrl + Shift + I or F12</span>
+<span id="cb22-35"><a href="#cb22-35"></a><span class="ss">- </span>**Mac**: ⌘ + ⌥ + I</span>
+<span id="cb22-36"><a href="#cb22-36"></a></span>
+<span id="cb22-37"><a href="#cb22-37"></a><span class="fu">### The Inspector Tab</span></span>
+<span id="cb22-38"><a href="#cb22-38"></a></span>
+<span id="cb22-39"><a href="#cb22-39"></a>The Inspector shows the HTML structure of the page as a tree. You can hover over elements to highlight them on the page, expand nested tags to explore the structure, and identify the CSS selectors or element attributes you will need for scraping. Start with a simple page like a Wikipedia article — most commercial websites are full of tracking scripts and dynamic content that obscure the actual structure.</span>
+<span id="cb22-40"><a href="#cb22-40"></a></span>
+<span id="cb22-41"><a href="#cb22-41"></a><span class="fu">### The Network Tab</span></span>
+<span id="cb22-42"><a href="#cb22-42"></a></span>
+<span id="cb22-43"><a href="#cb22-43"></a>The Network tab reveals all the HTTP requests your browser makes to load a page. When you reload a page with the Network tab open, you will see dozens or even hundreds of requests — not just for the HTML, but for CSS stylesheets, JavaScript files, images, fonts, and tracking pixels. Each request shows:</span>
+<span id="cb22-44"><a href="#cb22-44"></a></span>
+<span id="cb22-45"><a href="#cb22-45"></a><span class="ss">- </span>The URL being requested</span>
+<span id="cb22-46"><a href="#cb22-46"></a><span class="ss">- </span>The HTTP method (GET, POST, etc.)</span>
+<span id="cb22-47"><a href="#cb22-47"></a><span class="ss">- </span>The status code of the response (200 OK, 404 Not Found, etc.)</span>
+<span id="cb22-48"><a href="#cb22-48"></a><span class="ss">- </span>The response headers, including <span class="in">`Content-Type`</span>, <span class="in">`Set-Cookie`</span>, and <span class="in">`User-Agent`</span></span>
+<span id="cb22-49"><a href="#cb22-49"></a></span>
+<span id="cb22-50"><a href="#cb22-50"></a>Click on any individual request to inspect its headers. Pay particular attention to the <span class="in">`User-Agent`</span> header (how your browser identifies itself) and any <span class="in">`Cookie`</span> headers (session information that the server uses to recognize you).</span>
+<span id="cb22-51"><a href="#cb22-51"></a></span>
+<span id="cb22-52"><a href="#cb22-52"></a>::: {.callout-tip}</span>
+<span id="cb22-53"><a href="#cb22-53"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb22-54"><a href="#cb22-54"></a>For a broader introduction to how HTTP and web APIs work, see *Missing Manual* Chapter 24: HTTP and Web APIs.</span>
+<span id="cb22-55"><a href="#cb22-55"></a>:::</span>
+<span id="cb22-56"><a href="#cb22-56"></a></span>
+<span id="cb22-57"><a href="#cb22-57"></a><span class="fu">## TCP/IP: The Transport Layer</span></span>
+<span id="cb22-58"><a href="#cb22-58"></a></span>
+<span id="cb22-59"><a href="#cb22-59"></a>Every computer on a public network has an IP address — a numerical identifier that functions like a postal address. IPv4 addresses are formatted as four numbers separated by dots (e.g., <span class="in">`151.101.130.133`</span>), allowing for about 4.3 billion unique addresses. IPv6 uses a longer hexadecimal format to support a vastly larger address space.</span>
+<span id="cb22-60"><a href="#cb22-60"></a></span>
+<span id="cb22-61"><a href="#cb22-61"></a>You can find your own computer's IP address programmatically:</span>
+<span id="cb22-62"><a href="#cb22-62"></a></span>
+<span id="cb22-65"><a href="#cb22-65"></a><span class="in">```{python}</span></span>
+<span id="cb22-66"><a href="#cb22-66"></a><span class="im">import</span> socket</span>
+<span id="cb22-67"><a href="#cb22-67"></a></span>
+<span id="cb22-68"><a href="#cb22-68"></a><span class="co"># Your computer's hostname on the local network</span></span>
+<span id="cb22-69"><a href="#cb22-69"></a>hostname <span class="op">=</span> socket.gethostname()</span>
+<span id="cb22-70"><a href="#cb22-70"></a><span class="bu">print</span>(<span class="ss">f"Hostname: </span><span class="sc">{</span>hostname<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-71"><a href="#cb22-71"></a></span>
+<span id="cb22-72"><a href="#cb22-72"></a><span class="co"># Your local IP address</span></span>
+<span id="cb22-73"><a href="#cb22-73"></a>local_ip <span class="op">=</span> socket.gethostbyname(hostname)</span>
+<span id="cb22-74"><a href="#cb22-74"></a><span class="bu">print</span>(<span class="ss">f"Local IP: </span><span class="sc">{</span>local_ip<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-75"><a href="#cb22-75"></a><span class="in">```</span></span>
+<span id="cb22-76"><a href="#cb22-76"></a></span>
+<span id="cb22-77"><a href="#cb22-77"></a>Be aware that on many Linux and macOS systems this lookup returns a loopback address like <span class="in">`127.0.0.1`</span> or <span class="in">`127.0.1.1`</span> — an address that simply means "this machine" — rather than your network-assigned IP, so the public-IP query below is the more reliable way to see how the internet identifies you.</span>
+<span id="cb22-78"><a href="#cb22-78"></a></span>
+<span id="cb22-79"><a href="#cb22-79"></a>To see your *public* IP address (as seen by servers on the internet), you can query an external service:</span>
+<span id="cb22-80"><a href="#cb22-80"></a></span>
+<span id="cb22-83"><a href="#cb22-83"></a><span class="in">```{python}</span></span>
+<span id="cb22-84"><a href="#cb22-84"></a><span class="im">import</span> requests</span>
+<span id="cb22-85"><a href="#cb22-85"></a></span>
+<span id="cb22-86"><a href="#cb22-86"></a>response <span class="op">=</span> requests.get(<span class="st">"https://api.ipify.org?format=json"</span>)</span>
+<span id="cb22-87"><a href="#cb22-87"></a><span class="bu">print</span>(response.json())</span>
+<span id="cb22-88"><a href="#cb22-88"></a><span class="co"># {'ip': '128.138.xxx.xxx'} — your public IP</span></span>
+<span id="cb22-89"><a href="#cb22-89"></a><span class="in">```</span></span>
+<span id="cb22-90"><a href="#cb22-90"></a></span>
+<span id="cb22-91"><a href="#cb22-91"></a><span class="fu">### Traceroute</span></span>
+<span id="cb22-92"><a href="#cb22-92"></a></span>
+<span id="cb22-93"><a href="#cb22-93"></a>When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers. You can trace this path using the <span class="in">`scapy`</span> library:</span>
+<span id="cb22-94"><a href="#cb22-94"></a></span>
+<span id="cb22-97"><a href="#cb22-97"></a><span class="in">```{python}</span></span>
+<span id="cb22-98"><a href="#cb22-98"></a><span class="im">from</span> scapy.<span class="bu">all</span> <span class="im">import</span> traceroute</span>
+<span id="cb22-99"><a href="#cb22-99"></a></span>
+<span id="cb22-100"><a href="#cb22-100"></a><span class="co"># Trace the path to Wikipedia</span></span>
+<span id="cb22-101"><a href="#cb22-101"></a><span class="co"># Note: scapy requires root/administrator access on some systems</span></span>
+<span id="cb22-102"><a href="#cb22-102"></a>result, unans <span class="op">=</span> traceroute(<span class="st">"en.wikipedia.org"</span>, maxttl<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb22-103"><a href="#cb22-103"></a><span class="in">```</span></span>
+<span id="cb22-104"><a href="#cb22-104"></a></span>
+<span id="cb22-105"><a href="#cb22-105"></a>Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:</span>
+<span id="cb22-106"><a href="#cb22-106"></a></span>
+<span id="cb22-109"><a href="#cb22-109"></a><span class="in">```{python}</span></span>
+<span id="cb22-110"><a href="#cb22-110"></a><span class="im">import</span> requests</span>
+<span id="cb22-111"><a href="#cb22-111"></a></span>
+<span id="cb22-112"><a href="#cb22-112"></a><span class="kw">def</span> geolocate_ip(ip):</span>
+<span id="cb22-113"><a href="#cb22-113"></a>    <span class="co">"""Look up the geographic location of an IP address."""</span></span>
+<span id="cb22-114"><a href="#cb22-114"></a>    response <span class="op">=</span> requests.get(<span class="ss">f"http://ip-api.com/json/</span><span class="sc">{</span>ip<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-115"><a href="#cb22-115"></a>    <span class="cf">return</span> response.json()</span>
+<span id="cb22-116"><a href="#cb22-116"></a></span>
+<span id="cb22-117"><a href="#cb22-117"></a><span class="co"># Note: ip-api.com limits you to 45 requests per minute</span></span>
+<span id="cb22-118"><a href="#cb22-118"></a>location <span class="op">=</span> geolocate_ip(<span class="st">"151.101.130.133"</span>)</span>
+<span id="cb22-119"><a href="#cb22-119"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>location[<span class="st">'city'</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>location[<span class="st">'country'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-120"><a href="#cb22-120"></a><span class="in">```</span></span>
+<span id="cb22-121"><a href="#cb22-121"></a></span>
+<span id="cb22-122"><a href="#cb22-122"></a>::: {.callout-important}</span>
+<span id="cb22-123"><a href="#cb22-123"></a><span class="in">`scapy`</span> requires root/administrator privileges to send and receive raw network packets. On macOS or Linux, you may need to run <span class="in">`sudo jupyter notebook`</span> from the terminal. On Windows, install the <span class="co">[</span><span class="ot">Npcap</span><span class="co">](https://npcap.com/)</span> packet-capture driver and launch Anaconda Prompt as Administrator. If you cannot get packet capture working on your machine, read along instead — nothing later in this book depends on it.</span>
+<span id="cb22-124"><a href="#cb22-124"></a>:::</span>
+<span id="cb22-125"><a href="#cb22-125"></a></span>
+<span id="cb22-126"><a href="#cb22-126"></a><span class="fu">## DNS: The Address Book</span></span>
+<span id="cb22-127"><a href="#cb22-127"></a></span>
+<span id="cb22-128"><a href="#cb22-128"></a>The Domain Name System translates human-readable domain names (like <span class="in">`en.wikipedia.org`</span>) into IP addresses that computers can route to. You can perform DNS lookups programmatically with the <span class="in">`dnspython`</span> library:</span>
+<span id="cb22-129"><a href="#cb22-129"></a></span>
+<span id="cb22-132"><a href="#cb22-132"></a><span class="in">```{python}</span></span>
+<span id="cb22-133"><a href="#cb22-133"></a><span class="im">import</span> dns.resolver</span>
+<span id="cb22-134"><a href="#cb22-134"></a></span>
+<span id="cb22-135"><a href="#cb22-135"></a><span class="co"># Look up the IP address for Wikipedia</span></span>
+<span id="cb22-136"><a href="#cb22-136"></a>answers <span class="op">=</span> dns.resolver.resolve(<span class="st">"en.wikipedia.org"</span>, <span class="st">"A"</span>)</span>
+<span id="cb22-137"><a href="#cb22-137"></a><span class="cf">for</span> answer <span class="kw">in</span> answers:</span>
+<span id="cb22-138"><a href="#cb22-138"></a>    <span class="bu">print</span>(<span class="ss">f"IP address: </span><span class="sc">{</span>answer<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-139"><a href="#cb22-139"></a><span class="in">```</span></span>
+<span id="cb22-140"><a href="#cb22-140"></a></span>
+<span id="cb22-141"><a href="#cb22-141"></a>Domain names have a hierarchical structure: <span class="in">`subdomain.domain.top-level-domain`</span>. Each top-level domain (<span class="in">`.com`</span>, <span class="in">`.org`</span>, <span class="in">`.edu`</span>) is operated by a registry organization — Verisign runs <span class="in">`.com`</span>, for example — under the coordination of ICANN, the nonprofit that oversees the internet's naming system. The domain (<span class="in">`wikipedia`</span>) is registered by the organization. Subdomains (<span class="in">`en`</span>, <span class="in">`es`</span>, <span class="in">`m`</span>) are controlled by the domain owner and do not require separate registration.</span>
+<span id="cb22-142"><a href="#cb22-142"></a></span>
+<span id="cb22-143"><a href="#cb22-143"></a><span class="fu">### The Structure of Domain Names</span></span>
+<span id="cb22-144"><a href="#cb22-144"></a></span>
+<span id="cb22-145"><a href="#cb22-145"></a>Understanding this hierarchy helps you navigate the web programmatically. Consider two examples:</span>
+<span id="cb22-146"><a href="#cb22-146"></a></span>
+<span id="cb22-147"><a href="#cb22-147"></a><span class="ss">- </span><span class="in">`en.wikipedia.org`</span> — The TLD is <span class="in">`.org`</span> (a generic TLD for organizations). The domain is <span class="in">`wikipedia`</span> (registered by the Wikimedia Foundation). The subdomain <span class="in">`en`</span> indicates the English-language edition. Other subdomains like <span class="in">`es`</span>, <span class="in">`de`</span>, or <span class="in">`m`</span> (mobile) are all controlled by Wikipedia and do not require separate registration. The pageviews API you will use later in this chapter lives at <span class="in">`wikimedia.org`</span> — not a subdomain of <span class="in">`wikipedia.org`</span> but a separate registered domain that the Wikimedia Foundation also operates.</span>
+<span id="cb22-148"><a href="#cb22-148"></a></span>
+<span id="cb22-149"><a href="#cb22-149"></a><span class="ss">- </span><span class="in">`api.census.gov`</span> — The TLD is <span class="in">`.gov`</span> (restricted to U.S. government entities). The domain is <span class="in">`census`</span>. The subdomain <span class="in">`api`</span> indicates this is the programmatic access point rather than the public-facing website at <span class="in">`www.census.gov`</span>.</span>
+<span id="cb22-150"><a href="#cb22-150"></a></span>
+<span id="cb22-151"><a href="#cb22-151"></a>When you construct URLs for scraping or API calls, knowing which part of the domain identifies the service (the domain) versus which part routes you to a specific feature (the subdomain and path) helps you anticipate URL patterns. Government APIs often live at <span class="in">`api.agency.gov`</span>, data portals at <span class="in">`data.agency.gov`</span>, and documentation at <span class="in">`developers.agency.gov`</span>. Recognizing these conventions saves you time when exploring new data sources.</span>
+<span id="cb22-152"><a href="#cb22-152"></a></span>
+<span id="cb22-153"><a href="#cb22-153"></a><span class="fu">## HTTP: The Application Layer</span></span>
+<span id="cb22-154"><a href="#cb22-154"></a></span>
+<span id="cb22-155"><a href="#cb22-155"></a>HTTP (Hypertext Transfer Protocol) is the language that clients and servers use to communicate. A client sends a **request** with a method (GET, POST, PUT, DELETE), headers (metadata), and optionally a body. The server sends a **response** with a status code, headers, and a body.</span>
+<span id="cb22-156"><a href="#cb22-156"></a></span>
+<span id="cb22-157"><a href="#cb22-157"></a>The status codes you will encounter most often:</span>
+<span id="cb22-158"><a href="#cb22-158"></a></span>
+<span id="cb22-159"><a href="#cb22-159"></a><span class="ss">- </span>**200 OK**: The request succeeded and the response body contains the data</span>
+<span id="cb22-160"><a href="#cb22-160"></a><span class="ss">- </span>**301/302 Redirect**: The resource has moved; follow the <span class="in">`Location`</span> header</span>
+<span id="cb22-161"><a href="#cb22-161"></a><span class="ss">- </span>**403 Forbidden**: The server understood your request but refused to fulfill it (often a User-Agent issue)</span>
+<span id="cb22-162"><a href="#cb22-162"></a><span class="ss">- </span>**404 Not Found**: The resource does not exist at this URL</span>
+<span id="cb22-163"><a href="#cb22-163"></a><span class="ss">- </span>**429 Too Many Requests**: You are being rate-limited; slow down</span>
+<span id="cb22-164"><a href="#cb22-164"></a><span class="ss">- </span>**500 Internal Server Error**: Something went wrong on the server side</span>
+<span id="cb22-165"><a href="#cb22-165"></a></span>
+<span id="cb22-166"><a href="#cb22-166"></a><span class="fu">### Diagnosing HTTP Errors</span></span>
+<span id="cb22-167"><a href="#cb22-167"></a></span>
+<span id="cb22-168"><a href="#cb22-168"></a>When a request fails, the status code tells you *what* went wrong, but diagnosing *why* requires looking at the full response. A diagnostic function can help:</span>
+<span id="cb22-169"><a href="#cb22-169"></a></span>
+<span id="cb22-172"><a href="#cb22-172"></a><span class="in">```{python}</span></span>
+<span id="cb22-173"><a href="#cb22-173"></a><span class="im">import</span> requests</span>
+<span id="cb22-174"><a href="#cb22-174"></a></span>
+<span id="cb22-175"><a href="#cb22-175"></a><span class="kw">def</span> diagnose_request(url, headers<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb22-176"><a href="#cb22-176"></a>    <span class="co">"""Print diagnostic information about an HTTP request."""</span></span>
+<span id="cb22-177"><a href="#cb22-177"></a>    <span class="cf">try</span>:</span>
+<span id="cb22-178"><a href="#cb22-178"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers, timeout<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb22-179"><a href="#cb22-179"></a>        <span class="bu">print</span>(<span class="ss">f"URL: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-180"><a href="#cb22-180"></a>        <span class="bu">print</span>(<span class="ss">f"Status: </span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-181"><a href="#cb22-181"></a>        <span class="bu">print</span>(<span class="ss">f"Content-Type: </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'Content-Type'</span>, <span class="st">'not specified'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-182"><a href="#cb22-182"></a>        <span class="bu">print</span>(<span class="ss">f"Server: </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'Server'</span>, <span class="st">'not specified'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-183"><a href="#cb22-183"></a>        <span class="bu">print</span>(<span class="ss">f"Response size: </span><span class="sc">{</span><span class="bu">len</span>(response.content)<span class="sc">:,}</span><span class="ss"> bytes"</span>)</span>
+<span id="cb22-184"><a href="#cb22-184"></a>        <span class="cf">if</span> response.history:</span>
+<span id="cb22-185"><a href="#cb22-185"></a>            <span class="bu">print</span>(<span class="ss">f"Redirected from: </span><span class="sc">{</span>response<span class="sc">.</span>history[<span class="dv">0</span>]<span class="sc">.</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-186"><a href="#cb22-186"></a>        <span class="cf">return</span> response</span>
+<span id="cb22-187"><a href="#cb22-187"></a>    <span class="cf">except</span> requests.exceptions.<span class="pp">ConnectionError</span>:</span>
+<span id="cb22-188"><a href="#cb22-188"></a>        <span class="bu">print</span>(<span class="ss">f"Connection failed: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-189"><a href="#cb22-189"></a>    <span class="cf">except</span> requests.exceptions.Timeout:</span>
+<span id="cb22-190"><a href="#cb22-190"></a>        <span class="bu">print</span>(<span class="ss">f"Request timed out: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-191"><a href="#cb22-191"></a></span>
+<span id="cb22-192"><a href="#cb22-192"></a><span class="co"># Test on a few URLs</span></span>
+<span id="cb22-193"><a href="#cb22-193"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Python_(programming_language)"</span>)</span>
+<span id="cb22-194"><a href="#cb22-194"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Nonexistent_Page_12345"</span>)</span>
+<span id="cb22-195"><a href="#cb22-195"></a><span class="in">```</span></span>
+<span id="cb22-196"><a href="#cb22-196"></a></span>
+<span id="cb22-197"><a href="#cb22-197"></a>The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a <span class="in">`User-Agent`</span> header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:</span>
+<span id="cb22-198"><a href="#cb22-198"></a></span>
+<span id="cb22-201"><a href="#cb22-201"></a><span class="in">```{python}</span></span>
+<span id="cb22-202"><a href="#cb22-202"></a><span class="im">import</span> time</span>
+<span id="cb22-203"><a href="#cb22-203"></a></span>
+<span id="cb22-204"><a href="#cb22-204"></a><span class="kw">def</span> get_with_backoff(url, headers<span class="op">=</span><span class="va">None</span>, max_retries<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb22-205"><a href="#cb22-205"></a>    <span class="co">"""Retry a request with exponential backoff on 429 errors."""</span></span>
+<span id="cb22-206"><a href="#cb22-206"></a>    <span class="cf">for</span> attempt <span class="kw">in</span> <span class="bu">range</span>(max_retries):</span>
+<span id="cb22-207"><a href="#cb22-207"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb22-208"><a href="#cb22-208"></a>        <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">429</span>:</span>
+<span id="cb22-209"><a href="#cb22-209"></a>            wait_time <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> attempt  <span class="co"># 1s, 2s, 4s</span></span>
+<span id="cb22-210"><a href="#cb22-210"></a>            <span class="bu">print</span>(<span class="ss">f"Rate limited. Waiting </span><span class="sc">{</span>wait_time<span class="sc">}</span><span class="ss">s before retry..."</span>)</span>
+<span id="cb22-211"><a href="#cb22-211"></a>            time.sleep(wait_time)</span>
+<span id="cb22-212"><a href="#cb22-212"></a>        <span class="cf">else</span>:</span>
+<span id="cb22-213"><a href="#cb22-213"></a>            <span class="cf">return</span> response</span>
+<span id="cb22-214"><a href="#cb22-214"></a>    <span class="cf">return</span> response  <span class="co"># Return the last response even if still 429</span></span>
+<span id="cb22-215"><a href="#cb22-215"></a><span class="in">```</span></span>
+<span id="cb22-216"><a href="#cb22-216"></a></span>
+<span id="cb22-217"><a href="#cb22-217"></a>Exponential backoff doubles the wait time with each retry, giving the server progressively more breathing room. Many APIs include a <span class="in">`Retry-After`</span> header in their 429 responses that tells you exactly how long to wait — check for it with <span class="in">`response.headers.get("Retry-After")`</span> before falling back to your own backoff schedule.</span>
+<span id="cb22-218"><a href="#cb22-218"></a></span>
+<span id="cb22-219"><a href="#cb22-219"></a>Understanding status codes in context makes debugging much faster. A 403 from the Wikimedia API almost always means you forgot the <span class="in">`User-Agent`</span> header — the fix is a single line of code. A 403 from a news site might mean the site blocks all automated access, and no header change will help. A 404 could mean the page was deleted, the URL has a typo, or the site restructured its paths. A 500 is the server's problem, not yours — retry after a delay. Building this diagnostic intuition takes practice, but the pattern is always the same: check the status code, inspect the response headers, read the response body for error messages, and adjust your request accordingly. This systematic approach to debugging carries through every chapter that follows.</span>
+<span id="cb22-220"><a href="#cb22-220"></a></span>
+<span id="cb22-221"><a href="#cb22-221"></a><span class="fu">### Making API Requests with Custom Headers</span></span>
+<span id="cb22-222"><a href="#cb22-222"></a></span>
+<span id="cb22-223"><a href="#cb22-223"></a>Let us retrieve data from the Wikimedia pageviews API. This API requires a meaningful <span class="in">`User-Agent`</span> header — if you send the default <span class="in">`requests`</span> User-Agent, you will get a 403 error:</span>
+<span id="cb22-224"><a href="#cb22-224"></a></span>
+<span id="cb22-227"><a href="#cb22-227"></a><span class="in">```{python}</span></span>
+<span id="cb22-228"><a href="#cb22-228"></a><span class="im">import</span> requests</span>
+<span id="cb22-229"><a href="#cb22-229"></a></span>
+<span id="cb22-230"><a href="#cb22-230"></a>article <span class="op">=</span> <span class="st">"University_of_Colorado_Boulder"</span></span>
+<span id="cb22-231"><a href="#cb22-231"></a>api_url <span class="op">=</span> (</span>
+<span id="cb22-232"><a href="#cb22-232"></a>    <span class="ss">f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
+<span id="cb22-233"><a href="#cb22-233"></a>    <span class="ss">f"/en.wikipedia/all-access/all-agents/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
+<span id="cb22-234"><a href="#cb22-234"></a>)</span>
+<span id="cb22-235"><a href="#cb22-235"></a></span>
+<span id="cb22-236"><a href="#cb22-236"></a><span class="co"># This will likely fail with a 403</span></span>
+<span id="cb22-237"><a href="#cb22-237"></a>response <span class="op">=</span> requests.get(api_url)</span>
+<span id="cb22-238"><a href="#cb22-238"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 403</span></span>
+<span id="cb22-239"><a href="#cb22-239"></a></span>
+<span id="cb22-240"><a href="#cb22-240"></a><span class="co"># Add a custom User-Agent header</span></span>
+<span id="cb22-241"><a href="#cb22-241"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb22-242"><a href="#cb22-242"></a>response <span class="op">=</span> requests.get(api_url, headers<span class="op">=</span>headers)</span>
+<span id="cb22-243"><a href="#cb22-243"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200</span></span>
+<span id="cb22-244"><a href="#cb22-244"></a></span>
+<span id="cb22-245"><a href="#cb22-245"></a><span class="co"># Parse the JSON response</span></span>
+<span id="cb22-246"><a href="#cb22-246"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb22-247"><a href="#cb22-247"></a><span class="in">```</span></span>
+<span id="cb22-248"><a href="#cb22-248"></a></span>
+<span id="cb22-249"><a href="#cb22-249"></a>Now convert the response to a DataFrame and plot it:</span>
+<span id="cb22-250"><a href="#cb22-250"></a></span>
+<span id="cb22-253"><a href="#cb22-253"></a><span class="in">```{python}</span></span>
+<span id="cb22-254"><a href="#cb22-254"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb22-255"><a href="#cb22-255"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb22-256"><a href="#cb22-256"></a></span>
+<span id="cb22-257"><a href="#cb22-257"></a><span class="co"># The pageview data is nested inside data['items']</span></span>
+<span id="cb22-258"><a href="#cb22-258"></a>df <span class="op">=</span> pd.DataFrame(data[<span class="st">"items"</span>])</span>
+<span id="cb22-259"><a href="#cb22-259"></a>df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">00"</span>)</span>
+<span id="cb22-260"><a href="#cb22-260"></a></span>
+<span id="cb22-261"><a href="#cb22-261"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb22-262"><a href="#cb22-262"></a>plt.plot(df[<span class="st">"timestamp"</span>], df[<span class="st">"views"</span>])</span>
+<span id="cb22-263"><a href="#cb22-263"></a>plt.title(<span class="ss">f"Daily Pageviews: </span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-264"><a href="#cb22-264"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
+<span id="cb22-265"><a href="#cb22-265"></a>plt.ylabel(<span class="st">"Views"</span>)</span>
+<span id="cb22-266"><a href="#cb22-266"></a>plt.tight_layout()</span>
+<span id="cb22-267"><a href="#cb22-267"></a>plt.show()</span>
+<span id="cb22-268"><a href="#cb22-268"></a><span class="in">```</span></span>
+<span id="cb22-269"><a href="#cb22-269"></a></span>
+<span id="cb22-270"><a href="#cb22-270"></a><span class="fu">### Connections, Sessions, and Retries</span></span>
+<span id="cb22-271"><a href="#cb22-271"></a></span>
+<span id="cb22-272"><a href="#cb22-272"></a>Every bare <span class="in">`requests.get()`</span> call does more work than it appears to: it opens a fresh TCP connection to the server, performs the TLS handshake, sends the request, and tears the connection back down. For a single request, that overhead is negligible. But the chapters ahead will have you making dozens or hundreds of requests to the same host — one per Wikipedia article, one per bill, one per archived page — and paying the connection setup cost every time is wasteful for both you and the server.</span>
+<span id="cb22-273"><a href="#cb22-273"></a></span>
+<span id="cb22-274"><a href="#cb22-274"></a>A <span class="in">`requests.Session`</span> object fixes this. A Session keeps the underlying connection open and reuses it for subsequent requests to the same host, and it remembers headers, so you set your <span class="in">`User-Agent`</span> once instead of passing it to every call. A Session can also carry a retry policy: rather than hand-rolling backoff logic like the <span class="in">`get_with_backoff()`</span> function you wrote earlier, you can mount a <span class="in">`Retry`</span> configuration that automatically retries rate limits and transient server errors with exponentially increasing delays — and it honors any <span class="in">`Retry-After`</span> header the server sends:</span>
+<span id="cb22-275"><a href="#cb22-275"></a></span>
+<span id="cb22-278"><a href="#cb22-278"></a><span class="in">```{python}</span></span>
+<span id="cb22-279"><a href="#cb22-279"></a><span class="im">import</span> requests</span>
+<span id="cb22-280"><a href="#cb22-280"></a><span class="im">from</span> requests.adapters <span class="im">import</span> HTTPAdapter</span>
+<span id="cb22-281"><a href="#cb22-281"></a><span class="im">from</span> urllib3.util.retry <span class="im">import</span> Retry</span>
+<span id="cb22-282"><a href="#cb22-282"></a></span>
+<span id="cb22-283"><a href="#cb22-283"></a><span class="co"># Create a session with persistent headers</span></span>
+<span id="cb22-284"><a href="#cb22-284"></a>session <span class="op">=</span> requests.Session()</span>
+<span id="cb22-285"><a href="#cb22-285"></a>session.headers.update(</span>
+<span id="cb22-286"><a href="#cb22-286"></a>    {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb22-287"><a href="#cb22-287"></a>)</span>
+<span id="cb22-288"><a href="#cb22-288"></a></span>
+<span id="cb22-289"><a href="#cb22-289"></a><span class="co"># Retry up to 3 times on rate limits and server errors, waiting 1s, 2s, then 4s between attempts</span></span>
+<span id="cb22-290"><a href="#cb22-290"></a>retries <span class="op">=</span> Retry(</span>
+<span id="cb22-291"><a href="#cb22-291"></a>    total<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb22-292"><a href="#cb22-292"></a>    backoff_factor<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb22-293"><a href="#cb22-293"></a>    status_forcelist<span class="op">=</span>[<span class="dv">429</span>, <span class="dv">500</span>, <span class="dv">502</span>, <span class="dv">503</span>, <span class="dv">504</span>],</span>
+<span id="cb22-294"><a href="#cb22-294"></a>)</span>
+<span id="cb22-295"><a href="#cb22-295"></a>session.mount(<span class="st">"https://"</span>, HTTPAdapter(max_retries<span class="op">=</span>retries))</span>
+<span id="cb22-296"><a href="#cb22-296"></a></span>
+<span id="cb22-297"><a href="#cb22-297"></a><span class="co"># Use the session exactly like the requests module itself</span></span>
+<span id="cb22-298"><a href="#cb22-298"></a>articles <span class="op">=</span> [<span class="st">"Python_(programming_language)"</span>, <span class="st">"Web_scraping"</span>, <span class="st">"Data_science"</span>]</span>
+<span id="cb22-299"><a href="#cb22-299"></a><span class="cf">for</span> article <span class="kw">in</span> articles:</span>
+<span id="cb22-300"><a href="#cb22-300"></a>    url <span class="op">=</span> <span class="ss">f"https://en.wikipedia.org/wiki/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb22-301"><a href="#cb22-301"></a>    response <span class="op">=</span> session.get(url)  <span class="co"># Connection reused; headers already set</span></span>
+<span id="cb22-302"><a href="#cb22-302"></a>    <span class="bu">print</span>(article, response.status_code, <span class="bu">len</span>(response.text))</span>
+<span id="cb22-303"><a href="#cb22-303"></a><span class="co"># Python_(programming_language) 200 812394</span></span>
+<span id="cb22-304"><a href="#cb22-304"></a><span class="co"># Web_scraping 200 145207</span></span>
+<span id="cb22-305"><a href="#cb22-305"></a><span class="co"># Data_science 200 291846</span></span>
+<span id="cb22-306"><a href="#cb22-306"></a><span class="in">```</span></span>
+<span id="cb22-307"><a href="#cb22-307"></a></span>
+<span id="cb22-308"><a href="#cb22-308"></a>The setup costs six lines, and everything after that behaves exactly like the <span class="in">`requests.get()`</span> calls you already know — <span class="in">`session.get()`</span> returns the same <span class="in">`Response`</span> object with the same <span class="in">`.json()`</span>, <span class="in">`.text`</span>, and <span class="in">`.status_code`</span>.</span>
+<span id="cb22-309"><a href="#cb22-309"></a></span>
+<span id="cb22-310"><a href="#cb22-310"></a>::: {.callout-tip}</span>
+<span id="cb22-311"><a href="#cb22-311"></a>A <span class="in">`for`</span> loop around <span class="in">`requests.get()`</span> is your cue to create a <span class="in">`Session`</span> first. The scraping and API chapters ahead (@sec-static-pages, @sec-wikipedia, @sec-government) all involve exactly this kind of loop over many URLs at the same host, and this pattern carries over unchanged.</span>
+<span id="cb22-312"><a href="#cb22-312"></a>:::</span>
+<span id="cb22-313"><a href="#cb22-313"></a></span>
+<span id="cb22-314"><a href="#cb22-314"></a><span class="fu">## URLs: Anatomy and Parsing</span></span>
+<span id="cb22-315"><a href="#cb22-315"></a></span>
+<span id="cb22-316"><a href="#cb22-316"></a>URLs (Uniform Resource Locators) have a well-defined structure:</span>
+<span id="cb22-317"><a href="#cb22-317"></a></span>
+<span id="cb22-318"><a href="#cb22-318"></a><span class="in">```</span></span>
+<span id="cb22-319"><a href="#cb22-319"></a><span class="in">scheme://userinfo@host:port/path?query#fragment</span></span>
+<span id="cb22-320"><a href="#cb22-320"></a><span class="in">```</span></span>
+<span id="cb22-321"><a href="#cb22-321"></a></span>
+<span id="cb22-322"><a href="#cb22-322"></a>Never write regular expressions to parse URLs. Use the <span class="in">`urllib.parse`</span> module instead:</span>
+<span id="cb22-323"><a href="#cb22-323"></a></span>
+<span id="cb22-326"><a href="#cb22-326"></a><span class="in">```{python}</span></span>
+<span id="cb22-327"><a href="#cb22-327"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlparse, parse_qs</span>
+<span id="cb22-328"><a href="#cb22-328"></a></span>
+<span id="cb22-329"><a href="#cb22-329"></a>url <span class="op">=</span> <span class="st">"https://api.census.gov/data/2022/acs/acs5?get=NAME,B01001_001E&amp;for=place:07850&amp;in=state:08"</span></span>
+<span id="cb22-330"><a href="#cb22-330"></a></span>
+<span id="cb22-331"><a href="#cb22-331"></a>parsed <span class="op">=</span> urlparse(url)</span>
+<span id="cb22-332"><a href="#cb22-332"></a><span class="bu">print</span>(<span class="ss">f"Scheme: </span><span class="sc">{</span>parsed<span class="sc">.</span>scheme<span class="sc">}</span><span class="ss">"</span>)      <span class="co"># https</span></span>
+<span id="cb22-333"><a href="#cb22-333"></a><span class="bu">print</span>(<span class="ss">f"Host: </span><span class="sc">{</span>parsed<span class="sc">.</span>netloc<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># api.census.gov</span></span>
+<span id="cb22-334"><a href="#cb22-334"></a><span class="bu">print</span>(<span class="ss">f"Path: </span><span class="sc">{</span>parsed<span class="sc">.</span>path<span class="sc">}</span><span class="ss">"</span>)          <span class="co"># /data/2022/acs/acs5</span></span>
+<span id="cb22-335"><a href="#cb22-335"></a><span class="bu">print</span>(<span class="ss">f"Query: </span><span class="sc">{</span>parsed<span class="sc">.</span>query<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># get=NAME,...</span></span>
+<span id="cb22-336"><a href="#cb22-336"></a></span>
+<span id="cb22-337"><a href="#cb22-337"></a><span class="co"># Parse query parameters into a dictionary</span></span>
+<span id="cb22-338"><a href="#cb22-338"></a>params <span class="op">=</span> parse_qs(parsed.query)</span>
+<span id="cb22-339"><a href="#cb22-339"></a><span class="bu">print</span>(params)</span>
+<span id="cb22-340"><a href="#cb22-340"></a><span class="co"># {'get': ['NAME,B01001_001E'], 'for': ['place:07850'], 'in': ['state:08']}</span></span>
+<span id="cb22-341"><a href="#cb22-341"></a><span class="in">```</span></span>
+<span id="cb22-342"><a href="#cb22-342"></a></span>
+<span id="cb22-343"><a href="#cb22-343"></a>Understanding URL structure is essential for constructing API requests. In @sec-wikipedia through @sec-ai-apis, you will build URLs programmatically by assembling scheme, host, path, and query parameters.</span>
+<span id="cb22-344"><a href="#cb22-344"></a></span>
+<span id="cb22-345"><a href="#cb22-345"></a><span class="fu">### Building URLs Programmatically</span></span>
+<span id="cb22-346"><a href="#cb22-346"></a></span>
+<span id="cb22-347"><a href="#cb22-347"></a>Web APIs expect the values you supply in one of two places, and you need to recognize which pattern you are dealing with before you can build the URL correctly.</span>
+<span id="cb22-348"><a href="#cb22-348"></a></span>
+<span id="cb22-349"><a href="#cb22-349"></a>**Path-segment APIs** embed each value at a fixed position in the URL's path. The Wikimedia pageviews endpoint you used earlier works this way: project, access method, agent, article, granularity, and date range are all path segments in a required order. Build these URLs with an f-string over the components — but URL-encode any component that might contain special characters using <span class="in">`urllib.parse.quote`</span>, because a stray slash or space inside a path segment produces a URL the server cannot route:</span>
+<span id="cb22-350"><a href="#cb22-350"></a></span>
+<span id="cb22-353"><a href="#cb22-353"></a><span class="in">```{python}</span></span>
+<span id="cb22-354"><a href="#cb22-354"></a><span class="im">from</span> urllib.parse <span class="im">import</span> quote</span>
+<span id="cb22-355"><a href="#cb22-355"></a></span>
+<span id="cb22-356"><a href="#cb22-356"></a><span class="co"># Each value occupies a fixed position in the path</span></span>
+<span id="cb22-357"><a href="#cb22-357"></a>project <span class="op">=</span> <span class="st">"en.wikipedia"</span></span>
+<span id="cb22-358"><a href="#cb22-358"></a>access <span class="op">=</span> <span class="st">"all-access"</span></span>
+<span id="cb22-359"><a href="#cb22-359"></a>agent <span class="op">=</span> <span class="st">"all-agents"</span></span>
+<span id="cb22-360"><a href="#cb22-360"></a>article <span class="op">=</span> <span class="st">"University of Colorado Boulder"</span>  <span class="co"># Note the spaces</span></span>
+<span id="cb22-361"><a href="#cb22-361"></a></span>
+<span id="cb22-362"><a href="#cb22-362"></a><span class="co"># Wikipedia titles replace spaces with underscores; quote() percent-encodes anything else that would break a path segment (slashes, question marks)</span></span>
+<span id="cb22-363"><a href="#cb22-363"></a>encoded_article <span class="op">=</span> quote(article.replace(<span class="st">" "</span>, <span class="st">"_"</span>), safe<span class="op">=</span><span class="st">""</span>)</span>
+<span id="cb22-364"><a href="#cb22-364"></a><span class="bu">print</span>(encoded_article)</span>
+<span id="cb22-365"><a href="#cb22-365"></a><span class="co"># University_of_Colorado_Boulder</span></span>
+<span id="cb22-366"><a href="#cb22-366"></a></span>
+<span id="cb22-367"><a href="#cb22-367"></a>url <span class="op">=</span> (</span>
+<span id="cb22-368"><a href="#cb22-368"></a>    <span class="st">"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
+<span id="cb22-369"><a href="#cb22-369"></a>    <span class="ss">f"/</span><span class="sc">{</span>project<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>access<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>agent<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>encoded_article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
+<span id="cb22-370"><a href="#cb22-370"></a>)</span>
+<span id="cb22-371"><a href="#cb22-371"></a><span class="bu">print</span>(url)</span>
+<span id="cb22-372"><a href="#cb22-372"></a><span class="co"># https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/University_of_Colorado_Boulder/daily/20260101/20260131</span></span>
+<span id="cb22-373"><a href="#cb22-373"></a><span class="in">```</span></span>
+<span id="cb22-374"><a href="#cb22-374"></a></span>
+<span id="cb22-375"><a href="#cb22-375"></a>The encoding matters more than this example suggests: a band like "AC/DC" has a slash in its article title, and <span class="in">`quote("AC/DC", safe="")`</span> correctly produces <span class="in">`AC%2FDC`</span>. Paste the raw title into your f-string instead, and the API would interpret the slash as a path separator and return a 404.</span>
+<span id="cb22-376"><a href="#cb22-376"></a></span>
+<span id="cb22-377"><a href="#cb22-377"></a>**Query-parameter APIs** instead accept <span class="in">`key=value`</span> pairs after a <span class="in">`?`</span>, where order does not matter and many parameters are optional. The MediaWiki Action API — Wikipedia's general-purpose API, which you will explore in @sec-wikipedia — works this way. The <span class="in">`urlencode`</span> function converts a dictionary into a properly escaped query string:</span>
+<span id="cb22-378"><a href="#cb22-378"></a></span>
+<span id="cb22-381"><a href="#cb22-381"></a><span class="in">```{python}</span></span>
+<span id="cb22-382"><a href="#cb22-382"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlencode</span>
+<span id="cb22-383"><a href="#cb22-383"></a></span>
+<span id="cb22-384"><a href="#cb22-384"></a>base_url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb22-385"><a href="#cb22-385"></a>params <span class="op">=</span> {</span>
+<span id="cb22-386"><a href="#cb22-386"></a>    <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb22-387"><a href="#cb22-387"></a>    <span class="st">"format"</span>: <span class="st">"json"</span>,</span>
+<span id="cb22-388"><a href="#cb22-388"></a>    <span class="st">"titles"</span>: <span class="st">"University of Colorado Boulder"</span>,</span>
+<span id="cb22-389"><a href="#cb22-389"></a>    <span class="st">"prop"</span>: <span class="st">"info"</span>,</span>
+<span id="cb22-390"><a href="#cb22-390"></a>}</span>
+<span id="cb22-391"><a href="#cb22-391"></a></span>
+<span id="cb22-392"><a href="#cb22-392"></a>query_string <span class="op">=</span> urlencode(params)</span>
+<span id="cb22-393"><a href="#cb22-393"></a><span class="bu">print</span>(query_string)</span>
+<span id="cb22-394"><a href="#cb22-394"></a><span class="co"># action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span>
+<span id="cb22-395"><a href="#cb22-395"></a><span class="in">```</span></span>
+<span id="cb22-396"><a href="#cb22-396"></a></span>
+<span id="cb22-397"><a href="#cb22-397"></a>For query-parameter APIs, the <span class="in">`requests`</span> library can do this encoding for you: pass the dictionary as the <span class="in">`params`</span> argument. This is the preferred approach for API calls:</span>
+<span id="cb22-398"><a href="#cb22-398"></a></span>
+<span id="cb22-401"><a href="#cb22-401"></a><span class="in">```{python}</span></span>
+<span id="cb22-402"><a href="#cb22-402"></a>response <span class="op">=</span> requests.get(base_url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb22-403"><a href="#cb22-403"></a><span class="bu">print</span>(response.url)  <span class="co"># The full URL that requests actually built</span></span>
+<span id="cb22-404"><a href="#cb22-404"></a><span class="co"># https://en.wikipedia.org/w/api.php?action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span>
+<span id="cb22-405"><a href="#cb22-405"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200</span></span>
+<span id="cb22-406"><a href="#cb22-406"></a><span class="in">```</span></span>
+<span id="cb22-407"><a href="#cb22-407"></a></span>
+<span id="cb22-408"><a href="#cb22-408"></a>How do you know which pattern an API expects? Read its documentation — but the URL itself usually tells you. Values between slashes are path segments: build the URL with an f-string and <span class="in">`quote()`</span> each component. Values after a <span class="in">`?`</span> are query parameters: pass a dictionary via <span class="in">`params=`</span> and let <span class="in">`requests`</span> handle the escaping. REST-style endpoints that return one specific resource (like pageviews for one article) tend to use path segments; APIs with many optional settings (like the Action API's dozens of parameters) tend to use query strings. Mixing them up is a classic source of confusing 404s — query-encoding values that an API expects in its path sends the server a URL it cannot route. You will appreciate this distinction especially in @sec-wikipedia and @sec-government, where article titles and variable names frequently contain characters that require encoding.</span>
+<span id="cb22-409"><a href="#cb22-409"></a></span>
+<span id="cb22-410"><a href="#cb22-410"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb22-411"><a href="#cb22-411"></a></span>
+<span id="cb22-412"><a href="#cb22-412"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
+<span id="cb22-413"><a href="#cb22-413"></a></span>
+<span id="cb22-414"><a href="#cb22-414"></a>You will build a URL diagnostic tool from the protocol layers this chapter covered — DNS, HTTP status codes, headers, and redirects — and use it to profile five real URLs.</span>
+<span id="cb22-415"><a href="#cb22-415"></a></span>
+<span id="cb22-416"><a href="#cb22-416"></a>**Step 1 — Take a URL apart.** Use <span class="in">`urlparse()`</span> on three URLs of different shapes — a plain page, a URL with a query string, and one of the API URLs from earlier chapters. For each, print the scheme, netloc, path, and query.</span>
+<span id="cb22-417"><a href="#cb22-417"></a></span>
+<span id="cb22-420"><a href="#cb22-420"></a><span class="in">```{python}</span></span>
+<span id="cb22-421"><a href="#cb22-421"></a><span class="co"># Step 1: urlparse three different URLs and print their components.</span></span>
+<span id="cb22-422"><a href="#cb22-422"></a><span class="co"># Your code here</span></span>
+<span id="cb22-423"><a href="#cb22-423"></a><span class="in">```</span></span>
+<span id="cb22-424"><a href="#cb22-424"></a></span>
+<span id="cb22-425"><a href="#cb22-425"></a>**Step 2 — Resolve a name.** Use <span class="in">`dns.resolver`</span> to look up the A records for <span class="in">`en.wikipedia.org`</span> and two other domains you choose. Print the IP addresses. Do any share an address?</span>
+<span id="cb22-426"><a href="#cb22-426"></a></span>
+<span id="cb22-429"><a href="#cb22-429"></a><span class="in">```{python}</span></span>
+<span id="cb22-430"><a href="#cb22-430"></a><span class="co"># Step 2: Resolve A records for three domains and print the IPs.</span></span>
+<span id="cb22-431"><a href="#cb22-431"></a><span class="co"># Your code here</span></span>
+<span id="cb22-432"><a href="#cb22-432"></a><span class="in">```</span></span>
+<span id="cb22-433"><a href="#cb22-433"></a></span>
+<span id="cb22-434"><a href="#cb22-434"></a>**Step 3 — Request with named headers.** Define your <span class="in">`HEADERS`</span> (@sec-ethics) and request one of the three URLs from Step 1. Print the status code and three response headers: <span class="in">`Content-Type`</span>, <span class="in">`Server`</span>, and <span class="in">`Content-Length`</span> (or the length of <span class="in">`response.content`</span> if the header is absent).</span>
+<span id="cb22-435"><a href="#cb22-435"></a></span>
+<span id="cb22-438"><a href="#cb22-438"></a><span class="in">```{python}</span></span>
+<span id="cb22-439"><a href="#cb22-439"></a><span class="co"># Step 3: Make a request with your HEADERS and print the status code and three response headers.</span></span>
+<span id="cb22-440"><a href="#cb22-440"></a><span class="co"># Your code here</span></span>
+<span id="cb22-441"><a href="#cb22-441"></a><span class="in">```</span></span>
+<span id="cb22-442"><a href="#cb22-442"></a></span>
+<span id="cb22-443"><a href="#cb22-443"></a>**Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function <span class="in">`diagnose_url(url)`</span> that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check <span class="in">`response.history`</span>, and if it redirected, print where it ended up. Include a docstring.</span>
+<span id="cb22-444"><a href="#cb22-444"></a></span>
+<span id="cb22-447"><a href="#cb22-447"></a><span class="in">```{python}</span></span>
+<span id="cb22-448"><a href="#cb22-448"></a><span class="co"># Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring.</span></span>
+<span id="cb22-449"><a href="#cb22-449"></a><span class="co"># Your code here</span></span>
+<span id="cb22-450"><a href="#cb22-450"></a><span class="in">```</span></span>
+<span id="cb22-451"><a href="#cb22-451"></a></span>
+<span id="cb22-452"><a href="#cb22-452"></a>**Step 5 — Profile five URLs.** Run <span class="in">`diagnose_url()`</span> on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an <span class="in">`http://`</span> address of a site that upgrades you to <span class="in">`https://`</span>), an API endpoint, and a site that blocks automated access (@sec-post-api showed you one).</span>
+<span id="cb22-453"><a href="#cb22-453"></a></span>
+<span id="cb22-456"><a href="#cb22-456"></a><span class="in">```{python}</span></span>
+<span id="cb22-457"><a href="#cb22-457"></a><span class="co"># Step 5: Diagnose five URLs -- working, 404, redirect, API, and blocked.</span></span>
+<span id="cb22-458"><a href="#cb22-458"></a><span class="co"># Your code here</span></span>
+<span id="cb22-459"><a href="#cb22-459"></a><span class="in">```</span></span>
+<span id="cb22-460"><a href="#cb22-460"></a></span>
+<span id="cb22-461"><a href="#cb22-461"></a>**Step 6 — Interpret.** In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the blocked site, what layer refused you — and how do you know it was the site rather than your network (@sec-post-api)?</span>
+<span id="cb22-462"><a href="#cb22-462"></a></span>
+<span id="cb22-465"><a href="#cb22-465"></a><span class="in">```{python}</span></span>
+<span id="cb22-466"><a href="#cb22-466"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb22-467"><a href="#cb22-467"></a><span class="in">```</span></span>
+<span id="cb22-468"><a href="#cb22-468"></a></span>
+<span id="cb22-469"><a href="#cb22-469"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb22-470"><a href="#cb22-470"></a></span>
+<span id="cb22-471"><a href="#cb22-471"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
+<span id="cb22-472"><a href="#cb22-472"></a></span>
+<span id="cb22-473"><a href="#cb22-473"></a><span class="ss">1. </span>**Browser developer tools.** Open a Wikipedia article and a commercial news site side by side, each with the Network tab open. Reload both pages and compare: how many requests does each make? What types of resources (HTML, CSS, JS, images, fonts, tracking) does each load? What does this tell you about modern web architecture?</span>
+<span id="cb22-474"><a href="#cb22-474"></a></span>
+<span id="cb22-475"><a href="#cb22-475"></a><span class="ss">2. </span>**DNS exploration.** Use <span class="in">`dns.resolver`</span> to look up the IP addresses for five related domains (e.g., <span class="in">`google.com`</span>, <span class="in">`youtube.com`</span>, <span class="in">`gmail.com`</span>, <span class="in">`drive.google.com`</span>, <span class="in">`cloud.google.com`</span>). Are any of them hosted at the same IP address? What does this tell you about Google's infrastructure?</span>
+<span id="cb22-476"><a href="#cb22-476"></a></span>
+<span id="cb22-477"><a href="#cb22-477"></a><span class="ss">3. </span>**Wikimedia pageviews.** Using the API pattern from this chapter, retrieve and plot daily pageview data for three related Wikipedia articles over the same time period. Identify any spikes and hypothesize about what real-world events caused them.</span>
+<span id="cb22-478"><a href="#cb22-478"></a></span>
+<span id="cb22-479"><a href="#cb22-479"></a><span class="ss">4. </span>**Network tab analysis.** Pick a website you visit frequently. Reload it with the browser's Network tab open and recording. Count and categorize all requests into types: HTML documents, CSS stylesheets, JavaScript files, images, fonts, and tracking/analytics scripts. What fraction of requests serve actual content vs. tracking and advertising? Write a brief analysis of what this reveals about the site's business model.</span>
+<span id="cb22-480"><a href="#cb22-480"></a></span>
+<span id="cb22-481"><a href="#cb22-481"></a><span class="ss">5. </span>**Graduate extension (INFO 5617).** Choose a website you might plausibly study in your own research and profile its delivery infrastructure. Use the browser's Network tab to record the time to first byte, the full redirect chain, and evidence of CDN involvement (inspect the <span class="in">`Server`</span>, <span class="in">`Via`</span>, and similar response headers), then run <span class="in">`traceroute`</span> (or <span class="in">`scapy`</span>'s traceroute) to the same host and geolocate a few of the hops. Write a 500-word memo connecting these protocol-level observations to research-infrastructure concerns: where does "the" site actually live, how stable are measurements of it likely to be across time and vantage points, and what would an automated collection pipeline need to handle — redirects, rate limits, geographically varying responses — to gather data from it reliably?</span>
+<span id="cb22-482"><a href="#cb22-482"></a></span>
+<span id="cb22-483"><a href="#cb22-483"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb22-484"><a href="#cb22-484"></a></span>
+<span id="cb22-485"><a href="#cb22-485"></a>The protocols described in this chapter were designed as public infrastructure. Vint Cerf and Bob Kahn developed TCP/IP in the 1970s for DARPA, creating a transport layer engineered for resilience under attack. Tim Berners-Lee invented HTTP and URLs at CERN in 1989–1991, and made the deliberate decision to release them into the public domain. The web was born open.</span>
+<span id="cb22-486"><a href="#cb22-486"></a></span>
+<span id="cb22-487"><a href="#cb22-487"></a>Browser developer tools embody this original spirit of openness. The ability to "view source" — to inspect exactly what a web server sends your browser — was a foundational feature of the web. It is what makes web data science possible. As you will see in @sec-post-api, the tension between this transparency and platforms' desire to control their data is one of the defining conflicts of the contemporary web.</span>
+<span id="cb22-488"><a href="#cb22-488"></a></span>
+<span id="cb22-489"><a href="#cb22-489"></a>::: {.callout-note}</span>
+<span id="cb22-490"><a href="#cb22-490"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb22-491"><a href="#cb22-491"></a>The web's protocol stack was designed as public infrastructure — open standards documented in public RFCs, not proprietary products controlled by corporations. HTTP, HTML, DNS, and TCP/IP are all open protocols that anyone can implement. The "view source" capability and network inspection tools you learned in this chapter are features that embody **openness** (@sec-post-api). They exist because the web's architects believed that transparency was a feature, not a vulnerability. As platforms increasingly obfuscate their front-end code and move toward closed APIs, these tools become more important, not less.</span>
+<span id="cb22-492"><a href="#cb22-492"></a>:::</span>
+<span id="cb22-493"><a href="#cb22-493"></a></span>
+<span id="cb22-494"><a href="#cb22-494"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb22-495"><a href="#cb22-495"></a></span>
+<span id="cb22-496"><a href="#cb22-496"></a><span class="ss">- </span>**`scapy` import errors**: Requires <span class="in">`pcap`</span> drivers. On Windows, install Npcap. On macOS, the built-in <span class="in">`libpcap`</span> usually works.</span>
+<span id="cb22-497"><a href="#cb22-497"></a><span class="ss">- </span>**403 from Wikimedia API**: You forgot the custom <span class="in">`User-Agent`</span> header.</span>
+<span id="cb22-498"><a href="#cb22-498"></a><span class="ss">- </span>**DNS results varying by location**: Normal — content delivery networks return different IPs based on your geographic location.</span>
+<span id="cb22-499"><a href="#cb22-499"></a><span class="ss">- </span>**URL encoding issues**: Use <span class="in">`urllib.parse.quote()`</span> for article titles with spaces or special characters.</span>
+<span id="cb22-500"><a href="#cb22-500"></a></span>
+<span id="cb22-501"><a href="#cb22-501"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb22-502"><a href="#cb22-502"></a></span>
+<span id="cb22-503"><a href="#cb22-503"></a>The web is built on a layered stack of protocols: TCP/IP transports data, DNS resolves names to addresses, HTTP structures the conversation, and URLs identify the target. Understanding this stack transforms debugging from guesswork into systematic diagnosis. When a request fails, you can ask: can I reach the server at all? Am I resolving the right address? What status code did I get? Are my headers correct? Is my URL well-formed? This systematic approach carries through every chapter that follows.</span>
+<span id="cb22-504"><a href="#cb22-504"></a></span>
+<span id="cb22-505"><a href="#cb22-505"></a><span class="fu">## Further Reading</span></span>
+<span id="cb22-506"><a href="#cb22-506"></a></span>
+<span id="cb22-507"><a href="#cb22-507"></a><span class="ss">- </span>Mozilla Developer Network — How the Web Works: <span class="ot">&lt;https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works&gt;</span></span>
+<span id="cb22-508"><a href="#cb22-508"></a><span class="ss">- </span>Mozilla Developer Network — HTTP Overview: <span class="ot">&lt;https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview&gt;</span></span>
+<span id="cb22-509"><a href="#cb22-509"></a><span class="ss">- </span><span class="in">`scapy`</span> documentation: <span class="ot">&lt;https://scapy.readthedocs.io/&gt;</span></span>
+<span id="cb22-510"><a href="#cb22-510"></a><span class="ss">- </span><span class="in">`dnspython`</span> documentation: <span class="ot">&lt;https://dnspython.readthedocs.io/&gt;</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

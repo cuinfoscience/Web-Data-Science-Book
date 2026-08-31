@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>15&nbsp; Research Design with Web Data – Web Data Science</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./appendix-notebooks.html" rel="next">
+<link href="./ch-14-automation.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-14-automation.html">Practice</a></li><li class="breadcrumb-item"><a href="./ch-15-research-design.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Web Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Web Data Science</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-02-ethics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ethics, Law, and Responsible Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-03-post-api.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">The Post-API Age</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-04-data-formats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Formats: XML and JSON</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-05-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documents</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-06-static-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-07-archives.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-08-dynamic-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-09-pdfs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">APIs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-10-wikipedia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-11-government.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Government Data APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-12-social.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Social and Media Platform APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-13-ai-apis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Practice</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-14-automation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Automating Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-15-research-design.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-notebooks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Companion Notebooks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-ai-disclosure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">AI Coauthorship and Responsible Disclosure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-further.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Where to Go from Here</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#technical-skill-is-not-enough" id="toc-technical-skill-is-not-enough" class="nav-link active" data-scroll-target="#technical-skill-is-not-enough"><span class="header-section-number">15.1</span> Technical Skill Is Not Enough</a></li>
+  <li><a href="#from-question-to-data-source" id="toc-from-question-to-data-source" class="nav-link" data-scroll-target="#from-question-to-data-source"><span class="header-section-number">15.2</span> From Question to Data Source</a>
+  <ul class="collapse">
+  <li><a href="#the-proposal-arc" id="toc-the-proposal-arc" class="nav-link" data-scroll-target="#the-proposal-arc"><span class="header-section-number">15.2.1</span> The Proposal Arc</a></li>
+  <li><a href="#matching-questions-to-methods" id="toc-matching-questions-to-methods" class="nav-link" data-scroll-target="#matching-questions-to-methods"><span class="header-section-number">15.2.2</span> Matching Questions to Methods</a></li>
+  </ul></li>
+  <li><a href="#common-research-designs-with-web-data" id="toc-common-research-designs-with-web-data" class="nav-link" data-scroll-target="#common-research-designs-with-web-data"><span class="header-section-number">15.3</span> Common Research Designs with Web Data</a>
+  <ul class="collapse">
+  <li><a href="#longitudinal-tracking" id="toc-longitudinal-tracking" class="nav-link" data-scroll-target="#longitudinal-tracking"><span class="header-section-number">15.3.1</span> Longitudinal Tracking</a></li>
+  <li><a href="#cross-sectional-snapshot" id="toc-cross-sectional-snapshot" class="nav-link" data-scroll-target="#cross-sectional-snapshot"><span class="header-section-number">15.3.2</span> Cross-Sectional Snapshot</a></li>
+  <li><a href="#content-analysis" id="toc-content-analysis" class="nav-link" data-scroll-target="#content-analysis"><span class="header-section-number">15.3.3</span> Content Analysis</a></li>
+  <li><a href="#natural-experiments" id="toc-natural-experiments" class="nav-link" data-scroll-target="#natural-experiments"><span class="header-section-number">15.3.4</span> Natural Experiments</a></li>
+  </ul></li>
+  <li><a href="#sampling-and-representativeness" id="toc-sampling-and-representativeness" class="nav-link" data-scroll-target="#sampling-and-representativeness"><span class="header-section-number">15.4</span> Sampling and Representativeness</a></li>
+  <li><a href="#human-subjects-and-the-irb" id="toc-human-subjects-and-the-irb" class="nav-link" data-scroll-target="#human-subjects-and-the-irb"><span class="header-section-number">15.5</span> Human Subjects and the IRB</a></li>
+  <li><a href="#data-quality-and-validation" id="toc-data-quality-and-validation" class="nav-link" data-scroll-target="#data-quality-and-validation"><span class="header-section-number">15.6</span> Data Quality and Validation</a></li>
+  <li><a href="#reproducibility-and-documentation" id="toc-reproducibility-and-documentation" class="nav-link" data-scroll-target="#reproducibility-and-documentation"><span class="header-section-number">15.7</span> Reproducibility and Documentation</a></li>
+  <li><a href="#managing-the-research-process" id="toc-managing-the-research-process" class="nav-link" data-scroll-target="#managing-the-research-process"><span class="header-section-number">15.8</span> Managing the Research Process</a>
+  <ul class="collapse">
+  <li><a href="#version-control-for-research-projects" id="toc-version-control-for-research-projects" class="nav-link" data-scroll-target="#version-control-for-research-projects"><span class="header-section-number">15.8.1</span> Version Control for Research Projects</a></li>
+  <li><a href="#data-documentation" id="toc-data-documentation" class="nav-link" data-scroll-target="#data-documentation"><span class="header-section-number">15.8.2</span> Data Documentation</a></li>
+  </ul></li>
+  <li><a href="#communicating-findings" id="toc-communicating-findings" class="nav-link" data-scroll-target="#communicating-findings"><span class="header-section-number">15.9</span> Communicating Findings</a>
+  <ul class="collapse">
+  <li><a href="#visualization-as-argument" id="toc-visualization-as-argument" class="nav-link" data-scroll-target="#visualization-as-argument"><span class="header-section-number">15.9.1</span> Visualization as Argument</a></li>
+  </ul></li>
+  <li><a href="#social-history-and-public-interest" id="toc-social-history-and-public-interest" class="nav-link" data-scroll-target="#social-history-and-public-interest"><span class="header-section-number">15.10</span> Social History and Public Interest</a>
+  <ul class="collapse">
+  <li><a href="#data-journalism-as-a-model" id="toc-data-journalism-as-a-model" class="nav-link" data-scroll-target="#data-journalism-as-a-model"><span class="header-section-number">15.10.1</span> Data Journalism as a Model</a></li>
+  </ul></li>
+  <li><a href="#recommended-exercises" id="toc-recommended-exercises" class="nav-link" data-scroll-target="#recommended-exercises"><span class="header-section-number">15.11</span> Recommended Exercises</a></li>
+  <li><a href="#additional-exercises" id="toc-additional-exercises" class="nav-link" data-scroll-target="#additional-exercises"><span class="header-section-number">15.12</span> Additional Exercises</a></li>
+  <li><a href="#common-pitfalls" id="toc-common-pitfalls" class="nav-link" data-scroll-target="#common-pitfalls"><span class="header-section-number">15.13</span> Common Pitfalls</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">15.14</span> Key Takeaways</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">15.15</span> Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-14-automation.html">Practice</a></li><li class="breadcrumb-item"><a href="./ch-15-research-design.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-research-design" class="quarto-section-identifier"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Develop a research question suited to web data and match it to appropriate data sources</li>
+<li>Design a multi-stage data collection plan combining scraping, APIs, and supplementary data</li>
+<li>Evaluate the sampling, representativeness, and validity challenges specific to web data</li>
+<li>Build a reproducible research pipeline from data collection through analysis</li>
+<li>Communicate findings to different audiences with appropriate evidentiary standards</li>
+<li>Apply the values of openness, oversight, and ownership to your own research practice</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Companion Notebook
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Run this chapter’s code as you read: open the <a href="https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/notebooks/ch-15-research-design.ipynb">companion notebook</a> (see <a href="appendix-notebooks.html" class="quarto-xref"><span>Appendix A</span></a> for all of them).</p>
+</div>
+</div>
+<section id="technical-skill-is-not-enough" class="level2" data-number="15.1">
+<h2 data-number="15.1" class="anchored" data-anchor-id="technical-skill-is-not-enough"><span class="header-section-number">15.1</span> Technical Skill Is Not Enough</h2>
+<p>You now command a substantial technical toolkit: you can scrape static and dynamic web pages, parse PDFs, query APIs for platforms from Wikipedia to Spotify to the Federal Reserve, apply NLP and LLM-based analysis, and automate your data collection with GitHub Actions. These are powerful capabilities. But technical skill without research design produces data, not knowledge.</p>
+<p>This chapter steps back from code to address the questions that determine whether your technically-excellent scraping produces genuine insight: What is the right question for this data source? What can this data actually tell you? What are the threats to the validity of your conclusions? How do you communicate your findings responsibly?</p>
+</section>
+<section id="from-question-to-data-source" class="level2" data-number="15.2">
+<h2 data-number="15.2" class="anchored" data-anchor-id="from-question-to-data-source"><span class="header-section-number">15.2</span> From Question to Data Source</h2>
+<p>The best web data science projects start with a question, not a dataset. The data source serves the question, not the other way around.</p>
+<section id="the-proposal-arc" class="level3" data-number="15.2.1">
+<h3 data-number="15.2.1" class="anchored" data-anchor-id="the-proposal-arc"><span class="header-section-number">15.2.1</span> The Proposal Arc</h3>
+<p>A research proposal — whether for a class project, a thesis, a journal article, or a grant application — follows a consistent structure:</p>
+<ol type="1">
+<li><strong>Motivation</strong>: What is the question or problem? Why does it matter? Who benefits from the answer?</li>
+<li><strong>Data source</strong>: What specific web data could address this question? What constructs does the data measure? What are the gaps?</li>
+<li><strong>Methods</strong>: How will you collect the data? What tools and techniques from this book will you use? What analytical approach will you apply?</li>
+<li><strong>Expected results</strong>: What kinds of analyses or visualizations will you produce? What patterns do you expect to find?</li>
+<li><strong>Implications</strong>: What should stakeholders do if your findings hold? What are the practical consequences?</li>
+<li><strong>Limitations</strong>: What can this data <em>not</em> tell you? What are the threats to validity? What alternative explanations exist?</li>
+</ol>
+<p>Notice that limitations are not an afterthought — they are a core component of the design. Acknowledging what your data cannot do is as important as demonstrating what it can.</p>
+</section>
+<section id="matching-questions-to-methods" class="level3" data-number="15.2.2">
+<h3 data-number="15.2.2" class="anchored" data-anchor-id="matching-questions-to-methods"><span class="header-section-number">15.2.2</span> Matching Questions to Methods</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Research Design</th>
+<th>Web Data Methods</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Longitudinal tracking</td>
+<td>Wayback Machine (<a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>), GitHub Actions (<a href="ch-14-automation.html" class="quarto-xref"><span>Chapter 14</span></a>)</td>
+<td>How has a platform’s privacy policy changed over time?</td>
+</tr>
+<tr class="even">
+<td>Cross-sectional snapshot</td>
+<td>API queries (<a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>, <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>, <a href="ch-12-social.html" class="quarto-xref"><span>Chapter 12</span></a>)</td>
+<td>How does Reddit moderation differ across subreddits?</td>
+</tr>
+<tr class="odd">
+<td>Content analysis</td>
+<td>HTML scraping (<a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>) + LLM coding (<a href="ch-13-ai-apis.html" class="quarto-xref"><span>Chapter 13</span></a>)</td>
+<td>What topics dominate legislative activity in Colorado?</td>
+</tr>
+<tr class="even">
+<td>Network analysis</td>
+<td>Link extraction (<a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>), social graphs (<a href="ch-12-social.html" class="quarto-xref"><span>Chapter 12</span></a>)</td>
+<td>How connected are Wikipedia articles about climate change?</td>
+</tr>
+<tr class="odd">
+<td>Natural experiment</td>
+<td>Event-triggered collection (<a href="ch-14-automation.html" class="quarto-xref"><span>Chapter 14</span></a>)</td>
+<td>How did a policy change affect web search patterns?</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="common-research-designs-with-web-data" class="level2" data-number="15.3">
+<h2 data-number="15.3" class="anchored" data-anchor-id="common-research-designs-with-web-data"><span class="header-section-number">15.3</span> Common Research Designs with Web Data</h2>
+<p>The table above compresses a lot of decisions into single rows. Four of these designs come up so often in web data science that they deserve a closer look; choosing among them depends on your question, your data source, and the claims you want to make.</p>
+<section id="longitudinal-tracking" class="level3" data-number="15.3.1">
+<h3 data-number="15.3.1" class="anchored" data-anchor-id="longitudinal-tracking"><span class="header-section-number">15.3.1</span> Longitudinal Tracking</h3>
+<p><strong>Question type</strong>: How does X change over time?</p>
+<p>You observed something on the web and want to track how it evolves — the content of a policy document, the composition of a playlist, the frequency of a term in news coverage, or the price of a product. Longitudinal tracking requires either archival data (the Wayback Machine in <a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>) or forward-looking automated collection (GitHub Actions in <a href="ch-14-automation.html" class="quarto-xref"><span>Chapter 14</span></a>).</p>
+<p><strong>Design considerations</strong>: The Wayback Machine captures snapshots opportunistically, not on a fixed schedule, so your temporal resolution is uneven. Automated scrapers give you consistent intervals but require maintenance. In both cases, you need to account for changes in the underlying structure (a website redesign, an API version change) that might affect your measurements without reflecting genuine change in the phenomenon you are studying.</p>
+</section>
+<section id="cross-sectional-snapshot" class="level3" data-number="15.3.2">
+<h3 data-number="15.3.2" class="anchored" data-anchor-id="cross-sectional-snapshot"><span class="header-section-number">15.3.2</span> Cross-Sectional Snapshot</h3>
+<p><strong>Question type</strong>: How does X vary across cases at a point in time?</p>
+<p>You want to compare legislative activity across states, subreddit moderation policies across communities, or audio features across genres. Cross-sectional designs collect data at one point in time and analyze variation across units.</p>
+<p><strong>Design considerations</strong>: The main threat is selection bias — you are limited to the platforms, communities, and data sources that exist and are accessible. If a platform’s API does not expose the variable you need, you cannot include it. If a community is private or a government website does not publish the data you want, it is missing from your sample.</p>
+</section>
+<section id="content-analysis" class="level3" data-number="15.3.3">
+<h3 data-number="15.3.3" class="anchored" data-anchor-id="content-analysis"><span class="header-section-number">15.3.3</span> Content Analysis</h3>
+<p><strong>Question type</strong>: What is the substantive content of a corpus?</p>
+<p>You have collected a body of text — scraped web pages, PDF documents, social media posts — and want to characterize what it contains. Content analysis can be manual (human coding), automated (NLP in <a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>, LLM-assisted coding in <a href="ch-13-ai-apis.html" class="quarto-xref"><span>Chapter 13</span></a>), or a combination.</p>
+<p><strong>Design considerations</strong>: The reliability of automated coding should be validated against manual coding on a random sample. LLM-based classification is powerful but non-deterministic — run the same prompt twice and you may get different results. Always report inter-coder reliability or human-AI agreement rates.</p>
+</section>
+<section id="natural-experiments" class="level3" data-number="15.3.4">
+<h3 data-number="15.3.4" class="anchored" data-anchor-id="natural-experiments"><span class="header-section-number">15.3.4</span> Natural Experiments</h3>
+<p><strong>Question type</strong>: What was the causal effect of an event or policy change?</p>
+<p>Sometimes external events — a platform policy change, a natural disaster, a legislative decision — create natural variation that allows you to estimate causal effects. For example, you might compare Wikipedia editing behavior before and after a major news event, or Reddit community dynamics before and after a moderation policy change.</p>
+<p><strong>Design considerations</strong>: Causal claims from observational data are always tentative. You need a clear “treatment” event, a defensible comparison group, and controls for confounding variables. Web data makes it easy to observe change but does not, by itself, establish causation.</p>
+</section>
+</section>
+<section id="sampling-and-representativeness" class="level2" data-number="15.4">
+<h2 data-number="15.4" class="anchored" data-anchor-id="sampling-and-representativeness"><span class="header-section-number">15.4</span> Sampling and Representativeness</h2>
+<p>Whichever design you choose, it inherits a common problem: web data is not a random sample of anything. It is a convenience sample shaped by who uses the platform, what the API exposes, and what your scraper can reach. Understanding these biases is essential for interpreting your findings.</p>
+<p><strong>Who is missing?</strong> Reddit users skew young, male, and American. Wikipedia editors skew educated, male, and from the Global North. Bluesky’s early adopters skew toward journalists and technologists. The data you retrieve from any platform reflects its user base, not the broader population.</p>
+<p><strong>What is hidden?</strong> APIs expose what platforms choose to expose. Reddit’s API does not reveal deleted posts, shadow-banned users, or the internal ranking algorithms that determine what content becomes visible. Spotify’s audio features are proprietary measurements, not raw audio data. What you can measure is constrained by what the platform makes available.</p>
+<p><strong>What has been lost?</strong> Longitudinal studies face the erosion problem from <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>. Articles are deleted, accounts are suspended, pages are redesigned. The data available today may not be available tomorrow, and the data available yesterday may already be gone.</p>
+<p>Methodologists group many of these concerns under the formal term <strong>construct validity</strong>: the degree to which the thing you can measure (pageviews, posts, search queries) actually corresponds to the concept you claim to study (attention, public opinion, illness) <span class="citation" data-cites="salganik2018bit">(<a href="#ref-salganik2018bit" role="doc-biblioref">Salganik 2018</a>)</span>. Whenever this book asks “does your variable actually measure what you claim?”, it is asking about construct validity — and weak construct validity is the most common flaw in web data research.</p>
+<p>The canonical cautionary tale is Google Flu Trends, which promised to estimate influenza prevalence from search queries and instead overestimated it by roughly a factor of two for more than a hundred consecutive weeks <span class="citation" data-cites="lazer2014parable">(<a href="#ref-lazer2014parable" role="doc-biblioref">D. Lazer et al. 2014</a>)</span>. Part of the failure was <em>big data hubris</em> — treating a large behavioral dataset as a substitute for, rather than a supplement to, traditional measurement. The rest was <em>algorithm dynamics</em>: Google kept redesigning its search and suggestion features, so the measurement instrument drifted underneath the model even as the underlying phenomenon stayed put. Every automated collector you build (<a href="ch-14-automation.html" class="quarto-xref"><span>Chapter 14</span></a>) is exposed to both failure modes.</p>
+</section>
+<section id="human-subjects-and-the-irb" class="level2" data-number="15.5">
+<h2 data-number="15.5" class="anchored" data-anchor-id="human-subjects-and-the-irb"><span class="header-section-number">15.5</span> Human Subjects and the IRB</h2>
+<p>If your research involves data about people — and most web data does — you need to know when it counts as <strong>human subjects research</strong>. This is not a question you get to answer for yourself, and the answer is less intuitive than many researchers expect.</p>
+<p>Under the Common Rule, the federal regulation governing research ethics in the United States, human subjects research involves obtaining information about living individuals through interaction or intervention, or obtaining their <strong>identifiable private information</strong>. Scraped web data complicates every clause of that definition. A public post is not exactly private, but the person who wrote it did not expect it to land in a research dataset <span class="citation" data-cites="fiesler2020no">(<a href="#ref-fiesler2020no" role="doc-biblioref">Fiesler, Beard, and Keegan 2020</a>)</span>. A username is not exactly identifiable, but linking it across platforms often makes it so.</p>
+<p>Three principles should guide you:</p>
+<ul>
+<li><strong>Publicly available does not mean automatically exempt.</strong> “It was on the public web” is a statement about access, not about ethics or regulation. Institutional Review Boards (IRBs) frequently determine that analyses of scraped public data are “not human subjects research” or qualify for an exemption — but that determination belongs to the IRB, not to the researcher. If you catch yourself reasoning “this is obviously fine, so I will not ask,” you have identified exactly the moment to ask.</li>
+<li><strong>Platform terms of service are not an ethics review.</strong> Complying with a ToS is a legal and contractual matter, as discussed in <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>; it neither substitutes for nor settles the human subjects question.</li>
+<li><strong>Data minimization and de-identification are default practice, not extra credit.</strong> Collect only the fields your question requires, strip or hash identifiers you do not need, and store anything sensitive separately from your analysis dataset. These habits shrink both the ethical risk and the consequences of any future leak.</li>
+</ul>
+<p>Consult your IRB early whenever your design involves interacting with users (even sending messages from a research account), collecting from private or semi-private spaces (closed groups, invite-only servers), identifying specific individuals, or measuring sensitive attributes such as health, sexuality, immigration status, or political affiliation.</p>
+<p>Expectations differ by context. For a class project in this course, your instructor and your campus’s guidance on student research are the right checkpoints. For research you intend to publish, graduate students should engage the IRB early — a determination request is usually a short form, and “our IRB reviewed the protocol and determined it was not human subjects research” is a sentence reviewers like to see. The ethics chapter of <span class="citation" data-cites="salganik2018bit">Salganik (<a href="#ref-salganik2018bit" role="doc-biblioref">2018</a>)</span> (and its historical appendix) is the best single treatment of these questions, <span class="citation" data-cites="fiesler2020no">Fiesler, Beard, and Keegan (<a href="#ref-fiesler2020no" role="doc-biblioref">2020</a>)</span> documents how poorly platform rules align with either law or ethics, and <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> covers the legal landscape in more depth.</p>
+</section>
+<section id="data-quality-and-validation" class="level2" data-number="15.6">
+<h2 data-number="15.6" class="anchored" data-anchor-id="data-quality-and-validation"><span class="header-section-number">15.6</span> Data Quality and Validation</h2>
+<p>Web data is messy. Scrapers fail silently, APIs return incomplete results, and the same information can appear in different formats across sources. Build validation into your pipeline:</p>
+<div id="df59134f" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">def</span> validate_dataset(df, expected_columns, min_rows<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb1-2"><a href="#cb1-2"></a>    <span class="co">"""Basic validation checks for a scraped dataset.</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co">    </span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co">    Parameters</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co">    ----------</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co">    df : pd.DataFrame</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="co">        The dataset to validate</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="co">    expected_columns : list</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co">        Columns that should be present</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co">    min_rows : int</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="co">        Minimum expected number of rows</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co">    </span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="co">    Returns</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="co">    -------</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co">    bool</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="co">        True if all checks pass</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="co">    """</span></span>
+<span id="cb1-18"><a href="#cb1-18"></a>    checks <span class="op">=</span> []</span>
+<span id="cb1-19"><a href="#cb1-19"></a>    </span>
+<span id="cb1-20"><a href="#cb1-20"></a>    <span class="co"># Check column presence</span></span>
+<span id="cb1-21"><a href="#cb1-21"></a>    missing_cols <span class="op">=</span> <span class="bu">set</span>(expected_columns) <span class="op">-</span> <span class="bu">set</span>(df.columns)</span>
+<span id="cb1-22"><a href="#cb1-22"></a>    <span class="cf">if</span> missing_cols:</span>
+<span id="cb1-23"><a href="#cb1-23"></a>        <span class="bu">print</span>(<span class="ss">f"WARNING: Missing columns: </span><span class="sc">{</span>missing_cols<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24"></a>        checks.append(<span class="va">False</span>)</span>
+<span id="cb1-25"><a href="#cb1-25"></a>    <span class="cf">else</span>:</span>
+<span id="cb1-26"><a href="#cb1-26"></a>        checks.append(<span class="va">True</span>)</span>
+<span id="cb1-27"><a href="#cb1-27"></a>    </span>
+<span id="cb1-28"><a href="#cb1-28"></a>    <span class="co"># Check minimum rows</span></span>
+<span id="cb1-29"><a href="#cb1-29"></a>    <span class="cf">if</span> <span class="bu">len</span>(df) <span class="op">&lt;</span> min_rows:</span>
+<span id="cb1-30"><a href="#cb1-30"></a>        <span class="bu">print</span>(<span class="ss">f"WARNING: Only </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> rows (expected &gt;= </span><span class="sc">{</span>min_rows<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb1-31"><a href="#cb1-31"></a>        checks.append(<span class="va">False</span>)</span>
+<span id="cb1-32"><a href="#cb1-32"></a>    <span class="cf">else</span>:</span>
+<span id="cb1-33"><a href="#cb1-33"></a>        checks.append(<span class="va">True</span>)</span>
+<span id="cb1-34"><a href="#cb1-34"></a>    </span>
+<span id="cb1-35"><a href="#cb1-35"></a>    <span class="co"># Check for excessive missing data</span></span>
+<span id="cb1-36"><a href="#cb1-36"></a>    null_pct <span class="op">=</span> df.isnull().mean()</span>
+<span id="cb1-37"><a href="#cb1-37"></a>    high_null <span class="op">=</span> null_pct[null_pct <span class="op">&gt;</span> <span class="fl">0.5</span>]</span>
+<span id="cb1-38"><a href="#cb1-38"></a>    <span class="cf">if</span> <span class="kw">not</span> high_null.empty:</span>
+<span id="cb1-39"><a href="#cb1-39"></a>        <span class="bu">print</span>(<span class="ss">f"WARNING: High null rates: </span><span class="sc">{</span><span class="bu">dict</span>(high_null)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-40"><a href="#cb1-40"></a>        checks.append(<span class="va">False</span>)</span>
+<span id="cb1-41"><a href="#cb1-41"></a>    <span class="cf">else</span>:</span>
+<span id="cb1-42"><a href="#cb1-42"></a>        checks.append(<span class="va">True</span>)</span>
+<span id="cb1-43"><a href="#cb1-43"></a>    </span>
+<span id="cb1-44"><a href="#cb1-44"></a>    <span class="cf">return</span> <span class="bu">all</span>(checks)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="reproducibility-and-documentation" class="level2" data-number="15.7">
+<h2 data-number="15.7" class="anchored" data-anchor-id="reproducibility-and-documentation"><span class="header-section-number">15.7</span> Reproducibility and Documentation</h2>
+<p>A reproducible research pipeline means that someone else — or you, six months from now — can re-run your code and get the same results. This requires:</p>
+<ul>
+<li><strong>Version control</strong>: Your code, configuration, and documentation should be in a git repository (more on this below).</li>
+<li><strong>Data documentation</strong>: For each dataset, record what it contains, how it was collected, when it was collected, and what its known quality issues are <span class="citation" data-cites="gebru2021datasheets">(<a href="#ref-gebru2021datasheets" role="doc-biblioref">Gebru et al. 2021</a>)</span>.</li>
+<li><strong>Environment specification</strong>: A <code>requirements.txt</code> or <code>environment.yml</code> file that pins the exact versions of your dependencies.</li>
+<li><strong>Collection parameters</strong>: Document not just what data you collected but how: the API endpoints, query parameters, rate limiting, date ranges, and any filters you applied.</li>
+</ul>
+</section>
+<section id="managing-the-research-process" class="level2" data-number="15.8">
+<h2 data-number="15.8" class="anchored" data-anchor-id="managing-the-research-process"><span class="header-section-number">15.8</span> Managing the Research Process</h2>
+<p>These principles become concrete when you organize an actual project. Two habits — disciplined version control and systematic documentation — separate projects that can be revisited, audited, and extended from projects that become black boxes the moment you stop working on them.</p>
+<section id="version-control-for-research-projects" class="level3" data-number="15.8.1">
+<h3 data-number="15.8.1" class="anchored" data-anchor-id="version-control-for-research-projects"><span class="header-section-number">15.8.1</span> Version Control for Research Projects</h3>
+<p>Your code, data documentation, and analysis notebooks should be version-controlled with git from the start. This is not just good practice — it is essential for reproducibility. When you revise your analysis after a reviewer’s feedback, you need to be able to trace exactly what changed and when.</p>
+<pre><code>my-project/
+├── .gitignore           # Exclude api_keys.json, large data files
+├── README.md            # Project overview and setup instructions
+├── requirements.txt     # Python dependencies with pinned versions
+├── data/
+│   ├── raw/             # Original scraped data (never modify)
+│   ├── processed/       # Cleaned and transformed data
+│   └── README.md        # Data documentation (provenance, variables)
+├── notebooks/
+│   ├── 01_collection.ipynb
+│   ├── 02_cleaning.ipynb
+│   └── 03_analysis.ipynb
+├── scripts/
+│   └── scraper.py       # Production scraping scripts
+└── output/
+    ├── figures/
+    └── tables/</code></pre>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Missing Manual Reference
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For a complete guide to version control with Git and GitHub — commits, branches, pull requests, and collaboration workflows — see <em>Missing Manual</em> Chapter 31: Version Control.</p>
+</div>
+</div>
+</section>
+<section id="data-documentation" class="level3" data-number="15.8.2">
+<h3 data-number="15.8.2" class="anchored" data-anchor-id="data-documentation"><span class="header-section-number">15.8.2</span> Data Documentation</h3>
+<p>For every dataset you create, write a datasheet <span class="citation" data-cites="gebru2021datasheets">(<a href="#ref-gebru2021datasheets" role="doc-biblioref">Gebru et al. 2021</a>)</span> that answers:</p>
+<ul>
+<li><strong>What</strong>: What does each variable measure? What are the units? What do missing values mean?</li>
+<li><strong>How</strong>: What tools did you use? What parameters and filters did you apply? What date range does the data cover?</li>
+<li><strong>Limits</strong>: What is not captured? What biases are likely present? What quality issues are you aware of?</li>
+<li><strong>Ethics</strong>: Does the data contain personally identifiable information? Was it collected in accordance with the platform’s terms? Are there privacy risks if the dataset is shared?</li>
+</ul>
+<p>This documentation is not busywork — it is the difference between a dataset that can be used by others (including future-you) and one that is a black box.</p>
+</section>
+</section>
+<section id="communicating-findings" class="level2" data-number="15.9">
+<h2 data-number="15.9" class="anchored" data-anchor-id="communicating-findings"><span class="header-section-number">15.9</span> Communicating Findings</h2>
+<p>Web data science serves different audiences, each with different expectations:</p>
+<ul>
+<li><strong>Academic papers</strong> require methodological precision, explicit limitations, and engagement with prior scholarship. Your data collection methods should be replicable from the description alone.</li>
+<li><strong>Policy briefs</strong> need actionable findings, clear implications, and accessible language. Lead with the “so what?” rather than the methodology.</li>
+<li><strong>Data journalism</strong> demands narrative structure, visual evidence, and accountability framing. The question is not just “what did you find?” but “what should the public know?”</li>
+</ul>
+<p>In all cases, the visualizations you create with matplotlib and seaborn are not decorations — they are arguments. Every axis label, every color choice, every title should serve your analytical purpose.</p>
+<section id="visualization-as-argument" class="level3" data-number="15.9.1">
+<h3 data-number="15.9.1" class="anchored" data-anchor-id="visualization-as-argument"><span class="header-section-number">15.9.1</span> Visualization as Argument</h3>
+<p>Consider the difference between a default plot and one designed to communicate a finding. A default <code>plt.plot()</code> call with no labels, no title, and no context forces the reader to guess what they are looking at. A well-designed figure makes its argument legible at a glance: the title states a claim, the annotations connect data patterns to real-world causes, and the axis labels include units so the reader can evaluate the evidence independently.</p>
+<div id="19d78885" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="im">import</span> matplotlib.dates <span class="im">as</span> mdates</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-4"><a href="#cb3-4"></a></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co"># Suppose you have monthly Wikipedia pageviews for "Affordable Care Act"</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co"># with columns: 'month' (datetime) and 'pageviews' (int)</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'aca_pageviews.csv'</span>, parse_dates<span class="op">=</span>[<span class="st">'month'</span>])</span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co"># Scale raw counts to thousands so the data matches the axis label below</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>pageviews_k <span class="op">=</span> df[<span class="st">'pageviews'</span>] <span class="op">/</span> <span class="dv">1000</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a></span>
+<span id="cb3-12"><a href="#cb3-12"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb3-13"><a href="#cb3-13"></a>ax.plot(df[<span class="st">'month'</span>], pageviews_k, color<span class="op">=</span><span class="st">'#2c3e50'</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb3-14"><a href="#cb3-14"></a></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co"># Annotate key events with vertical lines and text</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a>ax.axvline(pd.Timestamp(<span class="st">'2017-07-28'</span>), color<span class="op">=</span><span class="st">'#e74c3c'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb3-17"><a href="#cb3-17"></a>ax.text(pd.Timestamp(<span class="st">'2017-08-15'</span>), pageviews_k.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">0.92</span>,</span>
+<span id="cb3-18"><a href="#cb3-18"></a>        <span class="st">'"Skinny repeal"</span><span class="ch">\n</span><span class="st">vote fails'</span>,</span>
+<span id="cb3-19"><a href="#cb3-19"></a>        fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">'#e74c3c'</span>)</span>
+<span id="cb3-20"><a href="#cb3-20"></a></span>
+<span id="cb3-21"><a href="#cb3-21"></a>ax.axvline(pd.Timestamp(<span class="st">'2020-03-11'</span>), color<span class="op">=</span><span class="st">'#2980b9'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb3-22"><a href="#cb3-22"></a>ax.text(pd.Timestamp(<span class="st">'2020-04-01'</span>), pageviews_k.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">0.78</span>,</span>
+<span id="cb3-23"><a href="#cb3-23"></a>        <span class="st">'WHO declares</span><span class="ch">\n</span><span class="st">COVID-19 pandemic'</span>,</span>
+<span id="cb3-24"><a href="#cb3-24"></a>        fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">'#2980b9'</span>)</span>
+<span id="cb3-25"><a href="#cb3-25"></a></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="co"># Labels that include units and a title that states a finding</span></span>
+<span id="cb3-27"><a href="#cb3-27"></a>ax.set_title(<span class="st">'Public attention to the ACA spikes around legislative and health crises'</span>,</span>
+<span id="cb3-28"><a href="#cb3-28"></a>             fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb3-29"><a href="#cb3-29"></a>ax.set_xlabel(<span class="st">'Month'</span>)</span>
+<span id="cb3-30"><a href="#cb3-30"></a>ax.set_ylabel(<span class="st">'Monthly pageviews (thousands)'</span>)</span>
+<span id="cb3-31"><a href="#cb3-31"></a>ax.xaxis.set_major_locator(mdates.YearLocator())</span>
+<span id="cb3-32"><a href="#cb3-32"></a>ax.xaxis.set_major_formatter(mdates.DateFormatter(<span class="st">'%Y'</span>))</span>
+<span id="cb3-33"><a href="#cb3-33"></a>ax.spines[<span class="st">'top'</span>].set_visible(<span class="va">False</span>)</span>
+<span id="cb3-34"><a href="#cb3-34"></a>ax.spines[<span class="st">'right'</span>].set_visible(<span class="va">False</span>)</span>
+<span id="cb3-35"><a href="#cb3-35"></a></span>
+<span id="cb3-36"><a href="#cb3-36"></a>plt.tight_layout()</span>
+<span id="cb3-37"><a href="#cb3-37"></a>plt.savefig(<span class="st">'aca_pageviews_annotated.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="co"># plt.show()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice that the title does not say “Wikipedia Pageviews for Affordable Care Act Over Time” — that merely describes the axes. Instead, it states a finding: public attention spikes around legislative and health crises. The annotations connect specific peaks to specific events, transforming a line chart into an argument about the relationship between political events and public information-seeking behavior. The clean axis formatting and removal of chart junk (top and right spines) keep the reader’s attention on the data rather than on visual noise. When you build a figure, ask yourself: if a reader saw only this image and its title, would they understand the claim you are making?</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Public Interest Connection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Research design is where the values of <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> stop being abstractions and become decisions. <strong>Openness</strong> is a design choice: a pipeline built for reproducibility — pinned environments, documented collection parameters, archived raw data — stays verifiable even as the platforms beneath it erode. <strong>Oversight</strong> is a question choice: studies designed around accountability questions serve publics, not just literatures. <strong>Ownership</strong> is an infrastructure choice: collecting into datasets and tools that others can reuse means your project outlives your paper.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="social-history-and-public-interest" class="level2" data-number="15.10">
+<h2 data-number="15.10" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">15.10</span> Social History and Public Interest</h2>
+<p>Every data source in this book carries a social history — someone fought to make it public, keep it public, or archive it before it vanished. As you design your own research, return to the values introduced in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>:</p>
+<ul>
+<li><strong>Openness</strong>: Will you publish your code, data (to the extent ethically permissible), and methods so others can evaluate and build on your work?</li>
+<li><strong>Oversight</strong>: Does your research contribute to independent accountability — helping citizens, journalists, or policymakers understand systems that affect them?</li>
+<li><strong>Ownership</strong>: Are you building infrastructure (datasets, tools, pipelines) that others can use, or are you extracting value from public resources without contributing back?</li>
+</ul>
+<p>These questions do not have formulaic answers. But asking them is itself a practice of responsible web data science.</p>
+<section id="data-journalism-as-a-model" class="level3" data-number="15.10.1">
+<h3 data-number="15.10.1" class="anchored" data-anchor-id="data-journalism-as-a-model"><span class="header-section-number">15.10.1</span> Data Journalism as a Model</h3>
+<p>Some of the most compelling examples of web data science in practice come not from academia but from data journalism. Consider ProPublica’s “Dollars for Docs” investigation: it began with a straightforward question — which doctors receive payments from pharmaceutical companies? — and pursued it by scraping publicly available but practically inaccessible disclosure databases maintained by drug manufacturers. The team cleaned, standardized, and linked records across companies, then published a searchable database that allowed local journalists across the country to investigate payment patterns in their own communities. The project moved from question to data collection to analysis to public accountability, following the same arc that a strong research proposal describes.</p>
+<p>Academic researchers can learn several things from this model. Data journalists are accountable to an audience that will scrutinize their methods and challenge their conclusions. This pressure produces methodological transparency: the best data journalism outlets publish their code, describe their scraping and cleaning procedures, and explain the limitations of their data. They also structure their findings as narratives rather than tables of regression coefficients, making complex analyses accessible to non-specialist readers without sacrificing rigor. The journalistic commitment to showing your work — publishing the underlying data, linking to source documents, and explaining analytical choices — aligns directly with the reproducibility standards discussed earlier in this chapter.</p>
+<p>The practitioners who do this work well — computational social scientists, civic technologists, data journalists — share a common profile: they combine data fluency with deep domain expertise. They understand not just how to scrape a website or query an API but why the data matters, who it affects, and what questions it can and cannot answer. This integration of technical and substantive knowledge is precisely what this book aims to develop. The tools you have learned are necessary but not sufficient; pairing them with domain knowledge, ethical reflection, and a commitment to public accountability is what transforms data collection into genuine contribution.</p>
+</section>
+</section>
+<section id="recommended-exercises" class="level2" data-number="15.11">
+<h2 data-number="15.11" class="anchored" data-anchor-id="recommended-exercises"><span class="header-section-number">15.11</span> Recommended Exercises</h2>
+<p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook and submit the completed notebook. This chapter’s exercise is written rather than coded: each cell below asks for a few sentences, not a program. Write your answers as comments or convert the cells to Markdown — either is fine. The steps follow the proposal arc from this chapter, and each should take a paragraph at most.</p>
+<p>By the end you will have a one-page skeleton of a research design — the seed of the Final Project proposal, and of the full proposal in the Additional Exercises.</p>
+<p><strong>Step 1 — The question.</strong> State one research question that web data could answer. Apply this chapter’s criteria: it should be specific enough to be answerable, and it should name the <em>construct</em> you actually care about (attention, opinion, participation, price), not just a dataset you find interesting.</p>
+<div id="59c160c3" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Step 1: State your research question, and name the construct it is really about. Write as comments, or convert this cell to Markdown.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 2 — The data source and access method.</strong> Name the data source that would answer it and the specific technique from this book you would use — an API (<a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>, <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>, <a href="ch-12-social.html" class="quarto-xref"><span>Chapter 12</span></a>), scraping (<a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, <a href="ch-08-dynamic-pages.html" class="quarto-xref"><span>Chapter 8</span></a>), archives (<a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>), PDFs (<a href="ch-09-pdfs.html" class="quarto-xref"><span>Chapter 9</span></a>), or automated collection (<a href="ch-14-automation.html" class="quarto-xref"><span>Chapter 14</span></a>). Note what the source’s access rules (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>, <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>) permit.</p>
+<div id="f045820c" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Step 2: Name the source, the chapter technique you would use, and what the access rules permit.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 3 — The design.</strong> Which of the chapter’s four designs is this — longitudinal tracking, cross-sectional snapshot, content analysis, or a natural experiment? Say why that design fits your question, and what your unit of analysis is.</p>
+<div id="099b5930" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Step 3: Name the design, justify it, and state the unit of analysis.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 4 — Sampling and representativeness.</strong> Who or what is in your data, and who is missing? Apply the chapter’s discussion: what population does your source actually represent, and how does that differ from the population your question is about?</p>
+<div id="d3a0d342" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Step 4: Describe the sample, the population it represents, and the gap between that and the population your question targets.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 5 — Measurement validity.</strong> Make the construct-validity argument: why does the thing you can count (pageviews, posts, mentions, dollar amounts) measure the thing you care about? Name the strongest objection to that link, and one check that would strengthen it.</p>
+<div id="4b08b61f" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Step 5: Make the construct validity argument, name its weakest point, and propose one validation check.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 6 — Limitations and contingency.</strong> Name the two threats most likely to undermine the study — draw on the chapter’s validity discussion and the erosion scenarios of <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — and write a one-sentence contingency for each: if the source closes or changes mid-study, what is your fallback?</p>
+<div id="123612a2" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Step 6: Two biggest threats, and a contingency plan for each.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 7 — Ethics and human subjects.</strong> Does this study involve people’s data? Apply the chapter’s IRB discussion and the framework from <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>: would it need review, what would you collect at minimum, and what would you refuse to collect?</p>
+<div id="416d6865" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Step 7: The ethical determination -- IRB or not, and the collection boundaries you would set.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="additional-exercises" class="level2" data-number="15.12">
+<h2 data-number="15.12" class="anchored" data-anchor-id="additional-exercises"><span class="header-section-number">15.12</span> Additional Exercises</h2>
+<p>These are open-ended extensions — no scaffold, no fixed path. The first expands your skeleton from above into a full proposal.</p>
+<ol type="1">
+<li><p><strong>Research proposal.</strong> Write a 1,500-word research proposal for a web data science project — expanding the skeleton you built in the Recommended Exercises. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.</p></li>
+<li><p><strong>Validity threats.</strong> Identify three potential threats to validity in a hypothetical study that uses scraped social media data to measure public opinion. For each threat, propose a mitigation strategy.</p></li>
+<li><p><strong>Data documentation.</strong> Take a dataset you collected in an earlier chapter and write a “datasheet” following <span class="citation" data-cites="gebru2021datasheets">Gebru et al. (<a href="#ref-gebru2021datasheets" role="doc-biblioref">2021</a>)</span>: what does each variable measure, how was it collected, what are the known quality issues, and how should it be cited?</p></li>
+<li><p><strong>Data limitations assessment.</strong> Choose a dataset you collected in an earlier chapter. Write a 500-word assessment of its limitations, covering: sampling bias (what is included and excluded?), measurement validity (does your variable actually measure what you claim?), temporal scope (what period does the data cover, and what might have changed?), and platform constraints (how does the platform’s design shape the data you can collect?).</p></li>
+<li><p><strong>Multi-method design.</strong> Design a research study that combines at least three techniques from this book (e.g., API data collection, web scraping, PDF extraction, text analysis, or automated collection). Write a one-page methods section that describes your data sources, collection procedures, analysis plan, and anticipated limitations. This should read like a methods section in an academic paper.</p></li>
+<li><p><strong>Graduate extension (INFO 5617).</strong> Write a complete pre-registration-style research design of two to three pages for a study you could actually execute. Specify the research question, data sources, sampling frame, and measurement strategy, making an explicit construct validity argument for each measure <span class="citation" data-cites="salganik2018bit">(<a href="#ref-salganik2018bit" role="doc-biblioref">Salganik 2018</a>)</span>. Then confront the threats: enumerate the validity risks (including algorithm dynamics <span class="citation" data-cites="lazer2014parable">(<a href="#ref-lazer2014parable" role="doc-biblioref">D. Lazer et al. 2014</a>)</span>), sketch the IRB determination you would request and why, and write a contingency plan for the platform-erosion scenarios of <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>. The discipline of specifying everything before collecting anything is the point — a design you cannot write down is a design you have not finished.</p></li>
+</ol>
+</section>
+<section id="common-pitfalls" class="level2" data-number="15.13">
+<h2 data-number="15.13" class="anchored" data-anchor-id="common-pitfalls"><span class="header-section-number">15.13</span> Common Pitfalls</h2>
+<p>Research design failures are harder to debug than code failures — there is no traceback, just a dataset that cannot answer your question. Watch for these:</p>
+<ul>
+<li><strong>Collecting before defining the unit of analysis.</strong> Is a row of your dataset a post, a user, a day, or a community? Deciding after collection usually means collecting again.</li>
+<li><strong>Sampling on the dependent variable.</strong> Studying only viral posts to learn what makes posts go viral tells you nothing without the posts that never took off.</li>
+<li><strong>Ignoring bot and spam contamination.</strong> On many platforms, automated accounts generate a substantial share of raw activity; skipping this filter means measuring bots while making claims about people.</li>
+<li><strong>Survivorship bias in longitudinal scrapes.</strong> The accounts, pages, and posts still visible at collection time are the survivors; deleted and suspended content is invisible precisely because something happened to it.</li>
+<li><strong>Changing instrumentation mid-collection.</strong> Editing your scraper’s selectors, query parameters, or sampling logic partway through a collection creates artificial discontinuities that look like real change — the algorithm dynamics problem, self-inflicted.</li>
+<li><strong>Validating only at analysis time.</strong> If your first quality check happens months after collection began, so does your discovery that a site redesign in June silently emptied half your columns.</li>
+</ul>
+</section>
+<section id="key-takeaways" class="level2" data-number="15.14">
+<h2 data-number="15.14" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">15.14</span> Key Takeaways</h2>
+<p>Technical skill without research design produces data, not knowledge. Every project needs a clear question, a defensible data collection strategy, honest assessment of limitations, and responsible communication of findings. The web is the richest data source humanity has ever created; using it well is both a technical and an ethical challenge. The skills in this book — scraping, API access, PDF extraction, NLP, LLM analysis, automation — are means, not ends. The end is producing knowledge that serves openness, oversight, and ownership.</p>
+</section>
+<section id="further-reading" class="level2" data-number="15.15">
+<h2 data-number="15.15" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">15.15</span> Further Reading</h2>
+<ul>
+<li><span class="citation" data-cites="salganik2018bit">Salganik (<a href="#ref-salganik2018bit" role="doc-biblioref">2018</a>)</span> — comprehensive treatment of digital-age research design</li>
+<li><span class="citation" data-cites="gebru2021datasheets">Gebru et al. (<a href="#ref-gebru2021datasheets" role="doc-biblioref">2021</a>)</span> — a framework for documenting datasets</li>
+<li><span class="citation" data-cites="lazer2020computational">D. M. J. Lazer et al. (<a href="#ref-lazer2020computational" role="doc-biblioref">2020</a>)</span> — obstacles and opportunities in computational social science</li>
+<li><span class="citation" data-cites="vanatteveldt2022computational">Atteveldt, Trilling, and Arcila Calderón (<a href="#ref-vanatteveldt2022computational" role="doc-biblioref">2022</a>)</span> — methods for computational analysis of communication</li>
+<li><span class="citation" data-cites="rogers2019doing">Rogers (<a href="#ref-rogers2019doing" role="doc-biblioref">2019</a>)</span> — qualitative and critical approaches to digital methods</li>
+</ul>
+
+
+<!-- -->
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-vanatteveldt2022computational" class="csl-entry" role="listitem">
+Atteveldt, Wouter van, Damian Trilling, and Carlos Arcila Calderón. 2022. <em>Computational Analysis of Communication</em>. Wiley.
+</div>
+<div id="ref-fiesler2020no" class="csl-entry" role="listitem">
+Fiesler, Casey, Nathan Beard, and Brian C. Keegan. 2020. <span>“No Robots, Spiders, or Scrapers: Legal and Ethical Regulation of Data Collection Methods in Social Media Terms of Service.”</span> In <em>Proceedings of the International AAAI Conference on Web and Social Media</em>, 14:187–96.
+</div>
+<div id="ref-gebru2021datasheets" class="csl-entry" role="listitem">
+Gebru, Timnit, Jamie Morgenstern, Brenda Vecchione, Jennifer Wortman Vaughan, Hanna Wallach, Hal Daumé III, and Kate Crawford. 2021. <span>“Datasheets for Datasets.”</span> <em>Communications of the ACM</em> 64 (12): 86–92. <a href="https://doi.org/10.1145/3458723">https://doi.org/10.1145/3458723</a>.
+</div>
+<div id="ref-lazer2020computational" class="csl-entry" role="listitem">
+Lazer, David M. J., Alex Pentland, Duncan J. Watts, Sinan Aral, Susan Athey, Noshir Contractor, Deen Freelon, et al. 2020. <span>“Computational Social Science: Obstacles and Opportunities.”</span> <em>Science</em> 369 (6507): 1060–62. <a href="https://doi.org/10.1126/science.aaz8170">https://doi.org/10.1126/science.aaz8170</a>.
+</div>
+<div id="ref-lazer2014parable" class="csl-entry" role="listitem">
+Lazer, David, Ryan Kennedy, Gary King, and Alessandro Vespignani. 2014. <span>“The Parable of <span>Google Flu</span>: Traps in Big Data Analysis.”</span> <em>Science</em> 343 (6176): 1203–5. <a href="https://doi.org/10.1126/science.1248506">https://doi.org/10.1126/science.1248506</a>.
+</div>
+<div id="ref-rogers2019doing" class="csl-entry" role="listitem">
+Rogers, Richard. 2019. <em>Doing Digital Methods</em>. SAGE Publications.
+</div>
+<div id="ref-salganik2018bit" class="csl-entry" role="listitem">
+Salganik, Matthew J. 2018. <em>Bit by Bit: Social Research in the Digital Age</em>. Princeton University Press. <a href="https://www.bitbybitbook.com/">https://www.bitbybitbook.com/</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./ch-14-automation.html" class="pagination-link" aria-label="Automating Data Collection">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Automating Data Collection</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./appendix-notebooks.html" class="pagination-link" aria-label="Companion Notebooks">
+        <span class="nav-page-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Companion Notebooks</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb11" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu"># Research Design with Web Data {#sec-research-design}</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a>::: {.callout-tip}</span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="fu">## Learning Objectives</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="ss">- </span>Develop a research question suited to web data and match it to appropriate data sources</span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="ss">- </span>Design a multi-stage data collection plan combining scraping, APIs, and supplementary data</span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="ss">- </span>Evaluate the sampling, representativeness, and validity challenges specific to web data</span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="ss">- </span>Build a reproducible research pipeline from data collection through analysis</span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="ss">- </span>Communicate findings to different audiences with appropriate evidentiary standards</span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="ss">- </span>Apply the values of openness, oversight, and ownership to your own research practice</span>
+<span id="cb11-11"><a href="#cb11-11"></a>:::</span>
+<span id="cb11-12"><a href="#cb11-12"></a></span>
+<span id="cb11-13"><a href="#cb11-13"></a>::: {.callout-tip}</span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="fu">## Companion Notebook</span></span>
+<span id="cb11-15"><a href="#cb11-15"></a>Run this chapter's code as you read: open the <span class="co">[</span><span class="ot">companion notebook</span><span class="co">](https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/notebooks/ch-15-research-design.ipynb)</span> (see @sec-appendix-notebooks for all of them).</span>
+<span id="cb11-16"><a href="#cb11-16"></a>:::</span>
+<span id="cb11-17"><a href="#cb11-17"></a></span>
+<span id="cb11-18"><a href="#cb11-18"></a></span>
+<span id="cb11-19"><a href="#cb11-19"></a><span class="fu">## Technical Skill Is Not Enough</span></span>
+<span id="cb11-20"><a href="#cb11-20"></a></span>
+<span id="cb11-21"><a href="#cb11-21"></a>You now command a substantial technical toolkit: you can scrape static and dynamic web pages, parse PDFs, query APIs for platforms from Wikipedia to Spotify to the Federal Reserve, apply NLP and LLM-based analysis, and automate your data collection with GitHub Actions. These are powerful capabilities. But technical skill without research design produces data, not knowledge.</span>
+<span id="cb11-22"><a href="#cb11-22"></a></span>
+<span id="cb11-23"><a href="#cb11-23"></a>This chapter steps back from code to address the questions that determine whether your technically-excellent scraping produces genuine insight: What is the right question for this data source? What can this data actually tell you? What are the threats to the validity of your conclusions? How do you communicate your findings responsibly?</span>
+<span id="cb11-24"><a href="#cb11-24"></a></span>
+<span id="cb11-25"><a href="#cb11-25"></a><span class="fu">## From Question to Data Source</span></span>
+<span id="cb11-26"><a href="#cb11-26"></a></span>
+<span id="cb11-27"><a href="#cb11-27"></a>The best web data science projects start with a question, not a dataset. The data source serves the question, not the other way around.</span>
+<span id="cb11-28"><a href="#cb11-28"></a></span>
+<span id="cb11-29"><a href="#cb11-29"></a><span class="fu">### The Proposal Arc</span></span>
+<span id="cb11-30"><a href="#cb11-30"></a></span>
+<span id="cb11-31"><a href="#cb11-31"></a>A research proposal — whether for a class project, a thesis, a journal article, or a grant application — follows a consistent structure:</span>
+<span id="cb11-32"><a href="#cb11-32"></a></span>
+<span id="cb11-33"><a href="#cb11-33"></a><span class="ss">1. </span>**Motivation**: What is the question or problem? Why does it matter? Who benefits from the answer?</span>
+<span id="cb11-34"><a href="#cb11-34"></a><span class="ss">2. </span>**Data source**: What specific web data could address this question? What constructs does the data measure? What are the gaps?</span>
+<span id="cb11-35"><a href="#cb11-35"></a><span class="ss">3. </span>**Methods**: How will you collect the data? What tools and techniques from this book will you use? What analytical approach will you apply?</span>
+<span id="cb11-36"><a href="#cb11-36"></a><span class="ss">4. </span>**Expected results**: What kinds of analyses or visualizations will you produce? What patterns do you expect to find?</span>
+<span id="cb11-37"><a href="#cb11-37"></a><span class="ss">5. </span>**Implications**: What should stakeholders do if your findings hold? What are the practical consequences?</span>
+<span id="cb11-38"><a href="#cb11-38"></a><span class="ss">6. </span>**Limitations**: What can this data *not* tell you? What are the threats to validity? What alternative explanations exist?</span>
+<span id="cb11-39"><a href="#cb11-39"></a></span>
+<span id="cb11-40"><a href="#cb11-40"></a>Notice that limitations are not an afterthought — they are a core component of the design. Acknowledging what your data cannot do is as important as demonstrating what it can.</span>
+<span id="cb11-41"><a href="#cb11-41"></a></span>
+<span id="cb11-42"><a href="#cb11-42"></a><span class="fu">### Matching Questions to Methods</span></span>
+<span id="cb11-43"><a href="#cb11-43"></a></span>
+<span id="cb11-44"><a href="#cb11-44"></a>| Research Design | Web Data Methods | Example |</span>
+<span id="cb11-45"><a href="#cb11-45"></a>|---|---|---|</span>
+<span id="cb11-46"><a href="#cb11-46"></a>| Longitudinal tracking | Wayback Machine (@sec-archives), GitHub Actions (@sec-automation) | How has a platform's privacy policy changed over time? |</span>
+<span id="cb11-47"><a href="#cb11-47"></a>| Cross-sectional snapshot | API queries (@sec-wikipedia, @sec-government, @sec-social) | How does Reddit moderation differ across subreddits? |</span>
+<span id="cb11-48"><a href="#cb11-48"></a>| Content analysis | HTML scraping (@sec-static-pages) + LLM coding (@sec-ai-apis) | What topics dominate legislative activity in Colorado? |</span>
+<span id="cb11-49"><a href="#cb11-49"></a>| Network analysis | Link extraction (@sec-wikipedia), social graphs (@sec-social) | How connected are Wikipedia articles about climate change? |</span>
+<span id="cb11-50"><a href="#cb11-50"></a>| Natural experiment | Event-triggered collection (@sec-automation) | How did a policy change affect web search patterns? |</span>
+<span id="cb11-51"><a href="#cb11-51"></a></span>
+<span id="cb11-52"><a href="#cb11-52"></a><span class="fu">## Common Research Designs with Web Data</span></span>
+<span id="cb11-53"><a href="#cb11-53"></a></span>
+<span id="cb11-54"><a href="#cb11-54"></a>The table above compresses a lot of decisions into single rows. Four of these designs come up so often in web data science that they deserve a closer look; choosing among them depends on your question, your data source, and the claims you want to make.</span>
+<span id="cb11-55"><a href="#cb11-55"></a></span>
+<span id="cb11-56"><a href="#cb11-56"></a><span class="fu">### Longitudinal Tracking</span></span>
+<span id="cb11-57"><a href="#cb11-57"></a></span>
+<span id="cb11-58"><a href="#cb11-58"></a>**Question type**: How does X change over time?</span>
+<span id="cb11-59"><a href="#cb11-59"></a></span>
+<span id="cb11-60"><a href="#cb11-60"></a>You observed something on the web and want to track how it evolves — the content of a policy document, the composition of a playlist, the frequency of a term in news coverage, or the price of a product. Longitudinal tracking requires either archival data (the Wayback Machine in @sec-archives) or forward-looking automated collection (GitHub Actions in @sec-automation).</span>
+<span id="cb11-61"><a href="#cb11-61"></a></span>
+<span id="cb11-62"><a href="#cb11-62"></a>**Design considerations**: The Wayback Machine captures snapshots opportunistically, not on a fixed schedule, so your temporal resolution is uneven. Automated scrapers give you consistent intervals but require maintenance. In both cases, you need to account for changes in the underlying structure (a website redesign, an API version change) that might affect your measurements without reflecting genuine change in the phenomenon you are studying.</span>
+<span id="cb11-63"><a href="#cb11-63"></a></span>
+<span id="cb11-64"><a href="#cb11-64"></a><span class="fu">### Cross-Sectional Snapshot</span></span>
+<span id="cb11-65"><a href="#cb11-65"></a></span>
+<span id="cb11-66"><a href="#cb11-66"></a>**Question type**: How does X vary across cases at a point in time?</span>
+<span id="cb11-67"><a href="#cb11-67"></a></span>
+<span id="cb11-68"><a href="#cb11-68"></a>You want to compare legislative activity across states, subreddit moderation policies across communities, or audio features across genres. Cross-sectional designs collect data at one point in time and analyze variation across units.</span>
+<span id="cb11-69"><a href="#cb11-69"></a></span>
+<span id="cb11-70"><a href="#cb11-70"></a>**Design considerations**: The main threat is selection bias — you are limited to the platforms, communities, and data sources that exist and are accessible. If a platform's API does not expose the variable you need, you cannot include it. If a community is private or a government website does not publish the data you want, it is missing from your sample.</span>
+<span id="cb11-71"><a href="#cb11-71"></a></span>
+<span id="cb11-72"><a href="#cb11-72"></a><span class="fu">### Content Analysis</span></span>
+<span id="cb11-73"><a href="#cb11-73"></a></span>
+<span id="cb11-74"><a href="#cb11-74"></a>**Question type**: What is the substantive content of a corpus?</span>
+<span id="cb11-75"><a href="#cb11-75"></a></span>
+<span id="cb11-76"><a href="#cb11-76"></a>You have collected a body of text — scraped web pages, PDF documents, social media posts — and want to characterize what it contains. Content analysis can be manual (human coding), automated (NLP in @sec-archives, LLM-assisted coding in @sec-ai-apis), or a combination.</span>
+<span id="cb11-77"><a href="#cb11-77"></a></span>
+<span id="cb11-78"><a href="#cb11-78"></a>**Design considerations**: The reliability of automated coding should be validated against manual coding on a random sample. LLM-based classification is powerful but non-deterministic — run the same prompt twice and you may get different results. Always report inter-coder reliability or human-AI agreement rates.</span>
+<span id="cb11-79"><a href="#cb11-79"></a></span>
+<span id="cb11-80"><a href="#cb11-80"></a><span class="fu">### Natural Experiments</span></span>
+<span id="cb11-81"><a href="#cb11-81"></a></span>
+<span id="cb11-82"><a href="#cb11-82"></a>**Question type**: What was the causal effect of an event or policy change?</span>
+<span id="cb11-83"><a href="#cb11-83"></a></span>
+<span id="cb11-84"><a href="#cb11-84"></a>Sometimes external events — a platform policy change, a natural disaster, a legislative decision — create natural variation that allows you to estimate causal effects. For example, you might compare Wikipedia editing behavior before and after a major news event, or Reddit community dynamics before and after a moderation policy change.</span>
+<span id="cb11-85"><a href="#cb11-85"></a></span>
+<span id="cb11-86"><a href="#cb11-86"></a>**Design considerations**: Causal claims from observational data are always tentative. You need a clear "treatment" event, a defensible comparison group, and controls for confounding variables. Web data makes it easy to observe change but does not, by itself, establish causation.</span>
+<span id="cb11-87"><a href="#cb11-87"></a></span>
+<span id="cb11-88"><a href="#cb11-88"></a><span class="fu">## Sampling and Representativeness</span></span>
+<span id="cb11-89"><a href="#cb11-89"></a></span>
+<span id="cb11-90"><a href="#cb11-90"></a>Whichever design you choose, it inherits a common problem: web data is not a random sample of anything. It is a convenience sample shaped by who uses the platform, what the API exposes, and what your scraper can reach. Understanding these biases is essential for interpreting your findings.</span>
+<span id="cb11-91"><a href="#cb11-91"></a></span>
+<span id="cb11-92"><a href="#cb11-92"></a>**Who is missing?** Reddit users skew young, male, and American. Wikipedia editors skew educated, male, and from the Global North. Bluesky's early adopters skew toward journalists and technologists. The data you retrieve from any platform reflects its user base, not the broader population.</span>
+<span id="cb11-93"><a href="#cb11-93"></a></span>
+<span id="cb11-94"><a href="#cb11-94"></a>**What is hidden?** APIs expose what platforms choose to expose. Reddit's API does not reveal deleted posts, shadow-banned users, or the internal ranking algorithms that determine what content becomes visible. Spotify's audio features are proprietary measurements, not raw audio data. What you can measure is constrained by what the platform makes available.</span>
+<span id="cb11-95"><a href="#cb11-95"></a></span>
+<span id="cb11-96"><a href="#cb11-96"></a>**What has been lost?** Longitudinal studies face the erosion problem from @sec-post-api. Articles are deleted, accounts are suspended, pages are redesigned. The data available today may not be available tomorrow, and the data available yesterday may already be gone.</span>
+<span id="cb11-97"><a href="#cb11-97"></a></span>
+<span id="cb11-98"><a href="#cb11-98"></a>Methodologists group many of these concerns under the formal term **construct validity**: the degree to which the thing you can measure (pageviews, posts, search queries) actually corresponds to the concept you claim to study (attention, public opinion, illness) <span class="co">[</span><span class="ot">@salganik2018bit</span><span class="co">]</span>. Whenever this book asks "does your variable actually measure what you claim?", it is asking about construct validity — and weak construct validity is the most common flaw in web data research.</span>
+<span id="cb11-99"><a href="#cb11-99"></a></span>
+<span id="cb11-100"><a href="#cb11-100"></a>The canonical cautionary tale is Google Flu Trends, which promised to estimate influenza prevalence from search queries and instead overestimated it by roughly a factor of two for more than a hundred consecutive weeks <span class="co">[</span><span class="ot">@lazer2014parable</span><span class="co">]</span>. Part of the failure was *big data hubris* — treating a large behavioral dataset as a substitute for, rather than a supplement to, traditional measurement. The rest was *algorithm dynamics*: Google kept redesigning its search and suggestion features, so the measurement instrument drifted underneath the model even as the underlying phenomenon stayed put. Every automated collector you build (@sec-automation) is exposed to both failure modes.</span>
+<span id="cb11-101"><a href="#cb11-101"></a></span>
+<span id="cb11-102"><a href="#cb11-102"></a><span class="fu">## Human Subjects and the IRB</span></span>
+<span id="cb11-103"><a href="#cb11-103"></a></span>
+<span id="cb11-104"><a href="#cb11-104"></a>If your research involves data about people — and most web data does — you need to know when it counts as **human subjects research**. This is not a question you get to answer for yourself, and the answer is less intuitive than many researchers expect.</span>
+<span id="cb11-105"><a href="#cb11-105"></a></span>
+<span id="cb11-106"><a href="#cb11-106"></a>Under the Common Rule, the federal regulation governing research ethics in the United States, human subjects research involves obtaining information about living individuals through interaction or intervention, or obtaining their **identifiable private information**. Scraped web data complicates every clause of that definition. A public post is not exactly private, but the person who wrote it did not expect it to land in a research dataset <span class="co">[</span><span class="ot">@fiesler2020no</span><span class="co">]</span>. A username is not exactly identifiable, but linking it across platforms often makes it so.</span>
+<span id="cb11-107"><a href="#cb11-107"></a></span>
+<span id="cb11-108"><a href="#cb11-108"></a>Three principles should guide you:</span>
+<span id="cb11-109"><a href="#cb11-109"></a></span>
+<span id="cb11-110"><a href="#cb11-110"></a><span class="ss">- </span>**Publicly available does not mean automatically exempt.** "It was on the public web" is a statement about access, not about ethics or regulation. Institutional Review Boards (IRBs) frequently determine that analyses of scraped public data are "not human subjects research" or qualify for an exemption — but that determination belongs to the IRB, not to the researcher. If you catch yourself reasoning "this is obviously fine, so I will not ask," you have identified exactly the moment to ask.</span>
+<span id="cb11-111"><a href="#cb11-111"></a><span class="ss">- </span>**Platform terms of service are not an ethics review.** Complying with a ToS is a legal and contractual matter, as discussed in @sec-ethics; it neither substitutes for nor settles the human subjects question.</span>
+<span id="cb11-112"><a href="#cb11-112"></a><span class="ss">- </span>**Data minimization and de-identification are default practice, not extra credit.** Collect only the fields your question requires, strip or hash identifiers you do not need, and store anything sensitive separately from your analysis dataset. These habits shrink both the ethical risk and the consequences of any future leak.</span>
+<span id="cb11-113"><a href="#cb11-113"></a></span>
+<span id="cb11-114"><a href="#cb11-114"></a>Consult your IRB early whenever your design involves interacting with users (even sending messages from a research account), collecting from private or semi-private spaces (closed groups, invite-only servers), identifying specific individuals, or measuring sensitive attributes such as health, sexuality, immigration status, or political affiliation.</span>
+<span id="cb11-115"><a href="#cb11-115"></a></span>
+<span id="cb11-116"><a href="#cb11-116"></a>Expectations differ by context. For a class project in this course, your instructor and your campus's guidance on student research are the right checkpoints. For research you intend to publish, graduate students should engage the IRB early — a determination request is usually a short form, and "our IRB reviewed the protocol and determined it was not human subjects research" is a sentence reviewers like to see. The ethics chapter of @salganik2018bit (and its historical appendix) is the best single treatment of these questions, @fiesler2020no documents how poorly platform rules align with either law or ethics, and @sec-ethics covers the legal landscape in more depth.</span>
+<span id="cb11-117"><a href="#cb11-117"></a></span>
+<span id="cb11-118"><a href="#cb11-118"></a><span class="fu">## Data Quality and Validation</span></span>
+<span id="cb11-119"><a href="#cb11-119"></a></span>
+<span id="cb11-120"><a href="#cb11-120"></a>Web data is messy. Scrapers fail silently, APIs return incomplete results, and the same information can appear in different formats across sources. Build validation into your pipeline:</span>
+<span id="cb11-121"><a href="#cb11-121"></a></span>
+<span id="cb11-124"><a href="#cb11-124"></a><span class="in">```{python}</span></span>
+<span id="cb11-125"><a href="#cb11-125"></a><span class="kw">def</span> validate_dataset(df, expected_columns, min_rows<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb11-126"><a href="#cb11-126"></a>    <span class="co">"""Basic validation checks for a scraped dataset.</span></span>
+<span id="cb11-127"><a href="#cb11-127"></a><span class="co">    </span></span>
+<span id="cb11-128"><a href="#cb11-128"></a><span class="co">    Parameters</span></span>
+<span id="cb11-129"><a href="#cb11-129"></a><span class="co">    ----------</span></span>
+<span id="cb11-130"><a href="#cb11-130"></a><span class="co">    df : pd.DataFrame</span></span>
+<span id="cb11-131"><a href="#cb11-131"></a><span class="co">        The dataset to validate</span></span>
+<span id="cb11-132"><a href="#cb11-132"></a><span class="co">    expected_columns : list</span></span>
+<span id="cb11-133"><a href="#cb11-133"></a><span class="co">        Columns that should be present</span></span>
+<span id="cb11-134"><a href="#cb11-134"></a><span class="co">    min_rows : int</span></span>
+<span id="cb11-135"><a href="#cb11-135"></a><span class="co">        Minimum expected number of rows</span></span>
+<span id="cb11-136"><a href="#cb11-136"></a><span class="co">    </span></span>
+<span id="cb11-137"><a href="#cb11-137"></a><span class="co">    Returns</span></span>
+<span id="cb11-138"><a href="#cb11-138"></a><span class="co">    -------</span></span>
+<span id="cb11-139"><a href="#cb11-139"></a><span class="co">    bool</span></span>
+<span id="cb11-140"><a href="#cb11-140"></a><span class="co">        True if all checks pass</span></span>
+<span id="cb11-141"><a href="#cb11-141"></a><span class="co">    """</span></span>
+<span id="cb11-142"><a href="#cb11-142"></a>    checks <span class="op">=</span> []</span>
+<span id="cb11-143"><a href="#cb11-143"></a>    </span>
+<span id="cb11-144"><a href="#cb11-144"></a>    <span class="co"># Check column presence</span></span>
+<span id="cb11-145"><a href="#cb11-145"></a>    missing_cols <span class="op">=</span> <span class="bu">set</span>(expected_columns) <span class="op">-</span> <span class="bu">set</span>(df.columns)</span>
+<span id="cb11-146"><a href="#cb11-146"></a>    <span class="cf">if</span> missing_cols:</span>
+<span id="cb11-147"><a href="#cb11-147"></a>        <span class="bu">print</span>(<span class="ss">f"WARNING: Missing columns: </span><span class="sc">{</span>missing_cols<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-148"><a href="#cb11-148"></a>        checks.append(<span class="va">False</span>)</span>
+<span id="cb11-149"><a href="#cb11-149"></a>    <span class="cf">else</span>:</span>
+<span id="cb11-150"><a href="#cb11-150"></a>        checks.append(<span class="va">True</span>)</span>
+<span id="cb11-151"><a href="#cb11-151"></a>    </span>
+<span id="cb11-152"><a href="#cb11-152"></a>    <span class="co"># Check minimum rows</span></span>
+<span id="cb11-153"><a href="#cb11-153"></a>    <span class="cf">if</span> <span class="bu">len</span>(df) <span class="op">&lt;</span> min_rows:</span>
+<span id="cb11-154"><a href="#cb11-154"></a>        <span class="bu">print</span>(<span class="ss">f"WARNING: Only </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> rows (expected &gt;= </span><span class="sc">{</span>min_rows<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb11-155"><a href="#cb11-155"></a>        checks.append(<span class="va">False</span>)</span>
+<span id="cb11-156"><a href="#cb11-156"></a>    <span class="cf">else</span>:</span>
+<span id="cb11-157"><a href="#cb11-157"></a>        checks.append(<span class="va">True</span>)</span>
+<span id="cb11-158"><a href="#cb11-158"></a>    </span>
+<span id="cb11-159"><a href="#cb11-159"></a>    <span class="co"># Check for excessive missing data</span></span>
+<span id="cb11-160"><a href="#cb11-160"></a>    null_pct <span class="op">=</span> df.isnull().mean()</span>
+<span id="cb11-161"><a href="#cb11-161"></a>    high_null <span class="op">=</span> null_pct[null_pct <span class="op">&gt;</span> <span class="fl">0.5</span>]</span>
+<span id="cb11-162"><a href="#cb11-162"></a>    <span class="cf">if</span> <span class="kw">not</span> high_null.empty:</span>
+<span id="cb11-163"><a href="#cb11-163"></a>        <span class="bu">print</span>(<span class="ss">f"WARNING: High null rates: </span><span class="sc">{</span><span class="bu">dict</span>(high_null)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-164"><a href="#cb11-164"></a>        checks.append(<span class="va">False</span>)</span>
+<span id="cb11-165"><a href="#cb11-165"></a>    <span class="cf">else</span>:</span>
+<span id="cb11-166"><a href="#cb11-166"></a>        checks.append(<span class="va">True</span>)</span>
+<span id="cb11-167"><a href="#cb11-167"></a>    </span>
+<span id="cb11-168"><a href="#cb11-168"></a>    <span class="cf">return</span> <span class="bu">all</span>(checks)</span>
+<span id="cb11-169"><a href="#cb11-169"></a><span class="in">```</span></span>
+<span id="cb11-170"><a href="#cb11-170"></a></span>
+<span id="cb11-171"><a href="#cb11-171"></a><span class="fu">## Reproducibility and Documentation</span></span>
+<span id="cb11-172"><a href="#cb11-172"></a></span>
+<span id="cb11-173"><a href="#cb11-173"></a>A reproducible research pipeline means that someone else — or you, six months from now — can re-run your code and get the same results. This requires:</span>
+<span id="cb11-174"><a href="#cb11-174"></a></span>
+<span id="cb11-175"><a href="#cb11-175"></a><span class="ss">- </span>**Version control**: Your code, configuration, and documentation should be in a git repository (more on this below).</span>
+<span id="cb11-176"><a href="#cb11-176"></a><span class="ss">- </span>**Data documentation**: For each dataset, record what it contains, how it was collected, when it was collected, and what its known quality issues are <span class="co">[</span><span class="ot">@gebru2021datasheets</span><span class="co">]</span>.</span>
+<span id="cb11-177"><a href="#cb11-177"></a><span class="ss">- </span>**Environment specification**: A <span class="in">`requirements.txt`</span> or <span class="in">`environment.yml`</span> file that pins the exact versions of your dependencies.</span>
+<span id="cb11-178"><a href="#cb11-178"></a><span class="ss">- </span>**Collection parameters**: Document not just what data you collected but how: the API endpoints, query parameters, rate limiting, date ranges, and any filters you applied.</span>
+<span id="cb11-179"><a href="#cb11-179"></a></span>
+<span id="cb11-180"><a href="#cb11-180"></a><span class="fu">## Managing the Research Process</span></span>
+<span id="cb11-181"><a href="#cb11-181"></a></span>
+<span id="cb11-182"><a href="#cb11-182"></a>These principles become concrete when you organize an actual project. Two habits — disciplined version control and systematic documentation — separate projects that can be revisited, audited, and extended from projects that become black boxes the moment you stop working on them.</span>
+<span id="cb11-183"><a href="#cb11-183"></a></span>
+<span id="cb11-184"><a href="#cb11-184"></a><span class="fu">### Version Control for Research Projects</span></span>
+<span id="cb11-185"><a href="#cb11-185"></a></span>
+<span id="cb11-186"><a href="#cb11-186"></a>Your code, data documentation, and analysis notebooks should be version-controlled with git from the start. This is not just good practice — it is essential for reproducibility. When you revise your analysis after a reviewer's feedback, you need to be able to trace exactly what changed and when.</span>
+<span id="cb11-187"><a href="#cb11-187"></a></span>
+<span id="cb11-188"><a href="#cb11-188"></a><span class="in">```</span></span>
+<span id="cb11-189"><a href="#cb11-189"></a><span class="in">my-project/</span></span>
+<span id="cb11-190"><a href="#cb11-190"></a><span class="in">├── .gitignore           # Exclude api_keys.json, large data files</span></span>
+<span id="cb11-191"><a href="#cb11-191"></a><span class="in">├── README.md            # Project overview and setup instructions</span></span>
+<span id="cb11-192"><a href="#cb11-192"></a><span class="in">├── requirements.txt     # Python dependencies with pinned versions</span></span>
+<span id="cb11-193"><a href="#cb11-193"></a><span class="in">├── data/</span></span>
+<span id="cb11-194"><a href="#cb11-194"></a><span class="in">│   ├── raw/             # Original scraped data (never modify)</span></span>
+<span id="cb11-195"><a href="#cb11-195"></a><span class="in">│   ├── processed/       # Cleaned and transformed data</span></span>
+<span id="cb11-196"><a href="#cb11-196"></a><span class="in">│   └── README.md        # Data documentation (provenance, variables)</span></span>
+<span id="cb11-197"><a href="#cb11-197"></a><span class="in">├── notebooks/</span></span>
+<span id="cb11-198"><a href="#cb11-198"></a><span class="in">│   ├── 01_collection.ipynb</span></span>
+<span id="cb11-199"><a href="#cb11-199"></a><span class="in">│   ├── 02_cleaning.ipynb</span></span>
+<span id="cb11-200"><a href="#cb11-200"></a><span class="in">│   └── 03_analysis.ipynb</span></span>
+<span id="cb11-201"><a href="#cb11-201"></a><span class="in">├── scripts/</span></span>
+<span id="cb11-202"><a href="#cb11-202"></a><span class="in">│   └── scraper.py       # Production scraping scripts</span></span>
+<span id="cb11-203"><a href="#cb11-203"></a><span class="in">└── output/</span></span>
+<span id="cb11-204"><a href="#cb11-204"></a><span class="in">    ├── figures/</span></span>
+<span id="cb11-205"><a href="#cb11-205"></a><span class="in">    └── tables/</span></span>
+<span id="cb11-206"><a href="#cb11-206"></a><span class="in">```</span></span>
+<span id="cb11-207"><a href="#cb11-207"></a></span>
+<span id="cb11-208"><a href="#cb11-208"></a>::: {.callout-tip}</span>
+<span id="cb11-209"><a href="#cb11-209"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb11-210"><a href="#cb11-210"></a>For a complete guide to version control with Git and GitHub — commits, branches, pull requests, and collaboration workflows — see *Missing Manual* Chapter 31: Version Control.</span>
+<span id="cb11-211"><a href="#cb11-211"></a>:::</span>
+<span id="cb11-212"><a href="#cb11-212"></a></span>
+<span id="cb11-213"><a href="#cb11-213"></a><span class="fu">### Data Documentation</span></span>
+<span id="cb11-214"><a href="#cb11-214"></a></span>
+<span id="cb11-215"><a href="#cb11-215"></a>For every dataset you create, write a datasheet <span class="co">[</span><span class="ot">@gebru2021datasheets</span><span class="co">]</span> that answers:</span>
+<span id="cb11-216"><a href="#cb11-216"></a></span>
+<span id="cb11-217"><a href="#cb11-217"></a><span class="ss">- </span>**What**: What does each variable measure? What are the units? What do missing values mean?</span>
+<span id="cb11-218"><a href="#cb11-218"></a><span class="ss">- </span>**How**: What tools did you use? What parameters and filters did you apply? What date range does the data cover?</span>
+<span id="cb11-219"><a href="#cb11-219"></a><span class="ss">- </span>**Limits**: What is not captured? What biases are likely present? What quality issues are you aware of?</span>
+<span id="cb11-220"><a href="#cb11-220"></a><span class="ss">- </span>**Ethics**: Does the data contain personally identifiable information? Was it collected in accordance with the platform's terms? Are there privacy risks if the dataset is shared?</span>
+<span id="cb11-221"><a href="#cb11-221"></a></span>
+<span id="cb11-222"><a href="#cb11-222"></a>This documentation is not busywork — it is the difference between a dataset that can be used by others (including future-you) and one that is a black box.</span>
+<span id="cb11-223"><a href="#cb11-223"></a></span>
+<span id="cb11-224"><a href="#cb11-224"></a><span class="fu">## Communicating Findings</span></span>
+<span id="cb11-225"><a href="#cb11-225"></a></span>
+<span id="cb11-226"><a href="#cb11-226"></a>Web data science serves different audiences, each with different expectations:</span>
+<span id="cb11-227"><a href="#cb11-227"></a></span>
+<span id="cb11-228"><a href="#cb11-228"></a><span class="ss">- </span>**Academic papers** require methodological precision, explicit limitations, and engagement with prior scholarship. Your data collection methods should be replicable from the description alone.</span>
+<span id="cb11-229"><a href="#cb11-229"></a><span class="ss">- </span>**Policy briefs** need actionable findings, clear implications, and accessible language. Lead with the "so what?" rather than the methodology.</span>
+<span id="cb11-230"><a href="#cb11-230"></a><span class="ss">- </span>**Data journalism** demands narrative structure, visual evidence, and accountability framing. The question is not just "what did you find?" but "what should the public know?"</span>
+<span id="cb11-231"><a href="#cb11-231"></a></span>
+<span id="cb11-232"><a href="#cb11-232"></a>In all cases, the visualizations you create with matplotlib and seaborn are not decorations — they are arguments. Every axis label, every color choice, every title should serve your analytical purpose.</span>
+<span id="cb11-233"><a href="#cb11-233"></a></span>
+<span id="cb11-234"><a href="#cb11-234"></a><span class="fu">### Visualization as Argument</span></span>
+<span id="cb11-235"><a href="#cb11-235"></a></span>
+<span id="cb11-236"><a href="#cb11-236"></a>Consider the difference between a default plot and one designed to communicate a finding. A default <span class="in">`plt.plot()`</span> call with no labels, no title, and no context forces the reader to guess what they are looking at. A well-designed figure makes its argument legible at a glance: the title states a claim, the annotations connect data patterns to real-world causes, and the axis labels include units so the reader can evaluate the evidence independently.</span>
+<span id="cb11-237"><a href="#cb11-237"></a></span>
+<span id="cb11-240"><a href="#cb11-240"></a><span class="in">```{python}</span></span>
+<span id="cb11-241"><a href="#cb11-241"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb11-242"><a href="#cb11-242"></a><span class="im">import</span> matplotlib.dates <span class="im">as</span> mdates</span>
+<span id="cb11-243"><a href="#cb11-243"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb11-244"><a href="#cb11-244"></a></span>
+<span id="cb11-245"><a href="#cb11-245"></a><span class="co"># Suppose you have monthly Wikipedia pageviews for "Affordable Care Act"</span></span>
+<span id="cb11-246"><a href="#cb11-246"></a><span class="co"># with columns: 'month' (datetime) and 'pageviews' (int)</span></span>
+<span id="cb11-247"><a href="#cb11-247"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'aca_pageviews.csv'</span>, parse_dates<span class="op">=</span>[<span class="st">'month'</span>])</span>
+<span id="cb11-248"><a href="#cb11-248"></a></span>
+<span id="cb11-249"><a href="#cb11-249"></a><span class="co"># Scale raw counts to thousands so the data matches the axis label below</span></span>
+<span id="cb11-250"><a href="#cb11-250"></a>pageviews_k <span class="op">=</span> df[<span class="st">'pageviews'</span>] <span class="op">/</span> <span class="dv">1000</span></span>
+<span id="cb11-251"><a href="#cb11-251"></a></span>
+<span id="cb11-252"><a href="#cb11-252"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb11-253"><a href="#cb11-253"></a>ax.plot(df[<span class="st">'month'</span>], pageviews_k, color<span class="op">=</span><span class="st">'#2c3e50'</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb11-254"><a href="#cb11-254"></a></span>
+<span id="cb11-255"><a href="#cb11-255"></a><span class="co"># Annotate key events with vertical lines and text</span></span>
+<span id="cb11-256"><a href="#cb11-256"></a>ax.axvline(pd.Timestamp(<span class="st">'2017-07-28'</span>), color<span class="op">=</span><span class="st">'#e74c3c'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb11-257"><a href="#cb11-257"></a>ax.text(pd.Timestamp(<span class="st">'2017-08-15'</span>), pageviews_k.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">0.92</span>,</span>
+<span id="cb11-258"><a href="#cb11-258"></a>        <span class="st">'"Skinny repeal"</span><span class="ch">\n</span><span class="st">vote fails'</span>,</span>
+<span id="cb11-259"><a href="#cb11-259"></a>        fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">'#e74c3c'</span>)</span>
+<span id="cb11-260"><a href="#cb11-260"></a></span>
+<span id="cb11-261"><a href="#cb11-261"></a>ax.axvline(pd.Timestamp(<span class="st">'2020-03-11'</span>), color<span class="op">=</span><span class="st">'#2980b9'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb11-262"><a href="#cb11-262"></a>ax.text(pd.Timestamp(<span class="st">'2020-04-01'</span>), pageviews_k.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">0.78</span>,</span>
+<span id="cb11-263"><a href="#cb11-263"></a>        <span class="st">'WHO declares</span><span class="ch">\n</span><span class="st">COVID-19 pandemic'</span>,</span>
+<span id="cb11-264"><a href="#cb11-264"></a>        fontsize<span class="op">=</span><span class="dv">9</span>, color<span class="op">=</span><span class="st">'#2980b9'</span>)</span>
+<span id="cb11-265"><a href="#cb11-265"></a></span>
+<span id="cb11-266"><a href="#cb11-266"></a><span class="co"># Labels that include units and a title that states a finding</span></span>
+<span id="cb11-267"><a href="#cb11-267"></a>ax.set_title(<span class="st">'Public attention to the ACA spikes around legislative and health crises'</span>,</span>
+<span id="cb11-268"><a href="#cb11-268"></a>             fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb11-269"><a href="#cb11-269"></a>ax.set_xlabel(<span class="st">'Month'</span>)</span>
+<span id="cb11-270"><a href="#cb11-270"></a>ax.set_ylabel(<span class="st">'Monthly pageviews (thousands)'</span>)</span>
+<span id="cb11-271"><a href="#cb11-271"></a>ax.xaxis.set_major_locator(mdates.YearLocator())</span>
+<span id="cb11-272"><a href="#cb11-272"></a>ax.xaxis.set_major_formatter(mdates.DateFormatter(<span class="st">'%Y'</span>))</span>
+<span id="cb11-273"><a href="#cb11-273"></a>ax.spines[<span class="st">'top'</span>].set_visible(<span class="va">False</span>)</span>
+<span id="cb11-274"><a href="#cb11-274"></a>ax.spines[<span class="st">'right'</span>].set_visible(<span class="va">False</span>)</span>
+<span id="cb11-275"><a href="#cb11-275"></a></span>
+<span id="cb11-276"><a href="#cb11-276"></a>plt.tight_layout()</span>
+<span id="cb11-277"><a href="#cb11-277"></a>plt.savefig(<span class="st">'aca_pageviews_annotated.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb11-278"><a href="#cb11-278"></a><span class="co"># plt.show()</span></span>
+<span id="cb11-279"><a href="#cb11-279"></a><span class="in">```</span></span>
+<span id="cb11-280"><a href="#cb11-280"></a></span>
+<span id="cb11-281"><a href="#cb11-281"></a>Notice that the title does not say "Wikipedia Pageviews for Affordable Care Act Over Time" — that merely describes the axes. Instead, it states a finding: public attention spikes around legislative and health crises. The annotations connect specific peaks to specific events, transforming a line chart into an argument about the relationship between political events and public information-seeking behavior. The clean axis formatting and removal of chart junk (top and right spines) keep the reader's attention on the data rather than on visual noise. When you build a figure, ask yourself: if a reader saw only this image and its title, would they understand the claim you are making?</span>
+<span id="cb11-282"><a href="#cb11-282"></a></span>
+<span id="cb11-283"><a href="#cb11-283"></a>::: {.callout-note}</span>
+<span id="cb11-284"><a href="#cb11-284"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb11-285"><a href="#cb11-285"></a>Research design is where the values of @sec-post-api stop being abstractions and become decisions. **Openness** is a design choice: a pipeline built for reproducibility — pinned environments, documented collection parameters, archived raw data — stays verifiable even as the platforms beneath it erode. **Oversight** is a question choice: studies designed around accountability questions serve publics, not just literatures. **Ownership** is an infrastructure choice: collecting into datasets and tools that others can reuse means your project outlives your paper.</span>
+<span id="cb11-286"><a href="#cb11-286"></a>:::</span>
+<span id="cb11-287"><a href="#cb11-287"></a></span>
+<span id="cb11-288"><a href="#cb11-288"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb11-289"><a href="#cb11-289"></a></span>
+<span id="cb11-290"><a href="#cb11-290"></a>Every data source in this book carries a social history — someone fought to make it public, keep it public, or archive it before it vanished. As you design your own research, return to the values introduced in @sec-post-api:</span>
+<span id="cb11-291"><a href="#cb11-291"></a></span>
+<span id="cb11-292"><a href="#cb11-292"></a><span class="ss">- </span>**Openness**: Will you publish your code, data (to the extent ethically permissible), and methods so others can evaluate and build on your work?</span>
+<span id="cb11-293"><a href="#cb11-293"></a><span class="ss">- </span>**Oversight**: Does your research contribute to independent accountability — helping citizens, journalists, or policymakers understand systems that affect them?</span>
+<span id="cb11-294"><a href="#cb11-294"></a><span class="ss">- </span>**Ownership**: Are you building infrastructure (datasets, tools, pipelines) that others can use, or are you extracting value from public resources without contributing back?</span>
+<span id="cb11-295"><a href="#cb11-295"></a></span>
+<span id="cb11-296"><a href="#cb11-296"></a>These questions do not have formulaic answers. But asking them is itself a practice of responsible web data science.</span>
+<span id="cb11-297"><a href="#cb11-297"></a></span>
+<span id="cb11-298"><a href="#cb11-298"></a><span class="fu">### Data Journalism as a Model</span></span>
+<span id="cb11-299"><a href="#cb11-299"></a></span>
+<span id="cb11-300"><a href="#cb11-300"></a>Some of the most compelling examples of web data science in practice come not from academia but from data journalism. Consider ProPublica's "Dollars for Docs" investigation: it began with a straightforward question — which doctors receive payments from pharmaceutical companies? — and pursued it by scraping publicly available but practically inaccessible disclosure databases maintained by drug manufacturers. The team cleaned, standardized, and linked records across companies, then published a searchable database that allowed local journalists across the country to investigate payment patterns in their own communities. The project moved from question to data collection to analysis to public accountability, following the same arc that a strong research proposal describes.</span>
+<span id="cb11-301"><a href="#cb11-301"></a></span>
+<span id="cb11-302"><a href="#cb11-302"></a>Academic researchers can learn several things from this model. Data journalists are accountable to an audience that will scrutinize their methods and challenge their conclusions. This pressure produces methodological transparency: the best data journalism outlets publish their code, describe their scraping and cleaning procedures, and explain the limitations of their data. They also structure their findings as narratives rather than tables of regression coefficients, making complex analyses accessible to non-specialist readers without sacrificing rigor. The journalistic commitment to showing your work — publishing the underlying data, linking to source documents, and explaining analytical choices — aligns directly with the reproducibility standards discussed earlier in this chapter.</span>
+<span id="cb11-303"><a href="#cb11-303"></a></span>
+<span id="cb11-304"><a href="#cb11-304"></a>The practitioners who do this work well — computational social scientists, civic technologists, data journalists — share a common profile: they combine data fluency with deep domain expertise. They understand not just how to scrape a website or query an API but why the data matters, who it affects, and what questions it can and cannot answer. This integration of technical and substantive knowledge is precisely what this book aims to develop. The tools you have learned are necessary but not sufficient; pairing them with domain knowledge, ethical reflection, and a commitment to public accountability is what transforms data collection into genuine contribution.</span>
+<span id="cb11-305"><a href="#cb11-305"></a></span>
+<span id="cb11-306"><a href="#cb11-306"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb11-307"><a href="#cb11-307"></a></span>
+<span id="cb11-308"><a href="#cb11-308"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook and submit the completed notebook. This chapter's exercise is written rather than coded: each cell below asks for a few sentences, not a program. Write your answers as comments or convert the cells to Markdown — either is fine. The steps follow the proposal arc from this chapter, and each should take a paragraph at most.</span>
+<span id="cb11-309"><a href="#cb11-309"></a></span>
+<span id="cb11-310"><a href="#cb11-310"></a>By the end you will have a one-page skeleton of a research design — the seed of the Final Project proposal, and of the full proposal in the Additional Exercises.</span>
+<span id="cb11-311"><a href="#cb11-311"></a></span>
+<span id="cb11-312"><a href="#cb11-312"></a>**Step 1 — The question.** State one research question that web data could answer. Apply this chapter's criteria: it should be specific enough to be answerable, and it should name the *construct* you actually care about (attention, opinion, participation, price), not just a dataset you find interesting.</span>
+<span id="cb11-313"><a href="#cb11-313"></a></span>
+<span id="cb11-316"><a href="#cb11-316"></a><span class="in">```{python}</span></span>
+<span id="cb11-317"><a href="#cb11-317"></a><span class="co"># Step 1: State your research question, and name the construct it is really about. Write as comments, or convert this cell to Markdown.</span></span>
+<span id="cb11-318"><a href="#cb11-318"></a><span class="in">```</span></span>
+<span id="cb11-319"><a href="#cb11-319"></a></span>
+<span id="cb11-320"><a href="#cb11-320"></a>**Step 2 — The data source and access method.** Name the data source that would answer it and the specific technique from this book you would use — an API (@sec-wikipedia, @sec-government, @sec-social), scraping (@sec-static-pages, @sec-dynamic-pages), archives (@sec-archives), PDFs (@sec-pdfs), or automated collection (@sec-automation). Note what the source's access rules (@sec-ethics, @sec-post-api) permit.</span>
+<span id="cb11-321"><a href="#cb11-321"></a></span>
+<span id="cb11-324"><a href="#cb11-324"></a><span class="in">```{python}</span></span>
+<span id="cb11-325"><a href="#cb11-325"></a><span class="co"># Step 2: Name the source, the chapter technique you would use, and what the access rules permit.</span></span>
+<span id="cb11-326"><a href="#cb11-326"></a><span class="in">```</span></span>
+<span id="cb11-327"><a href="#cb11-327"></a></span>
+<span id="cb11-328"><a href="#cb11-328"></a>**Step 3 — The design.** Which of the chapter's four designs is this — longitudinal tracking, cross-sectional snapshot, content analysis, or a natural experiment? Say why that design fits your question, and what your unit of analysis is.</span>
+<span id="cb11-329"><a href="#cb11-329"></a></span>
+<span id="cb11-332"><a href="#cb11-332"></a><span class="in">```{python}</span></span>
+<span id="cb11-333"><a href="#cb11-333"></a><span class="co"># Step 3: Name the design, justify it, and state the unit of analysis.</span></span>
+<span id="cb11-334"><a href="#cb11-334"></a><span class="in">```</span></span>
+<span id="cb11-335"><a href="#cb11-335"></a></span>
+<span id="cb11-336"><a href="#cb11-336"></a>**Step 4 — Sampling and representativeness.** Who or what is in your data, and who is missing? Apply the chapter's discussion: what population does your source actually represent, and how does that differ from the population your question is about?</span>
+<span id="cb11-337"><a href="#cb11-337"></a></span>
+<span id="cb11-340"><a href="#cb11-340"></a><span class="in">```{python}</span></span>
+<span id="cb11-341"><a href="#cb11-341"></a><span class="co"># Step 4: Describe the sample, the population it represents, and the gap between that and the population your question targets.</span></span>
+<span id="cb11-342"><a href="#cb11-342"></a><span class="in">```</span></span>
+<span id="cb11-343"><a href="#cb11-343"></a></span>
+<span id="cb11-344"><a href="#cb11-344"></a>**Step 5 — Measurement validity.** Make the construct-validity argument: why does the thing you can count (pageviews, posts, mentions, dollar amounts) measure the thing you care about? Name the strongest objection to that link, and one check that would strengthen it.</span>
+<span id="cb11-345"><a href="#cb11-345"></a></span>
+<span id="cb11-348"><a href="#cb11-348"></a><span class="in">```{python}</span></span>
+<span id="cb11-349"><a href="#cb11-349"></a><span class="co"># Step 5: Make the construct validity argument, name its weakest point, and propose one validation check.</span></span>
+<span id="cb11-350"><a href="#cb11-350"></a><span class="in">```</span></span>
+<span id="cb11-351"><a href="#cb11-351"></a></span>
+<span id="cb11-352"><a href="#cb11-352"></a>**Step 6 — Limitations and contingency.** Name the two threats most likely to undermine the study — draw on the chapter's validity discussion and the erosion scenarios of @sec-post-api — and write a one-sentence contingency for each: if the source closes or changes mid-study, what is your fallback?</span>
+<span id="cb11-353"><a href="#cb11-353"></a></span>
+<span id="cb11-356"><a href="#cb11-356"></a><span class="in">```{python}</span></span>
+<span id="cb11-357"><a href="#cb11-357"></a><span class="co"># Step 6: Two biggest threats, and a contingency plan for each.</span></span>
+<span id="cb11-358"><a href="#cb11-358"></a><span class="in">```</span></span>
+<span id="cb11-359"><a href="#cb11-359"></a></span>
+<span id="cb11-360"><a href="#cb11-360"></a>**Step 7 — Ethics and human subjects.** Does this study involve people's data? Apply the chapter's IRB discussion and the framework from @sec-ethics: would it need review, what would you collect at minimum, and what would you refuse to collect?</span>
+<span id="cb11-361"><a href="#cb11-361"></a></span>
+<span id="cb11-364"><a href="#cb11-364"></a><span class="in">```{python}</span></span>
+<span id="cb11-365"><a href="#cb11-365"></a><span class="co"># Step 7: The ethical determination -- IRB or not, and the collection boundaries you would set.</span></span>
+<span id="cb11-366"><a href="#cb11-366"></a><span class="in">```</span></span>
+<span id="cb11-367"><a href="#cb11-367"></a></span>
+<span id="cb11-368"><a href="#cb11-368"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb11-369"><a href="#cb11-369"></a></span>
+<span id="cb11-370"><a href="#cb11-370"></a>These are open-ended extensions — no scaffold, no fixed path. The first expands your skeleton from above into a full proposal.</span>
+<span id="cb11-371"><a href="#cb11-371"></a></span>
+<span id="cb11-372"><a href="#cb11-372"></a><span class="ss">1. </span>**Research proposal.** Write a 1,500-word research proposal for a web data science project — expanding the skeleton you built in the Recommended Exercises. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.</span>
+<span id="cb11-373"><a href="#cb11-373"></a></span>
+<span id="cb11-374"><a href="#cb11-374"></a><span class="ss">2. </span>**Validity threats.** Identify three potential threats to validity in a hypothetical study that uses scraped social media data to measure public opinion. For each threat, propose a mitigation strategy.</span>
+<span id="cb11-375"><a href="#cb11-375"></a></span>
+<span id="cb11-376"><a href="#cb11-376"></a><span class="ss">3. </span>**Data documentation.** Take a dataset you collected in an earlier chapter and write a "datasheet" following @gebru2021datasheets: what does each variable measure, how was it collected, what are the known quality issues, and how should it be cited?</span>
+<span id="cb11-377"><a href="#cb11-377"></a></span>
+<span id="cb11-378"><a href="#cb11-378"></a><span class="ss">4. </span>**Data limitations assessment.** Choose a dataset you collected in an earlier chapter. Write a 500-word assessment of its limitations, covering: sampling bias (what is included and excluded?), measurement validity (does your variable actually measure what you claim?), temporal scope (what period does the data cover, and what might have changed?), and platform constraints (how does the platform's design shape the data you can collect?).</span>
+<span id="cb11-379"><a href="#cb11-379"></a></span>
+<span id="cb11-380"><a href="#cb11-380"></a><span class="ss">5. </span>**Multi-method design.** Design a research study that combines at least three techniques from this book (e.g., API data collection, web scraping, PDF extraction, text analysis, or automated collection). Write a one-page methods section that describes your data sources, collection procedures, analysis plan, and anticipated limitations. This should read like a methods section in an academic paper.</span>
+<span id="cb11-381"><a href="#cb11-381"></a></span>
+<span id="cb11-382"><a href="#cb11-382"></a><span class="ss">6. </span>**Graduate extension (INFO 5617).** Write a complete pre-registration-style research design of two to three pages for a study you could actually execute. Specify the research question, data sources, sampling frame, and measurement strategy, making an explicit construct validity argument for each measure <span class="co">[</span><span class="ot">@salganik2018bit</span><span class="co">]</span>. Then confront the threats: enumerate the validity risks (including algorithm dynamics <span class="co">[</span><span class="ot">@lazer2014parable</span><span class="co">]</span>), sketch the IRB determination you would request and why, and write a contingency plan for the platform-erosion scenarios of @sec-post-api. The discipline of specifying everything before collecting anything is the point — a design you cannot write down is a design you have not finished.</span>
+<span id="cb11-383"><a href="#cb11-383"></a></span>
+<span id="cb11-384"><a href="#cb11-384"></a><span class="fu">## Common Pitfalls</span></span>
+<span id="cb11-385"><a href="#cb11-385"></a></span>
+<span id="cb11-386"><a href="#cb11-386"></a>Research design failures are harder to debug than code failures — there is no traceback, just a dataset that cannot answer your question. Watch for these:</span>
+<span id="cb11-387"><a href="#cb11-387"></a></span>
+<span id="cb11-388"><a href="#cb11-388"></a><span class="ss">- </span>**Collecting before defining the unit of analysis.** Is a row of your dataset a post, a user, a day, or a community? Deciding after collection usually means collecting again.</span>
+<span id="cb11-389"><a href="#cb11-389"></a><span class="ss">- </span>**Sampling on the dependent variable.** Studying only viral posts to learn what makes posts go viral tells you nothing without the posts that never took off.</span>
+<span id="cb11-390"><a href="#cb11-390"></a><span class="ss">- </span>**Ignoring bot and spam contamination.** On many platforms, automated accounts generate a substantial share of raw activity; skipping this filter means measuring bots while making claims about people.</span>
+<span id="cb11-391"><a href="#cb11-391"></a><span class="ss">- </span>**Survivorship bias in longitudinal scrapes.** The accounts, pages, and posts still visible at collection time are the survivors; deleted and suspended content is invisible precisely because something happened to it.</span>
+<span id="cb11-392"><a href="#cb11-392"></a><span class="ss">- </span>**Changing instrumentation mid-collection.** Editing your scraper's selectors, query parameters, or sampling logic partway through a collection creates artificial discontinuities that look like real change — the algorithm dynamics problem, self-inflicted.</span>
+<span id="cb11-393"><a href="#cb11-393"></a><span class="ss">- </span>**Validating only at analysis time.** If your first quality check happens months after collection began, so does your discovery that a site redesign in June silently emptied half your columns.</span>
+<span id="cb11-394"><a href="#cb11-394"></a></span>
+<span id="cb11-395"><a href="#cb11-395"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb11-396"><a href="#cb11-396"></a></span>
+<span id="cb11-397"><a href="#cb11-397"></a>Technical skill without research design produces data, not knowledge. Every project needs a clear question, a defensible data collection strategy, honest assessment of limitations, and responsible communication of findings. The web is the richest data source humanity has ever created; using it well is both a technical and an ethical challenge. The skills in this book — scraping, API access, PDF extraction, NLP, LLM analysis, automation — are means, not ends. The end is producing knowledge that serves openness, oversight, and ownership.</span>
+<span id="cb11-398"><a href="#cb11-398"></a></span>
+<span id="cb11-399"><a href="#cb11-399"></a><span class="fu">## Further Reading</span></span>
+<span id="cb11-400"><a href="#cb11-400"></a></span>
+<span id="cb11-401"><a href="#cb11-401"></a><span class="ss">- </span>@salganik2018bit — comprehensive treatment of digital-age research design</span>
+<span id="cb11-402"><a href="#cb11-402"></a><span class="ss">- </span>@gebru2021datasheets — a framework for documenting datasets</span>
+<span id="cb11-403"><a href="#cb11-403"></a><span class="ss">- </span>@lazer2020computational — obstacles and opportunities in computational social science</span>
+<span id="cb11-404"><a href="#cb11-404"></a><span class="ss">- </span>@vanatteveldt2022computational — methods for computational analysis of communication</span>
+<span id="cb11-405"><a href="#cb11-405"></a><span class="ss">- </span>@rogers2019doing — qualitative and critical approaches to digital methods</span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>8&nbsp; Dynamic Web Pages with Selenium – Web Data Science</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./ch-09-pdfs.html" rel="next">
+<link href="./ch-07-archives.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-06-static-pages.html">Documents</a></li><li class="breadcrumb-item"><a href="./ch-08-dynamic-pages.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Web Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-01-introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Web Data Science</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-02-ethics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Ethics, Law, and Responsible Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-03-post-api.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">The Post-API Age</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-04-data-formats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Formats: XML and JSON</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-05-protocols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Web Architecture and Protocols</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documents</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-06-static-pages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Parsing Static Web Pages</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-07-archives.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-08-dynamic-pages.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-09-pdfs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">APIs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-10-wikipedia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-11-government.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Government Data APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-12-social.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Social and Media Platform APIs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-13-ai-apis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Practice</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-14-automation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Automating Data Collection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ch-15-research-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Research Design with Web Data</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-notebooks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Companion Notebooks</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-ai-disclosure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">AI Coauthorship and Responsible Disclosure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix-further.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Where to Go from Here</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#when-static-scraping-fails" id="toc-when-static-scraping-fails" class="nav-link active" data-scroll-target="#when-static-scraping-fails"><span class="header-section-number">8.1</span> When Static Scraping Fails</a></li>
+  <li><a href="#setting-up-selenium" id="toc-setting-up-selenium" class="nav-link" data-scroll-target="#setting-up-selenium"><span class="header-section-number">8.2</span> Setting Up Selenium</a></li>
+  <li><a href="#navigating-and-finding-elements" id="toc-navigating-and-finding-elements" class="nav-link" data-scroll-target="#navigating-and-finding-elements"><span class="header-section-number">8.3</span> Navigating and Finding Elements</a></li>
+  <li><a href="#extracting-data" id="toc-extracting-data" class="nav-link" data-scroll-target="#extracting-data"><span class="header-section-number">8.4</span> Extracting Data</a></li>
+  <li><a href="#simulating-interactions" id="toc-simulating-interactions" class="nav-link" data-scroll-target="#simulating-interactions"><span class="header-section-number">8.5</span> Simulating Interactions</a>
+  <ul class="collapse">
+  <li><a href="#clicking" id="toc-clicking" class="nav-link" data-scroll-target="#clicking"><span class="header-section-number">8.5.1</span> Clicking</a></li>
+  <li><a href="#typing-and-searching" id="toc-typing-and-searching" class="nav-link" data-scroll-target="#typing-and-searching"><span class="header-section-number">8.5.2</span> Typing and Searching</a></li>
+  <li><a href="#scrolling" id="toc-scrolling" class="nav-link" data-scroll-target="#scrolling"><span class="header-section-number">8.5.3</span> Scrolling</a></li>
+  <li><a href="#waiting-for-dynamic-content" id="toc-waiting-for-dynamic-content" class="nav-link" data-scroll-target="#waiting-for-dynamic-content"><span class="header-section-number">8.5.4</span> Waiting for Dynamic Content</a></li>
+  <li><a href="#scraping-infinite-scroll-pages" id="toc-scraping-infinite-scroll-pages" class="nav-link" data-scroll-target="#scraping-infinite-scroll-pages"><span class="header-section-number">8.5.5</span> Scraping Infinite Scroll Pages</a></li>
+  </ul></li>
+  <li><a href="#passing-to-beautifulsoup" id="toc-passing-to-beautifulsoup" class="nav-link" data-scroll-target="#passing-to-beautifulsoup"><span class="header-section-number">8.6</span> Passing to BeautifulSoup</a></li>
+  <li><a href="#always-close-the-driver" id="toc-always-close-the-driver" class="nav-link" data-scroll-target="#always-close-the-driver"><span class="header-section-number">8.7</span> Always Close the Driver</a></li>
+  <li><a href="#the-fragility-problem" id="toc-the-fragility-problem" class="nav-link" data-scroll-target="#the-fragility-problem"><span class="header-section-number">8.8</span> The Fragility Problem</a>
+  <ul class="collapse">
+  <li><a href="#headless-mode" id="toc-headless-mode" class="nav-link" data-scroll-target="#headless-mode"><span class="header-section-number">8.8.1</span> Headless Mode</a></li>
+  </ul></li>
+  <li><a href="#a-practical-selenium-workflow" id="toc-a-practical-selenium-workflow" class="nav-link" data-scroll-target="#a-practical-selenium-workflow"><span class="header-section-number">8.9</span> A Practical Selenium Workflow</a></li>
+  <li><a href="#when-to-use-selenium-vs.-apis" id="toc-when-to-use-selenium-vs.-apis" class="nav-link" data-scroll-target="#when-to-use-selenium-vs.-apis"><span class="header-section-number">8.10</span> When to Use Selenium vs.&nbsp;APIs</a></li>
+  <li><a href="#recommended-exercises" id="toc-recommended-exercises" class="nav-link" data-scroll-target="#recommended-exercises"><span class="header-section-number">8.11</span> Recommended Exercises</a></li>
+  <li><a href="#additional-exercises" id="toc-additional-exercises" class="nav-link" data-scroll-target="#additional-exercises"><span class="header-section-number">8.12</span> Additional Exercises</a></li>
+  <li><a href="#social-history-and-public-interest" id="toc-social-history-and-public-interest" class="nav-link" data-scroll-target="#social-history-and-public-interest"><span class="header-section-number">8.13</span> Social History and Public Interest</a></li>
+  <li><a href="#common-issues-to-debug" id="toc-common-issues-to-debug" class="nav-link" data-scroll-target="#common-issues-to-debug"><span class="header-section-number">8.14</span> Common Issues to Debug</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">8.15</span> Key Takeaways</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">8.16</span> Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-06-static-pages.html">Documents</a></li><li class="breadcrumb-item"><a href="./ch-08-dynamic-pages.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-dynamic-pages" class="quarto-section-identifier"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Dynamic Web Pages with Selenium</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Explain why JavaScript-rendered content is invisible to <code>requests</code> + BeautifulSoup</li>
+<li>Install and configure Selenium WebDriver for Chrome, Firefox, or Safari</li>
+<li>Locate elements using multiple strategies (ID, name, XPath, CSS selector)</li>
+<li>Simulate user interactions — clicking, typing, and scrolling — programmatically</li>
+<li>Pass fully-rendered page source from Selenium back to BeautifulSoup for parsing</li>
+<li>Assess the fragility and ethical implications of browser automation</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Companion Notebook
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Run this chapter’s code as you read: open the <a href="https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/notebooks/ch-08-dynamic-pages.ipynb">companion notebook</a> (see <a href="appendix-notebooks.html" class="quarto-xref"><span>Appendix A</span></a> for all of them).</p>
+</div>
+</div>
+<section id="when-static-scraping-fails" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="when-static-scraping-fails"><span class="header-section-number">8.1</span> When Static Scraping Fails</h2>
+<p>In <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, you learned to retrieve web pages with <code>requests</code> and parse them with BeautifulSoup. This works well for pages whose content is fully present in the initial HTML — what we call <em>static</em> pages. But most modern websites are <em>dynamic</em>: their content is loaded, modified, or entirely rendered by JavaScript after the initial HTML arrives.</p>
+<p>When you use <code>requests.get()</code> on a dynamic page, you get the HTML skeleton before JavaScript has run. The data you see in your browser may simply not exist in the response that <code>requests</code> receives. You can verify this by comparing <code>requests.get(url).text</code> with what you see in the browser — if significant content is missing from the <code>requests</code> version, the page is dynamic.</p>
+<p>The solution is to use a tool that can execute JavaScript: a real web browser, controlled programmatically. Selenium is the standard tool for this.</p>
+</section>
+<section id="setting-up-selenium" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="setting-up-selenium"><span class="header-section-number">8.2</span> Setting Up Selenium</h2>
+<p>Selenium requires two components: the <code>selenium</code> Python library and a browser driver — a small program that lets Python control a specific browser. Fortunately, you only need to install the library: since version 4.6 (late 2022), Selenium has shipped with <strong>Selenium Manager</strong>, which automatically finds or downloads the correct driver for whatever browser you have installed.</p>
+<div id="1e4cd0db" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Install from a terminal:</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co"># pip install selenium</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Creating a driver is then a one-liner:</p>
+<div id="c3a9091c" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># For Chrome:</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>driver <span class="op">=</span> webdriver.Chrome()</span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co"># For Firefox:</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co"># driver = webdriver.Firefox()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If driver resolution fails on your machine — an unusual browser install location or a very new browser release can confuse it — check Selenium’s driver documentation for manual setup instructions.</p>
+<p>When you create the <code>driver</code>, a browser window opens. This is your programmable browser — every command you issue through the <code>driver</code> object happens in that window.</p>
+</section>
+<section id="navigating-and-finding-elements" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="navigating-and-finding-elements"><span class="header-section-number">8.3</span> Navigating and Finding Elements</h2>
+<div id="b9b6d3a8" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Navigate to a website</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>driver.get(<span class="st">"https://xkcd.com"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co"># Find elements by various strategies</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
+<span id="cb3-6"><a href="#cb3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co"># By ID</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>comic_div <span class="op">=</span> driver.find_element(By.ID, <span class="st">"comic"</span>)</span>
+<span id="cb3-9"><a href="#cb3-9"></a></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co"># By CSS selector</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>nav_links <span class="op">=</span> driver.find_elements(By.CSS_SELECTOR, <span class="st">"ul.comicNav li a"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co"># By XPath</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a>title <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//div[@id='ctitle']"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="bu">print</span>(title.text)  <span class="co"># The title of the current comic</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>find_element</code> method (singular) returns the first matching element. The <code>find_elements</code> method (plural) returns a list of all matches.</p>
+</section>
+<section id="extracting-data" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="extracting-data"><span class="header-section-number">8.4</span> Extracting Data</h2>
+<p>xkcd is famous for its hidden alt-text messages. You can extract element attributes:</p>
+<div id="a0f151e6" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Find the comic image</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>img <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//div[@id='comic']//img"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co"># Get the alt-text and title attributes</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="bu">print</span>(<span class="ss">f"Alt text: </span><span class="sc">{</span>img<span class="sc">.</span>get_attribute(<span class="st">'alt'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="bu">print</span>(<span class="ss">f"Title (hover text): </span><span class="sc">{</span>img<span class="sc">.</span>get_attribute(<span class="st">'title'</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="simulating-interactions" class="level2" data-number="8.5">
+<h2 data-number="8.5" class="anchored" data-anchor-id="simulating-interactions"><span class="header-section-number">8.5</span> Simulating Interactions</h2>
+<p>Selenium can simulate clicks, keyboard input, and scrolling — anything a human user would do:</p>
+<section id="clicking" class="level3" data-number="8.5.1">
+<h3 data-number="8.5.1" class="anchored" data-anchor-id="clicking"><span class="header-section-number">8.5.1</span> Clicking</h3>
+<div id="90294ce9" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Click the "Random" button to navigate to a random comic</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>random_button <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//ul[@class='comicNav']//a[contains(text(),'Random')]"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>random_button.click()</span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co"># Extract the alt-text from the random page</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="im">import</span> time</span>
+<span id="cb5-7"><a href="#cb5-7"></a>time.sleep(<span class="dv">1</span>)  <span class="co"># Wait for the page to load</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a></span>
+<span id="cb5-9"><a href="#cb5-9"></a>img <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//div[@id='comic']//img"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="bu">print</span>(<span class="ss">f"Random comic title: </span><span class="sc">{</span>img<span class="sc">.</span>get_attribute(<span class="st">'title'</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="typing-and-searching" class="level3" data-number="8.5.2">
+<h3 data-number="8.5.2" class="anchored" data-anchor-id="typing-and-searching"><span class="header-section-number">8.5.2</span> Typing and Searching</h3>
+<p>Selenium can type into forms and submit them. We will demonstrate with Wikipedia’s search box: Wikipedia’s robots policy is permissive toward automated access, and its markup is stable enough that this example should keep working for years. (Search engines like Google, by contrast, explicitly prohibit automated queries in their Terms of Service — where you point your automation matters as much as how you write it.)</p>
+<div id="8d8a1198" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="im">from</span> selenium.webdriver.common.keys <span class="im">import</span> Keys</span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># Navigate to the Wikipedia portal</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>driver.get(<span class="st">"https://www.wikipedia.org"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5"></a></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co"># Find the search box by its name attribute</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>search_box <span class="op">=</span> driver.find_element(By.NAME, <span class="st">"search"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8"></a></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co"># Type a query</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a>search_box.send_keys(<span class="st">"Colorado Buffaloes"</span>)</span>
+<span id="cb6-11"><a href="#cb6-11"></a>time.sleep(<span class="dv">1</span>)  <span class="co"># Observe autocomplete suggestions</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co"># Press Enter to submit the search</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a>search_box.send_keys(Keys.RETURN)</span>
+<span id="cb6-15"><a href="#cb6-15"></a>time.sleep(<span class="dv">2</span>)  <span class="co"># Wait for the results page to load</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co"># Read the resulting page</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="bu">print</span>(driver.title)</span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co"># Colorado Buffaloes - Wikipedia</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a></span>
+<span id="cb6-21"><a href="#cb6-21"></a>heading <span class="op">=</span> driver.find_element(By.ID, <span class="st">"firstHeading"</span>)</span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="bu">print</span>(heading.text)</span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co"># Colorado Buffaloes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>When your query matches an article title exactly, Wikipedia takes you straight to that article; otherwise you land on a search results page listing candidate matches. Either way, the pattern is the one you will reuse on any site with a search form: find the input element, type with <code>send_keys()</code>, submit with <code>Keys.RETURN</code>, wait for the new page, and read the results.</p>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Automation Is Not a Loophole
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Everything from <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> applies with full force to browser automation. A robots.txt disallow rule does not stop mattering because a real browser is doing the requesting, and a site’s Terms of Service does not stop applying because a script is doing the clicking. Legal risk concentrates precisely where Selenium is most tempting: automating logged-in accounts and ToS-restricted content. Check the policies of any site before you automate interactions with it.</p>
+</div>
+</div>
+</section>
+<section id="scrolling" class="level3" data-number="8.5.3">
+<h3 data-number="8.5.3" class="anchored" data-anchor-id="scrolling"><span class="header-section-number">8.5.3</span> Scrolling</h3>
+<p>Some pages load content as you scroll (infinite scroll). You can simulate this:</p>
+<div id="ae6eb791" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="im">from</span> selenium.webdriver.common.keys <span class="im">import</span> Keys</span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a>body <span class="op">=</span> driver.find_element(By.TAG_NAME, <span class="st">"body"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4"></a></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co"># Scroll down 5 times</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb7-7"><a href="#cb7-7"></a>    body.send_keys(Keys.PAGE_DOWN)</span>
+<span id="cb7-8"><a href="#cb7-8"></a>    time.sleep(<span class="dv">1</span>)  <span class="co"># Wait for new content to load</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="waiting-for-dynamic-content" class="level3" data-number="8.5.4">
+<h3 data-number="8.5.4" class="anchored" data-anchor-id="waiting-for-dynamic-content"><span class="header-section-number">8.5.4</span> Waiting for Dynamic Content</h3>
+<p>The <code>time.sleep()</code> calls in the examples above are a crude approach to waiting for content to load. A better strategy is <em>explicit waits</em>, which pause execution until a specific condition is met:</p>
+<div id="b2adb21d" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="im">from</span> selenium.webdriver.support.ui <span class="im">import</span> WebDriverWait</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="im">from</span> selenium.webdriver.support <span class="im">import</span> expected_conditions <span class="im">as</span> EC</span>
+<span id="cb8-3"><a href="#cb8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co"># Navigate to a page with dynamically loaded content</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a>driver.get(<span class="st">"https://example-dynamic-site.com"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6"></a></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co"># Wait up to 10 seconds for a specific element to appear</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>element <span class="op">=</span> WebDriverWait(driver, <span class="dv">10</span>).until(</span>
+<span id="cb8-9"><a href="#cb8-9"></a>    EC.presence_of_element_located((By.CLASS_NAME, <span class="st">"results-container"</span>))</span>
+<span id="cb8-10"><a href="#cb8-10"></a>)</span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="bu">print</span>(<span class="ss">f"Element found: </span><span class="sc">{</span>element<span class="sc">.</span>tag_name<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>WebDriverWait</code> checks the condition repeatedly (every 0.5 seconds by default) and returns the element as soon as it appears, or raises a <code>TimeoutException</code> if the timeout expires. This is superior to <code>time.sleep()</code> in two ways: it does not wait longer than necessary (if the element appears in 0.2 seconds, it proceeds immediately), and it fails loudly if the element never appears (rather than silently returning an empty page).</p>
+<p>The most common expected conditions you will use are:</p>
+<ul>
+<li><code>presence_of_element_located</code> — the element exists in the DOM (even if not visible)</li>
+<li><code>visibility_of_element_located</code> — the element is both present and visible on the page</li>
+<li><code>element_to_be_clickable</code> — the element is visible, enabled, and can receive clicks</li>
+<li><code>text_to_be_present_in_element</code> — specific text has appeared inside an element</li>
+</ul>
+<p>Use these instead of <code>time.sleep()</code> whenever possible. The combination of <code>WebDriverWait</code> with explicit conditions makes your Selenium scripts both more reliable (they wait for exactly what they need) and faster (they proceed as soon as the condition is met rather than waiting a fixed duration). You will see this pattern used in the practical workflow section later in this chapter.</p>
+</section>
+<section id="scraping-infinite-scroll-pages" class="level3" data-number="8.5.5">
+<h3 data-number="8.5.5" class="anchored" data-anchor-id="scraping-infinite-scroll-pages"><span class="header-section-number">8.5.5</span> Scraping Infinite Scroll Pages</h3>
+<p>Many modern websites load content progressively as you scroll — social media feeds, image galleries, and product listings all use this pattern. The technique for scraping these pages involves scrolling to the bottom, waiting for new content to load, and repeating until no more content appears:</p>
+<div id="af1c414c" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">def</span> scrape_infinite_scroll(driver, max_scrolls<span class="op">=</span><span class="dv">20</span>, scroll_pause<span class="op">=</span><span class="dv">2</span>):</span>
+<span id="cb9-2"><a href="#cb9-2"></a>    <span class="co">"""Scroll an infinite-scroll page and collect all loaded content."""</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>    last_height <span class="op">=</span> driver.execute_script(<span class="st">"return document.body.scrollHeight"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4"></a></span>
+<span id="cb9-5"><a href="#cb9-5"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_scrolls):</span>
+<span id="cb9-6"><a href="#cb9-6"></a>        <span class="co"># Scroll to the bottom of the page</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a>        driver.execute_script(<span class="st">"window.scrollTo(0, document.body.scrollHeight);"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8"></a>        time.sleep(scroll_pause)</span>
+<span id="cb9-9"><a href="#cb9-9"></a></span>
+<span id="cb9-10"><a href="#cb9-10"></a>        <span class="co"># Check if the page grew</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a>        new_height <span class="op">=</span> driver.execute_script(<span class="st">"return document.body.scrollHeight"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12"></a>        <span class="cf">if</span> new_height <span class="op">==</span> last_height:</span>
+<span id="cb9-13"><a href="#cb9-13"></a>            <span class="bu">print</span>(<span class="ss">f"No new content after scroll </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. Stopping."</span>)</span>
+<span id="cb9-14"><a href="#cb9-14"></a>            <span class="cf">break</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a>        last_height <span class="op">=</span> new_height</span>
+<span id="cb9-16"><a href="#cb9-16"></a>        <span class="bu">print</span>(<span class="ss">f"Scroll </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: page height grew to </span><span class="sc">{</span>new_height<span class="sc">}</span><span class="ss">px"</span>)</span>
+<span id="cb9-17"><a href="#cb9-17"></a></span>
+<span id="cb9-18"><a href="#cb9-18"></a>    <span class="co"># Return the fully-loaded page source</span></span>
+<span id="cb9-19"><a href="#cb9-19"></a>    <span class="cf">return</span> driver.page_source</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The key insight is checking <code>document.body.scrollHeight</code> before and after each scroll. When the height stops growing, you have reached the end of the available content. Some sites use a “Load More” button instead of infinite scroll — for those, replace the scroll with a click on the button and watch for the button to disappear or become disabled.</p>
+<p>A practical consideration: infinite scroll pages can contain thousands of items, and loading them all consumes significant memory in the browser process. Set a reasonable <code>max_scrolls</code> limit based on how much data you actually need. If you are collecting data for a class project, you rarely need more than a few hundred items — scrolling through an entire social media feed of 10,000 posts is both unnecessary and discourteous to the server. Remember the proportionality principle from <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>: collect only the data you need for your research question.</p>
+</section>
+</section>
+<section id="passing-to-beautifulsoup" class="level2" data-number="8.6">
+<h2 data-number="8.6" class="anchored" data-anchor-id="passing-to-beautifulsoup"><span class="header-section-number">8.6</span> Passing to BeautifulSoup</h2>
+<p>Once the page is fully rendered in the browser, you can extract the complete HTML and parse it with the familiar BeautifulSoup tools:</p>
+<div id="655a40f9" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb10-2"><a href="#cb10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co"># Get the fully-rendered page source from Selenium</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>html <span class="op">=</span> driver.page_source</span>
+<span id="cb10-5"><a href="#cb10-5"></a>soup <span class="op">=</span> BeautifulSoup(html, <span class="st">"html.parser"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6"></a></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co"># Now use BeautifulSoup as usual</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a>links <span class="op">=</span> soup.find_all(<span class="st">"a"</span>, href<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="bu">print</span>(<span class="ss">f"Total links on page: </span><span class="sc">{</span><span class="bu">len</span>(links)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This hybrid approach — Selenium for rendering, BeautifulSoup for parsing — gives you the best of both worlds. Selenium excels at navigating, clicking, scrolling, and waiting for JavaScript to execute. BeautifulSoup excels at searching and extracting data from HTML. By combining them, you avoid the awkwardness of using Selenium’s relatively limited element-finding API for complex extraction tasks while still getting access to the fully-rendered page content.</p>
+<p>The workflow is always the same: use Selenium to get the page into the state you need (scrolled, clicked, searched, logged in), then hand off the rendered HTML to BeautifulSoup for extraction. Think of Selenium as the hands that navigate the browser and BeautifulSoup as the eyes that read the content. This division of labor keeps your code cleaner and more maintainable than trying to do everything with Selenium alone.</p>
+</section>
+<section id="always-close-the-driver" class="level2" data-number="8.7">
+<h2 data-number="8.7" class="anchored" data-anchor-id="always-close-the-driver"><span class="header-section-number">8.7</span> Always Close the Driver</h2>
+<p>When you are done, close the browser window:</p>
+<div id="fd76226e" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a>driver.quit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>After calling <code>quit()</code>, any subsequent calls to the driver will raise an error. Use <code>try/finally</code> blocks to ensure cleanup:</p>
+<div id="d5d80ed6" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="cf">try</span>:</span>
+<span id="cb12-2"><a href="#cb12-2"></a>    driver.get(<span class="st">"https://example.com"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3"></a>    <span class="co"># ... scraping logic ...</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="cf">finally</span>:</span>
+<span id="cb12-5"><a href="#cb12-5"></a>    driver.quit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="the-fragility-problem" class="level2" data-number="8.8">
+<h2 data-number="8.8" class="anchored" data-anchor-id="the-fragility-problem"><span class="header-section-number">8.8</span> The Fragility Problem</h2>
+<div class="callout callout-style-simple callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Screen-scraping with Selenium is inherently fragile. The Twitter scraping examples that worked in the 2019 version of this course broke completely by 2024 because Twitter (now X) redesigned its HTML to use dynamically-generated class names and require authentication for basic browsing. This is not unusual — platforms regularly change their front-end code, sometimes specifically to resist automated access.</p>
+</div>
+</div>
+<p>This fragility reinforces a principle from <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>: when an API is available, use it. Selenium is a powerful last resort for cases where you ethically need data that no API provides, but it is slow, resource-intensive, and brittle compared to API access. The decision tree should be: API first → static scraping second → Selenium third.</p>
+<p>Selenium is also not the only browser automation tool. <strong>Playwright</strong>, developed by Microsoft, is the modern alternative: it waits for elements automatically (eliminating much of the explicit-wait boilerplate you saw earlier), runs noticeably faster, and supports asynchronous operation for parallel scraping. If browser automation becomes a regular part of your work, Playwright is worth learning. That said, Selenium remains far more widespread, has a deeper reservoir of documentation and community answers, and is entirely adequate for coursework — which is why this chapter teaches it.</p>
+<section id="headless-mode" class="level3" data-number="8.8.1">
+<h3 data-number="8.8.1" class="anchored" data-anchor-id="headless-mode"><span class="header-section-number">8.8.1</span> Headless Mode</h3>
+<p>For production scraping, you do not need a visible browser window. Headless mode runs the browser without a graphical interface, which is faster and can run on servers without a display:</p>
+<div id="a410ba7e" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="im">from</span> selenium.webdriver.chrome.options <span class="im">import</span> Options</span>
+<span id="cb13-2"><a href="#cb13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3"></a>options <span class="op">=</span> Options()</span>
+<span id="cb13-4"><a href="#cb13-4"></a>options.add_argument(<span class="st">"--headless=new"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5"></a>options.add_argument(<span class="st">"--no-sandbox"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6"></a>options.add_argument(<span class="st">"--disable-dev-shm-usage"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7"></a></span>
+<span id="cb13-8"><a href="#cb13-8"></a>driver <span class="op">=</span> webdriver.Chrome(options<span class="op">=</span>options)</span>
+<span id="cb13-9"><a href="#cb13-9"></a>driver.get(<span class="st">"https://example.com"</span>)</span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="bu">print</span>(<span class="ss">f"Title: </span><span class="sc">{</span>driver<span class="sc">.</span>title<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-11"><a href="#cb13-11"></a>driver.quit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>=new</code> suffix selects Chrome’s new headless implementation (Chrome 109 and later), which behaves much more like the regular browser than the legacy <code>--headless</code> mode did. The <code>--no-sandbox</code> and <code>--disable-dev-shm-usage</code> flags resolve common issues when running Chrome in containerized or server environments (like GitHub Actions, which you will use in <a href="ch-14-automation.html" class="quarto-xref"><span>Chapter 14</span></a>). Headless mode is essential for automated data collection pipelines where no one is watching the browser window.</p>
+<p>One important caveat: some websites detect headless browsers and serve different content or block access entirely. They do this by checking for browser properties that headless mode handles differently (like the <code>navigator.webdriver</code> flag). If you get different results in headless mode than in a visible browser, this is likely the cause. For educational purposes, switching back to headed mode usually resolves the issue. In production settings, there are legitimate workarounds, but circumventing bot detection raises the ethical questions discussed in <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> — the fact that you <em>can</em> evade detection does not mean you <em>should</em>.</p>
+</section>
+</section>
+<section id="a-practical-selenium-workflow" class="level2" data-number="8.9">
+<h2 data-number="8.9" class="anchored" data-anchor-id="a-practical-selenium-workflow"><span class="header-section-number">8.9</span> A Practical Selenium Workflow</h2>
+<p>Fragility is an argument for writing Selenium code defensively, not for avoiding Selenium. Here is a complete workflow that pulls together everything this chapter has covered. We will automate a multi-page interaction: navigating to a website, performing a search, waiting for results to load, extracting the data, and repeating across multiple pages.</p>
+<div id="4ca36c8c" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">import</span> time</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="im">from</span> selenium.webdriver.chrome.options <span class="im">import</span> Options</span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="im">from</span> selenium.webdriver.support.ui <span class="im">import</span> WebDriverWait</span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="im">from</span> selenium.webdriver.support <span class="im">import</span> expected_conditions <span class="im">as</span> EC</span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb14-9"><a href="#cb14-9"></a></span>
+<span id="cb14-10"><a href="#cb14-10"></a><span class="kw">def</span> scrape_with_selenium(search_term, max_pages<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb14-11"><a href="#cb14-11"></a>    <span class="co">"""Scrape search results from a dynamic website.</span></span>
+<span id="cb14-12"><a href="#cb14-12"></a></span>
+<span id="cb14-13"><a href="#cb14-13"></a><span class="co">    This demonstrates the full Selenium workflow:</span></span>
+<span id="cb14-14"><a href="#cb14-14"></a><span class="co">    1. Launch a headless browser</span></span>
+<span id="cb14-15"><a href="#cb14-15"></a><span class="co">    2. Navigate and interact with the page</span></span>
+<span id="cb14-16"><a href="#cb14-16"></a><span class="co">    3. Wait for dynamic content to load</span></span>
+<span id="cb14-17"><a href="#cb14-17"></a><span class="co">    4. Extract data via BeautifulSoup</span></span>
+<span id="cb14-18"><a href="#cb14-18"></a><span class="co">    5. Handle pagination</span></span>
+<span id="cb14-19"><a href="#cb14-19"></a><span class="co">    6. Clean up</span></span>
+<span id="cb14-20"><a href="#cb14-20"></a><span class="co">    """</span></span>
+<span id="cb14-21"><a href="#cb14-21"></a>    options <span class="op">=</span> Options()</span>
+<span id="cb14-22"><a href="#cb14-22"></a>    options.add_argument(<span class="st">"--headless=new"</span>)</span>
+<span id="cb14-23"><a href="#cb14-23"></a>    driver <span class="op">=</span> webdriver.Chrome(options<span class="op">=</span>options)</span>
+<span id="cb14-24"><a href="#cb14-24"></a></span>
+<span id="cb14-25"><a href="#cb14-25"></a>    all_results <span class="op">=</span> []</span>
+<span id="cb14-26"><a href="#cb14-26"></a></span>
+<span id="cb14-27"><a href="#cb14-27"></a>    <span class="cf">try</span>:</span>
+<span id="cb14-28"><a href="#cb14-28"></a>        driver.get(<span class="st">"https://example-search-site.com"</span>)</span>
+<span id="cb14-29"><a href="#cb14-29"></a></span>
+<span id="cb14-30"><a href="#cb14-30"></a>        <span class="co"># Find and fill the search box</span></span>
+<span id="cb14-31"><a href="#cb14-31"></a>        search_box <span class="op">=</span> driver.find_element(By.NAME, <span class="st">"q"</span>)</span>
+<span id="cb14-32"><a href="#cb14-32"></a>        search_box.send_keys(search_term)</span>
+<span id="cb14-33"><a href="#cb14-33"></a>        search_box.submit()</span>
+<span id="cb14-34"><a href="#cb14-34"></a></span>
+<span id="cb14-35"><a href="#cb14-35"></a>        <span class="cf">for</span> page <span class="kw">in</span> <span class="bu">range</span>(max_pages):</span>
+<span id="cb14-36"><a href="#cb14-36"></a>            <span class="co"># Wait for results to load (up to 10 seconds)</span></span>
+<span id="cb14-37"><a href="#cb14-37"></a>            WebDriverWait(driver, <span class="dv">10</span>).until(</span>
+<span id="cb14-38"><a href="#cb14-38"></a>                EC.presence_of_element_located((By.CLASS_NAME, <span class="st">"result-item"</span>))</span>
+<span id="cb14-39"><a href="#cb14-39"></a>            )</span>
+<span id="cb14-40"><a href="#cb14-40"></a></span>
+<span id="cb14-41"><a href="#cb14-41"></a>            <span class="co"># Pass rendered HTML to BeautifulSoup</span></span>
+<span id="cb14-42"><a href="#cb14-42"></a>            soup <span class="op">=</span> BeautifulSoup(driver.page_source, <span class="st">"html.parser"</span>)</span>
+<span id="cb14-43"><a href="#cb14-43"></a></span>
+<span id="cb14-44"><a href="#cb14-44"></a>            <span class="co"># Extract data from this page</span></span>
+<span id="cb14-45"><a href="#cb14-45"></a>            <span class="cf">for</span> item <span class="kw">in</span> soup.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"result-item"</span>):</span>
+<span id="cb14-46"><a href="#cb14-46"></a>                <span class="co"># Check that both elements exist before calling .text — the same defensive pattern you learned for static scraping</span></span>
+<span id="cb14-47"><a href="#cb14-47"></a>                title_tag <span class="op">=</span> item.find(<span class="st">"h3"</span>)</span>
+<span id="cb14-48"><a href="#cb14-48"></a>                desc_tag <span class="op">=</span> item.find(<span class="st">"p"</span>)</span>
+<span id="cb14-49"><a href="#cb14-49"></a>                <span class="cf">if</span> title_tag <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> desc_tag <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb14-50"><a href="#cb14-50"></a>                    <span class="cf">continue</span>  <span class="co"># Skip malformed result items rather than crash</span></span>
+<span id="cb14-51"><a href="#cb14-51"></a>                all_results.append({</span>
+<span id="cb14-52"><a href="#cb14-52"></a>                    <span class="st">"title"</span>: title_tag.text.strip(),</span>
+<span id="cb14-53"><a href="#cb14-53"></a>                    <span class="st">"description"</span>: desc_tag.text.strip(),</span>
+<span id="cb14-54"><a href="#cb14-54"></a>                    <span class="st">"page"</span>: page <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb14-55"><a href="#cb14-55"></a>                })</span>
+<span id="cb14-56"><a href="#cb14-56"></a></span>
+<span id="cb14-57"><a href="#cb14-57"></a>            <span class="co"># Try to click "Next" for pagination</span></span>
+<span id="cb14-58"><a href="#cb14-58"></a>            <span class="cf">try</span>:</span>
+<span id="cb14-59"><a href="#cb14-59"></a>                next_button <span class="op">=</span> driver.find_element(By.LINK_TEXT, <span class="st">"Next"</span>)</span>
+<span id="cb14-60"><a href="#cb14-60"></a>                next_button.click()</span>
+<span id="cb14-61"><a href="#cb14-61"></a>                time.sleep(<span class="dv">2</span>)  <span class="co"># Wait for next page to load</span></span>
+<span id="cb14-62"><a href="#cb14-62"></a>            <span class="cf">except</span> <span class="pp">Exception</span>:</span>
+<span id="cb14-63"><a href="#cb14-63"></a>                <span class="cf">break</span>  <span class="co"># No more pages</span></span>
+<span id="cb14-64"><a href="#cb14-64"></a></span>
+<span id="cb14-65"><a href="#cb14-65"></a>    <span class="cf">finally</span>:</span>
+<span id="cb14-66"><a href="#cb14-66"></a>        driver.quit()  <span class="co"># Always clean up</span></span>
+<span id="cb14-67"><a href="#cb14-67"></a></span>
+<span id="cb14-68"><a href="#cb14-68"></a>    <span class="cf">return</span> pd.DataFrame(all_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice the use of <code>WebDriverWait</code> with <code>expected_conditions</code> — this is superior to <code>time.sleep()</code> because it waits only as long as needed for the element to appear, rather than waiting a fixed amount of time that might be too short (element not loaded) or too long (wasted time). The <code>try/finally</code> block ensures the browser is closed even if an error occurs. And notice the <code>None</code> checks before calling <code>.text</code>: dynamic pages serve malformed or incomplete items just as often as static ones do, and the defensive parsing habits from <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a> carry over unchanged.</p>
+</section>
+<section id="when-to-use-selenium-vs.-apis" class="level2" data-number="8.10">
+<h2 data-number="8.10" class="anchored" data-anchor-id="when-to-use-selenium-vs.-apis"><span class="header-section-number">8.10</span> When to Use Selenium vs.&nbsp;APIs</h2>
+<p>With the full toolkit in hand, here is the decision tree for choosing your data access method:</p>
+<ol type="1">
+<li><strong>Is there an API?</strong> Use it. APIs are faster, more reliable, and more structured (see <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a> through <a href="ch-13-ai-apis.html" class="quarto-xref"><span>Chapter 13</span></a>).</li>
+<li><strong>Is the content in the static HTML?</strong> Use <code>requests</code> + BeautifulSoup (see <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>). It is simpler and faster than Selenium.</li>
+<li><strong>Is the content loaded by JavaScript?</strong> Use browser automation — Selenium, or Playwright if auto-waiting and speed matter for your project. Either way, expect it to be slower, more fragile, and more resource-intensive than the options above.</li>
+<li><strong>Is the content behind a login?</strong> This is where ethical judgment matters most. Automating access to login-gated content may violate Terms of Service. See <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>.</li>
+</ol>
+<p>The exercises below give you practice at every branch of this tree.</p>
+</section>
+<section id="recommended-exercises" class="level2" data-number="8.11">
+<h2 data-number="8.11" class="anchored" data-anchor-id="recommended-exercises"><span class="header-section-number">8.11</span> Recommended Exercises</h2>
+<p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
+<p>You will measure the difference between what a static request sees and what a browser sees, on a site where that difference matters.</p>
+<p><strong>Step 1 — Fetch statically first.</strong> Choose a JavaScript-heavy site — a news site’s live section, a social feed, a site the chapter mentioned. Check its <code>robots.txt</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), then fetch it with <code>requests.get()</code> and your <code>HEADERS</code>. Record the length of <code>response.text</code> and count a target element with BeautifulSoup (<a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>) — headlines, list items, whatever the page is made of.</p>
+<div id="deb5b596" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Step 1: Fetch your chosen page with requests, record the HTML length, and count your target element with BeautifulSoup.</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 2 — Start a headless browser.</strong> Set up a headless Selenium driver following the chapter’s setup code, and load the same URL with <code>driver.get()</code>.</p>
+<div id="9b06b470" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Step 2: Configure a headless driver and load the same URL.</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 3 — Wait, then measure again.</strong> Use <code>WebDriverWait</code> to wait for your target element to be present — the chapter shows the pattern — then record the length of <code>driver.page_source</code> and count the same target element, this time parsing <code>driver.page_source</code> with BeautifulSoup.</p>
+<div id="37ce224e" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Step 3: Wait for the content to load, then measure page_source length and re-count the same element.</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 4 — Load more.</strong> Make the page reveal content a plain request never sees: scroll to the bottom with the chapter’s scrolling pattern (or click a “Load More” button if the site has one), wait, and count your element a third time.</p>
+<div id="f487704c" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Step 4: Scroll or click to load more content, wait, and count again.</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 5 — Tabulate and clean up.</strong> Build a small DataFrame with one row per measurement — static request, initial Selenium load, after scrolling — and columns for HTML length and element count. Then close the browser with <code>driver.quit()</code>, as the chapter insists.</p>
+<div id="1aeb7d1c" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># Step 5: Build the comparison DataFrame, then driver.quit().</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="co"># Your code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 6 — Interpret.</strong> In four to six sentences: How much of the page did the static request miss? Would you classify this site as static, partially dynamic, or fully dynamic? Given the speed difference you experienced, when is Selenium worth the cost for this site — and when would <code>requests</code> alone do?</p>
+<div id="02004853" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="additional-exercises" class="level2" data-number="8.12">
+<h2 data-number="8.12" class="anchored" data-anchor-id="additional-exercises"><span class="header-section-number">8.12</span> Additional Exercises</h2>
+<p>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</p>
+<ol type="1">
+<li><p><strong>Multi-step interaction.</strong> Use Selenium to automate a multi-step process: navigate to a site with a search form, enter a query, submit it, and extract results from the response page.</p></li>
+<li><p><strong>Static vs.&nbsp;dynamic comparison.</strong> For three websites of your choice, compare the HTML returned by <code>requests.get()</code> with the <code>driver.page_source</code> from Selenium. Categorize each site as static, partially dynamic, or fully dynamic.</p></li>
+<li><p><strong>Load More button.</strong> Find a website that uses a “Load More” button (rather than infinite scroll) to reveal additional content. Write a Selenium script that clicks the button in a loop until it disappears or becomes disabled, then extracts all the loaded data. How many items were hidden behind the button?</p></li>
+<li><p><strong>Performance comparison.</strong> For the same URL, measure the time taken by three approaches: <code>requests.get()</code>, headed Selenium (with a visible browser), and headless Selenium. Use <code>time.time()</code> to measure each. Create a table comparing the three approaches on speed, completeness of data retrieved, and resource usage. When is the speed tradeoff of Selenium worth it?</p></li>
+<li><p><strong>Graduate extension (INFO 5617).</strong> Choose a JavaScript-heavy site relevant to your own research interests and instrument it with both approaches from this part of the book: static <code>requests</code> + BeautifulSoup and Selenium. Quantify what each approach sees — count of elements retrieved, payload size in bytes, and wall-clock time — across at least five pages. Then write a roughly 500-word memo on when the added cost of browser automation is justified, engaging with the treatment of JavaScript scraping in <span class="citation" data-cites="mitchell2018web">Mitchell (<a href="#ref-mitchell2018web" role="doc-biblioref">2018</a>)</span>. Your memo should articulate a defensible general rule for other researchers, not just describe your particular site.</p></li>
+</ol>
+<div class="callout callout-style-simple callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Missing Manual Reference
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For background on debugging strategies when Selenium scripts fail, see <em>Missing Manual</em> Chapter 6: Debugging and Chapter 7: Reading Python Tracebacks.</p>
+</div>
+</div>
+</section>
+<section id="social-history-and-public-interest" class="level2" data-number="8.13">
+<h2 data-number="8.13" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">8.13</span> Social History and Public Interest</h2>
+<p>The shift from server-rendered to client-rendered web pages represents a fundamental change in the web’s architecture. JavaScript frameworks like React, Angular, and Vue have made the web more interactive but also more opaque to automated observation. The ability to “view source” — once a straightforward way to see exactly what a page contained — now often reveals only a JavaScript bootstrap that fetches and renders content dynamically.</p>
+<p>This architectural shift interacts with the enclosure dynamics described in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures — CAPTCHAs, bot detection, dynamically-generated class names — become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes. The tools in this chapter are a response to that architectural shift — they exist because the simpler approaches taught in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a> are no longer sufficient for much of the modern web.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Public Interest Connection
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When platforms close their APIs and render content exclusively through JavaScript, browser automation becomes the last-resort path to data that serves the public interest. The tools in this chapter exist because of the <strong>enclosure</strong> dynamic from <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — the progressive restriction of access to data that was once openly available. Researchers studying algorithmic bias, misinformation, and platform governance increasingly depend on Selenium-based methods precisely because the APIs that once served these research needs have been shut down or restricted beyond practical use.</p>
+</div>
+</div>
+</section>
+<section id="common-issues-to-debug" class="level2" data-number="8.14">
+<h2 data-number="8.14" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">8.14</span> Common Issues to Debug</h2>
+<ul>
+<li><strong><code>NoSuchElementException</code></strong>: The element does not exist yet because the page has not finished loading. Add <code>time.sleep()</code> or use explicit waits with <code>WebDriverWait</code>.</li>
+<li><strong><code>StaleElementReferenceException</code></strong>: The DOM changed between when you found the element and when you tried to interact with it. Re-find the element.</li>
+<li><strong>Driver/browser version mismatch</strong>: Selenium Manager usually resolves this automatically, but brand-new browser releases occasionally break compatibility for a few days. Updating the <code>selenium</code> package typically fixes it.</li>
+<li><strong>Memory issues</strong>: Each Selenium driver runs a full browser process. Close drivers promptly with <code>driver.quit()</code>.</li>
+</ul>
+</section>
+<section id="key-takeaways" class="level2" data-number="8.15">
+<h2 data-number="8.15" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">8.15</span> Key Takeaways</h2>
+<p>The modern web is dynamic: JavaScript renders content after the initial HTML loads, making it invisible to static scraping tools. Selenium controls a real browser programmatically, letting you access fully-rendered pages, simulate user interactions, and extract content that <code>requests</code> cannot see. But Selenium is slow, fragile, and resource-intensive — a last resort when APIs and static scraping are unavailable. The hybrid approach of Selenium for rendering plus BeautifulSoup for parsing gives you full access to the modern web while keeping your parsing code familiar.</p>
+</section>
+<section id="further-reading" class="level2" data-number="8.16">
+<h2 data-number="8.16" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">8.16</span> Further Reading</h2>
+<ul>
+<li>Selenium documentation: <a href="https://www.selenium.dev/documentation/" class="uri">https://www.selenium.dev/documentation/</a></li>
+<li>Selenium Python bindings: <a href="https://selenium-python.readthedocs.io/" class="uri">https://selenium-python.readthedocs.io/</a></li>
+<li>Playwright for Python: <a href="https://playwright.dev/python/" class="uri">https://playwright.dev/python/</a></li>
+<li><span class="citation" data-cites="mitchell2018web">Mitchell (<a href="#ref-mitchell2018web" role="doc-biblioref">2018</a>)</span> — Chapter 11: Scraping JavaScript</li>
+</ul>
+
+
+<!-- -->
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-mitchell2018web" class="csl-entry" role="listitem">
+Mitchell, Ryan. 2018. <em>Web Scraping with <span>Python</span>: Collecting More Data from the Modern Web</em>. 2nd ed. O’Reilly Media.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./ch-07-archives.html" class="pagination-link" aria-label="Archived Web Pages and the Wayback Machine">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Archived Web Pages and the Wayback Machine</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./ch-09-pdfs.html" class="pagination-link" aria-label="Extracting Data from PDFs">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb21" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu"># Dynamic Web Pages with Selenium {#sec-dynamic-pages}</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a></span>
+<span id="cb21-3"><a href="#cb21-3"></a>::: {.callout-tip}</span>
+<span id="cb21-4"><a href="#cb21-4"></a><span class="fu">## Learning Objectives</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a><span class="ss">- </span>Explain why JavaScript-rendered content is invisible to <span class="in">`requests`</span> + BeautifulSoup</span>
+<span id="cb21-6"><a href="#cb21-6"></a><span class="ss">- </span>Install and configure Selenium WebDriver for Chrome, Firefox, or Safari</span>
+<span id="cb21-7"><a href="#cb21-7"></a><span class="ss">- </span>Locate elements using multiple strategies (ID, name, XPath, CSS selector)</span>
+<span id="cb21-8"><a href="#cb21-8"></a><span class="ss">- </span>Simulate user interactions — clicking, typing, and scrolling — programmatically</span>
+<span id="cb21-9"><a href="#cb21-9"></a><span class="ss">- </span>Pass fully-rendered page source from Selenium back to BeautifulSoup for parsing</span>
+<span id="cb21-10"><a href="#cb21-10"></a><span class="ss">- </span>Assess the fragility and ethical implications of browser automation</span>
+<span id="cb21-11"><a href="#cb21-11"></a>:::</span>
+<span id="cb21-12"><a href="#cb21-12"></a></span>
+<span id="cb21-13"><a href="#cb21-13"></a>::: {.callout-tip}</span>
+<span id="cb21-14"><a href="#cb21-14"></a><span class="fu">## Companion Notebook</span></span>
+<span id="cb21-15"><a href="#cb21-15"></a>Run this chapter's code as you read: open the <span class="co">[</span><span class="ot">companion notebook</span><span class="co">](https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/notebooks/ch-08-dynamic-pages.ipynb)</span> (see @sec-appendix-notebooks for all of them).</span>
+<span id="cb21-16"><a href="#cb21-16"></a>:::</span>
+<span id="cb21-17"><a href="#cb21-17"></a></span>
+<span id="cb21-18"><a href="#cb21-18"></a></span>
+<span id="cb21-19"><a href="#cb21-19"></a><span class="fu">## When Static Scraping Fails</span></span>
+<span id="cb21-20"><a href="#cb21-20"></a></span>
+<span id="cb21-21"><a href="#cb21-21"></a>In @sec-static-pages, you learned to retrieve web pages with <span class="in">`requests`</span> and parse them with BeautifulSoup. This works well for pages whose content is fully present in the initial HTML — what we call *static* pages. But most modern websites are *dynamic*: their content is loaded, modified, or entirely rendered by JavaScript after the initial HTML arrives.</span>
+<span id="cb21-22"><a href="#cb21-22"></a></span>
+<span id="cb21-23"><a href="#cb21-23"></a>When you use <span class="in">`requests.get()`</span> on a dynamic page, you get the HTML skeleton before JavaScript has run. The data you see in your browser may simply not exist in the response that <span class="in">`requests`</span> receives. You can verify this by comparing <span class="in">`requests.get(url).text`</span> with what you see in the browser — if significant content is missing from the <span class="in">`requests`</span> version, the page is dynamic.</span>
+<span id="cb21-24"><a href="#cb21-24"></a></span>
+<span id="cb21-25"><a href="#cb21-25"></a>The solution is to use a tool that can execute JavaScript: a real web browser, controlled programmatically. Selenium is the standard tool for this.</span>
+<span id="cb21-26"><a href="#cb21-26"></a></span>
+<span id="cb21-27"><a href="#cb21-27"></a><span class="fu">## Setting Up Selenium</span></span>
+<span id="cb21-28"><a href="#cb21-28"></a></span>
+<span id="cb21-29"><a href="#cb21-29"></a>Selenium requires two components: the <span class="in">`selenium`</span> Python library and a browser driver — a small program that lets Python control a specific browser. Fortunately, you only need to install the library: since version 4.6 (late 2022), Selenium has shipped with **Selenium Manager**, which automatically finds or downloads the correct driver for whatever browser you have installed.</span>
+<span id="cb21-30"><a href="#cb21-30"></a></span>
+<span id="cb21-33"><a href="#cb21-33"></a><span class="in">```{python}</span></span>
+<span id="cb21-34"><a href="#cb21-34"></a><span class="co"># Install from a terminal:</span></span>
+<span id="cb21-35"><a href="#cb21-35"></a><span class="co"># pip install selenium</span></span>
+<span id="cb21-36"><a href="#cb21-36"></a><span class="in">```</span></span>
+<span id="cb21-37"><a href="#cb21-37"></a></span>
+<span id="cb21-38"><a href="#cb21-38"></a>Creating a driver is then a one-liner:</span>
+<span id="cb21-39"><a href="#cb21-39"></a></span>
+<span id="cb21-42"><a href="#cb21-42"></a><span class="in">```{python}</span></span>
+<span id="cb21-43"><a href="#cb21-43"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
+<span id="cb21-44"><a href="#cb21-44"></a></span>
+<span id="cb21-45"><a href="#cb21-45"></a><span class="co"># For Chrome:</span></span>
+<span id="cb21-46"><a href="#cb21-46"></a>driver <span class="op">=</span> webdriver.Chrome()</span>
+<span id="cb21-47"><a href="#cb21-47"></a></span>
+<span id="cb21-48"><a href="#cb21-48"></a><span class="co"># For Firefox:</span></span>
+<span id="cb21-49"><a href="#cb21-49"></a><span class="co"># driver = webdriver.Firefox()</span></span>
+<span id="cb21-50"><a href="#cb21-50"></a><span class="in">```</span></span>
+<span id="cb21-51"><a href="#cb21-51"></a></span>
+<span id="cb21-52"><a href="#cb21-52"></a>If driver resolution fails on your machine — an unusual browser install location or a very new browser release can confuse it — check Selenium's driver documentation for manual setup instructions.</span>
+<span id="cb21-53"><a href="#cb21-53"></a></span>
+<span id="cb21-54"><a href="#cb21-54"></a>When you create the <span class="in">`driver`</span>, a browser window opens. This is your programmable browser — every command you issue through the <span class="in">`driver`</span> object happens in that window.</span>
+<span id="cb21-55"><a href="#cb21-55"></a></span>
+<span id="cb21-56"><a href="#cb21-56"></a><span class="fu">## Navigating and Finding Elements</span></span>
+<span id="cb21-57"><a href="#cb21-57"></a></span>
+<span id="cb21-60"><a href="#cb21-60"></a><span class="in">```{python}</span></span>
+<span id="cb21-61"><a href="#cb21-61"></a><span class="co"># Navigate to a website</span></span>
+<span id="cb21-62"><a href="#cb21-62"></a>driver.get(<span class="st">"https://xkcd.com"</span>)</span>
+<span id="cb21-63"><a href="#cb21-63"></a></span>
+<span id="cb21-64"><a href="#cb21-64"></a><span class="co"># Find elements by various strategies</span></span>
+<span id="cb21-65"><a href="#cb21-65"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
+<span id="cb21-66"><a href="#cb21-66"></a></span>
+<span id="cb21-67"><a href="#cb21-67"></a><span class="co"># By ID</span></span>
+<span id="cb21-68"><a href="#cb21-68"></a>comic_div <span class="op">=</span> driver.find_element(By.ID, <span class="st">"comic"</span>)</span>
+<span id="cb21-69"><a href="#cb21-69"></a></span>
+<span id="cb21-70"><a href="#cb21-70"></a><span class="co"># By CSS selector</span></span>
+<span id="cb21-71"><a href="#cb21-71"></a>nav_links <span class="op">=</span> driver.find_elements(By.CSS_SELECTOR, <span class="st">"ul.comicNav li a"</span>)</span>
+<span id="cb21-72"><a href="#cb21-72"></a></span>
+<span id="cb21-73"><a href="#cb21-73"></a><span class="co"># By XPath</span></span>
+<span id="cb21-74"><a href="#cb21-74"></a>title <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//div[@id='ctitle']"</span>)</span>
+<span id="cb21-75"><a href="#cb21-75"></a><span class="bu">print</span>(title.text)  <span class="co"># The title of the current comic</span></span>
+<span id="cb21-76"><a href="#cb21-76"></a><span class="in">```</span></span>
+<span id="cb21-77"><a href="#cb21-77"></a></span>
+<span id="cb21-78"><a href="#cb21-78"></a>The <span class="in">`find_element`</span> method (singular) returns the first matching element. The <span class="in">`find_elements`</span> method (plural) returns a list of all matches.</span>
+<span id="cb21-79"><a href="#cb21-79"></a></span>
+<span id="cb21-80"><a href="#cb21-80"></a><span class="fu">## Extracting Data</span></span>
+<span id="cb21-81"><a href="#cb21-81"></a></span>
+<span id="cb21-82"><a href="#cb21-82"></a>xkcd is famous for its hidden alt-text messages. You can extract element attributes:</span>
+<span id="cb21-83"><a href="#cb21-83"></a></span>
+<span id="cb21-86"><a href="#cb21-86"></a><span class="in">```{python}</span></span>
+<span id="cb21-87"><a href="#cb21-87"></a><span class="co"># Find the comic image</span></span>
+<span id="cb21-88"><a href="#cb21-88"></a>img <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//div[@id='comic']//img"</span>)</span>
+<span id="cb21-89"><a href="#cb21-89"></a></span>
+<span id="cb21-90"><a href="#cb21-90"></a><span class="co"># Get the alt-text and title attributes</span></span>
+<span id="cb21-91"><a href="#cb21-91"></a><span class="bu">print</span>(<span class="ss">f"Alt text: </span><span class="sc">{</span>img<span class="sc">.</span>get_attribute(<span class="st">'alt'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb21-92"><a href="#cb21-92"></a><span class="bu">print</span>(<span class="ss">f"Title (hover text): </span><span class="sc">{</span>img<span class="sc">.</span>get_attribute(<span class="st">'title'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb21-93"><a href="#cb21-93"></a><span class="in">```</span></span>
+<span id="cb21-94"><a href="#cb21-94"></a></span>
+<span id="cb21-95"><a href="#cb21-95"></a><span class="fu">## Simulating Interactions</span></span>
+<span id="cb21-96"><a href="#cb21-96"></a></span>
+<span id="cb21-97"><a href="#cb21-97"></a>Selenium can simulate clicks, keyboard input, and scrolling — anything a human user would do:</span>
+<span id="cb21-98"><a href="#cb21-98"></a></span>
+<span id="cb21-99"><a href="#cb21-99"></a><span class="fu">### Clicking</span></span>
+<span id="cb21-100"><a href="#cb21-100"></a></span>
+<span id="cb21-103"><a href="#cb21-103"></a><span class="in">```{python}</span></span>
+<span id="cb21-104"><a href="#cb21-104"></a><span class="co"># Click the "Random" button to navigate to a random comic</span></span>
+<span id="cb21-105"><a href="#cb21-105"></a>random_button <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//ul[@class='comicNav']//a[contains(text(),'Random')]"</span>)</span>
+<span id="cb21-106"><a href="#cb21-106"></a>random_button.click()</span>
+<span id="cb21-107"><a href="#cb21-107"></a></span>
+<span id="cb21-108"><a href="#cb21-108"></a><span class="co"># Extract the alt-text from the random page</span></span>
+<span id="cb21-109"><a href="#cb21-109"></a><span class="im">import</span> time</span>
+<span id="cb21-110"><a href="#cb21-110"></a>time.sleep(<span class="dv">1</span>)  <span class="co"># Wait for the page to load</span></span>
+<span id="cb21-111"><a href="#cb21-111"></a></span>
+<span id="cb21-112"><a href="#cb21-112"></a>img <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//div[@id='comic']//img"</span>)</span>
+<span id="cb21-113"><a href="#cb21-113"></a><span class="bu">print</span>(<span class="ss">f"Random comic title: </span><span class="sc">{</span>img<span class="sc">.</span>get_attribute(<span class="st">'title'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb21-114"><a href="#cb21-114"></a><span class="in">```</span></span>
+<span id="cb21-115"><a href="#cb21-115"></a></span>
+<span id="cb21-116"><a href="#cb21-116"></a><span class="fu">### Typing and Searching</span></span>
+<span id="cb21-117"><a href="#cb21-117"></a></span>
+<span id="cb21-118"><a href="#cb21-118"></a>Selenium can type into forms and submit them. We will demonstrate with Wikipedia's search box: Wikipedia's robots policy is permissive toward automated access, and its markup is stable enough that this example should keep working for years. (Search engines like Google, by contrast, explicitly prohibit automated queries in their Terms of Service — where you point your automation matters as much as how you write it.)</span>
+<span id="cb21-119"><a href="#cb21-119"></a></span>
+<span id="cb21-122"><a href="#cb21-122"></a><span class="in">```{python}</span></span>
+<span id="cb21-123"><a href="#cb21-123"></a><span class="im">from</span> selenium.webdriver.common.keys <span class="im">import</span> Keys</span>
+<span id="cb21-124"><a href="#cb21-124"></a></span>
+<span id="cb21-125"><a href="#cb21-125"></a><span class="co"># Navigate to the Wikipedia portal</span></span>
+<span id="cb21-126"><a href="#cb21-126"></a>driver.get(<span class="st">"https://www.wikipedia.org"</span>)</span>
+<span id="cb21-127"><a href="#cb21-127"></a></span>
+<span id="cb21-128"><a href="#cb21-128"></a><span class="co"># Find the search box by its name attribute</span></span>
+<span id="cb21-129"><a href="#cb21-129"></a>search_box <span class="op">=</span> driver.find_element(By.NAME, <span class="st">"search"</span>)</span>
+<span id="cb21-130"><a href="#cb21-130"></a></span>
+<span id="cb21-131"><a href="#cb21-131"></a><span class="co"># Type a query</span></span>
+<span id="cb21-132"><a href="#cb21-132"></a>search_box.send_keys(<span class="st">"Colorado Buffaloes"</span>)</span>
+<span id="cb21-133"><a href="#cb21-133"></a>time.sleep(<span class="dv">1</span>)  <span class="co"># Observe autocomplete suggestions</span></span>
+<span id="cb21-134"><a href="#cb21-134"></a></span>
+<span id="cb21-135"><a href="#cb21-135"></a><span class="co"># Press Enter to submit the search</span></span>
+<span id="cb21-136"><a href="#cb21-136"></a>search_box.send_keys(Keys.RETURN)</span>
+<span id="cb21-137"><a href="#cb21-137"></a>time.sleep(<span class="dv">2</span>)  <span class="co"># Wait for the results page to load</span></span>
+<span id="cb21-138"><a href="#cb21-138"></a></span>
+<span id="cb21-139"><a href="#cb21-139"></a><span class="co"># Read the resulting page</span></span>
+<span id="cb21-140"><a href="#cb21-140"></a><span class="bu">print</span>(driver.title)</span>
+<span id="cb21-141"><a href="#cb21-141"></a><span class="co"># Colorado Buffaloes - Wikipedia</span></span>
+<span id="cb21-142"><a href="#cb21-142"></a></span>
+<span id="cb21-143"><a href="#cb21-143"></a>heading <span class="op">=</span> driver.find_element(By.ID, <span class="st">"firstHeading"</span>)</span>
+<span id="cb21-144"><a href="#cb21-144"></a><span class="bu">print</span>(heading.text)</span>
+<span id="cb21-145"><a href="#cb21-145"></a><span class="co"># Colorado Buffaloes</span></span>
+<span id="cb21-146"><a href="#cb21-146"></a><span class="in">```</span></span>
+<span id="cb21-147"><a href="#cb21-147"></a></span>
+<span id="cb21-148"><a href="#cb21-148"></a>When your query matches an article title exactly, Wikipedia takes you straight to that article; otherwise you land on a search results page listing candidate matches. Either way, the pattern is the one you will reuse on any site with a search form: find the input element, type with <span class="in">`send_keys()`</span>, submit with <span class="in">`Keys.RETURN`</span>, wait for the new page, and read the results.</span>
+<span id="cb21-149"><a href="#cb21-149"></a></span>
+<span id="cb21-150"><a href="#cb21-150"></a>::: {.callout-warning}</span>
+<span id="cb21-151"><a href="#cb21-151"></a><span class="fu">## Automation Is Not a Loophole</span></span>
+<span id="cb21-152"><a href="#cb21-152"></a>Everything from @sec-ethics applies with full force to browser automation. A robots.txt disallow rule does not stop mattering because a real browser is doing the requesting, and a site's Terms of Service does not stop applying because a script is doing the clicking. Legal risk concentrates precisely where Selenium is most tempting: automating logged-in accounts and ToS-restricted content. Check the policies of any site before you automate interactions with it.</span>
+<span id="cb21-153"><a href="#cb21-153"></a>:::</span>
+<span id="cb21-154"><a href="#cb21-154"></a></span>
+<span id="cb21-155"><a href="#cb21-155"></a><span class="fu">### Scrolling</span></span>
+<span id="cb21-156"><a href="#cb21-156"></a></span>
+<span id="cb21-157"><a href="#cb21-157"></a>Some pages load content as you scroll (infinite scroll). You can simulate this:</span>
+<span id="cb21-158"><a href="#cb21-158"></a></span>
+<span id="cb21-161"><a href="#cb21-161"></a><span class="in">```{python}</span></span>
+<span id="cb21-162"><a href="#cb21-162"></a><span class="im">from</span> selenium.webdriver.common.keys <span class="im">import</span> Keys</span>
+<span id="cb21-163"><a href="#cb21-163"></a></span>
+<span id="cb21-164"><a href="#cb21-164"></a>body <span class="op">=</span> driver.find_element(By.TAG_NAME, <span class="st">"body"</span>)</span>
+<span id="cb21-165"><a href="#cb21-165"></a></span>
+<span id="cb21-166"><a href="#cb21-166"></a><span class="co"># Scroll down 5 times</span></span>
+<span id="cb21-167"><a href="#cb21-167"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb21-168"><a href="#cb21-168"></a>    body.send_keys(Keys.PAGE_DOWN)</span>
+<span id="cb21-169"><a href="#cb21-169"></a>    time.sleep(<span class="dv">1</span>)  <span class="co"># Wait for new content to load</span></span>
+<span id="cb21-170"><a href="#cb21-170"></a><span class="in">```</span></span>
+<span id="cb21-171"><a href="#cb21-171"></a></span>
+<span id="cb21-172"><a href="#cb21-172"></a><span class="fu">### Waiting for Dynamic Content</span></span>
+<span id="cb21-173"><a href="#cb21-173"></a></span>
+<span id="cb21-174"><a href="#cb21-174"></a>The <span class="in">`time.sleep()`</span> calls in the examples above are a crude approach to waiting for content to load. A better strategy is *explicit waits*, which pause execution until a specific condition is met:</span>
+<span id="cb21-175"><a href="#cb21-175"></a></span>
+<span id="cb21-178"><a href="#cb21-178"></a><span class="in">```{python}</span></span>
+<span id="cb21-179"><a href="#cb21-179"></a><span class="im">from</span> selenium.webdriver.support.ui <span class="im">import</span> WebDriverWait</span>
+<span id="cb21-180"><a href="#cb21-180"></a><span class="im">from</span> selenium.webdriver.support <span class="im">import</span> expected_conditions <span class="im">as</span> EC</span>
+<span id="cb21-181"><a href="#cb21-181"></a></span>
+<span id="cb21-182"><a href="#cb21-182"></a><span class="co"># Navigate to a page with dynamically loaded content</span></span>
+<span id="cb21-183"><a href="#cb21-183"></a>driver.get(<span class="st">"https://example-dynamic-site.com"</span>)</span>
+<span id="cb21-184"><a href="#cb21-184"></a></span>
+<span id="cb21-185"><a href="#cb21-185"></a><span class="co"># Wait up to 10 seconds for a specific element to appear</span></span>
+<span id="cb21-186"><a href="#cb21-186"></a>element <span class="op">=</span> WebDriverWait(driver, <span class="dv">10</span>).until(</span>
+<span id="cb21-187"><a href="#cb21-187"></a>    EC.presence_of_element_located((By.CLASS_NAME, <span class="st">"results-container"</span>))</span>
+<span id="cb21-188"><a href="#cb21-188"></a>)</span>
+<span id="cb21-189"><a href="#cb21-189"></a><span class="bu">print</span>(<span class="ss">f"Element found: </span><span class="sc">{</span>element<span class="sc">.</span>tag_name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb21-190"><a href="#cb21-190"></a><span class="in">```</span></span>
+<span id="cb21-191"><a href="#cb21-191"></a></span>
+<span id="cb21-192"><a href="#cb21-192"></a><span class="in">`WebDriverWait`</span> checks the condition repeatedly (every 0.5 seconds by default) and returns the element as soon as it appears, or raises a <span class="in">`TimeoutException`</span> if the timeout expires. This is superior to <span class="in">`time.sleep()`</span> in two ways: it does not wait longer than necessary (if the element appears in 0.2 seconds, it proceeds immediately), and it fails loudly if the element never appears (rather than silently returning an empty page).</span>
+<span id="cb21-193"><a href="#cb21-193"></a></span>
+<span id="cb21-194"><a href="#cb21-194"></a>The most common expected conditions you will use are:</span>
+<span id="cb21-195"><a href="#cb21-195"></a></span>
+<span id="cb21-196"><a href="#cb21-196"></a><span class="ss">- </span><span class="in">`presence_of_element_located`</span> — the element exists in the DOM (even if not visible)</span>
+<span id="cb21-197"><a href="#cb21-197"></a><span class="ss">- </span><span class="in">`visibility_of_element_located`</span> — the element is both present and visible on the page</span>
+<span id="cb21-198"><a href="#cb21-198"></a><span class="ss">- </span><span class="in">`element_to_be_clickable`</span> — the element is visible, enabled, and can receive clicks</span>
+<span id="cb21-199"><a href="#cb21-199"></a><span class="ss">- </span><span class="in">`text_to_be_present_in_element`</span> — specific text has appeared inside an element</span>
+<span id="cb21-200"><a href="#cb21-200"></a></span>
+<span id="cb21-201"><a href="#cb21-201"></a>Use these instead of <span class="in">`time.sleep()`</span> whenever possible. The combination of <span class="in">`WebDriverWait`</span> with explicit conditions makes your Selenium scripts both more reliable (they wait for exactly what they need) and faster (they proceed as soon as the condition is met rather than waiting a fixed duration). You will see this pattern used in the practical workflow section later in this chapter.</span>
+<span id="cb21-202"><a href="#cb21-202"></a></span>
+<span id="cb21-203"><a href="#cb21-203"></a><span class="fu">### Scraping Infinite Scroll Pages</span></span>
+<span id="cb21-204"><a href="#cb21-204"></a></span>
+<span id="cb21-205"><a href="#cb21-205"></a>Many modern websites load content progressively as you scroll — social media feeds, image galleries, and product listings all use this pattern. The technique for scraping these pages involves scrolling to the bottom, waiting for new content to load, and repeating until no more content appears:</span>
+<span id="cb21-206"><a href="#cb21-206"></a></span>
+<span id="cb21-209"><a href="#cb21-209"></a><span class="in">```{python}</span></span>
+<span id="cb21-210"><a href="#cb21-210"></a><span class="kw">def</span> scrape_infinite_scroll(driver, max_scrolls<span class="op">=</span><span class="dv">20</span>, scroll_pause<span class="op">=</span><span class="dv">2</span>):</span>
+<span id="cb21-211"><a href="#cb21-211"></a>    <span class="co">"""Scroll an infinite-scroll page and collect all loaded content."""</span></span>
+<span id="cb21-212"><a href="#cb21-212"></a>    last_height <span class="op">=</span> driver.execute_script(<span class="st">"return document.body.scrollHeight"</span>)</span>
+<span id="cb21-213"><a href="#cb21-213"></a></span>
+<span id="cb21-214"><a href="#cb21-214"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_scrolls):</span>
+<span id="cb21-215"><a href="#cb21-215"></a>        <span class="co"># Scroll to the bottom of the page</span></span>
+<span id="cb21-216"><a href="#cb21-216"></a>        driver.execute_script(<span class="st">"window.scrollTo(0, document.body.scrollHeight);"</span>)</span>
+<span id="cb21-217"><a href="#cb21-217"></a>        time.sleep(scroll_pause)</span>
+<span id="cb21-218"><a href="#cb21-218"></a></span>
+<span id="cb21-219"><a href="#cb21-219"></a>        <span class="co"># Check if the page grew</span></span>
+<span id="cb21-220"><a href="#cb21-220"></a>        new_height <span class="op">=</span> driver.execute_script(<span class="st">"return document.body.scrollHeight"</span>)</span>
+<span id="cb21-221"><a href="#cb21-221"></a>        <span class="cf">if</span> new_height <span class="op">==</span> last_height:</span>
+<span id="cb21-222"><a href="#cb21-222"></a>            <span class="bu">print</span>(<span class="ss">f"No new content after scroll </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. Stopping."</span>)</span>
+<span id="cb21-223"><a href="#cb21-223"></a>            <span class="cf">break</span></span>
+<span id="cb21-224"><a href="#cb21-224"></a>        last_height <span class="op">=</span> new_height</span>
+<span id="cb21-225"><a href="#cb21-225"></a>        <span class="bu">print</span>(<span class="ss">f"Scroll </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: page height grew to </span><span class="sc">{</span>new_height<span class="sc">}</span><span class="ss">px"</span>)</span>
+<span id="cb21-226"><a href="#cb21-226"></a></span>
+<span id="cb21-227"><a href="#cb21-227"></a>    <span class="co"># Return the fully-loaded page source</span></span>
+<span id="cb21-228"><a href="#cb21-228"></a>    <span class="cf">return</span> driver.page_source</span>
+<span id="cb21-229"><a href="#cb21-229"></a><span class="in">```</span></span>
+<span id="cb21-230"><a href="#cb21-230"></a></span>
+<span id="cb21-231"><a href="#cb21-231"></a>The key insight is checking <span class="in">`document.body.scrollHeight`</span> before and after each scroll. When the height stops growing, you have reached the end of the available content. Some sites use a "Load More" button instead of infinite scroll — for those, replace the scroll with a click on the button and watch for the button to disappear or become disabled.</span>
+<span id="cb21-232"><a href="#cb21-232"></a></span>
+<span id="cb21-233"><a href="#cb21-233"></a>A practical consideration: infinite scroll pages can contain thousands of items, and loading them all consumes significant memory in the browser process. Set a reasonable <span class="in">`max_scrolls`</span> limit based on how much data you actually need. If you are collecting data for a class project, you rarely need more than a few hundred items — scrolling through an entire social media feed of 10,000 posts is both unnecessary and discourteous to the server. Remember the proportionality principle from @sec-ethics: collect only the data you need for your research question.</span>
+<span id="cb21-234"><a href="#cb21-234"></a></span>
+<span id="cb21-235"><a href="#cb21-235"></a><span class="fu">## Passing to BeautifulSoup</span></span>
+<span id="cb21-236"><a href="#cb21-236"></a></span>
+<span id="cb21-237"><a href="#cb21-237"></a>Once the page is fully rendered in the browser, you can extract the complete HTML and parse it with the familiar BeautifulSoup tools:</span>
+<span id="cb21-238"><a href="#cb21-238"></a></span>
+<span id="cb21-241"><a href="#cb21-241"></a><span class="in">```{python}</span></span>
+<span id="cb21-242"><a href="#cb21-242"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb21-243"><a href="#cb21-243"></a></span>
+<span id="cb21-244"><a href="#cb21-244"></a><span class="co"># Get the fully-rendered page source from Selenium</span></span>
+<span id="cb21-245"><a href="#cb21-245"></a>html <span class="op">=</span> driver.page_source</span>
+<span id="cb21-246"><a href="#cb21-246"></a>soup <span class="op">=</span> BeautifulSoup(html, <span class="st">"html.parser"</span>)</span>
+<span id="cb21-247"><a href="#cb21-247"></a></span>
+<span id="cb21-248"><a href="#cb21-248"></a><span class="co"># Now use BeautifulSoup as usual</span></span>
+<span id="cb21-249"><a href="#cb21-249"></a>links <span class="op">=</span> soup.find_all(<span class="st">"a"</span>, href<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-250"><a href="#cb21-250"></a><span class="bu">print</span>(<span class="ss">f"Total links on page: </span><span class="sc">{</span><span class="bu">len</span>(links)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb21-251"><a href="#cb21-251"></a><span class="in">```</span></span>
+<span id="cb21-252"><a href="#cb21-252"></a></span>
+<span id="cb21-253"><a href="#cb21-253"></a>This hybrid approach — Selenium for rendering, BeautifulSoup for parsing — gives you the best of both worlds. Selenium excels at navigating, clicking, scrolling, and waiting for JavaScript to execute. BeautifulSoup excels at searching and extracting data from HTML. By combining them, you avoid the awkwardness of using Selenium's relatively limited element-finding API for complex extraction tasks while still getting access to the fully-rendered page content.</span>
+<span id="cb21-254"><a href="#cb21-254"></a></span>
+<span id="cb21-255"><a href="#cb21-255"></a>The workflow is always the same: use Selenium to get the page into the state you need (scrolled, clicked, searched, logged in), then hand off the rendered HTML to BeautifulSoup for extraction. Think of Selenium as the hands that navigate the browser and BeautifulSoup as the eyes that read the content. This division of labor keeps your code cleaner and more maintainable than trying to do everything with Selenium alone.</span>
+<span id="cb21-256"><a href="#cb21-256"></a></span>
+<span id="cb21-257"><a href="#cb21-257"></a><span class="fu">## Always Close the Driver</span></span>
+<span id="cb21-258"><a href="#cb21-258"></a></span>
+<span id="cb21-259"><a href="#cb21-259"></a>When you are done, close the browser window:</span>
+<span id="cb21-260"><a href="#cb21-260"></a></span>
+<span id="cb21-263"><a href="#cb21-263"></a><span class="in">```{python}</span></span>
+<span id="cb21-264"><a href="#cb21-264"></a>driver.quit()</span>
+<span id="cb21-265"><a href="#cb21-265"></a><span class="in">```</span></span>
+<span id="cb21-266"><a href="#cb21-266"></a></span>
+<span id="cb21-267"><a href="#cb21-267"></a>After calling <span class="in">`quit()`</span>, any subsequent calls to the driver will raise an error. Use <span class="in">`try/finally`</span> blocks to ensure cleanup:</span>
+<span id="cb21-268"><a href="#cb21-268"></a></span>
+<span id="cb21-271"><a href="#cb21-271"></a><span class="in">```{python}</span></span>
+<span id="cb21-272"><a href="#cb21-272"></a><span class="cf">try</span>:</span>
+<span id="cb21-273"><a href="#cb21-273"></a>    driver.get(<span class="st">"https://example.com"</span>)</span>
+<span id="cb21-274"><a href="#cb21-274"></a>    <span class="co"># ... scraping logic ...</span></span>
+<span id="cb21-275"><a href="#cb21-275"></a><span class="cf">finally</span>:</span>
+<span id="cb21-276"><a href="#cb21-276"></a>    driver.quit()</span>
+<span id="cb21-277"><a href="#cb21-277"></a><span class="in">```</span></span>
+<span id="cb21-278"><a href="#cb21-278"></a></span>
+<span id="cb21-279"><a href="#cb21-279"></a><span class="fu">## The Fragility Problem</span></span>
+<span id="cb21-280"><a href="#cb21-280"></a></span>
+<span id="cb21-281"><a href="#cb21-281"></a>::: {.callout-warning}</span>
+<span id="cb21-282"><a href="#cb21-282"></a><span class="fu">## Warning</span></span>
+<span id="cb21-283"><a href="#cb21-283"></a>Screen-scraping with Selenium is inherently fragile. The Twitter scraping examples that worked in the 2019 version of this course broke completely by 2024 because Twitter (now X) redesigned its HTML to use dynamically-generated class names and require authentication for basic browsing. This is not unusual — platforms regularly change their front-end code, sometimes specifically to resist automated access.</span>
+<span id="cb21-284"><a href="#cb21-284"></a>:::</span>
+<span id="cb21-285"><a href="#cb21-285"></a></span>
+<span id="cb21-286"><a href="#cb21-286"></a>This fragility reinforces a principle from @sec-post-api: when an API is available, use it. Selenium is a powerful last resort for cases where you ethically need data that no API provides, but it is slow, resource-intensive, and brittle compared to API access. The decision tree should be: API first → static scraping second → Selenium third.</span>
+<span id="cb21-287"><a href="#cb21-287"></a></span>
+<span id="cb21-288"><a href="#cb21-288"></a>Selenium is also not the only browser automation tool. **Playwright**, developed by Microsoft, is the modern alternative: it waits for elements automatically (eliminating much of the explicit-wait boilerplate you saw earlier), runs noticeably faster, and supports asynchronous operation for parallel scraping. If browser automation becomes a regular part of your work, Playwright is worth learning. That said, Selenium remains far more widespread, has a deeper reservoir of documentation and community answers, and is entirely adequate for coursework — which is why this chapter teaches it.</span>
+<span id="cb21-289"><a href="#cb21-289"></a></span>
+<span id="cb21-290"><a href="#cb21-290"></a><span class="fu">### Headless Mode</span></span>
+<span id="cb21-291"><a href="#cb21-291"></a></span>
+<span id="cb21-292"><a href="#cb21-292"></a>For production scraping, you do not need a visible browser window. Headless mode runs the browser without a graphical interface, which is faster and can run on servers without a display:</span>
+<span id="cb21-293"><a href="#cb21-293"></a></span>
+<span id="cb21-296"><a href="#cb21-296"></a><span class="in">```{python}</span></span>
+<span id="cb21-297"><a href="#cb21-297"></a><span class="im">from</span> selenium.webdriver.chrome.options <span class="im">import</span> Options</span>
+<span id="cb21-298"><a href="#cb21-298"></a></span>
+<span id="cb21-299"><a href="#cb21-299"></a>options <span class="op">=</span> Options()</span>
+<span id="cb21-300"><a href="#cb21-300"></a>options.add_argument(<span class="st">"--headless=new"</span>)</span>
+<span id="cb21-301"><a href="#cb21-301"></a>options.add_argument(<span class="st">"--no-sandbox"</span>)</span>
+<span id="cb21-302"><a href="#cb21-302"></a>options.add_argument(<span class="st">"--disable-dev-shm-usage"</span>)</span>
+<span id="cb21-303"><a href="#cb21-303"></a></span>
+<span id="cb21-304"><a href="#cb21-304"></a>driver <span class="op">=</span> webdriver.Chrome(options<span class="op">=</span>options)</span>
+<span id="cb21-305"><a href="#cb21-305"></a>driver.get(<span class="st">"https://example.com"</span>)</span>
+<span id="cb21-306"><a href="#cb21-306"></a><span class="bu">print</span>(<span class="ss">f"Title: </span><span class="sc">{</span>driver<span class="sc">.</span>title<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb21-307"><a href="#cb21-307"></a>driver.quit()</span>
+<span id="cb21-308"><a href="#cb21-308"></a><span class="in">```</span></span>
+<span id="cb21-309"><a href="#cb21-309"></a></span>
+<span id="cb21-310"><a href="#cb21-310"></a>The <span class="in">`=new`</span> suffix selects Chrome's new headless implementation (Chrome 109 and later), which behaves much more like the regular browser than the legacy <span class="in">`--headless`</span> mode did. The <span class="in">`--no-sandbox`</span> and <span class="in">`--disable-dev-shm-usage`</span> flags resolve common issues when running Chrome in containerized or server environments (like GitHub Actions, which you will use in @sec-automation). Headless mode is essential for automated data collection pipelines where no one is watching the browser window.</span>
+<span id="cb21-311"><a href="#cb21-311"></a></span>
+<span id="cb21-312"><a href="#cb21-312"></a>One important caveat: some websites detect headless browsers and serve different content or block access entirely. They do this by checking for browser properties that headless mode handles differently (like the <span class="in">`navigator.webdriver`</span> flag). If you get different results in headless mode than in a visible browser, this is likely the cause. For educational purposes, switching back to headed mode usually resolves the issue. In production settings, there are legitimate workarounds, but circumventing bot detection raises the ethical questions discussed in @sec-ethics — the fact that you *can* evade detection does not mean you *should*.</span>
+<span id="cb21-313"><a href="#cb21-313"></a></span>
+<span id="cb21-314"><a href="#cb21-314"></a><span class="fu">## A Practical Selenium Workflow</span></span>
+<span id="cb21-315"><a href="#cb21-315"></a></span>
+<span id="cb21-316"><a href="#cb21-316"></a>Fragility is an argument for writing Selenium code defensively, not for avoiding Selenium. Here is a complete workflow that pulls together everything this chapter has covered. We will automate a multi-page interaction: navigating to a website, performing a search, waiting for results to load, extracting the data, and repeating across multiple pages.</span>
+<span id="cb21-317"><a href="#cb21-317"></a></span>
+<span id="cb21-320"><a href="#cb21-320"></a><span class="in">```{python}</span></span>
+<span id="cb21-321"><a href="#cb21-321"></a><span class="im">import</span> time</span>
+<span id="cb21-322"><a href="#cb21-322"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
+<span id="cb21-323"><a href="#cb21-323"></a><span class="im">from</span> selenium.webdriver.chrome.options <span class="im">import</span> Options</span>
+<span id="cb21-324"><a href="#cb21-324"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
+<span id="cb21-325"><a href="#cb21-325"></a><span class="im">from</span> selenium.webdriver.support.ui <span class="im">import</span> WebDriverWait</span>
+<span id="cb21-326"><a href="#cb21-326"></a><span class="im">from</span> selenium.webdriver.support <span class="im">import</span> expected_conditions <span class="im">as</span> EC</span>
+<span id="cb21-327"><a href="#cb21-327"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb21-328"><a href="#cb21-328"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb21-329"><a href="#cb21-329"></a></span>
+<span id="cb21-330"><a href="#cb21-330"></a><span class="kw">def</span> scrape_with_selenium(search_term, max_pages<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb21-331"><a href="#cb21-331"></a>    <span class="co">"""Scrape search results from a dynamic website.</span></span>
+<span id="cb21-332"><a href="#cb21-332"></a></span>
+<span id="cb21-333"><a href="#cb21-333"></a><span class="co">    This demonstrates the full Selenium workflow:</span></span>
+<span id="cb21-334"><a href="#cb21-334"></a><span class="co">    1. Launch a headless browser</span></span>
+<span id="cb21-335"><a href="#cb21-335"></a><span class="co">    2. Navigate and interact with the page</span></span>
+<span id="cb21-336"><a href="#cb21-336"></a><span class="co">    3. Wait for dynamic content to load</span></span>
+<span id="cb21-337"><a href="#cb21-337"></a><span class="co">    4. Extract data via BeautifulSoup</span></span>
+<span id="cb21-338"><a href="#cb21-338"></a><span class="co">    5. Handle pagination</span></span>
+<span id="cb21-339"><a href="#cb21-339"></a><span class="co">    6. Clean up</span></span>
+<span id="cb21-340"><a href="#cb21-340"></a><span class="co">    """</span></span>
+<span id="cb21-341"><a href="#cb21-341"></a>    options <span class="op">=</span> Options()</span>
+<span id="cb21-342"><a href="#cb21-342"></a>    options.add_argument(<span class="st">"--headless=new"</span>)</span>
+<span id="cb21-343"><a href="#cb21-343"></a>    driver <span class="op">=</span> webdriver.Chrome(options<span class="op">=</span>options)</span>
+<span id="cb21-344"><a href="#cb21-344"></a></span>
+<span id="cb21-345"><a href="#cb21-345"></a>    all_results <span class="op">=</span> []</span>
+<span id="cb21-346"><a href="#cb21-346"></a></span>
+<span id="cb21-347"><a href="#cb21-347"></a>    <span class="cf">try</span>:</span>
+<span id="cb21-348"><a href="#cb21-348"></a>        driver.get(<span class="st">"https://example-search-site.com"</span>)</span>
+<span id="cb21-349"><a href="#cb21-349"></a></span>
+<span id="cb21-350"><a href="#cb21-350"></a>        <span class="co"># Find and fill the search box</span></span>
+<span id="cb21-351"><a href="#cb21-351"></a>        search_box <span class="op">=</span> driver.find_element(By.NAME, <span class="st">"q"</span>)</span>
+<span id="cb21-352"><a href="#cb21-352"></a>        search_box.send_keys(search_term)</span>
+<span id="cb21-353"><a href="#cb21-353"></a>        search_box.submit()</span>
+<span id="cb21-354"><a href="#cb21-354"></a></span>
+<span id="cb21-355"><a href="#cb21-355"></a>        <span class="cf">for</span> page <span class="kw">in</span> <span class="bu">range</span>(max_pages):</span>
+<span id="cb21-356"><a href="#cb21-356"></a>            <span class="co"># Wait for results to load (up to 10 seconds)</span></span>
+<span id="cb21-357"><a href="#cb21-357"></a>            WebDriverWait(driver, <span class="dv">10</span>).until(</span>
+<span id="cb21-358"><a href="#cb21-358"></a>                EC.presence_of_element_located((By.CLASS_NAME, <span class="st">"result-item"</span>))</span>
+<span id="cb21-359"><a href="#cb21-359"></a>            )</span>
+<span id="cb21-360"><a href="#cb21-360"></a></span>
+<span id="cb21-361"><a href="#cb21-361"></a>            <span class="co"># Pass rendered HTML to BeautifulSoup</span></span>
+<span id="cb21-362"><a href="#cb21-362"></a>            soup <span class="op">=</span> BeautifulSoup(driver.page_source, <span class="st">"html.parser"</span>)</span>
+<span id="cb21-363"><a href="#cb21-363"></a></span>
+<span id="cb21-364"><a href="#cb21-364"></a>            <span class="co"># Extract data from this page</span></span>
+<span id="cb21-365"><a href="#cb21-365"></a>            <span class="cf">for</span> item <span class="kw">in</span> soup.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"result-item"</span>):</span>
+<span id="cb21-366"><a href="#cb21-366"></a>                <span class="co"># Check that both elements exist before calling .text — the same defensive pattern you learned for static scraping</span></span>
+<span id="cb21-367"><a href="#cb21-367"></a>                title_tag <span class="op">=</span> item.find(<span class="st">"h3"</span>)</span>
+<span id="cb21-368"><a href="#cb21-368"></a>                desc_tag <span class="op">=</span> item.find(<span class="st">"p"</span>)</span>
+<span id="cb21-369"><a href="#cb21-369"></a>                <span class="cf">if</span> title_tag <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> desc_tag <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb21-370"><a href="#cb21-370"></a>                    <span class="cf">continue</span>  <span class="co"># Skip malformed result items rather than crash</span></span>
+<span id="cb21-371"><a href="#cb21-371"></a>                all_results.append({</span>
+<span id="cb21-372"><a href="#cb21-372"></a>                    <span class="st">"title"</span>: title_tag.text.strip(),</span>
+<span id="cb21-373"><a href="#cb21-373"></a>                    <span class="st">"description"</span>: desc_tag.text.strip(),</span>
+<span id="cb21-374"><a href="#cb21-374"></a>                    <span class="st">"page"</span>: page <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb21-375"><a href="#cb21-375"></a>                })</span>
+<span id="cb21-376"><a href="#cb21-376"></a></span>
+<span id="cb21-377"><a href="#cb21-377"></a>            <span class="co"># Try to click "Next" for pagination</span></span>
+<span id="cb21-378"><a href="#cb21-378"></a>            <span class="cf">try</span>:</span>
+<span id="cb21-379"><a href="#cb21-379"></a>                next_button <span class="op">=</span> driver.find_element(By.LINK_TEXT, <span class="st">"Next"</span>)</span>
+<span id="cb21-380"><a href="#cb21-380"></a>                next_button.click()</span>
+<span id="cb21-381"><a href="#cb21-381"></a>                time.sleep(<span class="dv">2</span>)  <span class="co"># Wait for next page to load</span></span>
+<span id="cb21-382"><a href="#cb21-382"></a>            <span class="cf">except</span> <span class="pp">Exception</span>:</span>
+<span id="cb21-383"><a href="#cb21-383"></a>                <span class="cf">break</span>  <span class="co"># No more pages</span></span>
+<span id="cb21-384"><a href="#cb21-384"></a></span>
+<span id="cb21-385"><a href="#cb21-385"></a>    <span class="cf">finally</span>:</span>
+<span id="cb21-386"><a href="#cb21-386"></a>        driver.quit()  <span class="co"># Always clean up</span></span>
+<span id="cb21-387"><a href="#cb21-387"></a></span>
+<span id="cb21-388"><a href="#cb21-388"></a>    <span class="cf">return</span> pd.DataFrame(all_results)</span>
+<span id="cb21-389"><a href="#cb21-389"></a><span class="in">```</span></span>
+<span id="cb21-390"><a href="#cb21-390"></a></span>
+<span id="cb21-391"><a href="#cb21-391"></a>Notice the use of <span class="in">`WebDriverWait`</span> with <span class="in">`expected_conditions`</span> — this is superior to <span class="in">`time.sleep()`</span> because it waits only as long as needed for the element to appear, rather than waiting a fixed amount of time that might be too short (element not loaded) or too long (wasted time). The <span class="in">`try/finally`</span> block ensures the browser is closed even if an error occurs. And notice the <span class="in">`None`</span> checks before calling <span class="in">`.text`</span>: dynamic pages serve malformed or incomplete items just as often as static ones do, and the defensive parsing habits from @sec-static-pages carry over unchanged.</span>
+<span id="cb21-392"><a href="#cb21-392"></a></span>
+<span id="cb21-393"><a href="#cb21-393"></a><span class="fu">## When to Use Selenium vs. APIs</span></span>
+<span id="cb21-394"><a href="#cb21-394"></a></span>
+<span id="cb21-395"><a href="#cb21-395"></a>With the full toolkit in hand, here is the decision tree for choosing your data access method:</span>
+<span id="cb21-396"><a href="#cb21-396"></a></span>
+<span id="cb21-397"><a href="#cb21-397"></a><span class="ss">1. </span>**Is there an API?** Use it. APIs are faster, more reliable, and more structured (see @sec-wikipedia through @sec-ai-apis).</span>
+<span id="cb21-398"><a href="#cb21-398"></a><span class="ss">2. </span>**Is the content in the static HTML?** Use <span class="in">`requests`</span> + BeautifulSoup (see @sec-static-pages). It is simpler and faster than Selenium.</span>
+<span id="cb21-399"><a href="#cb21-399"></a><span class="ss">3. </span>**Is the content loaded by JavaScript?** Use browser automation — Selenium, or Playwright if auto-waiting and speed matter for your project. Either way, expect it to be slower, more fragile, and more resource-intensive than the options above.</span>
+<span id="cb21-400"><a href="#cb21-400"></a><span class="ss">4. </span>**Is the content behind a login?** This is where ethical judgment matters most. Automating access to login-gated content may violate Terms of Service. See @sec-ethics.</span>
+<span id="cb21-401"><a href="#cb21-401"></a></span>
+<span id="cb21-402"><a href="#cb21-402"></a>The exercises below give you practice at every branch of this tree.</span>
+<span id="cb21-403"><a href="#cb21-403"></a></span>
+<span id="cb21-404"><a href="#cb21-404"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb21-405"><a href="#cb21-405"></a></span>
+<span id="cb21-406"><a href="#cb21-406"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
+<span id="cb21-407"><a href="#cb21-407"></a></span>
+<span id="cb21-408"><a href="#cb21-408"></a>You will measure the difference between what a static request sees and what a browser sees, on a site where that difference matters.</span>
+<span id="cb21-409"><a href="#cb21-409"></a></span>
+<span id="cb21-410"><a href="#cb21-410"></a>**Step 1 — Fetch statically first.** Choose a JavaScript-heavy site — a news site's live section, a social feed, a site the chapter mentioned. Check its <span class="in">`robots.txt`</span> (@sec-ethics), then fetch it with <span class="in">`requests.get()`</span> and your <span class="in">`HEADERS`</span>. Record the length of <span class="in">`response.text`</span> and count a target element with BeautifulSoup (@sec-static-pages) — headlines, list items, whatever the page is made of.</span>
+<span id="cb21-411"><a href="#cb21-411"></a></span>
+<span id="cb21-414"><a href="#cb21-414"></a><span class="in">```{python}</span></span>
+<span id="cb21-415"><a href="#cb21-415"></a><span class="co"># Step 1: Fetch your chosen page with requests, record the HTML length, and count your target element with BeautifulSoup.</span></span>
+<span id="cb21-416"><a href="#cb21-416"></a><span class="co"># Your code here</span></span>
+<span id="cb21-417"><a href="#cb21-417"></a><span class="in">```</span></span>
+<span id="cb21-418"><a href="#cb21-418"></a></span>
+<span id="cb21-419"><a href="#cb21-419"></a>**Step 2 — Start a headless browser.** Set up a headless Selenium driver following the chapter's setup code, and load the same URL with <span class="in">`driver.get()`</span>.</span>
+<span id="cb21-420"><a href="#cb21-420"></a></span>
+<span id="cb21-423"><a href="#cb21-423"></a><span class="in">```{python}</span></span>
+<span id="cb21-424"><a href="#cb21-424"></a><span class="co"># Step 2: Configure a headless driver and load the same URL.</span></span>
+<span id="cb21-425"><a href="#cb21-425"></a><span class="co"># Your code here</span></span>
+<span id="cb21-426"><a href="#cb21-426"></a><span class="in">```</span></span>
+<span id="cb21-427"><a href="#cb21-427"></a></span>
+<span id="cb21-428"><a href="#cb21-428"></a>**Step 3 — Wait, then measure again.** Use <span class="in">`WebDriverWait`</span> to wait for your target element to be present — the chapter shows the pattern — then record the length of <span class="in">`driver.page_source`</span> and count the same target element, this time parsing <span class="in">`driver.page_source`</span> with BeautifulSoup.</span>
+<span id="cb21-429"><a href="#cb21-429"></a></span>
+<span id="cb21-432"><a href="#cb21-432"></a><span class="in">```{python}</span></span>
+<span id="cb21-433"><a href="#cb21-433"></a><span class="co"># Step 3: Wait for the content to load, then measure page_source length and re-count the same element.</span></span>
+<span id="cb21-434"><a href="#cb21-434"></a><span class="co"># Your code here</span></span>
+<span id="cb21-435"><a href="#cb21-435"></a><span class="in">```</span></span>
+<span id="cb21-436"><a href="#cb21-436"></a></span>
+<span id="cb21-437"><a href="#cb21-437"></a>**Step 4 — Load more.** Make the page reveal content a plain request never sees: scroll to the bottom with the chapter's scrolling pattern (or click a "Load More" button if the site has one), wait, and count your element a third time.</span>
+<span id="cb21-438"><a href="#cb21-438"></a></span>
+<span id="cb21-441"><a href="#cb21-441"></a><span class="in">```{python}</span></span>
+<span id="cb21-442"><a href="#cb21-442"></a><span class="co"># Step 4: Scroll or click to load more content, wait, and count again.</span></span>
+<span id="cb21-443"><a href="#cb21-443"></a><span class="co"># Your code here</span></span>
+<span id="cb21-444"><a href="#cb21-444"></a><span class="in">```</span></span>
+<span id="cb21-445"><a href="#cb21-445"></a></span>
+<span id="cb21-446"><a href="#cb21-446"></a>**Step 5 — Tabulate and clean up.** Build a small DataFrame with one row per measurement — static request, initial Selenium load, after scrolling — and columns for HTML length and element count. Then close the browser with <span class="in">`driver.quit()`</span>, as the chapter insists.</span>
+<span id="cb21-447"><a href="#cb21-447"></a></span>
+<span id="cb21-450"><a href="#cb21-450"></a><span class="in">```{python}</span></span>
+<span id="cb21-451"><a href="#cb21-451"></a><span class="co"># Step 5: Build the comparison DataFrame, then driver.quit().</span></span>
+<span id="cb21-452"><a href="#cb21-452"></a><span class="co"># Your code here</span></span>
+<span id="cb21-453"><a href="#cb21-453"></a><span class="in">```</span></span>
+<span id="cb21-454"><a href="#cb21-454"></a></span>
+<span id="cb21-455"><a href="#cb21-455"></a>**Step 6 — Interpret.** In four to six sentences: How much of the page did the static request miss? Would you classify this site as static, partially dynamic, or fully dynamic? Given the speed difference you experienced, when is Selenium worth the cost for this site — and when would <span class="in">`requests`</span> alone do?</span>
+<span id="cb21-456"><a href="#cb21-456"></a></span>
+<span id="cb21-459"><a href="#cb21-459"></a><span class="in">```{python}</span></span>
+<span id="cb21-460"><a href="#cb21-460"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb21-461"><a href="#cb21-461"></a><span class="in">```</span></span>
+<span id="cb21-462"><a href="#cb21-462"></a></span>
+<span id="cb21-463"><a href="#cb21-463"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb21-464"><a href="#cb21-464"></a></span>
+<span id="cb21-465"><a href="#cb21-465"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
+<span id="cb21-466"><a href="#cb21-466"></a></span>
+<span id="cb21-467"><a href="#cb21-467"></a><span class="ss">1. </span>**Multi-step interaction.** Use Selenium to automate a multi-step process: navigate to a site with a search form, enter a query, submit it, and extract results from the response page.</span>
+<span id="cb21-468"><a href="#cb21-468"></a></span>
+<span id="cb21-469"><a href="#cb21-469"></a><span class="ss">2. </span>**Static vs. dynamic comparison.** For three websites of your choice, compare the HTML returned by <span class="in">`requests.get()`</span> with the <span class="in">`driver.page_source`</span> from Selenium. Categorize each site as static, partially dynamic, or fully dynamic.</span>
+<span id="cb21-470"><a href="#cb21-470"></a></span>
+<span id="cb21-471"><a href="#cb21-471"></a><span class="ss">3. </span>**Load More button.** Find a website that uses a "Load More" button (rather than infinite scroll) to reveal additional content. Write a Selenium script that clicks the button in a loop until it disappears or becomes disabled, then extracts all the loaded data. How many items were hidden behind the button?</span>
+<span id="cb21-472"><a href="#cb21-472"></a></span>
+<span id="cb21-473"><a href="#cb21-473"></a><span class="ss">4. </span>**Performance comparison.** For the same URL, measure the time taken by three approaches: <span class="in">`requests.get()`</span>, headed Selenium (with a visible browser), and headless Selenium. Use <span class="in">`time.time()`</span> to measure each. Create a table comparing the three approaches on speed, completeness of data retrieved, and resource usage. When is the speed tradeoff of Selenium worth it?</span>
+<span id="cb21-474"><a href="#cb21-474"></a></span>
+<span id="cb21-475"><a href="#cb21-475"></a><span class="ss">5. </span>**Graduate extension (INFO 5617).** Choose a JavaScript-heavy site relevant to your own research interests and instrument it with both approaches from this part of the book: static <span class="in">`requests`</span> + BeautifulSoup and Selenium. Quantify what each approach sees — count of elements retrieved, payload size in bytes, and wall-clock time — across at least five pages. Then write a roughly 500-word memo on when the added cost of browser automation is justified, engaging with the treatment of JavaScript scraping in @mitchell2018web. Your memo should articulate a defensible general rule for other researchers, not just describe your particular site.</span>
+<span id="cb21-476"><a href="#cb21-476"></a></span>
+<span id="cb21-477"><a href="#cb21-477"></a>::: {.callout-tip}</span>
+<span id="cb21-478"><a href="#cb21-478"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb21-479"><a href="#cb21-479"></a>For background on debugging strategies when Selenium scripts fail, see *Missing Manual* Chapter 6: Debugging and Chapter 7: Reading Python Tracebacks.</span>
+<span id="cb21-480"><a href="#cb21-480"></a>:::</span>
+<span id="cb21-481"><a href="#cb21-481"></a></span>
+<span id="cb21-482"><a href="#cb21-482"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb21-483"><a href="#cb21-483"></a></span>
+<span id="cb21-484"><a href="#cb21-484"></a>The shift from server-rendered to client-rendered web pages represents a fundamental change in the web's architecture. JavaScript frameworks like React, Angular, and Vue have made the web more interactive but also more opaque to automated observation. The ability to "view source" — once a straightforward way to see exactly what a page contained — now often reveals only a JavaScript bootstrap that fetches and renders content dynamically.</span>
+<span id="cb21-485"><a href="#cb21-485"></a></span>
+<span id="cb21-486"><a href="#cb21-486"></a>This architectural shift interacts with the enclosure dynamics described in @sec-post-api. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures — CAPTCHAs, bot detection, dynamically-generated class names — become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes. The tools in this chapter are a response to that architectural shift — they exist because the simpler approaches taught in @sec-static-pages are no longer sufficient for much of the modern web.</span>
+<span id="cb21-487"><a href="#cb21-487"></a></span>
+<span id="cb21-488"><a href="#cb21-488"></a>::: {.callout-note}</span>
+<span id="cb21-489"><a href="#cb21-489"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb21-490"><a href="#cb21-490"></a>When platforms close their APIs and render content exclusively through JavaScript, browser automation becomes the last-resort path to data that serves the public interest. The tools in this chapter exist because of the **enclosure** dynamic from @sec-post-api — the progressive restriction of access to data that was once openly available. Researchers studying algorithmic bias, misinformation, and platform governance increasingly depend on Selenium-based methods precisely because the APIs that once served these research needs have been shut down or restricted beyond practical use.</span>
+<span id="cb21-491"><a href="#cb21-491"></a>:::</span>
+<span id="cb21-492"><a href="#cb21-492"></a></span>
+<span id="cb21-493"><a href="#cb21-493"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb21-494"><a href="#cb21-494"></a></span>
+<span id="cb21-495"><a href="#cb21-495"></a><span class="ss">- </span>**`NoSuchElementException`**: The element does not exist yet because the page has not finished loading. Add <span class="in">`time.sleep()`</span> or use explicit waits with <span class="in">`WebDriverWait`</span>.</span>
+<span id="cb21-496"><a href="#cb21-496"></a><span class="ss">- </span>**`StaleElementReferenceException`**: The DOM changed between when you found the element and when you tried to interact with it. Re-find the element.</span>
+<span id="cb21-497"><a href="#cb21-497"></a><span class="ss">- </span>**Driver/browser version mismatch**: Selenium Manager usually resolves this automatically, but brand-new browser releases occasionally break compatibility for a few days. Updating the <span class="in">`selenium`</span> package typically fixes it.</span>
+<span id="cb21-498"><a href="#cb21-498"></a><span class="ss">- </span>**Memory issues**: Each Selenium driver runs a full browser process. Close drivers promptly with <span class="in">`driver.quit()`</span>.</span>
+<span id="cb21-499"><a href="#cb21-499"></a></span>
+<span id="cb21-500"><a href="#cb21-500"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb21-501"><a href="#cb21-501"></a></span>
+<span id="cb21-502"><a href="#cb21-502"></a>The modern web is dynamic: JavaScript renders content after the initial HTML loads, making it invisible to static scraping tools. Selenium controls a real browser programmatically, letting you access fully-rendered pages, simulate user interactions, and extract content that <span class="in">`requests`</span> cannot see. But Selenium is slow, fragile, and resource-intensive — a last resort when APIs and static scraping are unavailable. The hybrid approach of Selenium for rendering plus BeautifulSoup for parsing gives you full access to the modern web while keeping your parsing code familiar.</span>
+<span id="cb21-503"><a href="#cb21-503"></a></span>
+<span id="cb21-504"><a href="#cb21-504"></a><span class="fu">## Further Reading</span></span>
+<span id="cb21-505"><a href="#cb21-505"></a></span>
+<span id="cb21-506"><a href="#cb21-506"></a><span class="ss">- </span>Selenium documentation: <span class="ot">&lt;https://www.selenium.dev/documentation/&gt;</span></span>
+<span id="cb21-507"><a href="#cb21-507"></a><span class="ss">- </span>Selenium Python bindings: <span class="ot">&lt;https://selenium-python.readthedocs.io/&gt;</span></span>
+<span id="cb21-508"><a href="#cb21-508"></a><span class="ss">- </span>Playwright for Python: <span class="ot">&lt;https://playwright.dev/python/&gt;</span></span>
+<span id="cb21-509"><a href="#cb21-509"></a><span class="ss">- </span>@mitchell2018web — Chapter 11: Scraping JavaScript</span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
