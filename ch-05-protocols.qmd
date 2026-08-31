@@ -214,7 +214,7 @@ import requests
 article = "University_of_Colorado_Boulder"
 api_url = (
     f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
-    f"/en.wikipedia/all-access/all-agents/{article}/daily/20240101/20240131"
+    f"/en.wikipedia/all-access/all-agents/{article}/daily/20260101/20260131"
 )
 
 # This will likely fail with a 403
@@ -342,10 +342,10 @@ print(encoded_article)
 
 url = (
     "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
-    f"/{project}/{access}/{agent}/{encoded_article}/daily/20240101/20240131"
+    f"/{project}/{access}/{agent}/{encoded_article}/daily/20260101/20260131"
 )
 print(url)
-# https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/University_of_Colorado_Boulder/daily/20240101/20240131
+# https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/University_of_Colorado_Boulder/daily/20260101/20260131
 ```
 
 The encoding matters more than this example suggests: a band like "AC/DC" has a slash in its article title, and `quote("AC/DC", safe="")` correctly produces `AC%2FDC`. Paste the raw title into your f-string instead, and the API would interpret the slash as a path separator and return a 404.
