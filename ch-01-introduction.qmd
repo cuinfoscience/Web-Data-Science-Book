@@ -53,14 +53,14 @@ After installation, open a terminal (macOS/Linux) or Anaconda Prompt (Windows) a
 ```{python}
 # Run these commands in a terminal, not in Python
 # conda update conda
-# conda install anaconda=2024.06
+# conda install anaconda=2026.07-1
 ```
 
 Anaconda's default `base` environment is fine for your first session, but as you accumulate projects, their library requirements will eventually conflict. The `conda` package manager solves this with *environments*: isolated Python installations, each with its own set of packages. Create one for this book and activate it whenever you sit down to work:
 
 ```{python}
 # Run these commands in a terminal, not in Python
-# conda create -n webdata python=3.11
+# conda create -n webdata python=3.12
 # conda activate webdata
 ```
 
@@ -169,7 +169,7 @@ import requests
 
 api_url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
 article = "University_of_Colorado_Boulder"
-url = f"{api_url}/en.wikipedia/all-access/all-agents/{article}/daily/20240101/20240131"
+url = f"{api_url}/en.wikipedia/all-access/all-agents/{article}/daily/20260101/20260131"
 
 headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 response = requests.get(url, headers=headers)
@@ -193,7 +193,7 @@ df = pd.DataFrame(data["items"])
 print(df.head())
 # You'll see columns: project, article, granularity, timestamp, access, agent, views
 
-# The timestamp column looks like "2024010100" — convert it to a proper date
+# The timestamp column looks like "2026010100" — convert it to a proper date
 df["date"] = pd.to_datetime(df["timestamp"], format="%Y%m%d00")
 
 # Plot the time series
