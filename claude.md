@@ -74,6 +74,39 @@ web-data-science/
 - **Course notebooks**: The original Jupyter notebooks from INFO 4871 (Fall 2024) are the primary source material for tutorial content.
 - **JRC paper**: Keegan (2026), "Public interest data infrastructuring" — provides the theoretical framework for Chapter 3 and the public interest thread throughout.
 
+## Prose safeguards — the significance-verdict family
+
+The recurring failure in generated prose for this book is the **significance
+verdict**: a sentence or clause whose entire content is that the adjacent
+evidence means something. It appears under endlessly novel strings — "the
+distinction matters," "the differences matter," "the variety is diagnostic,"
+"that is the point," "the asymmetry is the tell," "the tagline is earned,"
+"each of these earns its place," "That is X rather than Y" — so banning
+strings only trains paraphrase. The rule targets the function:
+
+- **Never write a sentence that asserts the significance of its neighbors.**
+  Significance is carried by a consequence, not an adjective: "A gated service
+  can be negotiated with; a deleted one cannot" needs no "the distinction
+  matters, because" in front of it — the consequence *is* the mattering.
+- **The delete test.** If a sentence can be removed with no information lost,
+  it was a verdict, not a claim. Apply it to every paragraph-closing sentence
+  in new prose.
+- **End on the strongest fact, not a beat.** No quotable one-liner closers
+  ("openness as a design property rather than a press release"), no counting
+  verdicts ("three deaths, three causes"), no demonstrative applause ("That is
+  the point.").
+- **No verdict verbs on the book's own material**: earned, earns its place,
+  deserves, is telling, is diagnostic, is the tell, is no accident.
+- **Known banned figures** (tripwires for the function above, not the whole
+  ban): the gap matters, load-bearing, seam to follow, arc, the distinction/
+  difference(s) matter(s).
+
+Run `python tools/trope_lint.py` before opening a PR. Its hits are flags for
+the delete test, not automatic failures — "status codes matter because CDX
+records every attempt" survives the test (the because-clause carries content);
+"the differences matter" before a list of the differences does not. New prose
+deserves the scan most: fresh composition is where this family regenerates.
+
 ## Extending the Book
 
 When adding new chapters or updating existing ones:
