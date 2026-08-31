@@ -57,7 +57,7 @@ Why did enclosure accelerate when it did? Generative AI is a large part of the a
 
 **Exemption** is the second pressure: platforms operating beyond meaningful outside scrutiny, invoking privacy, intellectual property, or security to resist independent investigation while conducting the same investigations internally at will.
 
-The asymmetry is the tell. Platforms run experiments on their users continuously — every A/B test is a behavioral study — and employ large internal research teams with total data access. But when outside researchers attempt to study the platforms, the tools of resistance come out: cease-and-desist letters citing the Computer Fraud and Abuse Act, Terms of Service that prohibit the data collection that public-interest research requires [@fiesler2020no], and account bans for researchers who persist. In 2021, Meta disabled the accounts of NYU's Ad Observatory team, who were studying political ad targeting with data volunteered by consenting users — an action Meta justified as protecting user privacy. Courts have pushed back at the margins (@sec-ethics covers *Sandvig v. Barr*, *Van Buren*, and the *hiQ* litigation), but legal ambiguity itself does deterrence work: a graduate student weighing a scraping study against a potential federal claim usually just picks a different topic.
+Platforms run experiments on their users continuously — every A/B test is a behavioral study — and employ large internal research teams with total data access. But when outside researchers attempt to study the platforms, the tools of resistance come out: cease-and-desist letters citing the Computer Fraud and Abuse Act, Terms of Service that prohibit the data collection that public-interest research requires [@fiesler2020no], and account bans for researchers who persist. In 2021, Meta disabled the accounts of NYU's Ad Observatory team, who were studying political ad targeting with data volunteered by consenting users — an action Meta justified as protecting user privacy. Courts have pushed back at the margins (@sec-ethics covers *Sandvig v. Barr*, *Van Buren*, and the *hiQ* litigation), but legal ambiguity itself does deterrence work: a graduate student weighing a scraping study against a potential federal claim usually just picks a different topic.
 
 The privacy justification deserves particular scrutiny. Platforms routinely cite user protection when closing researcher access — while continuing to sell fine-grained targeting on the same users to advertisers. Privacy is genuinely important, and @sec-ethics takes it seriously. But when "privacy" restricts only accountability research and never revenue, it is functioning as exemption, not protection.
 
@@ -77,7 +77,7 @@ Erosion is also why two later chapters exist. The Wayback Machine (@sec-archives
 
 Enclosure, exemption, and erosion are claims about the world, and claims about the world can be checked. This section builds two small audits. Neither needs an API key, an account, or an application. Both are things you can re-run against any platform you care about, and both produce evidence you could put in a paper.
 
-A warning about what follows: these audits report the web as it is *today*. The outputs printed below were recorded on 28 August 2026, and yours will differ. That is the point. A chapter about disappearing access that shipped fixed numbers would be making the mistake it is warning you about.
+A warning about what follows: these audits report the web as it is *today*. The outputs printed below were recorded on 28 August 2026, and yours will differ — a chapter about disappearing access that shipped fixed numbers would be making the mistake it is warning you about.
 
 ### The Eight Endpoints
 
@@ -97,7 +97,7 @@ Before probing anything, know what you are probing. The eight services below wer
 
 **X (Twitter)** ([homepage](https://x.com), [developer documentation](https://developer.x.com)) — for fifteen years the workhorse of computational social science, the platform on which the field's methods for studying news diffusion, political communication, and public opinion were built. Nearly all of that research is now impossible to repeat at academic budgets. It stays in the audit partly for what it still is, and partly so you can measure what happened to it.
 
-**Meta Graph API** ([homepage](https://www.facebook.com), [API documentation](https://developers.facebook.com/docs/graph-api/)) — the programmatic interface to the world's largest social platform, and once, through tools like CrowdTangle, a real window for researchers and journalists tracking what spreads on Facebook and Instagram. Post-2018 lockdowns closed most of that view. Probing it today teaches you less about Facebook's users than about the shape of restriction itself — which is, for this chapter, the lesson.
+**Meta Graph API** ([homepage](https://www.facebook.com), [API documentation](https://developers.facebook.com/docs/graph-api/)) — the programmatic interface to the world's largest social platform, and once, through tools like CrowdTangle, a real window for researchers and journalists tracking what spreads on Facebook and Instagram. Post-2018 lockdowns closed most of that view. Probing it today teaches you less about Facebook's users than about the shape of restriction itself.
 
 ### An Access Matrix
 
@@ -107,7 +107,7 @@ The first audit asks one question of each of these endpoints: *if I show up with
 import requests
 import pandas as pd
 
-# Identify yourself. @sec-ethics explains why this header matters; here it is already load-bearing, because several of these hosts answer anonymous library defaults differently than they answer a named client.
+# Identify yourself. @sec-ethics explains why this header matters; several of these hosts answer anonymous library defaults differently than they answer a named client.
 HEADERS = {"User-Agent": "WebDataScience/1.0 (INFO 4617; you@colorado.edu)"}
 
 # Endpoints that ask for no key, no account, and no application.
@@ -174,9 +174,9 @@ Five open, two gated, one refusing outright. Read the rows rather than the total
 
 Wikipedia, Hacker News, and arXiv answer an anonymous request with data, and have done so for over a decade. They are run by a non-profit, a startup incubator, and a university consortium. None of them monetizes attention, and none has an incentive to fence the commons.
 
-Mastodon is the only host that volunteers its rate limit before you hit it. `x-ratelimit-limit: 300` states the budget up front, so a well-behaved client never has to discover the ceiling by crashing into it. That is openness as a design property rather than a press release.
+Mastodon is the only host that volunteers its rate limit before you hit it. `x-ratelimit-limit: 300` states the budget up front, so a well-behaved client never has to discover the ceiling by crashing into it.
 
-Reddit's row is the one to sit with. The status is 403, but the content type is `text/html` — that is not an API refusing you, it is a *web page* served where JSON should be. Reddit's public JSON endpoint was free from 2008 until the 2023 repricing described above. Today an unauthenticated request from a script gets a block page. Enclosure is not an abstraction in that row; it is a content-type header.
+Reddit's row is the one to sit with. The status is 403, but the content type is `text/html` — that is not an API refusing you, it is a *web page* served where JSON should be. Reddit's public JSON endpoint was free from 2008 until the 2023 repricing described above. Today an unauthenticated request from a script gets a block page. In that row, enclosure is a content-type header.
 
 X returns `application/problem+json` with a 401: a machine-readable "you are not authorized," which is at least an honest refusal. Meta's 400 says an access token must be used. Both are gates, but differently built ones, and knowing which you face determines whether applying for access would even help.
 
@@ -190,7 +190,7 @@ This is not hypothetical. The first time this audit was run while drafting this 
 {"message":"GitHub access to this repository is not enabled for this session..."}
 ```
 
-That was the sandbox the code was running in, not GitHub. Reporting it as enclosure would have been wrong in the specific way that makes a finding embarrassing: the measurement would have described the instrument rather than the thing measured.
+That was the sandbox the code was running in, not GitHub. Reporting it as enclosure would have described the instrument rather than the thing measured.
 
 ```{python}
 def diagnose(url):
@@ -220,7 +220,7 @@ Three habits follow. Check `server` and `via` before attributing a block. Read t
 
 ### Dead-Endpoint Forensics
 
-The second audit turns to endpoints that are no longer supposed to work. The naive expectation is that a dead API is simply unreachable. The reality is more varied, and the variety is diagnostic.
+The second audit turns to endpoints that are no longer supposed to work. You might expect a dead API to be simply unreachable. The three below fail in three different ways, and the way each fails says whether anything can still be recovered.
 
 ```{python}
 RETIRED = {
@@ -270,9 +270,7 @@ Twitter API v1.1             400    rejects the request without a token
                                     {"errors":[{"code":215,"message":"Bad Authentication data."}
 ```
 
-Three deaths, three causes, and the differences matter.
-
-**Pushshift did not disappear.** It answers, and it answers in JSON: `{"detail":"Not authenticated"}`. The service still runs, now restricted to Reddit moderators. This is worth stating precisely, because the loss is usually described as the archive going away: "no longer accepts queries" means "no longer accepts queries *from you*." The distinction matters, because a gated service can in principle be negotiated with. A deleted one cannot.
+**Pushshift did not disappear.** It answers, and it answers in JSON: `{"detail":"Not authenticated"}`. The service still runs, now restricted to Reddit moderators. The loss is usually described as the archive going away; more precisely, "no longer accepts queries" means "no longer accepts queries *from you*." A gated service can in principle be negotiated with. A deleted one cannot.
 
 **CrowdTangle is genuinely gone.** There is no HTTP response at all, because the host does not answer. Meta shut it down in August 2024, and the shutdown was thorough: the endpoint is not returning 404, it is not resolving. This is enclosure completed, with nothing left to negotiate with.
 
@@ -372,7 +370,7 @@ Students often arrive at this material with intuitions that the post-API age has
 
 This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.
 
-You will run the chapter's access audit yourself, on today's web, and extend it to platforms you care about. Your numbers will differ from the book's; recording that difference, with a date, is the point.
+You will run the chapter's access audit yourself, on today's web, and extend it to platforms you care about. Your numbers will differ from the book's; recording that difference, with a date, is part of the assignment.
 
 **Step 1 — Identify yourself.** Define the `HEADERS` dictionary with your named `User-Agent`, as in @sec-ethics.
 
