@@ -17,9 +17,9 @@ Run this chapter's code as you read: open the [companion notebook](https://githu
 
 ## The Ethics of Retrieval
 
-The phrase "web scraping" is colloquial and popular but has pejorative connotations. Data is valuable: other people invested time, money, and effort to create and host the content you are about to retrieve programmatically. Before writing a single line of scraping code, you need to understand the legal, normative, and ethical landscape that governs your work.
+The phrase "web scraping" is colloquial and popular but has pejorative connotations. Data is valuable: other people invested time, money, and effort to create and host the content you are about to retrieve programmatically. Before writing a single line of scraping code, you need to understand the law, the norms, and the ethics that govern your work.
 
-This chapter establishes a decision framework that you should revisit before every data collection project in this book and beyond. The question is never simply "can I scrape this?" but rather "should I, and if so, how do I do it responsibly?"
+This chapter establishes a decision framework that you should revisit before every data collection project in this book and beyond. The question "can I scrape this?" always carries two more behind it: "should I, and if so, how do I do it responsibly?"
 
 ## Legal Frameworks
 
@@ -29,11 +29,11 @@ The [Computer Fraud and Abuse Act](https://en.wikipedia.org/wiki/Computer_Fraud_
 
 Two cases define the modern boundaries. In *Van Buren v. United States* (2021), the Supreme Court narrowed the CFAA's "exceeds authorized access" provision: the Court adopted a "gates-up-or-down" reading under which the statute targets accessing systems or areas of systems you are not entitled to enter — not misusing information you were allowed to see. Before *Van Buren*, violating a website's stated terms could plausibly be framed as a federal crime; after it, that theory is much harder to sustain.
 
-The second is *hiQ Labs v. LinkedIn*, and its full arc is instructive. hiQ, a data analytics company, scraped public LinkedIn profiles to build workforce analytics products; LinkedIn sent a cease-and-desist letter and blocked hiQ's access. The Ninth Circuit held in 2019 — and, after the Supreme Court sent the case back for reconsideration in light of *Van Buren*, held again in 2022 — that scraping publicly accessible data likely does not violate the CFAA, since no authentication "gate" was bypassed. But that is not the end of the story: later in 2022, hiQ *lost* on LinkedIn's breach-of-contract claim — it had continued scraping after agreeing to the Terms of Service and receiving the cease-and-desist — and the case settled with hiQ agreeing to stop. The lesson is precise: the CFAA probably does not criminalize scraping public pages, but contract law can still make it costly.
+The second is *hiQ Labs v. LinkedIn*. hiQ, a data analytics company, scraped public LinkedIn profiles to build workforce analytics products; LinkedIn sent a cease-and-desist letter and blocked hiQ's access. The Ninth Circuit held in 2019 — and, after the Supreme Court sent the case back for reconsideration in light of *Van Buren*, held again in 2022 — that scraping publicly accessible data likely does not violate the CFAA, since no authentication "gate" was bypassed. But that is not the end of the story: later in 2022, hiQ *lost* on LinkedIn's breach-of-contract claim — it had continued scraping after agreeing to the Terms of Service and receiving the cease-and-desist — and the case settled with hiQ agreeing to stop. The CFAA probably does not criminalize scraping public pages; contract law can still make it costly.
 
 The case of *Sandvig v. Barr* challenged the CFAA's application to researchers who violated a website's Terms of Service in order to conduct audit studies of algorithmic discrimination. In 2020, a federal district court held that merely violating Terms of Service does not constitute a CFAA crime — a meaningful, if limited, protection for research. The case illustrates the tension between researchers' need for data and platforms' desire to control how their systems are studied.
 
-The key takeaway: the legal landscape is unsettled and varies by jurisdiction. "It's technically possible" is not the same as "it's legal," and "it's legal" is not the same as "it's ethical."
+The legal terrain is unsettled and varies by jurisdiction. "It's technically possible" is not the same as "it's legal," and "it's legal" is not the same as "it's ethical."
 
 ### The Current Landscape: Scraping, AI, and State Privacy Law
 
@@ -67,7 +67,7 @@ A `robots.txt` file lives at the root of a website (e.g., `https://example.com/r
 ```{python}
 import requests
 
-# Identify yourself. The next section explains why this header matters; here it is already load-bearing, because Wikipedia refuses anonymous library defaults with a 403.
+# Identify yourself. The next section explains why this header matters; Wikipedia refuses anonymous library defaults with a 403.
 HEADERS = {
     "User-Agent": "WebDataScience/1.0 (INFO 4617; your-email@colorado.edu)"
 }
@@ -175,9 +175,9 @@ Wikipedia's `robots.txt` is permissive where it matters most — the encyclopedi
 
 Reddit is the interesting case, and the shortest file. It is eight lines: a comment block, then `User-agent: *` followed by `Disallow: /`. Every crawler, every path, denied. The comments point instead to Reddit's Public Content Policy and to a separate program for researchers. Reddit spent years as one of the most openly scrapable large platforms; the blanket denial is recent, and it arrived with the AI-licensing deals described in @sec-post-api.
 
-Notice what that means for reading these files: **length is not restrictiveness**. Wikipedia's 700 lines and 460 `Disallow` rules describe a site that mostly wants to be crawled, carefully. Reddit's two rules close it completely.
+**Length is not restrictiveness.** Wikipedia's 700 lines and 460 `Disallow` rules describe a site that mostly wants to be crawled, carefully. Reddit's two rules close it completely.
 
-These differences are not arbitrary. They reflect each organization's relationship with automated access: Wikipedia encourages it as part of its mission, Reddit tolerates it within limits, and the Times treats its content as proprietary. Reading `robots.txt` before you scrape tells you not just what is permitted but what kind of organization you are dealing with.
+These differences reflect each organization's relationship with automated access: Wikipedia encourages it as part of its mission, Reddit tolerates it within limits, and the Times treats its content as proprietary. Reading `robots.txt` before you scrape tells you not just what is permitted but what kind of organization you are dealing with.
 
 ## Responsible Request Headers
 

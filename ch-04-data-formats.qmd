@@ -174,7 +174,7 @@ Why 441 rather than 435? The file includes the six non-voting delegates and resi
 
 ### From XML to DataFrame
 
-Counting party affiliations is useful, but the real power of parsing XML comes from converting it into a DataFrame for systematic analysis. The pattern is straightforward: use `find_all()` to get all records, extract the fields you need from each one, build a list of dictionaries, and pass it to `pd.DataFrame()`:
+Counting party affiliations is useful, but the larger payoff is converting the XML into a DataFrame for systematic analysis. The pattern is straightforward: use `find_all()` to get all records, extract the fields you need from each one, build a list of dictionaries, and pass it to `pd.DataFrame()`:
 
 ```{python}
 import pandas as pd
@@ -230,7 +230,7 @@ print(df.groupby("state").size().sort_values(ascending=False).head(10))
 # dtype: int64
 ```
 
-This `find_all` → extract fields → list of dictionaries → DataFrame pipeline is the fundamental pattern of this book. You will use it to parse HTML tables in @sec-static-pages, extract data from archived web pages in @sec-archives, and process PDF text in @sec-pdfs. The data source changes, the tag names change, but the pipeline stays the same. Once you internalize this pattern, every new parsing challenge becomes a question of "what tags contain the data I need?" rather than "how do I get data into a DataFrame?"
+This `find_all` → extract fields → list of dictionaries → DataFrame pipeline is the parsing half of the book's retrieve–parse–analyze loop. You will use it to parse HTML tables in @sec-static-pages, extract data from archived web pages in @sec-archives, and process PDF text in @sec-pdfs. The data source changes, the tag names change, but the pipeline stays the same. Once you internalize this pattern, every new parsing challenge becomes a question of "what tags contain the data I need?" rather than "how do I get data into a DataFrame?"
 
 The conditional checks (`if m.find("firstname") else None`) protect against missing tags — a common issue with real-world XML where not every record contains every field. Without these checks, a single missing tag would crash your entire extraction loop with an `AttributeError`.
 
