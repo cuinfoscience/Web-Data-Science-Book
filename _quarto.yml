@@ -13,10 +13,13 @@ book:
 
   # "Edit this page" and "Report an issue" links on every chapter page. The
   # edit link opens the chapter's .qmd in GitHub's web editor (forking for
-  # readers without write access); the issue link opens the issue-form chooser.
+  # readers without write access). The issue link is pointed at /new/choose
+  # explicitly: Quarto's default is /issues/new, which can land on a blank
+  # issue instead of the template chooser.
   repo-url: https://github.com/cuinfoscience/Web-Data-Science-Book
   repo-branch: main
   repo-actions: [edit, issue]
+  issue-url: https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new/choose
 
   sidebar:
     style: docked
