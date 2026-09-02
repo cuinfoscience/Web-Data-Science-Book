@@ -101,7 +101,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-8af8f98213e2c1b30ec54438e312c198.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dabb4177d918b2a71d8bf8ab8beb4a59.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -557,7 +557,7 @@ Table&nbsp;3.1: Four outcomes of an access request, sorted by intent that neithe
 <section id="an-access-matrix" class="level3" data-number="3.3.2">
 <h3 data-number="3.3.2" class="anchored" data-anchor-id="an-access-matrix"><span class="header-section-number">3.3.2</span> An Access Matrix</h3>
 <p>The first audit asks one question of each of these endpoints: <em>if I show up with no credentials, what happens?</em></p>
-<div id="ae1909e5" class="cell" data-execution_count="1">
+<div id="ccb11328" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
@@ -632,7 +632,7 @@ X (Twitter)     401   gated application/problem+json        NaN
 <p>This is not hypothetical. The first time this audit was run while drafting this chapter, GitHub’s API returned 403 — which would have been a striking finding, since GitHub documents 60 unauthenticated requests per hour for anyone. The body explained it:</p>
 <pre><code>{"message":"GitHub access to this repository is not enabled for this session..."}</code></pre>
 <p>That was the sandbox the code was running in, not GitHub. Reporting it as enclosure would have described the instrument rather than the thing measured.</p>
-<div id="ce66dac6" class="cell" data-execution_count="2">
+<div id="edd09273" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="kw">def</span> diagnose(url):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>    <span class="co">"""Show who actually answered, so a refusal can be attributed correctly."""</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>    response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">20</span>)</span>
@@ -656,7 +656,7 @@ body         '&lt;body class=theme-beta&gt;&lt;div&gt;&lt;style&gt;.theme-light,
 <section id="dead-endpoint-forensics" class="level3" data-number="3.3.4">
 <h3 data-number="3.3.4" class="anchored" data-anchor-id="dead-endpoint-forensics"><span class="header-section-number">3.3.4</span> Dead-Endpoint Forensics</h3>
 <p>The second audit turns to endpoints that are no longer supposed to work. You might expect a dead API to be simply unreachable. The three below fail in three different ways, and the way each fails says whether anything can still be recovered.</p>
-<div id="fba6a370" class="cell" data-execution_count="3">
+<div id="cfcaf76c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a>RETIRED <span class="op">=</span> {</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>    <span class="st">"Pushshift (Reddit archive)"</span>: <span class="st">"https://api.pushshift.io/reddit/search/submission/?q=test&amp;size=1"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>    <span class="st">"CrowdTangle (Meta)"</span>:         <span class="st">"https://api.crowdtangle.com/posts"</span>,</span>
@@ -705,7 +705,7 @@ Twitter API v1.1             400    rejects the request without a token
 <p><strong>Twitter v1.1 still parses your request</strong> and rejects it with error code 215, “Bad Authentication data.” The endpoint is alive and serving paying customers; you are simply not one of them. Repricing, not removal.</p>
 <p>The exact exception name in the <code>evidence</code> column depends on how you reach the network: a direct connection to a host that has vanished usually raises <code>ConnectionError</code>, while a machine behind a proxy raises <code>ProxyError</code> instead. Either way the <code>status</code> is <code>None</code>, and that is the part that matters — no HTTP conversation happened at all.</p>
 <p>For an endpoint in the second category, the only remaining evidence is archival. The Wayback Machine’s availability API reports whether the documentation was captured before it went:</p>
-<div id="a204c27f" class="cell" data-execution_count="4">
+<div id="68bf836a" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="kw">def</span> last_snapshot(url):</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>    <span class="co">"""Find the closest archived capture of a page.</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a></span>
@@ -790,40 +790,59 @@ www.crowdtangle.com      20240814023608</code></pre>
 <section id="recommended-exercises" class="level2" data-number="3.8">
 <h2 data-number="3.8" class="anchored" data-anchor-id="recommended-exercises"><span class="header-section-number">3.8</span> Recommended Exercises</h2>
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
-<p>You will run the chapter’s access audit yourself, on today’s web, and extend it to platforms you care about. Your numbers will differ from the book’s; recording that difference, with a date, is part of the assignment.</p>
+<p>The chapter audited eight platform endpoints. Your audit targets a different population: the APIs of public institutions — government agencies, scientific infrastructure, museums, libraries — which the misconceptions above describe as the counter-current to enclosure, “held open by legal mandate.” Whether that holds is the empirical question you are answering. You will reuse <code>HEADERS</code>, <code>probe()</code>, <code>diagnose()</code>, and <code>autopsy()</code> from the chapter; the endpoints are new, and none of them were demonstrated in class. Your numbers will differ from anyone else’s; recording them, with a date, is part of the assignment.</p>
+<p><strong>The anchor.</strong> Everyone probes the same first endpoint: <a href="https://openalex.org">OpenAlex</a>, the nonprofit index of scholarly works run by OurResearch — <code>https://api.openalex.org/works?per-page=1</code>. In February 2026 OpenAlex moved from free access to usage-based pricing: a small daily budget without a key, a larger one with a free key, and every response carries <code>X-RateLimit-*</code> headers that state the budget in U.S. dollars. That keyless budget is shared by everyone behind one IP address, so a whole class on one campus network can exhaust it before noon. If you get a <code>429</code> with a <code>Retry-After</code> header and a message about budget, you have not failed the step — you have measured the terms of access. Record every header whose name starts with <code>X-RateLimit</code>.</p>
+<p><strong>The menu.</strong> Choose at least two more from this list (all of them are welcome):</p>
+<ul>
+<li><strong>Federal Register</strong> (National Archives; the daily journal of the U.S. government) — <code>https://www.federalregister.gov/api/v1/documents.json?per_page=1</code></li>
+<li><strong>USGS Earthquake Catalog</strong> (U.S. Geological Survey) — <code>https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&amp;limit=1</code></li>
+<li><strong>Census ACS 5-year</strong> (U.S. Census Bureau) — <code>https://api.census.gov/data/2022/acs/acs5?get=NAME&amp;for=state:08</code></li>
+<li><strong>NASA Astronomy Picture of the Day</strong> (NASA, behind the shared <code>api.data.gov</code> gateway) — <code>https://api.nasa.gov/planetary/apod</code></li>
+<li><strong>Congress.gov</strong> (Library of Congress, behind the same gateway) — <code>https://api.congress.gov/v3/bill?limit=1</code></li>
+<li><strong>PubMed E-utilities</strong> (National Library of Medicine) — <code>https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&amp;term=scraping&amp;retmode=json</code></li>
+<li><strong>World Bank Indicators</strong> (the World Bank) — <code>https://api.worldbank.org/v2/country/US/indicator/SP.POP.TOTL?format=json</code></li>
+<li><strong>Art Institute of Chicago</strong> (a museum’s public collection API) — <code>https://api.artic.edu/api/v1/artworks?limit=1</code></li>
+</ul>
+<p>No verdicts are given for any of these. Some answer with data, some with a request for a key, and at least one answers <code>200</code> with something other than data — the <code>content-type</code> column will tell you which before the status column does.</p>
 <p><strong>Step 1 — Identify yourself.</strong> Define the <code>HEADERS</code> dictionary with your named <code>User-Agent</code>, as in <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
-<div id="4f34eb6c" class="cell" data-execution_count="5">
+<div id="89d190c5" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># Step 1: Define HEADERS with your named User-Agent.</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Step 2 — Probe one endpoint by hand.</strong> Request the Wikipedia endpoint from the chapter’s <code>TARGETS</code> with a 20-second timeout. Print the status code and the <code>content-type</code> header. Do not build the loop yet — make one request and look at it.</p>
-<div id="9285dc41" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Step 2: Request one endpoint and print its status and content-type.</span></span>
+<p><strong>Step 2 — Probe the anchor by hand.</strong> Request the OpenAlex endpoint with a 20-second timeout. Print the status code, the <code>content-type</code> header, and every response header whose name starts with <code>X-RateLimit</code>. Do not build the loop yet — make one request and look at it. In a comment, say what those headers tell you about the terms of access, and whether you received data or a budget.</p>
+<div id="102e33db" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Step 2: Request the OpenAlex endpoint; print status, content-type, and every X-RateLimit header.</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Step 3 — Build the access matrix.</strong> Write the <code>probe()</code> function from the chapter (or your own version) and run it over all eight <code>TARGETS</code>, collecting rows into a DataFrame. Remember the <code>Int64</code> dtype for the status column, and record today’s date in a comment.</p>
-<div id="d871a5b5" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Step 3: Probe all eight endpoints and collect the results into a DataFrame.</span></span>
+<p><strong>Step 3 — Build the institutional matrix.</strong> Define an <code>INSTITUTIONS</code> dictionary holding the anchor plus at least two endpoints from the menu, then run the chapter’s <code>probe()</code> (or your own version) over it and collect the rows into a DataFrame. Remember the <code>Int64</code> dtype for the status column, and record today’s date in a comment.</p>
+<div id="7525e3ef" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Step 3: Define INSTITUTIONS (anchor + at least two from the menu) and probe them into a DataFrame.</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co"># Record today's date -- your table is a snapshot, not a fact.</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Step 4 — Extend it.</strong> Add two endpoints of your own, for platforms you might actually study, and re-run the matrix with ten rows. Classify each new row as open, gated, or closed.</p>
-<div id="4816e88b" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 4: Add two endpoints you care about and rebuild the matrix.</span></span>
+<p><strong>Step 4 — Extend it.</strong> Add two endpoints of your own for public institutions that are not on the menu — a city’s open-data portal, your state legislature, a university library, an international agency — and rebuild the matrix. Classify each new row as open, gated, or closed.</p>
+<div id="9c225aa2" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 4: Add two institutional endpoints of your own and rebuild the matrix.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Step 5 — Attribute a refusal.</strong> Pick one endpoint that returned a non-200 and diagnose it: print the <code>server</code> and <code>via</code> headers and the first 120 characters of the body. State in a comment whether the refusal came from the platform or from something between you and it.</p>
-<div id="f0233188" class="cell" data-execution_count="9">
+<p><strong>Step 5 — Attribute a refusal.</strong> Pick one endpoint that did not return <code>200</code> with data — a <code>403</code>, a <code>429</code>, or a <code>200</code> whose <code>content-type</code> is <code>text/html</code> — and diagnose it: print the <code>server</code> and <code>via</code> headers and the first 120 characters of the body. State in a comment whether the refusal came from the institution itself, from a gateway in front of it (several federal APIs share one), or from something between you and it.</p>
+<div id="ec42a419" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 5: Diagnose one refusal -- server header, via header, body excerpt -- and attribute it in a comment.</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Step 6 — Autopsy a retired endpoint.</strong> Run the chapter’s <code>autopsy()</code> against one of the three retired endpoints and classify how it refuses: gone, gated, or repriced.</p>
-<div id="7f6fdb4f" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 6: Autopsy one retired endpoint and classify the manner of refusal.</span></span>
+<p><strong>Step 6 — Autopsy a retired institutional endpoint.</strong> Run the chapter’s <code>autopsy()</code> against one of these three, and classify how it refuses: gone, gated, or repriced.</p>
+<ul>
+<li><strong>Sunlight Foundation Congress API</strong> — <code>https://congress.api.sunlightfoundation.com/bills?per_page=1</code>. The civic-tech nonprofit closed Sunlight Labs in 2016; the API was shut down on October 1, 2017.</li>
+<li><strong>ProPublica Congress API</strong> — <code>https://api.propublica.org/congress/v1/118/senate/members.json</code>. ProPublica took over Sunlight’s Congress API in 2016 and ran its own for eight years, then closed it on July 10, 2024.</li>
+<li><strong>OpenSecrets API</strong> — <code>https://www.opensecrets.org/api/?method=getLegislators&amp;id=CO&amp;output=json</code>. The money-in-politics nonprofit discontinued its API on April 15, 2025, directing users to bulk downloads instead.</li>
+</ul>
+<p>None of these three fails the way the chapter’s three did. Say which of the chapter’s categories fits, or whether you need a new one.</p>
+<div id="0ad17b95" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 6: Autopsy one retired institutional endpoint and classify the manner of refusal.</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Step 7 — Interpret.</strong> In four to six sentences: Where did your matrix differ from the book’s, and what changed in between? Which of your two added platforms is more exposed to enclosure, and what evidence from the probe supports that? For the endpoint you autopsied, is there anyone left to negotiate with?</p>
-<div id="e033a5c8" class="cell" data-execution_count="11">
+<p><strong>Step 7 — Interpret.</strong> In four to six sentences: Does “held open by legal mandate” describe the institutions you probed, or only some of them? Which of your rows was a refusal wearing a success code, and how did you tell? For the endpoint you autopsied, is there anyone left to negotiate with — and where did its data go: a successor, a bulk download, or nowhere?</p>
+<div id="a6d5c4fe" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -846,6 +865,8 @@ www.crowdtangle.com      20240814023608</code></pre>
 <li><strong>Every endpoint returns 403, including ones this chapter lists as open</strong>: Something between you and the web is intercepting requests — a corporate proxy, a VPN, a locked-down campus network, or a cloud sandbox. Run <code>diagnose()</code> and read the <code>server</code> header and the body. If the refusal names your own network, the finding is about your network.</li>
 <li><strong>An endpoint works in your browser but returns 403 in Python</strong>: The site is treating your script differently from a browser. Check that you sent the <code>User-Agent</code> header; some hosts refuse library defaults outright. Note that this is exactly what Reddit does, and it is a finding rather than a bug.</li>
 <li><strong><code>archive.org</code> returns 429</strong>: The Wayback Machine rate-limits by IP, and campus and cloud addresses are shared by many users. Wait several minutes and retry. Do not add threads to make it go faster — that makes it worse.</li>
+<li><strong>OpenAlex returns 429 with “Insufficient budget”</strong>: The keyless daily budget is tiny and shared by everyone behind your IP address, so a classroom exhausts it quickly. Record the <code>X-RateLimit</code> headers — they are the measurement — and stop requesting; the budget resets at midnight UTC, and a free API key raises it. Do not retry in a loop.</li>
+<li><strong>An endpoint returns 200 but the content-type is <code>text/html</code></strong>: You received a web page, not data — often a “missing key” notice served with a success code. Print the first 120 characters of the body. A 200 tells you the server answered; the content-type tells you whether it answered your question.</li>
 <li><strong><code>autopsy()</code> hangs instead of failing</strong>: A host that has been shut down may drop packets rather than refuse the connection, so the request waits for the full timeout. That is why every request here passes <code>timeout=</code>. Without it, a dead host stops your notebook indefinitely.</li>
 <li><strong><code>access["status"].astype("Int64")</code> raises</strong>: Use the capital-I <code>Int64</code> dtype, not <code>int64</code>. Only the capital form holds missing values, and <code>status</code> is <code>None</code> for any endpoint that never answered.</li>
 <li><strong>Your table disagrees with the one printed above</strong>: Expected, and worth writing down. Access changes; that is the chapter’s argument. Record the date alongside the result so the observation stays interpretable later.</li>
@@ -1782,104 +1803,127 @@ Perriam, Jessamy, Andreas Birkbak, and Andy Freeman. 2020. <span>“Digital Meth
 <span id="cb17-415"><a href="#cb17-415" aria-label="407"></a></span>
 <span id="cb17-416"><a href="#cb17-416" aria-label="408"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
 <span id="cb17-417"><a href="#cb17-417" aria-label="409"></a></span>
-<span id="cb17-418"><a href="#cb17-418" aria-label="410"></a>You will run the chapter's access audit yourself, on today's web, and extend it to platforms you care about. Your numbers will differ from the book's; recording that difference, with a date, is part of the assignment.</span>
+<span id="cb17-418"><a href="#cb17-418" aria-label="410"></a>The chapter audited eight platform endpoints. Your audit targets a different population: the APIs of public institutions — government agencies, scientific infrastructure, museums, libraries — which the misconceptions above describe as the counter-current to enclosure, "held open by legal mandate." Whether that holds is the empirical question you are answering. You will reuse <span class="in">`HEADERS`</span>, <span class="in">`probe()`</span>, <span class="in">`diagnose()`</span>, and <span class="in">`autopsy()`</span> from the chapter; the endpoints are new, and none of them were demonstrated in class. Your numbers will differ from anyone else's; recording them, with a date, is part of the assignment.</span>
 <span id="cb17-419"><a href="#cb17-419" aria-label="411"></a></span>
-<span id="cb17-420"><a href="#cb17-420" aria-label="412"></a>**Step 1 — Identify yourself.** Define the <span class="in">`HEADERS`</span> dictionary with your named <span class="in">`User-Agent`</span>, as in @sec-ethics.</span>
+<span id="cb17-420"><a href="#cb17-420" aria-label="412"></a>**The anchor.** Everyone probes the same first endpoint: <span class="co">[</span><span class="ot">OpenAlex</span><span class="co">](https://openalex.org)</span>, the nonprofit index of scholarly works run by OurResearch — <span class="in">`https://api.openalex.org/works?per-page=1`</span>. In February 2026 OpenAlex moved from free access to usage-based pricing: a small daily budget without a key, a larger one with a free key, and every response carries <span class="in">`X-RateLimit-*`</span> headers that state the budget in U.S. dollars. That keyless budget is shared by everyone behind one IP address, so a whole class on one campus network can exhaust it before noon. If you get a <span class="in">`429`</span> with a <span class="in">`Retry-After`</span> header and a message about budget, you have not failed the step — you have measured the terms of access. Record every header whose name starts with <span class="in">`X-RateLimit`</span>.</span>
 <span id="cb17-421"><a href="#cb17-421" aria-label="413"></a></span>
-<span id="cb17-424"><a href="#cb17-424" aria-label="414"></a><span class="in">```{python}</span></span>
-<span id="cb17-425"><a href="#cb17-425" aria-label="415"></a><span class="co"># Step 1: Define HEADERS with your named User-Agent.</span></span>
-<span id="cb17-426"><a href="#cb17-426" aria-label="416"></a><span class="co"># Your code here</span></span>
-<span id="cb17-427"><a href="#cb17-427" aria-label="417"></a><span class="in">```</span></span>
-<span id="cb17-428"><a href="#cb17-428" aria-label="418"></a></span>
-<span id="cb17-429"><a href="#cb17-429" aria-label="419"></a>**Step 2 — Probe one endpoint by hand.** Request the Wikipedia endpoint from the chapter's <span class="in">`TARGETS`</span> with a 20-second timeout. Print the status code and the <span class="in">`content-type`</span> header. Do not build the loop yet — make one request and look at it.</span>
-<span id="cb17-430"><a href="#cb17-430" aria-label="420"></a></span>
-<span id="cb17-433"><a href="#cb17-433" aria-label="421"></a><span class="in">```{python}</span></span>
-<span id="cb17-434"><a href="#cb17-434" aria-label="422"></a><span class="co"># Step 2: Request one endpoint and print its status and content-type.</span></span>
-<span id="cb17-435"><a href="#cb17-435" aria-label="423"></a><span class="co"># Your code here</span></span>
-<span id="cb17-436"><a href="#cb17-436" aria-label="424"></a><span class="in">```</span></span>
-<span id="cb17-437"><a href="#cb17-437" aria-label="425"></a></span>
-<span id="cb17-438"><a href="#cb17-438" aria-label="426"></a>**Step 3 — Build the access matrix.** Write the <span class="in">`probe()`</span> function from the chapter (or your own version) and run it over all eight <span class="in">`TARGETS`</span>, collecting rows into a DataFrame. Remember the <span class="in">`Int64`</span> dtype for the status column, and record today's date in a comment.</span>
-<span id="cb17-439"><a href="#cb17-439" aria-label="427"></a></span>
-<span id="cb17-442"><a href="#cb17-442" aria-label="428"></a><span class="in">```{python}</span></span>
-<span id="cb17-443"><a href="#cb17-443" aria-label="429"></a><span class="co"># Step 3: Probe all eight endpoints and collect the results into a DataFrame.</span></span>
-<span id="cb17-444"><a href="#cb17-444" aria-label="430"></a><span class="co"># Record today's date -- your table is a snapshot, not a fact.</span></span>
-<span id="cb17-445"><a href="#cb17-445" aria-label="431"></a><span class="co"># Your code here</span></span>
-<span id="cb17-446"><a href="#cb17-446" aria-label="432"></a><span class="in">```</span></span>
-<span id="cb17-447"><a href="#cb17-447" aria-label="433"></a></span>
-<span id="cb17-448"><a href="#cb17-448" aria-label="434"></a>**Step 4 — Extend it.** Add two endpoints of your own, for platforms you might actually study, and re-run the matrix with ten rows. Classify each new row as open, gated, or closed.</span>
-<span id="cb17-449"><a href="#cb17-449" aria-label="435"></a></span>
-<span id="cb17-452"><a href="#cb17-452" aria-label="436"></a><span class="in">```{python}</span></span>
-<span id="cb17-453"><a href="#cb17-453" aria-label="437"></a><span class="co"># Step 4: Add two endpoints you care about and rebuild the matrix.</span></span>
-<span id="cb17-454"><a href="#cb17-454" aria-label="438"></a><span class="co"># Your code here</span></span>
-<span id="cb17-455"><a href="#cb17-455" aria-label="439"></a><span class="in">```</span></span>
-<span id="cb17-456"><a href="#cb17-456" aria-label="440"></a></span>
-<span id="cb17-457"><a href="#cb17-457" aria-label="441"></a>**Step 5 — Attribute a refusal.** Pick one endpoint that returned a non-200 and diagnose it: print the <span class="in">`server`</span> and <span class="in">`via`</span> headers and the first 120 characters of the body. State in a comment whether the refusal came from the platform or from something between you and it.</span>
-<span id="cb17-458"><a href="#cb17-458" aria-label="442"></a></span>
-<span id="cb17-461"><a href="#cb17-461" aria-label="443"></a><span class="in">```{python}</span></span>
-<span id="cb17-462"><a href="#cb17-462" aria-label="444"></a><span class="co"># Step 5: Diagnose one refusal -- server header, via header, body excerpt -- and attribute it in a comment.</span></span>
-<span id="cb17-463"><a href="#cb17-463" aria-label="445"></a><span class="co"># Your code here</span></span>
-<span id="cb17-464"><a href="#cb17-464" aria-label="446"></a><span class="in">```</span></span>
-<span id="cb17-465"><a href="#cb17-465" aria-label="447"></a></span>
-<span id="cb17-466"><a href="#cb17-466" aria-label="448"></a>**Step 6 — Autopsy a retired endpoint.** Run the chapter's <span class="in">`autopsy()`</span> against one of the three retired endpoints and classify how it refuses: gone, gated, or repriced.</span>
-<span id="cb17-467"><a href="#cb17-467" aria-label="449"></a></span>
-<span id="cb17-470"><a href="#cb17-470" aria-label="450"></a><span class="in">```{python}</span></span>
-<span id="cb17-471"><a href="#cb17-471" aria-label="451"></a><span class="co"># Step 6: Autopsy one retired endpoint and classify the manner of refusal.</span></span>
-<span id="cb17-472"><a href="#cb17-472" aria-label="452"></a><span class="co"># Your code here</span></span>
-<span id="cb17-473"><a href="#cb17-473" aria-label="453"></a><span class="in">```</span></span>
-<span id="cb17-474"><a href="#cb17-474" aria-label="454"></a></span>
-<span id="cb17-475"><a href="#cb17-475" aria-label="455"></a>**Step 7 — Interpret.** In four to six sentences: Where did your matrix differ from the book's, and what changed in between? Which of your two added platforms is more exposed to enclosure, and what evidence from the probe supports that? For the endpoint you autopsied, is there anyone left to negotiate with?</span>
-<span id="cb17-476"><a href="#cb17-476" aria-label="456"></a></span>
-<span id="cb17-479"><a href="#cb17-479" aria-label="457"></a><span class="in">```{python}</span></span>
-<span id="cb17-480"><a href="#cb17-480" aria-label="458"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span>
-<span id="cb17-481"><a href="#cb17-481" aria-label="459"></a><span class="in">```</span></span>
-<span id="cb17-482"><a href="#cb17-482" aria-label="460"></a></span>
-<span id="cb17-483"><a href="#cb17-483" aria-label="461"></a><span class="fu">## Additional Exercises</span></span>
-<span id="cb17-484"><a href="#cb17-484" aria-label="462"></a></span>
-<span id="cb17-485"><a href="#cb17-485" aria-label="463"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
-<span id="cb17-486"><a href="#cb17-486" aria-label="464"></a></span>
-<span id="cb17-487"><a href="#cb17-487" aria-label="465"></a><span class="ss">1. </span>**Extend the autopsy.** Find two more retired or restricted endpoints not covered here and classify each with <span class="in">`autopsy()`</span>. For each, say whether it is gone, gated, or repriced, and what that implies for a researcher who needs its data: is there anyone to ask, and if so, who?</span>
-<span id="cb17-488"><a href="#cb17-488" aria-label="466"></a></span>
-<span id="cb17-489"><a href="#cb17-489" aria-label="467"></a><span class="ss">2. </span>**Timeline exercise.** Create a timeline of major API access changes from 2008 to the present. Include at least five events across at least three platforms. For each event, identify which of the three pressures (enclosure, exemption, erosion) best characterizes it.</span>
-<span id="cb17-490"><a href="#cb17-490" aria-label="468"></a></span>
-<span id="cb17-491"><a href="#cb17-491" aria-label="469"></a><span class="ss">3. </span>**Framework application.** Choose a platform API change not discussed in this chapter. Write a 500-word analysis applying the enclosure/exemption/erosion framework.</span>
-<span id="cb17-492"><a href="#cb17-492" aria-label="470"></a></span>
-<span id="cb17-493"><a href="#cb17-493" aria-label="471"></a><span class="ss">4. </span>**Data contingency plan.** Design a research project that depends on a specific web data source. Then write a contingency plan: if your primary source disappears mid-study, what are your backup strategies? Consider at least three alternatives.</span>
-<span id="cb17-494"><a href="#cb17-494" aria-label="472"></a></span>
-<span id="cb17-495"><a href="#cb17-495" aria-label="473"></a><span class="ss">5. </span>**Public interest audit.** Identify a web data research project (published paper, journalism investigation, or civic tech tool) that was enabled by API access. Assess how the project would be affected by current access restrictions. Which of the three values — openness, oversight, or ownership — does the project embody?</span>
-<span id="cb17-496"><a href="#cb17-496" aria-label="474"></a></span>
-<span id="cb17-497"><a href="#cb17-497" aria-label="475"></a><span class="ss">6. </span>**Negotiate the gate.** With a partner, run an access negotiation: one of you represents a research team, the other a platform. Privately decide your own hidden intent (public-interest or extractive), then negotiate a data-access agreement — which records, which fields, how much history, at what rate, under what restrictions. Afterward, reveal intents and place the outcome in @tbl-access-quadrants (cooperation, refusal, resistance, or extraction). Debrief in writing: What did the researchers originally ask for? What did the platform actually agree to provide? Which restriction was hardest to negotiate, and what did each side trade away? Could another team reproduce research conducted under your agreement?</span>
-<span id="cb17-498"><a href="#cb17-498" aria-label="476"></a></span>
-<span id="cb17-499"><a href="#cb17-499" aria-label="477"></a><span class="ss">7. </span>**Graduate extension (INFO 5617).** Read @davidson2023platform and @perriam2020digital. Choose one platform and write a two-to-three page "state of research access" brief: what data researchers could obtain five years ago, what is available today and on what terms (cost, eligibility, restrictions), what official research-access programs exist, and which of this chapter's three pressures best explains the trajectory. Close with a concrete recommendation for a researcher starting a study of that platform this year.</span>
-<span id="cb17-500"><a href="#cb17-500" aria-label="478"></a></span>
-<span id="cb17-501"><a href="#cb17-501" aria-label="479"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb17-502"><a href="#cb17-502" aria-label="480"></a></span>
-<span id="cb17-503"><a href="#cb17-503" aria-label="481"></a><span class="ss">- </span>**Every endpoint returns 403, including ones this chapter lists as open**: Something between you and the web is intercepting requests — a corporate proxy, a VPN, a locked-down campus network, or a cloud sandbox. Run <span class="in">`diagnose()`</span> and read the <span class="in">`server`</span> header and the body. If the refusal names your own network, the finding is about your network.</span>
-<span id="cb17-504"><a href="#cb17-504" aria-label="482"></a><span class="ss">- </span>**An endpoint works in your browser but returns 403 in Python**: The site is treating your script differently from a browser. Check that you sent the <span class="in">`User-Agent`</span> header; some hosts refuse library defaults outright. Note that this is exactly what Reddit does, and it is a finding rather than a bug.</span>
-<span id="cb17-505"><a href="#cb17-505" aria-label="483"></a><span class="ss">- </span>**`archive.org` returns 429**: The Wayback Machine rate-limits by IP, and campus and cloud addresses are shared by many users. Wait several minutes and retry. Do not add threads to make it go faster — that makes it worse.</span>
-<span id="cb17-506"><a href="#cb17-506" aria-label="484"></a><span class="ss">- </span>**`autopsy()` hangs instead of failing**: A host that has been shut down may drop packets rather than refuse the connection, so the request waits for the full timeout. That is why every request here passes <span class="in">`timeout=`</span>. Without it, a dead host stops your notebook indefinitely.</span>
-<span id="cb17-507"><a href="#cb17-507" aria-label="485"></a><span class="ss">- </span>**`access["status"].astype("Int64")` raises**: Use the capital-I <span class="in">`Int64`</span> dtype, not <span class="in">`int64`</span>. Only the capital form holds missing values, and <span class="in">`status`</span> is <span class="in">`None`</span> for any endpoint that never answered.</span>
-<span id="cb17-508"><a href="#cb17-508" aria-label="486"></a><span class="ss">- </span>**Your table disagrees with the one printed above**: Expected, and worth writing down. Access changes; that is the chapter's argument. Record the date alongside the result so the observation stays interpretable later.</span>
+<span id="cb17-422"><a href="#cb17-422" aria-label="414"></a>**The menu.** Choose at least two more from this list (all of them are welcome):</span>
+<span id="cb17-423"><a href="#cb17-423" aria-label="415"></a></span>
+<span id="cb17-424"><a href="#cb17-424" aria-label="416"></a><span class="ss">- </span>**Federal Register** (National Archives; the daily journal of the U.S. government) — <span class="in">`https://www.federalregister.gov/api/v1/documents.json?per_page=1`</span></span>
+<span id="cb17-425"><a href="#cb17-425" aria-label="417"></a><span class="ss">- </span>**USGS Earthquake Catalog** (U.S. Geological Survey) — <span class="in">`https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&amp;limit=1`</span></span>
+<span id="cb17-426"><a href="#cb17-426" aria-label="418"></a><span class="ss">- </span>**Census ACS 5-year** (U.S. Census Bureau) — <span class="in">`https://api.census.gov/data/2022/acs/acs5?get=NAME&amp;for=state:08`</span></span>
+<span id="cb17-427"><a href="#cb17-427" aria-label="419"></a><span class="ss">- </span>**NASA Astronomy Picture of the Day** (NASA, behind the shared <span class="in">`api.data.gov`</span> gateway) — <span class="in">`https://api.nasa.gov/planetary/apod`</span></span>
+<span id="cb17-428"><a href="#cb17-428" aria-label="420"></a><span class="ss">- </span>**Congress.gov** (Library of Congress, behind the same gateway) — <span class="in">`https://api.congress.gov/v3/bill?limit=1`</span></span>
+<span id="cb17-429"><a href="#cb17-429" aria-label="421"></a><span class="ss">- </span>**PubMed E-utilities** (National Library of Medicine) — <span class="in">`https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&amp;term=scraping&amp;retmode=json`</span></span>
+<span id="cb17-430"><a href="#cb17-430" aria-label="422"></a><span class="ss">- </span>**World Bank Indicators** (the World Bank) — <span class="in">`https://api.worldbank.org/v2/country/US/indicator/SP.POP.TOTL?format=json`</span></span>
+<span id="cb17-431"><a href="#cb17-431" aria-label="423"></a><span class="ss">- </span>**Art Institute of Chicago** (a museum's public collection API) — <span class="in">`https://api.artic.edu/api/v1/artworks?limit=1`</span></span>
+<span id="cb17-432"><a href="#cb17-432" aria-label="424"></a></span>
+<span id="cb17-433"><a href="#cb17-433" aria-label="425"></a>No verdicts are given for any of these. Some answer with data, some with a request for a key, and at least one answers <span class="in">`200`</span> with something other than data — the <span class="in">`content-type`</span> column will tell you which before the status column does.</span>
+<span id="cb17-434"><a href="#cb17-434" aria-label="426"></a></span>
+<span id="cb17-435"><a href="#cb17-435" aria-label="427"></a>**Step 1 — Identify yourself.** Define the <span class="in">`HEADERS`</span> dictionary with your named <span class="in">`User-Agent`</span>, as in @sec-ethics.</span>
+<span id="cb17-436"><a href="#cb17-436" aria-label="428"></a></span>
+<span id="cb17-439"><a href="#cb17-439" aria-label="429"></a><span class="in">```{python}</span></span>
+<span id="cb17-440"><a href="#cb17-440" aria-label="430"></a><span class="co"># Step 1: Define HEADERS with your named User-Agent.</span></span>
+<span id="cb17-441"><a href="#cb17-441" aria-label="431"></a><span class="co"># Your code here</span></span>
+<span id="cb17-442"><a href="#cb17-442" aria-label="432"></a><span class="in">```</span></span>
+<span id="cb17-443"><a href="#cb17-443" aria-label="433"></a></span>
+<span id="cb17-444"><a href="#cb17-444" aria-label="434"></a>**Step 2 — Probe the anchor by hand.** Request the OpenAlex endpoint with a 20-second timeout. Print the status code, the <span class="in">`content-type`</span> header, and every response header whose name starts with <span class="in">`X-RateLimit`</span>. Do not build the loop yet — make one request and look at it. In a comment, say what those headers tell you about the terms of access, and whether you received data or a budget.</span>
+<span id="cb17-445"><a href="#cb17-445" aria-label="435"></a></span>
+<span id="cb17-448"><a href="#cb17-448" aria-label="436"></a><span class="in">```{python}</span></span>
+<span id="cb17-449"><a href="#cb17-449" aria-label="437"></a><span class="co"># Step 2: Request the OpenAlex endpoint; print status, content-type, and every X-RateLimit header.</span></span>
+<span id="cb17-450"><a href="#cb17-450" aria-label="438"></a><span class="co"># Your code here</span></span>
+<span id="cb17-451"><a href="#cb17-451" aria-label="439"></a><span class="in">```</span></span>
+<span id="cb17-452"><a href="#cb17-452" aria-label="440"></a></span>
+<span id="cb17-453"><a href="#cb17-453" aria-label="441"></a>**Step 3 — Build the institutional matrix.** Define an <span class="in">`INSTITUTIONS`</span> dictionary holding the anchor plus at least two endpoints from the menu, then run the chapter's <span class="in">`probe()`</span> (or your own version) over it and collect the rows into a DataFrame. Remember the <span class="in">`Int64`</span> dtype for the status column, and record today's date in a comment.</span>
+<span id="cb17-454"><a href="#cb17-454" aria-label="442"></a></span>
+<span id="cb17-457"><a href="#cb17-457" aria-label="443"></a><span class="in">```{python}</span></span>
+<span id="cb17-458"><a href="#cb17-458" aria-label="444"></a><span class="co"># Step 3: Define INSTITUTIONS (anchor + at least two from the menu) and probe them into a DataFrame.</span></span>
+<span id="cb17-459"><a href="#cb17-459" aria-label="445"></a><span class="co"># Record today's date -- your table is a snapshot, not a fact.</span></span>
+<span id="cb17-460"><a href="#cb17-460" aria-label="446"></a><span class="co"># Your code here</span></span>
+<span id="cb17-461"><a href="#cb17-461" aria-label="447"></a><span class="in">```</span></span>
+<span id="cb17-462"><a href="#cb17-462" aria-label="448"></a></span>
+<span id="cb17-463"><a href="#cb17-463" aria-label="449"></a>**Step 4 — Extend it.** Add two endpoints of your own for public institutions that are not on the menu — a city's open-data portal, your state legislature, a university library, an international agency — and rebuild the matrix. Classify each new row as open, gated, or closed.</span>
+<span id="cb17-464"><a href="#cb17-464" aria-label="450"></a></span>
+<span id="cb17-467"><a href="#cb17-467" aria-label="451"></a><span class="in">```{python}</span></span>
+<span id="cb17-468"><a href="#cb17-468" aria-label="452"></a><span class="co"># Step 4: Add two institutional endpoints of your own and rebuild the matrix.</span></span>
+<span id="cb17-469"><a href="#cb17-469" aria-label="453"></a><span class="co"># Your code here</span></span>
+<span id="cb17-470"><a href="#cb17-470" aria-label="454"></a><span class="in">```</span></span>
+<span id="cb17-471"><a href="#cb17-471" aria-label="455"></a></span>
+<span id="cb17-472"><a href="#cb17-472" aria-label="456"></a>**Step 5 — Attribute a refusal.** Pick one endpoint that did not return <span class="in">`200`</span> with data — a <span class="in">`403`</span>, a <span class="in">`429`</span>, or a <span class="in">`200`</span> whose <span class="in">`content-type`</span> is <span class="in">`text/html`</span> — and diagnose it: print the <span class="in">`server`</span> and <span class="in">`via`</span> headers and the first 120 characters of the body. State in a comment whether the refusal came from the institution itself, from a gateway in front of it (several federal APIs share one), or from something between you and it.</span>
+<span id="cb17-473"><a href="#cb17-473" aria-label="457"></a></span>
+<span id="cb17-476"><a href="#cb17-476" aria-label="458"></a><span class="in">```{python}</span></span>
+<span id="cb17-477"><a href="#cb17-477" aria-label="459"></a><span class="co"># Step 5: Diagnose one refusal -- server header, via header, body excerpt -- and attribute it in a comment.</span></span>
+<span id="cb17-478"><a href="#cb17-478" aria-label="460"></a><span class="co"># Your code here</span></span>
+<span id="cb17-479"><a href="#cb17-479" aria-label="461"></a><span class="in">```</span></span>
+<span id="cb17-480"><a href="#cb17-480" aria-label="462"></a></span>
+<span id="cb17-481"><a href="#cb17-481" aria-label="463"></a>**Step 6 — Autopsy a retired institutional endpoint.** Run the chapter's <span class="in">`autopsy()`</span> against one of these three, and classify how it refuses: gone, gated, or repriced.</span>
+<span id="cb17-482"><a href="#cb17-482" aria-label="464"></a></span>
+<span id="cb17-483"><a href="#cb17-483" aria-label="465"></a><span class="ss">- </span>**Sunlight Foundation Congress API** — <span class="in">`https://congress.api.sunlightfoundation.com/bills?per_page=1`</span>. The civic-tech nonprofit closed Sunlight Labs in 2016; the API was shut down on October 1, 2017.</span>
+<span id="cb17-484"><a href="#cb17-484" aria-label="466"></a><span class="ss">- </span>**ProPublica Congress API** — <span class="in">`https://api.propublica.org/congress/v1/118/senate/members.json`</span>. ProPublica took over Sunlight's Congress API in 2016 and ran its own for eight years, then closed it on July 10, 2024.</span>
+<span id="cb17-485"><a href="#cb17-485" aria-label="467"></a><span class="ss">- </span>**OpenSecrets API** — <span class="in">`https://www.opensecrets.org/api/?method=getLegislators&amp;id=CO&amp;output=json`</span>. The money-in-politics nonprofit discontinued its API on April 15, 2025, directing users to bulk downloads instead.</span>
+<span id="cb17-486"><a href="#cb17-486" aria-label="468"></a></span>
+<span id="cb17-487"><a href="#cb17-487" aria-label="469"></a>None of these three fails the way the chapter's three did. Say which of the chapter's categories fits, or whether you need a new one.</span>
+<span id="cb17-488"><a href="#cb17-488" aria-label="470"></a></span>
+<span id="cb17-491"><a href="#cb17-491" aria-label="471"></a><span class="in">```{python}</span></span>
+<span id="cb17-492"><a href="#cb17-492" aria-label="472"></a><span class="co"># Step 6: Autopsy one retired institutional endpoint and classify the manner of refusal.</span></span>
+<span id="cb17-493"><a href="#cb17-493" aria-label="473"></a><span class="co"># Your code here</span></span>
+<span id="cb17-494"><a href="#cb17-494" aria-label="474"></a><span class="in">```</span></span>
+<span id="cb17-495"><a href="#cb17-495" aria-label="475"></a></span>
+<span id="cb17-496"><a href="#cb17-496" aria-label="476"></a>**Step 7 — Interpret.** In four to six sentences: Does "held open by legal mandate" describe the institutions you probed, or only some of them? Which of your rows was a refusal wearing a success code, and how did you tell? For the endpoint you autopsied, is there anyone left to negotiate with — and where did its data go: a successor, a bulk download, or nowhere?</span>
+<span id="cb17-497"><a href="#cb17-497" aria-label="477"></a></span>
+<span id="cb17-500"><a href="#cb17-500" aria-label="478"></a><span class="in">```{python}</span></span>
+<span id="cb17-501"><a href="#cb17-501" aria-label="479"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb17-502"><a href="#cb17-502" aria-label="480"></a><span class="in">```</span></span>
+<span id="cb17-503"><a href="#cb17-503" aria-label="481"></a></span>
+<span id="cb17-504"><a href="#cb17-504" aria-label="482"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb17-505"><a href="#cb17-505" aria-label="483"></a></span>
+<span id="cb17-506"><a href="#cb17-506" aria-label="484"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
+<span id="cb17-507"><a href="#cb17-507" aria-label="485"></a></span>
+<span id="cb17-508"><a href="#cb17-508" aria-label="486"></a><span class="ss">1. </span>**Extend the autopsy.** Find two more retired or restricted endpoints not covered here and classify each with <span class="in">`autopsy()`</span>. For each, say whether it is gone, gated, or repriced, and what that implies for a researcher who needs its data: is there anyone to ask, and if so, who?</span>
 <span id="cb17-509"><a href="#cb17-509" aria-label="487"></a></span>
-<span id="cb17-510"><a href="#cb17-510" aria-label="488"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb17-510"><a href="#cb17-510" aria-label="488"></a><span class="ss">2. </span>**Timeline exercise.** Create a timeline of major API access changes from 2008 to the present. Include at least five events across at least three platforms. For each event, identify which of the three pressures (enclosure, exemption, erosion) best characterizes it.</span>
 <span id="cb17-511"><a href="#cb17-511" aria-label="489"></a></span>
-<span id="cb17-512"><a href="#cb17-512" aria-label="490"></a>The core argument of this chapter is that understanding *why* access is shrinking — not just *that* it is — equips you to navigate the constraints strategically rather than being surprised by them.</span>
+<span id="cb17-512"><a href="#cb17-512" aria-label="490"></a><span class="ss">3. </span>**Framework application.** Choose a platform API change not discussed in this chapter. Write a 500-word analysis applying the enclosure/exemption/erosion framework.</span>
 <span id="cb17-513"><a href="#cb17-513" aria-label="491"></a></span>
-<span id="cb17-514"><a href="#cb17-514" aria-label="492"></a><span class="ss">- </span>The open-API era (roughly 2008–2018) was a strategic bargain, not a natural state: platforms traded data access for ecosystems, and computational social science was built on the trade.</span>
-<span id="cb17-515"><a href="#cb17-515" aria-label="493"></a><span class="ss">- </span>**Enclosure** converts collectively produced data into privately controlled assets — API shutdowns, repricing, archive removals, and AI-training licensing deals are its mechanisms.</span>
-<span id="cb17-516"><a href="#cb17-516" aria-label="494"></a><span class="ss">- </span>**Exemption** is the asymmetry of scrutiny: platforms study their users freely while deploying legal and technical tools against independent researchers who study the platforms.</span>
-<span id="cb17-517"><a href="#cb17-517" aria-label="495"></a><span class="ss">- </span>**Erosion** is infrastructural decay — link rot, platform churn, and disappearing datasets — and it makes reproducibility a design problem you must solve at collection time.</span>
-<span id="cb17-518"><a href="#cb17-518" aria-label="496"></a><span class="ss">- </span>**Openness, oversight, and ownership** are the counter-values: document and deposit so your work resists enclosure, insist on inspectability, and prefer community-governed infrastructure.</span>
-<span id="cb17-519"><a href="#cb17-519" aria-label="497"></a><span class="ss">- </span>The practical response is redundancy: master multiple access techniques (documents, archives, APIs, automation) so no single closure ends your research program.</span>
-<span id="cb17-520"><a href="#cb17-520" aria-label="498"></a><span class="ss">- </span>Access is measurable, not just arguable. An unauthenticated probe tells you where a platform sits on the open-to-closed gradient today, and *how* a retired endpoint refuses — gone, gated, or repriced — tells you whether anyone is left to negotiate with.</span>
-<span id="cb17-521"><a href="#cb17-521" aria-label="499"></a><span class="ss">- </span>Attribute refusals carefully. A 403 can come from the platform, from your network, or from something in between, and the <span class="in">`server`</span> header and response body usually say which. A measurement that describes your instrument instead of your subject is worse than no measurement.</span>
-<span id="cb17-522"><a href="#cb17-522" aria-label="500"></a></span>
-<span id="cb17-523"><a href="#cb17-523" aria-label="501"></a><span class="fu">## Further Reading</span></span>
-<span id="cb17-524"><a href="#cb17-524" aria-label="502"></a></span>
-<span id="cb17-525"><a href="#cb17-525" aria-label="503"></a><span class="ss">- </span>@freelon2018computational — the original articulation of the "post-API age"</span>
-<span id="cb17-526"><a href="#cb17-526" aria-label="504"></a><span class="ss">- </span>@bruns2019after — platforms' fight against critical scholarly research</span>
-<span id="cb17-527"><a href="#cb17-527" aria-label="505"></a><span class="ss">- </span>@davidson2023platform — empirical study of how API restrictions threaten open science</span>
-<span id="cb17-528"><a href="#cb17-528" aria-label="506"></a><span class="ss">- </span>@perriam2020digital — digital methods in a post-API environment</span>
-<span id="cb17-529"><a href="#cb17-529" aria-label="507"></a><span class="ss">- </span>@lazer2020computational — obstacles and opportunities in computational social science</span>
+<span id="cb17-514"><a href="#cb17-514" aria-label="492"></a><span class="ss">4. </span>**Data contingency plan.** Design a research project that depends on a specific web data source. Then write a contingency plan: if your primary source disappears mid-study, what are your backup strategies? Consider at least three alternatives.</span>
+<span id="cb17-515"><a href="#cb17-515" aria-label="493"></a></span>
+<span id="cb17-516"><a href="#cb17-516" aria-label="494"></a><span class="ss">5. </span>**Public interest audit.** Identify a web data research project (published paper, journalism investigation, or civic tech tool) that was enabled by API access. Assess how the project would be affected by current access restrictions. Which of the three values — openness, oversight, or ownership — does the project embody?</span>
+<span id="cb17-517"><a href="#cb17-517" aria-label="495"></a></span>
+<span id="cb17-518"><a href="#cb17-518" aria-label="496"></a><span class="ss">6. </span>**Negotiate the gate.** With a partner, run an access negotiation: one of you represents a research team, the other a platform. Privately decide your own hidden intent (public-interest or extractive), then negotiate a data-access agreement — which records, which fields, how much history, at what rate, under what restrictions. Afterward, reveal intents and place the outcome in @tbl-access-quadrants (cooperation, refusal, resistance, or extraction). Debrief in writing: What did the researchers originally ask for? What did the platform actually agree to provide? Which restriction was hardest to negotiate, and what did each side trade away? Could another team reproduce research conducted under your agreement?</span>
+<span id="cb17-519"><a href="#cb17-519" aria-label="497"></a></span>
+<span id="cb17-520"><a href="#cb17-520" aria-label="498"></a><span class="ss">7. </span>**Graduate extension (INFO 5617).** Read @davidson2023platform and @perriam2020digital. Choose one platform and write a two-to-three page "state of research access" brief: what data researchers could obtain five years ago, what is available today and on what terms (cost, eligibility, restrictions), what official research-access programs exist, and which of this chapter's three pressures best explains the trajectory. Close with a concrete recommendation for a researcher starting a study of that platform this year.</span>
+<span id="cb17-521"><a href="#cb17-521" aria-label="499"></a></span>
+<span id="cb17-522"><a href="#cb17-522" aria-label="500"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb17-523"><a href="#cb17-523" aria-label="501"></a></span>
+<span id="cb17-524"><a href="#cb17-524" aria-label="502"></a><span class="ss">- </span>**Every endpoint returns 403, including ones this chapter lists as open**: Something between you and the web is intercepting requests — a corporate proxy, a VPN, a locked-down campus network, or a cloud sandbox. Run <span class="in">`diagnose()`</span> and read the <span class="in">`server`</span> header and the body. If the refusal names your own network, the finding is about your network.</span>
+<span id="cb17-525"><a href="#cb17-525" aria-label="503"></a><span class="ss">- </span>**An endpoint works in your browser but returns 403 in Python**: The site is treating your script differently from a browser. Check that you sent the <span class="in">`User-Agent`</span> header; some hosts refuse library defaults outright. Note that this is exactly what Reddit does, and it is a finding rather than a bug.</span>
+<span id="cb17-526"><a href="#cb17-526" aria-label="504"></a><span class="ss">- </span>**`archive.org` returns 429**: The Wayback Machine rate-limits by IP, and campus and cloud addresses are shared by many users. Wait several minutes and retry. Do not add threads to make it go faster — that makes it worse.</span>
+<span id="cb17-527"><a href="#cb17-527" aria-label="505"></a><span class="ss">- </span>**OpenAlex returns 429 with "Insufficient budget"**: The keyless daily budget is tiny and shared by everyone behind your IP address, so a classroom exhausts it quickly. Record the <span class="in">`X-RateLimit`</span> headers — they are the measurement — and stop requesting; the budget resets at midnight UTC, and a free API key raises it. Do not retry in a loop.</span>
+<span id="cb17-528"><a href="#cb17-528" aria-label="506"></a><span class="ss">- </span>**An endpoint returns 200 but the content-type is `text/html`**: You received a web page, not data — often a "missing key" notice served with a success code. Print the first 120 characters of the body. A 200 tells you the server answered; the content-type tells you whether it answered your question.</span>
+<span id="cb17-529"><a href="#cb17-529" aria-label="507"></a><span class="ss">- </span>**`autopsy()` hangs instead of failing**: A host that has been shut down may drop packets rather than refuse the connection, so the request waits for the full timeout. That is why every request here passes <span class="in">`timeout=`</span>. Without it, a dead host stops your notebook indefinitely.</span>
+<span id="cb17-530"><a href="#cb17-530" aria-label="508"></a><span class="ss">- </span>**`access["status"].astype("Int64")` raises**: Use the capital-I <span class="in">`Int64`</span> dtype, not <span class="in">`int64`</span>. Only the capital form holds missing values, and <span class="in">`status`</span> is <span class="in">`None`</span> for any endpoint that never answered.</span>
+<span id="cb17-531"><a href="#cb17-531" aria-label="509"></a><span class="ss">- </span>**Your table disagrees with the one printed above**: Expected, and worth writing down. Access changes; that is the chapter's argument. Record the date alongside the result so the observation stays interpretable later.</span>
+<span id="cb17-532"><a href="#cb17-532" aria-label="510"></a></span>
+<span id="cb17-533"><a href="#cb17-533" aria-label="511"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb17-534"><a href="#cb17-534" aria-label="512"></a></span>
+<span id="cb17-535"><a href="#cb17-535" aria-label="513"></a>The core argument of this chapter is that understanding *why* access is shrinking — not just *that* it is — equips you to navigate the constraints strategically rather than being surprised by them.</span>
+<span id="cb17-536"><a href="#cb17-536" aria-label="514"></a></span>
+<span id="cb17-537"><a href="#cb17-537" aria-label="515"></a><span class="ss">- </span>The open-API era (roughly 2008–2018) was a strategic bargain, not a natural state: platforms traded data access for ecosystems, and computational social science was built on the trade.</span>
+<span id="cb17-538"><a href="#cb17-538" aria-label="516"></a><span class="ss">- </span>**Enclosure** converts collectively produced data into privately controlled assets — API shutdowns, repricing, archive removals, and AI-training licensing deals are its mechanisms.</span>
+<span id="cb17-539"><a href="#cb17-539" aria-label="517"></a><span class="ss">- </span>**Exemption** is the asymmetry of scrutiny: platforms study their users freely while deploying legal and technical tools against independent researchers who study the platforms.</span>
+<span id="cb17-540"><a href="#cb17-540" aria-label="518"></a><span class="ss">- </span>**Erosion** is infrastructural decay — link rot, platform churn, and disappearing datasets — and it makes reproducibility a design problem you must solve at collection time.</span>
+<span id="cb17-541"><a href="#cb17-541" aria-label="519"></a><span class="ss">- </span>**Openness, oversight, and ownership** are the counter-values: document and deposit so your work resists enclosure, insist on inspectability, and prefer community-governed infrastructure.</span>
+<span id="cb17-542"><a href="#cb17-542" aria-label="520"></a><span class="ss">- </span>The practical response is redundancy: master multiple access techniques (documents, archives, APIs, automation) so no single closure ends your research program.</span>
+<span id="cb17-543"><a href="#cb17-543" aria-label="521"></a><span class="ss">- </span>Access is measurable, not just arguable. An unauthenticated probe tells you where a platform sits on the open-to-closed gradient today, and *how* a retired endpoint refuses — gone, gated, or repriced — tells you whether anyone is left to negotiate with.</span>
+<span id="cb17-544"><a href="#cb17-544" aria-label="522"></a><span class="ss">- </span>Attribute refusals carefully. A 403 can come from the platform, from your network, or from something in between, and the <span class="in">`server`</span> header and response body usually say which. A measurement that describes your instrument instead of your subject is worse than no measurement.</span>
+<span id="cb17-545"><a href="#cb17-545" aria-label="523"></a></span>
+<span id="cb17-546"><a href="#cb17-546" aria-label="524"></a><span class="fu">## Further Reading</span></span>
+<span id="cb17-547"><a href="#cb17-547" aria-label="525"></a></span>
+<span id="cb17-548"><a href="#cb17-548" aria-label="526"></a><span class="ss">- </span>@freelon2018computational — the original articulation of the "post-API age"</span>
+<span id="cb17-549"><a href="#cb17-549" aria-label="527"></a><span class="ss">- </span>@bruns2019after — platforms' fight against critical scholarly research</span>
+<span id="cb17-550"><a href="#cb17-550" aria-label="528"></a><span class="ss">- </span>@davidson2023platform — empirical study of how API restrictions threaten open science</span>
+<span id="cb17-551"><a href="#cb17-551" aria-label="529"></a><span class="ss">- </span>@perriam2020digital — digital methods in a post-API environment</span>
+<span id="cb17-552"><a href="#cb17-552" aria-label="530"></a><span class="ss">- </span>@lazer2020computational — obstacles and opportunities in computational social science</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

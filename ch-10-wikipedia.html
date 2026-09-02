@@ -101,7 +101,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-8af8f98213e2c1b30ec54438e312c198.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dabb4177d918b2a71d8bf8ab8beb4a59.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -458,7 +458,7 @@ div.csl-indent {
 <section id="the-anatomy-of-an-api-call" class="level2" data-number="10.3">
 <h2 data-number="10.3" class="anchored" data-anchor-id="the-anatomy-of-an-api-call"><span class="header-section-number">10.3</span> The Anatomy of an API Call</h2>
 <p>Every MediaWiki API request follows the same structure: a base URL, an <code>action</code> parameter specifying what you want to do, additional parameters narrowing your request, and a <code>format</code> parameter specifying the response format. Let us trace through a simple example:</p>
-<div id="beefb72a" class="cell" data-execution_count="1">
+<div id="94fb216a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
@@ -480,7 +480,7 @@ div.csl-indent {
 </div>
 <p>The <code>HEADERS</code> constant deserves a comment before we go further. The <a href="https://foundation.wikimedia.org/wiki/Policy:User-Agent_policy">Wikimedia User-Agent policy</a> asks every client to identify itself with a descriptive User-Agent string that includes contact information — anonymous or generic user agents may be throttled or blocked outright. Define it once as a module-level constant, and every function you write in this chapter can use it as a default.</p>
 <p>The response is a nested JSON structure. You navigate it one level at a time:</p>
-<div id="361444ef" class="cell" data-execution_count="2">
+<div id="bc61832c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co"># The data lives inside data &gt; query &gt; pages &gt; {page_id}</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a>pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
@@ -510,7 +510,7 @@ div.csl-indent {
 <section id="getting-revisions" class="level2" data-number="10.4">
 <h2 data-number="10.4" class="anchored" data-anchor-id="getting-revisions"><span class="header-section-number">10.4</span> Getting Revisions</h2>
 <p>Every edit ever made to a Wikipedia article is recorded and accessible through the API. The revisions endpoint returns metadata about each edit: who made it, when, how much the article size changed, and what edit summary they left.</p>
-<div id="4ef133da" class="cell" data-execution_count="3">
+<div id="b75148ba" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a></span>
@@ -573,7 +573,7 @@ div.csl-indent {
 </section>
 <section id="analyzing-revision-history" class="level3" data-number="10.4.2">
 <h3 data-number="10.4.2" class="anchored" data-anchor-id="analyzing-revision-history"><span class="header-section-number">10.4.2</span> Analyzing Revision History</h3>
-<div id="64770f48" class="cell" data-execution_count="4">
+<div id="d1966957" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Convert timestamps to datetime</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>df_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df_revisions[<span class="st">"timestamp"</span>])</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a></span>
@@ -592,7 +592,7 @@ div.csl-indent {
 <span id="cb4-16"><a href="#cb4-16" aria-label="16"></a><span class="co"># You'll see a massive spike around September 2022 (her death)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>You can also analyze who edits the article:</p>
-<div id="9248d7b5" class="cell" data-execution_count="5">
+<div id="4affec5d" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Top editors by number of revisions</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>top_editors <span class="op">=</span> df_revisions[<span class="st">"user"</span>].value_counts().head(<span class="dv">10</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="bu">print</span>(top_editors)</span>
@@ -606,7 +606,7 @@ div.csl-indent {
 <section id="getting-pageviews" class="level2" data-number="10.5">
 <h2 data-number="10.5" class="anchored" data-anchor-id="getting-pageviews"><span class="header-section-number">10.5</span> Getting Pageviews</h2>
 <p>The Wikimedia REST API (separate from the MediaWiki Action API) provides article pageview data — how many times an article was accessed across web and mobile platforms:</p>
-<div id="5115eda7" class="cell" data-execution_count="6">
+<div id="4c82ece0" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="kw">def</span> get_pageviews(title, start<span class="op">=</span><span class="st">"20230101"</span>, end<span class="op">=</span><span class="st">"20231231"</span>, headers<span class="op">=</span>HEADERS):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>    <span class="co">"""Get daily pageviews for a Wikipedia article.</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co">    </span></span>
@@ -652,7 +652,7 @@ div.csl-indent {
 <section id="getting-links-and-categories" class="level2" data-number="10.6">
 <h2 data-number="10.6" class="anchored" data-anchor-id="getting-links-and-categories"><span class="header-section-number">10.6</span> Getting Links and Categories</h2>
 <p>The API exposes the internal structure of Wikipedia — the web of connections between articles:</p>
-<div id="3f5860cb" class="cell" data-execution_count="7">
+<div id="3fe8f817" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="kw">def</span> get_outlinks(title, headers<span class="op">=</span>HEADERS):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a>    <span class="co">"""Get all internal wikilinks from an article."""</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
@@ -687,7 +687,7 @@ div.csl-indent {
 <span id="cb7-32"><a href="#cb7-32" aria-label="32"></a><span class="bu">print</span>(<span class="ss">f"First 10: </span><span class="sc">{</span>outlinks[:<span class="dv">10</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>You can do the same for external links (URLs that point outside Wikipedia), interlanguage links (corresponding articles in other language editions), and category memberships:</p>
-<div id="0f73158b" class="cell" data-execution_count="8">
+<div id="b7cd67df" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="kw">def</span> get_categories(title, headers<span class="op">=</span>HEADERS):</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>    <span class="co">"""Get all categories an article belongs to."""</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
@@ -725,7 +725,7 @@ div.csl-indent {
 <section id="interlanguage-links" class="level3" data-number="10.6.1">
 <h3 data-number="10.6.1" class="anchored" data-anchor-id="interlanguage-links"><span class="header-section-number">10.6.1</span> Interlanguage Links</h3>
 <p>One of the most revealing structural features of Wikipedia is which articles exist in which languages. The <code>langlinks</code> property tells you how many of Wikipedia’s 300+ language editions have a corresponding article for a given topic — and which languages those are.</p>
-<div id="a828c993" class="cell" data-execution_count="9">
+<div id="0ea8da9d" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="kw">def</span> get_langlinks(title, headers<span class="op">=</span>HEADERS):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>    <span class="co">"""Get all interlanguage links for an article.</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a></span>
@@ -778,7 +778,7 @@ div.csl-indent {
 <section id="getting-user-contributions" class="level2" data-number="10.7">
 <h2 data-number="10.7" class="anchored" data-anchor-id="getting-user-contributions"><span class="header-section-number">10.7</span> Getting User Contributions</h2>
 <p>You can also retrieve the editing history of individual Wikipedia users, which is useful for studying editor behavior and community dynamics:</p>
-<div id="8e478f29" class="cell" data-execution_count="10">
+<div id="badab227" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="kw">def</span> get_user_contributions(username, limit<span class="op">=</span><span class="dv">50</span>, headers<span class="op">=</span>HEADERS):</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a>    <span class="co">"""Get recent contributions by a Wikipedia user."""</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
@@ -811,7 +811,7 @@ div.csl-indent {
 <li>Read its parameters: what is required, what is optional, what values are accepted</li>
 <li>Construct a request, make it, and inspect the response structure</li>
 </ol>
-<div id="4f9a5ac5" class="cell" data-execution_count="11">
+<div id="59c8b18f" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Example: search Wikipedia for articles about "web scraping"</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>params <span class="op">=</span> {</span>
@@ -835,7 +835,7 @@ div.csl-indent {
 <section id="a-second-case-study-world-war-ii" class="level2" data-number="10.9">
 <h2 data-number="10.9" class="anchored" data-anchor-id="a-second-case-study-world-war-ii"><span class="header-section-number">10.9</span> A Second Case Study: World War II</h2>
 <p>To reinforce these patterns, try applying the same functions to a different article. The <a href="https://en.wikipedia.org/wiki/World_War_II">World War II</a> article is one of the most-edited on Wikipedia:</p>
-<div id="7aebece9" class="cell" data-execution_count="12">
+<div id="460c9040" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a>ww2_revisions <span class="op">=</span> get_revisions(<span class="st">"World_War_II"</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"World War II revisions: </span><span class="sc">{</span><span class="bu">len</span>(ww2_revisions)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a></span>
@@ -852,7 +852,7 @@ div.csl-indent {
 <section id="combining-endpoints" class="level3" data-number="10.9.1">
 <h3 data-number="10.9.1" class="anchored" data-anchor-id="combining-endpoints"><span class="header-section-number">10.9.1</span> Combining Endpoints</h3>
 <p>The real analytical power of the MediaWiki API emerges when you combine data from multiple endpoints to answer questions that no single endpoint can address. A natural question is whether editing activity and viewing activity are related: do articles get edited more during periods when they are being read more, or do edits happen independently of audience attention?</p>
-<div id="36531181" class="cell" data-execution_count="13">
+<div id="9ab4b83d" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Get monthly revision counts for Elizabeth II in 2022.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># Revision timestamps parse as timezone-aware UTC (their ISO strings end in "Z"); drop the timezone so they align with the tz-naive pageview timestamps</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>df_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df_revisions[<span class="st">"timestamp"</span>]).dt.tz_localize(<span class="va">None</span>)</span>
@@ -894,37 +894,37 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will build a complete profile of one Wikipedia article: who reads it, who writes it, and what it connects to.</p>
 <p><strong>Step 1 — Choose an article and get its pageviews.</strong> Pick an article on a topic that had at least one newsworthy moment in the past year. Define your <code>HEADERS</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), then use the chapter’s <code>get_pageviews()</code> (or your own version of it) to retrieve a full year of daily views. Build the DataFrame and plot the series.</p>
-<div id="4eabe0ef" class="cell" data-execution_count="14">
+<div id="66d0a674" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 1: Retrieve a year of daily pageviews for your article, build the DataFrame, and plot it.</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Find the spike.</strong> Identify the highest-traffic day with <code>idxmax()</code> (<a href="ch-01-introduction.html" class="quarto-xref"><span>Chapter 1</span></a> showed you this) and print the date and view count. Note in a comment what real-world event you think explains it.</p>
-<div id="52c16268" class="cell" data-execution_count="15">
+<div id="67c0b2bc" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 2: Find the peak day and connect it to an event.</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Get the revision history.</strong> Use the chapter’s <code>get_revisions()</code> pattern — following continuation tokens so you page through the full history — and build a DataFrame of revisions with user and timestamp columns. Print the total count and the date range.</p>
-<div id="466d7104" class="cell" data-execution_count="16">
+<div id="9296737d" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Step 3: Retrieve the full revision history, handling pagination, and build a revisions DataFrame.</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Profile the editors.</strong> How many unique editors does the article have? Use <code>value_counts()</code> on the user column to see edits per editor, and print the top ten. Is the editing concentrated in a few hands or spread out?</p>
-<div id="f38005f3" class="cell" data-execution_count="17">
+<div id="f86201e3" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># Step 4: Count unique editors and show the top ten by revision count.</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Align edits with attention.</strong> Resample or group the revisions by month, and plot monthly edit counts alongside (or above) the monthly pageview totals from Step 1. Do the two series move together around your spike?</p>
-<div id="bda2f783" class="cell" data-execution_count="18">
+<div id="c1032a71" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Step 5: Plot monthly edits and monthly pageviews for comparison.</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Map the neighborhood.</strong> Use the chapter’s <code>get_outlinks()</code> pattern to retrieve the article’s outgoing wikilinks. Print the count and ten example targets.</p>
-<div id="6f429a11" class="cell" data-execution_count="19">
+<div id="bf6ad402" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="co"># Step 6: Retrieve the article's outgoing links; print the count and a sample.</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In four to six sentences: What does the alignment (or misalignment) of edits and views around your spike suggest about how Wikipedia responds to events? Is your article maintained by a dedicated few or a broad crowd, and why might that matter for how much you trust it? What kind of article do its outlinks suggest it is?</p>
-<div id="7c7c7e41" class="cell" data-execution_count="20">
+<div id="ae2c5da7" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>

@@ -101,7 +101,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-8af8f98213e2c1b30ec54438e312c198.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dabb4177d918b2a71d8bf8ab8beb4a59.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -481,7 +481,7 @@ div.csl-indent {
 <h2 data-number="2.3" class="anchored" data-anchor-id="technical-norms-robots.txt"><span class="header-section-number">2.3</span> Technical Norms: <code>robots.txt</code></h2>
 <p>Beyond legal requirements, the web has developed a set of community norms for responsible automated access. The most important of these is the <code>robots.txt</code> protocol.</p>
 <p>A <code>robots.txt</code> file lives at the root of a website (e.g., <code>https://example.com/robots.txt</code>) and specifies which parts of the site automated agents are permitted or forbidden from accessing. It uses a simple syntax:</p>
-<div id="b3334aeb" class="cell" data-execution_count="1">
+<div id="fdd3ca81" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co"># Identify yourself. The next section explains why this header matters; Wikipedia refuses anonymous library defaults with a 403.</span></span>
@@ -502,7 +502,7 @@ div.csl-indent {
 <span id="cb1-18"><a href="#cb1-18" aria-label="18"></a><span class="co"># Disallow: /wiki/Special:</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The key directives are <code>User-agent</code> (which crawler the rule applies to), <code>Disallow</code> (paths that should not be accessed), <code>Allow</code> (exceptions to disallow rules), and <code>Crawl-delay</code> (requested time between requests). You can parse these programmatically:</p>
-<div id="fc0b519e" class="cell" data-execution_count="2">
+<div id="92091770" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">from</span> urllib.robotparser <span class="im">import</span> RobotFileParser</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="co"># Hand the parser text you fetched yourself, rather than calling rp.read(). The callout below explains what rp.read() does instead.</span></span>
@@ -542,7 +542,7 @@ div.csl-indent {
 </div>
 <p>The second result deserves a pause, because it teaches an important nuance. Wikipedia <em>wants</em> programmatic users on its API — <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a> is built on it — yet <code>robots.txt</code> disallows <code>/w/</code> paths. The two facts are not in conflict: <code>robots.txt</code> addresses <em>crawlers</em> that discover and fetch pages by following links, and Wikipedia would rather crawlers index its stable article URLs than its infinite space of dynamic, server-intensive <code>/w/</code> URLs. Deliberate API clients are governed by a different set of norms — the Wikimedia User-Agent policy and API etiquette guidelines — that you will follow in <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>. The general lesson: <code>robots.txt</code> tells you how a site wants <em>automated page-fetching</em> to behave, and it is one input among several (Terms of Service, API documentation, rate-limit guidance) rather than the complete rulebook.</p>
 <p>If a site declares a <code>Crawl-delay</code>, you can read it programmatically and respect it:</p>
-<div id="db5e444b" class="cell" data-execution_count="3">
+<div id="a8b9324c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a>delay <span class="op">=</span> rp.crawl_delay(<span class="st">"*"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="bu">print</span>(delay)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="co"># None if the site declares no crawl delay; otherwise seconds between requests</span></span>
@@ -552,7 +552,7 @@ div.csl-indent {
 <section id="comparing-robots.txt-across-platforms" class="level3" data-number="2.3.1">
 <h3 data-number="2.3.1" class="anchored" data-anchor-id="comparing-robots.txt-across-platforms"><span class="header-section-number">2.3.1</span> Comparing robots.txt Across Platforms</h3>
 <p>Different organizations have dramatically different approaches to automated access, and their <code>robots.txt</code> files reveal these philosophies. Compare three major sites:</p>
-<div id="8d8571bb" class="cell" data-execution_count="4">
+<div id="cc61da0b" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a>sites <span class="op">=</span> {</span>
@@ -580,7 +580,7 @@ div.csl-indent {
 <section id="responsible-request-headers" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="responsible-request-headers"><span class="header-section-number">2.4</span> Responsible Request Headers</h2>
 <p>When your code makes requests to a web server, the server sees metadata about the request including the <code>User-Agent</code> header, which identifies who is making the request. By default, the <code>requests</code> library sends a generic User-Agent string. You should replace it with one that identifies you and provides contact information:</p>
-<div id="407370cc" class="cell" data-execution_count="5">
+<div id="b7faab52" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>headers <span class="op">=</span> {</span>
@@ -607,7 +607,7 @@ div.csl-indent {
 <section id="rate-limiting" class="level2" data-number="2.5">
 <h2 data-number="2.5" class="anchored" data-anchor-id="rate-limiting"><span class="header-section-number">2.5</span> Rate Limiting</h2>
 <p>Making hundreds of requests per second to a web server can degrade its performance for other users — effectively mounting a denial-of-service attack on a site you are trying to study. Always space out your requests:</p>
-<div id="646656c5" class="cell" data-execution_count="6">
+<div id="5927430a" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="im">import</span> requests</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a></span>
@@ -622,7 +622,7 @@ div.csl-indent {
 <section id="building-a-responsible-scraper-function" class="level3" data-number="2.5.1">
 <h3 data-number="2.5.1" class="anchored" data-anchor-id="building-a-responsible-scraper-function"><span class="header-section-number">2.5.1</span> Building a Responsible Scraper Function</h3>
 <p>The principles above — custom User-Agent, rate limiting, error handling — appear in every scraping project. Rather than implementing them ad hoc each time, you can wrap them into a reusable function:</p>
-<div id="098517a5" class="cell" data-execution_count="7">
+<div id="b4930be8" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a><span class="im">import</span> time</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="im">import</span> logging</span>
@@ -691,32 +691,32 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or in <a href="ch-01-introduction.html" class="quarto-xref"><span>Chapter 1</span></a>.</p>
 <p>You will audit how three websites govern automated access, using the tools this chapter introduced: a named <code>User-Agent</code>, <code>robots.txt</code>, <code>RobotFileParser</code>, and polite request pacing.</p>
 <p><strong>Step 1 — Identify yourself.</strong> Define a <code>HEADERS</code> dictionary with a <code>User-Agent</code> string that names this course and includes your email, following the chapter’s pattern. You will send it with every request in this exercise.</p>
-<div id="764a590a" class="cell" data-execution_count="8">
+<div id="a174cfd9" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co"># Step 1: Define HEADERS with a User-Agent naming the course and your email.</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Fetch a robots.txt.</strong> Retrieve <code>https://en.wikipedia.org/robots.txt</code> with your headers. Print the status code and the first 500 characters, as you printed a response body in <a href="ch-01-introduction.html" class="quarto-xref"><span>Chapter 1</span></a>.</p>
-<div id="47ed6580" class="cell" data-execution_count="9">
+<div id="c7313c28" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># Step 2: Fetch Wikipedia's robots.txt and print the status code and the first 500 characters.</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Parse it properly.</strong> Create a <code>RobotFileParser</code>, feed it the text you fetched with <code>rp.parse(text.splitlines())</code> — not <code>rp.read()</code>, for the reason the chapter explains — and test <code>can_fetch("*", ...)</code> on three URLs: an article under <code>/wiki/</code>, something under <code>/w/</code>, and a <code>Special:</code> page. Print all three results.</p>
-<div id="f7d91e88" class="cell" data-execution_count="10">
+<div id="a0afbcc7" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Step 3: Parse the file with rp.parse(text.splitlines()) and test can_fetch() on three different paths.</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Widen the comparison.</strong> Pick two more websites you actually use. Fetch each site’s <code>robots.txt</code> politely — with your headers and <code>time.sleep(1)</code> between requests — and for each file count total lines, <code>Disallow</code> rules, and <code>Allow</code> rules, following the chapter’s comparison code.</p>
-<div id="e79d941a" class="cell" data-execution_count="11">
+<div id="cdb1bf5c" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Step 4: Fetch robots.txt for two sites of your choice, sleeping between requests, and count lines, Disallow rules, and Allow rules for each.</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Tabulate.</strong> Build a DataFrame with one row per site (all three) and columns for line count, Disallow count, Allow count, and the value of <code>crawl_delay("*")</code> if the parser reports one.</p>
-<div id="f096aa97" class="cell" data-execution_count="12">
+<div id="b6af7969" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 5: Build a DataFrame summarizing all three sites' robots.txt rules.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: Which of your three sites is most restrictive, and is that what its line count alone would have suggested? (Recall the chapter’s warning that length is not restrictiveness.) What does each file suggest about the organization’s relationship to automated access? If you wanted to collect data from your two chosen sites for a class project, what would each file permit?</p>
-<div id="2694d91e" class="cell" data-execution_count="13">
+<div id="96e7f640" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>

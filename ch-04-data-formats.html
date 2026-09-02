@@ -101,7 +101,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-8af8f98213e2c1b30ec54438e312c198.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dabb4177d918b2a71d8bf8ab8beb4a59.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -442,7 +442,7 @@ div.csl-indent {
 <section id="the-tree-structure" class="level3" data-number="4.2.1">
 <h3 data-number="4.2.1" class="anchored" data-anchor-id="the-tree-structure"><span class="header-section-number">4.2.1</span> The Tree Structure</h3>
 <p>XML organizes data as a hierarchy of nested tags. Each tag can contain text, attributes, and child tags. Here is a simplified example of Congressional member data, using the same tag names as the real U.S. House data feed you will retrieve later in this chapter:</p>
-<div id="2ec47bed" class="cell" data-execution_count="1">
+<div id="d2c48178" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a>house_raw <span class="op">=</span> <span class="st">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="st">&lt;MemberData publish-date="July 1, 2026"&gt;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="st">  &lt;members&gt;</span></span>
@@ -477,7 +477,7 @@ div.csl-indent {
 </section>
 <section id="parsing-with-beautifulsoup" class="level3" data-number="4.2.2">
 <h3 data-number="4.2.2" class="anchored" data-anchor-id="parsing-with-beautifulsoup"><span class="header-section-number">4.2.2</span> Parsing with BeautifulSoup</h3>
-<div id="f1b87ca0" class="cell" data-execution_count="2">
+<div id="e79ac862" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>soup <span class="op">=</span> BeautifulSoup(house_raw, <span class="st">"xml"</span>)</span>
@@ -497,7 +497,7 @@ div.csl-indent {
 </div>
 </div>
 <p>The power of BeautifulSoup is in its search methods. The <code>.find()</code> method returns the first tag matching your criteria — searching all descendants, no matter how deeply nested. The <code>.find_all()</code> method returns all matching tags as a list:</p>
-<div id="35a30f0b" class="cell" data-execution_count="3">
+<div id="1819e805" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co"># Find all member tags</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>members <span class="op">=</span> soup.find_all(<span class="st">"member"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="bu">print</span>(<span class="bu">len</span>(members))  <span class="co"># 2</span></span>
@@ -513,7 +513,7 @@ div.csl-indent {
 </div>
 <p>Notice that <code>member.find("firstname")</code> works even though <code>&lt;firstname&gt;</code> sits inside a nested <code>&lt;member-info&gt;</code> block — <code>.find()</code> searches the entire subtree beneath a tag. Also notice which names you can reach with dot notation. Shortcuts like <code>soup.members.member</code> only work for tag names that are valid Python identifiers; hyphenated names like <code>&lt;member-info&gt;</code> and <code>&lt;state-fullname&gt;</code> break dot notation (Python would read <code>soup.member-info</code> as subtraction), so you must use <code>.find()</code> for them.</p>
 <p>XML tags can also carry <strong>attributes</strong> — key-value pairs inside the opening tag itself. In this schema, the <code>&lt;state&gt;</code> tag stores the two-letter postal code as an attribute and spells out the full state name in a child tag. BeautifulSoup exposes attributes through dictionary-style bracket notation:</p>
-<div id="1649b601" class="cell" data-execution_count="4">
+<div id="86218643" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Attributes are accessed with brackets, text with .text</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>state_tag <span class="op">=</span> soup.find(<span class="st">"state"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="bu">print</span>(state_tag[<span class="st">"postal-code"</span>])               <span class="co"># CO</span></span>
@@ -527,7 +527,7 @@ div.csl-indent {
 <section id="extracting-and-counting" class="level3" data-number="4.2.3">
 <h3 data-number="4.2.3" class="anchored" data-anchor-id="extracting-and-counting"><span class="header-section-number">4.2.3</span> Extracting and Counting</h3>
 <p>A common pattern is extracting all values for a particular tag and then analyzing the distribution:</p>
-<div id="db29b670" class="cell" data-execution_count="5">
+<div id="a08bce80" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Count party affiliations</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>parties <span class="op">=</span> [m.find(<span class="st">"party"</span>).text <span class="cf">for</span> m <span class="kw">in</span> soup.find_all(<span class="st">"member"</span>)]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="bu">print</span>(parties)</span>
@@ -540,7 +540,7 @@ div.csl-indent {
 <span id="cb5-10"><a href="#cb5-10" aria-label="10"></a><span class="co"># Counter({'D': 1, 'R': 1}) — with full data you'd see actual totals</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The <code>.contents</code> method gives you a list of a tag’s direct children, which is useful for exploring unfamiliar XML structures:</p>
-<div id="75703644" class="cell" data-execution_count="6">
+<div id="0f3d932e" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a>first_member <span class="op">=</span> soup.find(<span class="st">"member"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="bu">print</span>(first_member.contents)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co"># A list of child tags and whitespace strings</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -549,7 +549,7 @@ div.csl-indent {
 <section id="working-with-real-xml" class="level3" data-number="4.2.4">
 <h3 data-number="4.2.4" class="anchored" data-anchor-id="working-with-real-xml"><span class="header-section-number">4.2.4</span> Working with Real XML</h3>
 <p>Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at <a href="https://clerk.house.gov">clerk.house.gov</a> in XML format. Its structure is exactly what the synthetic example prepared you for: a root <code>&lt;MemberData&gt;</code> tag with a <code>publish-date</code> attribute, containing a <code>&lt;members&gt;</code> tag, containing one <code>&lt;member&gt;</code> per representative, each with the biographical details nested inside <code>&lt;member-info&gt;</code> (plus a <code>&lt;committee-assignments&gt;</code> block we will ignore here):</p>
-<div id="3da417a3" class="cell" data-execution_count="7">
+<div id="fa16662e" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a></span>
@@ -582,7 +582,7 @@ div.csl-indent {
 <section id="from-xml-to-dataframe" class="level3" data-number="4.2.5">
 <h3 data-number="4.2.5" class="anchored" data-anchor-id="from-xml-to-dataframe"><span class="header-section-number">4.2.5</span> From XML to DataFrame</h3>
 <p>Counting party affiliations is useful, but the larger payoff is converting the XML into a DataFrame for systematic analysis. The pattern is straightforward: use <code>find_all()</code> to get all records, extract the fields you need from each one, build a list of dictionaries, and pass it to <code>pd.DataFrame()</code>:</p>
-<div id="1d6392a1" class="cell" data-execution_count="8">
+<div id="4d25f556" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="co"># Extract structured data from each member</span></span>
@@ -609,7 +609,7 @@ div.csl-indent {
 </div>
 <p>Note the <code>state</code> field: because the postal code is stored as an attribute of the <code>&lt;state&gt;</code> tag rather than as its text, we grab the tag once with <code>.find("state")</code> and then use bracket notation — the same pattern you practiced on the synthetic example. The <code>district</code> column contains strings like <code>"1st"</code> and <code>"At Large"</code> rather than numbers, a reminder that XML gives you text and any type conversion is your job.</p>
 <p>With the full Congressional dataset, you can now perform real analysis:</p>
-<div id="8eed3ffc" class="cell" data-execution_count="9">
+<div id="2dec7e28" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co"># Party breakdown</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a><span class="bu">print</span>(df.groupby(<span class="st">"party"</span>).size())</span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a><span class="co"># party</span></span>
@@ -642,13 +642,13 @@ div.csl-indent {
 <section id="lists-and-dictionaries" class="level3" data-number="4.3.1">
 <h3 data-number="4.3.1" class="anchored" data-anchor-id="lists-and-dictionaries"><span class="header-section-number">4.3.1</span> Lists and Dictionaries</h3>
 <p>JSON maps onto two Python data structures you already know. A JSON <strong>array</strong> is a Python <strong>list</strong> — ordered, indexed by position:</p>
-<div id="b8f2e295" class="cell" data-execution_count="10">
+<div id="840840b9" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a>classroom <span class="op">=</span> [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Carol"</span>]</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="bu">print</span>(classroom[<span class="dv">0</span>])   <span class="co"># "Alice"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="bu">print</span>(<span class="bu">len</span>(classroom))  <span class="co"># 3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>A JSON <strong>object</strong> is a Python <strong>dictionary</strong> — unordered, accessed by key:</p>
-<div id="911cbd5f" class="cell" data-execution_count="11">
+<div id="f1784f7c" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>state <span class="op">=</span> {</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>    <span class="st">"name"</span>: <span class="st">"Colorado"</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>    <span class="st">"capital"</span>: <span class="st">"Denver"</span>,</span>
@@ -661,7 +661,7 @@ div.csl-indent {
 <section id="nested-structures" class="level3" data-number="4.3.2">
 <h3 data-number="4.3.2" class="anchored" data-anchor-id="nested-structures"><span class="header-section-number">4.3.2</span> Nested Structures</h3>
 <p>Real-world JSON data nests these structures inside each other. A dictionary can contain lists, lists can contain dictionaries, and the nesting can go several levels deep:</p>
-<div id="04bc02dc" class="cell" data-execution_count="12">
+<div id="6ed6a14c" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a>schools <span class="op">=</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a>    <span class="st">"School 1"</span>: {</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>        <span class="st">"Classroom A"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>],</span>
@@ -681,7 +681,7 @@ div.csl-indent {
 <section id="the-list-of-dictionaries-pattern" class="level3" data-number="4.3.3">
 <h3 data-number="4.3.3" class="anchored" data-anchor-id="the-list-of-dictionaries-pattern"><span class="header-section-number">4.3.3</span> The List-of-Dictionaries Pattern</h3>
 <p>The most common JSON pattern you will encounter in web data is a list of dictionaries, where each dictionary represents a record and each key-value pair represents a field:</p>
-<div id="cfcfdb32" class="cell" data-execution_count="13">
+<div id="174b366d" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a>census_data <span class="op">=</span> [</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>    {<span class="st">"state"</span>: <span class="st">"Colorado"</span>, <span class="st">"year"</span>: <span class="dv">2020</span>, <span class="st">"population"</span>: <span class="dv">5773714</span>},</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>    {<span class="st">"state"</span>: <span class="st">"Colorado"</span>, <span class="st">"year"</span>: <span class="dv">2010</span>, <span class="st">"population"</span>: <span class="dv">5029196</span>},</span>
@@ -692,7 +692,7 @@ div.csl-indent {
 <span id="cb13-8"><a href="#cb13-8" aria-label="8"></a><span class="bu">print</span>(census_data[<span class="dv">0</span>][<span class="st">"population"</span>])  <span class="co"># 5773714</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This pattern converts directly into a pandas DataFrame:</p>
-<div id="4cfc11db" class="cell" data-execution_count="14">
+<div id="f71b3765" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a>df <span class="op">=</span> pd.DataFrame(census_data)</span>
@@ -707,7 +707,7 @@ div.csl-indent {
 <section id="parsing-json-strings" class="level3" data-number="4.3.4">
 <h3 data-number="4.3.4" class="anchored" data-anchor-id="parsing-json-strings"><span class="header-section-number">4.3.4</span> Parsing JSON Strings</h3>
 <p>When you receive JSON data from the web (as a string), you need to parse it into Python objects:</p>
-<div id="cac88066" class="cell" data-execution_count="15">
+<div id="331daf56" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="im">import</span> json</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="co"># Parse a JSON string into a Python object</span></span>
@@ -721,7 +721,7 @@ div.csl-indent {
 <span id="cb15-11"><a href="#cb15-11" aria-label="11"></a><span class="bu">print</span>(json_output)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>When working with <code>requests</code>, the <code>.json()</code> method on a response object does this parsing for you automatically:</p>
-<div id="fe3b4836" class="cell" data-execution_count="16">
+<div id="c50a923d" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a>response <span class="op">=</span> requests.get(<span class="st">"https://api.example.com/data"</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>data <span class="op">=</span> response.json()  <span class="co"># Equivalent to json.loads(response.text)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -729,7 +729,7 @@ div.csl-indent {
 <section id="working-with-a-real-json-object" class="level3" data-number="4.3.5">
 <h3 data-number="4.3.5" class="anchored" data-anchor-id="working-with-a-real-json-object"><span class="header-section-number">4.3.5</span> Working with a Real JSON Object</h3>
 <p>Here is a simplified version of a social media post object, similar to what Twitter’s API used to return:</p>
-<div id="df014e51" class="cell" data-execution_count="17">
+<div id="84ffbb0d" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a>tweet <span class="op">=</span> {</span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a>    <span class="st">"id"</span>: <span class="dv">266031293945503744</span>,</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a>    <span class="st">"text"</span>: <span class="st">"Four more years."</span>,</span>
@@ -763,7 +763,7 @@ div.csl-indent {
 <section id="handling-deeply-nested-json" class="level3" data-number="4.3.6">
 <h3 data-number="4.3.6" class="anchored" data-anchor-id="handling-deeply-nested-json"><span class="header-section-number">4.3.6</span> Handling Deeply Nested JSON</h3>
 <p>The Twitter example above is only two levels deep. Real API responses often nest data three or four levels down, and the path to the data you need is not always obvious. Let us work through a live example using the Open-Meteo weather API, which returns a forecast for Boulder, Colorado:</p>
-<div id="758df8e8" class="cell" data-execution_count="18">
+<div id="0b2c25e3" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://api.open-meteo.com/v1/forecast"</span></span>
@@ -794,7 +794,7 @@ div.csl-indent {
 <span id="cb18-28"><a href="#cb18-28" aria-label="28"></a><span class="bu">print</span>(<span class="ss">f"Elevation: </span><span class="sc">{</span>elevation<span class="sc">}</span><span class="ss"> meters"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The strategy is always the same: start with <code>type()</code> and <code>.keys()</code> at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:</p>
-<div id="0f2f4b4d" class="cell" data-execution_count="19">
+<div id="74ebfb24" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a></span>
@@ -854,37 +854,37 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will parse one real dataset in each format: an RSS feed (XML) and a weather forecast (JSON), ending with both as DataFrames.</p>
 <p><strong>Step 1 — Set up politely.</strong> Define your <code>HEADERS</code> with a named <code>User-Agent</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>). Find an RSS feed from a news outlet you read — most sites serve one at <code>/rss</code> or <code>/feed</code> — and check the site’s <code>robots.txt</code> permits fetching it.</p>
-<div id="f3cd6f7e" class="cell" data-execution_count="20">
+<div id="37e6a472" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 1: Define HEADERS and choose an RSS feed URL you have checked against the site's robots.txt.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Fetch and inspect the XML.</strong> Retrieve the feed with <code>requests</code>. Print the status code and the first 500 characters. Identify the repeating element by eye — for RSS it is <code>&lt;item&gt;</code>.</p>
-<div id="ed0df910" class="cell" data-execution_count="21">
+<div id="0222d230" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># Step 2: Fetch the feed and inspect the first 500 characters of raw XML.</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Parse the tree.</strong> Parse the response with BeautifulSoup’s <code>"xml"</code> parser, use <code>find_all()</code> to collect the items, and print how many the feed contains.</p>
-<div id="7d0436a6" class="cell" data-execution_count="22">
+<div id="8fad6cd9" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># Step 3: Parse with the "xml" parser, find_all the repeating items, and count them.</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Extract to a DataFrame.</strong> Loop over the items, building a list of dictionaries with each item’s title, link, and publication date — the list-of-dictionaries pattern from this chapter — then convert to a DataFrame.</p>
-<div id="170cc7f8" class="cell" data-execution_count="23">
+<div id="c5cf04f9" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="co"># Step 4: Build a list of dicts (title, link, pubDate) and convert it to a DataFrame.</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Fetch nested JSON.</strong> Retrieve the Boulder forecast from <code>https://api.open-meteo.com/v1/forecast?latitude=40.01&amp;longitude=-105.27&amp;daily=temperature_2m_max&amp;timezone=America/Denver</code> and parse it with <code>.json()</code>. Print the top-level keys, then the keys under <code>"daily"</code> — map the nesting before you extract anything.</p>
-<div id="da653676" class="cell" data-execution_count="24">
+<div id="ff88a8b4" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="co"># Step 5: Fetch the Open-Meteo forecast, parse the JSON, and print the top-level keys and the keys nested under "daily".</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Extract the parallel lists.</strong> The <code>"daily"</code> object holds parallel lists of dates and temperatures. Build a DataFrame from them and plot maximum temperature over the forecast days.</p>
-<div id="ec1735e4" class="cell" data-execution_count="25">
+<div id="9741c733" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a><span class="co"># Step 6: Build a DataFrame of dates and max temperatures, then plot it.</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In three to five sentences: The RSS feed nested repeating <em>elements</em>; the forecast nested parallel <em>lists</em>. Which was easier to get into a DataFrame, and why? What did you have to know about each structure before you could write the extraction code?</p>
-<div id="baebec9b" class="cell" data-execution_count="26">
+<div id="652ee214" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
