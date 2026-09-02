@@ -158,6 +158,9 @@ div.csl-indent {
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Web Data Science</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/cuinfoscience/Web-Data-Science-Book" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -382,7 +385,7 @@ div.csl-indent {
   <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">15.14</span> Key Takeaways</a></li>
   <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">15.15</span> Further Reading</a></li>
   </ul>
-</nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/edit/main/ch-15-research-design.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -558,7 +561,7 @@ div.csl-indent {
 <section id="data-quality-and-validation" class="level2" data-number="15.6">
 <h2 data-number="15.6" class="anchored" data-anchor-id="data-quality-and-validation"><span class="header-section-number">15.6</span> Data Quality and Validation</h2>
 <p>Web data is messy. Scrapers fail silently, APIs return incomplete results, and the same information can appear in different formats across sources. Build validation into your pipeline:</p>
-<div id="32ec6ffb" class="cell" data-execution_count="1">
+<div id="1fb9da85" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="kw">def</span> validate_dataset(df, expected_columns, min_rows<span class="op">=</span><span class="dv">10</span>):</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a>    <span class="co">"""Basic validation checks for a scraped dataset.</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co">    </span></span>
@@ -676,7 +679,7 @@ div.csl-indent {
 <section id="visualization-as-argument" class="level3" data-number="15.9.1">
 <h3 data-number="15.9.1" class="anchored" data-anchor-id="visualization-as-argument"><span class="header-section-number">15.9.1</span> Visualization as Argument</h3>
 <p>Consider the difference between a default plot and one designed to communicate a finding. A default <code>plt.plot()</code> call with no labels, no title, and no context forces the reader to guess what they are looking at. A well-designed figure makes its argument legible at a glance: the title states a claim, the annotations connect data patterns to real-world causes, and the axis labels include units so the reader can evaluate the evidence independently.</p>
-<div id="e3663add" class="cell" data-execution_count="2">
+<div id="0b312e8b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a><span class="im">import</span> matplotlib.dates <span class="im">as</span> mdates</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -753,31 +756,31 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook and submit the completed notebook. This chapter’s exercise is written rather than coded: each cell below asks for a few sentences, not a program. Write your answers as comments or convert the cells to Markdown — either is fine. The steps follow the proposal arc from this chapter, and each should take a paragraph at most.</p>
 <p>By the end you will have a one-page skeleton of a research design — the seed of the Final Project proposal, and of the full proposal in the Additional Exercises.</p>
 <p><strong>Step 1 — The question.</strong> State one research question that web data could answer. Apply this chapter’s criteria: it should be specific enough to be answerable, and it should name the <em>construct</em> you actually care about (attention, opinion, participation, price), not just a dataset you find interesting.</p>
-<div id="38aaf652" class="cell" data-execution_count="3">
+<div id="21cb7a49" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Step 1: State your research question, and name the construct it is really about. Write as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — The data source and access method.</strong> Name the data source that would answer it and the specific technique from this book you would use — an API (<a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>, <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>, <a href="ch-12-social.html" class="quarto-xref"><span>Chapter 12</span></a>), scraping (<a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, <a href="ch-08-dynamic-pages.html" class="quarto-xref"><span>Chapter 8</span></a>), archives (<a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>), PDFs (<a href="ch-09-pdfs.html" class="quarto-xref"><span>Chapter 9</span></a>), or automated collection (<a href="ch-14-automation.html" class="quarto-xref"><span>Chapter 14</span></a>). Note what the source’s access rules (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>, <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>) permit.</p>
-<div id="8bffb4d0" class="cell" data-execution_count="4">
+<div id="c2cfe1a1" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Step 2: Name the source, the chapter technique you would use, and what the access rules permit.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — The design.</strong> Which of the chapter’s four designs is this — longitudinal tracking, cross-sectional snapshot, content analysis, or a natural experiment? Say why that design fits your question, and what your unit of analysis is.</p>
-<div id="c93ad217" class="cell" data-execution_count="5">
+<div id="11dba2de" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="co"># Step 3: Name the design, justify it, and state the unit of analysis.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Sampling and representativeness.</strong> Who or what is in your data, and who is missing? Apply the chapter’s discussion: what population does your source actually represent, and how does that differ from the population your question is about?</p>
-<div id="5065bcfd" class="cell" data-execution_count="6">
+<div id="13594564" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># Step 4: Describe the sample, the population it represents, and the gap between that and the population your question targets.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Measurement validity.</strong> Make the construct-validity argument: why does the thing you can count (pageviews, posts, mentions, dollar amounts) measure the thing you care about? Name the strongest objection to that link, and one check that would strengthen it.</p>
-<div id="35c98f45" class="cell" data-execution_count="7">
+<div id="59bdd75d" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co"># Step 5: Make the construct validity argument, name its weakest point, and propose one validation check.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Limitations and contingency.</strong> Name the two threats most likely to undermine the study — draw on the chapter’s validity discussion and the erosion scenarios of <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — and write a one-sentence contingency for each: if the source closes or changes mid-study, what is your fallback?</p>
-<div id="f6e8127e" class="cell" data-execution_count="8">
+<div id="2835fe64" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co"># Step 6: Two biggest threats, and a contingency plan for each.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Ethics and human subjects.</strong> Does this study involve people’s data? Apply the chapter’s IRB discussion and the framework from <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>: would it need review, what would you collect at minimum, and what would you refuse to collect?</p>
-<div id="91e3ab27" class="cell" data-execution_count="9">
+<div id="ce23cebb" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># Step 7: The ethical determination -- IRB or not, and the collection boundaries you would set.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1705,4 +1708,4 @@ Salganik, Matthew J. 2018. <em>Bit by Bit: Social Research in the Digital Age</e
 
 
 
-</body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/edit/main/ch-15-research-design.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

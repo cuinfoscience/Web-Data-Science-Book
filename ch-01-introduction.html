@@ -158,6 +158,9 @@ div.csl-indent {
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Web Data Science</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/cuinfoscience/Web-Data-Science-Book" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -369,7 +372,7 @@ div.csl-indent {
   <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">1.10</span> Key Takeaways</a></li>
   <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">1.11</span> Further Reading</a></li>
   </ul>
-</nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/edit/main/ch-01-introduction.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -459,13 +462,13 @@ div.csl-indent {
 <h3 data-number="1.3.1" class="anchored" data-anchor-id="installing-anaconda"><span class="header-section-number">1.3.1</span> Installing Anaconda</h3>
 <p>The Anaconda distribution of Python provides a curated collection of scientific computing libraries along with the <code>conda</code> package manager. Download the latest version from <a href="https://www.anaconda.com/download">anaconda.com</a> and follow the installation instructions for your operating system.</p>
 <p>After installation, open a terminal (macOS/Linux) or Anaconda Prompt (Windows) and update your installation:</p>
-<div id="47648cae" class="cell" data-execution_count="1">
+<div id="b26f8914" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="co"># Run these commands in a terminal, not in Python</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="co"># conda update conda</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co"># conda install anaconda=2026.07-1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Anaconda’s default <code>base</code> environment is fine for your first session, but as you accumulate projects, their library requirements will eventually conflict. The <code>conda</code> package manager solves this with <em>environments</em>: isolated Python installations, each with its own set of packages. Create one for this book and activate it whenever you sit down to work:</p>
-<div id="6c5e50c7" class="cell" data-execution_count="2">
+<div id="bf039207" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co"># Run these commands in a terminal, not in Python</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="co"># conda create -n webdata python=3.12</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="co"># conda activate webdata</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -489,7 +492,7 @@ div.csl-indent {
 <h3 data-number="1.3.2" class="anchored" data-anchor-id="jupyter-notebooks"><span class="header-section-number">1.3.2</span> Jupyter Notebooks</h3>
 <p>Jupyter Notebooks are interactive computing environments that keep your code, documentation, and results in a single file. Launch one from the terminal with <code>jupyter notebook</code>, which will open a browser window where you can create and edit notebooks.</p>
 <p>A notebook consists of cells. <strong>Code cells</strong> contain Python that you can execute with Shift+Enter. <strong>Markdown cells</strong> contain formatted text for documentation. The ability to interleave code with narrative explanation makes notebooks ideal for the kind of exploratory, iterative work that characterizes web data science.</p>
-<div id="f70312b6" class="cell" data-execution_count="3">
+<div id="a2002ede" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co"># This is a code cell. When you run it, Python executes the code and displays any output below the cell.</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a><span class="bu">print</span>(<span class="st">"Hello, web data science!"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="co"># Output: Hello, web data science!</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -511,12 +514,12 @@ div.csl-indent {
 <section id="core-libraries" class="level3" data-number="1.3.3">
 <h3 data-number="1.3.3" class="anchored" data-anchor-id="core-libraries"><span class="header-section-number">1.3.3</span> Core Libraries</h3>
 <p>This book uses several Python libraries extensively. Install them now if they are not already available in your Anaconda distribution:</p>
-<div id="5de0219b" class="cell" data-execution_count="4">
+<div id="efe90bcd" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Run in a terminal:</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="co"># pip install requests beautifulsoup4 pandas matplotlib seaborn</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Throughout this book, you will install additional libraries as needed for specific chapters. For now, confirm that the core libraries import without error:</p>
-<div id="144f0aac" class="cell" data-execution_count="5">
+<div id="17c9f2c7" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -534,7 +537,7 @@ div.csl-indent {
 <p>Nearly everything in this book starts with the <a href="https://requests.readthedocs.io/"><code>requests</code></a> library. It is the standard way to fetch things from the web in Python — its documentation calls it “HTTP for Humans.” When you type a URL, your browser sends a request across the internet, receives a reply, and renders that reply as a page. <code>requests</code> does the same sending and receiving, but instead of rendering the reply, it hands the whole thing to <em>you</em>, as a Python object you can inspect, parse, and analyze.</p>
 <p>Why this library and not another? Python ships with a built-in module for the job (<code>urllib</code>), but it is verbose where <code>requests</code> is direct: fetching a page is one readable line, and the library quietly handles the details — character encodings, redirects, connection management — that you should not have to think about in week one. And <code>requests</code> is the ecosystem’s common ground: the scraping and API libraries you will meet later in this book are built on top of it, imitate its interface, or assume you will pair them with it, so the habits you form here transfer everywhere. What actually happens on the wire when a request is sent — protocols, servers, DNS, the anatomy of HTTP itself — is a story worth telling properly, and <a href="ch-05-protocols.html" class="quarto-xref"><span>Chapter 5</span></a> tells it. For now, treat <code>requests</code> as a well-made black box: ask for a page, get a reply.</p>
 <p>Here you will retrieve the Wikipedia article for the University of Colorado Boulder:</p>
-<div id="f2efe81e" class="cell" data-execution_count="6">
+<div id="cb55cefb" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co"># Retrieve the page</span></span>
@@ -547,7 +550,7 @@ div.csl-indent {
 <span id="cb6-10"><a href="#cb6-10" aria-label="10"></a><span class="bu">print</span>(<span class="bu">len</span>(response.text))    <span class="co"># Number of characters in the HTML</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>That <code>response</code> variable is a <strong>Response object</strong> — you will handle one every time you touch the web from now on. It is the parcel the server sent back, still in its packaging: not just the page you asked for, but everything about the exchange — whether it succeeded, what kind of document came back, the document itself in two forms, and a record of how you got there. A quick tour of the parts you will actually use:</p>
-<div id="5eaa8f06" class="cell" data-execution_count="7">
+<div id="172d5d47" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># What kind of document did the server send?</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="bu">print</span>(response.headers[<span class="st">"Content-Type"</span>])</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="co"># text/html; charset=UTF-8</span></span>
@@ -562,7 +565,7 @@ div.csl-indent {
 </div>
 <p>The <strong>status code</strong> you printed above is the server’s three-digit verdict on your request: codes starting with 2 mean success, 4 means something is wrong with your request, and the full taxonomy waits in <a href="ch-05-protocols.html" class="quarto-xref"><span>Chapter 5</span></a>. The <strong>headers</strong> are a dictionary of metadata about the reply, and <code>Content-Type</code> is the one you will consult most — it is how you know whether you received HTML to parse, JSON to decode, or something else entirely. The body comes in two forms: <strong><code>.text</code></strong> is the decoded string you will use for web pages, while <strong><code>.content</code></strong> is the raw bytes, which matters when the thing you retrieved is not text at all — a PDF (<a href="ch-09-pdfs.html" class="quarto-xref"><span>Chapter 9</span></a>) or an image has no meaningful <code>.text</code>. And <strong><code>.url</code></strong> with <strong><code>.history</code></strong> tell you where you actually landed: servers routinely redirect requests, and these attributes preserve the trail. One more member of the family, <code>.json()</code>, parses a JSON body into a Python dictionary — this page is HTML so there is nothing for it to parse here, but you will use it within the next few paragraphs.</p>
 <p>You can inspect the first 500 characters of the body:</p>
-<div id="1d5baeda" class="cell" data-execution_count="8">
+<div id="fad8d23e" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="bu">print</span>(response.text[:<span class="dv">500</span>])</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a><span class="co"># You'll see raw HTML: &lt;!DOCTYPE html&gt;, &lt;head&gt;, &lt;title&gt;, etc.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -571,7 +574,7 @@ div.csl-indent {
 <section id="calling-your-first-api" class="level3" data-number="1.4.2">
 <h3 data-number="1.4.2" class="anchored" data-anchor-id="calling-your-first-api"><span class="header-section-number">1.4.2</span> Calling Your First API</h3>
 <p>You can also retrieve data in JSON format from an API. Here is a request to the Wikimedia pageviews API, which returns the number of times a Wikipedia article was viewed on a given day:</p>
-<div id="025e4c8d" class="cell" data-execution_count="9">
+<div id="a2aa450c" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>api_url <span class="op">=</span> <span class="st">"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
@@ -590,7 +593,7 @@ div.csl-indent {
 <section id="from-response-to-dataframe" class="level3" data-number="1.4.3">
 <h3 data-number="1.4.3" class="anchored" data-anchor-id="from-response-to-dataframe"><span class="header-section-number">1.4.3</span> From Response to DataFrame</h3>
 <p>The <code>data["items"]</code> key contains a list of dictionaries, one per day, each with fields like <code>timestamp</code>, <code>views</code>, <code>article</code>, and <code>project</code>. This is exactly the kind of structure that pandas can convert into a DataFrame with a single call:</p>
-<div id="d3d31c6a" class="cell" data-execution_count="10">
+<div id="ca2c5310" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="co"># Convert the list of dictionaries into a DataFrame</span></span>
@@ -619,7 +622,7 @@ div.csl-indent {
 <section id="saving-your-work" class="level3" data-number="1.4.4">
 <h3 data-number="1.4.4" class="anchored" data-anchor-id="saving-your-work"><span class="header-section-number">1.4.4</span> Saving Your Work</h3>
 <p>Once you have data in a DataFrame, save it to disk — a core practice of responsible web data science:</p>
-<div id="47b99ed8" class="cell" data-execution_count="11">
+<div id="fadf75ab" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Save to CSV</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>df.to_csv(<span class="st">"cu_boulder_pageviews.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a></span>
@@ -660,37 +663,37 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter.</p>
 <p>Since this is the first chapter, the assignment is deliberately modest: prove that your environment works, then run the retrieve–parse–analyze loop once, end to end, on an article you choose.</p>
 <p><strong>Step 1 — Verify your environment.</strong> Import <code>requests</code>, <code>pandas</code> (as <code>pd</code>), and <code>matplotlib.pyplot</code> (as <code>plt</code>). If any import fails, revisit the setup section before going further.</p>
-<div id="e324bac0" class="cell" data-execution_count="12">
+<div id="215d99e9" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Step 1: Import requests, pandas as pd, and matplotlib.pyplot as plt.</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Make your first request.</strong> Use <code>requests.get()</code> to retrieve any web page you choose. Print the status code and the length of <code>response.text</code>.</p>
-<div id="9c8e984a" class="cell" data-execution_count="13">
+<div id="2ea8c9a5" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 2: Retrieve a web page and print the status code and response length.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Call the pageviews API.</strong> Pick a Wikipedia article you are curious about. Using the pageviews API URL pattern from this chapter — including the <code>User-Agent</code> header with your email — retrieve its daily views for one full month, and parse the response with <code>.json()</code>.</p>
-<div id="6bbe0635" class="cell" data-execution_count="14">
+<div id="eab7730f" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 3: Build the pageviews URL for your article, request it with a User-Agent header, and parse the JSON response.</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Build a DataFrame.</strong> Convert <code>data["items"]</code> into a DataFrame, and convert the <code>timestamp</code> column into a real date with <code>pd.to_datetime()</code>, as the chapter demonstrates.</p>
-<div id="8c0b03d4" class="cell" data-execution_count="15">
+<div id="41f2eb98" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 4: Convert data["items"] to a DataFrame and add a proper date column.</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Plot the time series.</strong> Create a line plot of daily views across your month, with labeled axes and a title naming the article.</p>
-<div id="b7c009dd" class="cell" data-execution_count="16">
+<div id="d722d042" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Step 5: Plot daily views over time with labeled axes and a title.</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Save and reload.</strong> Save the DataFrame to a CSV file with <code>to_csv()</code>, then load it back with <code>pd.read_csv()</code> and print how many rows you recovered.</p>
-<div id="b0db42d2" class="cell" data-execution_count="17">
+<div id="66807d57" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># Step 6: Save the DataFrame to CSV, load it back, and print the row count.</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In three to five sentences: What was the highest-traffic day, and can you connect it to a real-world event? What does the status code from Step 2 mean? And why did Step 6 matter — what can you now do without touching the network again?</p>
-<div id="3f04af07" class="cell" data-execution_count="18">
+<div id="916eb06d" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1582,4 +1585,4 @@ Wing, Jeannette M. 2006. <span>“Computational Thinking.”</span> <em>Communic
 
 
 
-</body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/edit/main/ch-01-introduction.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

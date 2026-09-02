@@ -158,6 +158,9 @@ div.csl-indent {
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Web Data Science</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/cuinfoscience/Web-Data-Science-Book" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -373,7 +376,7 @@ div.csl-indent {
   <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">8.15</span> Key Takeaways</a></li>
   <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">8.16</span> Further Reading</a></li>
   </ul>
-</nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/edit/main/ch-08-dynamic-pages.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -439,12 +442,12 @@ div.csl-indent {
 <section id="setting-up-selenium" class="level2" data-number="8.2">
 <h2 data-number="8.2" class="anchored" data-anchor-id="setting-up-selenium"><span class="header-section-number">8.2</span> Setting Up Selenium</h2>
 <p>Selenium requires two components: the <code>selenium</code> Python library and a browser driver — a small program that lets Python control a specific browser. Fortunately, you only need to install the library: since version 4.6 (late 2022), Selenium has shipped with <strong>Selenium Manager</strong>, which automatically finds or downloads the correct driver for whatever browser you have installed.</p>
-<div id="7148a3c2" class="cell" data-execution_count="1">
+<div id="9a3f30ee" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="co"># Install from a terminal:</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="co"># pip install selenium</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Creating a driver is then a one-liner:</p>
-<div id="1650c76c" class="cell" data-execution_count="2">
+<div id="08a26e4c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="co"># For Chrome:</span></span>
@@ -458,7 +461,7 @@ div.csl-indent {
 </section>
 <section id="navigating-and-finding-elements" class="level2" data-number="8.3">
 <h2 data-number="8.3" class="anchored" data-anchor-id="navigating-and-finding-elements"><span class="header-section-number">8.3</span> Navigating and Finding Elements</h2>
-<div id="e84b23fa" class="cell" data-execution_count="3">
+<div id="3d442dca" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co"># Navigate to a website</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>driver.get(<span class="st">"https://xkcd.com"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a></span>
@@ -480,7 +483,7 @@ div.csl-indent {
 <section id="extracting-data" class="level2" data-number="8.4">
 <h2 data-number="8.4" class="anchored" data-anchor-id="extracting-data"><span class="header-section-number">8.4</span> Extracting Data</h2>
 <p>xkcd is famous for its hidden alt-text messages. You can extract element attributes:</p>
-<div id="15051b3c" class="cell" data-execution_count="4">
+<div id="fceec80a" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Find the comic image</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>img <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//div[@id='comic']//img"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a></span>
@@ -494,7 +497,7 @@ div.csl-indent {
 <p>Selenium can simulate clicks, keyboard input, and scrolling — anything a human user would do:</p>
 <section id="clicking" class="level3" data-number="8.5.1">
 <h3 data-number="8.5.1" class="anchored" data-anchor-id="clicking"><span class="header-section-number">8.5.1</span> Clicking</h3>
-<div id="e99df0d3" class="cell" data-execution_count="5">
+<div id="310b4c6c" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Click the "Random" button to navigate to a random comic</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>random_button <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//ul[@class='comicNav']//a[contains(text(),'Random')]"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a>random_button.click()</span>
@@ -510,7 +513,7 @@ div.csl-indent {
 <section id="typing-and-searching" class="level3" data-number="8.5.2">
 <h3 data-number="8.5.2" class="anchored" data-anchor-id="typing-and-searching"><span class="header-section-number">8.5.2</span> Typing and Searching</h3>
 <p>Selenium can type into forms and submit them. We will demonstrate with Wikipedia’s search box: Wikipedia’s robots policy is permissive toward automated access, and its markup is stable enough that this example should keep working for years. (Search engines like Google, by contrast, explicitly prohibit automated queries in their Terms of Service — where you point your automation matters as much as how you write it.)</p>
-<div id="a35e7ff1" class="cell" data-execution_count="6">
+<div id="66e649df" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">from</span> selenium.webdriver.common.keys <span class="im">import</span> Keys</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co"># Navigate to the Wikipedia portal</span></span>
@@ -553,7 +556,7 @@ div.csl-indent {
 <section id="scrolling" class="level3" data-number="8.5.3">
 <h3 data-number="8.5.3" class="anchored" data-anchor-id="scrolling"><span class="header-section-number">8.5.3</span> Scrolling</h3>
 <p>Some pages load content as you scroll (infinite scroll). You can simulate this:</p>
-<div id="d4273901" class="cell" data-execution_count="7">
+<div id="391465a5" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">from</span> selenium.webdriver.common.keys <span class="im">import</span> Keys</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a>body <span class="op">=</span> driver.find_element(By.TAG_NAME, <span class="st">"body"</span>)</span>
@@ -567,7 +570,7 @@ div.csl-indent {
 <section id="waiting-for-dynamic-content" class="level3" data-number="8.5.4">
 <h3 data-number="8.5.4" class="anchored" data-anchor-id="waiting-for-dynamic-content"><span class="header-section-number">8.5.4</span> Waiting for Dynamic Content</h3>
 <p>The <code>time.sleep()</code> calls in the examples above are a crude approach to waiting for content to load. A better strategy is <em>explicit waits</em>, which pause execution until a specific condition is met:</p>
-<div id="5fde51df" class="cell" data-execution_count="8">
+<div id="f150afb7" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="im">from</span> selenium.webdriver.support.ui <span class="im">import</span> WebDriverWait</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a><span class="im">from</span> selenium.webdriver.support <span class="im">import</span> expected_conditions <span class="im">as</span> EC</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a></span>
@@ -593,7 +596,7 @@ div.csl-indent {
 <section id="scraping-infinite-scroll-pages" class="level3" data-number="8.5.5">
 <h3 data-number="8.5.5" class="anchored" data-anchor-id="scraping-infinite-scroll-pages"><span class="header-section-number">8.5.5</span> Scraping Infinite Scroll Pages</h3>
 <p>Many modern websites load content progressively as you scroll — social media feeds, image galleries, and product listings all use this pattern. The technique for scraping these pages involves scrolling to the bottom, waiting for new content to load, and repeating until no more content appears:</p>
-<div id="a61a52cf" class="cell" data-execution_count="9">
+<div id="54c14e99" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="kw">def</span> scrape_infinite_scroll(driver, max_scrolls<span class="op">=</span><span class="dv">20</span>, scroll_pause<span class="op">=</span><span class="dv">2</span>):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>    <span class="co">"""Scroll an infinite-scroll page and collect all loaded content."""</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>    last_height <span class="op">=</span> driver.execute_script(<span class="st">"return document.body.scrollHeight"</span>)</span>
@@ -621,7 +624,7 @@ div.csl-indent {
 <section id="passing-to-beautifulsoup" class="level2" data-number="8.6">
 <h2 data-number="8.6" class="anchored" data-anchor-id="passing-to-beautifulsoup"><span class="header-section-number">8.6</span> Passing to BeautifulSoup</h2>
 <p>Once the page is fully rendered in the browser, you can extract the complete HTML and parse it with the familiar BeautifulSoup tools:</p>
-<div id="86016f61" class="cell" data-execution_count="10">
+<div id="3cabb1f3" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="co"># Get the fully-rendered page source from Selenium</span></span>
@@ -638,11 +641,11 @@ div.csl-indent {
 <section id="always-close-the-driver" class="level2" data-number="8.7">
 <h2 data-number="8.7" class="anchored" data-anchor-id="always-close-the-driver"><span class="header-section-number">8.7</span> Always Close the Driver</h2>
 <p>When you are done, close the browser window:</p>
-<div id="7bbafb90" class="cell" data-execution_count="11">
+<div id="c95f02a2" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>driver.quit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>After calling <code>quit()</code>, any subsequent calls to the driver will raise an error. Use <code>try/finally</code> blocks to ensure cleanup:</p>
-<div id="6c33e494" class="cell" data-execution_count="12">
+<div id="228637e0" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="cf">try</span>:</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a>    driver.get(<span class="st">"https://example.com"</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>    <span class="co"># ... scraping logic ...</span></span>
@@ -670,7 +673,7 @@ div.csl-indent {
 <section id="headless-mode" class="level3" data-number="8.8.1">
 <h3 data-number="8.8.1" class="anchored" data-anchor-id="headless-mode"><span class="header-section-number">8.8.1</span> Headless Mode</h3>
 <p>For production scraping, you do not need a visible browser window. Headless mode runs the browser without a graphical interface, which is faster and can run on servers without a display:</p>
-<div id="ae7b9375" class="cell" data-execution_count="13">
+<div id="1cfefa00" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="im">from</span> selenium.webdriver.chrome.options <span class="im">import</span> Options</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>options <span class="op">=</span> Options()</span>
@@ -690,7 +693,7 @@ div.csl-indent {
 <section id="a-practical-selenium-workflow" class="level2" data-number="8.9">
 <h2 data-number="8.9" class="anchored" data-anchor-id="a-practical-selenium-workflow"><span class="header-section-number">8.9</span> A Practical Selenium Workflow</h2>
 <p>Fragility is an argument for writing Selenium code defensively, not for avoiding Selenium. Here is a complete workflow that pulls together everything this chapter has covered. We will automate a multi-page interaction: navigating to a website, performing a search, waiting for results to load, extracting the data, and repeating across multiple pages.</p>
-<div id="78ca8d40" class="cell" data-execution_count="14">
+<div id="77cd4850" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a><span class="im">from</span> selenium.webdriver.chrome.options <span class="im">import</span> Options</span>
@@ -778,32 +781,32 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will measure the difference between what a static request sees and what a browser sees, on a site where that difference matters.</p>
 <p><strong>Step 1 — Fetch statically first.</strong> Choose a JavaScript-heavy site — a news site’s live section, a social feed, a site the chapter mentioned. Check its <code>robots.txt</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), then fetch it with <code>requests.get()</code> and your <code>HEADERS</code>. Record the length of <code>response.text</code> and count a target element with BeautifulSoup (<a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>) — headlines, list items, whatever the page is made of.</p>
-<div id="3e491176" class="cell" data-execution_count="15">
+<div id="3d54aa46" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 1: Fetch your chosen page with requests, record the HTML length, and count your target element with BeautifulSoup.</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Start a headless browser.</strong> Set up a headless Selenium driver following the chapter’s setup code, and load the same URL with <code>driver.get()</code>.</p>
-<div id="9c216012" class="cell" data-execution_count="16">
+<div id="42e972db" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Step 2: Configure a headless driver and load the same URL.</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Wait, then measure again.</strong> Use <code>WebDriverWait</code> to wait for your target element to be present — the chapter shows the pattern — then record the length of <code>driver.page_source</code> and count the same target element, this time parsing <code>driver.page_source</code> with BeautifulSoup.</p>
-<div id="4de048b4" class="cell" data-execution_count="17">
+<div id="21332601" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># Step 3: Wait for the content to load, then measure page_source length and re-count the same element.</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Load more.</strong> Make the page reveal content a plain request never sees: scroll to the bottom with the chapter’s scrolling pattern (or click a “Load More” button if the site has one), wait, and count your element a third time.</p>
-<div id="0fd2dd5d" class="cell" data-execution_count="18">
+<div id="37396e89" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Step 4: Scroll or click to load more content, wait, and count again.</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Tabulate and clean up.</strong> Build a small DataFrame with one row per measurement — static request, initial Selenium load, after scrolling — and columns for HTML length and element count. Then close the browser with <code>driver.quit()</code>, as the chapter insists.</p>
-<div id="571f75d7" class="cell" data-execution_count="19">
+<div id="6f64876c" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="co"># Step 5: Build the comparison DataFrame, then driver.quit().</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: How much of the page did the static request miss? Would you classify this site as static, partially dynamic, or fully dynamic? Given the speed difference you experienced, when is Selenium worth the cost for this site — and when would <code>requests</code> alone do?</p>
-<div id="31d23af6" class="cell" data-execution_count="20">
+<div id="3d26c590" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1821,4 +1824,4 @@ Mitchell, Ryan. 2018. <em>Web Scraping with <span>Python</span>: Collecting More
 
 
 
-</body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/edit/main/ch-08-dynamic-pages.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
