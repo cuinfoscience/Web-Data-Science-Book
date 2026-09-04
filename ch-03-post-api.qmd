@@ -225,7 +225,7 @@ def diagnose(url):
     print(f"server       {response.headers.get('server')}")
     print(f"via          {response.headers.get('via')}")
     print(f"content-type {response.headers.get('content-type')}")
-    print(f"body         {response.text[:70]!r}")
+    print(f"body         {response.text[:120]!r}")
 
 
 diagnose("https://www.reddit.com/r/python/hot.json?limit=1")
