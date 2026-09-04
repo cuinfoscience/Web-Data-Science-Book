@@ -129,7 +129,7 @@ Wikipedia bans crawlers — the opposite of what its `robots.txt` actually
 says. `requests` has the same problem for the same reason: its default
 `python-requests/2.x` is refused too.
 
-So fetch the file yourself with a User-Agent that identifies you, then pass
+So fetch the file yourself with a [User-Agent](https://en.wikipedia.org/wiki/User-Agent_header) that identifies you, then pass
 the text to `rp.parse()`. The library that reads the politeness file is
 impolite by default, which is a fair summary of why this chapter exists.
 :::
