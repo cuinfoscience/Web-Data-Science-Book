@@ -467,7 +467,7 @@ div.csl-indent {
 <p><strong>Never hardcode API keys in your notebooks.</strong> If you share your notebook (on GitHub, in a class submission, with a collaborator), your key goes with it. Instead, store your keys as environment variables and read them at the top of your notebook:</p>
 <section id="environment-variables" class="level3" data-number="11.2.1">
 <h3 data-number="11.2.1" class="anchored" data-anchor-id="environment-variables"><span class="header-section-number">11.2.1</span> Environment Variables</h3>
-<div id="30601b2b" class="cell" data-execution_count="1">
+<div id="ed5d2590" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> os</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co"># Set in your terminal before launching Jupyter:</span></span>
@@ -502,7 +502,7 @@ div.csl-indent {
 </div>
 <div class="callout-body-container callout-body">
 <p>Some projects keep keys in a local configuration file instead of environment variables. Create a file called <code>api_keys.json</code> containing <code>{"census": "your-key", "fred": "your-key", "fec": "your-key"}</code>, add it to your <code>.gitignore</code> <strong>before your first commit</strong>, and load it into the same variable names:</p>
-<div id="0f40bebd" class="cell" data-execution_count="2">
+<div id="9b9123ab" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> json</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"api_keys.json"</span>) <span class="im">as</span> f:</span>
@@ -536,7 +536,7 @@ div.csl-indent {
 <section id="navigating-the-variable-catalog" class="level3" data-number="11.3.1">
 <h3 data-number="11.3.1" class="anchored" data-anchor-id="navigating-the-variable-catalog"><span class="header-section-number">11.3.1</span> Navigating the Variable Catalog</h3>
 <p>The Census API organizes variables into groups. Each group has a code (like <code>B25034</code> for “Year Structure Built”) and contains multiple variables representing different breakdowns:</p>
-<div id="ad324924" class="cell" data-execution_count="3">
+<div id="8f4cdc02" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a></span>
@@ -563,7 +563,7 @@ div.csl-indent {
 <section id="querying-for-specific-places" class="level3" data-number="11.3.3">
 <h3 data-number="11.3.3" class="anchored" data-anchor-id="querying-for-specific-places"><span class="header-section-number">11.3.3</span> Querying for Specific Places</h3>
 <p>Census data is organized geographically using FIPS codes. Colorado is state <code>08</code>; Boulder is place <code>07850</code>; Longmont is place <code>45970</code>. You can find FIPS codes at <a href="https://www.census.gov/library/reference/code-lists/ansi.html">census.gov/library/reference/code-lists</a>.</p>
-<div id="3cf650a7" class="cell" data-execution_count="4">
+<div id="6abbf21a" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Give each API's endpoint its own clearly named variable -- a generic name like `url` invites bugs when you move between APIs in one notebook</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>census_url <span class="op">=</span> <span class="st">"https://api.census.gov/data/2022/acs/acs5"</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a></span>
@@ -591,7 +591,7 @@ div.csl-indent {
 <section id="comparing-multiple-locations" class="level3" data-number="11.3.4">
 <h3 data-number="11.3.4" class="anchored" data-anchor-id="comparing-multiple-locations"><span class="header-section-number">11.3.4</span> Comparing Multiple Locations</h3>
 <p>You can pass multiple FIPS codes to compare locations side by side:</p>
-<div id="8ec122f7" class="cell" data-execution_count="5">
+<div id="172854aa" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Compare Boulder and Longmont</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>params[<span class="st">"for"</span>] <span class="op">=</span> <span class="st">"place:07850,45970"</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a></span>
@@ -623,7 +623,7 @@ div.csl-indent {
 <section id="finding-series-ids" class="level3" data-number="11.4.1">
 <h3 data-number="11.4.1" class="anchored" data-anchor-id="finding-series-ids"><span class="header-section-number">11.4.1</span> Finding Series IDs</h3>
 <p>FRED organizes data by “series” — each series is a specific time series with a unique ID. The easiest way to find series IDs is to search the <a href="https://fred.stlouisfed.org/">FRED website</a> interactively. For example, searching for “median household income Boulder County” will lead you to the series <code>MHICO08013A052NCEN</code>, an annual estimate from the Census Bureau’s Small Area Income and Poverty Estimates (SAIPE) program. Once you know to look, the ID is legible: it embeds the state postal abbreviation (<code>CO</code>) and Boulder County’s FIPS code (<code>08013</code>).</p>
-<div id="27d07f75" class="cell" data-execution_count="6">
+<div id="c7614fb2" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="co"># Retrieve median household income for Boulder County (SAIPE)</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>fred_url <span class="op">=</span> <span class="st">"https://api.stlouisfed.org/fred/series/observations"</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a></span>
@@ -646,7 +646,7 @@ div.csl-indent {
 <section id="combining-multiple-series" class="level3" data-number="11.4.2">
 <h3 data-number="11.4.2" class="anchored" data-anchor-id="combining-multiple-series"><span class="header-section-number">11.4.2</span> Combining Multiple Series</h3>
 <p>The real power of FRED emerges when you combine multiple series to tell a richer story:</p>
-<div id="b14400ca" class="cell" data-execution_count="7">
+<div id="9a4bf47a" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># Also get CPI data for comparison</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a>params_cpi <span class="op">=</span> {</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a>    <span class="st">"series_id"</span>: <span class="st">"CPIAUCSL"</span>,  <span class="co"># Consumer Price Index, All Urban Consumers</span></span>
@@ -672,7 +672,7 @@ div.csl-indent {
 <section id="server-side-transformations" class="level3" data-number="11.4.3">
 <h3 data-number="11.4.3" class="anchored" data-anchor-id="server-side-transformations"><span class="header-section-number">11.4.3</span> Server-Side Transformations</h3>
 <p>FRED can compute transformations before returning data, saving you work:</p>
-<div id="8eca9ce7" class="cell" data-execution_count="8">
+<div id="0b004696" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co"># Get CPI as year-over-year percent change</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>params_transform <span class="op">=</span> {</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a>    <span class="st">"series_id"</span>: <span class="st">"CPIAUCSL"</span>,</span>
@@ -702,7 +702,7 @@ div.csl-indent {
 <h3 data-number="11.4.4" class="anchored" data-anchor-id="comparing-cpi-across-locations"><span class="header-section-number">11.4.4</span> Comparing CPI Across Locations</h3>
 <p>National economic indicators often mask significant regional variation. The Denver metro area, for instance, experienced housing cost increases that diverged sharply from the national average during the post-pandemic period. FRED provides regional CPI series that let you measure this divergence directly.</p>
 <p>Two details matter when you set up this comparison. First, the regional series <code>CUURS49BSA0</code> is <em>not</em> seasonally adjusted, while the workhorse national series <code>CPIAUCSL</code> <em>is</em> — so for an apples-to-apples year-over-year comparison, use the not-seasonally-adjusted national series <code>CPIAUCNS</code> instead (year-over-year percent changes largely wash out seasonal effects on their own). Second, the BLS publishes the Denver-area CPI bimonthly rather than monthly, so gaps between observations are expected, not a bug in your code.</p>
-<div id="e6b4964d" class="cell" data-execution_count="9">
+<div id="c8203e14" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co"># Retrieve Denver metro CPI and national CPI</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>denver_params <span class="op">=</span> {</span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>    <span class="st">"series_id"</span>: <span class="st">"CUURS49BSA0"</span>,  <span class="co"># CPI, Denver-Aurora-Lakewood (not seasonally adjusted)</span></span>
@@ -749,7 +749,7 @@ div.csl-indent {
 <section id="fec-api" class="level2" data-number="11.5">
 <h2 data-number="11.5" class="anchored" data-anchor-id="fec-api"><span class="header-section-number">11.5</span> FEC API</h2>
 <p>The Federal Election Commission provides campaign finance data through a free API. This data enables accountability journalism and research on the influence of money in politics:</p>
-<div id="bf1b3f60" class="cell" data-execution_count="10">
+<div id="19f2abe6" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># Search for a candidate</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a>fec_search_url <span class="op">=</span> <span class="st">"https://api.open.fec.gov/v1/candidates/search/"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a>params <span class="op">=</span> {</span>
@@ -772,7 +772,7 @@ div.csl-indent {
 <section id="getting-campaign-finance-data" class="level3" data-number="11.5.1">
 <h3 data-number="11.5.1" class="anchored" data-anchor-id="getting-campaign-finance-data"><span class="header-section-number">11.5.1</span> Getting Campaign Finance Data</h3>
 <p>FEC identifiers follow a convention worth learning: candidate IDs begin with a letter for the office sought (<code>P</code> for president, <code>S</code> for Senate, <code>H</code> for House), while committee IDs begin with <code>C</code>. The ID below is therefore a <em>candidate</em> ID, and this endpoint returns that candidate’s financial totals, aggregated across their authorized committees.</p>
-<div id="f30cf71c" class="cell" data-execution_count="11">
+<div id="ca3286cc" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Get financial totals for a candidate</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>candidate_id <span class="op">=</span> <span class="st">"P80000722"</span>  <span class="co"># Biden's candidate ID ("P" = presidential)</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a></span>
@@ -795,7 +795,7 @@ div.csl-indent {
 <section id="combining-census-and-fred-data" class="level2" data-number="11.6">
 <h2 data-number="11.6" class="anchored" data-anchor-id="combining-census-and-fred-data"><span class="header-section-number">11.6</span> Combining Census and FRED Data</h2>
 <p>The most compelling analyses often integrate data from multiple government sources to tell a story that no single dataset can tell alone. Census data provides snapshots of demographic and housing characteristics; FRED provides economic time series that capture the conditions under which those characteristics formed. Combining them reveals the relationship between macro-level economic forces and community-level outcomes.</p>
-<div id="59f8508d" class="cell" data-execution_count="12">
+<div id="8e00a627" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Define each endpoint explicitly so this block stands on its own -- reusing a leftover `url` variable from an earlier section is a classic source of silent bugs in long notebooks</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a>census_url <span class="op">=</span> <span class="st">"https://api.census.gov/data/2022/acs/acs5"</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>fred_url <span class="op">=</span> <span class="st">"https://api.stlouisfed.org/fred/series/observations"</span></span>
@@ -860,33 +860,33 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one. You will need your Census and FRED keys from the start of this chapter.</p>
 <p>You will answer one comparative question about Colorado with two federal data sources: how does a Census measure vary across the state’s counties, and what has a related economic indicator done over time?</p>
 <p><strong>Step 1 — Load your keys safely.</strong> Load your Census and FRED API keys from environment variables or your <code>api_keys.json</code>, exactly as the chapter shows. Confirm both loaded by printing only their lengths — never the keys themselves, since the notebook is what you submit.</p>
-<div id="43f04643" class="cell" data-execution_count="13">
+<div id="6c824a14" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 1: Load your Census and FRED keys and confirm they are present</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># WITHOUT printing them.</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Query every Colorado county.</strong> Choose one ACS variable you care about (browse the groups catalog to pick it; median household income is <code>B19013_001E</code>). Query the Census API with <code>for=county:*</code> and <code>in=state:08</code> to get all Colorado counties in one call.</p>
-<div id="88a5f6a6" class="cell" data-execution_count="14">
+<div id="d68d8aee" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 2: Retrieve your chosen ACS variable for every Colorado county.</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Build and clean the DataFrame.</strong> First row is headers, the rest is data — the same shape you handled in <a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>. Convert your variable to numeric, sort by it, and print the top and bottom five counties.</p>
-<div id="d3385df1" class="cell" data-execution_count="15">
+<div id="a7b6bb72" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 3: Build the DataFrame, convert to numeric, sort, and print the extremes.</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Visualize the geography.</strong> Make a horizontal bar chart of the top 20 counties by your variable, labeled with county names.</p>
-<div id="09983447" class="cell" data-execution_count="16">
+<div id="e259fa70" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Step 4: Bar chart of the top 20 counties.</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Add the time dimension with FRED.</strong> Find one FRED series related to your Census variable for Colorado (unemployment rate, home price index, per-capita income — the chapter shows how to search for series IDs). Retrieve it, build a DataFrame with real dates, and plot the series over the last two decades.</p>
-<div id="71e1a367" class="cell" data-execution_count="17">
+<div id="5ed49a3d" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># Step 5: Retrieve a related FRED series for Colorado and plot it over time.</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: What geographic pattern did the county ranking reveal, and does it match what you know about Colorado? How does the FRED trend contextualize the Census snapshot — is the cross-sectional picture stable or a moment in a moving series? What would you need to be careful about before combining these two sources in one analysis (different geographies, different definitions, different vintages)?</p>
-<div id="d1d7c5bd" class="cell" data-execution_count="18">
+<div id="2aabeb35" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>

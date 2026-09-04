@@ -460,7 +460,7 @@ div.csl-indent {
 <section id="authentication" class="level3" data-number="12.2.1">
 <h3 data-number="12.2.1" class="anchored" data-anchor-id="authentication"><span class="header-section-number">12.2.1</span> Authentication</h3>
 <p>Reddit’s API uses <strong>OAuth2</strong>, the authorization standard behind most platform APIs. The core idea: instead of sending your password with every request, your application exchanges its credentials for a scoped, revocable token. OAuth2 comes in several <em>flows</em> for different situations. The <strong>client credentials</strong> flow used below authenticates your <em>application</em> and grants read-only access to public data — sufficient for research collection. The <strong>authorization code</strong> flow additionally asks a <em>user</em> to grant your app permission to act on their behalf (post, vote, read private feeds); you will not need it in this chapter, but you will recognize it from every “Sign in with Google” dialog you have ever clicked through.</p>
-<div id="e0940196" class="cell" data-execution_count="1">
+<div id="af6c8095" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="co"># Install: pip install praw</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="im">import</span> praw</span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
@@ -491,7 +491,7 @@ div.csl-indent {
 </section>
 <section id="exploring-subreddits" class="level3" data-number="12.2.2">
 <h3 data-number="12.2.2" class="anchored" data-anchor-id="exploring-subreddits"><span class="header-section-number">12.2.2</span> Exploring Subreddits</h3>
-<div id="0d956413" class="cell" data-execution_count="2">
+<div id="a45c5c2a" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
@@ -509,7 +509,7 @@ div.csl-indent {
 </section>
 <section id="retrieving-submissions" class="level3" data-number="12.2.3">
 <h3 data-number="12.2.3" class="anchored" data-anchor-id="retrieving-submissions"><span class="header-section-number">12.2.3</span> Retrieving Submissions</h3>
-<div id="aa32ab00" class="cell" data-execution_count="3">
+<div id="c91cd806" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co"># Get the top 25 submissions</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>submissions <span class="op">=</span> []</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="cf">for</span> submission <span class="kw">in</span> subreddit.top(limit<span class="op">=</span><span class="dv">25</span>, time_filter<span class="op">=</span><span class="st">"week"</span>):</span>
@@ -537,7 +537,7 @@ div.csl-indent {
 </section>
 <section id="comment-trees" class="level3" data-number="12.2.4">
 <h3 data-number="12.2.4" class="anchored" data-anchor-id="comment-trees"><span class="header-section-number">12.2.4</span> Comment Trees</h3>
-<div id="6731bd62" class="cell" data-execution_count="4">
+<div id="940bd290" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Take the current top submission from the subreddit's hot listing.</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="co"># (You can also pass any thread URL from your browser via</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="co"># reddit.submission(url="https://www.reddit.com/r/.../comments/..."))</span></span>
@@ -560,7 +560,7 @@ div.csl-indent {
 <section id="analyzing-comment-engagement" class="level3" data-number="12.2.5">
 <h3 data-number="12.2.5" class="anchored" data-anchor-id="analyzing-comment-engagement"><span class="header-section-number">12.2.5</span> Analyzing Comment Engagement</h3>
 <p>With the comment tree flattened into a DataFrame, you can start asking quantitative questions about how engagement varies with comment structure and position. One natural question: do deeper comments — replies to replies to replies — receive less attention than top-level responses? The <code>depth</code> field PRAW provides makes this straightforward to investigate.</p>
-<div id="28da9d74" class="cell" data-execution_count="5">
+<div id="65c80255" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
@@ -581,7 +581,7 @@ div.csl-indent {
 <span id="cb5-18"><a href="#cb5-18" aria-label="18"></a>plt.tight_layout()</span>
 <span id="cb5-19"><a href="#cb5-19" aria-label="19"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="15134abc" class="cell" data-execution_count="6">
+<div id="0694c996" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="co"># Summary statistics by depth</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>depth_summary <span class="op">=</span> df_comments.groupby(<span class="st">"depth"</span>).agg(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>    mean_score<span class="op">=</span>(<span class="st">"score"</span>, <span class="st">"mean"</span>),</span>
@@ -617,7 +617,7 @@ div.csl-indent {
 <section id="spotify-via-spotipy" class="level2" data-number="12.3">
 <h2 data-number="12.3" class="anchored" data-anchor-id="spotify-via-spotipy"><span class="header-section-number">12.3</span> Spotify via spotipy</h2>
 <p>Spotify’s API provides metadata about artists, albums, tracks, and playlists — a window into the catalog and popularity dynamics of the world’s largest music streaming platform:</p>
-<div id="fada60fc" class="cell" data-execution_count="7">
+<div id="a0b37401" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># Install: pip install spotipy</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="im">import</span> spotipy</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="im">from</span> spotipy.oauth2 <span class="im">import</span> SpotifyClientCredentials</span>
@@ -643,7 +643,7 @@ div.csl-indent {
 </div>
 <section id="searching-and-exploring" class="level3" data-number="12.3.1">
 <h3 data-number="12.3.1" class="anchored" data-anchor-id="searching-and-exploring"><span class="header-section-number">12.3.1</span> Searching and Exploring</h3>
-<div id="5ccd835c" class="cell" data-execution_count="8">
+<div id="c8e018e7" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co"># Search for an artist</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>results <span class="op">=</span> sp.search(q<span class="op">=</span><span class="st">"Queen"</span>, <span class="bu">type</span><span class="op">=</span><span class="st">"artist"</span>, limit<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="cf">for</span> artist <span class="kw">in</span> results[<span class="st">"artists"</span>][<span class="st">"items"</span>]:</span>
@@ -662,7 +662,7 @@ div.csl-indent {
 <section id="comparing-artists-with-catalog-metadata" class="level3" data-number="12.3.2">
 <h3 data-number="12.3.2" class="anchored" data-anchor-id="comparing-artists-with-catalog-metadata"><span class="header-section-number">12.3.2</span> Comparing Artists with Catalog Metadata</h3>
 <p>Metadata becomes revealing when you compare artists. Let us build a profile from three available endpoints — artist metadata, top tracks, and the album catalog — and compare two very different musicians:</p>
-<div id="5f42bc92" class="cell" data-execution_count="9">
+<div id="8b125c06" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="kw">def</span> get_artist_profile(sp, artist_name):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>    <span class="co">"""Build a metadata profile for an artist from public catalog data.</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a></span>
@@ -701,7 +701,7 @@ div.csl-indent {
 <span id="cb9-36"><a href="#cb9-36" aria-label="36"></a>          <span class="ss">f"</span><span class="sc">{</span>p[<span class="st">'followers'</span>]<span class="sc">:,}</span><span class="ss"> followers, "</span></span>
 <span id="cb9-37"><a href="#cb9-37" aria-label="37"></a>          <span class="ss">f"albums </span><span class="sc">{</span>p[<span class="st">'album_years'</span>][<span class="dv">0</span>]<span class="sc">}</span><span class="ss">–</span><span class="sc">{</span>p[<span class="st">'album_years'</span>][<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="46e79110" class="cell" data-execution_count="10">
+<div id="85da37b8" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="co"># Compare the popularity distributions of each artist's top tracks</span></span>
@@ -718,7 +718,7 @@ div.csl-indent {
 </div>
 <p>Even without audio analysis, the catalog tells stories: Daft Punk’s compact discography of studio albums contrasts with Yo-Yo Ma’s decades-long recording career spanning dozens of releases; their popularity scores reveal how streaming-era attention concentrates on some catalogs and spreads thin across others.</p>
 <p>For playlist-based questions, <code>sp.playlist_tracks()</code> retrieves the contents of any <em>user-created</em> public playlist (Spotify-owned editorial playlists are no longer accessible to new apps):</p>
-<div id="2a493d6a" class="cell" data-execution_count="11">
+<div id="dc64f052" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Retrieve tracks from a user-created public playlist by its ID</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>playlist_id <span class="op">=</span> <span class="st">"spotify_playlist_id_here"</span>  <span class="co"># From the playlist's share link</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>items <span class="op">=</span> sp.playlist_tracks(playlist_id, limit<span class="op">=</span><span class="dv">100</span>)[<span class="st">"items"</span>]</span>
@@ -743,7 +743,7 @@ div.csl-indent {
 <section id="bluesky-via-at-protocol" class="level2" data-number="12.4">
 <h2 data-number="12.4" class="anchored" data-anchor-id="bluesky-via-at-protocol"><span class="header-section-number">12.4</span> Bluesky via AT Protocol</h2>
 <p>Bluesky, built on the AT Protocol, represents a structural alternative to proprietary platforms. Its open protocol means that API access is an architectural feature, not a business decision:</p>
-<div id="91d2dd96" class="cell" data-execution_count="12">
+<div id="ca4eb27e" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Install: pip install atproto</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="im">from</span> atproto <span class="im">import</span> Client</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a></span>
@@ -764,7 +764,7 @@ div.csl-indent {
 </div>
 <p>Note the authentication style: an <strong>app password</strong> generated in Bluesky’s settings, distinct from your account password and revocable at any time — the same delegated-credential principle as OAuth, implemented more simply.</p>
 <p>Any account’s public posts are available through <code>get_author_feed</code>:</p>
-<div id="45379d0d" class="cell" data-execution_count="13">
+<div id="47fea1bd" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Retrieve a user's recent posts (public data; any handle works)</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>feed <span class="op">=</span> client.app.bsky.feed.get_author_feed(</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>    {<span class="st">"actor"</span>: <span class="st">"bsky.app"</span>, <span class="st">"limit"</span>: <span class="dv">50</span>}</span>
@@ -789,7 +789,7 @@ div.csl-indent {
 <section id="building-a-bluesky-social-network" class="level3" data-number="12.4.1">
 <h3 data-number="12.4.1" class="anchored" data-anchor-id="building-a-bluesky-social-network"><span class="header-section-number">12.4.1</span> Building a Bluesky Social Network</h3>
 <p>The AT Protocol makes social graph data directly accessible, enabling network analysis that would be difficult on more restricted platforms:</p>
-<div id="786dce81" class="cell" data-execution_count="14">
+<div id="86e9eed6" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="kw">def</span> get_social_graph(client, handle, direction<span class="op">=</span><span class="st">"followers"</span>, limit<span class="op">=</span><span class="dv">100</span>):</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a>    <span class="co">"""Get followers or following for a Bluesky user.</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a></span>
@@ -855,7 +855,7 @@ div.csl-indent {
 <section id="mastodon-via-mastodon.py" class="level2" data-number="12.5">
 <h2 data-number="12.5" class="anchored" data-anchor-id="mastodon-via-mastodon.py"><span class="header-section-number">12.5</span> Mastodon via Mastodon.py</h2>
 <p>Mastodon is a decentralized social network built on the ActivityPub protocol. Each server (instance) hosts its own API <span class="citation" data-cites="diener2026mastodonpy">(<a href="#ref-diener2026mastodonpy" role="doc-biblioref">Diener and Delcourt 2026</a>)</span>:</p>
-<div id="13e35d98" class="cell" data-execution_count="15">
+<div id="70abbf22" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Install: pip install Mastodon.py</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="im">from</span> mastodon <span class="im">import</span> Mastodon</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a></span>
@@ -888,7 +888,7 @@ div.csl-indent {
 <section id="working-across-instances" class="level3" data-number="12.5.1">
 <h3 data-number="12.5.1" class="anchored" data-anchor-id="working-across-instances"><span class="header-section-number">12.5.1</span> Working Across Instances</h3>
 <p>A key difference between Mastodon and centralized platforms is that there is no single API endpoint for “all of Mastodon.” Each instance maintains its own API, and you can only directly access the data on instances you authenticate with. This federated architecture means that comprehensive data collection requires accessing multiple instances — a fundamentally different research design challenge:</p>
-<div id="1e419a1a" class="cell" data-execution_count="16">
+<div id="657cdb6e" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Search for accounts across the instance you're connected to</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>results <span class="op">=</span> mastodon.account_search(<span class="st">"data science"</span>, limit<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a><span class="cf">for</span> account <span class="kw">in</span> results:</span>
@@ -969,32 +969,32 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will profile and compare the public activity of two Bluesky accounts. Bluesky is the chapter’s lowest-friction platform — a free account and an app password are all you need, with no application process. Remember the chapter’s caution: social data is people data, so pick public, organizational, or public-figure accounts rather than private individuals.</p>
 <p><strong>Step 1 — Authenticate.</strong> Create an app password in Bluesky’s settings (never your real password — the chapter explains the difference), log in with the <code>atproto</code> <code>Client</code>, and print your own handle to confirm the session works. Keep the credential out of the notebook, loading it the way you loaded API keys in <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>.</p>
-<div id="2966a077" class="cell" data-execution_count="17">
+<div id="9bbe52af" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># Step 1: Log in with the atproto Client using an app password loaded from an environment variable. Confirm with your handle, not the secret.</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Retrieve one account’s posts.</strong> Choose your first account and retrieve its 50 most recent posts with <code>get_author_feed</code>, building the list-of-dictionaries the chapter shows: text, created_at, likes, reposts, and whether each post is a reply. Convert to a DataFrame.</p>
-<div id="3bdca6b3" class="cell" data-execution_count="18">
+<div id="1e90059f" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Step 2: Retrieve 50 posts from your first account with get_author_feed and build a DataFrame.</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Compute an activity profile.</strong> From the DataFrame, compute: average post length in characters, posts per day (use the first and last <code>created_at</code> to get the window), the fraction of posts that are replies, and mean likes per post.</p>
-<div id="97a732ca" class="cell" data-execution_count="19">
+<div id="8b42ec47" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="co"># Step 3: Compute post length, posting rate, reply fraction, and mean likes.</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Repeat for a second account.</strong> Pick a second account you expect to behave differently — an institution vs.&nbsp;a person, a news outlet vs.&nbsp;a researcher — and run Steps 2–3 for it. Wrap the work in a function so you write the logic once, as you learned in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>.</p>
-<div id="85974c73" class="cell" data-execution_count="20">
+<div id="fefbe6ed" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 4: Write a profile_account(handle) function and run it on your second account.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Compare.</strong> Combine the two profiles into a single two-row DataFrame, and plot one comparison you find informative — likes per post, or the distribution of post lengths for both accounts.</p>
-<div id="b6447fd6" class="cell" data-execution_count="21">
+<div id="9818b872" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># Step 5: Build the two-row comparison DataFrame and plot one comparison.</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: How do the two accounts differ, and did the numbers match your expectations? What does each account seem to use the platform <em>for</em>? What could you not measure from <code>get_author_feed</code> alone, and which of the chapter’s other endpoints (or platforms) would you need for it?</p>
-<div id="d8b9c16f" class="cell" data-execution_count="22">
+<div id="938c63e8" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
