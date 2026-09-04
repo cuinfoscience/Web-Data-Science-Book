@@ -456,7 +456,7 @@ div.csl-indent {
 <section id="step-1-notebook-to-script" class="level2" data-number="14.3">
 <h2 data-number="14.3" class="anchored" data-anchor-id="step-1-notebook-to-script"><span class="header-section-number">14.3</span> Step 1: Notebook to Script</h2>
 <p>Let us convert a Rotten Tomatoes score scraper from notebook format to a standalone script. The key changes: remove interactive exploration, add a <code>main()</code> function, handle imports and configuration at the top, and write output to a file.</p>
-<div id="3b4bd50d" class="cell" data-execution_count="1">
+<div id="78197de9" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="co"># scraper.py — Rotten Tomatoes Score Scraper</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="co">"""Scrape Rotten Tomatoes audience and critic scores for a film."""</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
@@ -545,7 +545,7 @@ div.csl-indent {
 <section id="testing-your-script-locally" class="level3" data-number="14.3.1">
 <h3 data-number="14.3.1" class="anchored" data-anchor-id="testing-your-script-locally"><span class="header-section-number">14.3.1</span> Testing Your Script Locally</h3>
 <p>Before deploying your script to GitHub Actions, always test it locally from the command line. Running a script in the terminal is different from running cells in a notebook — import errors, missing dependencies, and file path issues that were invisible in Jupyter will surface immediately.</p>
-<div id="633e21c0" class="cell" data-execution_count="2">
+<div id="6e32cb76" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co"># From your terminal, run the script directly:</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="co"># $ python scraper.py</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="co"># Saved scores at 2024-11-15T14:23:07.482361+00:00</span></span>
@@ -723,7 +723,7 @@ div.csl-indent {
 <h3 data-number="14.4.5" class="anchored" data-anchor-id="handling-failures-gracefully"><span class="header-section-number">14.4.5</span> Handling Failures Gracefully</h3>
 <p>Even with validation in place, your scraper will occasionally fail due to circumstances beyond your control: the target website goes down for maintenance, a rate limit is temporarily enforced, or a network timeout occurs. A well-designed scraping pipeline handles these failures without losing previously collected data or crashing the workflow.</p>
 <p>The simplest approach is to wrap your scraping logic in a try/except block that logs the error and exits gracefully rather than raising an unhandled exception:</p>
-<div id="0acfe3a8" class="cell" data-execution_count="3">
+<div id="b8e13369" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> sys</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="im">import</span> traceback</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a></span>
@@ -766,7 +766,7 @@ div.csl-indent {
 <section id="step-3-analyze-collected-data" class="level2" data-number="14.5">
 <h2 data-number="14.5" class="anchored" data-anchor-id="step-3-analyze-collected-data"><span class="header-section-number">14.5</span> Step 3: Analyze Collected Data</h2>
 <p>After running your scraper for a period, you will have accumulated data to analyze:</p>
-<div id="4e619574" class="cell" data-execution_count="4">
+<div id="b647a36c" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"scores.csv"</span>)</span>
@@ -789,32 +789,32 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will take a collector you already trust and make it deployable: notebook to script, script to scheduled workflow, workflow to monitored pipeline. The deliverable stays inside the notebook — actually running it on GitHub Actions for days is the Additional Exercises’ territory — but every piece you write here is the real thing.</p>
 <p><strong>Step 1 — Choose and rehearse your collector.</strong> Pick a keyless data source from an earlier chapter — Open-Meteo (<a href="ch-04-data-formats.html" class="quarto-xref"><span>Chapter 4</span></a>) or Wikipedia pageviews (<a href="ch-01-introduction.html" class="quarto-xref"><span>Chapter 1</span></a>) are ideal. Write a <code>collect()</code> function with a docstring that fetches the current data with your <code>HEADERS</code> and returns a dictionary of the fields you want to keep, including a UTC timestamp. Run it once to prove it works.</p>
-<div id="03990cab" class="cell" data-execution_count="5">
+<div id="40820552" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># Step 1: Write collect() -- fetch one observation from your source and return a dict of fields including a UTC timestamp. Run it once.</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Append safely to CSV.</strong> Write <code>save_row(row, filepath)</code> following the chapter’s pattern: a pinned <code>FIELDNAMES</code> constant, append mode, header written only when the file does not yet exist. Run collect-and-save twice and show the CSV has two rows and one header.</p>
-<div id="1df527a3" class="cell" data-execution_count="6">
+<div id="dd1bac85" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Step 2: Write save_row() with a pinned schema, run the pipeline twice, and prove the CSV grew correctly.</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Convert to a script.</strong> Assemble the whole thing into a standalone <code>collector.py</code>: imports at top, your two functions, a <code>main()</code> that calls them, and the <code>if __name__ == "__main__":</code> guard. Write it to disk from the notebook, then verify it runs from the command line with <code>!python collector.py</code>.</p>
-<div id="17337f02" class="cell" data-execution_count="7">
+<div id="fd78af03" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Step 3: Write collector.py to disk (imports, collect, save_row, main, __main__ guard) and run it with !python collector.py.</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Add a freshness check.</strong> Write <code>check_freshness(filepath, max_age_hours=24)</code>: read the CSV, parse the newest timestamp, and print a clear OK or a warning if the data is stale. Test both paths — once against your fresh file, once with the threshold set low enough to trigger the warning.</p>
-<div id="51e7e9cc" class="cell" data-execution_count="8">
+<div id="ee727287" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 4: Write check_freshness() and demonstrate both the passing and the failing case.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Draft the workflow.</strong> Write the GitHub Actions workflow YAML for this collector as a string and save it to <code>collect.yml</code>: a cron schedule (explain your chosen expression in a comment — remember Actions cron is UTC), checkout, Python setup, dependency install, running <code>collector.py</code>, running the freshness check, and committing the CSV back — following the chapter’s template.</p>
-<div id="d876787b" class="cell" data-execution_count="9">
+<div id="1fcf46f2" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 5: Draft the full workflow YAML, with the cron expression explained, and save it to collect.yml.</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: What failure modes does this pipeline have — what breaks it silently, and what breaks it loudly? Which failure would your freshness check catch, and which would it miss? What one addition from the chapter’s hardening section would you make before trusting this pipeline for a semester?</p>
-<div id="089fdbb3" class="cell" data-execution_count="10">
+<div id="bd9fd867" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>

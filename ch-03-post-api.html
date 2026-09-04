@@ -557,7 +557,7 @@ Table&nbsp;3.1: Four outcomes of an access request, sorted by intent that neithe
 <section id="an-access-matrix" class="level3" data-number="3.3.2">
 <h3 data-number="3.3.2" class="anchored" data-anchor-id="an-access-matrix"><span class="header-section-number">3.3.2</span> An Access Matrix</h3>
 <p>The first audit asks one question of each of these endpoints: <em>if I show up with no credentials, what happens?</em></p>
-<div id="ccb11328" class="cell" data-execution_count="1">
+<div id="e3c3ca22" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
@@ -632,7 +632,7 @@ X (Twitter)     401   gated application/problem+json        NaN
 <p>This is not hypothetical. The first time this audit was run while drafting this chapter, GitHub’s API returned 403 — which would have been a striking finding, since GitHub documents 60 unauthenticated requests per hour for anyone. The body explained it:</p>
 <pre><code>{"message":"GitHub access to this repository is not enabled for this session..."}</code></pre>
 <p>That was the sandbox the code was running in, not GitHub. Reporting it as enclosure would have described the instrument rather than the thing measured.</p>
-<div id="edd09273" class="cell" data-execution_count="2">
+<div id="c653eaee" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="kw">def</span> diagnose(url):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>    <span class="co">"""Show who actually answered, so a refusal can be attributed correctly."""</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>    response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">20</span>)</span>
@@ -640,7 +640,7 @@ X (Twitter)     401   gated application/problem+json        NaN
 <span id="cb4-5"><a href="#cb4-5" aria-label="5"></a>    <span class="bu">print</span>(<span class="ss">f"server       </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'server'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-label="6"></a>    <span class="bu">print</span>(<span class="ss">f"via          </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'via'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb4-7"><a href="#cb4-7" aria-label="7"></a>    <span class="bu">print</span>(<span class="ss">f"content-type </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'content-type'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-label="8"></a>    <span class="bu">print</span>(<span class="ss">f"body         </span><span class="sc">{</span>response<span class="sc">.</span>text[:<span class="dv">70</span>]<span class="sc">!r}</span><span class="ss">"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-label="8"></a>    <span class="bu">print</span>(<span class="ss">f"body         </span><span class="sc">{</span>response<span class="sc">.</span>text[:<span class="dv">120</span>]<span class="sc">!r}</span><span class="ss">"</span>)</span>
 <span id="cb4-9"><a href="#cb4-9" aria-label="9"></a></span>
 <span id="cb4-10"><a href="#cb4-10" aria-label="10"></a></span>
 <span id="cb4-11"><a href="#cb4-11" aria-label="11"></a>diagnose(<span class="st">"https://www.reddit.com/r/python/hot.json?limit=1"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -656,7 +656,7 @@ body         '&lt;body class=theme-beta&gt;&lt;div&gt;&lt;style&gt;.theme-light,
 <section id="dead-endpoint-forensics" class="level3" data-number="3.3.4">
 <h3 data-number="3.3.4" class="anchored" data-anchor-id="dead-endpoint-forensics"><span class="header-section-number">3.3.4</span> Dead-Endpoint Forensics</h3>
 <p>The second audit turns to endpoints that are no longer supposed to work. You might expect a dead API to be simply unreachable. The three below fail in three different ways, and the way each fails says whether anything can still be recovered.</p>
-<div id="cfcaf76c" class="cell" data-execution_count="3">
+<div id="509c0773" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a>RETIRED <span class="op">=</span> {</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>    <span class="st">"Pushshift (Reddit archive)"</span>: <span class="st">"https://api.pushshift.io/reddit/search/submission/?q=test&amp;size=1"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>    <span class="st">"CrowdTangle (Meta)"</span>:         <span class="st">"https://api.crowdtangle.com/posts"</span>,</span>
@@ -705,7 +705,7 @@ Twitter API v1.1             400    rejects the request without a token
 <p><strong>Twitter v1.1 still parses your request</strong> and rejects it with error code 215, “Bad Authentication data.” The endpoint is alive and serving paying customers; you are simply not one of them. Repricing, not removal.</p>
 <p>The exact exception name in the <code>evidence</code> column depends on how you reach the network: a direct connection to a host that has vanished usually raises <code>ConnectionError</code>, while a machine behind a proxy raises <code>ProxyError</code> instead. Either way the <code>status</code> is <code>None</code>, and that is the part that matters — no HTTP conversation happened at all.</p>
 <p>For an endpoint in the second category, the only remaining evidence is archival. The Wayback Machine’s availability API reports whether the documentation was captured before it went:</p>
-<div id="68bf836a" class="cell" data-execution_count="4">
+<div id="09fad68e" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="kw">def</span> last_snapshot(url):</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>    <span class="co">"""Find the closest archived capture of a page.</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a></span>
@@ -805,28 +805,28 @@ www.crowdtangle.com      20240814023608</code></pre>
 </ul>
 <p>No verdicts are given for any of these. Some answer with data, some with a request for a key, and at least one answers <code>200</code> with something other than data — the <code>content-type</code> column will tell you which before the status column does.</p>
 <p><strong>Step 1 — Identify yourself.</strong> Define the <code>HEADERS</code> dictionary with your named <code>User-Agent</code>, as in <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
-<div id="89d190c5" class="cell" data-execution_count="5">
+<div id="4fa6b21d" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># Step 1: Define HEADERS with your named User-Agent.</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Probe the anchor by hand.</strong> Request the OpenAlex endpoint with a 20-second timeout. Print the status code, the <code>content-type</code> header, and every response header whose name starts with <code>X-RateLimit</code>. Do not build the loop yet — make one request and look at it. In a comment, say what those headers tell you about the terms of access, and whether you received data or a budget.</p>
-<div id="102e33db" class="cell" data-execution_count="6">
+<div id="f35a3f6f" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Step 2: Request the OpenAlex endpoint; print status, content-type, and every X-RateLimit header.</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Build the institutional matrix.</strong> Define an <code>INSTITUTIONS</code> dictionary holding the anchor plus at least two endpoints from the menu, then run the chapter’s <code>probe()</code> (or your own version) over it and collect the rows into a DataFrame. Remember the <code>Int64</code> dtype for the status column, and record today’s date in a comment.</p>
-<div id="7525e3ef" class="cell" data-execution_count="7">
+<div id="8ba3bcd8" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Step 3: Define INSTITUTIONS (anchor + at least two from the menu) and probe them into a DataFrame.</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co"># Record today's date -- your table is a snapshot, not a fact.</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Extend it.</strong> Add two endpoints of your own for public institutions that are not on the menu — a city’s open-data portal, your state legislature, a university library, an international agency — and rebuild the matrix. Classify each new row as open, gated, or closed.</p>
-<div id="9c225aa2" class="cell" data-execution_count="8">
+<div id="3fc3a306" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 4: Add two institutional endpoints of your own and rebuild the matrix.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Attribute a refusal.</strong> Pick one endpoint that did not return <code>200</code> with data — a <code>403</code>, a <code>429</code>, or a <code>200</code> whose <code>content-type</code> is <code>text/html</code> — and diagnose it: print the <code>server</code> and <code>via</code> headers and the first 120 characters of the body. State in a comment whether the refusal came from the institution itself, from a gateway in front of it (several federal APIs share one), or from something between you and it.</p>
-<div id="ec42a419" class="cell" data-execution_count="9">
+<div id="bf497a93" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 5: Diagnose one refusal -- server header, via header, body excerpt -- and attribute it in a comment.</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -837,12 +837,12 @@ www.crowdtangle.com      20240814023608</code></pre>
 <li><strong>OpenSecrets API</strong> — <code>https://www.opensecrets.org/api/?method=getLegislators&amp;id=CO&amp;output=json</code>. The money-in-politics nonprofit discontinued its API on April 15, 2025, directing users to bulk downloads instead.</li>
 </ul>
 <p>None of these three fails the way the chapter’s three did. Say which of the chapter’s categories fits, or whether you need a new one.</p>
-<div id="0ad17b95" class="cell" data-execution_count="10">
+<div id="51c95d81" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 6: Autopsy one retired institutional endpoint and classify the manner of refusal.</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In four to six sentences: Does “held open by legal mandate” describe the institutions you probed, or only some of them? Which of your rows was a refusal wearing a success code, and how did you tell? For the endpoint you autopsied, is there anyone left to negotiate with — and where did its data go: a successor, a bulk download, or nowhere?</p>
-<div id="a6d5c4fe" class="cell" data-execution_count="11">
+<div id="96ed740f" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1621,7 +1621,7 @@ Perriam, Jessamy, Andreas Birkbak, and Andy Freeman. 2020. <span>“Digital Meth
 <span id="cb17-229"><a href="#cb17-229" aria-label="225"></a>    <span class="bu">print</span>(<span class="ss">f"server       </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'server'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb17-230"><a href="#cb17-230" aria-label="226"></a>    <span class="bu">print</span>(<span class="ss">f"via          </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'via'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb17-231"><a href="#cb17-231" aria-label="227"></a>    <span class="bu">print</span>(<span class="ss">f"content-type </span><span class="sc">{</span>response<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'content-type'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb17-232"><a href="#cb17-232" aria-label="228"></a>    <span class="bu">print</span>(<span class="ss">f"body         </span><span class="sc">{</span>response<span class="sc">.</span>text[:<span class="dv">70</span>]<span class="sc">!r}</span><span class="ss">"</span>)</span>
+<span id="cb17-232"><a href="#cb17-232" aria-label="228"></a>    <span class="bu">print</span>(<span class="ss">f"body         </span><span class="sc">{</span>response<span class="sc">.</span>text[:<span class="dv">120</span>]<span class="sc">!r}</span><span class="ss">"</span>)</span>
 <span id="cb17-233"><a href="#cb17-233" aria-label="229"></a></span>
 <span id="cb17-234"><a href="#cb17-234" aria-label="230"></a></span>
 <span id="cb17-235"><a href="#cb17-235" aria-label="231"></a>diagnose(<span class="st">"https://www.reddit.com/r/python/hot.json?limit=1"</span>)</span>
