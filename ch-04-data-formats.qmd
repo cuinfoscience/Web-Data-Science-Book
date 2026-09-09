@@ -151,7 +151,7 @@ soup = BeautifulSoup(response.text, "xml")
 
 # When was this snapshot published?
 print(soup.find("MemberData")["publish-date"])
-# July 1, 2026
+# September 2, 2026
 
 # Find all members
 members = soup.find_all("member")
@@ -167,10 +167,12 @@ for m in members:
 
 from collections import Counter
 print(Counter(parties))
-# Counter({'R': 223, 'D': 218})
+# Counter({'R': 221, 'D': 217, '': 2, 'I': 1})
 ```
 
 Why 441 rather than 435? The file includes the six non-voting delegates and resident commissioner alongside the 435 voting representatives. Your exact counts will also drift as members resign and seats are filled — which is why the `publish-date` attribute matters. Record it alongside your data so your analysis documents exactly which snapshot of Congress it describes.
+
+That `Counter` already shows drift in two different ways, and both are worth reading rather than discarding. The two blank-string parties are not a parsing bug: they are vacant seats. The feed's `<member>` block for each still exists, but every biographical tag inside it — `<firstname>`, `<lastname>`, `<party>` — is present and empty, and a `<footnote>` names the reason (`"Vacancy due to the resignation of..."`, with the departing member's information preserved in a `<predecessor-info>` block). A seat count of 441 was never a claim that 441 people are serving; it is a claim that 441 *lines* exist in the roster, two of which are placeholders. And the lone `'I'` is Kevin Kiley of California's 3rd district, whose `<party>` tag reads `I` while his `<caucus>` tag reads `R` — the schema distinguishes formal party registration from which caucus a member actually sits with, and a `Counter` over `party` alone will call him something his colleagues would not. Neither wrinkle shows up unless you go looking; a `Counter(parties)` that only reports round numbers is one you should not fully trust.
 
 ### From XML to DataFrame
 
@@ -209,9 +211,11 @@ With the full Congressional dataset, you can now perform real analysis:
 ```{python}
 # Party breakdown
 print(df.groupby("party").size())
-# party
-# D    218
-# R    223
+#
+#     2
+# D    217
+# I      1
+# R    221
 # dtype: int64
 
 # Top 10 states by number of representatives
@@ -229,6 +233,8 @@ print(df.groupby("state").size().sort_values(ascending=False).head(10))
 # MI    13
 # dtype: int64
 ```
+
+The empty-string party appears here too, sorted before `"D"` because pandas orders group keys alphabetically and an empty string sorts first. If you wanted only the 439 members actually serving, `df[df["party"] != ""]` drops the two vacancies before you count.
 
 This `find_all` → extract fields → list of dictionaries → DataFrame pipeline is the parsing half of the book's retrieve–parse–analyze loop. You will use it to parse HTML tables in @sec-static-pages, extract data from archived web pages in @sec-archives, and process PDF text in @sec-pdfs. The data source changes, the tag names change, but the pipeline stays the same. Once you internalize this pattern, every new parsing challenge becomes a question of "what tags contain the data I need?" rather than "how do I get data into a DataFrame?"
 
@@ -333,8 +339,12 @@ print(json_output)
 When working with `requests`, the `.json()` method on a response object does this parsing for you automatically:
 
 ```{python}
-response = requests.get("https://api.example.com/data")
+response = requests.get("https://jsonverse.dev/examples/json-metrics.json")
 data = response.json()  # Equivalent to json.loads(response.text)
+print(data)
+# {'metric': 'cpu_usage', 'unit': 'percent', 'interval': '1m',
+#  'series': [{'ts': 1698000000, 'value': 45.2}, {'ts': 1698000060, 'value': 48.1}, ...],
+#  'tags': {'host': 'server-01', 'region': 'us-east-1'}}
 ```
 
 ### Working with a Real JSON Object
@@ -399,12 +409,13 @@ print(type(data["daily"]))      # <class 'dict'>
 print(data["daily"].keys())     # dict_keys(['time', 'temperature_2m_max', 'temperature_2m_min'])
 
 # The actual values are lists inside the 'daily' dictionary
-print(data["daily"]["time"][:3])              # ['2024-01-15', '2024-01-16', '2024-01-17']
-print(data["daily"]["temperature_2m_max"][:3]) # [5.2, 8.1, 3.7]
+print(data["daily"]["time"][:3])              # ['2026-09-09', '2026-09-10', '2026-09-11']
+print(data["daily"]["temperature_2m_max"][:3]) # [28.4, 31.2, 32.6]
 
 # Use .get() for safe access with a default
 elevation = data.get("elevation", "unknown")
 print(f"Elevation: {elevation} meters")
+# Elevation: 1635.0 meters
 ```
 
 The strategy is always the same: start with `type()` and `.keys()` at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:
@@ -473,7 +484,7 @@ This guided exercise is the chapter's take-home assignment. Work through it in t
 
 You will parse one real dataset in each format: an RSS feed (XML) and a weather forecast (JSON), ending with both as DataFrames.
 
-**Step 1 — Set up politely.** Define your `HEADERS` with a named `User-Agent` (@sec-ethics). Find an RSS feed from a news outlet you read — most sites serve one at `/rss` or `/feed` — and check the site's `robots.txt` permits fetching it.
+**Step 1 — Set up politely.** Define your `HEADERS` with a named `User-Agent` (@sec-ethics). Find an RSS feed from a news outlet or podcast — most sites serve one at `/rss` or `/feed` — and check the site's `robots.txt` permits fetching it.
 
 ```{python}
 # Step 1: Define HEADERS and choose an RSS feed URL you have checked against the site's robots.txt.
@@ -558,4 +569,5 @@ XML and JSON are the two structural languages of web data. XML organizes data as
 - Python `json` module: <https://docs.python.org/3/library/json.html>
 - W3C XML specification: <https://www.w3.org/XML/>
 - JSON specification: <https://www.json.org/>
+  - Examples of JSON versus XML: <https://www.json.org/example.html>
 - @mitchell2018web — Chapter 1: Your First Web Scraper
