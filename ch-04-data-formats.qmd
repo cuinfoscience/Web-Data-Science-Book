@@ -486,6 +486,41 @@ You will parse one real dataset in each format: an RSS feed (XML) and a weather 
 
 **Step 1 — Set up politely.** Define your `HEADERS` with a named `User-Agent` (@sec-ethics). Find an RSS feed from a news outlet or podcast — most sites serve one at `/rss` or `/feed` — and check the site's `robots.txt` permits fetching it.
 
+::: {.callout-tip}
+## Starter feeds
+
+Five news outlets and five data/tech podcasts, researched as of September 2026. RSS URLs move over time — treat these as a starting point, not a guarantee; the status-code check in Step 2 is exactly how you'd notice if one has moved.
+
+**News**
+
+| Outlet | Feed |
+|---|---|
+| The New York Times | `https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml` |
+| BBC News | `https://feeds.bbci.co.uk/news/rss.xml` |
+| The Guardian | `https://www.theguardian.com/world/rss` |
+| PBS NewsHour | `https://www.pbs.org/newshour/feeds/rss/headlines` |
+| Al Jazeera | `https://www.aljazeera.com/xml/rss/all.xml` |
+
+AP and Reuters are conspicuously absent: both discontinued their public RSS feeds (Reuters in 2020, AP some time after) — a small, real instance of the decline this chapter describes below.
+
+**Podcasts (data, tech, and data journalism)**
+
+| Podcast | Feed |
+|---|---|
+| Data Skeptic | `https://dataskeptic.libsyn.com/rss` |
+| Planet Money (NPR) | `https://feeds.npr.org/510289/podcast.xml` |
+| The Changelog | `https://changelog.com/podcast/feed` |
+| Data Engineering Podcast | no single published URL — find it on [dataengineeringpodcast.com](https://www.dataengineeringpodcast.com/) using the technique below |
+| The PolicyViz Podcast | no single published URL — find it on [policyviz.com/podcast](https://policyviz.com/podcast/) using the technique below |
+
+**Finding a feed this list doesn't cover.** Most sites don't advertise their feed on the homepage:
+
+- Try appending `/rss`, `/feed`, or `/rss.xml` to the site's root URL — the most common convention.
+- View the page source (not the rendered page) and search for `type="application/rss+xml"` — it names the feed URL directly in a `<link>` tag, even when nothing is visible on the page itself.
+- For a podcast specifically, check its listing on a podcast directory (Apple Podcasts, Podchaser, Listen Notes) — most display or link to the canonical feed even when the show's own site doesn't.
+- Look for a small RSS icon or a "Subscribe" link, often in a page footer or sidebar.
+:::
+
 ```{python}
 # Step 1: Define HEADERS and choose an RSS feed URL you have checked against the site's robots.txt.
 # Your code here
