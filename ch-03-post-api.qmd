@@ -160,13 +160,15 @@ def probe(name, url):
     except requests.RequestException as error:
         return {"api": name, "status": None, "verdict": "unreachable",
                 "content_type": type(error).__name__, "rate_limit": None}
+    
+    verdict_dict = {
+        200: "open",
+        401: "gated",
+        403: "gated",
+        429: "redirect"
+    }
 
-    if response.status_code == 200:
-        verdict = "open"
-    elif response.status_code in (401, 403):
-        verdict = "gated"
-    else:
-        verdict = "other"
+    verdict = verdict_dict.get(response.status_code, "other")
 
     return {
         "api": name,
