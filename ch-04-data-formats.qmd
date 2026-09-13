@@ -21,6 +21,10 @@ Before you can extract data from the web, you need to understand how data is str
 
 XML is the older format, born from the document-centric web of the 1990s. It represents data as a tree of nested tags — a structure you will recognize when you encounter HTML in @sec-static-pages. HTML and XML are siblings rather than parent and child: both descend from an older markup standard called SGML, and the HTML you find in the wild is *not* well-formed XML (only the stricter XHTML dialect is). That looseness is precisely why the forgiving HTML parsers you will meet in @sec-static-pages exist. The relationship runs deeper than a shared syntax, though: an entire family of formats is built on XML the way XHTML is — MathML for mathematical notation, SVG for vector graphics, RSS and RDF for syndication and metadata — because "define your own tags" turns out to be a useful property for far more than web pages. When you later meet a `.svg` file or an RSS feed and its structure feels familiar, that is why: you already know how to read it, because you already know how to read XML. JSON is the newer, lighter format that rose with Web 2.0 and the API economy. It maps directly onto Python's native data structures — lists and dictionaries — making it especially natural to work with programmatically.
 
+### XML vs. JSON
+
+XML uses nested tags to organize data, while JSON uses keys and values. JSON is often easier to parse in Python because it converts directly into dictionaries and lists. XML requires finding elements and extracting their text.
+
 This chapter teaches you to parse both formats, building the foundational skills that every subsequent chapter depends on.
 
 ## XML and BeautifulSoup
