@@ -36,18 +36,35 @@ Before writing code to scrape a page, you should always inspect it manually usin
 
 ### The Inspector Tab
 
-The Inspector shows the HTML structure of the page as a tree. You can hover over elements to highlight them on the page, expand nested tags to explore the structure, and identify the CSS selectors or element attributes you will need for scraping. Start with a simple page like a Wikipedia article — most commercial websites are full of tracking scripts and dynamic content that obscure the actual structure.
+The Inspector shows the HTML structure of the page as a tree, and it is the tool you will use most in this book. Chrome and Safari call this panel **Elements**; Firefox calls it **Inspector**. Whatever the name, the fastest way to open it on any specific piece of a page is to right-click the thing you care about — a headline, a table cell, an image — and choose **Inspect** (Chrome, Firefox) or **Inspect Element** (Safari). This jumps straight to that element in the tree, rather than dropping you at the top of a page that might be thousands of lines long.
+
+What you are looking at is not the page's original HTML — it is the **DOM** (Document Object Model), the browser's live, in-memory representation of the page after JavaScript has finished modifying it. View Source — usually reached from the page's right-click menu or the browser's main menu — shows the original bytes the server sent; the Inspector shows what the page looks like right now, which on a JavaScript-heavy site can be substantially different. If an element is visible in the Inspector but missing from View Source or from `requests.get(url).text`, JavaScript put it there after the page loaded, and `requests` alone will never see it (you will meet the tools for that case in @sec-dynamic-pages).
+
+Hover over any node in the tree and the browser highlights the corresponding region of the page — a fast way to confirm you have the right element before you write a selector for it. The reverse direction works too: click the small arrow-and-box icon in the DevTools toolbar (the **element picker**, sometimes called **inspect mode**), then click anywhere on the rendered page, and the Inspector jumps to that element's node in the tree. This is usually faster than hunting through nested `<div>`s by eye, especially on a complex page.
+
+Once you have the right node selected, look at its **attributes** — `id`, `class`, and any `data-*` attributes are usually your most reliable scraping targets, since class names built for styling can change with a redesign while `id`s and `data-*` attributes more often encode stable, semantic meaning. Right-click the node itself (not the page) for a **Copy** submenu with **Copy selector** and **Copy XPath** — both hand you a working CSS selector or XPath expression for exactly that element, which you can paste straight into a `soup.select()` call as a starting point. It is worth simplifying what these auto-generated selectors give you, though: they are often longer and more brittle than necessary, tied to a specific nesting depth rather than a stable class or id.
+
+You can also edit the DOM directly in the Inspector — double-click any text node or attribute to change it. These edits are temporary and local to your browser tab; reloading the page discards them, and no one else sees them. This makes the Inspector a safe place to experiment: delete an overlay or a cookie-consent banner that is blocking your view of the content underneath, or temporarily strip an element's styling to see the plain structure beneath it. Nothing you do here reaches the server.
+
+Start with a simple, mostly-static page like a Wikipedia article before trying a commercial site — most commercial sites are full of tracking scripts, ad-injection code, and dynamically generated markup that obscures the structure you are trying to learn to read. Once you are comfortable navigating a simple page's tree, a complicated one is just more of the same skill.
+
+For more detail than this book covers, see each browser's own documentation: [Chrome DevTools — Elements panel](https://developer.chrome.com/docs/devtools/elements), [Firefox DevTools — Page Inspector](https://firefox-source-docs.mozilla.org/devtools-user/page_inspector/), and [Safari — Web Inspector](https://developer.apple.com/documentation/safari-developer-tools/web-inspector).
 
 ### The Network Tab
 
-The Network tab reveals all the HTTP requests your browser makes to load a page. When you reload a page with the Network tab open, you will see dozens or even hundreds of requests — not just for the HTML, but for CSS stylesheets, JavaScript files, images, fonts, and tracking pixels. Each request shows:
+The Network tab lives alongside the Inspector in the same DevTools window — Chrome, Firefox, and Safari all call it **Network**. Open DevTools first (the shortcuts above, or right-click anywhere on the page and choose **Inspect** / **Inspect Element**, which opens the whole DevTools panel), then click the Network tab specifically. Reload the page while it is open — the Network tab only records requests that happen while it is visible, so a page you already loaded before opening DevTools will show nothing until you reload it. Check the **Preserve log** option if you want the list to survive a redirect or a full page navigation instead of clearing itself; this matters when you are tracing a login flow or a multi-step redirect chain.
 
-- The URL being requested
-- The HTTP method (GET, POST, etc.)
-- The status code of the response (200 OK, 404 Not Found, etc.)
-- The response headers, including `Content-Type`, `Set-Cookie`, and `User-Agent`
+A single page load typically produces dozens or hundreds of requests — not just for the HTML document, but for CSS stylesheets, JavaScript files, images, web fonts, and tracking or advertising pixels. The **filter bar** near the top narrows this down by resource type: **Doc** shows the main HTML page itself; **Fetch/XHR** shows requests JavaScript made after the page loaded, which is where API calls and dynamically-loaded data almost always appear; **JS**, **CSS**, **Img**, and **Font** show exactly what they say. When a page's actual data is not present in the initial HTML — a common pattern on modern, JavaScript-rendered sites — the Fetch/XHR filter is usually where you find the real, structured (often JSON) request that a Python scraper should replicate directly, instead of trying to parse rendered HTML at all (@sec-dynamic-pages covers this in depth).
 
-Click on any individual request to inspect its headers. Pay particular attention to the `User-Agent` header (how your browser identifies itself) and any `Cookie` headers (session information that the server uses to recognize you).
+Each row in the request list shows several columns at a glance: the request's **Name** (usually the URL's last path segment), its **Status** code, its **Type**, its **Size**, and its **Time** — how long that request took. The **Waterfall** column visualizes timing as a colored bar: a queuing delay, DNS lookup, connection setup, waiting for the server's first byte (often labeled TTFB, time-to-first-byte), and content download each get their own segment, so a request that is slow because the server is slow to respond looks visibly different from one that is slow because the response itself is simply large.
+
+Click any individual request to open a detail pane with several sub-tabs. **Headers** shows the request headers your browser sent (including `User-Agent`, `Accept`, and any `Cookie` header carrying session information) and the response headers the server sent back (including `Content-Type`, `Set-Cookie`, and caching directives). **Response** (Chrome/Safari) or the equivalent pane in Firefox shows the actual response body — for a Fetch/XHR request, this is usually where you confirm the exact JSON shape you will need to parse in Python, before writing a single line of code. **Timing** breaks the waterfall segments down into exact millisecond values.
+
+One feature is worth learning early: right-click any request and look for **Copy** → **Copy as cURL**. This gives you a complete command reproducing exactly what your browser sent — method, headers, cookies, and body — which is often the fastest way to figure out which headers a `requests` call needs to match a working browser request. Read the copied command directly, or paste it into a cURL-to-Python converter; the header names and values map onto the `headers=` dictionary you already know how to pass to `requests.get()`.
+
+Pay particular attention to the `User-Agent` header on outgoing requests — how your browser identifies itself, and a value you can deliberately change yourself, covered in "User-Agent Spoofing" later in this chapter — and to `Cookie` headers on both sides, since session-based sites use them to recognize you across requests.
+
+For more detail, see: [Chrome DevTools — Network panel](https://developer.chrome.com/docs/devtools/network), [Firefox DevTools — Network Monitor](https://firefox-source-docs.mozilla.org/devtools-user/network_monitor/), and [Safari — Web Inspector](https://developer.apple.com/documentation/safari-developer-tools/web-inspector).
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -86,13 +103,41 @@ print(response.json())
 
 ### Traceroute
 
-When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers. You can trace this path using the `scapy` library:
+When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers, and tracing that path is a good way to make the abstract idea of "the network" concrete. This section uses the `scapy` library to do it in Python — but unlike everything else in this chapter, `scapy` needs real setup before it will work at all, so the install and permissions come first, before any code.
+
+#### Installing and Running `scapy`
+
+`scapy` sends and receives raw network packets directly, bypassing the ordinary socket API that `requests` and every other library in this book uses. Crafting and sniffing raw packets is a privileged operating-system operation on every major platform — that restriction has nothing to do with `scapy` itself, and everything to do with what raw packet access would let *any* program do if it were unrestricted. Because of this, getting `scapy`'s traceroute to run takes three separate steps, in order, and skipping straight to the code below without them is the single most common way to get stuck.
+
+**1. Install the library.**
+
+```
+pip install scapy
+```
+
+or, if you manage packages with conda:
+
+```
+conda install -c conda-forge scapy
+```
+
+**2. On Windows only, install a packet-capture driver.** `scapy` cannot send or receive raw packets on Windows without [Npcap](https://npcap.com/) — a driver, not a Python package, so `pip install scapy` alone will not give you a working `traceroute()` on Windows. Download and run the Npcap installer before continuing, accepting the default options.
+
+**3. Launch your notebook with elevated privileges.** This is the step people skip, and the failure that follows is confusing rather than clear — the call hangs, or every hop comes back unanswered, with no error message pointing at the actual cause.
+
+- **macOS or Linux:** open a terminal and run `sudo jupyter notebook`. One gotcha worth knowing in advance: `sudo` resets your shell's `PATH` by default, so if `scapy` is installed inside a conda environment, a bare `sudo jupyter notebook` can launch a *different* Jupyter than the one in your environment — and fail with `ModuleNotFoundError: No module named 'scapy'` even though you installed it correctly. If that happens, be explicit about which Jupyter you mean: `sudo $(which jupyter) notebook`.
+- **Windows:** open the Start menu, right-click **Anaconda Prompt**, and choose **Run as administrator**. From that elevated prompt, run `jupyter notebook` as usual.
+
+::: {.callout-warning}
+Running an entire Jupyter server with root or Administrator privileges is a bigger step than it sounds. A notebook kernel executes arbitrary code, so once you launch it this way, *anything* that runs in *any* cell has full system access — not just the one `scapy` call that actually needed it. That trade-off is reasonable for a short, deliberate session on your own machine to run the code below, but it is not a habit to build: close the elevated notebook server when you are done, and never leave one running on a machine or network you do not fully trust.
+:::
+
+If your machine will not cooperate — a locked-down lab computer, no administrator rights, or Npcap will not install — skip ahead to the terminal-based backup at the end of this section. You will still see exactly what a traceroute reveals; you just will not be doing it from Python.
 
 ```{python}
 from scapy.all import traceroute
 
 # Trace the path to Wikipedia
-# Note: scapy requires root/administrator access on some systems
 result, unans = traceroute("en.wikipedia.org", maxttl=20)
 ```
 
@@ -111,9 +156,76 @@ location = geolocate_ip("151.101.130.133")
 print(f"{location['city']}, {location['country']}")
 ```
 
-::: {.callout-important}
-`scapy` requires root/administrator privileges to send and receive raw network packets. On macOS or Linux, you may need to run `sudo jupyter notebook` from the terminal. On Windows, install the [Npcap](https://npcap.com/) packet-capture driver and launch Anaconda Prompt as Administrator. If you cannot get packet capture working on your machine, read along instead — nothing later in this book depends on it.
-:::
+#### Interpreting Traceroute Output
+
+Each line `scapy` prints represents one hop — a router along the path — with its IP address (or hostname, if one resolves) and a round-trip time in milliseconds. A few patterns come up often enough to be worth recognizing on sight:
+
+- **`* * *`, or an unanswered hop.** Not every router replies to traceroute probes — many are configured to rate-limit or silently drop them for their own protection. This does *not* mean that hop or the connection is broken; it usually means the path continues fine past it, just without a visible line for that one router.
+- **A sudden jump in round-trip time.** A hop dramatically slower than the ones just before and after it often marks a long-haul or undersea link — the path crossing from one continent or region to another — rather than anything being wrong.
+- **Private IP addresses in the earliest hops.** Addresses starting with `10.`, `192.168.`, or `172.16.`–`172.31.` are private, non-routable addresses reserved for local networks. Seeing them in the first hop or two is normal: it is your own home or campus network's internal routing, before your traffic ever reaches the public internet.
+- **Hostnames that encode geography.** Router hostnames on the public internet often contain airport codes or city abbreviations from the network operator that owns them (`iad` for the Washington, D.C. area, `ord` for Chicago, and so on) — a quick, informal way to guess where a hop physically sits, well before you bother calling a geolocation API on it.
+- **Round-trip time stabilizing near the end.** The last few hops usually settle close to the actual latency you would measure with a simple ping to the destination — a sign you have essentially arrived, even if the exact last hop does not respond.
+
+#### A Backup: Traceroute from the Terminal
+
+If the Python setup above is too much friction — or you just want to see the result faster — every major operating system ships a traceroute tool that works from an ordinary, unprivileged terminal: no `scapy`, no elevated permissions, no Npcap.
+
+- **macOS or Linux:** open a terminal and run:
+
+```
+traceroute en.wikipedia.org
+```
+
+- **Windows:** open Command Prompt or Anaconda Prompt — no administrator rights needed for this one — and run:
+
+```
+tracert en.wikipedia.org
+```
+
+Both print the same information `scapy`'s `traceroute()` does, one line per hop with round-trip times, in a slightly different format. This is worth doing even if your Python setup worked: it is the fastest way to sanity-check that what you saw from `scapy` looks like the real path, and it is a reasonable fallback — or a reasonable default — if getting raw-socket access working inside a notebook is not worth the friction for what you are trying to learn here.
+
+### Packets and Packet Sniffing
+
+Every message this chapter has described — a DNS lookup, an HTTP request, a traceroute probe — ultimately travels as a sequence of **packets**: small chunks of data, each wrapped in its own headers that carry routing and delivery information separately from whatever payload it carries. TCP breaks a message into packets on the way out and reassembles them in order on the way in; that reassembly is exactly what lets `requests` hand you back one clean `Response` object instead of a pile of disconnected fragments.
+
+**Packet sniffing** means capturing these packets as they pass across a network interface, rather than only sending and receiving your own application's requests the normal way. This is a meaningfully more invasive capability than anything else in this chapter. A traceroute or a DNS lookup only ever touches traffic you generated. A packet sniffer running on a shared network — campus wifi, a coffee-shop hotspot, an office LAN — can, depending on the network's configuration, see *other people's* traffic too: which sites they are visiting, and on an unencrypted connection, potentially some of what they are sending. Capturing your own traffic on your own machine is unambiguously fine. Capturing other people's traffic without their knowledge or consent is a real privacy question, and in some jurisdictions and contexts a legal one — wiretapping and electronic-interception statutes were written with exactly this kind of capability in mind. @sec-ethics covers consent and authorized access in more depth, and it applies here as much as it does to scraping.
+
+For that reason, the only sniffing this book has you do is on **loopback traffic you generate yourself, to a server running on your own machine**. Nothing here ever touches a shared network or anyone else's packets.
+
+```{python}
+import time
+import threading
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+from scapy.all import AsyncSniffer
+import requests
+
+PORT = 8899
+
+# A minimal local server -- the only thing this section sends traffic to
+httpd = HTTPServer(("127.0.0.1", PORT), SimpleHTTPRequestHandler)
+threading.Thread(target=httpd.serve_forever, daemon=True).start()
+time.sleep(0.2)  # give the server a moment to start listening
+
+# Start capturing on the loopback interface before generating any traffic.
+# "lo0" on macOS, "lo" on Linux; on Windows, omit iface and let scapy pick the loopback adapter.
+sniffer = AsyncSniffer(filter=f"tcp port {PORT}", iface="lo0")
+sniffer.start()
+time.sleep(0.2)  # give the sniffer a moment to attach
+
+response = requests.get(f"http://127.0.0.1:{PORT}/")
+print("Response status:", response.status_code)
+
+packets = sniffer.stop()
+httpd.shutdown()
+
+print(f"\nCaptured {len(packets)} packets on the loopback interface:")
+for pkt in packets:
+    print(pkt.summary())
+```
+
+This needs the same elevated privileges as traceroute, for the same reason — see "Installing and Running `scapy`" above if you have not launched your notebook that way already.
+
+The captured packets tell the same story as the Network tab's Timing view, just one layer deeper. The first few packets are TCP's handshake — a `SYN` (your machine proposing a connection), a `SYN-ACK` (the local server accepting it), and an `ACK` (confirming) — before either side has sent a single byte of the actual HTTP request. After that, a `PSH, ACK` packet carries your GET request, and one or more further packets carry the server's response back. Every request this chapter has made with `requests.get()` involved this exact same exchange; `scapy`'s sniffer just makes it visible instead of hidden behind a library call.
 
 ## DNS: The Address Book
 
@@ -132,11 +244,22 @@ Domain names have a hierarchical structure: `subdomain.domain.top-level-domain`.
 
 ### The Structure of Domain Names
 
-Understanding this hierarchy helps you navigate the web programmatically. Consider two examples:
+Understanding this hierarchy helps you navigate the web programmatically. Consider a few examples:
 
 - `en.wikipedia.org` — The TLD is `.org` (a generic TLD for organizations). The domain is `wikipedia` (registered by the Wikimedia Foundation). The subdomain `en` indicates the English-language edition. Other subdomains like `es`, `de`, or `m` (mobile) are all controlled by Wikipedia and do not require separate registration. The pageviews API you will use later in this chapter lives at `wikimedia.org` — not a subdomain of `wikipedia.org` but a separate registered domain that the Wikimedia Foundation also operates.
 
 - `api.census.gov` — The TLD is `.gov` (restricted to U.S. government entities). The domain is `census`. The subdomain `api` indicates this is the programmatic access point rather than the public-facing website at `www.census.gov`.
+
+- `cuinfoscience.github.io` — the domain this very book is published under. The TLD is `.io`, officially the country code for the British Indian Ocean Territory — but almost no one using a `.io` domain has any connection to that territory. Developers read "io" as shorthand for *input/output*, and the tech industry adopted it for that association alone; GitHub Pages uses it as the default domain for every project site it hosts, this one included.
+
+- `www.bbc.co.uk` — the United Kingdom splits by *second-level* domain rather than by TLD the way the U.S. does. Commercial UK sites conventionally sit under `.co.uk`; UK government sites use `.gov.uk`, and UK universities use `.ac.uk` — three purposes the U.S. gives entirely separate top-level domains (`.com`, `.gov`, `.edu`), folded here into one ccTLD, `.uk`, with the purpose distinguished by what comes before it.
+
+Most of this chapter's examples end in `.org`, `.gov`, or `.edu` — generic TLDs with no country attached, because U.S. institutions built the early internet and defaulted to them. That produces a U.S.-centered blind spot worth naming directly: the United States has its *own* country-code TLD, `.us`, and almost nobody uses it — roughly three-quarters of the most-visited websites registered in the U.S. use `.com` instead. Most other countries went the opposite way. In Germany, `.de` is the dominant choice for German websites, used far more often than `.com`; the same pattern holds across much of Europe, Latin America, and Asia, where a country's own ccTLD *is* the unmarked, default choice — not a special-purpose alternative the way `.us` is in its own home country.
+
+Two further wrinkles are worth recognizing when you encounter them:
+
+- **Repurposed ccTLDs.** Some country codes get adopted for what their letters happen to spell rather than for any connection to the country they were assigned to — `.io` above is one. `.ai` (Anguilla) has become the default TLD for AI companies, and `.tv` (Tuvalu) was an early favorite of streaming and broadcast sites for the obvious reason. None of this changes how DNS resolves them; they are ordinary ccTLDs, functioning exactly like any other. It does mean you cannot infer a site's country of origin from its TLD alone.
+- **Non-Latin domain names.** DNS itself only understands ASCII characters, but browsers happily display domains in other scripts — a Russian site's name might render as `сайт.рф` in your address bar. Underneath, this is transparently translated into an ASCII-only form called **punycode**, prefixed with `xn--` (`сайт` becomes `xn--80aswg`; `.рф` becomes `.xn--p1ai`), which is what actually gets resolved. If you ever see a domain with an `xn--` prefix in `requests` output or in `urlparse()`'s result, that is what you are looking at: a non-Latin domain name in its underlying, DNS-legal encoding.
 
 When you construct URLs for scraping or API calls, knowing which part of the domain identifies the service (the domain) versus which part routes you to a specific feature (the subdomain and path) helps you anticipate URL patterns. Government APIs often live at `api.agency.gov`, data portals at `data.agency.gov`, and documentation at `developers.agency.gov`. Recognizing these conventions saves you time when exploring new data sources.
 
@@ -152,6 +275,10 @@ The status codes you will encounter most often:
 - **404 Not Found**: The resource does not exist at this URL
 - **429 Too Many Requests**: You are being rate-limited; slow down
 - **500 Internal Server Error**: Something went wrong on the server side
+
+This list covers what you will see most often in this book, not the full standard — see the [MDN HTTP response status code reference](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status) for the complete set, including the less common ones you will eventually run into (401 Unauthorized, 405 Method Not Allowed, 503 Service Unavailable, and dozens more). You do not need to memorize it; bookmark it instead, and look codes up as you hit them.
+
+Before you write a line of Python, the Network tab from earlier in this chapter already shows you every status code a page's requests receive, in the **Status** column of the request list — reloading a page with the Network tab open and watching for anything other than 200 is often the fastest way to spot a problem before you ever open a notebook.
 
 ### Diagnosing HTTP Errors
 
@@ -249,6 +376,47 @@ plt.tight_layout()
 plt.show()
 ```
 
+### User-Agent Spoofing
+
+Every request this chapter has made has honestly identified itself — `WebDataScience/1.0 (your-email@colorado.edu)`, a real contact address a server operator could actually use to reach you. **User-Agent spoofing** means sending a `User-Agent` header that claims to be something you are not: a specific browser, operating system, or device you are not actually running. It is worth understanding both because you will encounter it — some sites behave differently depending on what you claim to be — and because doing it yourself raises questions this book has otherwise been able to sidestep by simply identifying itself truthfully.
+
+There are legitimate, unremarkable reasons to change a `User-Agent`: testing how your own site renders on a phone without owning one, checking whether a page serves a simplified version to older browsers, or working around a service that blocks a legitimate research tool's honest identification for no defensible reason. There are also reasons that are not legitimate, covered below.
+
+Mechanically, spoofing is nothing more than the `headers` dictionary you already know how to build — just with a value that describes a browser and device you are not actually using:
+
+```{python}
+import requests
+
+# An honest identification, like every other request in this book
+honest_headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+
+# A spoofed identification, claiming to be a specific desktop Chrome browser
+spoofed_headers = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+    )
+}
+
+# httpbin.org's /user-agent endpoint just echoes back whatever header you sent --
+# a safe, verifiable way to see exactly what a server receives, with no guessing
+# about how any particular real site might currently react to it
+print(requests.get("https://httpbin.org/user-agent", headers=honest_headers).json())
+print(requests.get("https://httpbin.org/user-agent", headers=spoofed_headers).json())
+```
+
+The two responses differ only in the string you supplied — the server has no way to tell the second one apart from a real Chrome browser unless it looks at more than the `User-Agent` header alone (more on that below). You already saw a real, working case of a site's behavior actually changing based on this exact header earlier in this chapter: the Wikimedia pageviews API's default `requests` User-Agent got a 403, and a properly identified one got a 200. That is UA-based gatekeeping in its lightest, most common form — refusing an *unidentified* client — and it is already something you have done deliberately, just not by pretending to be a different, specific piece of software.
+
+**What a User-Agent string actually contains.** The long, oddly-formatted string above packs in a browser's rendering engine, version, and operating system, largely for historical compatibility reasons rather than any coherent modern design — that is why even a current Chrome browser's User-Agent still contains the word "Mozilla." Because parsing these strings reliably is genuinely difficult, modern browsers increasingly expose the same information in a cleaner, structured way through **User-Agent Client Hints** — a newer set of headers (`Sec-CH-UA` and related) that a server can request explicitly instead of parsing a free-text string. A server that checks the traditional `User-Agent` header while ignoring Client Hints, or the reverse, can end up seeing a mismatch between what the two report — one of several signals, beyond the User-Agent header alone, that modern bot-detection systems use. The practical takeaway for this book is narrower than "how to avoid detection": simply changing a `User-Agent` string is a weak, easily-noticed technique on its own, not a reliable way to make automated traffic indistinguishable from a real browser, and treating it as one will give you false confidence.
+
+::: {.callout-important}
+## Ethical and Legal Considerations
+
+Spoofing a `User-Agent` is not illegal simply as a technical act — declaring your browser to be something else is not, by itself, unauthorized access to anything. What matters is *what you do it for*. Using a spoofed header to check how your own site renders on different devices, or to access a page's mobile layout for research purposes, is unremarkable. Using one specifically to defeat a site's stated attempt to block automated access is a different act with different consequences, even though the code is identical either way — and it sits inside the exact same legal landscape @sec-ethics maps for scraping generally: the CFAA, Terms of Service as quasi-law, and the unsettled, still-shifting case law around each. Routing the evasion through a `User-Agent` header instead of, say, ignoring `robots.txt`, does not change that analysis or make it a smaller decision.
+
+For coursework in this class, the practical rule is the one @sec-ethics already establishes for everything else: identify yourself honestly by default, respect `robots.txt` and rate limits, and treat a site's explicit attempt to block automated access as a signal to stop and reconsider — not an obstacle to route around. If a legitimate research need ever leads you to consider doing otherwise, that is a conversation to have with your instructor first, not a default to reach for on your own.
+:::
+
 ### Connections, Sessions, and Retries
 
 Every bare `requests.get()` call does more work than it appears to: it opens a fresh TCP connection to the server, performs the TLS handshake, sends the request, and tears the connection back down. For a single request, that overhead is negligible. But the chapters ahead will have you making dozens or hundreds of requests to the same host — one per Wikipedia article, one per bill, one per archived page — and paying the connection setup cost every time is wasteful for both you and the server.
@@ -323,6 +491,23 @@ Understanding URL structure is essential for constructing API requests. In @sec-
 ### Building URLs Programmatically
 
 Web APIs expect the values you supply in one of two places, and you need to recognize which pattern you are dealing with before you can build the URL correctly.
+
+Both patterns below build URLs with Python's **f-strings** — a compact way to embed variables and expressions directly inside a string, written `f"...{expression}..."`. This is an intermediate Python feature: an f-string evaluates whatever sits inside the curly braces and inserts the result directly into the string at that position.
+
+```{python}
+name = "Boulder"
+count = 3
+
+# An f-string: the "f" before the opening quote enables {expression} substitution
+print(f"{name} has {count} things")          # Boulder has 3 things
+print(f"{name} has {count + 1} things")      # expressions work too, not just variables
+print(f"{name.upper()} has {count} things")  # so do method calls
+
+# An ordinary string does none of this -- braces stay literal text
+print("{name} has {count} things")           # {name} has {count} things
+```
+
+An f-string can also span multiple lines by placing several adjacent string literals next to each other — Python concatenates them automatically, which is how the URL-building code below builds one long string across several lines without a single `+`. The [Python tutorial's section on formatted string literals](https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals) covers the full syntax, including format specifiers (`{value:.2f}` for two decimal places, and similar) that come up less often in this book but are worth knowing exist.
 
 **Path-segment APIs** embed each value at a fixed position in the URL's path. The Wikimedia pageviews endpoint you used earlier works this way: project, access method, agent, article, granularity, and date range are all path segments in a required order. Build these URLs with an f-string over the components — but URL-encode any component that might contain special characters using `urllib.parse.quote`, because a stray slash or space inside a path segment produces a URL the server cannot route:
 
@@ -454,13 +639,14 @@ The web's protocol stack was designed as public infrastructure — open standard
 ## Common Issues to Debug
 
 - **`scapy` import errors**: Requires `pcap` drivers. On Windows, install Npcap. On macOS, the built-in `libpcap` usually works.
+- **`scapy` fails after `sudo jupyter notebook`**: `sudo` often resets `PATH`, launching a different Python than your conda environment. Use `sudo $(which jupyter) notebook` instead.
 - **403 from Wikimedia API**: You forgot the custom `User-Agent` header.
 - **DNS results varying by location**: Normal — content delivery networks return different IPs based on your geographic location.
 - **URL encoding issues**: Use `urllib.parse.quote()` for article titles with spaces or special characters.
 
 ## Key Takeaways
 
-The web is built on a layered stack of protocols: TCP/IP transports data, DNS resolves names to addresses, HTTP structures the conversation, and URLs identify the target. Understanding this stack transforms debugging from guesswork into systematic diagnosis. When a request fails, you can ask: can I reach the server at all? Am I resolving the right address? What status code did I get? Are my headers correct? Is my URL well-formed? This systematic approach carries through every chapter that follows.
+The web is built on a layered stack of protocols: TCP/IP transports data, DNS resolves names to addresses, HTTP structures the conversation, and URLs identify the target. Traceroute and packet sniffing make that transport layer directly observable, and the `User-Agent` header — honest or deliberately spoofed — is how a server decides who, or what, it believes is asking. Understanding this stack transforms debugging from guesswork into systematic diagnosis. When a request fails, you can ask: can I reach the server at all? Am I resolving the right address? What status code did I get? Are my headers correct? Is my URL well-formed? This systematic approach carries through every chapter that follows.
 
 ## Further Reading
 
