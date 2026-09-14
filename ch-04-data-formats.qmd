@@ -547,7 +547,9 @@ AP and Reuters are conspicuously absent: both discontinued their public RSS feed
 # Your code here
 ```
 
-**Step 5 — Fetch nested JSON.** Retrieve the Boulder forecast from `https://api.open-meteo.com/v1/forecast?latitude=40.01&longitude=-105.27&daily=temperature_2m_max&timezone=America/Denver` and parse it with `.json()`. Print the top-level keys, then the keys under `"daily"` — map the nesting before you extract anything.
+**Step 5 — Fetch nested JSON.** Retrieve the Boulder forecast from:
+`https://api.open-meteo.com/v1/forecast?latitude=40.01&longitude=-105.27&daily=temperature_2m_max&timezone=America/Denver` 
+Then parse it with `.json()`. Print the top-level keys, then the keys under `"daily"` — map the nesting before you extract anything.
 
 ```{python}
 # Step 5: Fetch the Open-Meteo forecast, parse the JSON, and print the top-level keys and the keys nested under "daily".
