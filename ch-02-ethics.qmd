@@ -191,9 +191,14 @@ headers = {
 }
 
 response = requests.get("https://example.com", headers=headers)
+
+print(response.status_code)
+print(response.request.headers["User-Agent"])
 ```
 
 This practice serves two purposes: it lets site operators contact you if your scraping causes problems, and it signals that you are a responsible actor rather than a malicious bot. Some APIs (including the Wikimedia API you used in @sec-introduction) require a meaningful User-Agent and will return errors or impose stricter rate limits if you do not provide one.
+
+The two `print()` calls are how you check your work. The status code confirms the request completed, and echoing `response.request.headers["User-Agent"]` confirms that `requests` actually sent the string you set. Mistype the key as `"User Agent"` and the header is silently dropped, leaving the library default `python-requests/2.x` in its place. Note that the status code alone is not evidence the header worked: `example.com` answers anonymous requests with a `200` as well, so only the echoed header tells the two cases apart.
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -208,10 +213,11 @@ Making hundreds of requests per second to a web server can degrade its performan
 import time
 import requests
 
-urls = ["https://example.com/page1", "https://example.com/page2"]
+urls = ["https://example.com", "https://example.org"]
 
 for url in urls:
     response = requests.get(url, headers=headers)
+    print(response.status_code, url)
     # Process the response...
     time.sleep(1)  # Wait 1 second between requests
 ```
