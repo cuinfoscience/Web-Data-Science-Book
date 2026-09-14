@@ -526,7 +526,7 @@ AP and Reuters are conspicuously absent: both discontinued their public RSS feed
 # Your code here
 ```
 
-**Step 2 — Fetch and inspect the XML.** Retrieve the feed with `requests`. Print the status code and the first 500 characters. Identify the repeating element by eye — for RSS it is `<item>`.
+**Step 2 - Fetch and inspect the XML.** Retrieve the feed with `requests`. Print the status code and the first 500 characters. Before parsing, make sure the status code is 200 and the response actually looks like XML. If you get a 403, 404, or an HTML error page, check the feed URL or choose another feed url instead of trying to parse the error response as XML. Identify the repeating element by eye, for RSS it is `<item>`. Check the content-type header to tell XML apart from an HTML error page.
 
 ```{python}
 # Step 2: Fetch the feed and inspect the first 500 characters of raw XML.
