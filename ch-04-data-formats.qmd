@@ -139,14 +139,17 @@ print(first_member.contents)
 
 ### Working with Real XML
 
-Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at [clerk.house.gov](https://clerk.house.gov) in XML format. Its structure is exactly what the synthetic example prepared you for: a root `<MemberData>` tag with a `publish-date` attribute, containing a `<members>` tag, containing one `<member>` per representative, each with the biographical details nested inside `<member-info>` (plus a `<committee-assignments>` block we will ignore here):
+Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at [clerk.house.gov](https://clerk.house.gov) in XML format. Its structure is exactly what the synthetic example prepared you for: a root `<MemberData>` tag with a `publish-date` attribute, containing a `<members>` tag, containing one `<member>` per representative, each with the biographical details nested inside `<member-info>` (plus a `<committee-assignments>` block we will ignore here). This is the chapter's first live request, so it also carries the `HEADERS` dictionary you adopted in @sec-ethics — every live request in this chapter uses it, and a server administrator reading the logs sees a named requester rather than an anonymous one:
 
 ```{python}
 import requests
 from bs4 import BeautifulSoup
 
+# Identify yourself on every live request: name the project and give a contact address
+HEADERS = {"User-Agent": "WebDataScience-Course/1.0 (your.email@colorado.edu)"}
+
 url = "https://clerk.house.gov/xml/lists/MemberData.xml"
-response = requests.get(url)
+response = requests.get(url, headers=HEADERS)
 soup = BeautifulSoup(response.text, "xml")
 
 # When was this snapshot published?
@@ -339,7 +342,7 @@ print(json_output)
 When working with `requests`, the `.json()` method on a response object does this parsing for you automatically:
 
 ```{python}
-response = requests.get("https://jsonverse.dev/examples/json-metrics.json")
+response = requests.get("https://jsonverse.dev/examples/json-metrics.json", headers=HEADERS)
 data = response.json()  # Equivalent to json.loads(response.text)
 print(data)
 # {'metric': 'cpu_usage', 'unit': 'percent', 'interval': '1m',
@@ -397,7 +400,7 @@ params = {
     "timezone": "America/Denver"
 }
 
-response = requests.get(url, params=params)
+response = requests.get(url, params=params, headers=HEADERS)
 data = response.json()
 
 # Start by understanding the top-level structure
