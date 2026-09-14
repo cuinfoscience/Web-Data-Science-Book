@@ -266,6 +266,19 @@ print(state["capital"])     # "Denver"
 print(state.keys())         # dict_keys(['name', 'capital', 'population'])
 ```
 
+Objects and arrays give JSON its structure, but JSON values also match several basic Python data types:
+
+| JSON value | Python type | Example |
+|---|---|---|
+| object | `dict` | `{"name": "Colorado"}` |
+| array | `list` | `["Alice", "Bob"]` |
+| string | `str` | `"Colorado"` |
+| number | `int` or `float` | `5773714` or `5.7` |
+| `true` or `false` | `bool` | `True` or `False` |
+| `null` | `NoneType` | `None` |
+
+One important difference is capitalization. JSON uses lowercase `true`, `false`, and `null`, while Python uses `True`, `False`, and `None`. Python’s `json` module automatically makes these conversions when it parses valid JSON.
+
 ### Nested Structures
 
 Real-world JSON data nests these structures inside each other. A dictionary can contain lists, lists can contain dictionaries, and the nesting can go several levels deep:
