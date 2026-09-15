@@ -165,7 +165,7 @@ def probe(name, url):
         200: "open",
         401: "gated",
         403: "gated",
-        429: "redirect"
+        429: "too-many-requests"
     }
 
     verdict = verdict_dict.get(response.status_code, "other")
