@@ -145,8 +145,11 @@ Let us retrieve and parse actual Congressional member data. The Office of the Cl
 import requests
 from bs4 import BeautifulSoup
 
+# Identify yourself. @sec-ethics explains why this header matters; every live request in this chapter sends it.
+HEADERS = {"User-Agent": "WebDataScience/1.0 (INFO 4617; you@colorado.edu)"}
+
 url = "https://clerk.house.gov/xml/lists/MemberData.xml"
-response = requests.get(url)
+response = requests.get(url, headers=HEADERS)
 soup = BeautifulSoup(response.text, "xml")
 
 # When was this snapshot published?
@@ -339,7 +342,7 @@ print(json_output)
 When working with `requests`, the `.json()` method on a response object does this parsing for you automatically:
 
 ```{python}
-response = requests.get("https://jsonverse.dev/examples/json-metrics.json")
+response = requests.get("https://jsonverse.dev/examples/json-metrics.json", headers=HEADERS)
 data = response.json()  # Equivalent to json.loads(response.text)
 print(data)
 # {'metric': 'cpu_usage', 'unit': 'percent', 'interval': '1m',
@@ -397,7 +400,7 @@ params = {
     "timezone": "America/Denver"
 }
 
-response = requests.get(url, params=params)
+response = requests.get(url, params=params, headers=HEADERS)
 data = response.json()
 
 # Start by understanding the top-level structure
