@@ -135,7 +135,7 @@ conda install -c conda-forge scapy
 
 - **macOS or Linux:** open a terminal and run `sudo jupyter notebook`. One gotcha worth knowing in advance: `sudo` resets your shell's `PATH` by default, so if `scapy` is installed inside a conda environment, a bare `sudo jupyter notebook` can launch a *different* Jupyter than the one in your environment — and fail with `ModuleNotFoundError: No module named 'scapy'` even though you installed it correctly. If that happens, be explicit about which Jupyter you mean: `sudo $(which jupyter) notebook`.
 - **Windows:** open the Start menu, right-click **Anaconda Prompt**, and choose **Run as administrator**. From that elevated prompt, run `jupyter notebook` as usual.
-
+- **Windows Running from elevated PowerShell:** open the Start menu, sesarch for Windows PowerShell, right click and select "Run as adminstrator", then from that elevated terminal, navigate to the appropriate folder and run jupyter as usual.
 ::: {.callout-warning}
 Running an entire Jupyter server with root or Administrator privileges is a bigger step than it sounds. A notebook kernel executes arbitrary code, so once you launch it this way, *anything* that runs in *any* cell has full system access — not just the one `scapy` call that actually needed it. That trade-off is reasonable for a short, deliberate session on your own machine to run the code below, but it is not a habit to build: close the elevated notebook server when you are done, and never leave one running on a machine or network you do not fully trust.
 :::
