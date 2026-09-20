@@ -420,6 +420,8 @@ print(f"Elevation: {elevation} meters")
 
 The strategy is always the same: start with `type()` and `.keys()` at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:
 
+Because the values are being stored in parallel lists, the different positionss must match to the same date. Before you makr the DataFrame, just make sure that the lists all have the same length and that the values are also in the same order.
+
 ```{python}
 import pandas as pd
 import matplotlib.pyplot as plt
