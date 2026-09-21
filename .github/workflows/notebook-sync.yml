@@ -1,0 +1,38 @@
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.qmd"
+      - "notebooks/**"
+      - "tools/make_notebooks.py"
+
+name: Notebook sync (PR check)
+
+# tools/make_notebooks.py is a pure function of the .qmd sources, so
+# regenerating every notebook should never produce a diff on a clean
+# tree. If it does, some chapter's notebook wasn't regenerated after an
+# edit to its .qmd -- exactly what happened to ch-02 and ch-03 before
+# this check existed (see PR #123).
+
+jobs:
+  notebook-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Regenerate notebooks and check for drift
+        run: |
+          python tools/make_notebooks.py
+          if ! git diff --quiet -- notebooks/; then
+            echo "::error::Notebooks are out of sync with their .qmd sources."
+            echo "::error::Run 'python tools/make_notebooks.py' locally and commit the result."
+            git diff --stat -- notebooks/
+            exit 1
+          fi
+          echo "Notebooks are in sync."

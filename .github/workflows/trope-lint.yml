@@ -1,0 +1,38 @@
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.qmd"
+
+name: Trope lint (PR check, informational)
+
+# tools/trope_lint.py never exits non-zero -- by its own design (see
+# claude.md, "Prose safeguards"), a flag is a candidate for the delete
+# test, not an automatic failure. This runs it on the chapters this PR
+# actually changed and prints the result; it never fails the build.
+
+jobs:
+  trope-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run trope_lint.py on changed chapters
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          CHANGED=$(git diff --name-only "$BASE" HEAD -- '*.qmd' || true)
+          if [ -z "$CHANGED" ]; then
+            echo "No .qmd files changed."
+            exit 0
+          fi
+          echo "Changed chapters:"
+          echo "$CHANGED"
+          python tools/trope_lint.py $CHANGED || true
