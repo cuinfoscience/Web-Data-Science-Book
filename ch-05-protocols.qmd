@@ -324,6 +324,7 @@ def diagnose_request(url, headers=None):
         print(f"Response size: {len(response.content):,} bytes")
         if response.history:
             print(f"Redirected from: {response.history[0].url}")
+            print(f"Ended up at: {response.url}")
         return response
     except requests.exceptions.ConnectionError:
         print(f"Connection failed: {url}")
@@ -333,6 +334,7 @@ def diagnose_request(url, headers=None):
 # Test on a few URLs
 diagnose_request("https://en.wikipedia.org/wiki/Python_(programming_language)")
 diagnose_request("https://en.wikipedia.org/wiki/Nonexistent_Page_12345")
+diagnose_request("http://en.wikipedia.org/wiki/Python_(programming_language)")
 ```
 
 The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a `User-Agent` header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:
