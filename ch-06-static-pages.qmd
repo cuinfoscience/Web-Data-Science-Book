@@ -2,11 +2,13 @@
 
 ::: {.callout-tip}
 ## Learning Objectives
-- Use browser developer tools to identify HTML elements containing target data
-- Extract data from HTML tables manually using BeautifulSoup's tag navigation
-- Use `pandas.read_html()` as a shortcut for well-structured tables
-- Write a custom HTML parser for non-tabular data using DOM tree navigation
+- Place a scraping project on a 2×2 spectrum of single vs. multiple sites and consistent vs. inconsistent design
+- Extract a page's single well-formed table with `pandas.read_html()`, and pick the right table by hand when decoys share the page
+- Clean up a scraped table's stray footnote markers, merged cells, and unconverted numeric columns
+- Parse a Wikipedia infobox's label/value structure with BeautifulSoup, then re-verify and port that same strategy to another language edition
+- Write a custom parser for repeating card-style containers, and recognize when a second site's cards require a second parser
 - Abstract repeated scraping logic into reusable functions with error handling
+- Recognize when a page's content is not actually static, and know where to pick up from there
 :::
 
 ::: {.callout-tip}
@@ -17,13 +19,45 @@ Run this chapter's code as you read: open the [companion notebook](https://githu
 
 ## From HTML to Data
 
-The overall goal of web scraping is converting data from one structured format — HTML, the language of web pages — into another structured format suitable for analysis: typically a pandas DataFrame, a CSV file, or a JSON document. This chapter teaches three strategies for that conversion, each appropriate for different situations and progressively more general.
+The overall goal of web scraping is converting data from one structured format — HTML, the language of web pages — into another structured format suitable for analysis: typically a pandas DataFrame, a CSV file, or a JSON document. How hard that conversion is depends less on how much data you want than on the shape of the page hiding it, and this chapter organizes that variety into eight strategies, each matched to a shape you will meet in the wild.
 
 HTML looks a great deal like the XML you learned to parse in @sec-data-formats, and the two are best understood as siblings: both descend from an older markup standard called SGML. But HTML is not well-formed XML — only its stricter cousin XHTML is — and browsers deliberately tolerate unclosed tags, missing quotes, and improperly nested elements. That tolerance for malformed markup is precisely why lenient HTML parsers like the `html.parser` backend you hand to BeautifulSoup exist, and it means the BeautifulSoup skills you already have transfer directly. The difference is that real-world HTML is far messier than the clean XML examples from the previous chapter. Web pages contain navigation bars, advertisements, tracking scripts, and deeply nested `<div>` tags that obscure the data you care about. Learning to cut through this noise is the core skill of this chapter.
 
-## Strategy 1: Manual Table Parsing
+## A Spectrum of Scraping Problems
 
-Many interesting datasets live in HTML tables — economic data, sports statistics, legislative records, demographic breakdowns. Let us extract box office revenue data from [The Numbers](https://www.the-numbers.com), a popular source of movie financial data. Our target is the weekly chart for late December 2018 — the lucrative holiday corridor between Christmas and New Year's. One hedge before we begin: sites reorganize their URLs and page structures over time, so the code below targets the page as it existed in mid-2026 (this chapter's closing "A Note on Fragility" has more to say about living with that reality).
+Before you write a line of parsing code, it helps to place your project on two independent axes. The first is how many sites your data lives on: a single site, or several. The second is how consistent that site's markup is: does every page you need follow the same template, or does the same page mix pieces built to different templates? Crossing those two axes gives you four quadrants, each with a real example:
+
+| | Single site | Multiple sites |
+|---|---|---|
+| **Consistent design** | Box Office Mojo's weekly box office chart — the same table shape every week | English and French Wikipedia's film infoboxes — the same MediaWiki platform and the same key/value layout, with different labels |
+| **Inconsistent design** | oscars.org's ceremony pages — a winner's card and a nominee's card on the same page are not shaped the same | The Numbers, Box Office Mojo, and Rotten Tomatoes — three real sites tracking the same movies with three unrelated HTML structures |
+
+Where your project lands changes how much code you write and how long that code keeps working. A single site with a consistent template needs one parser, written once, that covers every page you will ever fetch from it. Multiple sites with inconsistent designs need one parser per site, each translating that site's own shape into a schema you define, reconciled together afterward.
+
+This chapter works through eight concrete strategies, moving roughly from the easiest quadrant toward the hardest: **the clean single table** and **the table hiding among decoys**, for single, consistent pages that ship your data as a literal `<table>`; **the table that needs cleanup**, for a table whose values need work once you have it; **the infobox pattern** and **porting the pattern to a new site**, for the consistent-design quadrants on one Wikipedia edition and then another; **cards that need to become rows**, for a single site whose repeating containers were never tables at all; **inconsistent cards, multiple sites**, for the quadrant that forces you to write more than one parser and reconcile the results; and **when "static" isn't**, the strategy that is really a boundary, marking where the other seven strategies stop applying because the page was never fully there to parse in the first place.
+
+## Strategy 1: The Clean Single Table
+
+Start with the easiest case on the spectrum: a single site, a consistent template, and a page whose data lives in exactly one `<table>` with nothing else on the page competing for it. [Box Office Mojo](https://www.boxofficemojo.com)'s weekly box office charts are built this way, and the chart for the week ending December 28, 2018 — the lucrative corridor between Christmas and New Year's — sits at a URL that follows the same pattern every week:
+
+```{python}
+import pandas as pd
+
+url = "https://www.boxofficemojo.com/weekend/2018W52/"
+tables = pd.read_html(url)
+
+print(f"Number of tables found: {len(tables)}")
+# Number of tables found: 1
+
+df = tables[0]
+print(df.head())
+```
+
+One call to `pd.read_html()`, no `requests`, no BeautifulSoup, no navigating a tree by hand — because there is exactly one table on the page, `tables[0]` is unambiguous, and the DataFrame it returns needs little more than a numeric-type pass before you can plot it. Hold onto how little code that took, because most pages are not this generous. The next strategy shows what the same weekly-chart idea looks like on a site that ships two tables on the same page instead of one.
+
+## Strategy 2: The Table Hiding Among Decoys
+
+The Numbers publishes the same kind of weekly box office chart as Box Office Mojo, for the same weeks — but the page ships two `<table>` elements, not one: a full desktop layout and a separate mobile layout stacked beneath it. Pick `tables[0]` on faith and you have a fifty-fifty chance of parsing the wrong one; you have to inspect the page and confirm which table is the one you want before you write a line of extraction code. Let us extract box office revenue data from [The Numbers](https://www.the-numbers.com) for the same late-December 2018 chart. One hedge before we begin: sites reorganize their URLs and page structures over time, so the code below targets the page as it existed in mid-2026 (this chapter's closing "A Note on Fragility" has more to say about living with that reality).
 
 ### Retrieving and Inspecting
 
@@ -43,7 +77,7 @@ Before writing parsing code, inspect the page in your browser's developer tools.
 # Find all tables on the page
 tables = soup.find_all("table")
 print(f"Number of tables found: {len(tables)}")
-# Often there are navigation tables mixed in with data tables
+# Number of tables found: 2 -- a full desktop layout and a mobile layout
 
 # The main data table is usually the largest one
 # Inspect each to find the right one
@@ -99,9 +133,9 @@ df = pd.DataFrame(all_rows, columns=header)
 print(df.head())
 ```
 
-This manual approach gives you complete control over the extraction process. The tradeoff is that it requires more code and careful attention to the specific HTML structure of each page.
+This manual approach gives you complete control over the extraction process. The tradeoff is that it requires more code and careful attention to the specific HTML structure of each page. The next strategy goes back to `pandas.read_html()` — but this time the challenge is not finding the right table, since there is only one; it is cleaning up the one you found.
 
-## Strategy 2: `pandas.read_html()`
+## Strategy 3: The Table That Needs Cleanup
 
 For well-structured HTML tables, pandas provides a powerful shortcut. The `read_html()` function finds all tables on a page and converts each one to a DataFrame:
 
@@ -109,7 +143,7 @@ For well-structured HTML tables, pandas provides a powerful shortcut. The `read_
 import pandas as pd
 
 # Point read_html directly at a URL — no requests or BeautifulSoup needed
-url = "https://en.wikipedia.org/wiki/2018_in_film"
+url = "https://en.wikipedia.org/wiki/List_of_highest-grossing_films"
 tables = pd.read_html(url)
 
 print(f"Number of tables found: {len(tables)}")
@@ -119,138 +153,185 @@ print(f"Number of tables found: {len(tables)}")
 You can specify which row contains the column headers and select the table you want by index:
 
 ```{python}
-# The highest-grossing films table might be at index 3 (verify by inspection)
-films_df = pd.read_html(url, header=0)[3]
+# The highest-grossing films table is at index 0
+films_df = pd.read_html(url, header=0)[0]
 print(films_df.head())
+# Columns: Rank, Peak, Title, Worldwide gross, Year, Ref
+# Row 0: 1, 1, Avatar, $2,923,710,708, 2009, [# 1][# 2]
 ```
 
-The `read_html` function is remarkably powerful for its simplicity, but it has limitations. It struggles with tables that use `colspan` or `rowspan` attributes to merge cells — for example, a table where "Disney" spans two rows to cover multiple films. In those cases, you may need to fall back to manual parsing or clean up the DataFrame after extraction.
+`read_html` is remarkably powerful for its simplicity, but it is not magic: it still struggles with `colspan` and `rowspan` — cells merged across rows or columns to avoid repeating a value, which `read_html` cannot always split back apart — and it never guesses at what a cell's text is supposed to mean. This table shows a more common version of the second problem: every value it returned is technically present but not yet usable for arithmetic or plotting.
 
 ### Cleaning Up read_html Results
 
-In practice, `read_html` rarely produces a perfect DataFrame. Column names may contain whitespace or be split across multiple header rows. Numeric columns often parse as strings because of dollar signs, commas, or percentage symbols. Merged cells create NaN values that need to be filled. Here is a typical cleanup workflow:
+Look at the raw `Worldwide gross` column before you clean anything, so you know exactly what you are stripping out:
 
 ```{python}
-# Retrieve and extract the table
-tables = pd.read_html(url, header=0)
-df = tables[3]  # Verify the correct index by inspection
+print(films_df["Worldwide gross"].unique()[:10])
+```
 
-# Drop rows that repeat the header (common in long Wikipedia tables).
-# Do this BEFORE renaming: the embedded rows contain the *original* header text, so they must be compared against the original columns — after lowercasing, "Rank" in the data would never match "rank"
-df = df[df.iloc[:, 0] != df.columns[0]]
+Most entries look like `$2,923,710,708` — a dollar sign, digits, and commas. A handful carry a stray letter glued onto the front, left over from a footnote marker that never got separated from the number when the table was rendered: Titanic's gross reads `T$2,257,906,828`, and Ne Zha 2's reads `NZ$2,217,758,382`. The `Ref` column has its own quirk — footnote markers like `[# 1][# 2]` that `read_html` leaves as literal bracketed text rather than resolving into anything numeric. Here is a cleanup pass that handles both:
 
-# Rename columns to something usable
-df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
-
-# Convert numeric columns that parsed as strings
-df["worldwide_gross"] = pd.to_numeric(
-    df["worldwide_gross"].str.replace(r"[\$,]", "", regex=True),
+```{python}
+# Strip everything except digits -- removes the $ and the stray footnote letters in one pass
+films_df["gross"] = pd.to_numeric(
+    films_df["Worldwide gross"].str.replace(r"[^0-9]", "", regex=True),
     errors="coerce"
 )
 
-# Fill NaN values from merged cells (forward-fill)
-df["studio"] = df["studio"].ffill()
+# Ref holds bracketed footnote markers like [# 3][# 4] -- count them instead of discarding them
+films_df["footnote_count"] = films_df["Ref"].str.count(r"\[")
 
-print(df.dtypes)
-print(df.head())
+print(films_df[["Title", "gross", "footnote_count"]].head())
 ```
 
-The `errors="coerce"` argument in `pd.to_numeric()` is essential: it converts unparseable values to NaN instead of raising an error, which lets your cleanup pipeline continue even when some cells contain unexpected text. The forward-fill (`ffill`) operation handles the common Wikipedia pattern where a studio name spans multiple rows — the name appears once, and subsequent rows are blank until the next studio. You should expect to spend as much time cleaning `read_html` output as you spent extracting it — this is normal and not a sign that something went wrong. The function handles the hard part (parsing HTML tables); the cleanup is your job.
+The `errors="coerce"` argument in `pd.to_numeric()` is essential: it converts anything the regex missed into NaN instead of raising an exception, so your cleanup pipeline continues past a handful of unexpected cells rather than crashing on the first one. Counting the footnote markers instead of throwing them away keeps a signal — how heavily annotated a given figure is — that a straight `str.replace()` would have discarded along with the brackets. This table's columns happen not to need it, but the same `.ffill()` you would reach for on a merged-cell "Studio" column elsewhere works the same way here: propagate the last non-null value forward until the next one appears. You should expect to spend as much time cleaning `read_html` output as you spent extracting it — the function handles the hard part of parsing HTML tables; the cleanup is your job.
 
-## Strategy 3: Writing a Custom Parser
+## Strategy 4: The Infobox Pattern
 
-Many web pages present structured data without using HTML tables. Award nominees, product listings, news articles, and directory entries are often structured with `<div>` tags and CSS classes. Extracting this data requires navigating the HTML tree to find the right containers.
-
-### The Oscars Example
-
-The [Academy Awards](https://www.oscars.org) website lists nominees and winners organized by category. The data is structured with nested `<div>` tags rather than `<table>` elements. Let us build a parser for it.
+Not every `<table>` holds rows of records. Wikipedia's film infoboxes — the shaded box in the upper right of an article like [The Godfather](https://en.wikipedia.org/wiki/The_Godfather) — are a single record laid out as a labeled key/value list: one row per fact, a `<th>` holding the label and a `<td>` holding the value. `pandas.read_html()` will happily parse an infobox into a two-column DataFrame, but that discards the very thing that makes it useful — which label belongs to which value — so this shape calls for BeautifulSoup instead:
 
 ```{python}
 import requests
 from bs4 import BeautifulSoup
 
-url = "https://www.oscars.org/oscars/ceremonies/2024"
+url = "https://en.wikipedia.org/wiki/The_Godfather"
 headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 response = requests.get(url, headers=headers)
 soup = BeautifulSoup(response.text, "html.parser")
+
+infobox = soup.find("table", class_="infobox")
+facts = {}
+for row in infobox.find_all("tr"):
+    label, value = row.find("th"), row.find("td")
+    if label and value:
+        facts[label.get_text(strip=True)] = value.get_text(" ", strip=True)
+
+print(facts["Directed by"])
+# Francis Ford Coppola
+```
+
+The `if label and value` guard exists because not every `<tr>` in an infobox carries both cells: the top row is usually a single `<th>` spanning the film's title with no matching `<td>`, and image rows carry a `<td>` with no `<th>` beside it. Skipping any row missing either half keeps `facts` limited to genuine key/value pairs. Once built, `facts` reads like the infobox looks: `facts["Produced by"]` is `"Albert S. Ruddy"`, `facts["Cinematography"]` is `"Gordon Willis"`, and `facts["Screenplay by"]` runs Mario Puzo and Francis Ford Coppola together into one string, because `get_text(" ", strip=True)` joins everything inside the cell with a single space rather than preserving whatever line breaks separated the names visually. `facts["Starring"]` does the same across the entire cast list — Marlon Brando, Al Pacino, James Caan, Richard Castellano, Robert Duvall, Sterling Hayden, and more — worth remembering if you later want to split it back into individual names.
+
+## Strategy 5: Porting the Pattern to a New Site
+
+The loop above is barely ten lines, and the next step reuses it almost verbatim — the site changes, the labels change, but the shape does not. Point it at the French Wikipedia article for the same film and choose your URL carefully: `https://fr.wikipedia.org/wiki/Le_Parrain` (without `(film)`) is a disambiguation page, a "page d'homonymie" with no infobox and no tables at all. The article with the infobox lives at `https://fr.wikipedia.org/wiki/Le_Parrain_(film)`.
+
+Reach for the same class name you used in Strategy 4 there and it fails you in an unexpected way. The page does carry `class="infobox_v3"` — inspect it in a live browser and you can see it right there on the infobox — but `soup.select("table.infobox_v3")` still comes back empty. The class is real; it is just not on the `<table>`. French Wikipedia's infobox template wraps the actual `<table>` in a `<div class="infobox_v3 infobox infobox--frwiki ...">`, and the table itself carries no class at all. Selecting by a class you saw in the Inspector only works if you also confirm *which element* that class sits on — the visual "infobox" you are looking at and the `<table>` holding its rows are not always the same node. What holds up here is the table's own `<caption>`, one level down from the div you might have selected instead, which BeautifulSoup's CSS-selector support can target directly:
+
+```{python}
+url = "https://fr.wikipedia.org/wiki/Le_Parrain_(film)"
+response = requests.get(url, headers=headers)
+soup = BeautifulSoup(response.text, "html.parser")
+
+infobox = soup.select("table:has(caption)")[0]
+
+facts = {}
+for row in infobox.find_all("tr"):
+    label, value = row.find("th"), row.find("td")
+    if label and value:
+        facts[label.get_text(strip=True)] = value.get_text(" ", strip=True)
+
+print(facts["Réalisation"])
+# Francis Ford Coppola
+```
+
+The loop is identical to Strategy 4 — same guard, same two-cell extraction — because the shape of the problem, a table of label/value pairs, is identical. What changed is the anchor and the labels: `facts["Titre original"]` is `"The Godfather"`, `facts["Scénario"]` is `"Mario Puzo Francis Ford Coppola"`, `facts["Musique"]` is `"Nino Rota"`, `facts["Acteurs principaux"]` runs together Marlon Brando, Al Pacino, James Caan, Richard S. Castellano, and Robert Duvall, `facts["Sociétés de production"]` lists Paramount Pictures and Alfran Productions, `facts["Pays de production"]` is `"États-Unis"`, and `facts["Genre"]` is `"gangsters"`. Every one of those had to be re-verified against this specific page — the strategy transfers from one Wikipedia edition to another; the selector that anchors it does not.
+
+## Strategy 6: Cards That Need to Become Rows
+
+Many web pages present structured data without using HTML tables at all. Award nominees, product listings, news articles, and directory entries are often structured as repeating `<div>` containers — cards, in the loose sense the industry uses the word — where each card is conceptually a row and the page as a whole is conceptually a table. Extracting this data means navigating the HTML tree to find the right containers instead of a `<table>` tag.
+
+### The Oscars Example
+
+The [Academy Awards](https://www.oscars.org) website lists nominees and winners organized by category, structured with nested `<div>` tags rather than `<table>` elements — a good candidate for this strategy, with one complication before you can even start. As of this writing, oscars.org returns HTTP 403 to every automated fetch tried against it: `requests`, curl, and headless Chrome all get the same refusal, regardless of what `User-Agent` header you send. That is the site's own bot protection working as intended, not a bug in your code, and no amount of cleverness in the request gets past it. When a site closes the automated door entirely, the fix is not a better request — it is a different way of acquiring the page: save it from your own browser (File > Save Page As, or your browser's equivalent) and parse the saved file from disk instead. That is how the structure below was captured and verified, against the 2026 ceremony page:
+
+```{python}
+from bs4 import BeautifulSoup
+
+# Saved by hand from https://www.oscars.org/oscars/ceremonies/2026 --
+# oscars.org blocks every automated request, so there is no requests.get() here
+with open("oscars-2026-ceremony.html", encoding="utf-8") as f:
+    soup = BeautifulSoup(f.read(), "html.parser")
 ```
 
 ### Finding Reliable Anchors
 
-The key challenge with non-tabular scraping is finding HTML elements that reliably contain your target data. Start by using the browser's Inspector tool to examine the structure around one category:
+The key challenge with non-tabular scraping is finding HTML elements that reliably contain your target data. Oscars.org runs on Drupal, a content-management system whose class names describe Drupal's own data model rather than anything about awards — `field--name-field-award-categories` names a *field*, not a category — which is worth knowing before you go hunting the Inspector for something friendlier:
 
 ```{python}
-# Look for grouping elements — the structure may use classes like
-# "view-grouping" or similar containers for each award category
-groupings = soup.find_all("div", class_="view-grouping")
-print(f"Found {len(groupings)} category groupings")
+# The outer container that holds every award category on the page
+area = soup.find("div", class_="field--name-field-award-categories")
 
-# If the count doesn't match expectations (24 Oscar categories), you may need to navigate to a more specific parent element
+# Each category is its own paragraph-type container within it
+categories = area.find_all("div", class_="paragraph--type--award-category")
+print(f"Found {len(categories)} categories")
+# Found 24 categories
 ```
 
 ### Navigating the Tree for Specificity
 
-If your initial `find_all` returns too many or too few results, you need to navigate the tree structure to find a more specific anchor. This involves going *up* to a unique parent and then searching *down* within it:
+Each category nests a further level down: a name, and one "honoree" entry per person or film listed under it. Winners and nominees share the same container structure, distinguished only by a type field inside each honoree:
 
 ```{python}
-# Find the main content area first
-content_area = soup.find("div", class_="field--name-field-award-categories")
-
-if content_area:
-    # Now search only within this specific container
-    categories = content_area.find_all("div", class_="view-grouping")
-    print(f"Categories within content area: {len(categories)}")
-else:
-    # Guard: if the anchor is missing, fall back to an empty list so the code below still runs instead of crashing with a NameError.
-    # An empty result is your cue to re-inspect the page structure.
-    categories = []
-    print("Content area not found — re-inspect the page in dev tools")
+for cat in categories[:1]:
+    name = cat.find(class_="field--name-field-award-category-oscars").get_text(strip=True)
+    honorees = cat.find_all("div", class_="paragraph--type--award-honoree")
+    print(name, len(honorees))
+# Actor in a Leading Role 5
 ```
 
 ### Extracting Category Data
 
-For each category, extract the award name and the list of nominees:
+For each category, extract the award name and every honoree's type, entity, and — where the category distinguishes one — film:
 
 ```{python}
 results = []
 
-for category in categories:
-    # Extract the category name
-    name_tag = category.find("div", class_="view-grouping-header")
+for cat in categories:
+    name_tag = cat.find(class_="field--name-field-award-category-oscars")
     if not name_tag:
         continue
-    category_name = name_tag.text.strip()
-    
-    # Extract individual nominees
-    nominees = category.find_all("div", class_="views-row")
-    for nominee in nominees:
-        nominee_name = nominee.text.strip()
+    category_name = name_tag.get_text(strip=True)
+
+    for h in cat.find_all("div", class_="paragraph--type--award-honoree"):
+        type_tag = h.find(class_="field--name-field-honoree-type")
+        entity_tag = h.find(class_="field--name-field-award-entities")
+        film_tag = h.find(class_="field--name-field-award-film")  # None for some categories
+
         results.append({
             "category": category_name,
-            "nominee": nominee_name
+            "honoree_type": type_tag.get_text(strip=True) if type_tag else None,
+            "entity": entity_tag.get_text(strip=True) if entity_tag else None,
+            "film": film_tag.get_text(strip=True) if film_tag else None,
         })
 
 df = pd.DataFrame(results)
-print(df.head(10))
+print(df[df["category"] == "Actor in a Leading Role"].iloc[0])
+# honoree_type              Winner
+# entity        Michael B. Jordan
+# film                     Sinners
 ```
+
+The `field--name-field-award-film` lookup is what separates an award to a *person* from an award to a *film*: Michael B. Jordan's win names both an entity and the film he won it for. Best Picture works the other way around — its nominees, the winner "One Battle after Another" alongside Bugonia, F1, Frankenstein, Hamnet, Marty Supreme, and Sinners, are entities in their own right, so that category has no separate film to distinguish an entity from. That is exactly why `film_tag` is allowed to come back `None`, and why the guard checks for it rather than assuming every honoree has one.
 
 ### CSS Selectors with `select()`
 
 So far you have navigated the tree with `find()` and `find_all()`. BeautifulSoup offers a second navigation language you already half-know from browsing the web: CSS selectors, via the `select()` method. If you have ever written a stylesheet — or copied a selector out of your browser's Inspector — the syntax will feel familiar. A bare name matches a tag, a leading `.` matches a class, a leading `#` matches an id, and whitespace between selectors matches descendants:
 
 ```{python}
-# A tag name selects all matching elements — like find_all("table")
-tables = soup.select("table")
+# A tag name selects all matching elements — like find_all("div")
+divs = soup.select("div")
 
-# .class selects by CSS class — like find_all(class_="view-grouping")
-groupings = soup.select(".view-grouping")
+# .class selects by CSS class — like find_all(class_="paragraph--type--award-category")
+categories_by_css = soup.select(".paragraph--type--award-category")
 
 # #id selects the element with that id — like find(id="main-content")
 main = soup.select("#main-content")
 
 # Descendant combinators chain a whole path in one expression.
 # This single line is equivalent to the find() + find_all() pair we used to narrow down to categories within the content area:
-selected = soup.select("div.field--name-field-award-categories div.view-grouping")
+selected = soup.select("div.field--name-field-award-categories div.paragraph--type--award-category")
 print(f"Categories via CSS selector: {len(selected)}")
 # Categories via CSS selector: 24 — same result as before
 ```
@@ -259,86 +340,74 @@ print(f"Categories via CSS selector: {len(selected)}")
 
 ### Abstracting into Functions
 
-Once your parser works for one page, abstract it into a function you can reuse:
+Once your parser works for one saved page, abstract it into a function you can reuse across every ceremony you have saved:
 
 ```{python}
-import time
-
-def scrape_oscar_year(year, headers):
-    """Scrape Oscar nominees for a given ceremony year.
+def parse_oscar_ceremony(html_path, year):
+    """Parse a saved Oscars ceremony page into one row per honoree.
 
     Parameters
     ----------
+    html_path : str
+        Path to a locally saved copy of the ceremony page
     year : int
-        The ceremony year (e.g., 2024)
-    headers : dict
-        HTTP headers including User-Agent
+        The ceremony year, recorded alongside each row
 
     Returns
     -------
     pd.DataFrame
-        DataFrame with columns: category, nominee, year
+        DataFrame with columns: category, honoree_type, entity, film, year
     """
-    url = f"https://www.oscars.org/oscars/ceremonies/{year}"
+    with open(html_path, encoding="utf-8") as f:
+        soup = BeautifulSoup(f.read(), "html.parser")
 
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Raise exception for bad status codes
-    except requests.RequestException as e:
-        print(f"Error fetching {year}: {e}")
-        return pd.DataFrame()
-
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    # The same parsing logic as above, now bundled for reuse
-    content_area = soup.find("div", class_="field--name-field-award-categories")
-    if not content_area:
-        print(f"No categories found for {year} — page structure may differ")
+    area = soup.find("div", class_="field--name-field-award-categories")
+    if not area:
+        print(f"No categories found in {html_path} — page structure may differ")
         return pd.DataFrame()
 
     rows = []
-    for category in content_area.find_all("div", class_="view-grouping"):
-        name_tag = category.find("div", class_="view-grouping-header")
+    for cat in area.find_all("div", class_="paragraph--type--award-category"):
+        name_tag = cat.find(class_="field--name-field-award-category-oscars")
         if not name_tag:
             continue
-        for nominee in category.find_all("div", class_="views-row"):
+        category_name = name_tag.get_text(strip=True)
+
+        for h in cat.find_all("div", class_="paragraph--type--award-honoree"):
+            type_tag = h.find(class_="field--name-field-honoree-type")
+            entity_tag = h.find(class_="field--name-field-award-entities")
+            film_tag = h.find(class_="field--name-field-award-film")
+
             rows.append({
-                "category": name_tag.get_text(strip=True),
-                "nominee": nominee.get_text(strip=True),
+                "category": category_name,
+                "honoree_type": type_tag.get_text(strip=True) if type_tag else None,
+                "entity": entity_tag.get_text(strip=True) if entity_tag else None,
+                "film": film_tag.get_text(strip=True) if film_tag else None,
                 "year": year,
             })
 
-    df = pd.DataFrame(rows)
-    return df
+    return pd.DataFrame(rows)
 ```
 
-Note what the function does *not* do: it never sleeps. Rate limiting belongs in the loop that calls the function — that way a single test call returns immediately, and the delay happens between requests, where it actually matters:
+Collecting several ceremonies together is a loop over saved files rather than a loop over live requests — there is no server left to be polite to once the page is already sitting on your disk:
 
 ```{python}
-# Collect five ceremonies' worth of nominations
-all_years = []
-for year in range(2020, 2025):
-    print(f"Scraping {year}...")
-    year_df = scrape_oscar_year(year, headers)
-    all_years.append(year_df)
-    time.sleep(1)  # Pause between requests, not inside the function
+saved_ceremonies = {
+    2024: "oscars-2024-ceremony.html",
+    2025: "oscars-2025-ceremony.html",
+    2026: "oscars-2026-ceremony.html",
+}
 
+all_years = [parse_oscar_ceremony(path, year) for year, path in saved_ceremonies.items()]
 oscars = pd.concat(all_years, ignore_index=True)
-print(f"Collected {len(oscars)} nominations across {oscars['year'].nunique()} ceremonies")
+print(f"Collected {len(oscars)} honorees across {oscars['year'].nunique()} ceremonies")
 ```
 
-A loop like this is exactly where the principles of @sec-ethics stop being abstract. Before pointing it at oscars.org — or any other site — check the site's `robots.txt`, just as you practiced there: those rules govern the scraping you do in this chapter and the ones that follow, not just the theory you read in that one. And rather than re-implementing polite behavior each time, reuse the `responsible_get()` function you built in that chapter:
-
-```{python}
-# From @sec-ethics: responsible_get() sets the course User-Agent
-# "WebDataScience/1.0 (INFO 4617; brian.keegan@colorado.edu)", waits
-# `delay` seconds after each request, and returns None on network errors. Swap it in for requests.get() + time.sleep() in any loop:
-response = responsible_get(url, delay=1.0)
-```
+That is the trade a 403 imposes: the courtesy you would normally spend on rate limiting and `time.sleep()` between requests gets spent once, up front, saving each page yourself from a real browser session, rather than inside a loop. Not every site forces this — @sec-ethics's `responsible_get()` and the rate-limiting pattern it wraps are exactly what you would reach for here if oscars.org allowed automated fetches, and they are exactly what the Colorado Legislators parser below does use, on a site that allows them.
 
 ### A Second Parser: Colorado Legislators
 
-Let us build a second parser for a very different page structure. The Colorado General Assembly website at [leg.colorado.gov/legislators](https://leg.colorado.gov/legislators) lists all current state legislators with their names, party affiliations, districts, and chambers:
+The Oscars example is one instance of this strategy — cards standing in for rows — on one site. Let us apply the same strategy to a very different page, still on a single site, to see how much of it is the pattern and how much was specific to Drupal's field names. The Colorado General Assembly website at [leg.colorado.gov/legislators](https://leg.colorado.gov/legislators) lists all current state legislators with their names, party affiliations, districts, and chambers, and — unlike oscars.org — answers ordinary `requests.get()` calls without complaint:
 
 ```{python}
 import requests
@@ -381,7 +450,44 @@ This parser illustrates an important principle: start simple and iterate. Your f
 
 Note that the page may have changed since this was written — that is the fundamental challenge of web scraping. If the class names above do not match what you see in the Inspector, that is not a bug in this code; it is a feature of how the web works. The skill you are building is not memorizing specific class names but learning the *process* of inspection, hypothesis, and verification that lets you adapt to any page structure. Think of each parser as a hypothesis about the page's structure — you test it, compare the output to what you expect, and refine until they match.
 
-### Error Handling Patterns
+## Strategy 7: Inconsistent Cards, Multiple Sites
+
+Oscars' award cards and the Colorado legislators' cards are both single-site problems: write the parser once, and it covers the whole site. Move to a second site entirely and the same underlying idea — repeating containers standing in for table rows — reappears in a structurally unrelated shape. [Rotten Tomatoes](https://www.rottentomatoes.com)' "Movies in Theaters" grid at `https://www.rottentomatoes.com/browse/movies_in_theaters/` looks, at a glance, like the same kind of card layout as an Oscars category. It is not built the same way at all: Rotten Tomatoes' grid uses custom HTML elements — tags the site defines itself, not `<div>` — so `find_all("div", ...)` returns nothing useful there:
+
+```{python}
+tiles = soup.find_all("tile-dynamic", attrs={"data-qa": "tile"})
+
+for tile in tiles:
+    title = tile.find("span", class_="p--small")
+    score = tile.find("rt-text", class_="critics-score")
+    print(title.get_text(strip=True), score.get_text(strip=True) if score else None)
+# Resident Evil 96%
+```
+
+Each tile carries a poster image, a `<span class="p--small">` holding the title, and — wrapped inside a `<score-icon-critics>` element — an `<rt-text class="critics-score">` holding the Tomatometer score as a percentage string. None of this resembles `paragraph--type--award-honoree` or the Colorado legislators' `views-row`, and BeautifulSoup does not care: it navigates `tile-dynamic` and `rt-text` exactly as it would `<div>` and `<span>`, because it works on tag structure, not on a fixed vocabulary of "real" HTML tags.
+
+This is where the 2×2 spectrum from the start of the chapter stops being an abstraction. A research question that needs both box-office performance and critical reception — whether a film's opening-weekend take tracks its Tomatometer score, say — cannot be answered from one site: The Numbers and Box Office Mojo have the money figures, and Rotten Tomatoes has the reviews. This is the multiple-sites, inconsistent-design quadrant from the start of the chapter, and it is where most real scraping projects end up living. The fix is not a cleverer, more general parser. It is one parser per site, each translating that site's own shape into a shared handful of columns — title, plus whatever that site alone provides — joined afterward on the one field every source shares: the movie's title.
+
+## Strategy 8: When "Static" Isn't
+
+Every strategy so far assumes the HTML your code receives is the HTML a human sees — that the page is *static* in the sense this chapter needs, meaning fully formed before your request finishes. That assumption fails, and it fails without raising any error at all:
+
+```{python}
+import requests
+
+url = "https://www.imdb.com/title/tt0068646/"  # The Godfather
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+response = requests.get(url, headers=headers)
+
+print(response.status_code, len(response.text))
+# 202 0
+```
+
+Status code 202 means the request was accepted, and the body that came back is zero characters long — not a truncated cast list, not a missing infobox, nothing at all for BeautifulSoup to parse. Open the same URL in an actual browser and the page is there in full: title, cast, ratings, everything. The difference is what runs between the request and the pixels on your screen. IMDb builds this page with JavaScript that executes after the initial HTML arrives, and `requests` never runs JavaScript — it only ever sees whatever the server sent in that first response, which here is next to nothing.
+
+None of the eight strategies in this chapter close this gap, because none of them touch JavaScript execution; every one of them only ever operates on HTML that already exists in the response body. The tell is a response that comes back too fast, too short, or too empty relative to what the browser shows, and the fix is not a different BeautifulSoup pattern but a different tool: @sec-dynamic-pages covers Selenium and other approaches that drive an actual browser, wait for JavaScript to run, and hand you the HTML the human sees instead of the HTML the server first sent.
+
+## Error Handling Patterns
 
 As you scrape more pages, you will encounter failures: pages that do not load, elements that are missing, or structures that do not match your expectations. A robust scraper handles these gracefully:
 
@@ -429,7 +535,7 @@ This pattern separates the *what* (your parsing logic in `parse_func`) from the 
 
 ::: {.callout-warning}
 ## A Note on Fragility
-Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).
+Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. The Oscars class names in this chapter were re-verified against the live 2026 ceremony page after oscars.org started returning HTTP 403 to every automated fetch — a reminder that fragility is not only markup shifting under you, but sometimes a site closing the door to automation entirely, at which point a page saved by hand is the only copy left to inspect. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).
 :::
 
 ## Recommended Exercises
@@ -493,13 +599,15 @@ These are open-ended extensions — no scaffold, no fixed path. Use them for fur
 
 1. **Custom parser.** Write a custom BeautifulSoup parser for a non-tabular web page. Good candidates include a course catalog, a restaurant menu, or a list of elected officials. Document your element selection strategy: why did you choose these specific tags and classes?
 
-2. **Multi-page scraping.** Extend your parser from Exercise 2 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use `time.sleep()` between requests, `try/except` for error handling, and a function to abstract the repeated logic.
+2. **Multi-page scraping.** Extend your parser from Exercise 1 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use `time.sleep()` between requests, `try/except` for error handling, and a function to abstract the repeated logic.
 
 3. **Non-English Wikipedia.** Use `pd.read_html()` to scrape a data table from a non-English Wikipedia edition (e.g., the French, Spanish, or Japanese Wikipedia). Does `read_html` handle non-ASCII characters correctly? What cleanup is needed compared to the English version? Write a brief analysis of any encoding issues you encounter.
 
-4. **Cache first, parse offline.** Build a two-stage scraper. Stage one downloads the raw HTML for several pages (e.g., five Oscar ceremony years or five weekly box office charts) exactly once, saving each response to a local `cache/` directory with a filename derived from the URL slug (e.g., `cache/ceremonies-2024.html`) and sleeping between downloads. Stage two is your parser, which reads only from the cached files and never touches the network. In a short paragraph, explain why this save-then-parse pattern matters: consider politeness (how many times does each server get hit while you debug?), reproducibility (what is your analysis anchored to after the site changes?), and iteration speed.
+4. **Cache first, parse offline.** Build a two-stage scraper. Stage one downloads the raw HTML for several pages (e.g., five weekly box office charts, or five ceremony pages from a site that does not block automated fetches) exactly once, saving each response to a local `cache/` directory with a filename derived from the URL slug (e.g., `cache/weekend-2018w52.html`) and sleeping between downloads. Stage two is your parser, which reads only from the cached files and never touches the network. In a short paragraph, explain how this save-then-parse pattern serves politeness (how many times does each server get hit while you debug?), reproducibility (what is your analysis anchored to after the site changes?), and iteration speed.
 
-5. **Graduate extension (INFO 5617).** Read @fiesler2020no, a study of how social media platforms' Terms of Service regulate automated data collection. Then audit two websites you might realistically scrape for a research project: locate and read each site's Terms of Service and `robots.txt`, and classify what each document says about scraping using the paper's categories. Write a ~500-word memo comparing what the two sites permit, where the ToS and `robots.txt` agree or conflict, and how you would proceed as a researcher — including what the paper's findings suggest about the gap between written policy and ethical practice.
+5. **Reconcile two sites.** Pick two sites that describe the same underlying things through unrelated HTML — box office figures from The Numbers or Box Office Mojo, paired with critical reception from Rotten Tomatoes, or a pairing of your own choosing. Write one parser per site, extract a field both can produce (a title, a name, a date), and join the two results into a single DataFrame. Report where the join fails to match rows cleanly, and explain why — mismatched capitalization, alternate titles, or one site covering entries the other does not.
+
+6. **Graduate extension (INFO 5617).** Read @fiesler2020no, a study of how social media platforms' Terms of Service regulate automated data collection. Then audit two websites you might realistically scrape for a research project: locate and read each site's Terms of Service and `robots.txt`, and classify what each document says about scraping using the paper's categories. Write a ~500-word memo comparing what the two sites permit, where the ToS and `robots.txt` agree or conflict, and how you would proceed as a researcher — including what the paper's findings suggest about the gap between written policy and ethical practice.
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -522,11 +630,11 @@ The Colorado General Assembly website ([leg.colorado.gov](https://leg.colorado.g
 - **Multiple tables on a page**: `read_html` and `find_all("table")` return all tables, including navigation elements. Inspect each to find the one with your data.
 - **Character encoding**: Watch for `\xa0` (non-breaking spaces) and other Unicode characters in names and text. Use `.strip()` and `.replace('\xa0', ' ')`.
 - **Elements that look unique but are not**: Always verify your `find_all` count against the expected number of results before building your parser.
-- **Dynamic content**: If `requests` + BeautifulSoup returns a nearly-empty page, the content may be loaded by JavaScript. See @sec-dynamic-pages for Selenium-based solutions.
+- **Dynamic content**: If `requests` + BeautifulSoup returns a nearly-empty page — or, as in Strategy 8, no page at all — the content is loaded by JavaScript after the initial response. See "Strategy 8: When 'Static' Isn't" above and @sec-dynamic-pages for Selenium-based solutions.
 
 ## Key Takeaways
 
-HTML scraping follows a consistent pattern: retrieve the page, inspect it with developer tools, identify your target elements, extract the data, and convert it to a DataFrame. Start with `read_html()` for tables — it handles most simple cases. Fall back to manual BeautifulSoup parsing when you need more control. Write custom parsers for non-tabular data by navigating the DOM tree to find reliable anchors. Always abstract your parsing logic into functions, handle errors gracefully, and rate-limit your requests. Web pages change, so code defensively.
+HTML scraping follows a consistent pattern: retrieve the page, inspect it with developer tools, identify your target elements, extract the data, and convert it to a DataFrame. Where you start within that pattern depends on where your page sits on the chapter's 2×2 spectrum. A single, consistent table calls for `pd.read_html()` and little else; a table hiding among decoys, or one whose values need cleanup after extraction, calls for the same tools plus more inspection and cleanup code. A labeled infobox calls for a key/value loop that ports from one language edition to another once you re-verify the anchor and labels. Repeating card-style containers — consistent on a single site, or inconsistent across several — call for a custom parser, one per site when the sites disagree, joined afterward into a shared schema. Always abstract your parsing logic into functions, handle errors gracefully, and rate-limit your requests. And when a page comes back nearly or entirely empty, these eight strategies have reached their edge — @sec-dynamic-pages picks up from there.
 
 ## Further Reading
 
