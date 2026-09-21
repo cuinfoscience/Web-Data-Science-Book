@@ -231,6 +231,7 @@ The captured packets tell the same story as the Network tab's Timing view, just 
 
 The Domain Name System translates human-readable domain names (like `en.wikipedia.org`) into IP addresses that computers can route to. You can perform DNS lookups programmatically with the `dnspython` library:
 
+Note: If `dns.resolver` is not installed, you may need to run `%pip install dnspython` before using it.
 ```{python}
 import dns.resolver
 
