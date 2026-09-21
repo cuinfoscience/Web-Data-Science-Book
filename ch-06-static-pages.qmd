@@ -244,16 +244,21 @@ Many web pages present structured data without using HTML tables at all. Award n
 
 ### The Oscars Example
 
-The [Academy Awards](https://www.oscars.org) website lists nominees and winners organized by category, structured with nested `<div>` tags rather than `<table>` elements — a good candidate for this strategy, with one complication before you can even start. As of this writing, oscars.org returns HTTP 403 to every automated fetch tried against it: `requests`, curl, and headless Chrome all get the same refusal, regardless of what `User-Agent` header you send. That is the site's own bot protection working as intended, not a bug in your code, and no amount of cleverness in the request gets past it. When a site closes the automated door entirely, the fix is not a better request — it is a different way of acquiring the page: save it from your own browser (File > Save Page As, or your browser's equivalent) and parse the saved file from disk instead. That is how the structure below was captured and verified, against the 2026 ceremony page:
+The [Academy Awards](https://www.oscars.org) website lists nominees and winners organized by category, structured with nested `<div>` tags rather than `<table>` elements — a good candidate for this strategy, with one complication before you can even start. As of this writing, oscars.org's bot protection rejects a plain `requests.get()` with HTTP 403 — it also rejects a `User-Agent` spoofed to look like Chrome or Firefox, the same 403 either way. What it does *not* reject is a `User-Agent` that identifies you honestly, the way @sec-ethics asked you to identify yourself in the first place:
 
 ```{python}
+import requests
 from bs4 import BeautifulSoup
 
-# Saved by hand from https://www.oscars.org/oscars/ceremonies/2026 --
-# oscars.org blocks every automated request, so there is no requests.get() here
-with open("oscars-2026-ceremony.html", encoding="utf-8") as f:
-    soup = BeautifulSoup(f.read(), "html.parser")
+headers = {"User-Agent": "Web Data Science v1 brian.keegan@colorado.edu"}
+response = requests.get("https://www.oscars.org/oscars/ceremonies/2026", headers=headers)
+print(response.status_code)
+# 200
+
+soup = BeautifulSoup(response.text, "html.parser")
 ```
+
+Notice what the difference is *not*: it is not a more convincing disguise. A UA string that pretends to be a browser gets the same 403 as no UA at all — the WAF's whole job is catching exactly that pretense. A UA string that plainly says who you are and how to reach you gets through. That is not a coincidence a scraper can rely on everywhere, and it is not a trick — it is the actual point of @sec-ethics's advice to identify yourself: a site operator evaluating traffic can tell a named, reachable requester from an anonymous one pretending to be a real browser, and can choose to treat them differently. Sometimes, as here, that choice runs in your favor.
 
 ### Finding Reliable Anchors
 
@@ -340,30 +345,33 @@ print(f"Categories via CSS selector: {len(selected)}")
 
 ### Abstracting into Functions
 
-Once your parser works for one saved page, abstract it into a function you can reuse across every ceremony you have saved:
+Once your parser works for one ceremony, abstract it into a function you can reuse across every year you want. This is exactly the situation `responsible_get()` from @sec-ethics was built for: a named, identified requester, one page at a time, with a pause built in between calls:
 
 ```{python}
-def parse_oscar_ceremony(html_path, year):
-    """Parse a saved Oscars ceremony page into one row per honoree.
+def parse_oscar_ceremony(year):
+    """Fetch and parse one Oscars ceremony page into one row per honoree.
 
     Parameters
     ----------
-    html_path : str
-        Path to a locally saved copy of the ceremony page
     year : int
-        The ceremony year, recorded alongside each row
+        The ceremony year to fetch and parse
 
     Returns
     -------
     pd.DataFrame
         DataFrame with columns: category, honoree_type, entity, film, year
     """
-    with open(html_path, encoding="utf-8") as f:
-        soup = BeautifulSoup(f.read(), "html.parser")
+    url = f"https://www.oscars.org/oscars/ceremonies/{year}"
+    response = responsible_get(url)
+    if response is None:
+        print(f"Request failed for {year}")
+        return pd.DataFrame()
+
+    soup = BeautifulSoup(response.text, "html.parser")
 
     area = soup.find("div", class_="field--name-field-award-categories")
     if not area:
-        print(f"No categories found in {html_path} — page structure may differ")
+        print(f"No categories found for {year} — page structure may differ")
         return pd.DataFrame()
 
     rows = []
@@ -389,25 +397,19 @@ def parse_oscar_ceremony(html_path, year):
     return pd.DataFrame(rows)
 ```
 
-Collecting several ceremonies together is a loop over saved files rather than a loop over live requests — there is no server left to be polite to once the page is already sitting on your disk:
+Collecting several ceremonies together is an ordinary loop over years, one request per iteration, with `responsible_get()`'s own `delay` doing the rate-limiting rather than a manual `time.sleep()` scattered through the loop:
 
 ```{python}
-saved_ceremonies = {
-    2024: "oscars-2024-ceremony.html",
-    2025: "oscars-2025-ceremony.html",
-    2026: "oscars-2026-ceremony.html",
-}
-
-all_years = [parse_oscar_ceremony(path, year) for year, path in saved_ceremonies.items()]
+all_years = [parse_oscar_ceremony(year) for year in range(2024, 2027)]
 oscars = pd.concat(all_years, ignore_index=True)
 print(f"Collected {len(oscars)} honorees across {oscars['year'].nunique()} ceremonies")
 ```
 
-That is the trade a 403 imposes: the courtesy you would normally spend on rate limiting and `time.sleep()` between requests gets spent once, up front, saving each page yourself from a real browser session, rather than inside a loop. Not every site forces this — @sec-ethics's `responsible_get()` and the rate-limiting pattern it wraps are exactly what you would reach for here if oscars.org allowed automated fetches, and they are exactly what the Colorado Legislators parser below does use, on a site that allows them.
+Nothing about this loop is special to oscars.org — it is the same shape as the Colorado Legislators parser below, and the same shape @sec-ethics used for its own examples. The only thing this site asked of you that a fully open site would not is honesty: identify yourself, and it lets you in.
 
 ### A Second Parser: Colorado Legislators
 
-The Oscars example is one instance of this strategy — cards standing in for rows — on one site. Let us apply the same strategy to a very different page, still on a single site, to see how much of it is the pattern and how much was specific to Drupal's field names. The Colorado General Assembly website at [leg.colorado.gov/legislators](https://leg.colorado.gov/legislators) lists all current state legislators with their names, party affiliations, districts, and chambers, and — unlike oscars.org — answers ordinary `requests.get()` calls without complaint:
+The Oscars example is one instance of this strategy — cards standing in for rows — on one site. Let us apply the same strategy to a very different page, still on a single site, to see how much of it is the pattern and how much was specific to Drupal's field names. The Colorado General Assembly website at [leg.colorado.gov/legislators](https://leg.colorado.gov/legislators) lists all current state legislators with their names, party affiliations, districts, and chambers, and — unlike oscars.org — does not run a WAF that cares who is asking; a bare `requests.get()` with no headers at all works here just as well as an identified one:
 
 ```{python}
 import requests
@@ -535,7 +537,7 @@ This pattern separates the *what* (your parsing logic in `parse_func`) from the 
 
 ::: {.callout-warning}
 ## A Note on Fragility
-Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. The Oscars class names in this chapter were re-verified against the live 2026 ceremony page after oscars.org started returning HTTP 403 to every automated fetch — a reminder that fragility is not only markup shifting under you, but sometimes a site closing the door to automation entirely, at which point a page saved by hand is the only copy left to inspect. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).
+Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. The Oscars class names in this chapter were re-verified directly against the live 2026 ceremony page — a reminder that fragility is not only markup shifting under you, but sometimes a site's own bot protection changing what "asking nicely" requires: oscars.org rejects a bare `requests.get()` and rejects a browser-spoofed one, but accepts a request that identifies itself honestly. If a site you are scraping starts returning 403 where it once returned 200, check whether the fix is a more honest `User-Agent` before assuming the door is closed for good. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).
 :::
 
 ## Recommended Exercises
@@ -603,7 +605,7 @@ These are open-ended extensions — no scaffold, no fixed path. Use them for fur
 
 3. **Non-English Wikipedia.** Use `pd.read_html()` to scrape a data table from a non-English Wikipedia edition (e.g., the French, Spanish, or Japanese Wikipedia). Does `read_html` handle non-ASCII characters correctly? What cleanup is needed compared to the English version? Write a brief analysis of any encoding issues you encounter.
 
-4. **Cache first, parse offline.** Build a two-stage scraper. Stage one downloads the raw HTML for several pages (e.g., five weekly box office charts, or five ceremony pages from a site that does not block automated fetches) exactly once, saving each response to a local `cache/` directory with a filename derived from the URL slug (e.g., `cache/weekend-2018w52.html`) and sleeping between downloads. Stage two is your parser, which reads only from the cached files and never touches the network. In a short paragraph, explain how this save-then-parse pattern serves politeness (how many times does each server get hit while you debug?), reproducibility (what is your analysis anchored to after the site changes?), and iteration speed.
+4. **Cache first, parse offline.** Build a two-stage scraper. Stage one downloads the raw HTML for several pages (e.g., five weekly box office charts, or five Oscars ceremony years) exactly once, saving each response to a local `cache/` directory with a filename derived from the URL slug (e.g., `cache/weekend-2018w52.html`) and sleeping between downloads. Stage two is your parser, which reads only from the cached files and never touches the network. In a short paragraph, explain how this save-then-parse pattern serves politeness (how many times does each server get hit while you debug?), reproducibility (what is your analysis anchored to after the site changes?), and iteration speed.
 
 5. **Reconcile two sites.** Pick two sites that describe the same underlying things through unrelated HTML — box office figures from The Numbers or Box Office Mojo, paired with critical reception from Rotten Tomatoes, or a pairing of your own choosing. Write one parser per site, extract a field both can produce (a title, a name, a date), and join the two results into a single DataFrame. Report where the join fails to match rows cleanly, and explain why — mismatched capitalization, alternate titles, or one site covering entries the other does not.
 
