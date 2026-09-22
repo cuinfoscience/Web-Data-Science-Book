@@ -4,8 +4,9 @@
 Each ch-*.qmd file is converted to notebooks/<same-stem>.ipynb:
 prose becomes Markdown cells, ```{python} blocks become (unexecuted)
 code cells. Quarto-specific syntax that Jupyter cannot render —
-callout fences and heading anchors — is stripped or simplified so the
-notebooks read cleanly on their own.
+callout fences, heading anchors, and figure attributes and
+cross-references — is stripped or simplified so the notebooks read
+cleanly on their own.
 
 Run from the repository root after editing any chapter's code:
 
@@ -51,6 +52,38 @@ def strip_quarto_syntax(markdown: str) -> str:
     return text.strip()
 
 
+# Quarto figures: ![caption](images/...){#fig-label .lightbox fig-alt="..."}
+FIGURE_RE = re.compile(r"!\[([^\]]*)\]\((images/[^)\s]+)\)(?:\{([^}]*)\})?")
+
+
+def convert_figures(text: str, chapter: int) -> str:
+    """Rewrite Quarto figures and @fig- references for a standalone notebook.
+
+    A downloaded notebook has no images/ folder beside it, so figure
+    paths point at the published book instead. Quarto's attribute block
+    would show as literal text in Jupyter, so it becomes plain alt text
+    plus a visible caption, and each @fig- reference becomes the number
+    Quarto gives that figure in the book ("Figure 7.2").
+    """
+    numbers = {}
+    for match in FIGURE_RE.finditer(text):
+        label = re.search(r"#(fig-[\w-]+)", match.group(3) or "")
+        if label:
+            numbers[label.group(1)] = f"Figure {chapter}.{len(numbers) + 1}"
+
+    def replace(match):
+        caption, path, attrs = match.group(1), match.group(2), match.group(3) or ""
+        alt = re.search(r'fig-alt="([^"]*)"', attrs)
+        label = re.search(r"#(fig-[\w-]+)", attrs)
+        image = f"![{alt.group(1) if alt else caption}]({BOOK_URL}{path})"
+        if not label:
+            return image
+        return f"{image}\n\n*{numbers[label.group(1)]}: {caption}*"
+
+    text = FIGURE_RE.sub(replace, text)
+    return re.sub(r"@(fig-[\w-]+)", lambda m: numbers.get(m.group(1), m.group(0)), text)
+
+
 def split_at_sections(prose: str) -> list:
     """Split a prose run into one markdown cell per ## section.
 
@@ -90,6 +123,8 @@ def make_notebook(qmd_path: Path) -> dict:
         text,
         flags=re.M | re.S,
     )
+    chapter = int(re.match(r"ch-(\d+)", qmd_path.stem).group(1))
+    text = convert_figures(text, chapter)
     title_match = re.search(r"^# (.+?)(?:\s*\{[^}]*\})?\s*$", text, re.M)
     title = title_match.group(1).strip() if title_match else qmd_path.stem
 
