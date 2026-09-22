@@ -594,7 +594,7 @@ You will build a URL diagnostic tool from the protocol layers this chapter cover
 **Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check `response.history`, and if it redirected, print where it ended up. Include a docstring.
 
 ```{python}
-# Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring.
+# Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring. Use a timeout like `timeout=10` so an unresponsive URL does not stall the entire notebook.
 # Your code here
 ```
 
