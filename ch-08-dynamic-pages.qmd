@@ -3,10 +3,13 @@
 ::: {.callout-tip}
 ## Learning Objectives
 - Explain why JavaScript-rendered content is invisible to `requests` + BeautifulSoup
-- Install and configure Selenium WebDriver for Chrome, Firefox, or Safari
+- Decide by hand — with View Source, JavaScript switched off, and the Network tab — whether a page needs a browser at all
+- Install Selenium, explain what Selenium Manager does when it starts a browser, and fix it when it fails
 - Locate elements using multiple strategies (ID, name, XPath, CSS selector)
 - Simulate user interactions — clicking, typing, and scrolling — programmatically
 - Pass fully-rendered page source from Selenium back to BeautifulSoup for parsing
+- Script the same tasks with Playwright from the terminal, and explain why its simple API does not run in a notebook
+- Compare three ways to hand browser scripting to tools — an AI agent that drives the browser, an agent that writes the scraper, and Playwright's recorder — and weigh their costs and risks
 - Assess the fragility and ethical implications of browser automation
 :::
 
@@ -18,11 +21,87 @@ Run this chapter's code as you read: open the [companion notebook](https://githu
 
 ## When Static Scraping Fails
 
-In @sec-static-pages, you learned to retrieve web pages with `requests` and parse them with BeautifulSoup. This works well for pages whose content is fully present in the initial HTML — what we call *static* pages. But most modern websites are *dynamic*: their content is loaded, modified, or entirely rendered by JavaScript after the initial HTML arrives.
+In @sec-static-pages, you learned to retrieve web pages with `requests` and parse them with BeautifulSoup. This works well for pages whose content is fully present in the initial HTML — what we call *static* pages. That chapter ended on a page where it failed: IMDb answered `requests.get()` for *The Godfather* with status 202 and zero characters of HTML, while a browser showed the whole page. Most modern websites are *dynamic*: their content is loaded, modified, or entirely rendered by JavaScript after the initial HTML arrives.
 
 When you use `requests.get()` on a dynamic page, you get the HTML skeleton before JavaScript has run. The data you see in your browser may simply not exist in the response that `requests` receives. You can verify this by comparing `requests.get(url).text` with what you see in the browser — if significant content is missing from the `requests` version, the page is dynamic.
 
-The solution is to use a tool that can execute JavaScript: a real web browser, controlled programmatically. Selenium is the standard tool for this.
+The solution is a tool that can execute JavaScript: a real web browser, controlled programmatically. This chapter teaches two. Selenium, the long-standing standard, runs in your notebook; Playwright, a newer tool, runs as a script from the terminal. First, though, check whether you need a browser at all.
+
+## Do You Need a Browser?
+
+Driving a browser is slow and fragile, so check by hand first. Three checks in your own browser settle the question for most pages, and each takes about a minute. The examples use [Quotes to Scrape](https://quotes.toscrape.com), part of a [web scraping sandbox](https://toscrape.com) built for practice: it serves the same quotes in several ways, each one, in the sandbox's words, "including new scraping challenges for you."
+
+### Check 1: View Source
+
+Open <https://quotes.toscrape.com/js/>. Ten quotes appear on the screen, yet `requests` finds none of them:
+
+```{python}
+import requests
+from bs4 import BeautifulSoup
+
+HEADERS = {"User-Agent": "WebDataScience/1.0 (INFO 4617; you@colorado.edu)"}
+
+response = requests.get("https://quotes.toscrape.com/js/", headers=HEADERS)
+soup = BeautifulSoup(response.text, "html.parser")
+print(len(soup.select("div.quote")))
+# 0
+```
+
+Right-click the page and choose **View Page Source** to see exactly what the server sent (@fig-view-source). There is no `<div class="quote">` anywhere in it. The quotes are in the file all the same: a `<script>` near the bottom holds them as a JavaScript array named `data`, and the page's own code turns that array into the boxes you see.
+
+![View Source for `quotes.toscrape.com/js/`. No quote markup, but the quotes themselves sit in a script as a JavaScript array.](images/ch-08/view-source-js.png){#fig-view-source .lightbox fig-alt="Screenshot of Chrome's View Source for quotes.toscrape.com/js/. The HTML has a header with the site title and a login link, then a script tag that loads jquery.js and a second script that begins var data = [ followed by a quote object with tags change, deep-thoughts, thinking, and world, an author object for Albert Einstein, and the text of his quote."}
+
+Data inside a script is still data your `requests` response already contains. A regular expression can cut the array out, and because it is written in JSON syntax, `json.loads()` (@sec-data-formats) can parse it:
+
+```{python}
+import json
+import re
+
+# The array sits between "var data = " and the next "];" -- capture it, brackets included
+match = re.search(r"var data = (\[.*?\]);", response.text, re.DOTALL)
+quotes = json.loads(match.group(1))
+print(len(quotes), quotes[0]["author"]["name"])
+# 10 Albert Einstein
+```
+
+### Check 2: Turn JavaScript Off
+
+A page with its JavaScript switched off shows roughly what `requests` has to work with. In Chrome's developer tools, open the **Command Menu** (Control+Shift+P on Windows and Linux, Command+Shift+P on a Mac), type `javascript`, choose **Disable JavaScript**, and reload the page. @fig-js-off-on shows the result on the quotes page: the title, the login link, and a **Next** button, but no quotes. JavaScript stays off in that tab only while developer tools are open; close them, or run **Enable JavaScript**, to turn it back on. Firefox and Safari have the same switch in their developer settings.
+
+![The same page, `quotes.toscrape.com/js/`, with JavaScript switched off and on.](images/ch-08/javascript-off-on.png){#fig-js-off-on .lightbox fig-alt="Two screenshots side by side. On the left, labeled JavaScript off, the Quotes to Scrape page shows only its title, a Login link, a Next button, and the footer. On the right, labeled JavaScript on, the same page shows quote boxes by Albert Einstein and J.K. Rowling, each with tags."}
+
+### Check 3: Watch the Network Tab
+
+Now open <https://quotes.toscrape.com/scroll>. View Source shows no quotes and no data array this time, only scripts. Open the **Network** tab (@sec-protocols), click the **Fetch/XHR** filter, and scroll down the page. Each time you near the bottom, a new request appears: `quotes?page=2`, then `quotes?page=3`. Click one and open **Preview** (@fig-network-json). The response is JSON: ten quotes at a time, plus a `has_next` flag that says whether another page exists.
+
+![The Network tab on `quotes.toscrape.com/scroll`, filtered to Fetch/XHR. Scrolling triggered requests for pages 1 through 4 of the site's quote API, and Preview shows page 2's JSON.](images/ch-08/network-tab-json.png){#fig-network-json .lightbox fig-alt="Screenshot of Chrome with the Quotes to Scrape scroll page on the left and developer tools on the right. The Network tab is filtered to Fetch/XHR and lists four requests, quotes?page=1 through quotes?page=4. The Preview pane for page 2 shows JSON with has_next true, page 2, a quotes array whose first item has author, tags, and text fields, tag null, and top_ten_tags."}
+
+That request is an interface the page built for itself, and your own code can call it too. Check the site's terms first (@sec-ethics), then request it directly, with a pause between pages:
+
+```{python}
+import time
+
+all_quotes = []
+page = 1
+while True:
+    data = requests.get(
+        "https://quotes.toscrape.com/api/quotes",
+        params={"page": page},
+        headers=HEADERS,
+    ).json()
+    all_quotes.extend(data["quotes"])
+    if not data["has_next"]:  # The API says when to stop
+        break
+    page += 1
+    time.sleep(1)
+
+print(len(all_quotes))
+# 100
+```
+
+The JSON arrives already structured, with no HTML to parse. Nobody promised to keep an undocumented endpoint like this one stable, though, so save what you collect as you go, as @sec-archives recommends.
+
+When all three checks come up empty — the data appears only after the page runs code you cannot reproduce, or only after clicks, typing, or scrolling you must perform — you need a browser. The rest of this chapter drives one in two ways: with Selenium in the notebook, and then with Playwright as a script. The Selenium examples start on simple pages like xkcd that do not strictly need a browser, because simple pages make the tool's basics easy to see.
 
 ## Setting Up Selenium
 
@@ -45,9 +124,61 @@ driver = webdriver.Chrome()
 # driver = webdriver.Firefox()
 ```
 
-If driver resolution fails on your machine — an unusual browser install location or a very new browser release can confuse it — check Selenium's driver documentation for manual setup instructions.
+When you create the `driver`, a browser window opens (@fig-selenium-cft). This is your programmable browser — every command you issue through the `driver` object happens in that window.
 
-When you create the `driver`, a browser window opens. This is your programmable browser — every command you issue through the `driver` object happens in that window.
+![A browser started by `webdriver.Chrome()` on a machine with no Chrome installed. Selenium Manager downloaded Chrome for Testing, which labels itself as meant only for automation.](images/ch-08/selenium-chrome-for-testing.png){#fig-selenium-cft .lightbox fig-alt="Screenshot of a Chrome for Testing window showing the xkcd home page and the comic Stargazing 5. A bar under the address bar reads Chrome for Testing v154.0.8037.57 is only for automated testing. For regular browsing, use a standard version of Chrome that updates automatically. The comic's hover text is showing as a tooltip."}
+
+### What Selenium Manager Does
+
+Selenium Manager is a small program that ships inside the `selenium` package, and `webdriver.Chrome()` runs it before the browser starts. It:
+
+1. Looks for a `chromedriver` already on your system `PATH`, and for Chrome itself.
+2. Asks Google's Chrome for Testing service which driver version matches your Chrome. If you have no Chrome at all, it downloads Chrome for Testing, a build of Chrome made for automation, as well.
+3. Downloads the matching driver, and keeps it and any browser it fetched in a cache folder: `~/.cache/selenium` on macOS and Linux, `%USERPROFILE%\.cache\selenium` on Windows.
+4. Reuses the cache next time, checking for newer versions at most once an hour.
+
+You can watch it work by turning on its log before you create the driver:
+
+```{python}
+import logging
+
+logging.basicConfig(level=logging.WARNING)
+# Print each decision Selenium Manager makes
+logging.getLogger("selenium.webdriver.common.selenium_manager").setLevel(logging.DEBUG)
+
+driver.quit()  # Close the browser from the cell above before starting a logged one
+driver = webdriver.Chrome()
+```
+
+On a machine with no Chrome, in September 2026, the log included these lines (trimmed):
+
+```
+Found chromedriver 147.0.7727.24 in PATH: /opt/node22/bin/chromedriver
+chrome not found in the system
+Required browser: chrome 154.0.8037.57
+Downloading chrome 154.0.8037.57 from https://storage.googleapis.com/chrome-for-testing-public/...
+Required driver: chromedriver 154.0.8037.57
+Driver path: /opt/node22/bin/chromedriver
+```
+
+Selenium Manager downloaded Chrome 154 and worked out that it needed driver 154, then used driver 147 anyway, because an npm package had once installed that driver on the machine's `PATH`, and a driver on your `PATH` wins. Its log warned that "it is advised to delete the driver in PATH and retry," and the browser failed to start with `This version of ChromeDriver only supports Chrome version 147`. The log also recorded something else: Selenium Manager sends anonymous usage statistics (browser, operating system, language, and Selenium version) to Plausible, a web analytics service, unless you set the environment variable `SE_AVOID_STATS=true`.
+
+### When Selenium Manager Fails
+
+- **`This version of ChromeDriver only supports Chrome version N`.** An old driver on your `PATH`, left by a manual download, Homebrew, conda, or an npm package, outranks the one Selenium Manager would choose. Delete it, or set `SE_SKIP_DRIVER_IN_PATH=true`. With that setting, the machine above downloaded chromedriver 154 and started cleanly.
+- **Downloads fail on a campus or corporate network.** A proxy or firewall may block Google's download servers. Set `SE_PROXY` to your proxy's address, or run once on an open network; after that, Selenium Manager works from its cache, and `SE_OFFLINE=true` stops it from trying the network at all.
+- **Chrome is installed somewhere unusual.** Browsers installed through conda or snap can hide from Selenium Manager. Point Selenium at the browser with `options.binary_location = "/path/to/chrome"`.
+- **Something is stuck in the cache.** Delete the cache folder listed above and run your code again; Selenium Manager rebuilds it.
+- **Your computer is a Linux ARM machine, such as a Raspberry Pi.** Selenium Manager has no build for that platform, so install the browser and its driver with your system's package manager.
+
+Settings like these are environment variables. The simplest way to set one is at the top of your notebook, before your first `webdriver.Chrome()`:
+
+```{python}
+import os
+
+# Ignore any stray chromedriver on PATH and let Selenium Manager fetch a matching one
+os.environ["SE_SKIP_DRIVER_IN_PATH"] = "true"
+```
 
 ## Navigating and Finding Elements
 
@@ -73,7 +204,11 @@ The `find_element` method (singular) returns the first matching element. The `fi
 
 ## Extracting Data
 
-xkcd is famous for its hidden alt-text messages. You can extract element attributes:
+xkcd is famous for its hidden alt-text messages. Right-click the comic and choose **Inspect**, and developer tools show where they live (@fig-xkcd-inspect): the `<img>` tag's `alt` attribute holds the comic's name, and its `title` attribute holds the hover joke that readers call the alt-text.
+
+![Developer tools on xkcd with the comic's `<img>` selected. Its `title` attribute holds the hover joke; its `alt` attribute holds the comic's name.](images/ch-08/xkcd-inspect.png){#fig-xkcd-inspect .lightbox fig-alt="Screenshot of Chrome showing the xkcd comic Stargazing 5 on the left and developer tools on the right. In the Elements panel, an img element inside div id comic is selected; its src points to imgs.xkcd.com, its title attribute begins The sun and the moon appear the same size in the sky, and its alt attribute is Stargazing 5."}
+
+You can extract both attributes:
 
 ```{python}
 # Find the comic image
@@ -163,15 +298,18 @@ The `time.sleep()` calls in the examples above are a crude approach to waiting f
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-# Navigate to a page with dynamically loaded content
-driver.get("https://example-dynamic-site.com")
+# This practice page waits ten seconds before its JavaScript adds the quotes
+driver.get("https://quotes.toscrape.com/js-delayed/")
 
-# Wait up to 10 seconds for a specific element to appear
-element = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.CLASS_NAME, "results-container"))
+# Wait up to 15 seconds for the first quote to appear
+element = WebDriverWait(driver, 15).until(
+    EC.presence_of_element_located((By.CLASS_NAME, "quote"))
 )
-print(f"Element found: {element.tag_name}")
+print(len(driver.find_elements(By.CLASS_NAME, "quote")))
+# 10
 ```
+
+A `time.sleep(2)` here would have looked at the page too early and found nothing. `WebDriverWait` returned after about ten seconds, the moment the first quote appeared.
 
 `WebDriverWait` checks the condition repeatedly (every 0.5 seconds by default) and returns the element as soon as it appears, or raises a `TimeoutException` if the timeout expires. This is superior to `time.sleep()` in two ways: it does not wait longer than necessary (if the element appears in 0.2 seconds, it proceeds immediately), and it fails loudly if the element never appears (rather than silently returning an empty page).
 
@@ -211,6 +349,8 @@ def scrape_infinite_scroll(driver, max_scrolls=20, scroll_pause=2):
 ```
 
 The key insight is checking `document.body.scrollHeight` before and after each scroll. When the height stops growing, you have reached the end of the available content. Some sites use a "Load More" button instead of infinite scroll — for those, replace the scroll with a click on the button and watch for the button to disappear or become disabled.
+
+On <https://quotes.toscrape.com/scroll>, this function stops after its tenth scroll with all 100 quotes loaded. It is also a page where you do not need it: the Network tab check at the start of this chapter found the JSON the scrolling requests, and `requests` collected the same 100 quotes with no browser at all.
 
 A practical consideration: infinite scroll pages can contain thousands of items, and loading them all consumes significant memory in the browser process. Set a reasonable `max_scrolls` limit based on how much data you actually need. If you are collecting data for a class project, you rarely need more than a few hundred items — scrolling through an entire social media feed of 10,000 posts is both unnecessary and discourteous to the server. Remember the proportionality principle from @sec-ethics: collect only the data you need for your research question.
 
@@ -261,7 +401,7 @@ Screen-scraping with Selenium is inherently fragile. The Twitter scraping exampl
 
 This fragility reinforces a principle from @sec-post-api: when an API is available, use it. Selenium is a powerful last resort for cases where you ethically need data that no API provides, but it is slow, resource-intensive, and brittle compared to API access. The decision tree should be: API first → static scraping second → Selenium third.
 
-Selenium is also not the only browser automation tool. **Playwright**, developed by Microsoft, is the modern alternative: it waits for elements automatically (eliminating much of the explicit-wait boilerplate you saw earlier), runs noticeably faster, and supports asynchronous operation for parallel scraping. If browser automation becomes a regular part of your work, Playwright is worth learning. That said, Selenium remains far more widespread, has a deeper reservoir of documentation and community answers, and is entirely adequate for coursework — which is why this chapter teaches it.
+Selenium is also not the only browser automation tool. **Playwright**, which the second half of this chapter covers, waits for elements automatically and can record a script while you click, but it runs best outside the notebook. Selenium is long established, with a deep reservoir of documentation and community answers, and it runs in the notebook, which is why this chapter teaches it first.
 
 ### Headless Mode
 
@@ -287,7 +427,7 @@ One important caveat: some websites detect headless browsers and serve different
 
 ## A Practical Selenium Workflow
 
-Fragility is an argument for writing Selenium code defensively, not for avoiding Selenium. Here is a complete workflow that pulls together everything this chapter has covered. We will automate a multi-page interaction: navigating to a website, performing a search, waiting for results to load, extracting the data, and repeating across multiple pages.
+Fragility is an argument for writing Selenium code defensively, not for avoiding Selenium. Here is a complete workflow that pulls together everything this chapter has covered. We will automate a multi-page interaction on the JavaScript version of Quotes to Scrape: navigating to the site, waiting for JavaScript to render the quotes, extracting the data, and repeating across multiple pages. As the View Source check showed, this particular page does not strictly need a browser; it stands in for sites that do, and it will not change under you.
 
 ```{python}
 import time
@@ -299,13 +439,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import pandas as pd
 
-def scrape_with_selenium(search_term, max_pages=3):
-    """Scrape search results from a dynamic website.
+def scrape_quotes(max_pages=3):
+    """Scrape quotes from a JavaScript-rendered, paginated site.
 
     This demonstrates the full Selenium workflow:
     1. Launch a headless browser
-    2. Navigate and interact with the page
-    3. Wait for dynamic content to load
+    2. Navigate to the page
+    3. Wait for JavaScript to render the content
     4. Extract data via BeautifulSoup
     5. Handle pagination
     6. Clean up
@@ -317,59 +457,244 @@ def scrape_with_selenium(search_term, max_pages=3):
     all_results = []
 
     try:
-        driver.get("https://example-search-site.com")
-
-        # Find and fill the search box
-        search_box = driver.find_element(By.NAME, "q")
-        search_box.send_keys(search_term)
-        search_box.submit()
+        driver.get("https://quotes.toscrape.com/js/")
 
         for page in range(max_pages):
-            # Wait for results to load (up to 10 seconds)
+            # Wait for the quotes to render (up to 10 seconds)
             WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "result-item"))
+                EC.presence_of_element_located((By.CLASS_NAME, "quote"))
             )
 
             # Pass rendered HTML to BeautifulSoup
             soup = BeautifulSoup(driver.page_source, "html.parser")
 
             # Extract data from this page
-            for item in soup.find_all("div", class_="result-item"):
+            for item in soup.find_all("div", class_="quote"):
                 # Check that both elements exist before calling .text — the same defensive pattern you learned for static scraping
-                title_tag = item.find("h3")
-                desc_tag = item.find("p")
-                if title_tag is None or desc_tag is None:
-                    continue  # Skip malformed result items rather than crash
+                text_tag = item.find("span", class_="text")
+                author_tag = item.find("small", class_="author")
+                if text_tag is None or author_tag is None:
+                    continue  # Skip malformed items rather than crash
                 all_results.append({
-                    "title": title_tag.text.strip(),
-                    "description": desc_tag.text.strip(),
+                    "text": text_tag.text.strip(),
+                    "author": author_tag.text.strip(),
                     "page": page + 1
                 })
 
-            # Try to click "Next" for pagination
-            try:
-                next_button = driver.find_element(By.LINK_TEXT, "Next")
-                next_button.click()
-                time.sleep(2)  # Wait for next page to load
-            except Exception:
+            # Click "Next" if there is one; the last page has none
+            next_links = driver.find_elements(By.CSS_SELECTOR, "li.next a")
+            if not next_links:
                 break  # No more pages
+            next_links[0].click()
+            time.sleep(1)  # Pause between pages
 
     finally:
         driver.quit()  # Always clean up
 
     return pd.DataFrame(all_results)
+
+quotes_df = scrape_quotes(max_pages=3)
+print(quotes_df.shape)
+# (30, 3)
 ```
 
-Notice the use of `WebDriverWait` with `expected_conditions` — this is superior to `time.sleep()` because it waits only as long as needed for the element to appear, rather than waiting a fixed amount of time that might be too short (element not loaded) or too long (wasted time). The `try/finally` block ensures the browser is closed even if an error occurs. And notice the `None` checks before calling `.text`: dynamic pages serve malformed or incomplete items just as often as static ones do, and the defensive parsing habits from @sec-static-pages carry over unchanged.
+Notice the use of `WebDriverWait` with `expected_conditions` — this is superior to `time.sleep()` because it waits only as long as needed for the element to appear, rather than waiting a fixed amount of time that might be too short (element not loaded) or too long (wasted time). The `try/finally` block ensures the browser is closed even if an error occurs. The pagination uses `find_elements` (plural), which returns an empty list instead of raising an error when the last page has no **Next** link, so the loop ends cleanly. And notice the `None` checks before calling `.text`: dynamic pages serve malformed or incomplete items just as often as static ones do, and the defensive parsing habits from @sec-static-pages carry over unchanged.
 
-## When to Use Selenium vs. APIs
+## Playwright: Scripting a Browser
+
+[Playwright](https://playwright.dev/python/) is the newer way to drive a browser. Microsoft released it in January 2020, built by engineers who had worked on Puppeteer, a browser automation library at Google. It does what Selenium does, with three differences you will notice right away: it installs its own browsers, it waits for elements on its own, and it can write a script for you while you click. It also runs best from the terminal rather than from a notebook, so the code in this section is written as standalone scripts, not notebook cells.
+
+### Installing Playwright
+
+Playwright takes two installs: the Python library, and the browsers it drives.
+
+```
+pip install playwright
+playwright install chromium
+```
+
+The second command downloads Playwright's own copy of Chrome for Testing plus a smaller headless build. For Playwright 1.63 in September 2026, that came to about 300 MB of downloads and 650 MB on disk, so run it on a fast connection rather than on busy class Wi-Fi. Like Selenium Manager, Playwright fetches browsers for you; unlike Selenium Manager, it pins each Playwright release to one browser version (Chrome 153 for Playwright 1.63), so upgrading Playwright means downloading new browsers too.
+
+### A First Script
+
+Save this as `xkcd_alt.py` and run it from a terminal with `python xkcd_alt.py`:
+
+```python
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    browser = p.chromium.launch()  # Headless by default; pass headless=False to watch it work
+    page = browser.new_page()
+    page.goto("https://xkcd.com")
+
+    img = page.locator("#comic img")
+    print(img.get_attribute("alt"))    # The comic's name
+    print(img.get_attribute("title"))  # The hover joke
+
+    browser.close()
+```
+
+Line by line it mirrors the Selenium version: `page` plays the role of `driver`, `page.goto()` replaces `driver.get()`, and a **locator** replaces `find_element()`. The `with` block shuts Playwright down even if your code crashes, the job that `try/finally` and `driver.quit()` do in Selenium.
+
+### Locators Wait for You
+
+A locator is a description of how to find an element, not the element itself. Playwright looks it up only when you use it, and when you act on it or read from it — click it, fill it in, read its text or an attribute — it waits up to 30 seconds for the element to appear. Here is the ten-second practice page again:
+
+```python
+page.goto("https://quotes.toscrape.com/js-delayed/")
+
+print(page.locator("div.quote").count())  # count() does not wait
+# 0
+
+first = page.locator("div.quote span.text").first.inner_text()  # Waits for the quotes
+print(page.locator("div.quote").count())
+# 10
+```
+
+`inner_text()` waited about ten seconds without a `WebDriverWait` in sight. Not every method waits, though: `count()` answered at once, before any quotes existed. Methods that act on an element or read from it wait; methods that report on the page as it stands right now do not.
+
+### Catching the JSON Behind a Page
+
+Playwright can also listen to the page's own network traffic, the requests you watched in the Network tab, and hand you their JSON:
+
+```python
+page.goto("https://quotes.toscrape.com/scroll")
+
+# Scroll, and capture the request for page 2 that the scrolling triggers
+with page.expect_response(lambda r: "/api/quotes?page=2" in r.url) as info:
+    page.mouse.wheel(0, 20000)
+
+data = info.value.json()
+print(data["page"], len(data["quotes"]))
+# 2 10
+```
+
+This is the chapter's third by-hand check, written as code. Use it when the JSON request depends on something only the browser can supply, such as a token the page's JavaScript computes, so calling the endpoint yourself with `requests` fails. To parse the rendered page instead, `page.content()` returns its current HTML, which you hand to BeautifulSoup exactly as you did with `driver.page_source`.
+
+### Why Not in the Notebook?
+
+Paste the first script into a notebook cell and run it, and Playwright refuses:
+
+```
+Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+```
+
+Jupyter runs an *event loop*, the machinery that lets Python juggle many waiting tasks at once, for its own purposes. Playwright's straightforward interface, its *sync* API, needs to run an event loop of its own, and it cannot start one inside Jupyter's. There are two ways around this. The first is this chapter's choice: keep Playwright in `.py` scripts and run them from the terminal. The second is Playwright's *async* API, which does run in a notebook, at the price of putting `await` in front of nearly every call:
+
+```python
+from playwright.async_api import async_playwright
+
+p = await async_playwright().start()
+browser = await p.chromium.launch()
+page = await browser.new_page()
+await page.goto("https://quotes.toscrape.com/js/")
+print(await page.locator("div.quote").count())
+# 10
+await browser.close()
+await p.stop()
+```
+
+Forget one `await` and you get a coroutine object, a placeholder, instead of a result, and nothing stops your code from carrying on with it. That trap, plus the new syntax, is why this chapter's exercises stay with Selenium in the notebook.
+
+### Recording a Script with Codegen
+
+You do not have to write a Playwright script from scratch. Run:
+
+```
+playwright codegen --target python https://quotes.toscrape.com/
+```
+
+Two windows open: a browser, and the Playwright Inspector (@fig-codegen). Everything you do in the browser becomes a line of Python in the Inspector. Clicking the tag *change* and then an author's *(about)* link recorded these lines:
+
+```python
+page.goto("https://quotes.toscrape.com/")
+page.get_by_role("link", name="change").click()
+page.get_by_role("link", name="(about)").click()
+```
+
+![Playwright's codegen recorder. Every click in the browser on the left became a line in the Inspector on the right. Hovering over the author's name shows the locator codegen would use for it.](images/ch-08/playwright-codegen.png){#fig-codegen .lightbox fig-alt="Screenshot of two windows. On the left, a browser shows the Quotes to Scrape author page for Albert Einstein, with the heading highlighted and a tooltip reading get_by_role heading, name Albert Einstein. On the right, the Playwright Inspector shows a generated Python script that launches Chromium, goes to quotes.toscrape.com, and clicks the link named change and then the link named (about)."}
+
+Codegen writes *role-based* locators: "the link whose visible name is *change*" rather than a CSS path such as `div.tags > a:nth-child(2)`. Role-based locators survive a redesign that renames CSS classes, but they break when the visible text changes, so read what the recorder wrote before you trust it. A recording is a first draft: it reproduces your clicks, but it extracts nothing, so the scraping part is still yours to write.
+
+## Letting an AI Agent Drive
+
+The newest way to script a browser is not to write the script at all, and to ask an AI assistant to do the work. Playwright is the engine behind much of this.
+
+### An Assistant at the Wheel
+
+The **Model Context Protocol** (MCP) is a standard way to plug outside tools into an AI assistant, much as USB is a standard way to plug devices into a computer. [Playwright MCP](https://playwright.dev/mcp/introduction) is one such tool: once it is connected, an assistant that speaks MCP can open a browser and call actions such as `browser_navigate`, `browser_click`, `browser_type`, and `browser_snapshot`. Most MCP-capable assistants, from coding editors like VS Code and Cursor to chat apps like Claude Desktop, accept the same few lines of configuration; the server itself needs Node.js 20 or newer:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}
+```
+
+The assistant does not look at the page the way you do. Playwright MCP sends it an **accessibility snapshot**: a text outline of the page's parts by role and name, the same structure a screen reader uses. Playwright's own `aria_snapshot()` method produces this kind of outline. Here is the top of xkcd's comic area, from September 2026:
+
+```yaml
+- text: Stargazing 5
+- list:
+  - listitem:
+    - link "|<":
+      - /url: /1/
+  - listitem:
+    - link "< Prev":
+      - /url: /3300/
+  - listitem:
+    - link "Random":
+      - /url: //c.xkcd.com/random/comic/
+  - listitem:
+    - link "Next >":
+      - /url: "#"
+  - listitem:
+    - link ">|":
+      - /url: /
+- img "Stargazing 5"
+```
+
+Most of what the assistant knows about a page arrives this way. A page built from real links, labeled buttons, and `alt` text is easy for it to use; a page built from unlabeled `<div>`s is hard. A lighter-weight sibling, the Playwright CLI, gives coding agents such as Claude Code and GitHub Copilot the same browser control through terminal commands instead of MCP.
+
+### Driving versus Writing the Scraper
+
+You can put an agent to work in two ways, and for research they have very different consequences.
+
+**Let it drive.** Ask in plain English for the data: "Collect every quote tagged *love* on quotes.toscrape.com, with its author." The agent navigates, reads snapshots, clicks, and reports back. This is flexible and quick to try, but every run is a new improvisation: two runs can click different things and return different results, each run costs money in model usage, and what you end up with is a result, not a method. Nobody, including you six months later, can rerun exactly what happened.
+
+**Let it write.** Ask instead for a script: "Explore quotes.toscrape.com with Playwright and write me a Python script that collects every quote tagged *love*." The agent explores the same way, but hands you code: the same kind of first draft codegen produces from your clicks, produced this time from a description. You read it, test it, commit it to version control, and rerun it for free, and a reviewer can check it.
+
+For research, prefer the second. Your methods section can cite the script's version, and a reviewer can rerun it; an agent's one-time browsing session leaves nothing to cite or rerun.
+
+::: {.callout-warning}
+## An Agent Is Still Your Scraper
+Everything in @sec-ethics applies when an AI does the browsing, because the requests are still yours. Check `robots.txt` and the Terms of Service before you point an agent at a site. The page content goes to the AI provider along with your instructions, so keep agents away from pages holding private or confidential data. Watch for **prompt injection**: text on a page, even text you cannot see, can try to give the agent new instructions. And never let an agent drive a browser that is logged in to your own accounts: it acts with your identity, and you answer for what it does. Playwright MCP opens a visible browser by default; leave it that way, and watch.
+:::
+
+## Choosing a Tool
 
 With the full toolkit in hand, here is the decision tree for choosing your data access method:
 
 1. **Is there an API?** Use it. APIs are faster, more reliable, and more structured (see @sec-wikipedia through @sec-ai-apis).
-2. **Is the content in the static HTML?** Use `requests` + BeautifulSoup (see @sec-static-pages). It is simpler and faster than Selenium.
-3. **Is the content loaded by JavaScript?** Use browser automation — Selenium, or Playwright if auto-waiting and speed matter for your project. Either way, expect it to be slower, more fragile, and more resource-intensive than the options above.
-4. **Is the content behind a login?** This is where ethical judgment matters most. Automating access to login-gated content may violate Terms of Service. See @sec-ethics.
+2. **Is the content in the page source?** Use `requests` + BeautifulSoup (see @sec-static-pages). If the data sits inside a `<script>`, cut it out and parse it with `json.loads()`.
+3. **Does the Network tab show the data arriving as JSON?** Request that JSON directly with `requests`, politely.
+4. **Is the content rendered by JavaScript you cannot get around?** Drive a browser: Selenium in a notebook, or Playwright in a script. Either way, expect it to be slower, more fragile, and more resource-intensive than the options above.
+5. **Is the content behind a login?** This is where ethical judgment matters most. Automating access to login-gated content may violate Terms of Service. See @sec-ethics.
+
+When the answer is a browser, the two tools differ in ways that decide which one fits your project:
+
+| | Selenium | Playwright |
+|---|---|---|
+| Install | `pip install selenium` | `pip install playwright`, then `playwright install` |
+| Browsers | The one you have installed; Selenium Manager downloads Chrome for Testing if you have none | Its own copies, pinned to each Playwright release |
+| In a notebook | Yes | Only through the async API and `await` |
+| Waiting | Explicit, with `WebDriverWait` | Automatic when you act on or read an element |
+| Recording clicks | Selenium IDE, a separate browser extension | `playwright codegen`, built in |
 
 The exercises below give you practice at every branch of this tree.
 
@@ -432,7 +757,9 @@ These are open-ended extensions — no scaffold, no fixed path. Use them for fur
 
 4. **Performance comparison.** For the same URL, measure the time taken by three approaches: `requests.get()`, headed Selenium (with a visible browser), and headless Selenium. Use `time.time()` to measure each. Create a table comparing the three approaches on speed, completeness of data retrieved, and resource usage. When is the speed tradeoff of Selenium worth it?
 
-5. **Graduate extension (INFO 5617).** Choose a JavaScript-heavy site relevant to your own research interests and instrument it with both approaches from this part of the book: static `requests` + BeautifulSoup and Selenium. Quantify what each approach sees — count of elements retrieved, payload size in bytes, and wall-clock time — across at least five pages. Then write a roughly 500-word memo on when the added cost of browser automation is justified, engaging with the treatment of JavaScript scraping in @mitchell2018web. Your memo should articulate a defensible general rule for other researchers, not just describe your particular site.
+5. **Playwright script.** Rewrite Steps 2–4 of the Recommended Exercise as a Playwright script that you run from the terminal. Replace `WebDriverWait` with a locator that waits, and hand `page.content()` to BeautifulSoup. Compare the two versions: how many lines each took, how long each ran, and what each needed from you before the content was ready to read.
+
+6. **Graduate extension (INFO 5617).** Choose a JavaScript-heavy site relevant to your own research interests and instrument it with both approaches from this part of the book: static `requests` + BeautifulSoup and Selenium. Quantify what each approach sees — count of elements retrieved, payload size in bytes, and wall-clock time — across at least five pages. Then write a roughly 500-word memo on when the added cost of browser automation is justified, engaging with the treatment of JavaScript scraping in @mitchell2018web. Your memo should articulate a defensible general rule for other researchers, not just describe your particular site.
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -445,6 +772,8 @@ The shift from server-rendered to client-rendered web pages represents a fundame
 
 This architectural shift interacts with the enclosure dynamics described in @sec-post-api. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures — CAPTCHAs, bot detection, dynamically-generated class names — become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes. The tools in this chapter are a response to that architectural shift — they exist because the simpler approaches taught in @sec-static-pages are no longer sufficient for much of the modern web.
 
+Neither tool was built for research. Selenium began in 2004 at ThoughtWorks in Chicago, where Jason Huggins wrote "JavaScriptTestRunner" to test an internal time-and-expenses application; Playwright came from Microsoft in 2020, built by engineers who had worked on Google's Puppeteer, to test web applications across browsers. Researchers borrowed both because testing a website and observing one require the same ability: making a real browser do what a person would do, on demand, and recording what appears. The AI agents that now drive browsers through Playwright MCP extend the same borrowing to software that decides for itself what to click.
+
 ::: {.callout-note}
 ## Public Interest Connection
 When platforms close their APIs and render content exclusively through JavaScript, browser automation becomes the last-resort path to data that serves the public interest. The tools in this chapter exist because of the **enclosure** dynamic from @sec-post-api — the progressive restriction of access to data that was once openly available. Researchers studying algorithmic bias, misinformation, and platform governance increasingly depend on Selenium-based methods precisely because the APIs that once served these research needs have been shut down or restricted beyond practical use.
@@ -454,16 +783,21 @@ When platforms close their APIs and render content exclusively through JavaScrip
 
 - **`NoSuchElementException`**: The element does not exist yet because the page has not finished loading. Add `time.sleep()` or use explicit waits with `WebDriverWait`.
 - **`StaleElementReferenceException`**: The DOM changed between when you found the element and when you tried to interact with it. Re-find the element.
-- **Driver/browser version mismatch**: Selenium Manager usually resolves this automatically, but brand-new browser releases occasionally break compatibility for a few days. Updating the `selenium` package typically fixes it.
+- **`SessionNotCreatedException: This version of ChromeDriver only supports Chrome version N`**: An older `chromedriver` on your `PATH` is overriding Selenium Manager. Delete it, or set `SE_SKIP_DRIVER_IN_PATH=true` (see "When Selenium Manager Fails" above). If there is no stray driver, a brand-new browser release may have outrun Selenium for a few days; updating the `selenium` package typically fixes it.
 - **Memory issues**: Each Selenium driver runs a full browser process. Close drivers promptly with `driver.quit()`.
+- **Playwright: `It looks like you are using Playwright Sync API inside the asyncio loop`**: You ran a sync script in a notebook. Run it from the terminal instead, or switch to the async API.
+- **Playwright: `Executable doesn't exist at ...`**: Playwright's browsers are missing, usually right after you install or upgrade the library. Run `playwright install chromium`.
 
 ## Key Takeaways
 
-The modern web is dynamic: JavaScript renders content after the initial HTML loads, making it invisible to static scraping tools. Selenium controls a real browser programmatically, letting you access fully-rendered pages, simulate user interactions, and extract content that `requests` cannot see. But Selenium is slow, fragile, and resource-intensive — a last resort when APIs and static scraping are unavailable. The hybrid approach of Selenium for rendering plus BeautifulSoup for parsing gives you full access to the modern web while keeping your parsing code familiar.
+The modern web is dynamic: JavaScript renders content after the initial HTML loads, making it invisible to static scraping tools. Before you reach for a browser, check by hand: the data may be in the page source, inside a script, or arriving as JSON you can request directly. When you do need a browser, Selenium controls a real one from your notebook, with Selenium Manager fetching the driver, and the browser if you need one, letting you access fully-rendered pages, simulate user interactions, and extract content that `requests` cannot see. Playwright does the same from scripts, waits on its own, and can record a script while you click; AI agents can drive it too, but for research, have them write a script you can read and rerun rather than browse on your behalf. Every one of these tools is slow, fragile, and resource-intensive next to an API — a last resort when APIs and static scraping are unavailable. The hybrid approach of a browser for rendering plus BeautifulSoup for parsing gives you full access to the modern web while keeping your parsing code familiar.
 
 ## Further Reading
 
 - Selenium documentation: <https://www.selenium.dev/documentation/>
+- Selenium Manager: <https://www.selenium.dev/documentation/selenium_manager/>
 - Selenium Python bindings: <https://selenium-python.readthedocs.io/>
 - Playwright for Python: <https://playwright.dev/python/>
+- Playwright MCP: <https://playwright.dev/mcp/introduction>
+- Web Scraping Sandbox (Quotes to Scrape and Books to Scrape): <https://toscrape.com/>
 - @mitchell2018web — Chapter 11: Scraping JavaScript
