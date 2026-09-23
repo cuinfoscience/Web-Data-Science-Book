@@ -504,18 +504,22 @@ wget --user-agent="WebDataScience/1.0 (your-email@colorado.edu)" https://en.wiki
 
 `curl` prints the response body to your terminal by default — add `-O` to save it to a file named after the URL's last path segment, or `-o filename.html` to choose the name yourself. `wget` saves to disk automatically, without being asked.
 
-**Replicating `time.sleep()` between requests.** This is where the two tools genuinely differ, not just in syntax. `wget` has rate-limiting built in: `--wait=SECONDS` pauses between each request when you give it more than one URL, and `--random-wait` varies that pause between roughly half and one-and-a-half times the value you gave, so your request timing does not look as suspiciously uniform as a fixed delay does:
+**Replicating `time.sleep()` between requests.** When you make several requests in a row, you can pause between them with Python's `time.sleep()`. This slows down your requests so you are not sending them to a server as quickly as your computer can. For example, `time.sleep(2)` waits two seconds before the next request:
 
-```
-wget --wait=2 --random-wait https://en.wikipedia.org/wiki/Python_(programming_language) https://en.wikipedia.org/wiki/Web_scraping
+```python
+for url in urls:
+    response = requests.get(url)
+    time.sleep(2)
 ```
 
-`curl` has no equivalent flag — you get the same behavior only by wrapping it in a shell loop and calling `sleep` yourself, the command-line version of the `time.sleep()` calls you have already written in Python:
+This is a simple form of **rate limiting**: deliberately controlling how frequently you make requests. `wget` has a built-in equivalent, `--wait=2`, which waits two seconds between requests. `--random-wait` varies the length of those pauses rather than using the same delay every time.
 
-```
+`curl` does not have a direct equivalent to `--wait`; you would need to add the delay yourself in a shell loop:
+
+```bash
 for url in "https://en.wikipedia.org/wiki/Python_(programming_language)" "https://en.wikipedia.org/wiki/Web_scraping"; do
-  curl -O "$url"
-  sleep 2
+    curl -O "$url"
+    sleep 2
 done
 ```
 
