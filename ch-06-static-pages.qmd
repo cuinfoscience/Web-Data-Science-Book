@@ -142,19 +142,20 @@ For well-structured HTML tables, pandas provides a powerful shortcut. The `read_
 ```{python}
 import pandas as pd
 
-# Point read_html directly at a URL — no requests or BeautifulSoup needed
+# Read_html can fetch a URL directly; the User-Agent header avoids Wikipedia's 403
 url = "https://en.wikipedia.org/wiki/List_of_highest-grossing_films"
-tables = pd.read_html(url)
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+tables = pd.read_html(url, header=0, storage_options=headers)
 
 print(f"Number of tables found: {len(tables)}")
 # Wikipedia pages often have many tables
 ```
 
-You can specify which row contains the column headers and select the table you want by index:
+Because we passed `header=0` above, each DataFrame already uses its first row as column names. Select the table you want by index:
 
 ```{python}
 # The highest-grossing films table is at index 0
-films_df = pd.read_html(url, header=0)[0]
+films_df = tables[0]
 print(films_df.head())
 # Columns: Rank, Peak, Title, Worldwide gross, Year, Ref
 # Row 0: 1, 1, Avatar, $2,923,710,708, 2009, [# 1][# 2]
