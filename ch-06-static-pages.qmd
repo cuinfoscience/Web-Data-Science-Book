@@ -142,7 +142,7 @@ For well-structured HTML tables, pandas provides a powerful shortcut. The `read_
 ```{python}
 import pandas as pd
 
-# Read_html can fetch a URL directly; the User-Agent header avoids Wikipedia's 403
+# read_html can fetch a URL directly; the User-Agent header avoids Wikipedia's 403
 url = "https://en.wikipedia.org/wiki/List_of_highest-grossing_films"
 headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 tables = pd.read_html(url, header=0, storage_options=headers)
