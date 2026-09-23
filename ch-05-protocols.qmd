@@ -681,14 +681,16 @@ You will build a URL diagnostic tool from the protocol layers this chapter cover
 # Your code here
 ```
 
-**Step 5 — Profile five URLs.** Run `diagnose_url()` on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an `http://` address of a site that upgrades you to `https://`), an API endpoint, and a site that blocks automated access (@sec-post-api showed you one).
+**Step 5 — Profile five URLs.** Run `diagnose_url()` on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an `http://` address of a site that upgrades you to `https://`), an API endpoint, and a site known to restrict automated access (@sec-post-api showed you one).
+
+Record what you actually receive from the fifth site: its behavior can vary with your network, request headers, and the time of the request. Inspect a short excerpt of `response.text` as well as the status and headers. A `200` response or a small HTML body alone does not tell you whether you received the requested content, a page that needs JavaScript, or an access challenge. If the response does not clearly show a refusal, report that you could not confirm a block; you do not need to keep trying sites until one refuses you.
 
 ```{python}
-# Step 5: Diagnose five URLs -- working, 404, redirect, API, and blocked.
+# Step 5: Diagnose five URLs -- working, 404, redirect, API, and potentially blocked.
 # Your code here
 ```
 
-**Step 6 — Interpret.** In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the blocked site, what layer refused you — and how do you know it was the site rather than your network (@sec-post-api)?
+**Step 6 — Interpret.** In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the fifth site, what evidence supports a refusal, successful access, or an uncertain result? If you observed a refusal, explain what you can infer about the layer involved (@sec-post-api). An HTTP response shows that you reached an HTTP-speaking server, but its status alone does not identify whether the response came from the site's application, a CDN, or a proxy; a connection error or timeout provides no HTTP status to interpret.
 
 ```{python}
 # Step 6: Write your answer here as comments, or convert this cell to Markdown.
