@@ -6,6 +6,10 @@ Instructions for AI coding agents (Claude Code, Codex, and any other) and for pe
 
 Before starting work, read `docs/handoff.md` (where work stands, what is paused, what is next) and `docs/decisions.md` (standing decisions and the reasons for them). After-action reports are in `docs/aar/`, plans and roadmaps in `docs/plans/`; `docs/README.md` says how each is kept. When work pauses or a decision is made, update those files in the same pull request.
 
+## Git and Pull Requests
+
+Merge with merge commits. Don't squash, rebase, or force-push a branch someone may have seen. A merge commit keeps the branch inside `main`, so a session that has to reuse one branch starts its next pull request with a fast-forward, and the review history stays readable. Open a new branch for each pull request, and don't base one pull request on another's unmerged branch. Merge only when the maintainer asks, and never merge a student's pull request. If the environment can't delete merged branches, list them in `docs/handoff.md`. The reasons are in `docs/decisions.md`.
+
 ## Project Overview
 
 This is a Quarto book for an upper-division undergraduate and master's-level course on web data science taught at the University of Colorado Boulder's Department of Information Science. It covers retrieving, parsing, and analyzing data from the web using Python.
@@ -65,8 +69,14 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
   - A figure showing anything that changes (counts, versions, a live page) says in its caption when it was captured, as in "in September 2026."
   - A count, date, or total printed in a caption comes from a query whose limit and paging are recorded with the figure. If the query hit its limit, page until it doesn't, or don't print the number.
   - Numbered markers are drawn by `tools/shots` from the recipe's `annotate:` marks, each pointing at a page element or a DevTools row, so they follow the page on a retake. Don't place markers at hand-typed pixel positions or paint them into the image.
-  - Text must be readable where the figure is shown. A figure shows at most 800×600 CSS pixels of the screen (a soft limit: a recipe that needs more says why in `oversize:`); for DevTools, zoom DevTools and crop to what the text discusses rather than widening the window. Before a PR, run `tools/shots/run sheet ch-NN` and look at each take at book, slide, and handout size; `check` fails an image whose text measures too small.
+  - **Readable where it is shown, at both ends.** A reader can't use text that is too small, and can't use a figure too crammed to follow.
+    - Scope each figure to what its paragraph discusses: crop to it, and hide the panels, columns, and sidebars the text doesn't mention.
+    - Enlarge by zooming the application, not by widening the window. Three of the four chapter 5 figures zoom DevTools to 125%.
+    - A figure shows at most 800×600 CSS pixels of the screen, unless its recipe says why in `oversize:`.
+    - `tools/shots/run check` is the one place that judges text size. It measures the text at each place the recipe's `targets:` names: the book's column, a slide at a stated share of the text width, or a printed handout. It fails text under 11 pixels in the book, 16 on a 1920-pixel slide, or 6 points in print.
+    - Before a PR, look at every take in `tools/shots/run sheet ch-NN`. A wrapped row, or a column cut short with "…", means the figure shows too much.
   - Keep the capture's own traces out of frame: the proxy's address in DevTools' General section, and response headers that echo the capture's IP address or location. Where the setup changes what a reader would see (HTTP/1.1 through a proxy, a first visit with nothing cached), the caption says so.
+  - A change to `tools/shots` is done when two things are true: it has made one real figure that someone has looked at, and every setting it passes to Chrome or DevTools has a test in `tools/shots/selftest.py` that reads the effect back. An unknown key fails silently. In the chapter 5 pilot, two faults got past a passing selftest: a DevTools preference that the browser ignored, and a User-Agent option that also rewrote Client Hints.
 
 ## File Structure
 

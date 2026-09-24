@@ -337,14 +337,21 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 
 | ID | Pri | Target | Medium | Change | Owner | Status | Check next time |
 |---|---|---|---|---|---|---|---|
-| P0-1 | P0 | `AGENTS.md`, `AUTHORING.md` | definition | Two-sided legibility; scope, then zoom; `check` is the one threshold | maintainer | Proposed | Figures failing `check` at any target: 29 → 0 new; figures redone for cramming: 3 → 0 |
-| P0-2 | P0 | `AGENTS.md`, `docs/decisions.md`, `.claude/settings.json`, repo setting | definition + permission | Merge commits, new branch per PR, no force-push | maintainer | Decided | Force-pushes: ~6 → 0; squash merges by the agent: 12 → 0; stop-hook unpushed warnings: 2 → 0 |
-| P0-3 | P0 | `selftest.py`, `AGENTS.md` | tool config + definition | Effect test per external setting; a real figure before "done" | auto + maintainer | Proposed | Toolkit bugs found after merge: 5 → ≤1; settings with an effect test: 3 of 8 → 8 of 8 |
+| P0-1 | P0 | `AGENTS.md`, `AUTHORING.md` | definition | Two-sided legibility; scope, then zoom; `check` is the one threshold | maintainer | Applied 2026-09-24 (see note) | Figures failing `check` at any target: 29 → 0 new; figures redone for cramming: 3 → 0 |
+| P0-2 | P0 | `AGENTS.md`, `docs/decisions.md`, `.claude/settings.json`, repo setting | definition + permission | Merge commits, new branch per PR, no force-push | maintainer | Decided; text applied 2026-09-24; permission and repo setting open | Force-pushes: ~6 → 0; squash merges by the agent: 12 → 0; stop-hook unpushed warnings: 2 → 0 |
+| P0-3 | P0 | `selftest.py`, `AGENTS.md` | tool config + definition | Effect test per external setting; a real figure before "done" | auto + maintainer | Text applied 2026-09-24; effect tests open | Toolkit bugs found after merge: 5 → ≤1; settings with an effect test: 3 of 8 → 8 of 8 |
 | P1-1 | P1 | `.github/workflows/shots-check.yml` | CI | `check` on PRs that change images | maintainer | Proposed | Image PRs merged without `check` in CI: all → 0 |
 | P1-2 | P1 | `AGENTS.md`, `CLAUDE.md`, `docs/` | layout | One instruction file; records beside the code | auto | Applied | Instruction files found by the collector: 0 → 1; earlier AARs found: 0 → 2 |
 | P1-3 | P1 | skill collector | tool config | Read `queued_command`; wider correction pattern | skill maintainer | Proposed | Steering messages counted: 0 of 8 → 8 of 8 |
 | P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | Deferred | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
 | P2-2 | P2 | `docs/plans/` | plan | Computed outputs | maintainer | Proposed | Plan decided, yes or no |
+
+### Resolution notes
+
+**2026-09-24: P0 text applied at the maintainer's request.**
+- **P0-1.** Applied to `AGENTS.md` ("Figures and screenshots") and to the course repository's `slides/common/AUTHORING.md` ("How much a screenshot shows"), in a changed form. The proposal said `check` "gives the slide width to use", but `check` has no such output. It measures text size at each target the recipe names, and fails text under 11 pixels in the book, 16 on a 1920-pixel slide, or 6 points in print. The applied text describes that. `AUTHORING.md` keeps W/1680 as a starting point for a page's own text, notes that DevTools needs more, and names `check` as the judge.
+- **P0-2.** `AGENTS.md` gained "Git and Pull Requests". It adds one rule from `docs/decisions.md` that the proposal lacked: merge only when the maintainer asks, and never merge a student's pull request. Still open: the permission rule that denies force-pushes (untested), and GitHub's automatic deletion of merged branches.
+- **P0-3.** `AGENTS.md` gained the "done" rule for `tools/shots` changes. Still open: effect tests for the DevTools layout preferences (Styles split, overview, columns).
 
 ## Appendix A — Design sketch: why each part exists
 
