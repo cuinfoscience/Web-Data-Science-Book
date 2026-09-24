@@ -15,6 +15,10 @@
                                              than the window, such as Jupyter
     - press: 'Escape'                        a key
     - settle: 1.5                            seconds, for animation that has no end signal
+    - scroll: {match: '^User-agent: \\*$', in: 'pre', offset: 180}
+                                             so a match inside an element's text (lines of
+                                             a plain-text file, in one <pre>) is 180 pixels
+                                             below the window's top
 
 Playwright's text and CSS locators reach inside open shadow roots, which the
 Wayback Machine's toolbar and calendar use.
@@ -48,6 +52,50 @@ def js_pattern(text):
     return (text[4:], "i") if text.startswith("(?i)") else (text, "")
 
 
+# Runs on an element: the boxes of a pattern's matches inside its text, one box
+# per match, in the viewport's CSS pixels. A plain-text file is one <pre> with one
+# text node, so no element can stand for one of its lines; a match can. `^` and
+# `$` match at each line. `mode` 'first-line' keeps a match's first line.
+MATCH_BOXES = r"""
+(el, [source, flags, mode]) => {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  let text = '';
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    nodes.push([n, text.length]);
+    text += n.data;
+  }
+  const at = offset => {
+    let i = nodes.length - 1;
+    while (i > 0 && nodes[i][1] > offset) i--;
+    return [nodes[i][0], offset - nodes[i][1]];
+  };
+  const re = new RegExp(source, 'gm' + flags);
+  const boxes = [];
+  for (let m = re.exec(text); m; m = re.exec(text)) {
+    if (!m[0].length) { re.lastIndex++; continue; }
+    const range = document.createRange();
+    range.setStart(...at(m.index));
+    range.setEnd(...at(m.index + m[0].length));
+    let rects = [...range.getClientRects()].filter(q => q.width > 0 && q.height > 0);
+    if (!rects.length) continue;
+    if (mode === 'first-line') rects = rects.filter(q => q.top < rects[0].top + rects[0].height / 2);
+    boxes.push([Math.min(...rects.map(q => q.left)), Math.min(...rects.map(q => q.top)),
+                Math.max(...rects.map(q => q.right)), Math.max(...rects.map(q => q.bottom))]);
+  }
+  return boxes;
+}
+"""
+
+
+def match_boxes(page, arg, mode="text", timeout=10000):
+    """Boxes of `arg['match']` inside the element `arg['in']` names (the page's body by default)."""
+    holder = page.locator(arg.get("in", "body")).first
+    holder.wait_for(state="attached", timeout=timeout)
+    source, flags = js_pattern(arg["match"])
+    return holder.evaluate(MATCH_BOXES, [source, flags, mode])
+
+
 def target(page, arg):
     if "selector" in arg:
         return page.locator(arg["selector"]).first
@@ -69,6 +117,18 @@ def run(page, fig, log, extra=None):
         try:
             if kind in extra:
                 extra[kind](arg)
+            elif kind == "scroll" and "match" in arg:
+                # Measure again after scrolling: a page can move as it scrolls (a header that
+                # turns sticky leaves the flow), so correct until the match is at its offset.
+                n = arg.get("nth", 0)
+                for _ in range(3):
+                    boxes = match_boxes(page, arg, timeout=ms)
+                    if len(boxes) <= n:
+                        raise StepError(f"/{arg['match']}/ matched {len(boxes)} time(s) in {arg.get('in', 'body')}")
+                    dy = boxes[n][1] - arg.get("offset", 0)
+                    if abs(dy) < 1:
+                        break
+                    page.evaluate("dy => window.scrollBy(0, dy)", dy)
             elif kind == "wait":
                 if "text" in arg:
                     page.get_by_text(pattern(arg["text"])).first.wait_for(state="visible", timeout=ms)

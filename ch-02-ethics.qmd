@@ -85,7 +85,9 @@ print(response.text[:500])
 # Disallow: /wiki/Special:
 ```
 
-The key directives are `User-agent` (which crawler the rule applies to), `Disallow` (paths that should not be accessed), `Allow` (exceptions to disallow rules), and `Crawl-delay` (requested time between requests). You can parse these programmatically:
+![Wikipedia's robots.txt in Chrome, September 2026, at the block for every crawler. A comment welcomes "friendly, low-speed bots" on article pages but not on dynamically generated ones ①. `User-agent: *` ② starts the rules for all crawlers: four `Allow` exceptions ③, then `Disallow` rules for `/w/`, `/api/`, `/trap/`, and `/wiki/Special:` ④, followed by the same rule in other languages' spellings.](images/ch-02/robots-txt-wikipedia_annotated.png){#fig-robots-txt-wikipedia .lightbox width="78%" fig-alt="Screenshot of lines from en.wikipedia.org/robots.txt in Chrome. Marker 1: a comment, Friendly, low-speed bots are welcome viewing article pages, but not dynamically-generated pages please. Marker 2: User-agent: *. Marker 3: four Allow lines, for /w/api.php?action=mobileview&, /w/load.php?, /api/rest_v1/?doc, and /w/rest.php/site/v1/sitemap. Marker 4: Disallow lines for /w/, /api/, /trap/, and /wiki/Special:."}
+
+The key directives are `User-agent` (which crawler the rule applies to), `Disallow` (paths that should not be accessed), `Allow` (exceptions to disallow rules), and `Crawl-delay` (requested time between requests); @fig-robots-txt-wikipedia shows the first three in Wikipedia's file. You can parse these programmatically:
 
 ```{python}
 from urllib.robotparser import RobotFileParser
@@ -181,7 +183,11 @@ These differences reflect each organization's relationship with automated access
 
 ## Responsible Request Headers
 
-When your code makes requests to a web server, the server sees metadata about the request including the `User-Agent` header, which identifies who is making the request. By default, the `requests` library sends a generic User-Agent string. You should replace it with one that identifies you and provides contact information:
+When your code makes requests to a web server, the server sees metadata about the request, including the `User-Agent` header, which identifies who is making the request. By default, the `requests` library sends a generic User-Agent string: `python-requests/` and a version number. Wikimedia's User-Agent policy (@fig-wikimedia-ua-policy) asks every automated client for more: a name, a version, and a way to contact whoever runs it.
+
+![Wikimedia's User-Agent policy, September 2026. A bot should send a User-Agent that identifies it and gives some way to contact its operator ①. The policy's example ② follows its generic format, `<client name>/<version> (<contact information>)` ③, as this book's `WebDataScience/1.0 (your-email@colorado.edu)` does.](images/ch-02/wikimedia-ua-policy_annotated.png){#fig-wikimedia-ua-policy .lightbox width="60%" fig-alt="Screenshot of Wikimedia's User-Agent policy. Marker 1: If you operate a bot, please send a User-Agent header identifying the bot, and supplying some way of contacting you, the operator. Marker 2: the example, User-Agent: CoolBot/0.0 with a web address and an email address in parentheses. Marker 3: The generic format is client name slash version, then contact information in parentheses."}
+
+Replace the default with a User-Agent that identifies you and provides contact information:
 
 ```{python}
 import requests

@@ -5,8 +5,8 @@
 **Status:** In progress. The plan was proposed on 2026-09-24. The chapter 5 pilot
 is done (textbook #138, course #51), and its gate closed the same day. The gate
 note is in §9 of the screenshot AAR and in `tools/shots/README.md` ("What the
-chapter 5 pilot settled"). Chapter 4 is done, except figure 4-2, which waits on the maintainer (§4). Chapter 1
-is done, except figure 1-4 (§4). Chapters 2 and 3 are next, in §4's order. Implements [P1-4] of
+chapter 5 pilot settled"). Chapter 4 is done, except figure 4-2, which waits on the maintainer (§4). Chapters 1
+and 2 are done, except figures 1-4 and 2-2 (§4). Chapter 3 is next. Implements [P1-4] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md). Depends
 on P0-1 (`make_stubs.py` keeps notes), on P0-3 (what counts as a screenshot),
 and on toolkit milestones M1–M3 in
@@ -137,6 +137,13 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
 
 - **Slides:** week-02's two renders stay, recorded as `kind: render`. 2-1 is offered as their real-browser counterpart, and the instructor chooses.
 - **Placeholders:** the four unused placeholders are the instructor's call to delete or keep.
+- **Done 2026-09-24:** two figures.
+  - **2-1 is `robots-txt-wikipedia`:** the file in Chrome, from the comment welcoming "friendly, low-speed bots" through the generic block's `Disallow` rules. The toolkit gained `match:` anchors and scrolling for it, because a plain-text file is one text node.
+  - **2-3 is `wikimedia-ua-policy`:** the policy's request for a User-Agent with contact information, its example, and its generic format. It moved to foundation.wikimedia.org.
+  - **2-2 waits for the Friday review:** students' #50, #63, and #79 revise the paragraphs it would sit beside.
+  - **2-4 is dropped:** chapter 5's `network-headers` shows the Headers pane, and captures send the course's User-Agent, not a browser's.
+  - **2-5 is skipped** (optional).
+  - **Course:** copies of both go to `slides/week-02/img/`, offered beside the deck's two renders.
 
 ### Chapter 3 — The Post-API Age
 

@@ -3,7 +3,8 @@
 Two measurements go into every take's log, both in the take's own pixels:
 
 - **Anchors.** Each mark in a recipe's `annotate:` block points at something:
-  a page element (`selector:` or `text:`), something in DevTools
+  a page element (`selector:` or `text:`), a pattern's match inside an
+  element's text (`match:`, with `in:`), something in DevTools
   (`devtools: {row: ...}`, `{text: ...}`, `{css: ...}`, `{selected: true}`), or,
   as a last resort, a spot typed in by hand (`xy: [x, y]`, flagged for
   review). Its box is recorded here, so markers are placed from the take and
@@ -18,7 +19,7 @@ the image's height, and a bracket drawn on it says so.
 """
 import json
 
-from .steps import js_pattern, pattern
+from .steps import js_pattern, match_boxes, pattern
 
 # Runs on the elements a locator matched. Returns each one's box in the page's
 # CSS pixels: the element's own box, or the box of its text (one line or all).
@@ -167,6 +168,13 @@ def page_boxes(page, at, timeout=10):
         locator, mode, what = page.locator(at["selector"]), at.get("box", "element"), at["selector"]
     elif "text" in at:
         locator, mode, what = page.get_by_text(pattern(at["text"])), at.get("box", "text"), f"/{at['text']}/"
+    elif "match" in at:
+        what = f"/{at['match']}/ in {at.get('in', 'body')}"
+        try:
+            boxes = match_boxes(page, at, at.get("box", "text"), timeout=timeout * 1000)
+        except Exception:
+            raise AnchorError(f"anchor {what} matched nothing")
+        return pick(boxes, at, what)
     else:
         raise AnchorError(f"not a page anchor: {at!r}")
     try:
