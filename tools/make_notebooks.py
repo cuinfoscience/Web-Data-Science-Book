@@ -13,7 +13,9 @@ Run from the repository root after editing any chapter's code:
     python tools/make_notebooks.py
 
 The script is deterministic: regenerating without chapter changes
-produces byte-identical notebooks, so `git status` shows drift.
+produces byte-identical notebooks, so `git status` shows drift. It exits
+with an error when a figure or an @fig- reference is left unconverted,
+which would show as a broken image in the notebook.
 """
 
 import json
@@ -53,23 +55,34 @@ def strip_quarto_syntax(markdown: str) -> str:
 
 
 # Quarto figures: ![caption](images/...){#fig-label .lightbox fig-alt="..."}
-FIGURE_RE = re.compile(r"!\[([^\]]*)\]\((images/[^)\s]+)\)(?:\{([^}]*)\})?")
+# A caption may hold code spans and balanced brackets, as Pandoc allows:
+# `<![CDATA[ … ]]>` inside backticks does not end the caption.
+CAPTION = r"(?:`[^`]*`|\[[^\[\]`]*\]|[^\[\]`])*"
+FIGURE_RE = re.compile(r"!\[(" + CAPTION + r")\]\((images/[^)\s]+)\)(?:\{([^}]*)\})?")
 
 
-def convert_figures(text: str, chapter: int) -> str:
+def figure_numbers(text: str, chapter: int) -> dict:
+    """{label: "Figure N.M"} for the chapter's figures, numbered as Quarto numbers them."""
+    numbers = {}
+    for match in FIGURE_RE.finditer(text):
+        label = re.search(r"#(fig-[\w-]+)", match.group(3) or "")
+        if label:
+            numbers[label.group(1)] = f"Figure {chapter}.{len(numbers) + 1}"
+    return numbers
+
+
+def convert_figures(text: str, chapter: int, numbers: dict = None) -> str:
     """Rewrite Quarto figures and @fig- references for a standalone notebook.
 
     A downloaded notebook has no images/ folder beside it, so figure
     paths point at the published book instead. Quarto's attribute block
     would show as literal text in Jupyter, so it becomes plain alt text
     plus a visible caption, and each @fig- reference becomes the number
-    Quarto gives that figure in the book ("Figure 7.2").
+    Quarto gives that figure in the book ("Figure 7.2"). `numbers` maps
+    every chapter's labels, so a reference to another chapter's figure
+    converts too.
     """
-    numbers = {}
-    for match in FIGURE_RE.finditer(text):
-        label = re.search(r"#(fig-[\w-]+)", match.group(3) or "")
-        if label:
-            numbers[label.group(1)] = f"Figure {chapter}.{len(numbers) + 1}"
+    numbers = dict(numbers or {}, **figure_numbers(text, chapter))
 
     def replace(match):
         caption, path, attrs = match.group(1), match.group(2), match.group(3) or ""
@@ -113,7 +126,23 @@ def qmd_to_cells(text: str) -> list:
     return cells
 
 
-def make_notebook(qmd_path: Path) -> dict:
+def leftovers(nb: dict) -> list:
+    """What a figure conversion missed: @fig- references and images/ paths left in the Markdown.
+
+    Either one means a figure the pattern above did not match, so the
+    notebook would show a broken image and an unresolved reference.
+    """
+    found = []
+    for cell in nb["cells"]:
+        if cell["cell_type"] != "markdown":
+            continue
+        source = "".join(cell["source"])
+        found += [f"unconverted reference {m}" for m in re.findall(r"@fig-[\w-]+", source)]
+        found += [f"unconverted image path {m}" for m in re.findall(r"\]\((images/[^)\s]*)", source)]
+    return found
+
+
+def make_notebook(qmd_path: Path, numbers: dict = None) -> dict:
     text = qmd_path.read_text(encoding="utf-8")
     # The chapters' "Companion Notebook" download callout is navigation
     # for the rendered book; inside the notebook itself it is noise.
@@ -124,7 +153,7 @@ def make_notebook(qmd_path: Path) -> dict:
         flags=re.M | re.S,
     )
     chapter = int(re.match(r"ch-(\d+)", qmd_path.stem).group(1))
-    text = convert_figures(text, chapter)
+    text = convert_figures(text, chapter, numbers)
     title_match = re.search(r"^# (.+?)(?:\s*\{[^}]*\})?\s*$", text, re.M)
     title = title_match.group(1).strip() if title_match else qmd_path.stem
 
@@ -172,8 +201,15 @@ def main() -> None:
     chapters = sorted(ROOT.glob("ch-*.qmd"))
     if not chapters:
         raise SystemExit("No ch-*.qmd files found; run from the repository root.")
+    # Every chapter's figure numbers first, so a reference to another
+    # chapter's figure converts as well as one to the chapter's own.
+    numbers = {}
     for qmd in chapters:
-        nb = make_notebook(qmd)
+        chapter = int(re.match(r"ch-(\d+)", qmd.stem).group(1))
+        numbers.update(figure_numbers(qmd.read_text(encoding="utf-8"), chapter))
+    problems = []
+    for qmd in chapters:
+        nb = make_notebook(qmd, numbers)
         out = OUT_DIR / (qmd.stem + ".ipynb")
         out.write_text(
             json.dumps(nb, indent=1, ensure_ascii=False) + "\n",
@@ -181,6 +217,13 @@ def main() -> None:
         )
         n_code = sum(1 for c in nb["cells"] if c["cell_type"] == "code")
         print(f"{out.relative_to(ROOT)}: {len(nb['cells'])} cells ({n_code} code)")
+        problems += [f"{qmd.name}: {p}" for p in leftovers(nb)]
+    if problems:
+        print("\nFigures the notebooks could not convert:", *problems, sep="\n  ")
+        raise SystemExit(
+            "Check each figure's caption and label in its chapter: an unbalanced "
+            "bracket, or a reference to a label no chapter defines."
+        )
 
 
 if __name__ == "__main__":
