@@ -41,7 +41,7 @@ tools/shots/run check                             # before a PR
 - **`doctor`** answers whether capture works in this session. Do not reuse an earlier session's answer:
   - it checks the proxy, the browser, a real headless capture of example.com, and a real headed one with DevTools open;
   - it checks for TeX, and fails if a recipe has markers and TeX is missing;
-  - with a chapter, it makes one request to each host that chapter's recipes use;
+  - with a chapter, it makes one request to each host that chapter's recipes use, and reads that host's robots.txt for the capture's User-Agent and for Claude's agents (see "Field notes");
   - it reports a proxy refusal as a policy block, which you report rather than route around.
 
 ## The rules
@@ -99,6 +99,152 @@ dated record is in §9 of [the screenshot AAR](../../docs/aar/2026-09-24-screens
   text size, markers, and notes. Copy anything a retake needs into
   `IMAGES.md`, because the pull request's text isn't in the repository.
 
+## Field notes
+
+What later captures taught, in chapters 4, 7, and 8 (2026-09-22 to 24): each
+note is a practice and the case behind it. Read the notes for the kind of page
+you're about to capture before writing its recipe. When a capture teaches you
+something the next agent would otherwise find out again, add a note here.
+
+### Before the recipe
+
+- **Read every group in a host's robots.txt, including those for AI agents.** An AI agent makes
+  these captures for the maintainer, so a group addressed to Claude's agents
+  (`Claude-User`, `ClaudeBot`, `Claude-SearchBot`, `Claude-Web`,
+  `anthropic-ai`) applies to it, whatever User-Agent the browser sends. The
+  Guardian disallows four of these names and www.bbc.co.uk three, so chapter 4
+  has no figure from either. `doctor ch-NN` warns about both kinds of rule
+  (`lib/robots.py`).
+- **robots.txt is per host.** feeds.bbci.co.uk allows what
+  www.bbc.co.uk forbids, and feeds.npr.org has no robots.txt at all (404).
+  Check the host in the figure's own URL.
+- **An API host's `Disallow: /` is a question for the maintainer.**
+  api.open-meteo.com disallows every path, while chapter 2 says robots.txt
+  addresses crawlers and that API clients follow the API's own terms. Leave
+  such a figure out and ask, as the chapter 4 back-fill did with figure 4-2.
+- **Check the content type before choosing what Chrome will draw:**
+  `curl -sI URL | grep -i content-type`. Chrome's XML viewer draws a foldable
+  tree only for `text/xml` and `application/xml`. PBS NewsHour's feed
+  (`application/rss+xml`) and Data Skeptic's (`text/plain`) show as raw text.
+- **Pick content that won't pull attention from the lesson.** A live page
+  carries that day's news. Chapter 4's feed figure uses the BBC's science
+  section, not the front page, whose headlines that day were political. Say
+  why in `IMAGES.md`.
+- **Probe the page before writing its crop.** A short script prints where
+  things are, and a clip shows what a crop would hold; the window and crop
+  are then a few minutes' work, and `capture` confirms them:
+
+  ```bash
+  tools/shots/.venv/bin/python - <<'EOF'
+  import sys; sys.path.insert(0, "tools/shots")
+  from lib.env import chrome_path
+  from playwright.sync_api import sync_playwright
+
+  URL = "https://clerk.house.gov/xml/lists/MemberData.xml"
+  with sync_playwright() as p:
+      browser = p.chromium.launch(executable_path=chrome_path(),
+                                  args=["--user-agent=Web Data Science/v1 brian.keegan@colorado.edu"])
+      page = browser.new_page(viewport={"width": 800, "height": 700}, device_scale_factor=2)
+      page.goto(URL, wait_until="load")
+      for line in page.locator(".pretty-print .line").all()[:40]:    # what you might crop or mark
+          print(round(line.bounding_box()["y"]), line.text_content()[:70])
+      page.screenshot(path="tools/shots/out/probe.png", clip={"x": 0, "y": 42, "width": 800, "height": 600})
+      browser.close()
+  EOF
+  ```
+
+### Chrome's XML viewer (chapter 4)
+
+- **What it draws.** `div.header` holds the note that the file has no style
+  information, and `div.pretty-print` holds the tree. Each element with
+  children is a `div.folder` whose first line has a fold triangle
+  (`span.folder-button`) and the opening tag (`span.html-tag`). The text is
+  13-pixel monospace, 15 CSS pixels a line.
+- **Anchor the crop to the tree.** `crop: {selector:
+  'div.pretty-print', pad: [6, 0, 0, 20], width: 800, height: 591}` leaves
+  the note out, and still fits if the note's height changes.
+- **Fold what the text ignores with Chrome's own triangles, and say so in the
+  caption.** A folded element keeps three lines (its tags and "..."), so
+  folding saves lines only for an element longer than that. Folding a
+  one-line CDATA block saves nothing, but hides a line that would run past
+  the edge.
+- **Find a fold triangle by its tag's exact text:** `click: {selector:
+  'text="<title-info>" >> xpath=preceding-sibling::*[1]'}`. CSS `:has()`
+  with `:text-is()` ran for over a minute on the House roster's 18,000 lines
+  and timed out; this takes about a second. In an XML file the viewer's
+  elements are in the XHTML namespace, so an XPath step such as `//span`
+  matches nothing: write `*`.
+- **Text anchors count one match per tag:** `{text: '^<item>$', nth: 1}` is
+  the second `<item>`. A tag that wraps, such as `<rss>` with its namespace
+  declarations, takes `box: first-line`, or its marker lands past the right
+  edge.
+- **CDATA doesn't wrap** (`white-space: pre`), so a long description runs
+  past the window's edge. Fold what the text doesn't need, and say so in the
+  caption.
+
+### View Source and the find bar (chapters 4 and 8)
+
+- **Browser UI takes real input.** The find bar opens with `key: 'ctrl+f'` and
+  fills with `type:`; page steps can't reach it.
+- **Chrome centers the match, so scroll after searching, not before:** a
+  `scroll: {selector: 'td.line-number[value="32"]', offset: 60}` step after
+  `type:`.
+- **The find bar covers the page's top right,** to about 47 CSS pixels below
+  the toolbar. Put the line you're showing below it.
+- **The bars are about 42 pixels of tab strip and 46 of toolbar.** A band crop
+  from `top: 42` keeps the address bar, with its `view-source:` prefix, and
+  leaves the tabs out.
+- **Make the window 816 wide and crop 800,** so the page's 16-pixel scrollbar
+  falls outside. Tick Line wrap (`click: {selector:
+  'input[type="checkbox"]'}`) so long lines wrap rather than run off; a long
+  URL with no break points can still run past the edge. A wrapped row is 15
+  CSS pixels, and a new line about 17.
+- **A `between` crop needs both of its lines in the window.** The page area is
+  the window's height less 88. Make the window tall enough, and scroll the
+  first line to a small offset: ch-08's `view-source-js` is 720 pixels tall,
+  with line 11 at offset 4.
+- **Mark a source line at its end.** A box around the line covers its line
+  number. Anchor a marker to the line's cell with `box: first-line`
+  (`td.line-number[value="33"] + td`); anchored to the link inside it, the
+  marker sits on the closing quote.
+- **Line numbers move when the site changes.** Before a retake, confirm the
+  line the recipe names: `curl -s URL | grep -n 'application/rss+xml'`.
+
+### Sizes and markers
+
+- **Count lines before choosing a size.** At 15 pixels a line, 600 pixels
+  hold 40. End a crop at the bottom of a line, or a sliver of the next one
+  shows.
+- **Keep 13-pixel text at 800 pixels wide.** It comes to 12.6 pixels in the
+  book. At 1024 wide it would be 9.9, under the 11-pixel floor, so the relaxed
+  limit suits DevTools zoomed to about 150%, not the XML viewer or View
+  Source at 100%.
+- **A marker on the bottom line can hang past the picture's edge.** The
+  annotated image grows to hold it (by 3 pixels on ch-04's feed). To avoid
+  that, end the crop a few pixels lower.
+- **The narrowest legible width on a slide** is 16 × the image's width ÷
+  (`p20` × 1920 × 0.875) of `\textwidth`, both in image pixels. Chapter 4's
+  roster: 16 × 1602 ÷ (26 × 1920 × 0.875) = 0.59.
+
+### Captions and notebooks
+
+- **No square brackets in a caption, even inside backticks.**
+  `make_notebooks.py` reads a caption up to its first `]`. A caption that
+  showed `<![CDATA[` left its figure unconverted in the notebook, relative
+  image path and `@fig-` reference included. After `make_notebooks.py`,
+  search the chapter's notebook for a leftover `@fig-`.
+- **Alt text that names what drifts is rewritten on a retake:** the first
+  headline, the first member of the roster. `IMAGES.md` lists what to check.
+
+### When a host is down
+
+- **Tell an outage from a refusal.** On 2026-09-24,
+  web.archive.org reset every connection after about 11 seconds while
+  archive.org answered, and the proxy's status page (`curl -sS
+  "$HTTPS_PROXY/__agentproxy/status"`) listed the relay failures. Work on
+  another chapter and retry later. A 403, or a proxy refusal, is a policy:
+  report it, and don't route around it.
+
 ## Making a figure, start to finish
 
 One figure, from the request to the merged pull request. Each step names its
@@ -124,7 +270,9 @@ figure's record is kept.
    and the panes, columns, and sidebars to hide. Steps wait for a condition;
    none sleeps blindly. Add `annotate:` marks that point at elements or
    DevTools rows, `targets:` for each place the figure is shown, and
-   `drifts: true` if it shows anything that changes.
+   `drifts: true` if it shows anything that changes. The "Field notes" above
+   cover robots.txt, content types, Chrome's XML viewer, View Source, and
+   crops; read the ones for your page first.
 4. **Capture, and read what it says.** `tools/shots/run capture ch-NN
    <figure>`. A failed guard names the problem: an error page, missing text,
    an infobar. Read the warnings on a passing take too: a DevTools setting
@@ -529,6 +677,7 @@ It skips the marker checks if TeX is missing and the headed checks if the virtua
 | `lib/legibility.py` | text size at each target, against the thresholds |
 | `lib/sheet.py` | contact sheets |
 | `lib/guards.py` | error and block pages, retries, and policy blocks |
+| `lib/robots.py` | what a host's robots.txt says to the capture's User-Agent and to Claude's agents, for `doctor` |
 | `lib/capture.py` | one figure, start to finish, composites, and the take log |
 | `lib/compare.py` | take against approved image |
 | `lib/provenance.py` | `provenance.json` and the `IMAGES.md` table |

@@ -23,6 +23,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from lib import devtools as dt                   # noqa: E402  (to read a take's DevTools state)
 from lib.headed import BARS, BARS_SLACK          # noqa: E402
+from lib import robots                            # noqa: E402
 
 PAGES = {
     "/ok": (200, "<title>Selftest</title><h1>Hello from the selftest</h1>"
@@ -281,6 +282,17 @@ figures:
     expect("requests carry the one User-Agent, and Client Hints that name this machine's system",
            sent.get("user-agent") == "Web Data Science/v1 brian.keegan@colorado.edu"
            and sent.get("sec-ch-ua-platform") == PLATFORM, str(sent))
+
+    print("robots.txt")
+    rules = ("User-agent: *\nDisallow: /private/\n\n"
+             "User-agent: ClaudeBot\nUser-agent: Claude-User\nDisallow: /\n")
+    agent = "Web Data Science/v1 brian.keegan@colorado.edu"
+    found = robots.barred(rules, agent, "https://example.org/news/")
+    expect("doctor reads a group for Claude's agents, though the capture's User-Agent falls under *",
+           found == ["Claude-User", "ClaudeBot"], str(found))
+    found = robots.barred(rules, agent, "https://example.org/private/page")
+    expect("...and the capture's own User-Agent first; agents with no group of their own fall under *",
+           found[:1] == [agent] and len(found) == 1 + len(robots.CLAUDE_AGENTS), str(found))
 
     print("promote")
     code, out = shots("capture", "ch-99", "--only", "flaky")
