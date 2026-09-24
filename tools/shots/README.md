@@ -246,6 +246,12 @@ something the next agent would otherwise find out again, add a note here.
   "$HTTPS_PROXY/__agentproxy/status"`) listed the relay failures. Work on
   another chapter and retry later. A 403, or a proxy refusal, is a policy:
   report it, and don't route around it.
+- **A 429 on the first request is the session's address, not your pace.**
+  On 2026-09-24, Wikimedia's REST API answered the chapter 1 pageviews URL
+  with 429 ("You are making too many requests") before any other request had
+  gone to it: cloud sessions share addresses, and the limit counts everyone
+  on them. Don't retry in a loop. Try once much later, or have the figure
+  captured from another network.
 
 ## Making a figure, start to finish
 
