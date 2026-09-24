@@ -2,9 +2,15 @@
 
 A take that fails a guard is kept in out/ for inspection but can never be
 promoted into images/. A figure whose subject *is* a refusal says so with
-`expect: {block: true}`, and then the guard requires one.
+`expect: {block: true}`, and then the guard requires one. A figure whose
+subject is a host that no longer answers says so with `expect: {error: ...}`,
+the error Chrome reports; the take is then Chrome's own error page.
 """
+import json
+import os
 import re
+import urllib.parse
+import urllib.request
 
 from PIL import Image, ImageStat
 
@@ -22,10 +28,19 @@ BLOCK_PATTERNS = [
     (r"verify you are (a )?human|captcha", "a human check", False),
 ]
 HEAD_CHARS = 3000
+# Public DNS over HTTPS, asked through the session's proxy like every other request.
+DOH = os.environ.get("SHOTS_DOH", "https://dns.google/resolve")
+RCODES = {0: "NOERROR", 2: "SERVFAIL", 3: "NXDOMAIN", 5: "REFUSED"}
 
 
 def page_problems(status, title, text, expect):
     """Problems with a loaded page, and whether they look temporary."""
+    if expect.get("error"):
+        # The subject is a page that never loaded, so there is no status to check.
+        if status is not None:
+            return [f"expected the page not to load ({expect['error']}), "
+                    f"but it loaded with HTTP status {status}"], False
+        return [], False
     problems = []
     want = expect.get("status", 200)
     if status != want:
@@ -65,3 +80,33 @@ def retryable(status=None, error=None):
 def policy_block(error):
     """The proxy refused the host. Report it; never retry or route around it."""
     return bool(error) and "ERR_TUNNEL_CONNECTION_FAILED" in error
+
+
+def expected_error(expect, error):
+    """Whether the recipe expects this navigation error: the figure is Chrome's error page."""
+    pattern = (expect or {}).get("error")
+    return bool(pattern and error and re.search(pattern, error))
+
+
+def lookup(host, agent, timeout=20):
+    """What public DNS says about `host`: its response code, and its IPv4 and IPv6 addresses."""
+    found = {"rcode": None, "addresses": []}
+    for kind, number in (("A", 1), ("AAAA", 28)):
+        query = urllib.parse.urlencode({"name": host, "type": kind})
+        request = urllib.request.Request(f"{DOH}?{query}",
+                                         headers={"User-Agent": agent, "Accept": "application/dns-json"})
+        with urllib.request.urlopen(request, timeout=timeout) as r:
+            answer = json.load(r)
+        found["rcode"] = found["rcode"] or RCODES.get(answer.get("Status"), str(answer.get("Status")))
+        found["addresses"] += [a["data"] for a in answer.get("Answer") or [] if a.get("type") == number]
+    return found
+
+
+def dead_host(dns):
+    """Whether public DNS has no address for a host.
+
+    Behind the session's proxy, a host whose name no longer resolves and a host
+    the proxy refuses both reach Chrome as ERR_TUNNEL_CONNECTION_FAILED. Only the
+    first may be photographed as a dead host. The second is a policy, to report.
+    """
+    return bool(dns) and not dns.get("addresses")

@@ -11,10 +11,13 @@ import http.server
 import json
 import os
 import shutil
+import socket
+import socketserver
 import subprocess
 import sys
 import tempfile
 import threading
+import urllib.parse
 from pathlib import Path
 
 from PIL import Image, ImageChops
@@ -60,6 +63,14 @@ PAGES["/cookie"] = (200, "<title>Cookie</title><h1>A page that sets a cookie</h1
 PAGES["/plain"] = (200, "<!DOCTYPE html><title>Plain</title><body style='margin:0'>"
                         "<pre style='margin:0;font:16px monospace;line-height:20px'>"
                         + "\n".join(f"line {n}" for n in range(1, 121)) + "</pre>")
+# A site that checks the browser with a script, as EUR-Lex does: the first visit gets 202 and
+# a script that sets a cookie and reloads; the reload, with the cookie, gets the page.
+PAGES["/checked"] = (200, "<title>Checked</title><h1>Checked and reloaded</h1>"
+                          + "<p>" + "Something to look at. " * 40 + "</p>")
+CHECK = (202, "<title></title><script>document.cookie = 'checked=1; path=/'; location.reload();</script>")
+# Public DNS over HTTPS, as dns.google answers it: no address for the dead host, one for the refused host.
+DNS = {"dead-host.test": {"Status": 3},
+       "refused-host.test": {"Status": 0, "Answer": [{"name": "refused-host.test.", "type": 1, "data": "192.0.2.1"}]}}
 FLAKY = {"count": 0}      # /flaky works once, then answers 502
 SEEN = {}                 # path: the headers of each request for it, in order
 # What Chrome's User-Agent Client Hints should say on this machine.
@@ -81,14 +92,24 @@ def sections(output):
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         SEEN.setdefault(self.path, []).append({k.lower(): v for k, v in self.headers.items()})
-        if self.path == "/flaky":
+        path, _, query = self.path.partition("?")
+        kind = "text/html; charset=utf-8"
+        if path == "/resolve":
+            args = urllib.parse.parse_qs(query)
+            answer = DNS.get(args["name"][0], {"Status": 3})
+            if args.get("type", ["A"])[0] != "A":
+                answer = {"Status": answer["Status"]}           # no IPv6 addresses
+            status, body, kind = 200, json.dumps(answer), "application/dns-json"
+        elif path == "/check":
+            status, body = PAGES["/checked"] if "checked=1" in (self.headers.get("Cookie") or "") else CHECK
+        elif self.path == "/flaky":
             FLAKY["count"] += 1
             status, body = PAGES["/ok"] if FLAKY["count"] == 1 else PAGES["/gateway"]
         else:
             status, body = PAGES.get(self.path, (404, "<title>Not found</title>"))
         data = body.encode()
         self.send_response(status)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Type", kind)
         self.send_header("Content-Length", str(len(data)))
         if self.path == "/cookie":
             self.send_header("Set-Cookie", "visit=1; Path=/")
@@ -99,10 +120,28 @@ class Handler(http.server.BaseHTTPRequestHandler):
         pass
 
 
+class RefusingProxy(socketserver.BaseRequestHandler):
+    """A proxy that opens no tunnels: every CONNECT gets 502, as the session's proxy answers
+    both for a host whose name doesn't resolve and for one its policy refuses."""
+    def handle(self):
+        data = b""
+        while b"\r\n\r\n" not in data:
+            chunk = self.request.recv(4096)
+            if not chunk:
+                return
+            data += chunk
+        self.request.sendall(b"HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")
+
+
 def main():
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     base = f"http://127.0.0.1:{server.server_port}"
+    refusing = socketserver.ThreadingTCPServer(("127.0.0.1", 0), RefusingProxy)
+    threading.Thread(target=refusing.serve_forever, daemon=True).start()
+    with socket.socket() as s:               # a port nothing listens on: a host that doesn't answer
+        s.bind(("127.0.0.1", 0))
+        closed = s.getsockname()[1]
     tmp = Path(tempfile.mkdtemp(prefix="shots-selftest-"))
     for sub in ("recipes", "out", "images/ch-99"):
         (tmp / sub).mkdir(parents=True)
@@ -219,6 +258,7 @@ figures:
     url: "{base}/marks"
     scale: 2
     annotate: {{marks: [{{n: 1, at: {{selector: '#box'}}}}]}}
+  - {{id: band, kind: capture, url: "{base}/marks", crop: {{between: ['#title', '#box']}}}}
   - id: scroll-within
     kind: capture
     url: "{base}/panel"
@@ -249,6 +289,21 @@ figures:
     window: [400, 300]
     parts: [{{label: One}}, {{label: Two, javascript: false}}]
     layout: {{gap: 10, pad: 5, label_px: 20}}
+  - id: joined-column
+    kind: capture
+    url: "{base}/ok"
+    mode: composite
+    window: [400, 300]
+    parts: [{{label: One}}, {{label: Two}}]
+    layout: {{direction: column, gap: 10, pad: 5, label_px: 20}}
+  - {{id: dead-host, kind: capture, url: "http://127.0.0.1:{closed}/",
+      expect: {{error: 'ERR_CONNECTION_REFUSED', text: ['refused to connect']}}}}
+  - {{id: dead-host-loads, kind: capture, url: "{base}/ok", expect: {{error: 'ERR_CONNECTION_REFUSED'}}}}
+  - {{id: rechecked, kind: capture, url: "{base}/check", steps: [{{wait: {{text: 'Checked and reloaded'}}}}]}}
+  - {{id: tunnel-dead, kind: capture, url: "https://dead-host.test/", expect: {{error: 'ERR_TUNNEL_CONNECTION_FAILED'}}}}
+  - {{id: tunnel-refused, kind: capture, url: "https://refused-host.test/",
+      expect: {{error: 'ERR_TUNNEL_CONNECTION_FAILED'}}}}
+  - {{id: tunnel-unexpected, kind: capture, url: "https://other-host.test/"}}
   - id: headed-marks
     kind: capture
     url: "{base}/tree"
@@ -342,9 +397,54 @@ figures:
     code, out = shots("check", "ch-99")
     expect("check notices an image replaced by hand", code == 1 and "changed after" in out, out[-300:])
 
+    print("refusals and dead hosts")
+    code, out = shots("capture", "ch-99", "--only", "dead-host", "dead-host-loads", "rechecked")
+    dead, loaded, rechecked = newest("dead-host"), newest("dead-host-loads"), newest("rechecked")
+    expect("a figure of a host that doesn't answer is Chrome's own error page, and the take records the error",
+           dead.get("ok") is True and dead.get("status") is None
+           and "ERR_CONNECTION_REFUSED" in (dead.get("error") or ""),
+           str({k: dead.get(k) for k in ("ok", "status", "error", "problems")}) + out[-300:])
+    expect("...and fails if the page loads after all", loaded.get("ok") is False
+           and "expected the page not to load" in " ".join(loaded.get("problems", [])), str(loaded.get("problems")))
+    expect("a page that checks the browser with a script (202, then a reload) is recorded at the status of "
+           "the page it shows, and the first status is kept",
+           rechecked.get("ok") is True and rechecked.get("status") == 200 and rechecked.get("first_status") == 202,
+           str({k: rechecked.get(k) for k in ("ok", "status", "first_status", "problems")}) + out[-300:])
+    # Behind a proxy, a host whose name doesn't resolve and a host the proxy refuses fail alike,
+    # with ERR_TUNNEL_CONNECTION_FAILED. Public DNS (here, a stand-in for dns.google) tells them apart.
+    loopback = "127.0.0.1,localhost"
+    tunnel_env = dict(env, HTTPS_PROXY=f"http://127.0.0.1:{refusing.server_address[1]}",
+                      https_proxy=f"http://127.0.0.1:{refusing.server_address[1]}",
+                      SHOTS_DOH=f"{base}/resolve", NO_PROXY=loopback, no_proxy=loopback)
+    run = subprocess.run([sys.executable, str(HERE / "shots.py"), "capture", "ch-99", "--only", "tunnel-dead",
+                          "tunnel-refused", "tunnel-unexpected"], env=tunnel_env, capture_output=True, text=True,
+                         timeout=600)
+    said = sections(run.stdout + run.stderr)
+    tunnel = newest("tunnel-dead")
+    expect("behind a proxy, a tunnel failure is photographed as a dead host only when public DNS has no address "
+           "for it", tunnel.get("ok") is True and (tunnel.get("dns") or {}).get("rcode") == "NXDOMAIN",
+           str({k: tunnel.get(k) for k in ("ok", "dns", "error", "problems")}) + str(said.get("tunnel-dead")))
+    expect("...and is a policy block when public DNS resolves it: reported, with no take left behind",
+           "which public DNS resolves (192.0.2.1): a policy, not a dead host" in said.get("tunnel-refused", "")
+           and not list((tmp / "out" / "ch-99" / "tunnel-refused").glob("*.png")), said.get("tunnel-refused"))
+    expect("a tunnel failure the recipe doesn't expect is a policy block, as before",
+           "the proxy refused other-host.test" in said.get("tunnel-unexpected", ""), said.get("tunnel-unexpected"))
+    doctor = subprocess.run([sys.executable, "-c", "import sys; sys.path.insert(0, sys.argv[1]); import shots; "
+                             "sys.exit(shots.doctor_chapter('ch-99'))", str(HERE)],
+                            env=tunnel_env, capture_output=True, text=True, timeout=300)
+    said = doctor.stdout + doctor.stderr
+    expect("doctor asks public DNS about a host its figure expects not to answer, as capture does",
+           "dead-host.test: doesn't answer, and public DNS has no address for it (NXDOMAIN)" in said
+           and "refused-host.test: doesn't answer, but public DNS resolves it (192.0.2.1)" in said
+           and "other-host.test: the proxy refused it" in said, said[-900:])
+    found = robots.crawl_delay("User-agent: *\nCrawl-delay: 10\nDisallow: /search\n", agent)
+    expect("doctor reads the Crawl-delay robots.txt asks of the capture's User-Agent (EUR-Lex asks for 10 seconds)",
+           found == 10.0, str(found))
+
     print("anchors, markers, legibility, composites")
     code, out = captured = shots("capture", "ch-99", "--only", "marks", "marks-2x", "small-text", "joined",
-                                 "wide", "wide-allowed", "wide-small", "too-wide", "scroll-within")
+                                 "joined-column", "wide", "wide-allowed", "wide-small", "too-wide", "scroll-within",
+                                 "band")
     marks, marks2, small, joined = newest("marks"), newest("marks-2x"), newest("small-text"), newest("joined")
     said = sections(out)
     expect("a figure over 800x600 but within 1024x768 gets a warning that asks what clutter the room removes",
@@ -372,6 +472,9 @@ figures:
     expect("an anchor is recorded at capture, in the take's pixels", box == [500, 120, 620, 200], str(box))
     box2 = anchor(marks2, {"selector": "#box"})
     expect("...at scale 2 as well", box2 == [1000, 240, 1240, 400], str(box2))
+    band = newest("band")
+    expect("a crop `between` two elements is the band from the top of one to the bottom of the other",
+           band.get("ok") is True and band.get("size") == [800, 170], str({k: band.get(k) for k in ("ok", "size")}))
     deep = anchor(newest("scroll-within"), {"selector": "#deep"}) or [0, 0, 0, 0]
     expect("a scroll step with `within` scrolls that panel, putting the element at its offset",
            deep[1] == 100 and deep[3] == 130, str(deep))
@@ -425,6 +528,10 @@ figures:
     expect("a composite joins its parts side by side, labeled", joined.get("ok") is True
            and joined.get("size") == [820, 340] and len(joined.get("parts") or []) == 2
            and joined["parts"][1]["javascript"] is False, str({k: joined.get(k) for k in ("ok", "size", "problems")}))
+    column = newest("joined-column")
+    expect("...or one above the next (`direction: column`), each labeled below it",
+           column.get("ok") is True and column.get("size") == [410, 680],
+           str({k: column.get(k) for k in ("ok", "size", "problems")}))
 
     print("promote and check, with markers and text sizes")
     code, out = shots("promote", "ch-99", "small-text")
@@ -547,6 +654,7 @@ figures:
         print("  skip  headed tests: Xvfb, xdotool, or ImageMagick missing (bash tools/shots/bootstrap.sh --headed)")
 
     server.shutdown()
+    refusing.shutdown()
     passed = sum(results)
     if passed == len(results):
         shutil.rmtree(tmp)

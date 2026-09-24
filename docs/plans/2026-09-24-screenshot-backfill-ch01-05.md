@@ -6,7 +6,8 @@
 is done (textbook #138, course #51), and its gate closed the same day. The gate
 note is in §9 of the screenshot AAR and in `tools/shots/README.md` ("What the
 chapter 5 pilot settled"). Chapter 4 is done, except figure 4-2, which waits on the maintainer (§4). Chapters 1
-and 2 are done, except figures 1-4 and 2-2 (§4). Chapter 3 is next. Implements [P1-4] of
+and 2 are done, except figures 1-4 and 2-2 (§4). Chapter 3 is done, except 3-2 and 3-3, which wait for
+web.archive.org, and Twitter's part of 3-1, which waits on the maintainer (§4). Implements [P1-4] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md). Depends
 on P0-1 (`make_stubs.py` keeps notes), on P0-3 (what counts as a screenshot),
 and on toolkit milestones M1–M3 in
@@ -158,6 +159,13 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
 - **3-1:** a figure about refusals, so its recipe expects the refusals (toolkit §7.5). The chapter's table of status codes stays, and the figure shows what a reader meets.
 - **Slides:** week-03's Friday frames ("Step 4 — attach the issue," "Step 5 — review basics") are offered real signed-out captures of a public issue and PR.
 - **Placeholders:** the unused `ad_observatory.png` is left to the instructor, whose `meta-research-privacy.png` already covers that case.
+- **Done 2026-09-24:** two figures, and a toolkit that can show a host that doesn't answer.
+  - **3-1 is `dead-endpoints`** (figure 3.2), two of the three endpoints stacked: Pushshift's 403 in JSON above Chrome's own error page for CrowdTangle, whose names no longer resolve. Behind the session's proxy, a dead host fails as a refused one does, so the toolkit gained `expect: {error: ...}` with a public-DNS check before a take is kept.
+  - **Twitter's part of 3-1 waits on the maintainer:** api.twitter.com's robots.txt disallows every path, the question 4-2 raised. `images/ch-03/IMAGES.md` has the part ready.
+  - **3-4 is `dsa-article-40`** (figure 3.1): Article 40 from its heading through paragraph 4, boxed, on EUR-Lex, whose robots.txt asks for 10 seconds between requests.
+  - **3-2 and 3-3 wait for web.archive.org,** which reset every connection from the session. reddit.com's robots.txt now disallows every path, so 3-3 can only come from the archive; confirm first that Reddit itself stated $0.24 per 1,000 calls. Both draft recipes are in `images/ch-03/IMAGES.md`.
+  - **3-5 is skipped:** optional, and the chapter's take-home exercise asks students to find OpenAlex's rate-limit headers themselves.
+  - **Course:** copies of both figures go to `slides/week-03/img/` with notes, for the instructor to place. The Friday frames' issue and pull request wait on the maintainer's choice, as week 1's do.
 
 ## 5. The pull-request handout
 `handouts/common/pull-request-walkthrough.md` shows GitHub's web editor, which

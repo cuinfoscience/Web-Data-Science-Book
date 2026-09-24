@@ -8,6 +8,10 @@
     crop: {selector: "...", pad: [13, 0, 0, 18], width: 560, height: 595}
                                              padding as top, right, bottom, left, and a
                                              fixed size measured from the padded corner
+    crop: {between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 10, 0]}
+                                             a band from the top of one element to the
+                                             bottom of another; left/width default to
+                                             the window
 """
 
 
@@ -40,7 +44,15 @@ def clip(page, fig):
         return None, True
     if crop.get("window"):
         return {"x": 0, "y": 0, "width": width, "height": height}, False
-    if "selector" in crop:
+    if "between" in crop:
+        first, last = (page.locator(s).first.bounding_box() for s in crop["between"])
+        if not (first and last):
+            raise CropError(f"crop `between` {crop['between']!r}: an element matched nothing visible")
+        top, _, bottom, _ = pads(crop)
+        x, y = crop.get("left", 0), max(0, first["y"] - top)
+        rect = {"x": x, "y": y, "width": crop.get("width", width - x),
+                "height": last["y"] + last["height"] + bottom - y}
+    elif "selector" in crop:
         box = page.locator(crop["selector"]).first.bounding_box()
         if not box:
             raise CropError(f"crop selector {crop['selector']!r} matched nothing visible")

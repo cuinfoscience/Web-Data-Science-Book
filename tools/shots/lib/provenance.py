@@ -12,8 +12,8 @@ from .env import IMAGES
 BEGIN = ("<!-- shots:begin: generated from provenance.json by tools/shots;"
          " edits between these markers are replaced -->")
 END = "<!-- shots:end -->"
-KEEP = ("file", "kind", "url", "final_url", "status", "captured", "by", "method", "browser",
-        "user_agent", "window", "scale", "javascript", "crop", "clip", "size",
+KEEP = ("file", "kind", "url", "final_url", "status", "first_status", "error", "dns", "captured", "by",
+        "method", "browser", "user_agent", "window", "scale", "javascript", "crop", "clip", "size",
         "recipe_sha256", "image_sha256", "note", "text", "parts")
 
 
@@ -65,13 +65,20 @@ def _how(entry):
     return f"{entry.get('by')}: {entry.get('method', '')}"
 
 
+def _source(entry):
+    """The page an image came from; for a composite whose parts each load their own, all of them."""
+    if entry.get("url"):
+        return entry["url"]
+    return "; ".join(dict.fromkeys(p["url"] for p in entry.get("parts") or [] if p.get("url")))
+
+
 def table(data):
     rows = ["| File | Kind | Captured | Source | How |", "|---|---|---|---|---|"]
     for fid in sorted(data["figures"]):
         e = data["figures"][fid]
         name = f"`{e['file']}`" + (f" and `{annotated_name(e['file'])}`, `.pdf`" if e.get("annotated") else "")
         rows.append(f"| {name} | {e['kind']} | {str(e.get('captured', ''))[:10]} "
-                    f"| {e.get('url') or ''} | {_how(e)} |")
+                    f"| {_source(e)} | {_how(e)} |")
     return "\n".join(rows) + "\n"
 
 

@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 import random
+import re
 import time
 from urllib.parse import urlparse
 
@@ -116,12 +117,25 @@ def _headless(browser, fig, png):
     result = _result()
     context = browser.context(fig)
     page = context.new_page()
+    expect = fig.get("expect") or {}
+    # The status of each document the tab loads. A site that checks the browser with a
+    # script answers the first visit (EUR-Lex: 202) and then reloads the page it shows.
+    loaded = []
+    page.on("response", lambda r: loaded.append(r.status)
+            if r.request.is_navigation_request() and r.frame == page.main_frame else None)
     try:
         try:
             response = page.goto(fig["url"], wait_until="domcontentloaded", timeout=fig["timeout"] * 1000)
         except Exception as e:
             result["error"] = str(e).splitlines()[0]
-            return result
+            if not guards.expected_error(expect, result["error"]):
+                return result
+            response = None        # Chrome draws its own error page, the figure's subject,
+            try:                   # which loads just after the navigation fails
+                page.wait_for_url(re.compile(r"^chrome-error://"), timeout=fig["timeout"] * 1000)
+            except Exception:
+                pass               # a blank take fails its guards below
+
         status = result["status"] = response.status if response else None
         result["final_url"] = page.url
         if guards.retryable(status=status):
@@ -133,8 +147,11 @@ def _headless(browser, fig, png):
         except steps.StepError as e:
             problems.append(str(e))
         time.sleep(fig["settle"])
+        if status is not None and loaded and loaded[-1] != status:
+            result["first_status"], status = status, loaded[-1]
+            result["status"] = status
         text = page.evaluate("() => document.body ? document.body.innerText : ''")
-        issues, result["temporary"] = guards.page_problems(status, page.title(), text, fig.get("expect") or {})
+        issues, result["temporary"] = guards.page_problems(status, page.title(), text, expect)
         problems += issues + _expected(page, fig)
         result["final_url"] = page.url
         try:
@@ -180,14 +197,29 @@ def capture(browser, fig, pacer, say=print):
             result = _headless(browser, fig, png)
             label = browser.label
         status, problems, error = result["status"], result["problems"], result["error"]
-        attempt.update({k: v for k, v in (("status", status), ("steps", result["steps"]), ("error", error)) if v})
-        if error:
+        attempt.update({k: v for k, v in (("status", status), ("first_status", result.get("first_status")),
+                                          ("steps", result["steps"]), ("error", error)) if v})
+        host = urlparse(fig["url"].removeprefix("view-source:")).hostname
+        expected = guards.expected_error(fig.get("expect"), error)
+        if error and not expected:
             if guards.policy_block(error):
-                host = urlparse(fig["url"].removeprefix("view-source:")).hostname
                 raise PolicyBlock(f"the proxy refused {host} ({error})")
             if guards.retryable(error=error):
                 continue
             break
+        if expected and guards.policy_block(error):
+            # Behind the proxy, a dead host and a refused one look alike to Chrome. Public DNS
+            # tells them apart: only a name with no address is photographed as a dead host.
+            try:
+                attempt["dns"] = guards.lookup(host, fig["user_agent"])
+            except Exception as e:
+                problems.append(f"can't tell a dead host from a refused one: public DNS didn't answer "
+                                f"({str(getattr(e, 'reason', e))})")
+            else:
+                if not guards.dead_host(attempt["dns"]):
+                    png.unlink(missing_ok=True)        # Chrome's page says nothing true about the host
+                    raise PolicyBlock(f"the proxy refused {host}, which public DNS resolves "
+                                      f"({', '.join(attempt['dns']['addresses'])}): a policy, not a dead host")
         if guards.retryable(status=status):
             attempt["result"] = "server error"
             continue
@@ -203,6 +235,9 @@ def capture(browser, fig, pacer, say=print):
             png = failed
         take = _log(fig, png, problems, status, result["final_url"], label, result["clip"], attempts)
         take.update(anchors=result["anchors"], text=result["text"])
+        # A page reloaded after a script check, or never loaded: what the browser met first.
+        take.update({k: v for k, v in (("first_status", result.get("first_status")), ("error", error),
+                                       ("dns", attempt.get("dns"))) if v})
         # Headed takes: the browser's bars above the page, and what DevTools drew (read back).
         take.update({k: result[k] for k in ("bars", "devtools_seen") if result.get(k) is not None})
         _write(take, png)
@@ -222,7 +257,7 @@ def _log(fig, png, problems, status, final_url, label, clip, attempts):
     return {
         "ok": not problems, "problems": problems,
         "chapter": fig["chapter"], "figure": fig["id"], "file": fig["file"], "kind": fig["kind"],
-        "url": fig["url"], "final_url": final_url, "status": status,
+        "url": fig.get("url"), "final_url": final_url, "status": status,
         "captured": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
         "by": "tools/shots", "browser": label, "user_agent": fig["user_agent"],
         "window": fig["window"], "scale": fig["scale"], "javascript": fig["javascript"],
@@ -257,7 +292,8 @@ def _composite(browser, fig, pacer, say):
     problems = guards.image_problems(png)
     take = _log(fig, png, problems, parts[0]["status"], parts[0]["final_url"], parts[0]["browser"], None,
                 [a for p in parts for a in p["attempts"]])
-    take["parts"] = [{k: p.get(k) for k in ("label", "image", "image_sha256", "url", "javascript", "status")}
+    take["parts"] = [{k: p.get(k) for k in ("label", "image", "image_sha256", "url", "javascript", "status",
+                                            "first_status", "error", "dns") if k in p}
                      for p in parts]
     sizes = measure.merge(*[{float(s): c for s, c in ((p.get("text") or {}).get("sizes") or {}).items()}
                             for p in parts])
@@ -267,22 +303,32 @@ def _composite(browser, fig, pacer, say):
 
 
 def join(images, labels, layout, scale, out):
-    """Place images side by side on white, each labeled below it, inside a thin gray frame."""
+    """Place images side by side on white, or one above the next (`direction: column`),
+    each labeled below it, inside a thin gray frame."""
     gap, pad = layout.get("gap", 28) * scale, layout.get("pad", 14) * scale
     size = layout.get("label_px", 28) * scale
     font = ImageFont.truetype(LABEL_FONT, size)
     panels = [Image.open(p).convert("RGB") for p in images]
     tallest = max(p.height for p in panels)
     label_h = round(size * 1.5)
-    width = sum(p.width for p in panels) + gap * (len(panels) - 1) + 2 * pad
-    height = tallest + label_h + 2 * pad
+    column = layout.get("direction", "row") == "column"
+    if column:
+        width = max(p.width for p in panels) + 2 * pad
+        height = sum(p.height + label_h for p in panels) + gap * (len(panels) - 1) + 2 * pad
+    else:
+        width = sum(p.width for p in panels) + gap * (len(panels) - 1) + 2 * pad
+        height = tallest + label_h + 2 * pad
     sheet = Image.new("RGB", (width, height), "white")
     draw = ImageDraw.Draw(sheet)
-    x = pad
+    x = y = pad
     for panel, label in zip(panels, labels):
-        sheet.paste(panel, (x, pad))
-        draw.text((x + panel.width / 2, pad + tallest + label_h / 2), label, fill="black", font=font, anchor="mm")
-        x += panel.width + gap
+        sheet.paste(panel, (x, y))
+        below = y + (panel.height if column else tallest) + label_h / 2
+        draw.text((x + panel.width / 2, below), label, fill="black", font=font, anchor="mm")
+        if column:
+            y += panel.height + label_h + gap
+        else:
+            x += panel.width + gap
     draw.rectangle([0, 0, width - 1, height - 1], outline=(200, 200, 200), width=max(1, scale))
     sheet.save(out)
 

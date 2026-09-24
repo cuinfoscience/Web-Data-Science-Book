@@ -14,7 +14,7 @@ HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "ty
 STEPS = PAGE_STEPS | HEADED_STEPS
 CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad",
          "devtools"}
-EXPECTS = {"status", "text", "selector", "block", "infobar"}
+EXPECTS = {"status", "text", "selector", "block", "infobar", "error"}
 DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout", "overview", "columns", "first_visit"}
 DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
 FIGURE_KEYS = {"id", "file", "kind", "section", "brief", "url", "mode", "engine", "steps", "expect", "crop",
@@ -33,10 +33,12 @@ BOX_MODES = {"element", "text", "first-line"}
 # Where a figure is shown, for the legibility check (lib/legibility.py).
 TARGETS = {"book", "slides", "handout"}
 LEGIBILITY = {"skip"}
-# A composite (mode: composite) joins captures of its parts side by side.
+# A composite (mode: composite) joins captures of its parts side by side, or one
+# above the next (`layout: {direction: column}`).
 PART_KEYS = {"label", "url", "steps", "expect", "crop", "javascript", "window", "scale", "mode",
              "devtools", "settle", "timeout"}
-LAYOUT = {"gap", "pad", "label_px"}
+LAYOUT = {"gap", "pad", "label_px", "direction"}
+DIRECTIONS = {"row", "column"}
 # Settings that decide how a take is drawn on or judged, not how it is captured.
 # Changing them needs no new take, so they stay out of the recipe's hash. So does
 # the brief: the request the figure answers, in words.
@@ -82,8 +84,9 @@ def _problems(chapter, raw):
         seen.add(fid)
         if f.get("kind") not in KINDS:
             out.append(f"{where}: `kind` must be one of {sorted(KINDS)}")
-        if f.get("kind") == "capture" and not f.get("url"):
-            out.append(f"{where}: a capture needs a `url`")
+        if f.get("kind") == "capture" and not f.get("url") and not (
+                f.get("mode") == "composite" and all(isinstance(p, dict) and p.get("url") for p in f.get("parts") or [])):
+            out.append(f"{where}: a capture needs a `url` (a composite's, or one on each of its parts)")
         if f.get("mode", "headless") not in MODES:
             out.append(f"{where}: `mode` must be one of {sorted(MODES)}")
         if f.get("engine", "playwright") not in ENGINES:
@@ -101,10 +104,11 @@ def _problems(chapter, raw):
             out.append(f"{where}: `crop: {{devtools: true}}` needs a `devtools:` block")
         for key in set(f.get("crop") or {}) - CROPS:
             out.append(f"{where}: unknown crop key `{key}`")
-        for key in set(f.get("expect") or {}) - EXPECTS:
-            out.append(f"{where}: unknown expect key `{key}`")
-        if (f.get("expect") or {}).get("infobar") and f.get("mode") != "headed":
-            out.append(f"{where}: `expect: {{infobar: true}}` is for a headed figure, the only kind with browser bars")
+        between = (f.get("crop") or {}).get("between")
+        if between is not None and not (isinstance(between, list) and len(between) == 2
+                                        and all(isinstance(s, str) for s in between)):
+            out.append(f"{where}: crop `between` is two selectors: the top of the first to the bottom of the second")
+        out += [f"{where}: {p}" for p in _expect_problems(f.get("expect"), f.get("mode", "headless"))]
         out += [f"{where}: {p}" for p in _annotate_problems(f)]
         for key in set(f.get("targets") or {}) - TARGETS:
             out.append(f"{where}: unknown target `{key}` (one of {sorted(TARGETS)})")
@@ -116,6 +120,22 @@ def _problems(chapter, raw):
         if "brief" in f and not (isinstance(f["brief"], str) and f["brief"].strip()):
             out.append(f"{where}: `brief` is the request the figure answers, in sentences")
         out += [f"{where}: {p}" for p in _composite_problems(f)]
+    return out
+
+
+def _expect_problems(expect, mode):
+    expect = expect or {}
+    out = [f"unknown expect key `{key}`" for key in set(expect) - EXPECTS]
+    if expect.get("infobar") and mode != "headed":
+        out.append("`expect: {infobar: true}` is for a headed figure, the only kind with browser bars")
+    if "error" in expect:
+        if not (isinstance(expect["error"], str) and expect["error"].strip()):
+            out.append("`expect: {error: ...}` is the error Chrome reports, as a pattern: "
+                       "'ERR_NAME_NOT_RESOLVED|ERR_TUNNEL_CONNECTION_FAILED'")
+        if mode == "headed":
+            out.append("`expect: {error: ...}` is for a headless capture")
+        out += [f"`{key}` has no meaning for a page that never loaded, which `error` expects"
+                for key in ("status", "block") if key in expect]
     return out
 
 
@@ -144,7 +164,10 @@ def _composite_problems(f):
         if part.get("mode", "headless") not in ("headless", "headed"):
             out.append(f"part {n}: `mode` is headless or headed")
         out += [f"part {n}: {p}" for p in _step_problems(part.get("steps"), part.get("mode") == "headed")]
+        out += [f"part {n}: {p}" for p in _expect_problems(part.get("expect"), part.get("mode", "headless"))]
     out += [f"unknown layout key `{k}`" for k in set(f.get("layout") or {}) - LAYOUT]
+    if (f.get("layout") or {}).get("direction", "row") not in DIRECTIONS:
+        out.append(f"layout `direction` is one of {sorted(DIRECTIONS)}")
     return out
 
 
@@ -237,6 +260,14 @@ def figure(recipe, fid):
         if fig["id"] == fid:
             return fig
     raise RecipeError(f"{recipe['chapter']} has no figure `{fid}`")
+
+
+def loads(fig):
+    """Each page a figure loads, with what its recipe expects of it: the figure's own page,
+    or each composite part's (a part without a `url` loads the figure's)."""
+    if fig.get("mode") == "composite":
+        return [(part.get("url") or fig.get("url"), part.get("expect") or {}) for part in fig.get("parts") or []]
+    return [(fig["url"], fig.get("expect") or {})] if fig.get("url") else []
 
 
 def part_figure(fig, n):
