@@ -9,6 +9,10 @@
     - scroll: {selector: '...'}              into view; or {y: 400} to scroll by pixels
     - scroll: {selector: '...', offset: 175} so the element's top is 175 pixels below
                                              the window's top
+    - scroll: {selector: '...', offset: 175, within: '.panel'}
+                                             the same, scrolling the element that `within`
+                                             names: for pages that scroll a panel rather
+                                             than the window, such as Jupyter
     - press: 'Escape'                        a key
     - settle: 1.5                            seconds, for animation that has no end signal
     - scroll: {match: '^User-agent: \\*$', in: 'pre', offset: 180}
@@ -148,8 +152,15 @@ def run(page, fig, log, extra=None):
                 if "selector" in arg and "offset" in arg:
                     element = page.locator(arg["selector"]).first
                     element.wait_for(state="attached", timeout=ms)
-                    element.evaluate("(el, offset) => window.scrollTo(0, el.getBoundingClientRect().top"
-                                     " + window.scrollY - offset)", arg["offset"])
+                    if "within" in arg:
+                        panel = page.locator(arg["within"]).first
+                        panel.wait_for(state="attached", timeout=ms)
+                        element.evaluate("(el, [panel, offset]) => { panel.scrollTop +="
+                                         " el.getBoundingClientRect().top - offset; }",
+                                         [panel.element_handle(timeout=ms), arg["offset"]])
+                    else:
+                        element.evaluate("(el, offset) => window.scrollTo(0, el.getBoundingClientRect().top"
+                                         " + window.scrollY - offset)", arg["offset"])
                 elif "selector" in arg:
                     page.locator(arg["selector"]).first.scroll_into_view_if_needed(timeout=ms)
                 else:

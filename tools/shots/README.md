@@ -41,7 +41,7 @@ tools/shots/run check                             # before a PR
 - **`doctor`** answers whether capture works in this session. Do not reuse an earlier session's answer:
   - it checks the proxy, the browser, a real headless capture of example.com, and a real headed one with DevTools open;
   - it checks for TeX, and fails if a recipe has markers and TeX is missing;
-  - with a chapter, it makes one request to each host that chapter's recipes use, and reads that host's robots.txt for the capture's User-Agent, noting any group addressed to Claude's agents (see "Field notes");
+  - with a chapter, it makes one request to each host that chapter's recipes use, and reads that host's robots.txt for the capture's User-Agent, noting any group addressed to Claude's agents (see "Field notes"). A server on this machine (`localhost`), such as chapter 1's Jupyter, is asked at the figure's own address instead: robots.txt doesn't apply to it;
   - it reports a proxy refusal as a policy block, which you report rather than route around.
 
 ## The rules
@@ -101,7 +101,7 @@ dated record is in §9 of [the screenshot AAR](../../docs/aar/2026-09-24-screens
 
 ## Field notes
 
-What later captures taught, in chapters 4, 7, and 8 (2026-09-22 to 24): each
+What later captures taught, in chapters 1, 4, 7, and 8 (2026-09-22 to 24): each
 note is a practice and the case behind it. Read the notes for the kind of page
 you're about to capture before writing its recipe. When a capture teaches you
 something the next agent would otherwise find out again, add a note here.
@@ -266,6 +266,41 @@ something the next agent would otherwise find out again, add a note here.
 - **Alt text that names what drifts is rewritten on a retake:** the first
   headline, the first member of the roster. `IMAGES.md` lists what to check.
 
+### Jupyter and composites (chapter 1)
+
+- **A figure of a local app needs the app running.** Chapter 1's Jupyter
+  figures come from a real Jupyter server on this machine, set up with the
+  chapter's own commands (`images/ch-01/IMAGES.md` has them). Run it with no
+  token (`--IdentityProvider.token=''`), so the recipe's address carries no
+  secret, and bind it to `127.0.0.1`. `doctor` asks a `localhost` figure's own
+  address, since robots.txt doesn't apply.
+- **Reset what a take changes.** Running a cell raises the kernel's execution
+  count, so a retake would show `[2]:`. Close the notebook's kernel session
+  first; Jupyter's API refuses the `DELETE` without its `_xsrf` cookie echoed
+  in an `X-XSRFToken` header. Pre-answer first-run prompts the figure isn't
+  about (Jupyter's news and update questions) with a settings override, and
+  say so in `IMAGES.md`.
+- **Capture the text as the reader will get it.** The companion notebook's
+  Markdown cells are the chapter's own text, so a capture of the notebook
+  follows edits to the chapter: regenerate the notebooks and copy the new one
+  in before the take. Keep a figure's block out of the cells it captures;
+  chapter 1 places both Jupyter figures after the code cell they show.
+- **Some apps scroll a panel, not the window.** `scroll: {…, within:
+  '.jp-WindowedPanel-outer'}` positions a cell in Jupyter's notebook panel.
+- **Anchor to what is drawn.** In a rendered Markdown cell, a text pattern
+  also matches the cell's hidden source editor, and `.first` picks the hidden
+  one: anchor by selector (`.jp-RenderedMarkdown p:has-text(…)`). A text box
+  measured over a wrapper includes the full-width boxes of the blocks inside
+  it: anchor to the innermost element (`.jp-OutputArea-output pre`), or the
+  marker lands at the far edge.
+- **Chrome won't draw a normal window much under 500 pixels wide.** A headed
+  take at 386 pixels came out about 500 wide and cropped, cutting the page's
+  right side. For a narrow panel of browser UI, as in chapter 1's View Source
+  half, make the window wider and crop the page; a headless take can be as
+  narrow as the page allows.
+- **Check the page's own width.** Wikipedia's layout wraps at 370 pixels in a
+  headless take, so the article half of chapter 1's composite is 370 wide,
+  and the pair fits 800×600 with its text at 12.7 pixels in the book.
 ### When a host is down
 
 - **Tell an outage from a refusal.** On 2026-09-24,
@@ -279,7 +314,9 @@ something the next agent would otherwise find out again, add a note here.
   with 429 ("You are making too many requests") before any other request had
   gone to it: cloud sessions share addresses, and the limit counts everyone
   on them. Don't retry in a loop. Try once much later, or have the figure
-  captured from another network.
+  captured from another network. It answered 429 again that evening, through
+  `capture`'s three retries: a limit counted over a shared address outlasts
+  the backoff.
 
 ## Making a figure, start to finish
 
@@ -416,7 +453,7 @@ One YAML file per chapter in `recipes/`. A figure:
 
 - **The brief** is for people: what the reader should see, for which paragraph, and what the figure leaves out (step 1 of "Making a figure"). The tool doesn't read it, and it stays out of the recipe's hash, so rewording it needs no new take.
 - **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-07 and ch-08 recipes set 1280×800, the window their images were made in; they are over the soft limit until they are retaken.)
-- **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top.
+- **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top; add `within: '.panel'` for a page that scrolls a panel rather than the window, as Jupyter does.
 - **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`.
 - **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls.
 - **Other modes:** `mode: headed` and `mode: composite` are below. An `engine:` other than Playwright (M4) marks a figure that `capture` skips with a note.
@@ -685,9 +722,10 @@ It reports **warnings** for:
 - marks changed in the recipe since the annotated image was drawn (promote again);
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
 
-`selftest` runs 71 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 74 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
+- a `scroll` step that scrolls a panel (`within`), not the window;
 - anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture;
 - the size limits: 800×600; the relaxed 1024×768, which needs a reason and text that passes; beyond it; and `check`;
 - `match`: a line of a plain-text file scrolled to its offset, and a match's box across line breaks;

@@ -264,7 +264,7 @@ for answer in answers:
 dig en.wikipedia.org
 ```
 
-(macOS and Linux; on Windows, or anywhere `dig` is not installed, `nslookup en.wikipedia.org` asks the same question.) Both return the same A record `dns.resolver` gave you, plus detail the Python call does not surface by default: which DNS server answered, and how long the result is cached for — its **TTL**, in seconds.
+(macOS and Linux; on Windows, or anywhere `dig` is not installed, `nslookup en.wikipedia.org` asks the same question.) An "A" record, short for address record, is the type of DNS record that gives a domain's IP address. A records hold only IPv4 addresses, so finding one also tells you the domain has an IPv4 address. Both return the same A record `dns.resolver` gave you, plus detail the Python call does not surface by default: which DNS server answered, and how long the result is cached for — its **TTL**, in seconds.
 
 Domain names have a hierarchical structure: `subdomain.domain.top-level-domain`. Each top-level domain (`.com`, `.org`, `.edu`) is operated by a registry organization — Verisign runs `.com`, for example — under the coordination of ICANN, the nonprofit that oversees the internet's naming system. The domain (`wikipedia`) is registered by the organization. Subdomains (`en`, `es`, `m`) are controlled by the domain owner and do not require separate registration.
 
