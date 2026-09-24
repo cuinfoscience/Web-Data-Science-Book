@@ -56,6 +56,88 @@ These come from `slides/common/AUTHORING.md` in the course repo and from the AAR
 - **Dated captions.** A figure that shows things that change (counts, versions, live pages) says in its caption when it was captured.
 - **At most 800×600 of the screen.** A figure shows at most 800×600 CSS pixels of the screen (1600×1200 image pixels at scale 2). In the book's 778-pixel column its text then stays about the size it had on screen; a whole 1680-pixel window shrinks it to less than half. To show DevTools, zoom DevTools and crop to what the text discusses, rather than widening the window. This is the first check, and a soft one: going over is a warning, and a recipe that needs more says why in `oversize:`.
 
+## Making a figure, start to finish
+
+One figure, from the request to the merged pull request. Each step names its
+command or file; the table after the steps says where each part of a
+figure's record is kept.
+
+1. **Write the brief first.** Before any capture, write the figure's `brief:`
+   in its recipe: what the reader should see, for which paragraph, and what
+   the figure leaves out. Two to five plain sentences. It is the request the
+   figure answers. A reviewer can judge a take against it, and so can
+   whoever retakes the figure a year later, when the page has changed. The
+   recipes here have one for every figure; `check` warns about a figure
+   without one.
+2. **Check the session and the page.** Run `tools/shots/run doctor ch-NN` in
+   this session. The page must load signed out, and show no student names or
+   work and no one's personal data. A page behind a login is the
+   instructor's to capture by hand.
+3. **Write the rest of the recipe.** Use the smallest window and crop that
+   hold what the brief names: 800×600 CSS pixels at most, or `oversize:`
+   with the reason. For browser UI, add `mode: headed` and a `devtools:` block
+   that sets the dock, the zoom (125% in most chapter 5 figures), the panel,
+   and the panes, columns, and sidebars to hide. Steps wait for a condition;
+   none sleeps blindly. Add `annotate:` marks that point at elements or
+   DevTools rows, `targets:` for each place the figure is shown, and
+   `drifts: true` if it shows anything that changes.
+4. **Capture, and read what it says.** `tools/shots/run capture ch-NN
+   <figure>`. A failed guard names the problem: an error page, missing text,
+   an infobar. Read the warnings on a passing take too: a DevTools setting
+   that DevTools did not honor, a figure over the soft limit, and the text
+   size at each target.
+5. **Look at the contact sheet.** `tools/shots/run sheet ch-NN` shows each
+   take at the size its readers will see. Look for text too small to read; a
+   wrapped row or a column cut short with "…", which means too much is in
+   view; traces of the capture (the proxy's address, headers naming its IP
+   address or location); and any bar under the address bar. Then hold the
+   take against the brief: it should show what the brief asks for and
+   nothing the brief leaves out. If not, change the recipe and capture again.
+   `annotate` redraws markers without a new capture.
+6. **Promote.** `tools/shots/run promote ch-NN <figure>` copies the take into
+   `images/ch-NN/`, draws its markers once more, and records it in
+   `provenance.json` and the `IMAGES.md` table. Outside the table, write in
+   `IMAGES.md` what a retake needs to know: what the figure shows that is
+   easy to miss, and why it looks the way it does.
+7. **Write the figure block.** The caption says what to notice, gives the
+   capture's month and year if the figure drifts, and names Chrome's own
+   overlays, which get no marker. The `fig-alt` transcribes the text and
+   numbers a reader needs, in 280–440 characters. Then run
+   `tools/shots/run check`.
+8. **Build.** Regenerate the notebooks (`python tools/make_notebooks.py`),
+   run `python tools/trope_lint.py` on the changed chapter, and render it
+   with Quarto.
+9. **Make the course copies.** A slide or handout that uses the figure gets
+   a copy in the course repo's `slides/week-NN/img/` (or the handout's
+   `img/`), cropped to what the slide discusses and keeping the file name
+   the deck uses. Update the image's row in `stubs.tsv` (its size and what
+   it shows) and its notes in `IMAGES.md`, then regenerate the table with
+   `cd slides && python3 common/make_stubs.py week-NN`. On a 1920-pixel
+   slide its text must reach 16 pixels.
+10. **Open the pull requests.** Open one in the textbook and one in the
+    course repo, together, each on a new branch. The textbook PR's
+    description has the review table: for each figure, its section, what it
+    shows, kind, markers, alt text, capture date, and legibility result.
+    Attach the contact sheet. Merge with a merge commit, when the maintainer
+    asks.
+
+### Where each piece lives
+
+| Piece | Where |
+|---|---|
+| The request: what the reader should see, for which paragraph, and what the figure leaves out | the recipe's `brief:` |
+| How to capture it: the page, window, DevTools, steps, and crop | the rest of the figure's recipe in `recipes/` |
+| Markers | the recipe's `annotate:` |
+| Where it is shown, and the reason for any exception | the recipe's `targets:`, `oversize:`, and `legibility: {skip: …}` |
+| How an image made before the toolkit was made | the recipe's `legacy:` |
+| What the reader is told | the chapter's figure block: the caption and `fig-alt` |
+| What was captured, when, how, and the hashes that tie image to recipe | `images/ch-NN/provenance.json` |
+| What a retake needs to know | `images/ch-NN/IMAGES.md`, outside the generated table |
+| Every take, its log, and its markers | `tools/shots/out/ch-NN/<figure>/` (not committed) |
+| Copies on slides and handouts | the course repo's `img/` folders, each with `stubs.tsv` and `IMAGES.md` |
+| Which figures were accepted, and why | the PR's review table. It lives on GitHub, not in the repo, so copy anything a retake needs into `IMAGES.md`. |
+| The plans, and the decisions behind these rules | `docs/plans/`, `docs/decisions.md`, and `docs/aar/` |
+
 ## How a capture works
 
 `capture` runs each figure's recipe in a fresh browser context:
@@ -87,6 +169,10 @@ One YAML file per chapter in `recipes/`. A figure:
 - id: x-com-1999                 # the image is images/ch-07/x-com-1999.png
   kind: capture                  # capture | render | diagram | illustration
   section: "Broken and Missing Captures"
+  brief: >-                      # the request the figure answers, in sentences
+    Show a capture whose HTML was saved but whose images were not: x.com on
+    November 14, 1999, with broken-image icons and their alt text above the
+    signup form and the X.com Corporation footer, under the Wayback toolbar.
   url: https://web.archive.org/web/19991114081850/http://x.com/
   steps:                         # each step waits for a condition; none sleeps blindly
     - wait: {selector: '#wm-ipp-base'}
@@ -100,6 +186,7 @@ One YAML file per chapter in `recipes/`. A figure:
     method: headless Playwright (Node), 1280×800 window at 1×, top 610 pixels
 ```
 
+- **The brief** is for people: what the reader should see, for which paragraph, and what the figure leaves out (step 1 of "Making a figure"). The tool doesn't read it, and it stays out of the recipe's hash, so rewording it needs no new take.
 - **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-07 and ch-08 recipes set 1280×800, the window their images were made in; they are over the soft limit until they are retaken.)
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top.
 - **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`.
@@ -319,7 +406,7 @@ column of markers.
   - the sizes of its text, which `check` judges;
   - for a composite, its parts;
   - for an image with markers, hashes of the annotated PNG and PDF, the printed width they were drawn for, and a hash of the marks.
-- **The recipe's hash** covers what decides the capture. Marks, targets, and legibility settings are left out, so changing them needs no new take.
+- **The recipe's hash** covers what decides the capture. The brief, `notes:`, `legacy:`, marks, targets, `oversize:`, and legibility settings are left out, so changing them needs no new take.
 - **Existing images:** `adopt` records ones made before the toolkit, from their recipe's `legacy:` block.
 - **`images/<chapter>/IMAGES.md`** gets a table generated from `provenance.json`, between `<!-- shots:begin -->` and `<!-- shots:end -->`. Everything outside the markers is for people, and the tool never touches it: what a figure shows that is easy to miss, and what a retake needs.
 
@@ -338,6 +425,7 @@ column of markers.
 
 It reports **warnings** for:
 
+- a figure whose recipe has no `brief:`;
 - a figure not used in its chapter (a figure may use either `<figure>.png` or `<figure>_annotated.png`);
 - short alt text;
 - a drifting figure whose caption does not give the capture year;

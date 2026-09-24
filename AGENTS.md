@@ -65,6 +65,7 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
 - **Word count target**: ~3,000 words per chapter (soft target; tutorial-heavy chapters may run to 4,000–5,000 including code blocks).
 - **Figures and screenshots**: images live in `images/ch-NN/`, each made from a recipe in `tools/shots/recipes/ch-NN.yml` and recorded in that folder's `provenance.json` (see `tools/shots/README.md`; run `tools/shots/run check` before a PR).
   - A screenshot is a real capture of a real page. Diagrams and renders are welcome, but never rebuild a real site's interface with invented content.
+  - Start each figure from its `brief:` in the recipe: what the reader should see, for which paragraph, and what the figure leaves out. `tools/shots/README.md` ("Making a figure, start to finish") has the steps from the brief to a merged PR, and a table of where each part of a figure's record is kept.
   - Every figure has `fig-alt` that transcribes the text and numbers a reader needs from it. The ch-07 and ch-08 figures, at 280–440 characters, set the bar.
   - A figure showing anything that changes (counts, versions, a live page) says in its caption when it was captured, as in "in September 2026."
   - A count, date, or total printed in a caption comes from a query whose limit and paging are recorded with the figure. If the query hit its limit, page until it doesn't, or don't print the number.

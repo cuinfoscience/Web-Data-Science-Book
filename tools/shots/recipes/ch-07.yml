@@ -15,6 +15,12 @@ figures:
   - id: wayback-calendar
     kind: capture
     section: "Finding a Capture"
+    brief: >-
+      Show the Wayback Machine's Calendar for facebook.com with 2005 selected: the
+      "Saved N times" line, the bar chart of captures per year, and enough months
+      of calendar that circles of different sizes and colors both appear. The
+      caption explains them: size is how many captures a day holds, color is the
+      status code the crawler received.
     url: https://web.archive.org/web/2005*/facebook.com
     steps:
       - wait: {text: 'Saved [0-9,]+ times'}
@@ -31,6 +37,10 @@ figures:
   - id: facebook-2004
     kind: capture
     section: "Finding a Capture"
+    brief: >-
+      Show what a replayed capture looks like: facebook.com on January 21, 2004,
+      two weeks before Thefacebook launched, when the domain belonged to
+      AboutFace, with the Wayback toolbar across the top.
     url: https://web.archive.org/web/20040121224607/http://facebook.com/
     steps:
       - wait: {selector: '#wm-ipp-base'}
@@ -45,6 +55,12 @@ figures:
   - id: about-this-capture
     kind: capture
     section: "About This Capture"
+    brief: >-
+      Show the toolbar's About this capture panel on the February 12, 2004 capture
+      of thefacebook.com: who collected the capture (Collected by) and when each
+      embedded image was saved relative to the page (Timestamps). Only the toolbar
+      and the panel. "Collected by" loads after the panel opens; the first take
+      missed it, so wait for it.
     url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
     steps:
       - wait: {selector: '#wm-ipp-base'}
@@ -64,6 +80,10 @@ figures:
   - id: x-com-1999
     kind: capture
     section: "Broken and Missing Captures"
+    brief: >-
+      Show a capture whose HTML was saved but whose images were not: x.com on
+      November 14, 1999, with broken-image icons and their alt text above the
+      signup form and the X.com Corporation footer, under the Wayback toolbar.
     url: https://web.archive.org/web/19991114081850/http://x.com/
     steps:
       - wait: {selector: '#wm-ipp-base'}
@@ -83,6 +103,12 @@ figures:
   - id: devtools-archived-page
     kind: capture
     section: "Inspecting Archived Pages"
+    brief: >-
+      Show the markup the Wayback Machine adds to a replayed page: on the February
+      12, 2004 capture of thefacebook.com, the Elements tree lists the toolbar's
+      div#wm-ipp-base first in the body, then the END WAYBACK TOOLBAR INSERT
+      comment, then the page's own <center>. The page stays in view beside
+      DevTools, so the reader can match the toolbar to its markup.
     url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
     mode: headed
     window: [1680, 1000]

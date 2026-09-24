@@ -17,7 +17,7 @@ CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "h
 EXPECTS = {"status", "text", "selector", "block", "infobar"}
 DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout", "overview", "columns", "first_visit"}
 DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
-FIGURE_KEYS = {"id", "file", "kind", "section", "url", "mode", "engine", "steps", "expect", "crop",
+FIGURE_KEYS = {"id", "file", "kind", "section", "brief", "url", "mode", "engine", "steps", "expect", "crop",
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
                "user_agent", "pause", "settle", "timeout", "retries",
                "annotate", "targets", "legibility", "parts", "layout", "oversize"}
@@ -38,8 +38,9 @@ PART_KEYS = {"label", "url", "steps", "expect", "crop", "javascript", "window", 
              "devtools", "settle", "timeout"}
 LAYOUT = {"gap", "pad", "label_px"}
 # Settings that decide how a take is drawn on or judged, not how it is captured.
-# Changing them needs no new take, so they stay out of the recipe's hash.
-NOT_CAPTURE = ("legacy", "notes", "annotate", "targets", "legibility", "oversize")
+# Changing them needs no new take, so they stay out of the recipe's hash. So does
+# the brief: the request the figure answers, in words.
+NOT_CAPTURE = ("brief", "legacy", "notes", "annotate", "targets", "legibility", "oversize")
 DEFAULTS = {
     "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
     "window": [800, 600],    # CSS pixels; also the soft limit on what a figure shows (lib/legibility.py)
@@ -111,6 +112,8 @@ def _problems(chapter, raw):
             out.append(f"{where}: unknown legibility key `{key}`")
         if "oversize" in f and not (isinstance(f["oversize"], str) and f["oversize"].strip()):
             out.append(f"{where}: `oversize` is the reason a figure shows more than 800×600, as a sentence")
+        if "brief" in f and not (isinstance(f["brief"], str) and f["brief"].strip()):
+            out.append(f"{where}: `brief` is the request the figure answers, in sentences")
         out += [f"{where}: {p}" for p in _composite_problems(f)]
     return out
 

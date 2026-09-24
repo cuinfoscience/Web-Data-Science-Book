@@ -502,6 +502,10 @@ def cmd_check(args):
         except RecipeError as e:
             err(str(e))
             continue
+        for fig in recipe["figures"]:
+            if not (fig.get("brief") or "").strip():
+                warn(f"{fig['id']}: its recipe has no `brief:`, the request the figure answers "
+                     "(what it shows, for which paragraph, what it leaves out)")
         if recipe["course"]:
             line(GOOD, f"{len(recipe['figures'])} course-only recipe(s) valid; their images live in the course repo")
             continue
