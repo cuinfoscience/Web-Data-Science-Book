@@ -345,7 +345,11 @@ def get_with_backoff(url, headers=None, max_retries=3):
     for attempt in range(max_retries):
         response = requests.get(url, headers=headers)
         if response.status_code == 429:
-            wait_time = 2 ** attempt  # 1s, 2s, 4s
+            retry_after = response.headers.get("Retry-After")
+            if retry_after and retry_after.isdigit():
+                wait_time = int(retry_after)  # the server told us how long to wait
+            else:
+                wait_time = 2 ** attempt  # 1s, 2s, 4s
             print(f"Rate limited. Waiting {wait_time}s before retry...")
             time.sleep(wait_time)
         else:
@@ -353,7 +357,7 @@ def get_with_backoff(url, headers=None, max_retries=3):
     return response  # Return the last response even if still 429
 ```
 
-Exponential backoff doubles the wait time with each retry, giving the server progressively more breathing room. Many APIs include a `Retry-After` header in their 429 responses that tells you exactly how long to wait — check for it with `response.headers.get("Retry-After")` before falling back to your own backoff schedule.
+Exponential backoff doubles the wait time with each retry, giving the server progressively more breathing room. Many APIs include a `Retry-After` header in their 429 responses that tells you exactly how long to wait — the function above checks for it with `response.headers.get("Retry-After")` before falling back to its own backoff schedule.
 
 Understanding status codes in context makes debugging much faster. A 403 from the Wikimedia API almost always means you forgot the `User-Agent` header — the fix is a single line of code. A 403 from a news site might mean the site blocks all automated access, and no header change will help. A 404 could mean the page was deleted, the URL has a typo, or the site restructured its paths. A 500 is the server's problem, not yours — retry after a delay. Building this diagnostic intuition takes practice, but the pattern is always the same: check the status code, inspect the response headers, read the response body for error messages, and adjust your request accordingly. This systematic approach to debugging carries through every chapter that follows.
 
