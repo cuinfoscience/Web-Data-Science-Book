@@ -42,27 +42,28 @@ For a deeper discussion of computational thinking and its four components — de
 
 ## Setting Up Your Environment
 
-You will need three things to work through this book: a Python installation, a way to run Jupyter Notebooks, and a few core libraries.
+You will need three things to work through this book: a Python installation, Jupyter Notebooks to run it in, and five core libraries: `requests`, `beautifulsoup4`, `pandas`, `matplotlib`, and `seaborn`. The steps below set up all three in one environment.
 
 ### Installing Anaconda
 
 The Anaconda distribution of Python provides a curated collection of scientific computing libraries along with the `conda` package manager. Download the latest version from [anaconda.com](https://www.anaconda.com/download) and follow the installation instructions for your operating system.
 
-After installation, open a terminal (macOS/Linux) or Anaconda Prompt (Windows) and update your installation:
+The commands in this section go in a terminal, not in Python. On macOS or Linux, open the **Terminal** app. On Windows, open **Anaconda Prompt** from the Start menu: the installer adds it, and it knows where to find `conda`, which an ordinary Command Prompt or PowerShell window may not. The commands are the same on every system. Type each one, press Enter, and let it finish before typing the next. First, update your installation:
 
-```{python}
-# Run these commands in a terminal, not in Python
-# conda update conda
-# conda install anaconda=2026.07-1
+```bash
+conda update conda
+conda install anaconda=2026.07-1
 ```
 
-Anaconda's default `base` environment is fine for your first session, but as you accumulate projects, their library requirements will eventually conflict. The `conda` package manager solves this with *environments*: isolated Python installations, each with its own set of packages. Create one for this book and activate it whenever you sit down to work:
+Anaconda's default `base` environment is fine for your first session, but as you accumulate projects, their library requirements will eventually conflict. The `conda` package manager solves this with *environments*: isolated Python installations, each with its own set of packages. Create one for this book, activate it, and install Jupyter and the core libraries into it:
 
-```{python}
-# Run these commands in a terminal, not in Python
-# conda create -n webdata python=3.12
-# conda activate webdata
+```bash
+conda create -n webdata python=3.12
+conda activate webdata
+pip install notebook requests beautifulsoup4 pandas matplotlib seaborn
 ```
+
+A new environment holds Python and `pip` and little else, not even Jupyter, which is why `notebook` is on the install line. `conda activate webdata` changes the start of your prompt from `(base)` to `(webdata)`, and from then on `pip` installs into `webdata` and the programs you start run from it. Each new terminal starts in `base`, so run `conda activate webdata` whenever you open one to work on this book.
 
 Giving each project its own environment is a reproducibility practice, not just tidiness: it records exactly which Python and package versions your analysis ran against, so you — or someone replicating your work — can recreate the same setup on another machine months later.
 
@@ -73,7 +74,13 @@ If you run into installation issues, see *Missing Manual* Chapter 14: Package Ma
 
 ### Jupyter Notebooks
 
-Jupyter Notebooks are interactive computing environments that keep your code, documentation, and results in a single file. Launch one from the terminal with `jupyter notebook`, which will open a browser window where you can create and edit notebooks.
+Jupyter Notebooks are interactive computing environments that keep your code, documentation, and results in a single file. Start Jupyter from the same terminal, with `webdata` active:
+
+```bash
+jupyter notebook
+```
+
+The command is the same on macOS, Linux, and Windows. Jupyter prints a few lines of log in the terminal and opens a browser tab listing the files in the folder you started it from. Keep the terminal open while you work, because closing it stops Jupyter. To make a notebook, choose **New** and then **Notebook**, and pick the Python 3 kernel if Jupyter asks: started from `webdata`, it is that environment's Python.
 
 A notebook consists of cells. **Code cells** contain Python that you can execute with Shift+Enter. **Markdown cells** contain formatted text for documentation. The ability to interleave code with narrative explanation makes notebooks ideal for the kind of exploratory, iterative work that characterizes web data science.
 
@@ -90,14 +97,7 @@ For a thorough introduction to Jupyter Notebooks — cell types, execution order
 
 ### Core Libraries
 
-This book uses several Python libraries extensively. Install them now if they are not already available in your Anaconda distribution:
-
-```{python}
-# Run in a terminal:
-# pip install requests beautifulsoup4 pandas matplotlib seaborn
-```
-
-Throughout this book, you will install additional libraries as needed for specific chapters. For now, confirm that the core libraries import without error:
+This book uses several Python libraries extensively. You installed the core ones into `webdata` along with Jupyter; later chapters install more as they need them, with the same `pip install` in a terminal where `webdata` is active. For now, confirm in a notebook that the core libraries import without error:
 
 ```{python}
 import requests
@@ -107,6 +107,8 @@ from bs4 import BeautifulSoup
 
 print("All core libraries loaded successfully.")
 ```
+
+If an import fails with `ModuleNotFoundError`, the notebook is running a different Python than `webdata`. Close Jupyter, run `conda activate webdata` in the terminal, and start `jupyter notebook` again.
 
 ## Your First Request
 
@@ -118,14 +120,17 @@ Nearly everything in this book starts with the [`requests`](https://requests.rea
 
 Why this library and not another? Python ships with a built-in module for the job (`urllib`), but it is verbose where `requests` is direct: fetching a page is one readable line, and the library quietly handles the details — character encodings, redirects, connection management — that you should not have to think about in week one. And `requests` is the ecosystem's common ground: the scraping and API libraries you will meet later in this book are built on top of it, imitate its interface, or assume you will pair them with it, so the habits you form here transfer everywhere. What actually happens on the wire when a request is sent — protocols, servers, DNS, the anatomy of HTTP itself — is a story worth telling properly, and @sec-protocols tells it. For now, treat `requests` as a well-made black box: ask for a page, get a reply.
 
-Here you will retrieve the Wikipedia article for the University of Colorado Boulder:
+Here you will retrieve the Wikipedia article for the University of Colorado Boulder. Wikipedia refuses requests that don't say who is sending them, answering `requests`' default with a 403, so this one carries a `User-Agent` header that names you. Put your own email address in it; @sec-ethics explains why sites ask for this.
 
 ```{python}
 import requests
 
+# Identify yourself: Wikipedia answers the library's default User-Agent with a 403
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+
 # Retrieve the page
 url = "https://en.wikipedia.org/wiki/University_of_Colorado_Boulder"
-response = requests.get(url)
+response = requests.get(url, headers=headers)
 
 # Check the response
 print(response.status_code)  # 200 means success
@@ -179,7 +184,7 @@ print(type(data))        # <class 'dict'>
 print(data.keys())       # What keys are in the response?
 ```
 
-Notice two things. First, you included a custom `User-Agent` header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the `.json()` method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate.
+Notice two things. First, as with the article, you included a custom `User-Agent` header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the `.json()` method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate.
 
 ### From Response to DataFrame
 
@@ -259,7 +264,7 @@ Since this is the first chapter, the assignment is deliberately modest: prove th
 # Your code here
 ```
 
-**Step 2 — Make your first request.** Use `requests.get()` to retrieve any web page you choose. Print the status code and the length of `response.text`.
+**Step 2 — Make your first request.** Use `requests.get()` to retrieve any web page you choose, sending a `User-Agent` header with your email as the chapter does. Print the status code and the length of `response.text`.
 
 ```{python}
 # Step 2: Retrieve a web page and print the status code and response length.
@@ -329,9 +334,10 @@ The tools you learn in this book are not neutral. Web data collection can serve 
 
 ## Common Issues to Debug
 
-- **`ModuleNotFoundError`**: A library is not installed in your current Python environment. Run `pip install library-name` from a terminal, then restart your Jupyter kernel.
+- **`jupyter: command not found`** (or "not recognized" on Windows): Jupyter isn't installed in the active environment. Run `conda activate webdata`, then `pip install notebook`, and start `jupyter notebook` again.
+- **`ModuleNotFoundError`**: A library is not installed in the Python your notebook runs. In a terminal where `webdata` is active (the prompt starts with `(webdata)`), run `pip install library-name`, then restart your Jupyter kernel. If the library is installed and the error remains, Jupyter was started from another environment: run `import sys; print(sys.executable)` in the notebook, and check that the path includes `webdata`.
 - **`ConnectionError`**: Your computer cannot reach the server. Check your internet connection; if you are on a university network, try a different network.
-- **Status code 403 (Forbidden)**: The server rejected your request, often because you did not include a `User-Agent` header. See @sec-ethics for how to set custom headers.
+- **Status code 403 (Forbidden)**: The server rejected your request, often because you did not include a `User-Agent` header; Wikipedia refuses `requests`' default. Send one with your email, as this chapter's requests do, and see @sec-ethics for more on headers.
 - **Cells running out of order**: Jupyter cells can be executed in any order, which leads to stale variables. When in doubt, restart the kernel and run all cells from the top.
 
 ## Key Takeaways
