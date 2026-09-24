@@ -482,7 +482,7 @@ div.csl-indent {
 <section id="strategy-1-the-clean-single-table" class="level2" data-number="6.3">
 <h2 data-number="6.3" class="anchored" data-anchor-id="strategy-1-the-clean-single-table"><span class="header-section-number">6.3</span> Strategy 1: The Clean Single Table</h2>
 <p>Start with the easiest case on the spectrum: a single site, a consistent template, and a page whose data lives in exactly one <code>&lt;table&gt;</code> with nothing else on the page competing for it. <a href="https://www.boxofficemojo.com">Box Office Mojo</a>’s weekly box office charts are built this way, and the chart for the week ending December 28, 2018 — the lucrative corridor between Christmas and New Year’s — sits at a URL that follows the same pattern every week:</p>
-<div id="344b8e74" class="cell" data-execution_count="1">
+<div id="715351e5" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://www.boxofficemojo.com/weekend/2018W52/"</span></span>
@@ -501,7 +501,7 @@ div.csl-indent {
 <p>The Numbers publishes the same kind of weekly box office chart as Box Office Mojo, for the same weeks — but the page ships two <code>&lt;table&gt;</code> elements, not one: a full desktop layout and a separate mobile layout stacked beneath it. Pick <code>tables[0]</code> on faith and you have a fifty-fifty chance of parsing the wrong one; you have to inspect the page and confirm which table is the one you want before you write a line of extraction code. Let us extract box office revenue data from <a href="https://www.the-numbers.com">The Numbers</a> for the same late-December 2018 chart. One hedge before we begin: sites reorganize their URLs and page structures over time, so the code below targets the page as it existed in mid-2026 (this chapter’s closing “A Note on Fragility” has more to say about living with that reality).</p>
 <section id="retrieving-and-inspecting" class="level3" data-number="6.4.1">
 <h3 data-number="6.4.1" class="anchored" data-anchor-id="retrieving-and-inspecting"><span class="header-section-number">6.4.1</span> Retrieving and Inspecting</h3>
-<div id="9f89bdd8" class="cell" data-execution_count="2">
+<div id="c9ad1199" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
@@ -511,7 +511,7 @@ div.csl-indent {
 <span id="cb2-7"><a href="#cb2-7" aria-label="7"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Before writing parsing code, inspect the page in your browser’s developer tools. Right-click on the table and select “Inspect” to see the HTML structure. You are looking for the <code>&lt;table&gt;</code> tag and, within it, <code>&lt;tr&gt;</code> (table row) and <code>&lt;td&gt;</code> (table data) tags.</p>
-<div id="3fe11602" class="cell" data-execution_count="3">
+<div id="4f8f24d2" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co"># Find all tables on the page</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>tables <span class="op">=</span> soup.find_all(<span class="st">"table"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"Number of tables found: </span><span class="sc">{</span><span class="bu">len</span>(tables)<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -527,7 +527,7 @@ div.csl-indent {
 <section id="extracting-row-data" class="level3" data-number="6.4.2">
 <h3 data-number="6.4.2" class="anchored" data-anchor-id="extracting-row-data"><span class="header-section-number">6.4.2</span> Extracting Row Data</h3>
 <p>Once you have identified the correct table, the next step is to navigate its structure tag by tag. Every <code>&lt;tr&gt;</code> (table row) contains a sequence of <code>&lt;td&gt;</code> (table data) or <code>&lt;th&gt;</code> (table header) cells, and BeautifulSoup lets you walk that hierarchy directly:</p>
-<div id="50439c27" class="cell" data-execution_count="4">
+<div id="8bd4cba3" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Assuming the data table is tables[1] (verify by inspection)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>data_table <span class="op">=</span> tables[<span class="dv">1</span>]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>rows <span class="op">=</span> data_table.find_all(<span class="st">"tr"</span>)</span>
@@ -549,7 +549,7 @@ div.csl-indent {
 </section>
 <section id="building-the-dataframe" class="level3" data-number="6.4.3">
 <h3 data-number="6.4.3" class="anchored" data-anchor-id="building-the-dataframe"><span class="header-section-number">6.4.3</span> Building the DataFrame</h3>
-<div id="dffde87d" class="cell" data-execution_count="5">
+<div id="365b4826" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Loop through the data rows, extracting each cell's text</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>all_rows <span class="op">=</span> []</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="cf">for</span> row <span class="kw">in</span> rows[<span class="dv">1</span>:]:  <span class="co"># Skip the header row</span></span>
@@ -574,7 +574,7 @@ div.csl-indent {
 <section id="strategy-3-the-table-that-needs-cleanup" class="level2" data-number="6.5">
 <h2 data-number="6.5" class="anchored" data-anchor-id="strategy-3-the-table-that-needs-cleanup"><span class="header-section-number">6.5</span> Strategy 3: The Table That Needs Cleanup</h2>
 <p>For well-structured HTML tables, pandas provides a powerful shortcut. The <code>read_html()</code> function finds all tables on a page and converts each one to a DataFrame:</p>
-<div id="30077161" class="cell" data-execution_count="6">
+<div id="2afe754a" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co"># Point read_html directly at a URL — no requests or BeautifulSoup needed</span></span>
@@ -585,7 +585,7 @@ div.csl-indent {
 <span id="cb6-8"><a href="#cb6-8" aria-label="8"></a><span class="co"># Wikipedia pages often have many tables</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>You can specify which row contains the column headers and select the table you want by index:</p>
-<div id="ac6980f7" class="cell" data-execution_count="7">
+<div id="a82062a4" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># The highest-grossing films table is at index 0</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a>films_df <span class="op">=</span> pd.read_html(url, header<span class="op">=</span><span class="dv">0</span>)[<span class="dv">0</span>]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="bu">print</span>(films_df.head())</span>
@@ -596,11 +596,11 @@ div.csl-indent {
 <section id="cleaning-up-read_html-results" class="level3" data-number="6.5.1">
 <h3 data-number="6.5.1" class="anchored" data-anchor-id="cleaning-up-read_html-results"><span class="header-section-number">6.5.1</span> Cleaning Up read_html Results</h3>
 <p>Look at the raw <code>Worldwide gross</code> column before you clean anything, so you know exactly what you are stripping out:</p>
-<div id="bca81498" class="cell" data-execution_count="8">
+<div id="b533684d" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="bu">print</span>(films_df[<span class="st">"Worldwide gross"</span>].unique()[:<span class="dv">10</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Most entries look like <code>$2,923,710,708</code> — a dollar sign, digits, and commas. A handful carry a stray letter glued onto the front, left over from a footnote marker that never got separated from the number when the table was rendered: Titanic’s gross reads <code>T$2,257,906,828</code>, and Ne Zha 2’s reads <code>NZ$2,217,758,382</code>. The <code>Ref</code> column has its own quirk — footnote markers like <code>[# 1][# 2]</code> that <code>read_html</code> leaves as literal bracketed text rather than resolving into anything numeric. Here is a cleanup pass that handles both:</p>
-<div id="6e6884ef" class="cell" data-execution_count="9">
+<div id="afc511c0" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co"># Strip everything except digits -- removes the $ and the stray footnote letters in one pass</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>films_df[<span class="st">"gross"</span>] <span class="op">=</span> pd.to_numeric(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>    films_df[<span class="st">"Worldwide gross"</span>].<span class="bu">str</span>.replace(<span class="vs">r"</span><span class="pp">[^0-9]</span><span class="vs">"</span>, <span class="st">""</span>, regex<span class="op">=</span><span class="va">True</span>),</span>
@@ -618,7 +618,7 @@ div.csl-indent {
 <section id="strategy-4-the-infobox-pattern" class="level2" data-number="6.6">
 <h2 data-number="6.6" class="anchored" data-anchor-id="strategy-4-the-infobox-pattern"><span class="header-section-number">6.6</span> Strategy 4: The Infobox Pattern</h2>
 <p>Not every <code>&lt;table&gt;</code> holds rows of records. Wikipedia’s film infoboxes — the shaded box in the upper right of an article like <a href="https://en.wikipedia.org/wiki/The_Godfather">The Godfather</a> — are a single record laid out as a labeled key/value list: one row per fact, a <code>&lt;th&gt;</code> holding the label and a <code>&lt;td&gt;</code> holding the value. <code>pandas.read_html()</code> will happily parse an infobox into a two-column DataFrame, but that discards the very thing that makes it useful — which label belongs to which value — so this shape calls for BeautifulSoup instead:</p>
-<div id="85dd223d" class="cell" data-execution_count="10">
+<div id="151f9aa5" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a></span>
@@ -643,7 +643,7 @@ div.csl-indent {
 <h2 data-number="6.7" class="anchored" data-anchor-id="strategy-5-porting-the-pattern-to-a-new-site"><span class="header-section-number">6.7</span> Strategy 5: Porting the Pattern to a New Site</h2>
 <p>The loop above is barely ten lines, and the next step reuses it almost verbatim — the site changes, the labels change, but the shape does not. Point it at the French Wikipedia article for the same film and choose your URL carefully: <code>https://fr.wikipedia.org/wiki/Le_Parrain</code> (without <code>(film)</code>) is a disambiguation page, a “page d’homonymie” with no infobox and no tables at all. The article with the infobox lives at <code>https://fr.wikipedia.org/wiki/Le_Parrain_(film)</code>.</p>
 <p>Reach for the same class name you used in Strategy 4 there and it fails you in an unexpected way. The page does carry <code>class="infobox_v3"</code> — inspect it in a live browser and you can see it right there on the infobox — but <code>soup.select("table.infobox_v3")</code> still comes back empty. The class is real; it is just not on the <code>&lt;table&gt;</code>. French Wikipedia’s infobox template wraps the actual <code>&lt;table&gt;</code> in a <code>&lt;div class="infobox_v3 infobox infobox--frwiki ..."&gt;</code>, and the table itself carries no class at all. Selecting by a class you saw in the Inspector only works if you also confirm <em>which element</em> that class sits on — the visual “infobox” you are looking at and the <code>&lt;table&gt;</code> holding its rows are not always the same node. What holds up here is the table’s own <code>&lt;caption&gt;</code>, one level down from the div you might have selected instead, which BeautifulSoup’s CSS-selector support can target directly:</p>
-<div id="ba207120" class="cell" data-execution_count="11">
+<div id="fd02eb9f" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>url <span class="op">=</span> <span class="st">"https://fr.wikipedia.org/wiki/Le_Parrain_(film)"</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
@@ -667,7 +667,7 @@ div.csl-indent {
 <section id="the-oscars-example" class="level3" data-number="6.8.1">
 <h3 data-number="6.8.1" class="anchored" data-anchor-id="the-oscars-example"><span class="header-section-number">6.8.1</span> The Oscars Example</h3>
 <p>The <a href="https://www.oscars.org">Academy Awards</a> website lists nominees and winners organized by category, structured with nested <code>&lt;div&gt;</code> tags rather than <code>&lt;table&gt;</code> elements — a good candidate for this strategy, with one complication before you can even start. As of this writing, oscars.org’s bot protection rejects a plain <code>requests.get()</code> with HTTP 403 — it also rejects a <code>User-Agent</code> spoofed to look like Chrome or Firefox, the same 403 either way. What it does <em>not</em> reject is a <code>User-Agent</code> that identifies you honestly, the way <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> asked you to identify yourself in the first place:</p>
-<div id="7114f1be" class="cell" data-execution_count="12">
+<div id="37aea69b" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a></span>
@@ -683,7 +683,7 @@ div.csl-indent {
 <section id="finding-reliable-anchors" class="level3" data-number="6.8.2">
 <h3 data-number="6.8.2" class="anchored" data-anchor-id="finding-reliable-anchors"><span class="header-section-number">6.8.2</span> Finding Reliable Anchors</h3>
 <p>The key challenge with non-tabular scraping is finding HTML elements that reliably contain your target data. Oscars.org runs on Drupal, a content-management system whose class names describe Drupal’s own data model rather than anything about awards — <code>field--name-field-award-categories</code> names a <em>field</em>, not a category — which is worth knowing before you go hunting the Inspector for something friendlier:</p>
-<div id="153fbc98" class="cell" data-execution_count="13">
+<div id="b34c1d47" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># The outer container that holds every award category on the page</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>area <span class="op">=</span> soup.find(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"field--name-field-award-categories"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a></span>
@@ -696,7 +696,7 @@ div.csl-indent {
 <section id="navigating-the-tree-for-specificity" class="level3" data-number="6.8.3">
 <h3 data-number="6.8.3" class="anchored" data-anchor-id="navigating-the-tree-for-specificity"><span class="header-section-number">6.8.3</span> Navigating the Tree for Specificity</h3>
 <p>Each category nests a further level down: a name, and one “honoree” entry per person or film listed under it. Winners and nominees share the same container structure, distinguished only by a type field inside each honoree:</p>
-<div id="26fec46a" class="cell" data-execution_count="14">
+<div id="1714cb37" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="cf">for</span> cat <span class="kw">in</span> categories[:<span class="dv">1</span>]:</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a>    name <span class="op">=</span> cat.find(class_<span class="op">=</span><span class="st">"field--name-field-award-category-oscars"</span>).get_text(strip<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a>    honorees <span class="op">=</span> cat.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"paragraph--type--award-honoree"</span>)</span>
@@ -707,7 +707,7 @@ div.csl-indent {
 <section id="extracting-category-data" class="level3" data-number="6.8.4">
 <h3 data-number="6.8.4" class="anchored" data-anchor-id="extracting-category-data"><span class="header-section-number">6.8.4</span> Extracting Category Data</h3>
 <p>For each category, extract the award name and every honoree’s type, entity, and — where the category distinguishes one — film:</p>
-<div id="9949cb02" class="cell" data-execution_count="15">
+<div id="9872d2c0" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a>results <span class="op">=</span> []</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="cf">for</span> cat <span class="kw">in</span> categories:</span>
@@ -739,7 +739,7 @@ div.csl-indent {
 <section id="css-selectors-with-select" class="level3" data-number="6.8.5">
 <h3 data-number="6.8.5" class="anchored" data-anchor-id="css-selectors-with-select"><span class="header-section-number">6.8.5</span> CSS Selectors with <code>select()</code></h3>
 <p>So far you have navigated the tree with <code>find()</code> and <code>find_all()</code>. BeautifulSoup offers a second navigation language you already half-know from browsing the web: CSS selectors, via the <code>select()</code> method. If you have ever written a stylesheet — or copied a selector out of your browser’s Inspector — the syntax will feel familiar. A bare name matches a tag, a leading <code>.</code> matches a class, a leading <code>#</code> matches an id, and whitespace between selectors matches descendants:</p>
-<div id="58386d20" class="cell" data-execution_count="16">
+<div id="ae9a17c5" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># A tag name selects all matching elements — like find_all("div")</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>divs <span class="op">=</span> soup.select(<span class="st">"div"</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a></span>
@@ -760,7 +760,7 @@ div.csl-indent {
 <section id="abstracting-into-functions" class="level3" data-number="6.8.6">
 <h3 data-number="6.8.6" class="anchored" data-anchor-id="abstracting-into-functions"><span class="header-section-number">6.8.6</span> Abstracting into Functions</h3>
 <p>Once your parser works for one ceremony, abstract it into a function you can reuse across every year you want. This is exactly the situation <code>responsible_get()</code> from <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> was built for: a named, identified requester, one page at a time, with a pause built in between calls:</p>
-<div id="a5451def" class="cell" data-execution_count="17">
+<div id="7400310e" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="kw">def</span> parse_oscar_ceremony(year):</span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a>    <span class="co">"""Fetch and parse one Oscars ceremony page into one row per honoree.</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a></span>
@@ -810,7 +810,7 @@ div.csl-indent {
 <span id="cb17-47"><a href="#cb17-47" aria-label="47"></a>    <span class="cf">return</span> pd.DataFrame(rows)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Collecting several ceremonies together is an ordinary loop over years, one request per iteration, with <code>responsible_get()</code>’s own <code>delay</code> doing the rate-limiting rather than a manual <code>time.sleep()</code> scattered through the loop:</p>
-<div id="4b41360a" class="cell" data-execution_count="18">
+<div id="b9a22c7a" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a>all_years <span class="op">=</span> [parse_oscar_ceremony(year) <span class="cf">for</span> year <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2024</span>, <span class="dv">2027</span>)]</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a>oscars <span class="op">=</span> pd.concat(all_years, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"Collected </span><span class="sc">{</span><span class="bu">len</span>(oscars)<span class="sc">}</span><span class="ss"> honorees across </span><span class="sc">{</span>oscars[<span class="st">'year'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> ceremonies"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -820,7 +820,7 @@ div.csl-indent {
 <section id="a-second-parser-colorado-legislators" class="level3" data-number="6.8.7">
 <h3 data-number="6.8.7" class="anchored" data-anchor-id="a-second-parser-colorado-legislators"><span class="header-section-number">6.8.7</span> A Second Parser: Colorado Legislators</h3>
 <p>The Oscars example is one instance of this strategy — cards standing in for rows — on one site. Let us apply the same strategy to a very different page, still on a single site, to see how much of it is the pattern and how much was specific to Drupal’s field names. The Colorado General Assembly website at <a href="https://leg.colorado.gov/legislators">leg.colorado.gov/legislators</a> lists all current state legislators with their names, party affiliations, districts, and chambers, and — unlike oscars.org — does not run a WAF that cares who is asking; a bare <code>requests.get()</code> with no headers at all works here just as well as an identified one:</p>
-<div id="5c44849c" class="cell" data-execution_count="19">
+<div id="fb48bfc5" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -836,7 +836,7 @@ div.csl-indent {
 <span id="cb19-13"><a href="#cb19-13" aria-label="13"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(containers)<span class="sc">}</span><span class="ss"> legislator entries"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For each container, extract the relevant fields. The exact tag structure will vary, so the key skill here is using the Inspector to trace from the visible text on the page back to the HTML elements that contain it:</p>
-<div id="8147df6d" class="cell" data-execution_count="20">
+<div id="fa92aaef" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a>records <span class="op">=</span> []</span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="cf">for</span> container <span class="kw">in</span> containers:</span>
 <span id="cb20-3"><a href="#cb20-3" aria-label="3"></a>    name_tag <span class="op">=</span> container.find(<span class="st">"a"</span>)</span>
@@ -861,7 +861,7 @@ div.csl-indent {
 <section id="strategy-7-inconsistent-cards-multiple-sites" class="level2" data-number="6.9">
 <h2 data-number="6.9" class="anchored" data-anchor-id="strategy-7-inconsistent-cards-multiple-sites"><span class="header-section-number">6.9</span> Strategy 7: Inconsistent Cards, Multiple Sites</h2>
 <p>Oscars’ award cards and the Colorado legislators’ cards are both single-site problems: write the parser once, and it covers the whole site. Move to a second site entirely and the same underlying idea — repeating containers standing in for table rows — reappears in a structurally unrelated shape. <a href="https://www.rottentomatoes.com">Rotten Tomatoes</a>’ “Movies in Theaters” grid at <code>https://www.rottentomatoes.com/browse/movies_in_theaters/</code> looks, at a glance, like the same kind of card layout as an Oscars category. It is not built the same way at all: Rotten Tomatoes’ grid uses custom HTML elements — tags the site defines itself, not <code>&lt;div&gt;</code> — so <code>find_all("div", ...)</code> returns nothing useful there:</p>
-<div id="21d14dc1" class="cell" data-execution_count="21">
+<div id="f10cad09" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a>tiles <span class="op">=</span> soup.find_all(<span class="st">"tile-dynamic"</span>, attrs<span class="op">=</span>{<span class="st">"data-qa"</span>: <span class="st">"tile"</span>})</span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a></span>
 <span id="cb21-3"><a href="#cb21-3" aria-label="3"></a><span class="cf">for</span> tile <span class="kw">in</span> tiles:</span>
@@ -876,7 +876,7 @@ div.csl-indent {
 <section id="strategy-8-when-static-isnt" class="level2" data-number="6.10">
 <h2 data-number="6.10" class="anchored" data-anchor-id="strategy-8-when-static-isnt"><span class="header-section-number">6.10</span> Strategy 8: When “Static” Isn’t</h2>
 <p>Every strategy so far assumes the HTML your code receives is the HTML a human sees — that the page is <em>static</em> in the sense this chapter needs, meaning fully formed before your request finishes. That assumption fails, and it fails without raising any error at all:</p>
-<div id="38620d6d" class="cell" data-execution_count="22">
+<div id="0bb380ec" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://www.imdb.com/title/tt0068646/"</span>  <span class="co"># The Godfather</span></span>
@@ -892,7 +892,7 @@ div.csl-indent {
 <section id="error-handling-patterns" class="level2" data-number="6.11">
 <h2 data-number="6.11" class="anchored" data-anchor-id="error-handling-patterns"><span class="header-section-number">6.11</span> Error Handling Patterns</h2>
 <p>As you scrape more pages, you will encounter failures: pages that do not load, elements that are missing, or structures that do not match your expectations. A robust scraper handles these gracefully:</p>
-<div id="3c1ce7b0" class="cell" data-execution_count="23">
+<div id="2cb309b3" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="kw">def</span> safe_scrape(url, headers, parse_func):</span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a>    <span class="co">"""Scrape a URL with comprehensive error handling.</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-label="3"></a></span>
@@ -950,38 +950,38 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset, then look under the hood at the same page with BeautifulSoup.</p>
 <p><strong>Step 1 — Choose and check.</strong> Pick a Wikipedia article containing a data table you find interesting — countries by population, U.S. states by area, highest-grossing films. Confirm the article path is allowed by Wikipedia’s <code>robots.txt</code> (you parsed it in <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), and fetch the page with your named <code>HEADERS</code>.</p>
-<div id="c6b0d2e4" class="cell" data-execution_count="24">
+<div id="e60c263d" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="co"># Step 1: Choose a Wikipedia article with a table, confirm robots.txt allows it, and fetch the page with your HEADERS.</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Cache the raw HTML.</strong> Save <code>response.text</code> to a local file before parsing anything, and re-read it from disk. Every later step should parse the cached file, not re-request the page — while you debug, Wikipedia’s servers should be hit exactly once.</p>
-<div id="92db363f" class="cell" data-execution_count="25">
+<div id="cb3db719" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a><span class="co"># Step 2: Save response.text to a local file, then read it back from disk.</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Extract with <code>read_html()</code>.</strong> Run <code>pd.read_html()</code> on the cached HTML. Print how many tables it found, look at the <code>head()</code> of a few, and identify the index of the table you want.</p>
-<div id="145d839a" class="cell" data-execution_count="26">
+<div id="eab33cc5" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a><span class="co"># Step 3: Run pd.read_html on the cached HTML, count the tables, and pick out yours.</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Clean it.</strong> Apply the chapter’s cleanup patterns as needed: select and rename columns, strip footnote markers from values, and convert numeric columns with <code>pd.to_numeric()</code> after removing commas. Show <code>dtypes</code> before and after to prove the conversion happened.</p>
-<div id="fdf5f46f" class="cell" data-execution_count="27">
+<div id="058c178e" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-label="1"></a><span class="co"># Step 4: Clean the DataFrame -- columns, footnote markers, numeric types.</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-label="2"></a><span class="co"># Show dtypes before and after.</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-label="3"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Visualize.</strong> Plot a horizontal bar chart of the top ten rows by your main numeric column, with labeled axes and a title saying what the data is and where it came from.</p>
-<div id="1815546b" class="cell" data-execution_count="28">
+<div id="fdb22454" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-label="1"></a><span class="co"># Step 5: Bar chart of the top ten rows, labeled and titled.</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Look under the hood.</strong> Parse the same cached HTML with BeautifulSoup and find your table by its class (Wikipedia data tables usually carry <code>class="wikitable"</code>). Extract the header row’s text yourself with <code>find_all()</code>. Compare what you got to <code>read_html()</code>’s column names.</p>
-<div id="dfd14fb2" class="cell" data-execution_count="29">
+<div id="d677b438" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-label="1"></a><span class="co"># Step 6: Parse the cached HTML with BeautifulSoup, find your table by class, and extract the header row by hand.</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In four to six sentences: What did <code>read_html()</code> do for you that the manual approach made visible? What cleanup did the table need and why (footnotes, merged headers, number formatting)? If Wikipedia renamed the table’s CSS class tomorrow, which of your two extraction paths would break?</p>
-<div id="cf63f68a" class="cell" data-execution_count="30">
+<div id="a380e637" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
