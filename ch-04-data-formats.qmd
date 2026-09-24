@@ -139,7 +139,11 @@ print(first_member.contents)
 
 ### Working with Real XML
 
-Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at [clerk.house.gov](https://clerk.house.gov) in XML format. Its structure is exactly what the synthetic example prepared you for: a root `<MemberData>` tag with a `publish-date` attribute, containing a `<members>` tag, containing one `<member>` per representative, each with the biographical details nested inside `<member-info>` (plus a `<committee-assignments>` block we will ignore here):
+Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at [clerk.house.gov](https://clerk.house.gov) in XML format. Its structure is what the synthetic example prepared you for: a root `<MemberData>` tag with a `publish-date` attribute, containing a `<members>` tag, containing one `<member>` per representative, each with the biographical details nested inside `<member-info>`. The real file adds two blocks we will ignore here: a `<title-info>` header before `<members>`, and a `<committee-assignments>` block in each `<member>`. You can check that shape before writing any code by opening the file's address in Chrome, which draws an XML file that has no stylesheet as a tree you can fold (@fig-house-xml-tree).
+
+![The House roster in Chrome, September 2026: the root `<MemberData>` ① with its `publish-date`, `<members>` ②, and one `<member>` ③ per seat, whose biographical details sit in `<member-info>` ④. The second `<member>` ③ begins at the bottom. Chrome's triangles fold `<title-info>` and the first member's `<committee-assignments>`. Chrome's note above the tree, that the file has no style information, is cropped out.](images/ch-04/house-xml-tree_annotated.png){#fig-house-xml-tree .lightbox fig-alt="Screenshot of Chrome's tree view of MemberData.xml. Marker 1: the root tag, MemberData, publish-date September 2, 2026. Under a folded title-info, marker 2: members, and marker 3: the first member, statedistrict AK00. Marker 4: member-info, listing Nicholas Begich's names, bioguideID, party R, caucus R, state Alaska, district At Large, office, phone, and election and swearing-in dates. Marker 3 again: the second member."}
+
+In Python, fetch the file with `requests` and parse it with BeautifulSoup's `"xml"` parser:
 
 ```{python}
 import requests
@@ -147,7 +151,8 @@ from bs4 import BeautifulSoup
 
 url = "https://clerk.house.gov/xml/lists/MemberData.xml"
 response = requests.get(url)
-soup = BeautifulSoup(response.text, "xml")
+# Pass the bytes, not response.text: the server names no character set, so .text would guess wrong
+soup = BeautifulSoup(response.content, "xml")
 
 # When was this snapshot published?
 print(soup.find("MemberData")["publish-date"])
@@ -169,6 +174,8 @@ from collections import Counter
 print(Counter(parties))
 # Counter({'R': 221, 'D': 217, '': 2, 'I': 1})
 ```
+
+Notice `response.content` rather than `response.text`. The Clerk's server labels the file `text/xml` without naming a character set, so `requests` falls back to ISO-8859-1, and `.text` would turn Linda T. Sánchez into "Linda T. SÃ¡nchez". Given the raw bytes, BeautifulSoup reads the encoding the file declares in its first line, UTF-8, and every name comes out right.
 
 Why 441 rather than 435? The file includes the six non-voting delegates and resident commissioner alongside the 435 voting representatives. Your exact counts will also drift as members resign and seats are filled — which is why the `publish-date` attribute matters. Record it alongside your data so your analysis documents exactly which snapshot of Congress it describes.
 
@@ -320,7 +327,7 @@ This list-of-dictionaries-to-DataFrame pipeline is the standard way to convert A
 
 ### Parsing JSON Strings
 
-When you receive JSON data from the web (as a string), you need to parse it into Python objects:
+When you receive JSON data from the web (as a string), you need to parse it into Python objects. Python's built-in [`json` module](https://docs.python.org/3/library/json.html) does the work; its documentation lists every option these functions take:
 
 ```{python}
 import json
@@ -417,6 +424,8 @@ elevation = data.get("elevation", "unknown")
 print(f"Elevation: {elevation} meters")
 # Elevation: 1635.0 meters
 ```
+
+The address in `url` is only half of the request. Opened on its own in a browser, `https://api.open-meteo.com/v1/forecast` returns an empty page, because the parameters are what ask for a forecast. `requests` adds them to the address for you, and `print(response.url)` shows the full URL it sent, which you can paste into a browser to see the same JSON.
 
 The strategy is always the same: start with `type()` and `.keys()` at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:
 
@@ -516,9 +525,11 @@ AP and Reuters are conspicuously absent: both discontinued their public RSS feed
 **Finding a feed this list doesn't cover.** Most sites don't advertise their feed on the homepage:
 
 - Try appending `/rss`, `/feed`, or `/rss.xml` to the site's root URL — the most common convention.
-- View the page source (not the rendered page) and search for `type="application/rss+xml"` — it names the feed URL directly in a `<link>` tag, even when nothing is visible on the page itself.
+- View the page source, not the rendered page (right-click the page and choose **View Page Source**, or press Ctrl + U; ⌘ + ⌥ + U on a Mac), and search it for `application/rss+xml`. The `<link>` tag with that `type` names the feed's address in its `href`, even when nothing on the page itself links to the feed (@fig-view-source-rss-link).
 - For a podcast specifically, check its listing on a podcast directory (Apple Podcasts, Podchaser, Listen Notes) — most display or link to the canonical feed even when the show's own site doesn't.
 - Look for a small RSS icon or a "Subscribe" link, often in a page footer or sidebar.
+
+![PBS NewsHour's home page in View Source, searched with Chrome's find bar (Ctrl + F, or ⌘ + F on a Mac) for `application/rss+xml`, September 2026. The one match is on line 33, in a `<link rel="alternate">` whose `href` ① is the feed's address. The address bar shows the `view-source:` prefix; typed before any address, it opens that page's source.](images/ch-04/view-source-rss-link_annotated.png){#fig-view-source-rss-link .lightbox fig-alt="Screenshot of Chrome's toolbar over a View Source page. The address bar reads view-source:https://www.pbs.org/newshour/, and the find bar holds application/rss+xml, match 1 of 1. Under the end of a script, line 32 is a canonical link, and line 33 is a link with rel alternate, href https://www.pbs.org/newshour/feeds/rss/headlines, and type application/rss+xml, highlighted. Marker 1 is beside the href."}
 :::
 
 ```{python}
@@ -526,7 +537,9 @@ AP and Reuters are conspicuously absent: both discontinued their public RSS feed
 # Your code here
 ```
 
-**Step 2 — Fetch and inspect the XML.** Retrieve the feed with `requests`. Print the status code and the first 500 characters. Identify the repeating element by eye — for RSS it is `<item>`.
+**Step 2 — Fetch and inspect the XML.** Retrieve the feed with `requests`. Print the status code and the first 500 characters. Identify the repeating element by eye — for RSS it is `<item>`. Chrome draws a feed served as XML as a tree you can fold (@fig-rss-feed-xml), and a feed served as `application/rss+xml`, such as PBS NewsHour's, as plain text.
+
+![BBC News's science and environment feed in Chrome, September 2026. `<rss>` ① holds one `<channel>` ②: the feed's title, description, and link, then one `<item>` ③ per story, each with a title, description, link, `guid`, date, and thumbnail; the second `<item>` ③ begins at the bottom. Each `CDATA` wrapper marks text the parser takes as it is, and BeautifulSoup's `.text` returns what is inside. The channel's `<image>` and `<copyright>` are folded, and Chrome doesn't wrap CDATA, so the first description runs past the edge.](images/ch-04/rss-feed-xml_annotated.png){#fig-rss-feed-xml .lightbox fig-alt="Screenshot of Chrome's tree view of the feed. Marker 1: the rss root tag and its namespaces. Marker 2: channel, with title BBC News, description BBC News - Science & Environment, a link, and folded image and copyright. Marker 3: the first item, titled Elephants use medicinal plants to treat themselves, researchers find, with description, link, guid, pubDate of 24 September 2026, and thumbnail. Marker 3 again: the second item."}
 
 ```{python}
 # Step 2: Fetch the feed and inspect the first 500 characters of raw XML.
@@ -592,6 +605,7 @@ RSS (Really Simple Syndication) deserves special mention as an early experiment 
 - **Parser selection**: Use `"xml"` for XML documents and `"html.parser"` or `"lxml"` for HTML. Using the wrong parser produces unexpected results.
 - **`json.JSONDecodeError`**: The string is not valid JSON. Common causes include trailing commas, single quotes (JSON requires double quotes), or the response containing HTML error pages instead of JSON.
 - **`KeyError` in dictionaries**: The key does not exist. Use `.get("key", default_value)` for safe access.
+- **Garbled accented letters, such as `SÃ¡nchez` for `Sánchez`**: `requests` decoded the body with the wrong character set, usually because the server's `Content-Type` header names none; `requests` then falls back to ISO-8859-1. Pass `response.content` to BeautifulSoup so the parser reads the encoding the document declares, or set `response.encoding = "utf-8"` before reading `response.text`.
 - **Confusion between `json.loads()` and `json.load()`**: `loads` parses a **s**tring; `load` parses a **f**ile object.
 
 ## Key Takeaways
