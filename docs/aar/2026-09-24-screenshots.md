@@ -274,13 +274,13 @@ All of these live in the transcript, so the next session would have to find them
 | ID | Priority | Target | Change | Owner | Status |
 |----|----------|--------|--------|-------|--------|
 | P0-1 | P0 | `slides/common/make_stubs.py`, `AUTHORING.md` | Generated table between markers; never overwrite notes; stop hiding the output | auto-applyable | **Applied** (2026-09-24) — see §9 |
-| P0-2 | P0 | textbook `tools/shots/` | Build the screenshot toolkit per the plan | maintainer review | Plan approved (merged, #48); M1 **merged** (textbook #135); M2 (#136) and M3 (#137) in review |
+| P0-2 | P0 | textbook `tools/shots/` | Build the screenshot toolkit per the plan | maintainer review | Plan approved (merged, #48); M1–M3 **merged** (textbook #135–#137) |
 | P0-3 | P0 | `AUTHORING.md`, week-01 images | Decide what counts as a screenshot; label every image's kind | maintainer decision | **Resolved: option (a)**, real or labeled — rule in `AUTHORING.md`; week-01's look-alikes replaced in the ch-01 back-fill |
 | P1-1 | P1 | textbook `images/ch-07`, `images/ch-08` | Provenance notes for the 11 existing figures | auto-applyable | **Applied** (merged with M1, textbook #135): `provenance.json` and `IMAGES.md` for all 11 |
 | P1-2 | P1 | `AUTHORING.md`, textbook `claude.md`, toolkit | Numbers in captions need a complete, recorded query | auto-applyable + P0-2 | Rules **applied** in `AUTHORING.md` and the textbook's `claude.md` (#135); the toolkit's query check is M4 |
 | P1-3 | P1 | textbook `claude.md`, toolkit | Alt-text and as-of rules | auto-applyable | **Applied** (#135): the `claude.md` rule and `check`, which flags 3 ch-07/08 captions that don't say when they were captured |
-| P1-4 | P1 | ch-01–05, weeks 01–05, handouts | Back-fill per the plan, pilot first | maintainer review | Plan approved (merged, #48) |
-| P1-5 | P1 | toolkit, `AUTHORING.md`, textbook `claude.md`, plans | A screenshot shows at most 800×600 CSS pixels (a soft limit) | maintainer decision | Rule **applied** in `AUTHORING.md`; toolkit warning in review (textbook #137); retakes listed in §9 |
+| P1-4 | P1 | ch-01–05, weeks 01–05, handouts | Back-fill per the plan, pilot first | maintainer review | Plan approved (#48); pilot **done** (textbook #138, course #51); gate closed 2026-09-24 (§9); chapters 1–4 next |
+| P1-5 | P1 | toolkit, `AUTHORING.md`, textbook `claude.md`, plans | A screenshot shows at most 800×600 CSS pixels (a soft limit) | maintainer decision | Rule **applied** in `AUTHORING.md`; toolkit warning **merged** (textbook #137); restated as the two-sided rule (P0-1 of [the toolkit-sprint AAR](AAR_Web-Data-Science-Book_2026-09-24.md)); retakes listed in §9 |
 | P2-1 | P2 | week-01 and week-05 `IMAGES.md` | Fix stale notes | auto-applyable, after P0-1 | **Applied** (2026-09-24) |
 
 ## 9. Resolution (2026-09-24)
@@ -352,3 +352,55 @@ book's column. The same figure today is at 5.1.
 
 The retakes follow the back-fill's order, with ch-07 and ch-08 (and weeks 07
 and 08) after the chapter-5 pilot. Week 06 stays untouched this week.
+
+### Later the same day: the chapter 5 pilot, and its gate (P1-4)
+
+The pilot merged as textbook #138 and course #51. The back-fill plan asks for
+a note on what review changed, in four parts, before chapter 4 starts.
+
+- **Figures.** Four of the eight candidates were made:
+  - 5-1 `inspector-heading`;
+  - 5-2 `element-picker`;
+  - 5-4 `network-requests`;
+  - 5-5 `network-headers`.
+
+  5-3 and 5-6 show native context menus (Copy selector or XPath, and Copy as
+  cURL). Chrome draws those outside the page and DevTools, where the
+  toolkit's steps and anchors can't reach, so they were not attempted. The
+  optional 5-7 and 5-8 were left out. On the week-05 deck, 5-1 fills the
+  Inspector frame. `pr_review.png` stays a placeholder, because every
+  chapter 5 pull request with a review comment is a student's.
+- **Legibility.** The thresholds held: the four figures measure 12.8–14.6
+  pixels in the book, against a floor of 11.
+
+  The pilot found a failure at the other end. Squeezed under the 800×600
+  cap, the first takes were crammed: the Styles pane took 40% of the width,
+  rows wrapped, and names were cut to "…". Three of the four were retaken
+  with a narrower scope:
+  - a stacked Styles pane at its smallest;
+  - hidden columns and timeline;
+  - a taller window cropped to DevTools.
+
+  On slides, DevTools text needs 0.56–0.58 of the text width, more than the
+  0.48 that W/1680 gives. Both findings are now rules in the textbook's
+  `AGENTS.md` and the course's `AUTHORING.md` (P0-1 of
+  [the toolkit-sprint AAR](AAR_Web-Data-Science-Book_2026-09-24.md)).
+- **Markers.** Markers are numbered and placed on measured anchors:
+  - a brace marks a block of rows (the Client Hints);
+  - a box marks a control (the picker button).
+
+  An overlay that Chrome draws itself, such as the picker's size label, takes
+  no marker; the caption names it. Markers are drawn once, at the book's
+  scale, so on a slide at 0.75 of the text width they come out about half
+  size. That needs fixing before slide copies need markers.
+- **Captions.** Captions are dated ("September 2026"). They say what the
+  capture setup changes that a reader would see: a first visit with nothing
+  cached, and HTTP/1.1 through the proxy. They never claim a route the
+  capture didn't take. The alt text runs 400–433 characters. The capture's
+  own traces stay out of frame: the proxy's address, the egress IP, and a
+  GeoIP cookie.
+
+The pilot also found five toolkit bugs that the selftest missed (§5.2 of
+[the toolkit-sprint AAR](AAR_Web-Data-Science-Book_2026-09-24.md)), all
+handled in #138. The last gate before chapter 4 is an effect test for each
+DevTools preference the toolkit writes (that AAR's P0-3).

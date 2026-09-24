@@ -2,6 +2,18 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-09-24 · Chapter work resumes
+
+**Decision.** The maintainer lifted the pause set after the chapter 5 pilot. The order of work:
+- The screenshot back-fill of chapters 1–4 comes first, in the plan's order: ch-04, ch-01, ch-02, ch-03. Each chapter gets one textbook PR and one course PR.
+- Two gates come before it: the pilot's resolution note, and effect tests for the DevTools preferences (AAR P0-3).
+- The chapter 7–8 and slide retakes (AAR P2-1) follow the back-fill.
+- Computed outputs wait on their plan's §9 decisions, not on the pause.
+
+**Why.** The pause existed to review the toolkit and the process before scaling them. That review is done: the AAR, its P0 text (#140, course #53), and the pilot gate, closed on 2026-09-24.
+
+**Where.** [`handoff.md`](handoff.md), and [`plans/2026-09-24-screenshot-backfill-ch01-05.md`](plans/2026-09-24-screenshot-backfill-ch01-05.md). *Supersedes* "Pause chapter work after the chapter 5 pilot", below.
+
 ## 2026-09-24 · Figures are readable at both ends
 
 **Decision.**
@@ -29,6 +41,8 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 **Where.** This log, and `AGENTS.md` ("Git and Pull Requests"). A permission rule that denies force-pushes is proposed and untested (P0-2). *Supersedes* the squash merges used up to #138.
 
 ## 2026-09-24 · Pause chapter work after the chapter 5 pilot
+
+*Superseded the same day by "Chapter work resumes", above.*
 
 **Decision.** After the chapter 5 screenshot pilot merged (#138 here, #51 in the course repo), stop implementation on other chapters until the maintainer resumes it. That covers the back-fill of chapters 1–4, the retakes for chapters 7–8 and the slides, and computed outputs.
 
