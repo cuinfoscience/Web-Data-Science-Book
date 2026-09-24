@@ -1,0 +1,78 @@
+# Recipes for Chapter 8's figures (ch-08-dynamic-pages.qmd). See tools/shots/README.md.
+#
+# Every figure here shows browser UI (View Source, DevTools, the Chrome for
+# Testing window, the Playwright Inspector) or joins two captures, so none can
+# be re-captured headless: they wait for milestones M2 (headed) and M3
+# (composites). Until then their `legacy:` blocks record how they were made.
+# quotes.toscrape.com is a sandbox built for scraping practice and has no
+# robots.txt.
+chapter: ch-08
+qmd: ch-08-dynamic-pages.qmd
+defaults:
+  window: [1280, 800]
+  scale: 2
+
+figures:
+  - id: view-source-js
+    kind: capture
+    section: "Check 1: View Source"
+    url: view-source:https://quotes.toscrape.com/js/
+    mode: headed
+    legacy:
+      captured: 2026-09-22
+      method: Chrome for Testing 154 driven by Selenium 4.49, headed on a virtual display (Xvfb), View Source grabbed with ImageMagick import; lines 27–43
+      note: The quotes sit in a script element as `var data = [...]`.
+
+  - id: javascript-off-on
+    kind: capture
+    section: "Check 2: Turn JavaScript Off"
+    url: https://quotes.toscrape.com/js/
+    mode: composite     # the page with JavaScript off, then on, side by side, labeled
+    legacy:
+      captured: 2026-09-22
+      method: two captures of the same page, JavaScript disabled and enabled, joined side by side and labeled
+
+  - id: network-tab-json
+    kind: capture
+    section: "Check 3: Watch the Network Tab"
+    url: https://quotes.toscrape.com/scroll
+    mode: headed
+    devtools: {panel: network, dock: right, filter: Fetch/XHR}
+    drifts: false
+    legacy:
+      captured: 2026-09-22
+      method: Chrome for Testing 154 driven by Selenium 4.49, headed on Xvfb, DevTools docked right and operated with real clicks (xdotool), grabbed with ImageMagick import
+      note: After scrolling, the Fetch/XHR filter lists quotes?page=1 to page=4; Preview shows page 2's JSON.
+
+  - id: selenium-chrome-for-testing
+    kind: capture
+    section: "Setting Up Selenium"
+    url: https://xkcd.com/
+    mode: headed        # the subject is the window Selenium opens, including its automation bar
+    drifts: true        # xkcd's current comic and the browser version
+    legacy:
+      captured: 2026-09-22
+      method: webdriver.Chrome() with Selenium 4.49 on a machine with no Chrome; Selenium Manager downloaded Chrome for Testing 154; headed on Xvfb, grabbed with ImageMagick import
+      note: The comic was Stargazing 5; its hover text shows because the pointer rested on it.
+
+  - id: xkcd-inspect
+    kind: capture
+    section: "Extracting Data"
+    url: https://xkcd.com/
+    mode: headed
+    devtools: {panel: elements, dock: right}
+    drifts: true
+    legacy:
+      captured: 2026-09-22
+      method: Chrome for Testing 154, headed on Xvfb, right-click > Inspect on the comic with real clicks (xdotool), DevTools docked right, grabbed with ImageMagick import
+      note: The selected img has the hover joke in its title attribute and the comic's name in alt.
+
+  - id: playwright-codegen
+    kind: capture
+    section: "Recording a Script with Codegen"
+    url: https://quotes.toscrape.com/
+    mode: headed        # two windows: the browser and the Playwright Inspector
+    legacy:
+      captured: 2026-09-22
+      method: playwright codegen --target python (Playwright 1.63, its bundled Chrome for Testing 153), headed on Xvfb, grabbed with ImageMagick import
+      note: After two recorded clicks (the tag "change", then an "(about)" link), hovering the author's name shows the locator codegen would use.

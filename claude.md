@@ -53,6 +53,11 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
 - **Exercises**: two sections per chapter. **Recommended Exercises** is the take-home assignment: one guided build of 5–7 numbered steps (`**Step N — Title.**` prose followed by a ```{python} block containing only comment prompts like `# Your code here` — never solution code), ending with an interpretation step answered in comments or Markdown. Steps may use only concepts from that chapter or earlier ones, never later chapters, and should cite earlier chapters with `@sec-` references. The empty cells flow into the companion notebook, which students complete and submit. **Additional Exercises** are open-ended items, no scaffold, with one **Graduate extension (INFO 5617)** exercise as the final numbered item — a scholarly reading paired with an open-ended, rigorous task for the 5000-level section. At least one exercise per chapter should involve a data source not used in the tutorial.
 - **Companion notebooks**: every chapter has a generated Jupyter notebook in `notebooks/` (regenerate with `python tools/make_notebooks.py` after editing chapter code; see the Companion Notebooks appendix).
 - **Word count target**: ~3,000 words per chapter (soft target; tutorial-heavy chapters may run to 4,000–5,000 including code blocks).
+- **Figures and screenshots**: images live in `images/ch-NN/`, each made from a recipe in `tools/shots/recipes/ch-NN.yml` and recorded in that folder's `provenance.json` (see `tools/shots/README.md`; run `tools/shots/run check` before a PR).
+  - A screenshot is a real capture of a real page. Diagrams and renders are welcome, but never rebuild a real site's interface with invented content.
+  - Every figure has `fig-alt` that transcribes the text and numbers a reader needs from it. The ch-07 and ch-08 figures, at 280–440 characters, set the bar.
+  - A figure showing anything that changes (counts, versions, a live page) says in its caption when it was captured, as in "in September 2026."
+  - A count, date, or total printed in a caption comes from a query whose limit and paging are recorded with the figure. If the query hit its limit, page until it doesn't, or don't print the number.
 
 ## File Structure
 
@@ -64,6 +69,8 @@ web-data-science/
 ├── ch-01-introduction.qmd through ch-15-research-design.qmd
 ├── appendix-ai-disclosure.qmd
 ├── appendix-further.qmd
+├── images/ch-NN/        # Figures, with provenance.json and IMAGES.md
+├── tools/shots/         # Screenshot recipes and the capture toolkit
 └── references.bib       # BibTeX references
 ```
 
