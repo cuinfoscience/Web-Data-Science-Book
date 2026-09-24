@@ -1,0 +1,92 @@
+# Recipes for Chapter 7's figures (ch-07-archives.qmd). See tools/shots/README.md.
+#
+# The Wayback Machine answers 502 or drops the connection on many first
+# attempts; the toolkit retries politely (30, 60, then 120 seconds apart) and
+# fails a take whose page says "Fail with status" or "upstream request failed".
+# Its toolbar and calendar live in shadow DOM, which the text and CSS
+# locators below reach into.
+chapter: ch-07
+qmd: ch-07-archives.qmd
+defaults:
+  window: [1280, 800]
+  scale: 2
+
+figures:
+  - id: wayback-calendar
+    kind: capture
+    section: "Finding a Capture"
+    url: https://web.archive.org/web/2005*/facebook.com
+    steps:
+      - wait: {text: 'Saved [0-9,]+ times'}
+      - wait: {network_idle: true}
+    expect:
+      text: ['Saved [0-9,]+ times']
+    crop: {window: true}
+    drifts: true        # "Saved N times" and the capture circles change every day
+    legacy:
+      captured: 2026-09-22
+      method: headless Playwright (Node), 1280×800 window at 1×, the whole window
+      note: Shows "Saved 8,461,424 times between December 12, 1998 and September 22, 2026."
+
+  - id: facebook-2004
+    kind: capture
+    section: "Finding a Capture"
+    url: https://web.archive.org/web/20040121224607/http://facebook.com/
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'AboutFace'}
+    expect:
+      text: ['AboutFace']
+    crop: {window: true}
+    legacy:
+      captured: 2026-09-22
+      method: headless Playwright (Node), 1280×800 window at 1×, the whole window
+
+  - id: about-this-capture
+    kind: capture
+    section: "About This Capture"
+    url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      # The panel's "Collected by" section loads on hover (from /__wb/provenance),
+      # so hover the control first, then open it and wait for that section.
+      - hover: {text: '(?i)about this capture'}
+      - click: {text: '(?i)about this capture'}
+      - wait: {text: '(?i)collected by'}
+    expect:
+      text: ['(?i)collected by', '(?i)timestamps']
+    crop: {top: 0, height: 240}
+    legacy:
+      captured: 2026-09-22
+      method: headless Playwright (Node), 1280×800 window at 1×, top 240 pixels, after hovering and clicking About this capture by position
+      note: 'Retaken 2026-09-22 (course PR #44) because the first take missed "Collected by".'
+
+  - id: x-com-1999
+    kind: capture
+    section: "Broken and Missing Captures"
+    url: https://web.archive.org/web/19991114081850/http://x.com/
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'X\.com Corporation'}
+    expect:
+      text: ['X\.com Corporation']
+    crop: {top: 0, height: 610}
+    drifts: true        # the toolbar's capture count
+    legacy:
+      captured: 2026-09-22
+      method: headless Playwright (Node), 1280×800 window at 1×, top 610 pixels
+      note: >-
+        The toolbar showed 83,190 captures. Why the images are broken: of the seven
+        images the page references, six were only ever captured as 404s (CDX API,
+        full query, not the first 25 rows; see course PR #44).
+
+  - id: devtools-archived-page
+    kind: capture
+    section: "Inspecting Archived Pages"
+    url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
+    mode: headed        # DevTools is browser UI: headed capture arrives in M2
+    devtools: {panel: elements, dock: right}
+    legacy:
+      captured: 2026-09-22
+      method: Chrome on a virtual display (Xvfb) with DevTools docked right, grabbed with ImageMagick import
+      note: The Elements panel shows div#wm-ipp-base, the END WAYBACK TOOLBAR INSERT comment, then the page's own center element.

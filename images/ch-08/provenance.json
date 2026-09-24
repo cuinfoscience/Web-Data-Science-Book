@@ -1,0 +1,88 @@
+{
+  "chapter": "ch-08",
+  "figures": {
+    "javascript-off-on": {
+      "by": "hand-run script, before tools/shots",
+      "captured": "2026-09-22",
+      "file": "javascript-off-on.png",
+      "image_sha256": "ee3513122ff5cc9e96b26cfbd23acaf36cd013ff48565732346c27221e00930b",
+      "kind": "capture",
+      "method": "two captures of the same page, JavaScript disabled and enabled, joined side by side and labeled",
+      "size": [
+        1858,
+        758
+      ],
+      "url": "https://quotes.toscrape.com/js/"
+    },
+    "network-tab-json": {
+      "by": "hand-run script, before tools/shots",
+      "captured": "2026-09-22",
+      "file": "network-tab-json.png",
+      "image_sha256": "26a0c35e62eb927b05ab499c260fbe11aedb0a828708ebf47abba173dbccd640",
+      "kind": "capture",
+      "method": "Chrome for Testing 154 driven by Selenium 4.49, headed on Xvfb, DevTools docked right and operated with real clicks (xdotool), grabbed with ImageMagick import",
+      "note": "After scrolling, the Fetch/XHR filter lists quotes?page=1 to page=4; Preview shows page 2's JSON.",
+      "size": [
+        1680,
+        680
+      ],
+      "url": "https://quotes.toscrape.com/scroll"
+    },
+    "playwright-codegen": {
+      "by": "hand-run script, before tools/shots",
+      "captured": "2026-09-22",
+      "file": "playwright-codegen.png",
+      "image_sha256": "43f07aa404f86fe6ee8391f3e02974b8acf919f9cbbaed5e187f02aaa9d43431",
+      "kind": "capture",
+      "method": "playwright codegen --target python (Playwright 1.63, its bundled Chrome for Testing 153), headed on Xvfb, grabbed with ImageMagick import",
+      "note": "After two recorded clicks (the tag \"change\", then an \"(about)\" link), hovering the author's name shows the locator codegen would use.",
+      "size": [
+        1630,
+        860
+      ],
+      "url": "https://quotes.toscrape.com/"
+    },
+    "selenium-chrome-for-testing": {
+      "by": "hand-run script, before tools/shots",
+      "captured": "2026-09-22",
+      "file": "selenium-chrome-for-testing.png",
+      "image_sha256": "7e8cdc35d07ef8c1c0cd6b42b276bce8ec5df0c6fdfc383d831c5014a92409cd",
+      "kind": "capture",
+      "method": "webdriver.Chrome() with Selenium 4.49 on a machine with no Chrome; Selenium Manager downloaded Chrome for Testing 154; headed on Xvfb, grabbed with ImageMagick import",
+      "note": "The comic was Stargazing 5; its hover text shows because the pointer rested on it.",
+      "size": [
+        1280,
+        860
+      ],
+      "url": "https://xkcd.com/"
+    },
+    "view-source-js": {
+      "by": "hand-run script, before tools/shots",
+      "captured": "2026-09-22",
+      "file": "view-source-js.png",
+      "image_sha256": "00d1ffd8a9c7dc2f2db798f375c36b0afedc40a022f0ca20dd5d035ce6f3cb3b",
+      "kind": "capture",
+      "method": "Chrome for Testing 154 driven by Selenium 4.49, headed on a virtual display (Xvfb), View Source grabbed with ImageMagick import; lines 27–43",
+      "note": "The quotes sit in a script element as `var data = [...]`.",
+      "size": [
+        1100,
+        760
+      ],
+      "url": "view-source:https://quotes.toscrape.com/js/"
+    },
+    "xkcd-inspect": {
+      "by": "hand-run script, before tools/shots",
+      "captured": "2026-09-22",
+      "file": "xkcd-inspect.png",
+      "image_sha256": "25f54211bea618bba74368aa13196120d165959267d3b5106d95194326eeb044",
+      "kind": "capture",
+      "method": "Chrome for Testing 154, headed on Xvfb, right-click > Inspect on the comic with real clicks (xdotool), DevTools docked right, grabbed with ImageMagick import",
+      "note": "The selected img has the hover joke in its title attribute and the comic's name in alt.",
+      "size": [
+        1680,
+        1000
+      ],
+      "url": "https://xkcd.com/"
+    }
+  }
+}
