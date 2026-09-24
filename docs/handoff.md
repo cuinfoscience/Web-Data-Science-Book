@@ -12,7 +12,7 @@
 
   The selftest passes 71 of 71. `check` reports 0 errors and 11 warnings: 9 chapter 7–8 figures over the size limit, and 2 captions without a capture date.
 - **Chapters.**
-  - ch-04 has three figures from the back-fill: the House roster and a BBC feed in Chrome's XML tree, and View Source searched for a feed's address. Figure 4-2 (Open-Meteo's JSON) is dropped: api.open-meteo.com's robots.txt disallows every path.
+  - ch-04 has three figures from the back-fill: the House roster and a BBC feed in Chrome's XML tree, and View Source searched for a feed's address. Figure 4-2 (Open-Meteo's JSON) is left out until the maintainer decides (see the table below).
   - ch-05 has four DevTools figures from the pilot (#138).
   - ch-08: two DevTools figures were retaken within 800×600 (#142). §8.3 now checks Selenium Manager before the first browser, and covers Firefox, Edge, and Safari (#143).
 - **Contributors.** `CONTRIBUTING.md`, a pull request template, and issue forms that point to it (#146). The README acknowledges the AI tools used to write the book (#145).
@@ -53,6 +53,7 @@ In this order:
 | AAR P1-1 | The `shots-check` CI workflow, part of M4. |
 | AAR P1-3 | Fix the review skill's session collector. This belongs to whoever maintains the skill, not this repository. |
 | Computed outputs | The four questions in the plan's §9. |
+| Figure 4-2 and Open-Meteo | api.open-meteo.com's robots.txt disallows every path, so the back-fill left out figure 4-2, the forecast in Chrome's JSON view. Chapter 2 says `robots.txt` addresses crawlers, and that deliberate API clients follow the API's own terms; by that reading, one capture of the chapter's request is allowed. Capture 4-2, or leave it out. Either way, Step 5 of the exercise sends students to the same API after Step 1 taught them to check `robots.txt`, so it could point back to chapter 2's distinction. |
 | Chapter 4's starter feeds | The Changelog's robots.txt (`changelog.com`) disallows every path, feed included, so a student who follows Step 1 can't use it. Keep it as a lesson in that check, or replace it in the chapter and in the course's `rss-feeds.md`. |
 | Chapters 1–3 back-fill | <ul><li>Week 01's look-alikes (`issue_form.png`, `pr_review.png`): use a real public issue and pull request that aren't a student's, or capture them by hand.</li><li>The unused placeholders (week 02's four, week 03's `ad_observatory`, week 05's `dev_tools_network`): delete or keep.</li><li>Figure 1-1: should it replace `anaconda_jupyter.png` in `setup.md`?</li></ul> |
 
