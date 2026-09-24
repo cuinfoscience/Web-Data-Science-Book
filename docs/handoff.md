@@ -1,6 +1,6 @@
 # Hand-off note
 
-**Updated 2026-09-24**, after textbook #148–#152 and #154–#157 and courses #55–#57 merged, and after the maintainer's decisions on the User-Agent, the Python version, and students' pull requests. This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
+**Updated 2026-09-24**, after textbook #148–#152 and #154–#157 and courses #55–#57 merged, with the chapter 3 back-fill that this note's pull request adds, and after the maintainer's decisions on the User-Agent, the Python version, and students' pull requests. This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
 
 ## Where things stand
 
@@ -13,11 +13,13 @@
   - `tools/make_notebooks.py` reads brackets inside code spans in captions, and fails when a figure or `@fig-` reference is left unconverted (#151).
 
   - `scroll` steps can scroll a panel (`within:`), as Jupyter needs, and `doctor` asks a local server (`localhost`) at its own address.
+  - A figure can show a host that doesn't answer: the take is Chrome's own error page, kept only after public DNS confirms the host is gone rather than refused by the session's proxy. Composites can stack their parts, and `doctor` checks each part's host and robots.txt's `Crawl-delay`.
 
-  The selftest passes 76 of 76. `check` reports 0 errors and 8 warnings: six in chapter 7 (five figures over the size limit, one undated caption), and two in chapter 8 (the Selenium and codegen windows, which need M4).
+  The selftest passes 86 of 86. `check` reports 0 errors and 8 warnings: six in chapter 7 (five figures over the size limit, one undated caption), and two in chapter 8 (the Selenium and codegen windows, which need M4).
 - **Chapters.**
   - ch-01: the setup works as written (#152). Jupyter installs into `webdata`, terminal commands are shell blocks, and the first request sends a User-Agent. #155 adds three figures: Jupyter's **New** menu, the companion notebook's cells, and the article beside View Source. It also corrects the instruction to choose **New** and then **Notebook**: Notebook 7's menu lists **Python 3 (ipykernel)**. Figure 1-4 (the pageviews JSON) is left out; see "Next".
   - ch-02: #156 adds Wikipedia's robots.txt at its generic block and Wikimedia's User-Agent policy, and `tools/shots` gains `match:` anchors for lines of plain text. Reddit's robots.txt (2-2) waits for the Friday review, since students' #50, #63, and #79 revise its paragraphs.
+  - ch-03: this note's pull request adds figure 3.1, Article 40 of the Digital Services Act on EUR-Lex, and figure 3.2, Pushshift's JSON refusal above Chrome's error page for CrowdTangle. Twitter's part of 3.2 waits for the maintainer (the table below). CrowdTangle's last capture (3-2) and Reddit's pricing post (3-3) wait for web.archive.org; see "Next".
   - ch-04 has three figures from the back-fill and fixes for #84, #87, and #132 (#149). Figure 4-2 (Open-Meteo's JSON) is left out; see the table below.
   - ch-05 has four DevTools figures from the pilot (#138).
   - ch-08: its View Source and JavaScript off/on figures are within the size limit, and the Selenium caption is dated (#142, #148). §8.3 checks Selenium Manager before the first browser (#143).
@@ -34,13 +36,11 @@
 In this order:
 
 1. **The first Friday code-review standup** for students' pull requests, on the course's roadmap ([plan](https://github.com/cuinfoscience/INFO4617-Fall2026/blob/main/docs/plans/2026-09-24-friday-code-review.md)). Before it, prepare the plan's review table: every open student pull request with its chapter, the issue it fixes, its checks, and any conflict or duplicate.
-2. **Back-fill chapter 3**, the last in the [plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)'s §4: refusals and retired services.
-   - A textbook and course pair of pull requests; each figure starts from its brief. Read the plan's §4 table and the README's field notes first.
-   - Students' #80 and #95 edit chapter 3, and #62 its notebook. Keep figure blocks off the lines they change, or name the overlap in the description.
-   - The CrowdTangle figure (3-2) needs web.archive.org, which reset connections on 2026-09-24.
-   - Left from chapters 1 and 2: figure 1-4 (the pageviews JSON) waits for another network, since Wikimedia's REST API answered 429 twice on 2026-09-24 (`images/ch-01/IMAGES.md` has a draft recipe); figure 2-2 (Reddit's robots.txt) waits for the Friday review.
+2. **Finish the back-fill** ([plan](plans/2026-09-24-screenshot-backfill-ch01-05.md), §4). Every chapter has had its pass; what is left waits on a host, the Friday review, or the maintainer.
+   - Chapter 3 (`images/ch-03/IMAGES.md` has the draft recipes): CrowdTangle's last capture (3-2) and Reddit's June 2023 post on API pricing (3-3) need web.archive.org, which reset every connection from this session on 2026-09-24. reddit.com's robots.txt now disallows every path, so 3-3 can only come from the archive. Before capturing 3-3, confirm that Reddit itself stated $0.24 per 1,000 calls: Wikipedia credits the first public figure to Apollo's developer, and the chapter says "the company announced" it.
+   - Figure 1-4 (the pageviews JSON) waits for another network, since Wikimedia's REST API answered 429 twice on 2026-09-24 (`images/ch-01/IMAGES.md` has a draft recipe). Figure 2-2 (Reddit's robots.txt) waits for the Friday review.
    - `shots import`, for hand captures such as week 1's issue form, isn't built (M4).
-3. **Retake the chapter 7 figures** (AAR P2-1): five are over the size limit, and `x-com-1999`'s caption lacks a date. On 2026-09-24 web.archive.org reset every connection after about 11 seconds; retry. Chapter 8's two tool windows wait for M4.
+3. **Retake the chapter 7 figures** (AAR P2-1): five are over the size limit, and `x-com-1999`'s caption lacks a date. On 2026-09-24 web.archive.org reset every connection after about 11 seconds, still at 21:45 UTC; retry. Chapter 8's two tool windows wait for M4.
 4. **Toolkit M4** ([plan](plans/2026-09-24-screenshot-toolkit.md), §8): evidence queries for counts in captions (AAR P1-2), `sync` and `import`, the Selenium and codegen engines, and the `shots-check` CI job (AAR P1-1).
 5. **Align the chapters' User-Agent strings** with `WebDataScience/1.0 (your-email@colorado.edu)`, after the Friday review.
    - Students' #88 and #93 add one to chapter 4's requests.
@@ -54,7 +54,7 @@ In this order:
 | Item | What to decide |
 |---|---|
 | Notebook sync on browser edits | A pull request edited in GitHub's browser editor can't regenerate its notebook, so the Notebook sync check fails. Either let CI regenerate the notebooks on pull requests (a workflow change), or keep the check and have the maintainer regenerate before merging, for example after the Friday review. `CONTRIBUTING.md` describes the second. On 2026-09-24 #117, which edited `notebooks/ch-05-protocols.ipynb` directly, merged with bare quotes that made the notebook invalid JSON: Jupyter couldn't open it, and every pull request's Notebook sync failed until #157 moved its note into the chapter. Merging only after Notebook sync passes would have caught it. |
-| Figure 4-2 and Open-Meteo | api.open-meteo.com's robots.txt disallows every path, the course's User-Agent included, so the back-fill left out figure 4-2, the forecast in Chrome's JSON view. Chapter 2 says robots.txt addresses crawlers, and that deliberate API clients follow the API's own terms. Capture 4-2 as an API client, or leave it out. Either way, Step 5 of chapter 4's exercise sends students to the same API after Step 1 taught them to check robots.txt, so it could point back to chapter 2's distinction. |
+| API hosts' robots.txt: figure 4-2, and Twitter's part of figure 3.2 | api.open-meteo.com's robots.txt disallows every path, the course's User-Agent included, so the back-fill left out figure 4-2, the forecast in Chrome's JSON view. api.twitter.com's disallows every path for all but Googlebot and Bingbot, so figure 3.2 shows two of chapter 3's three retired endpoints; `images/ch-03/IMAGES.md` has Twitter's part ready to add. Chapter 2 says robots.txt addresses crawlers, and that deliberate API clients follow the API's own terms. Capture both as an API client, or leave them out. Either way, Step 5 of chapter 4's exercise sends students to Open-Meteo after Step 1 taught them to check robots.txt, so it could point back to chapter 2's distinction. |
 | AAR P0-2 | Enable the permission rule that denies force-pushes (untested; test it first). Turn on "Automatically delete head branches" in both repositories. |
 | AAR P1-1 | The `shots-check` CI workflow, part of M4. |
 | AAR P1-3 | Fix the review skill's session collector. This belongs to whoever maintains the skill, not this repository. |
@@ -74,7 +74,7 @@ In this order:
     - chapters: `claude/ch01-setup-fixes`, `claude/ch04-figures`, `claude/ch04-refresh-live-data`, `claude/ch04-rss-directory-links`, `claude/ch04-rss-starter-feeds`, `claude/ch04-swap-rss-links`, `claude/ch05-protocols-expansion`, `claude/ch05-protocols-terminal-tools`, `claude/ch07-wayback-background`, `claude/ch08-retakes`, `claude/ch08-selenium-manager-playwright`, `claude/ch08-selenium-preflight`;
     - the toolkit: `claude/pilot-ch05`, `claude/shots-toolkit-m1`, `claude/shots-toolkit-m2`, `claude/shots-toolkit-m3`, `claude/shots-devtools-effect-tests`, `claude/shots-relaxed-limit`, `claude/shots-field-notes`, `claude/notebook-figure-brackets`;
     - docs: `claude/docs-agents-md`, `claude/aar-p0-edits`, `claude/lift-pause-pilot-gate`, `claude/readme-ai-acknowledgement`, `claude/contributing-guide`, `claude/handoff-after-merges`, and `claude/decisions-ua-python`;
-    - the back-fill: `claude/ch01-figures`, `claude/ch05-a-record-note`, and this note's own branch, `claude/ch02-figures`, once it merges.
+    - the back-fill: `claude/ch01-figures`, `claude/ch02-figures`, `claude/ch05-a-record-note`, and this note's own branch, `claude/ch03-figures`, once it merges.
   - **This repository, closed without merging:** `claude/decisions-ua-python-review` (#153). #154 replaced it with the same changes, because the message of #153's first commit quoted a closing keyword with #90's number: merged, it would have closed #90 again.
   - **The course repository, merged into `main`:** `add-slides-ci`, `claude/detrope-week02-images`, `claude/week-01-screenshots-2aiqhh`, `claude/week-02-expansion`, `claude/week-04-rss-feeds-handout`, `claude/wk02-fixes`, `fix-oscars-403-headers-slides`, `overleaf-2026-08-24-0430`, and `overleaf-2026-08-24-0500`.
   - **The course repository, closed without merging:** `claude/swartz-ca-frames` (#23). Delete it only if #23 won't be revived. GitHub can restore it from the closed pull request.

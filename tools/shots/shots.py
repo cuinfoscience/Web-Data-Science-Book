@@ -35,7 +35,8 @@ from lib import robots                                                  # noqa: 
 from lib.capture import Pacer, PolicyBlock, capture, sha256, takes      # noqa: E402
 from lib.compare import compare                                         # noqa: E402
 from lib.env import IMAGES, OUT, ROOT, TOOL, chrome_path, chrome_version, proxy, rel  # noqa: E402
-from lib.recipes import DEFAULTS, RecipeError, chapters, figure, load   # noqa: E402
+from lib import guards                                                  # noqa: E402
+from lib.recipes import DEFAULTS, RecipeError, chapters, figure, load, loads   # noqa: E402
 
 GOOD, NOTE, WARN, BAD = "ok", "note", "warn", "FAIL"
 
@@ -157,14 +158,16 @@ def doctor_chapter(chapter):
     recipe = load(chapter)
     by_host = {}
     for fig in recipe["figures"]:
-        if fig.get("url") and host_of(fig["url"]):
-            by_host.setdefault(host_of(fig["url"]), []).append(fig)
-    for host, figs in sorted(by_host.items()):
+        for url, expect in loads(fig):      # a composite's parts can each load another host
+            if url and host_of(url):
+                by_host.setdefault(host_of(url), []).append((fig, url, expect))
+    for host, pages in sorted(by_host.items()):
+        figs = [fig for fig, _, _ in pages]
         agent = figs[0]["user_agent"]
         if host in ("localhost", "127.0.0.1", "::1"):
             # A server on this machine, such as chapter 1's Jupyter: robots.txt doesn't apply,
             # and it listens on its own port, so ask the figure's own address.
-            address = figs[0]["url"]
+            address = pages[0][1]
             try:
                 with urllib.request.urlopen(address, timeout=10) as r:
                     line(GOOD, f"{host}: a server on this machine answers {urlparse(address).netloc} "
@@ -183,15 +186,41 @@ def doctor_chapter(chapter):
             continue
         except Exception as e:
             reason = str(getattr(e, "reason", e))
-            if "Tunnel connection failed" in reason:
+            if all(expect.get("error") for _, _, expect in pages):
+                # The subject is a host that no longer answers. Behind the proxy, a refused
+                # host fails the same way, so public DNS decides, as it does in `capture`.
+                try:
+                    dns = guards.lookup(host, agent)
+                except Exception as err:
+                    line(WARN, f"{host}: doesn't answer ({reason}), and public DNS didn't either "
+                               f"({str(getattr(err, 'reason', err))})")
+                    continue
+                if guards.dead_host(dns):
+                    line(NOTE, f"{host}: doesn't answer, and public DNS has no address for it ({dns['rcode']}): "
+                               "the dead host its figure expects")
+                else:
+                    failed = True
+                    line(BAD, f"{host}: doesn't answer, but public DNS resolves it "
+                              f"({', '.join(dns['addresses'])}): the proxy refused it",
+                         "a policy block: report it; do not retry or route around it")
+            elif "Tunnel connection failed" in reason:
                 failed = True
                 line(BAD, f"{host}: the proxy refused it ({reason})",
                      "a policy block: report it; do not retry or route around it")
             else:
                 line(WARN, f"{host}: not reachable now ({reason})")
             continue
-        for fig in figs:
-            page = fig["url"].removeprefix("view-source:")
+        delay = robots.crawl_delay(text, agent)
+        if delay:
+            slowest = min(fig["pause"][0] for fig in figs)
+            if slowest < delay:
+                line(WARN, f"{host}: robots.txt asks for {delay:g} seconds between requests; "
+                           f"the recipe's pause starts at {slowest:g}", f"set `pause: [{delay:g}, 30]` on its figures")
+            else:
+                line(NOTE, f"{host}: robots.txt asks for {delay:g} seconds between requests; "
+                           f"the recipe's pause starts at {slowest:g}")
+        for fig, url, _ in pages:
+            page = url.removeprefix("view-source:")
             names = robots.barred(text, agent, page)
             if agent in names:
                 line(WARN, f"{host}: robots.txt disallows {urlparse(page).path} ({fig['id']})",

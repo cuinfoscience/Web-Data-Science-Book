@@ -1,0 +1,125 @@
+{
+  "chapter": "ch-03",
+  "figures": {
+    "dead-endpoints": {
+      "browser": "Google Chrome for Testing 154.0.8037.57 (headless, Playwright 1.63.0)",
+      "by": "tools/shots",
+      "captured": "2026-09-24T22:01:40+00:00",
+      "clip": null,
+      "crop": {
+        "window": true
+      },
+      "file": "dead-endpoints.png",
+      "final_url": "https://api.pushshift.io/reddit/search/submission?q=test&size=1",
+      "image_sha256": "4cc6457bf5533647580ec01e45615e292c1afb3e1367d6f70a0fd9d4432faa6e",
+      "javascript": true,
+      "kind": "capture",
+      "parts": [
+        {
+          "image": "tools/shots/out/ch-03/dead-endpoints-part1/20260924T220135Z.png",
+          "image_sha256": "f91a4949c62f2b68c8e4356591d45d647df6406aa3082b90c95728edf4e5e0d5",
+          "javascript": true,
+          "label": "api.pushshift.io answers: a 403, in JSON",
+          "status": 403,
+          "url": "https://api.pushshift.io/reddit/search/submission/?q=test&size=1"
+        },
+        {
+          "dns": {
+            "addresses": [],
+            "rcode": "SERVFAIL"
+          },
+          "error": "Page.goto: net::ERR_TUNNEL_CONNECTION_FAILED at https://api.crowdtangle.com/posts",
+          "image": "tools/shots/out/ch-03/dead-endpoints-part2/20260924T220137Z.png",
+          "image_sha256": "9762950641af364db0d5fef8076d7e452b2da3469d64ca4f6f968ba3062bfd70",
+          "javascript": true,
+          "label": "api.crowdtangle.com doesn't answer: the page is Chrome's own",
+          "status": null,
+          "url": "https://api.crowdtangle.com/posts"
+        }
+      ],
+      "recipe_sha256": "0e5261052a83f206ffa91040f3f64ec027fa53c7e7f1f1993f4299a88dfff0e1",
+      "scale": 2,
+      "size": [
+        1168,
+        770
+      ],
+      "status": 403,
+      "text": {
+        "chars": 190,
+        "median": 28.6,
+        "min": 24.0,
+        "p20": 26.0,
+        "sizes": {
+          "24": 28,
+          "26": 29,
+          "28.6": 111,
+          "45": 22
+        }
+      },
+      "url": null,
+      "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
+      "window": [
+        560,
+        400
+      ]
+    },
+    "dsa-article-40": {
+      "annotated": {
+        "annotate_sha256": "4d9f7885062b520ad6c3318059d06d441c1a0f397da4b5bf8de51019c58118f0",
+        "pdf_sha256": "66dce6479dceffd0d04cda087841f425077774c9852d222ec5020e23e2394f83",
+        "png_sha256": "4f0fe98d945344ae6dea630057d32f6c2f44a67f11959c5c8d67aa42a7b9ba0f",
+        "unit_in": 0.005008755665430573,
+        "warnings": [],
+        "width_in": 8.1042
+      },
+      "browser": "Google Chrome for Testing 154.0.8037.57 (headless, Playwright 1.63.0)",
+      "by": "tools/shots",
+      "captured": "2026-09-24T22:00:11+00:00",
+      "clip": {
+        "height": 497.75,
+        "width": 800,
+        "x": 0,
+        "y": 0
+      },
+      "crop": {
+        "between": [
+          "#art_40",
+          "[id=\"040.004\"]"
+        ],
+        "pad": [
+          12,
+          0,
+          12,
+          0
+        ]
+      },
+      "file": "dsa-article-40.png",
+      "final_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2065",
+      "image_sha256": "dcd40775f0d38f7ed2d3963dd48c6777c98c6fadb189454f01a1a262989d7a6e",
+      "javascript": true,
+      "kind": "capture",
+      "recipe_sha256": "596f07f95bf02d8d06650874682ed8169ec280f92b51cfcc7d7c175e43248ae1",
+      "scale": 2,
+      "size": [
+        1600,
+        994
+      ],
+      "status": 200,
+      "text": {
+        "chars": 1608,
+        "median": 32.0,
+        "min": 32.0,
+        "p20": 32.0,
+        "sizes": {
+          "32": 1608
+        }
+      },
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2065",
+      "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
+      "window": [
+        800,
+        700
+      ]
+    }
+  }
+}

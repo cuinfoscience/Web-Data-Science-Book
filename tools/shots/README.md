@@ -41,8 +41,8 @@ tools/shots/run check                             # before a PR
 - **`doctor`** answers whether capture works in this session. Do not reuse an earlier session's answer:
   - it checks the proxy, the browser, a real headless capture of example.com, and a real headed one with DevTools open;
   - it checks for TeX, and fails if a recipe has markers and TeX is missing;
-  - with a chapter, it makes one request to each host that chapter's recipes use, and reads that host's robots.txt for the capture's User-Agent, noting any group addressed to Claude's agents (see "Field notes"). A server on this machine (`localhost`), such as chapter 1's Jupyter, is asked at the figure's own address instead: robots.txt doesn't apply to it;
-  - it reports a proxy refusal as a policy block, which you report rather than route around.
+  - with a chapter, it makes one request to each host that chapter's recipes use, a composite's parts included, and reads that host's robots.txt for the capture's User-Agent, noting any group addressed to Claude's agents (see "Field notes"). It warns when a host's `Crawl-delay` is longer than the pause its figures start at. A server on this machine (`localhost`), such as chapter 1's Jupyter, is asked at the figure's own address instead: robots.txt doesn't apply to it;
+  - it reports a proxy refusal as a policy block, which you report rather than route around. A host that a figure expects not to answer (`expect: {error: ...}`) is checked against public DNS instead, as `capture` does (see "Refusals and dead hosts").
 
 ## The rules
 
@@ -101,7 +101,7 @@ dated record is in §9 of [the screenshot AAR](../../docs/aar/2026-09-24-screens
 
 ## Field notes
 
-What later captures taught, in chapters 1, 2, 4, 7, and 8 (2026-09-22 to 24): each
+What later captures taught, in chapters 1, 2, 3, 4, 7, and 8 (2026-09-22 to 24): each
 note is a practice and the case behind it. Read the notes for the kind of page
 you're about to capture before writing its recipe. When a capture teaches you
 something the next agent would otherwise find out again, add a note here.
@@ -121,9 +121,13 @@ something the next agent would otherwise find out again, add a note here.
   www.bbc.co.uk forbids, and feeds.npr.org has no robots.txt at all (404).
   Check the host in the figure's own URL.
 - **An API host's `Disallow: /` is a question for the maintainer.**
-  api.open-meteo.com disallows every path, while chapter 2 says robots.txt
-  addresses crawlers and that API clients follow the API's own terms. Leave
-  such a figure out and ask, as the chapter 4 back-fill did with figure 4-2.
+  api.open-meteo.com and api.twitter.com disallow every path, while chapter 2
+  says robots.txt addresses crawlers and that API clients follow the API's own
+  terms. Leave such a figure, or such a part of one, out and ask, as the
+  back-fill did with figure 4-2 and with Twitter's part of figure 3-1.
+- **Keep to a host's `Crawl-delay`.** EUR-Lex's robots.txt asks for 10
+  seconds between requests, so its figure sets `pause: [12, 30]`; `doctor`
+  warns when a figure's pause starts below a host's delay.
 - **Check the content type before choosing what Chrome will draw:**
   `curl -sI URL | grep -i content-type`. Chrome's XML viewer draws a foldable
   tree only for `text/xml` and `application/xml`. PBS NewsHour's feed
@@ -301,6 +305,50 @@ something the next agent would otherwise find out again, add a note here.
 - **Check the page's own width.** Wikipedia's layout wraps at 370 pixels in a
   headless take, so the article half of chapter 1's composite is 370 wide,
   and the pair fits 800×600 with its text at 12.7 pixels in the book.
+
+### Refusals and dead hosts (chapter 3)
+
+- **Show a refusal as the reader meets it.** A retired API that still runs
+  answers with a status and a body. Pushshift's 403 is one line of JSON,
+  `{"detail":"Not authenticated"}`, under Chrome's Pretty-print bar.
+  `expect: {status: 403, text: ['Not authenticated']}` makes the refusal the
+  take's subject.
+- **A host that doesn't answer is shown as Chrome's own page.** `expect:
+  {error: 'ERR_NAME_NOT_RESOLVED|ERR_TUNNEL_CONNECTION_FAILED'}` keeps the take
+  when the page fails to load with that error, and fails it if the page loads.
+  The error page arrives a moment after the failure, so `capture` waits for
+  `chrome-error://` before it measures; an `evaluate` right after the failed
+  `goto` meets "Execution context was destroyed".
+- **Behind the proxy, a dead host looks like a refused one.** The session's
+  proxy answers 502 to a tunnel it can't open, whether the host's name
+  doesn't resolve or its policy refuses the host, and Chrome reports both as
+  `ERR_TUNNEL_CONNECTION_FAILED`. So `capture` and `doctor` ask public DNS
+  (Google's DNS over HTTPS). No address means a dead host, and the take is
+  kept, with the answer in its log. An address means a policy block: it is
+  reported, and the take is deleted. On 2026-09-24 api.crowdtangle.com's
+  names answered SERVFAIL. The caption says the page names a failed tunnel
+  because the capture went through a proxy; chapter 3 makes the same point
+  about `ProxyError`.
+- **Crop Chrome's error page from `.icon` to `.error-code`.** `#main-content`
+  runs 40 pixels past the error's name, and the page is indented 24 pixels:
+  `crop: {between: ['.icon', '.error-code'], left: 24}` lines it up with the
+  part above it.
+- **Stack parts that differ in height.** Side by side, a one-line JSON answer
+  next to a 250-pixel error page leaves half the figure empty. `layout:
+  {direction: column}` puts one above the other.
+- **A site may check the browser before it answers.** EUR-Lex sometimes
+  answers a first visit with 202 and a script that checks the browser, sets a
+  cookie, and reloads. `capture` judges the page it shows (200) and keeps the
+  first status as `first_status`. Its floating contents box (`#TOCSidebarSA`)
+  covers the bottom quarter of the window until `click: {selector:
+  '#tocHideBtnStandalone'}` closes it. Its paragraph ids start with a digit,
+  so select them as `[id="040.004"]`; `#040.004` is not valid CSS.
+- **Some candidates need another day.** web.archive.org was still resetting
+  connections at 21:45 UTC on 2026-09-24, so CrowdTangle's last capture (3-2)
+  and Reddit's 2023 pricing post (3-3) wait. reddit.com's robots.txt now
+  disallows every path, which leaves 3-3 to the archive's copy.
+  `images/ch-03/IMAGES.md` keeps both draft recipes.
+
 ### When a host is down
 
 - **Tell an outage from a refusal.** On 2026-09-24,
@@ -420,7 +468,10 @@ A take fails its guards when:
 - the page reads like an error or block page (a Cloudflare challenge, "Access denied," the Wayback Machine's "Fail with status");
 - expected text is missing;
 - the image is nearly blank;
-- in a headed take, an infobar sits above the page (see "No infobars").
+- in a headed take, an infobar sits above the page (see "No infobars");
+- a page the recipe expects not to load (`expect: {error: ...}`) loads after all.
+
+The status judged is that of the page the take shows. A site that checks the browser with a script (EUR-Lex answers some first visits with 202, then reloads) is judged at the reloaded page's status, and the take keeps the first as `first_status`.
 
 A failed take is named `<UTC time>.FAILED.png` and kept for inspection. `promote` refuses it. Nothing but `promote` writes to `images/`.
 
@@ -454,7 +505,8 @@ One YAML file per chapter in `recipes/`. A figure:
 - **The brief** is for people: what the reader should see, for which paragraph, and what the figure leaves out (step 1 of "Making a figure"). The tool doesn't read it, and it stays out of the recipe's hash, so rewording it needs no new take.
 - **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-07 and ch-08 recipes set 1280×800, the window their images were made in; they are over the soft limit until they are retaken.)
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top; add `within: '.panel'` for a page that scrolls a panel rather than the window, as Jupyter does.
-- **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`.
+- **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`. `{between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 12, 0]}` is a band from the top of one element to the bottom of another; `left` and `width` default to the window.
+- **Refusals as subjects:** `expect: {status: 403}` for a refusal with a body, `expect: {block: true}` for a block page, and `expect: {error: 'ERR_NAME_NOT_RESOLVED|…'}` for a host that doesn't answer, whose take is Chrome's own error page (see "Refusals and dead hosts" under Field notes).
 - **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls.
 - **Other modes:** `mode: headed` and `mode: composite` are below. An `engine:` other than Playwright (M4) marks a figure that `capture` skips with a note.
 - **Patterns** are regular expressions. A leading `(?i)` ignores case; the tool turns it into JavaScript's `i` flag, because Playwright and DevTools evaluate patterns in JavaScript, which has no inline flags.
@@ -662,6 +714,10 @@ joins them side by side on white, each labeled below, inside a thin frame:
 A part can set its own `url`, `steps`, `expect`, `crop`, `javascript`,
 `window`, `scale`, `mode` (headless or headed), and `devtools`. Each part is
 paced, guarded, and retried like any take, and the joined take lists its parts.
+A composite whose parts each load their own page needs no `url` of its own;
+`IMAGES.md` then lists every part's. `layout: {direction: column}` stacks the
+parts one above the other, each labeled below, for parts of different
+heights (chapter 3's `dead-endpoints`).
 
 ## Contact sheets
 
@@ -722,14 +778,15 @@ It reports **warnings** for:
 - marks changed in the recipe since the annotated image was drawn (promote again);
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
 
-`selftest` runs 76 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 86 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
+- refusals: a host that doesn't answer shown as Chrome's error page, and a failure when that page loads after all; behind a stand-in proxy that opens no tunnels, public DNS (a stand-in too) telling a dead host from a policy block in `capture` and `doctor`, and an unexpected tunnel failure still a policy block; a script check's 202 and reload; robots.txt's `Crawl-delay`;
 - a `scroll` step that scrolls a panel (`within`), not the window;
 - anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture;
 - the size limits: 800×600; the relaxed 1024×768, which needs a reason and text that passes; beyond it; and `check`;
 - `match`: a line of a plain-text file scrolled to its offset, and a match's box across line breaks;
-- legibility, with week 08's `infinite_scroll.png` as the failing case; a composite; `sheet`;
+- legibility, with week 08's `infinite_scroll.png` as the failing case; composites side by side and stacked; a `between` crop in a headless take; `sheet`;
 - headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take;
 - the User-Agent and its Client Hints, and a first visit's reload, read back from what the local server receives;
 - every DevTools setting read back from what DevTools drew (the table under "Headed figures"), with DevTools' defaults as a control, and a setting DevTools won't honor reported at capture;
@@ -753,7 +810,7 @@ It skips the marker checks if TeX is missing and the headed checks if the virtua
 | `lib/annotate.py`, `styles/shotmarkers.sty` | markers laid out from anchors, drawn with TikZ to PDF and PNG |
 | `lib/legibility.py` | text size at each target, against the thresholds |
 | `lib/sheet.py` | contact sheets |
-| `lib/guards.py` | error and block pages, retries, and policy blocks |
+| `lib/guards.py` | error and block pages, retries, policy blocks, and public DNS for a host that doesn't answer |
 | `lib/robots.py` | what a host's robots.txt says to the capture's User-Agent and to Claude's agents, for `doctor` |
 | `lib/capture.py` | one figure, start to finish, composites, and the take log |
 | `lib/compare.py` | take against approved image |

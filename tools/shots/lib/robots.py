@@ -13,8 +13,19 @@ import urllib.robotparser
 CLAUDE_AGENTS = ("Claude-User", "ClaudeBot", "Claude-SearchBot", "Claude-Web", "anthropic-ai")
 
 
-def barred(text, agent, url):
-    """The agents that robots.txt `text` disallows from `url`: the capture's `agent`, then Claude's."""
+def _parsed(text):
     robots = urllib.robotparser.RobotFileParser()
     robots.parse(text.splitlines())
+    return robots
+
+
+def barred(text, agent, url):
+    """The agents that robots.txt `text` disallows from `url`: the capture's `agent`, then Claude's."""
+    robots = _parsed(text)
     return [name for name in (agent,) + CLAUDE_AGENTS if not robots.can_fetch(name, url)]
+
+
+def crawl_delay(text, agent):
+    """The seconds robots.txt asks `agent` to leave between requests, or None."""
+    delay = _parsed(text).crawl_delay(agent)
+    return float(delay) if delay is not None else None

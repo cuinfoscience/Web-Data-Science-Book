@@ -1,0 +1,77 @@
+# Recipes for Chapter 3's figures (ch-03-post-api.qmd). See tools/shots/README.md.
+#
+# The last chapter of the back-fill after the chapter 5 pilot
+# (docs/plans/2026-09-24-screenshot-backfill-ch01-05.md, §4): refusals and
+# retired services. Left out for now:
+#
+# - The third of 3-1's endpoints, Twitter API v1.1: api.twitter.com's
+#   robots.txt disallows every path for the course's User-Agent. It is the
+#   question figure 4-2 waits on (docs/handoff.md, "Waiting on the maintainer").
+# - 3-2, CrowdTangle's last capture in the Wayback Machine, and 3-3, Reddit's
+#   June 2023 post on API pricing: web.archive.org reset every connection from
+#   this session on 2026-09-24, and reddit.com's robots.txt now disallows every
+#   path, so 3-3 can only come from an archived copy. images/ch-03/IMAGES.md
+#   keeps their draft recipes.
+# - 3-5, OpenAlex's rate-limit headers: optional, and the chapter's take-home
+#   exercise asks students to find those headers themselves.
+chapter: ch-03
+qmd: ch-03-post-api.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: dead-endpoints
+    kind: capture
+    section: "Dead-Endpoint Forensics"
+    brief: >-
+      Show two of the section's retired endpoints as a browser meets them, one
+      above the other. Pushshift answers: a 403 with one line of JSON,
+      {"detail":"Not authenticated"}, so the service still runs and turns you
+      away. CrowdTangle doesn't: no HTTP response comes back, and what shows
+      is Chrome's own error page, which nothing from CrowdTangle is in. Each
+      part is labeled with its host and what its failure means. The third
+      endpoint, Twitter v1.1, waits for the maintainer (see the header).
+    mode: composite
+    window: [560, 400]
+    parts:
+      - label: "api.pushshift.io answers: a 403, in JSON"
+        url: https://api.pushshift.io/reddit/search/submission/?q=test&size=1
+        expect: {status: 403, text: ['Not authenticated']}
+        crop: {top: 0, height: 56}      # Chrome's Pretty-print bar and the one line of JSON
+      - label: "api.crowdtangle.com doesn't answer: the page is Chrome's own"
+        url: https://api.crowdtangle.com/posts
+        # No HTTP response, so Chrome's error page is the subject. Behind this session's
+        # proxy the error is a failed tunnel, which capture accepts only when public DNS
+        # has no address for the host (a refused host would fail the same way).
+        expect: {error: 'ERR_NAME_NOT_RESOLVED|ERR_TUNNEL_CONNECTION_FAILED', text: ['api\.crowdtangle\.com']}
+        # The icon through the error's name, from Chrome's 24-pixel indent, so it lines up with the JSON.
+        crop: {between: ['.icon', '.error-code'], pad: [4, 0, 14, 0], left: 24}
+    layout: {direction: column, gap: 12, pad: 12, label_px: 15}
+    drifts: true        # endpoints are retired, gated, or restored
+
+  - id: dsa-article-40
+    kind: capture
+    section: "Exemption"
+    brief: >-
+      Show the provision the chapter cites, as the EU publishes it: Article 40
+      of the Digital Services Act, "Data access and scrutiny", on EUR-Lex,
+      from its heading through paragraph 4, which obliges very large online
+      platforms and search engines to give vetted researchers access to data
+      for research on systemic risks (boxed, 1). Paragraphs 1 to 3, access for
+      regulators, stay in view above it. EUR-Lex's floating contents box is
+      closed first.
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2065
+    window: [800, 700]    # tall enough to hold the band, which is cropped from it
+    pause: [12, 30]       # EUR-Lex's robots.txt asks for 10 seconds between requests
+    steps:
+      # A first visit gets 202 and a script that checks the browser, then reloads the page.
+      - wait: {text: 'Data access and scrutiny'}
+      - click: {selector: '#tocHideBtnStandalone'}     # the contents box floating over the text
+      - scroll: {selector: '#art_40', offset: 12}
+    expect:
+      text: ['vetted researchers']
+    crop: {between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 12, 0]}   # the heading through paragraph 4
+    annotate:
+      marks:
+        - {n: 1, shape: box, at: {selector: '[id="040.004"] p'}}
