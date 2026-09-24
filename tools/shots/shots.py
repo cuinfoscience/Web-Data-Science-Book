@@ -285,6 +285,12 @@ def report_take(fig, take):
         except annotate.AnnotateError as e:
             line(BAD, f"markers: {e}")
             return 1
+    over = legibility.oversize(take)
+    if over and fig.get("oversize"):
+        line("note", f"{over}; allowed: {fig['oversize']}")
+    elif over:
+        line(WARN, over, "crop to what the text discusses, or zoom DevTools, rather than widen the window "
+                         "(or say why in `oversize:`)")
     results = legibility.judge(fig, take.get("text"), take["size"][0], record)
     skip = (fig.get("legibility") or {}).get("skip")
     if results and skip and not all(r[-1] for r in results):
@@ -450,6 +456,15 @@ def check_markers(fig, entry, chapter, err, warn):
         warn(f"{fig['id']}: the recipe's marks changed since the markers were drawn (promote again)")
 
 
+def check_size(fig, entry, warn):
+    """The first and soft limit: a figure shows at most 800x600 CSS pixels, or its recipe says why."""
+    over = legibility.oversize(entry)
+    if over and fig.get("oversize"):
+        line("note", f"{fig['id']}: {over}; allowed: {fig['oversize']}")
+    elif over:
+        warn(f"{fig['id']}: {over}")
+
+
 def check_legibility(fig, entry, err):
     if not entry.get("text"):
         return                           # made before the toolkit measured text: nothing to judge
@@ -504,6 +519,7 @@ def cmd_check(args):
                 if entry.get("kind") != fig["kind"]:
                     err(f"{fig['id']}: provenance says {entry.get('kind')}, recipe says {fig['kind']}")
                 check_markers(fig, entry, chapter, err, warn)
+                check_size(fig, entry, warn)
                 check_legibility(fig, entry, err)
             block = figure_block(text, chapter, fig["file"])
             if not block and entry and entry.get("annotated"):

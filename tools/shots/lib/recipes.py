@@ -14,11 +14,12 @@ HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "ty
 STEPS = PAGE_STEPS | HEADED_STEPS
 CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad"}
 EXPECTS = {"status", "text", "selector", "block"}
-DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar"}
+DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout"}
+DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
 FIGURE_KEYS = {"id", "file", "kind", "section", "url", "mode", "engine", "steps", "expect", "crop",
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
                "user_agent", "pause", "settle", "timeout", "retries",
-               "annotate", "targets", "legibility", "parts", "layout"}
+               "annotate", "targets", "legibility", "parts", "layout", "oversize"}
 ENGINES = {"playwright", "selenium", "codegen"}
 # Annotation (lib/annotate.py): marks placed from what the browser measured.
 ANNOTATE = {"width_in", "size", "border", "marks"}
@@ -37,10 +38,10 @@ PART_KEYS = {"label", "url", "steps", "expect", "crop", "javascript", "window", 
 LAYOUT = {"gap", "pad", "label_px"}
 # Settings that decide how a take is drawn on or judged, not how it is captured.
 # Changing them needs no new take, so they stay out of the recipe's hash.
-NOT_CAPTURE = ("legacy", "notes", "annotate", "targets", "legibility")
+NOT_CAPTURE = ("legacy", "notes", "annotate", "targets", "legibility", "oversize")
 DEFAULTS = {
     "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
-    "window": [1280, 800],   # CSS pixels
+    "window": [800, 600],    # CSS pixels; also the soft limit on what a figure shows (lib/legibility.py)
     "scale": 2,              # device pixels per CSS pixel
     "pause": [8, 30],        # seconds between page loads on one host
     "settle": 1.0,           # seconds to let rendering finish after the last step
@@ -88,6 +89,8 @@ def _problems(chapter, raw):
         out += [f"{where}: {p}" for p in _step_problems(f.get("steps"), f.get("mode") == "headed")]
         for key in set(f.get("devtools") or {}) - DEVTOOLS:
             out.append(f"{where}: unknown devtools key `{key}`")
+        if (f.get("devtools") or {}).get("layout", "auto") not in DEVTOOLS_LAYOUTS:
+            out.append(f"{where}: devtools `layout` is one of {sorted(DEVTOOLS_LAYOUTS)}")
         if f.get("devtools") and f.get("mode") != "headed":
             out.append(f"{where}: `devtools` needs `mode: headed`")
         for key in set(f.get("crop") or {}) - CROPS:
@@ -99,6 +102,8 @@ def _problems(chapter, raw):
             out.append(f"{where}: unknown target `{key}` (one of {sorted(TARGETS)})")
         for key in set(f.get("legibility") or {}) - LEGIBILITY:
             out.append(f"{where}: unknown legibility key `{key}`")
+        if "oversize" in f and not (isinstance(f["oversize"], str) and f["oversize"].strip()):
+            out.append(f"{where}: `oversize` is the reason a figure shows more than 800×600, as a sentence")
         out += [f"{where}: {p}" for p in _composite_problems(f)]
     return out
 

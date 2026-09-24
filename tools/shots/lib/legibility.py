@@ -15,8 +15,15 @@ The size judged is `p20`, the size that four in five characters reach or
 exceed, so a copyright line does not fail a figure but small main text does.
 The starting thresholds come from the toolkit plan: 11 pixels in the book and
 16 on a 1920-pixel slide. Week 08's `infinite_scroll.png`, dropped because no
-one could read it on its slide, measures about 12.5 there. For print, 6 points
-is the usual floor for small print.
+one could read it on its slide, measures 11.7 there. For print, 6 points is
+the usual floor for small print.
+
+Before any of that, a first and soft limit: a figure shows at most 800×600
+CSS pixels of the screen (1600×1200 image pixels at the default scale of 2).
+A capture no wider than the book's column keeps its text at about the size it
+had on screen; a whole 1680-pixel window shrinks it to less than half. Going
+over is a warning, not an error, and a recipe that needs more says why:
+`oversize: "the lesson is the whole page's layout"`.
 """
 BOOK_PX = 778
 SLIDE_PX = 1920
@@ -24,6 +31,25 @@ SLIDE_TEXT = 398.34 / 455.24     # the course decks' text width over paper width
 PT_PER_IN = 72.27
 THRESHOLDS = {"book": 11.0, "slides": 16.0, "handout": 6.0}
 UNITS = {"book": "px", "slides": "px", "handout": "pt"}
+SOFT_LIMIT = (800, 600)          # CSS pixels a figure shows, at most, before a warning
+
+
+def region(entry):
+    """The part of the screen a take or an image shows, in CSS pixels: its size over its scale.
+    Images made before the toolkit record no scale; they were captured at 1x."""
+    scale = entry.get("scale") or 1
+    return round(entry["size"][0] / scale), round(entry["size"][1] / scale)
+
+
+def oversize(entry):
+    """'' within the soft limit; otherwise what the figure shows, and what that does in the book."""
+    width, height = region(entry)
+    if width <= SOFT_LIMIT[0] and height <= SOFT_LIMIT[1]:
+        return ""
+    said = f"shows {width}×{height} CSS pixels, over the {SOFT_LIMIT[0]}×{SOFT_LIMIT[1]} soft limit"
+    if width > BOOK_PX:
+        said += f"; the book's column shows its text at {round(100 * BOOK_PX / width)}% of its size on screen"
+    return said
 
 
 def targets(fig):

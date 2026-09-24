@@ -46,6 +46,18 @@ PAGES = {
 FLAKY = {"count": 0}      # /flaky works once, then answers 502
 
 
+def sections(output):
+    """A `capture` run's output, split by figure: {figure id: its lines}."""
+    found, current = {}, None
+    for text in output.splitlines():
+        if text.startswith("ch-99/"):
+            current = text.split("/", 1)[1].strip()
+            found[current] = ""
+        elif current:
+            found[current] += text + "\n"
+    return found
+
+
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/flaky":
@@ -132,6 +144,8 @@ figures:
     url: "{base}/small"
     window: [555, 400]
     targets: {{slides: {{width: 0.35}}}}
+  - {{id: wide, kind: capture, url: "{base}/ok", window: [1000, 500]}}
+  - {{id: wide-allowed, kind: capture, url: "{base}/ok", window: [1000, 500], oversize: "a test of the reason"}}
   - id: joined
     kind: capture
     url: "{base}/ok"
@@ -217,8 +231,17 @@ figures:
     expect("check notices an image replaced by hand", code == 1 and "changed after" in out, out[-300:])
 
     print("anchors, markers, legibility, composites")
-    code, out = captured = shots("capture", "ch-99", "--only", "marks", "marks-2x", "small-text", "joined")
+    code, out = captured = shots("capture", "ch-99", "--only", "marks", "marks-2x", "small-text", "joined",
+                                 "wide", "wide-allowed")
     marks, marks2, small, joined = newest("marks"), newest("marks-2x"), newest("small-text"), newest("joined")
+    said = sections(out)
+    expect("a figure showing more than 800x600 CSS pixels gets a warning (the soft limit)",
+           "shows 1000×500 CSS pixels, over the 800×600 soft limit; the book's column shows its text at 78%"
+           in said.get("wide", "") and newest("wide").get("ok") is True, said.get("wide"))
+    expect("...which its recipe can allow, with a reason",
+           "allowed: a test of the reason" in said.get("wide-allowed", ""), said.get("wide-allowed"))
+    expect("...and an 800x600 figure is within it", "marks" in said and "soft limit" not in said["marks"],
+           said.get("marks"))
 
     def anchor(take, at):
         return ((take.get("anchors") or {}).get(json.dumps(at, sort_keys=True, separators=(",", ":"))) or {}).get("box")
@@ -274,9 +297,12 @@ figures:
 
     print("promote and check, with markers and text sizes")
     code, out = shots("promote", "ch-99", "small-text")
+    code, out = shots("promote", "ch-99", "wide")
     code, out = shots("check", "ch-99")
     expect("check fails a promoted image whose text is too small to read",
            code == 1 and "text too small to read: slides 11.7 px" in out, out[-400:])
+    expect("check warns about an approved image over the 800x600 soft limit",
+           "wide: shows 1000×500 CSS pixels, over the 800×600 soft limit" in out, out[-400:])
     if tex_tools:
         code, out = shots("promote", "ch-99", "marks")
         annotated = tmp / "images" / "ch-99" / "marks_annotated.png"

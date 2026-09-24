@@ -59,7 +59,7 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
   - A figure showing anything that changes (counts, versions, a live page) says in its caption when it was captured, as in "in September 2026."
   - A count, date, or total printed in a caption comes from a query whose limit and paging are recorded with the figure. If the query hit its limit, page until it doesn't, or don't print the number.
   - Numbered markers are drawn by `tools/shots` from the recipe's `annotate:` marks, each pointing at a page element or a DevTools row, so they follow the page on a retake. Don't place markers at hand-typed pixel positions or paint them into the image.
-  - Text must be readable where the figure is shown. Before a PR, run `tools/shots/run sheet ch-NN` and look at each take at book, slide, and handout size; `check` fails an image whose text measures too small.
+  - Text must be readable where the figure is shown. A figure shows at most 800×600 CSS pixels of the screen (a soft limit: a recipe that needs more says why in `oversize:`); for DevTools, zoom DevTools and crop to what the text discusses rather than widening the window. Before a PR, run `tools/shots/run sheet ch-NN` and look at each take at book, slide, and handout size; `check` fails an image whose text measures too small.
 
 ## File Structure
 

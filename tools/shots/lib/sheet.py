@@ -62,16 +62,23 @@ def blocks(entries):
             row.append(tile)
             used += tile[0].width + GAP
         rows.append(row)
-        title = f"{fig['chapter']}/{fig['id']}  ·  {take['captured'][:16]}Z  ·  {take['size'][0]}×{take['size'][1]}"
+        shows = "{}×{}".format(*legibility.region(take))
+        title = (f"{fig['chapter']}/{fig['id']}  ·  {take['captured'][:16]}Z  ·  "
+                 f"{take['size'][0]}×{take['size'][1]} pixels, {shows} CSS")
         if annotated:
             title += f"  ·  annotated at {annotated['width_in']:g} in"
             if annotated.get("warnings"):
                 title += "  ·  " + "; ".join(annotated["warnings"])
-        height = MARGIN + 40 + sum(max(t.height for t, _, _ in r) + 40 + GAP for r in rows)
+        over = legibility.oversize(take)
+        note = (over + (f"; allowed: {fig['oversize']}" if fig.get("oversize") else "")) if over else ""
+        height = MARGIN + 40 + (30 if note else 0) + sum(max(t.height for t, _, _ in r) + 40 + GAP for r in rows)
         block = Image.new("RGB", (WIDTH, height), "white")
         draw = ImageDraw.Draw(block)
         draw.text((MARGIN, MARGIN), title, fill="black", font=bold)
         y = MARGIN + 40
+        if note:                         # the soft limit on what a figure shows
+            draw.text((MARGIN, y), note, fill=(110, 110, 110) if fig.get("oversize") else (190, 0, 0), font=font)
+            y += 30
         for r in rows:
             x = MARGIN
             for tile, caption, ok in r:

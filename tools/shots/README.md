@@ -53,6 +53,7 @@ These come from `slides/common/AUTHORING.md` in the course repo and from the AAR
 - **Retries:** a 5xx or a dropped connection is retried three times, 30, 60, then 120 seconds apart. A block page, a 403, or a proxy refusal is not retried.
 - **No logins, no credentials, no student names or work.** A page behind a login is captured by the instructor by hand (M4 adds `import`).
 - **Dated captions.** A figure that shows things that change (counts, versions, live pages) says in its caption when it was captured.
+- **At most 800×600 of the screen.** A figure shows at most 800×600 CSS pixels of the screen (1600×1200 image pixels at scale 2). In the book's 778-pixel column its text then stays about the size it had on screen; a whole 1680-pixel window shrinks it to less than half. To show DevTools, zoom DevTools and crop to what the text discusses, rather than widening the window. This is the first check, and a soft one: going over is a warning, and a recipe that needs more says why in `oversize:`.
 
 ## How a capture works
 
@@ -97,7 +98,7 @@ One YAML file per chapter in `recipes/`. A figure:
     method: headless Playwright (Node), 1280×800 window at 1×, top 610 pixels
 ```
 
-- **Defaults:** a 1280×800 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them.
+- **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-07 and ch-08 recipes set 1280×800, the window their images were made in; they are over the soft limit until they are retaken.)
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top.
 - **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`.
 - **Other modes:** `mode: headed` and `mode: composite` are below. An `engine:` other than Playwright (M4) marks a figure that `capture` skips with a note.
@@ -106,15 +107,20 @@ One YAML file per chapter in `recipes/`. A figure:
 
 ## Headed figures
 
-A figure that shows browser UI (DevTools, View Source, a menu) sets `mode: headed`:
+A figure that shows browser UI (DevTools, View Source, a menu) sets `mode: headed`.
+This one keeps DevTools readable inside the 800×600 soft limit: a small window,
+DevTools docked at the bottom and zoomed to 125%, and the Styles pane beside the
+Elements tree rather than under it. Captured on 2026-09-24, it puts DevTools'
+text at 13.4 pixels in the book's column; the full 1680-pixel window of the
+book's current `xkcd-inspect.png` puts it at 5.1.
 
 ```yaml
 - id: xkcd-inspect
   kind: capture
   url: https://xkcd.com/
   mode: headed
-  window: [1680, 1000]              # the whole browser window, in CSS pixels
-  devtools: {dock: right, panel: elements}
+  window: [800, 600]                # the whole browser window, in CSS pixels
+  devtools: {dock: bottom, size: 340, zoom: 1.25, layout: side-by-side}
   steps:
     - wait: {selector: '#comic img'}
     - inspect: {selector: '#comic img', selects: '^<img'}
@@ -126,9 +132,10 @@ How a headed capture runs:
 - **The window:** Chrome for Testing opens on a virtual display sized for the window at its scale. It gets a fresh profile, a debugging port, and no "controlled by automated test software" bar.
 - **DevTools settings:** `devtools:` opens DevTools with the page, from settings written into the profile before launch:
   - `dock` (`right`, `bottom`, `left`);
-  - `zoom` (1.75 makes its text large enough for print);
+  - `zoom` (1.25 keeps DevTools readable in the book inside the 800×600 limit; 1.75 makes it large enough for print);
   - `size`: the pane's width, or its height when docked at the bottom;
-  - `sidebar`: the Styles sidebar's width.
+  - `layout`: `side-by-side` puts the Styles pane beside the Elements tree. DevTools' default (`auto`) stacks Styles under the tree in a narrow window, where it can squeeze the tree out entirely;
+  - `sidebar`: the Styles pane's width, or `hidden` for the tree alone. DevTools 154 applied this in a wide pane (the Oscars figure) but not in an 800-pixel window with `layout: side-by-side`.
 
   DevTools 154 ignores the stored `panel`, so the toolkit clicks that panel's tab. For `network`, it then reloads the page so the log is complete.
 - **Finding DevTools controls:** docked DevTools is itself a web page. The toolkit reads that page over the debugging port to find where a tab, button, request row, or header name is drawn, then clicks it for real with xdotool. No pixel positions are typed into recipes.
@@ -149,8 +156,6 @@ Crops for headed figures are in window coordinates:
 - `{top: 0, height: 680}`: a band of the window;
 - `{between: ['body', 'td.line-number[value="43"]']}`: from the top of one element to the bottom of another, which is how View Source is cut at a line;
 - `{selector: …, pad: 8}`: one element.
-
-`devtools: {sidebar: hidden}` shows the Elements tree alone, without the Styles pane.
 
 ## Markers
 
@@ -207,9 +212,19 @@ so a marker drawn here looks like one in a handout.
 
 ## Legibility
 
-Every take records the size of the text inside its crop, counted by
-character, from the page and from DevTools. The legibility check works out
-how tall that text will be where the figure is shown:
+**First, a soft limit on size.** A figure shows at most 800×600 CSS pixels of
+the screen: its image size over its scale. `capture`, `annotate`, `sheet`, and
+`check` warn about a figure over the limit, and say how small the book's
+column will make its text. A recipe that needs more says why, and the warning
+becomes a note:
+
+```yaml
+oversize: "DevTools is zoomed to 175%, so its text reads as a 594×471 capture's would"
+```
+
+**Then, the text itself.** Every take records the size of the text inside its
+crop, counted by character, from the page and from DevTools. The legibility
+check works out how tall that text will be where the figure is shown:
 
 | Target | Recipe | Shown at | Threshold |
 |---|---|---|---|
@@ -229,7 +244,7 @@ Known cases, measured or computed from the images:
 - Week 08's `infinite_scroll.png`, dropped because it could not be read on its slide: DevTools text at 11 pixels, in a 555-pixel crop, on 35% of the slide's text width. That is 11.7 pixels on a 1920-pixel slide, under 16. The selftest checks this case.
 - Week 08's `xkcd_inspect.png` read well: the same text on half the text width comes to 16.7 pixels.
 - The week-06 handout's DevTools figure measures 6.7 points in print. Its card figure measures 5.2 points, which is readable at the edge; at 3 inches wide it would pass.
-- Full-window DevTools captures in the book's column (`network-tab-json`, `xkcd-inspect`) come to about 5 pixels. The book's lightbox lets a reader enlarge them. Whether that counts is the pilot's question.
+- Every ch-07 and ch-08 figure shows 1100–1858 CSS pixels across, so the book's column shows its text at 42–71% of its size on screen. In the full-window DevTools captures (`network-tab-json`, `xkcd-inspect`), DevTools' text comes to about 5 pixels. `check` flags all eleven against the soft limit; they are due to be retaken within it.
 
 ## Composites
 
@@ -306,12 +321,14 @@ It reports **warnings** for:
 - a figure not used in its chapter (a figure may use either `<figure>.png` or `<figure>_annotated.png`);
 - short alt text;
 - a drifting figure whose caption does not give the capture year;
-- marks changed in the recipe since the annotated image was drawn (promote again).
+- marks changed in the recipe since the annotated image was drawn (promote again);
+- a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`).
 
-`selftest` runs 46 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 51 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
-- anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG; `annotate` without a new capture;
+- anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture;
+- the 800×600 soft limit: its warning, a recipe's reason, and `check`;
 - legibility, with week 08's `infinite_scroll.png` as the failing case; a composite; `sheet`;
 - headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take.
 

@@ -20,6 +20,9 @@ from .env import CHROME_VERSION
 
 DOCKS = {"right", "bottom", "left"}
 PANELS = {"elements", "network", "console", "sources"}
+# The Elements panel's layout: the Styles pane beside the tree, or under it. DevTools'
+# default ("auto") stacks them in a narrow window, where Styles can squeeze the tree out.
+LAYOUTS = {"side-by-side": "right", "stacked": "bottom", "auto": "auto"}
 
 
 def preferences(devtools):
@@ -37,7 +40,10 @@ def preferences(devtools):
     if "size" in devtools:         # the DevTools pane's width (docked right or left) or height (bottom)
         axis = "horizontal" if devtools.get("dock") == "bottom" else "vertical"
         prefs["inspector-view.split-view-state"] = json.dumps({axis: {"size": devtools["size"]}})
+    if "layout" in devtools:       # Styles beside the tree (side-by-side) or under it (stacked)
+        prefs["sidebar-position"] = json.dumps(LAYOUTS[devtools["layout"]])
     if "sidebar" in devtools:      # the Styles sidebar's width, or `hidden` for the Elements tree alone
+        # (DevTools 154 applied both in a wide pane, but not with `layout: side-by-side` at 800 px)
         if devtools["sidebar"] in ("hidden", 0, False):
             hidden = {"size": 300, "showMode": "OnlyMain"}
             prefs["elements.styles.sidebar.width"] = json.dumps({"vertical": hidden, "horizontal": hidden})
