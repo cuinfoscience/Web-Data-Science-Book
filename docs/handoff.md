@@ -21,13 +21,15 @@
 - **Decisions on 2026-09-24** ([`decisions.md`](decisions.md)): robots.txt is read for the course's User-Agent, and examples send one; the book recommends Python 3.14; students' pull requests merge after a code-review standup in class on a Friday.
 - **Contributors.** `CONTRIBUTING.md`, a pull request template, and issue forms that point to it (#146). The README acknowledges the AI tools used to write the book (#145).
 - **Project records.** `AGENTS.md` and `docs/`: the AARs, the plans, the decision log, and this note.
-- **Course repository.** Course #55 is merged: week 4's figures for the RSS handout and slides, Jupyter in week 1's setup, and `AUTHORING.md`'s notes on copies and the field notes. The course's roadmap for the Friday code review is `docs/plans/2026-09-24-friday-code-review.md` there.
+- **Course repository.**
+  - Course #55 is merged: week 4's figures for the RSS handout and slides, Jupyter in week 1's setup, and `AUTHORING.md`'s notes on copies and the field notes.
+  - Course #56 pairs with this note's pull request and waits for review. It adds the roadmap for the Friday code review (`docs/plans/2026-09-24-friday-code-review.md`) and the merge rule in the revision framework, the pull request walkthrough, and week 4's FAQ. It also puts Python 3.14 in week 1's setup and gensim from conda-forge in week 7's deck.
 
 ## Next
 
 In this order:
 
-1. **The first Friday code-review standup** for students' pull requests, on the course's roadmap ([plan](https://github.com/cuinfoscience/INFO4617-Fall2026/blob/main/docs/plans/2026-09-24-friday-code-review.md)). Before it, prepare the plan's review table: every open student pull request with its chapter, the issue it fixes, its checks, and any conflict or duplicate.
+1. **The first Friday code-review standup** for students' pull requests, on the course's roadmap ([plan](https://github.com/cuinfoscience/INFO4617-Fall2026/blob/main/docs/plans/2026-09-24-friday-code-review.md); the link works once course #56 merges). Before it, prepare the plan's review table: every open student pull request with its chapter, the issue it fixes, its checks, and any conflict or duplicate.
 2. **Back-fill chapters 1–3** in the [plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)'s order (§4): ch-01, ch-02, ch-03.
    - ch-01: 1-1 and 1-2 can be made now that Jupyter installs into `webdata`. 1-3 pairs the article with View Source, as a composite. 1-4 (the pageviews API in Chrome's JSON view) got 429 from Wikimedia on the session's first request: the shared cloud address was over Wikimedia's limit. Try once later, or capture it from another network.
    - Each chapter is a textbook and course pair of pull requests, and each figure starts from its brief.
