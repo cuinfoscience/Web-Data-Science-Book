@@ -1,6 +1,6 @@
 # Computed figures and tables in the book: roadmap
 
-**Status:** Proposed 2026-09-24. Not implemented. Two things have to happen before work starts: the maintainer's decisions in §9, and the end of the pause on chapter work (`docs/decisions.md`).
+**Status:** Proposed 2026-09-24. Not implemented. It waits only on the maintainer's decisions in §9; the pause on chapter work was lifted the same day (`docs/decisions.md`).
 
 **In one paragraph.** The chapters show code but never its results, because `_quarto.yml` sets `execute: eval: false` for the whole book. This plan puts computed charts and DataFrame tables on the website and keeps the student notebooks free of outputs. Code re-runs only when code changes. Each chapter gets a small compute file for any code that runs. The compute file reads a dated snapshot of the data, never the network. Quarto freezes each compute file's results, keyed to that file's own text. The chapter embeds those results and runs nothing itself. A prose edit therefore runs nothing, and CI never runs book code. Ten tests of Quarto 1.10.18 shaped this design (§3). Two of them showed that freezing a chapter directly cannot meet the requirement.
 
@@ -148,7 +148,7 @@ Showing results changes a promise the preface makes. Proposed wording for the pr
 
 ## 8. Roadmap
 
-Paused until the maintainer decides §9 and lifts the pause on chapter work.
+Waiting on the maintainer's decisions in §9. (The pause on chapter work was lifted on 2026-09-24.)
 
 - **M0: pilot on chapter 5.** One figure: daily pageviews, the block after "Now convert the response to a DataFrame and plot it". One table: `df.head()` of the same data.
   - Fetch the snapshot, write `computed/ch-05.qmd`, and embed its results. Teach `make_notebooks.py` to resolve embeds, add the checks, and render.

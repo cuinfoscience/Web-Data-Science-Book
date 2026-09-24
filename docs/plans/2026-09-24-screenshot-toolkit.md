@@ -2,7 +2,9 @@
 
 > Moved here on 2026-09-24 from the course repo (`cuinfoscience/INFO4617-Fall2026`, `docs/plans/2026-09-24-screenshot-toolkit.md`), so the toolkit's records sit beside its code. It was written there: "this repo" means the course repo, and paths under `slides/`, `handouts/`, and `syllabus/` are the course repo's.
 
-**Status:** Proposed, 2026-09-24. Implements [P0-2] of
+**Status:** M1–M3 merged (#135–#137). After the chapter 5 pilot, #142 added a read-back of every
+DevTools setting, the no-infobar guard, and a `brief:` for every figure, and #144 added the relaxed
+1024×768 size limit. M4 (§8) is next. Proposed 2026-09-24. Implements [P0-2] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md), and
 carries the checks behind [P1-2] and [P1-3]. The back-fill of chapters 1–5 that
 uses it is planned separately in
