@@ -84,8 +84,20 @@ figures:
     kind: capture
     section: "Inspecting Archived Pages"
     url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
-    mode: headed        # DevTools is browser UI: headed capture arrives in M2
-    devtools: {panel: elements, dock: right}
+    mode: headed
+    window: [1680, 1000]
+    devtools: {dock: right, panel: elements}
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'Welcome to Thefacebook'}
+      # Pick the 2004 page's own <center> in its empty left margin (the 700-pixel
+      # table is centered inside it), so DevTools selects <center> itself. The body
+      # then shows the toolbar insert, the comment that ends it, and Thefacebook's
+      # markup. (Climbing from a word of the page takes three nested tables.)
+      - inspect: {selector: 'center', at: [0.02, 0.5], selects: '^<center'}
+    expect:
+      text: ['Welcome to Thefacebook']
+    crop: {top: 0, height: 615}
     legacy:
       captured: 2026-09-22
       method: Chrome on a virtual display (Xvfb) with DevTools docked right, grabbed with ImageMagick import

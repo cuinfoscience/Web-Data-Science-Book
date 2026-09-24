@@ -26,8 +26,9 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
   them: six of the seven the page references were captured only as 404s, in
   August and September 2000 (CDX API, full query). An early query capped at
   25 rows suggested otherwise; see course PR #44.
-- `devtools-archived-page.png` needs a headed browser (tools/shots milestone
-  M2). Until then, retake it by hand: open the capture, dock DevTools right,
-  and select the first children of the page's body.
+- `devtools-archived-page.png` is a headed capture (tools/shots milestone M2):
+  its recipe inspects a word of the 2004 page, then climbs the Elements tree
+  by keyboard to the page's own `<center>`, so the body shows the toolbar
+  insert, the comment that ends it, and Thefacebook's markup.
 - The week 7 slides use crops of the same captures; their notes are in the
   course repo, `slides/week-07/img/IMAGES.md`.

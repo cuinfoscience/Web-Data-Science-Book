@@ -90,14 +90,48 @@ def cmd_doctor(args):
         else:
             line(BAD, f"headless capture failed: {error}")
     missing = [t for t in ("Xvfb", "xdotool", "import") if not shutil.which(t)]
-    line(GOOD if not missing else WARN,
-         "headed capture tools present" if not missing else
-         f"not installed yet: {', '.join(missing)} (needed from milestone M2)",
-         None if not missing else "bash tools/shots/bootstrap.sh --headed")
+    if missing:
+        line(WARN, f"headed capture needs {', '.join(missing)}, which is not installed",
+             "bash tools/shots/bootstrap.sh --headed")
+    else:
+        failed |= doctor_headed()
     for chapter in args.chapters:
         failed |= doctor_chapter(chapter)
     print("Ready to capture." if not failed else "Not ready; fix the FAIL lines first.")
     return 1 if failed else 0
+
+
+def doctor_headed():
+    """A real headed window on the virtual display, with DevTools, grabbed from the screen."""
+    from PIL import Image, ImageStat
+    from lib import headed
+    from lib.browser import Browser
+    browser = None
+    try:
+        browser = Browser()
+        fig = {**DEFAULTS, "id": "doctor", "chapter": "doctor", "mode": "headed", "scale": 1,
+               "window": [900, 600], "devtools": {"dock": "right"}, "timeout": 60}
+        session = headed.Session(browser, fig, browser.display(900, 600))
+        try:
+            response = session.page.goto("https://example.com/", wait_until="domcontentloaded", timeout=60000)
+            session.ready()
+            OUT.mkdir(parents=True, exist_ok=True)
+            session.grab(OUT / "doctor-headed.png")
+        finally:
+            session.close()
+        with Image.open(OUT / "doctor-headed.png") as img:
+            spread = ImageStat.Stat(img.convert("L")).stddev[0]
+        if response and response.status == 200 and spread > 3:
+            line(GOOD, "headed capture works (virtual display, DevTools, screen grab)")
+            return False
+        line(BAD, f"headed capture of example.com came back wrong (status "
+                  f"{response and response.status}, pixel spread {spread:.1f})")
+    except Exception as e:
+        line(BAD, f"headed capture failed: {str(e).splitlines()[0]}", "bash tools/shots/bootstrap.sh --headed")
+    finally:
+        if browser:
+            browser.close()
+    return True
 
 
 def doctor_chapter(chapter):

@@ -11,15 +11,18 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 | `network-tab-json.png` | capture | 2026-09-22 | https://quotes.toscrape.com/scroll | hand-run script, before tools/shots: Chrome for Testing 154 driven by Selenium 4.49, headed on Xvfb, DevTools docked right and operated with real clicks (xdotool), grabbed with ImageMagick import |
 | `playwright-codegen.png` | capture | 2026-09-22 | https://quotes.toscrape.com/ | hand-run script, before tools/shots: playwright codegen --target python (Playwright 1.63, its bundled Chrome for Testing 153), headed on Xvfb, grabbed with ImageMagick import |
 | `selenium-chrome-for-testing.png` | capture | 2026-09-22 | https://xkcd.com/ | hand-run script, before tools/shots: webdriver.Chrome() with Selenium 4.49 on a machine with no Chrome; Selenium Manager downloaded Chrome for Testing 154; headed on Xvfb, grabbed with ImageMagick import |
-| `view-source-js.png` | capture | 2026-09-22 | view-source:https://quotes.toscrape.com/js/ | hand-run script, before tools/shots: Chrome for Testing 154 driven by Selenium 4.49, headed on a virtual display (Xvfb), View Source grabbed with ImageMagick import; lines 27–43 |
+| `view-source-js.png` | capture | 2026-09-22 | view-source:https://quotes.toscrape.com/js/ | hand-run script, before tools/shots: Chrome for Testing 154 driven by Selenium 4.49, headed on a virtual display (Xvfb), View Source grabbed with ImageMagick import; the top of the source through line 43 |
 | `xkcd-inspect.png` | capture | 2026-09-22 | https://xkcd.com/ | hand-run script, before tools/shots: Chrome for Testing 154, headed on Xvfb, right-click > Inspect on the comic with real clicks (xdotool), DevTools docked right, grabbed with ImageMagick import |
 <!-- shots:end -->
 
 ## Notes
 
-- None of these can be re-captured headless: each shows browser UI or joins
-  two captures. They wait for tools/shots milestones M2 (headed) and M3
-  (composites); their recipes record how they were made.
+- None of these is captured headless: each shows browser UI or joins two
+  captures. `view-source-js`, `network-tab-json`, and `xkcd-inspect` are headed
+  captures (tools/shots milestone M2). `javascript-off-on` waits for
+  composites (M3). `selenium-chrome-for-testing` and `playwright-codegen` show
+  the tool itself, so they need that tool as the engine (M4); until then their
+  recipes record how they were made.
 - Chrome for Testing labels its own window "only for automated testing";
   `selenium-chrome-for-testing.png` keeps that bar because it is the lesson.
 - `xkcd-inspect.png` and `selenium-chrome-for-testing.png` show the comic

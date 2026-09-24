@@ -1,4 +1,4 @@
-"""Launch Chrome for Testing under Playwright. Headless only in milestone M1."""
+"""Chrome for Testing under Playwright: headless, or headed on a virtual display."""
 from playwright.sync_api import sync_playwright
 
 from .env import chrome_path, chrome_version, playwright_version, proxy
@@ -8,14 +8,15 @@ class Browser:
     def __init__(self, use_proxy=True):
         self.path = chrome_path()
         self.version = chrome_version(self.path)
-        self._pw = sync_playwright().start()
+        self.playwright = sync_playwright().start()
         options = {"executable_path": self.path, "headless": True}
         if use_proxy and proxy():
             # Every request goes through the session's proxy, certificate checks on,
             # except this machine's own servers (a local Jupyter, the selftest), which
             # the proxy cannot reach. Playwright would otherwise send loopback through it.
             options["proxy"] = {"server": proxy(), "bypass": "localhost,127.0.0.1"}
-        self._browser = self._pw.chromium.launch(**options)
+        self._browser = self.playwright.chromium.launch(**options)
+        self._display = None
 
     @property
     def label(self):
@@ -32,6 +33,18 @@ class Browser:
             timezone_id="America/Denver",
         )
 
+    def display(self, width, height):
+        """A virtual display at least width x height screen pixels, made on first use."""
+        from .display import Display
+        if self._display and not self._display.fits(width, height):
+            self._display.close()
+            self._display = None
+        if self._display is None:
+            self._display = Display(width, height)
+        return self._display
+
     def close(self):
         self._browser.close()
-        self._pw.stop()
+        if self._display:
+            self._display.close()
+        self.playwright.stop()
