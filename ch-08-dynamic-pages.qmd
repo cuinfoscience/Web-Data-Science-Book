@@ -4,7 +4,8 @@
 ## Learning Objectives
 - Explain why JavaScript-rendered content is invisible to `requests` + BeautifulSoup
 - Decide by hand — with View Source, JavaScript switched off, and the Network tab — whether a page needs a browser at all
-- Install Selenium, explain what Selenium Manager does when it starts a browser, and fix it when it fails
+- Install Selenium, check what Selenium Manager finds and downloads before starting the first browser, and fix it when it fails
+- Start Firefox, Edge, or Safari instead of Chrome, and say what each one needs
 - Locate elements using multiple strategies (ID, name, XPath, CSS selector)
 - Simulate user interactions — clicking, typing, and scrolling — programmatically
 - Pass fully-rendered page source from Selenium back to BeautifulSoup for parsing
@@ -105,80 +106,207 @@ When all three checks come up empty — the data appears only after the page run
 
 ## Setting Up Selenium
 
-Selenium requires two components: the `selenium` Python library and a browser driver — a small program that lets Python control a specific browser. Fortunately, you only need to install the library: since version 4.6 (late 2022), Selenium has shipped with **Selenium Manager**, which automatically finds or downloads the correct driver for whatever browser you have installed.
+Selenium requires two components: the `selenium` Python library and a browser driver — a small program that lets Python control a specific browser. You only need to install the library: since version 4.6 (late 2022), Selenium has shipped with **Selenium Manager**, which finds or downloads the correct driver for whatever browser you have installed, and downloads the browser as well if you have none.
 
 ```{python}
 # Install from a terminal:
 # pip install selenium
 ```
 
-Creating a driver is then a one-liner:
+### Before the First Browser
+
+Creating a driver takes one line, `webdriver.Chrome()`, and that line does three jobs before a window appears. It reads your settings; it runs Selenium Manager, which finds your browser and downloads whatever is missing; and it starts the driver and the browser. When the line fails, the error rarely says which job went wrong. So do the first two jobs yourself, one cell at a time, and check the result before you start the browser.
+
+The first run downloads files. The driver is about 10 MB. On a machine without Chrome, Selenium Manager also downloads **Chrome for Testing**, a build of Chrome made for automation, at about 190 MB. A download that size can take minutes on busy Wi-Fi, and in a cell of its own it can't be mistaken for a frozen scraper.
+
+**Step 1: settings first.** Selenium Manager takes its settings from environment variables and reads them each time it runs, so set them before anything starts it:
+
+```{python}
+import os
+
+import selenium
+
+print("selenium", selenium.__version__)  # the next cell needs 4.20 or later
+
+os.environ["SE_SKIP_DRIVER_IN_PATH"] = "true"  # ignore stray drivers on your PATH
+os.environ["SE_AVOID_STATS"] = "true"          # send no usage statistics (optional)
+# os.environ["SE_PROXY"] = "http://proxy.example.edu:3128"  # only behind a proxy
+```
+
+If the version printed is older than 4.20 (April 2024), run `pip install --upgrade selenium` and restart the notebook's kernel. The first setting matters most: it tells Selenium Manager to ignore any driver already on your system `PATH` and use one it has matched to your browser. The end of this section shows what happens without it. The second setting stops the usage statistics that Selenium Manager otherwise sends. The third is for networks that require a proxy; "When Selenium Manager Fails" below says when you need it.
+
+**Step 2: run Selenium Manager.** Ask it for the driver and browser that `webdriver.Chrome()` would use, with its log turned on so that you can read each decision:
+
+```{python}
+import logging
+
+from selenium.webdriver.common.selenium_manager import SeleniumManager
+
+logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(message)s")
+log = logging.getLogger("selenium.webdriver.common.selenium_manager")
+
+log.setLevel(logging.DEBUG)    # show each decision Selenium Manager makes
+paths = SeleniumManager().binary_paths(["--browser", "chrome"])
+log.setLevel(logging.WARNING)  # from here on, show only its warnings
+```
+
+On a Linux machine with no Chrome, in September 2026, the first run printed these lines, among others (the home folder is shortened to `~`):
+
+```
+DEBUG Found chromedriver 147.0.7727.24 in PATH: /opt/node22/bin/chromedriver
+DEBUG chrome not found in the system
+DEBUG Required browser: chrome 154.0.8037.57
+DEBUG Downloading chrome 154.0.8037.57 from https://storage.googleapis.com/chrome-for-testing-public/...
+DEBUG Required driver: chromedriver 154.0.8037.57
+DEBUG Skipping chromedriver in path: /opt/node22/bin/chromedriver
+DEBUG Downloading chromedriver 154.0.8037.57 from https://storage.googleapis.com/chrome-for-testing-public/...
+DEBUG Driver path: ~/.cache/selenium/chromedriver/linux64/154.0.8037.57/chromedriver
+DEBUG Browser path: ~/.cache/selenium/chrome/linux64/154.0.8037.57/chrome
+```
+
+Read it from the top. Selenium Manager found an old driver on the machine's `PATH`, left there by an npm package. It found no Chrome, so it downloaded Chrome for Testing 154 and the driver made for it, and it skipped the old driver because of the first setting. Both went into its cache folder, `~/.cache/selenium` (`%USERPROFILE%\.cache\selenium` on Windows), where the next run finds them without downloading anything. On a machine with Chrome installed, the log says `Detected browser: chrome` and the version instead, and only the driver is downloaded.
+
+**Step 3: check before you start the browser.** Look at the two paths Selenium Manager returned:
+
+```{python}
+from pathlib import Path
+
+driver_path = Path(paths["driver_path"])
+browser_path = Path(paths["browser_path"])
+cache = Path.home() / ".cache" / "selenium"
+
+print("Driver: ", driver_path, "(found)" if driver_path.is_file() else "(MISSING)")
+print("Browser:", browser_path, "(found)" if browser_path.is_file() else "(MISSING)")
+print("Driver chosen by Selenium Manager:", cache in driver_path.parents)
+```
+
+On the same machine, it printed:
+
+```
+Driver:  ~/.cache/selenium/chromedriver/linux64/154.0.8037.57/chromedriver (found)
+Browser: ~/.cache/selenium/chrome/linux64/154.0.8037.57/chrome (found)
+Driver chosen by Selenium Manager: True
+```
+
+Start the browser only when three things are true:
+
+- Both paths end in `(found)`.
+- The last line says `True`. Selenium Manager keeps the drivers it matches to your browser in its cache; a driver anywhere else came from your `PATH`, and nothing has checked that it fits your browser.
+- The log from step 2 has no line starting with `WARNING`. Selenium Manager warns instead of stopping when something looks wrong, so a warning now can become an error when the browser starts.
+
+If step 2 stopped with an error instead, Selenium Manager could not find or download something. The message says what, and "When Selenium Manager Fails" below lists the usual causes.
+
+Without the first setting, the same machine went wrong, and steps 2 and 3 caught it before the browser started. Selenium Manager downloaded Chrome 154 and worked out that it needed driver 154, then returned the old driver 147 from the `PATH` anyway, because a driver on your `PATH` wins. The log warned that "it is advised to delete the driver in PATH and retry," step 3 printed `False`, and `webdriver.Chrome()` failed with `This version of ChromeDriver only supports Chrome version 147`.
+
+### Starting the Browser
+
+Now create the driver:
 
 ```{python}
 from selenium import webdriver
 
-# For Chrome:
 driver = webdriver.Chrome()
 
-# For Firefox:
-# driver = webdriver.Firefox()
+# The browser that opened, and the driver controlling it
+print("Browser:", driver.capabilities["browserVersion"])
+print("Driver: ", driver.capabilities["chrome"]["chromedriverVersion"].split()[0])
 ```
 
-When you create the `driver`, a browser window opens (@fig-selenium-cft). This is your programmable browser — every command you issue through the `driver` object happens in that window.
+It printed:
+
+```
+Browser: 154.0.8037.57
+Driver:  154.0.8037.57
+```
+
+`webdriver.Chrome()` runs Selenium Manager once more, finds what step 2 downloaded in its cache, and starts the pair that step 3 checked. The two numbers should match up to the first dot. A browser window opens (@fig-selenium-cft). This is your programmable browser — every command you issue through the `driver` object happens in that window.
 
 ![A browser started by `webdriver.Chrome()` on a machine with no Chrome installed. Selenium Manager downloaded Chrome for Testing, which labels itself as meant only for automation.](images/ch-08/selenium-chrome-for-testing.png){#fig-selenium-cft .lightbox fig-alt="Screenshot of a Chrome for Testing window showing the xkcd home page and the comic Stargazing 5. A bar under the address bar reads Chrome for Testing v154.0.8037.57 is only for automated testing. For regular browsing, use a standard version of Chrome that updates automatically. The comic's hover text is showing as a tooltip."}
 
 ### What Selenium Manager Does
 
-Selenium Manager is a small program that ships inside the `selenium` package, and `webdriver.Chrome()` runs it before the browser starts. It:
+Selenium Manager is a small program that ships inside the `selenium` package. Step 2 ran it on its own; `webdriver.Chrome()` runs it every time, before the browser starts. It:
 
 1. Looks for a `chromedriver` already on your system `PATH`, and for Chrome itself.
-2. Asks Google's Chrome for Testing service which driver version matches your Chrome. If you have no Chrome at all, it downloads Chrome for Testing, a build of Chrome made for automation, as well.
+2. Asks Google's Chrome for Testing service which driver version matches your Chrome. If you have no Chrome at all, it downloads Chrome for Testing as well.
 3. Downloads the matching driver, and keeps it and any browser it fetched in a cache folder: `~/.cache/selenium` on macOS and Linux, `%USERPROFILE%\.cache\selenium` on Windows.
 4. Reuses the cache next time, checking for newer versions at most once an hour.
 
-You can watch it work by turning on its log before you create the driver:
-
-```{python}
-import logging
-
-logging.basicConfig(level=logging.WARNING)
-# Print each decision Selenium Manager makes
-logging.getLogger("selenium.webdriver.common.selenium_manager").setLevel(logging.DEBUG)
-
-driver.quit()  # Close the browser from the cell above before starting a logged one
-driver = webdriver.Chrome()
-```
-
-On a machine with no Chrome, in September 2026, the log included these lines (trimmed):
-
-```
-Found chromedriver 147.0.7727.24 in PATH: /opt/node22/bin/chromedriver
-chrome not found in the system
-Required browser: chrome 154.0.8037.57
-Downloading chrome 154.0.8037.57 from https://storage.googleapis.com/chrome-for-testing-public/...
-Required driver: chromedriver 154.0.8037.57
-Driver path: /opt/node22/bin/chromedriver
-```
-
-Selenium Manager downloaded Chrome 154 and worked out that it needed driver 154, then used driver 147 anyway, because an npm package had once installed that driver on the machine's `PATH`, and a driver on your `PATH` wins. Its log warned that "it is advised to delete the driver in PATH and retry," and the browser failed to start with `This version of ChromeDriver only supports Chrome version 147`. The log also recorded something else: Selenium Manager sends anonymous usage statistics (browser, operating system, language, and Selenium version) to Plausible, a web analytics service, unless you set the environment variable `SE_AVOID_STATS=true`.
+It also sends anonymous usage statistics (the browser, operating system, language, and Selenium version) to Plausible, a web analytics service, unless you set `SE_AVOID_STATS=true`, as step 1 does.
 
 ### When Selenium Manager Fails
 
-- **`This version of ChromeDriver only supports Chrome version N`.** An old driver on your `PATH`, left by a manual download, Homebrew, conda, or an npm package, outranks the one Selenium Manager would choose. Delete it, or set `SE_SKIP_DRIVER_IN_PATH=true`. With that setting, the machine above downloaded chromedriver 154 and started cleanly.
+- **`This version of ChromeDriver only supports Chrome version N`.** An old driver on your `PATH`, left by a manual download, Homebrew, conda, or an npm package, outranks the one Selenium Manager would choose. Set `SE_SKIP_DRIVER_IN_PATH=true`, as step 1 does, or delete the old driver.
 - **Downloads fail on a campus or corporate network.** A proxy or firewall may block Google's download servers. Set `SE_PROXY` to your proxy's address, or run once on an open network; after that, Selenium Manager works from its cache, and `SE_OFFLINE=true` stops it from trying the network at all.
-- **Chrome is installed somewhere unusual.** Browsers installed through conda or snap can hide from Selenium Manager. Point Selenium at the browser with `options.binary_location = "/path/to/chrome"`.
+- **Chrome is installed somewhere unusual.** Browsers installed through conda or snap can hide from Selenium Manager. Give it the path: in step 2, add `"--browser-path", "/path/to/chrome"` to the list, and when you start the browser, set `options.binary_location = "/path/to/chrome"`.
 - **Something is stuck in the cache.** Delete the cache folder listed above and run your code again; Selenium Manager rebuilds it.
-- **Your computer is a Linux ARM machine, such as a Raspberry Pi.** Selenium Manager has no build for that platform, so install the browser and its driver with your system's package manager.
+- **`'SeleniumManager' object has no attribute 'binary_paths'`.** Your `selenium` is older than 4.20. Run `pip install --upgrade selenium` and restart the kernel.
+- **Your computer runs Linux on an ARM processor, such as a Raspberry Pi.** Selenium's documentation says Selenium Manager doesn't run there, but Selenium 4.49 includes a build for 64-bit ARM, and Chrome for Testing and Firefox both publish 64-bit ARM Linux builds for it to download. If it fails anyway, or on 32-bit Linux such as 32-bit Raspberry Pi OS, where there is no Selenium Manager at all, install the browser and its driver with your system's package manager.
 
-Settings like these are environment variables. The simplest way to set one is at the top of your notebook, before your first `webdriver.Chrome()`:
+Each fix is a setting or a file to delete. Put the setting in step 1's cell, then run steps 1 to 3 again: they show whether the fix worked before you start a browser.
 
-```{python}
-import os
+### Other Browsers
 
-# Ignore any stray chromedriver on PATH and let Selenium Manager fetch a matching one
-os.environ["SE_SKIP_DRIVER_IN_PATH"] = "true"
+This chapter uses Chrome, but Selenium drives the other major browsers the same way. Once a driver has started, `driver.get()`, `find_element()`, and the waits later in this chapter work unchanged. What differs is how each browser starts: its driver, who makes that driver, and what Selenium Manager can download for you.
+
+| Browser | Start it with | Its driver, made by | Selenium Manager downloads |
+|---|---|---|---|
+| Chrome | `webdriver.Chrome()` | chromedriver, Google | the driver, and Chrome for Testing if you have no Chrome |
+| Firefox | `webdriver.Firefox()` | geckodriver, Mozilla | the driver, and Firefox if you have none |
+| Edge | `webdriver.Edge()` | msedgedriver, Microsoft | the driver, and Edge if you have none (on Windows, which comes with Edge, only with administrator rights) |
+| Safari | `webdriver.Safari()` | safaridriver, Apple | nothing: macOS includes both |
+
+Steps 1 to 3 work for Firefox and Edge too: in step 2, change `"chrome"` to `"firefox"` or `"edge"`.
+
+**Firefox.** Start it in place of Chrome. Its capabilities report the driver's version under a name of its own:
+
+```python
+driver = webdriver.Firefox()
+
+print("Browser:", driver.capabilities["browserVersion"])
+print("Driver: ", driver.capabilities["moz:geckodriverVersion"])
 ```
+
+In September 2026 that printed Firefox `156.0.1` and geckodriver `0.37.1`. The numbers don't match, and they shouldn't: geckodriver has its own version numbers, and each release supports a range of Firefox versions. Selenium Manager's log lists the ones that fit your Firefox (`Valid geckodriver versions for firefox 156: ["0.37.1", ...]`) and picks the newest. Firefox's headless switch differs too: `options.add_argument("-headless")`, with one dash, on `webdriver.FirefoxOptions()`. And geckodriver downloads come from GitHub, so a network that blocks GitHub blocks Firefox's driver even when Chrome's downloads work.
+
+On Ubuntu 22.04 and later, the Firefox that comes with the system is a snap, a package that runs in a container with its own view of the files, and a driver outside the container can leave it hanging at startup. Mozilla's fix is to use the driver that comes inside the snap:
+
+```python
+service = webdriver.FirefoxService(executable_path="/snap/bin/geckodriver")
+driver = webdriver.Firefox(service=service)
+```
+
+**Edge.** Microsoft builds Edge on Chromium, the open-source core of Chrome, so Edge takes the same options as Chrome: create them with `webdriver.EdgeOptions()`, and `--headless=new` and the other flags in "Headless Mode" below work unchanged.
+
+```python
+driver = webdriver.Edge()
+
+print("Browser:", driver.capabilities["browserVersion"])
+print("Driver: ", driver.capabilities["msedge"]["msedgedriverVersion"].split()[0])
+```
+
+As with Chrome, the two numbers match: `153.0.4234.48` for both in September 2026.
+
+**Safari.** Safari's driver comes only with macOS, at `/usr/bin/safaridriver`, so Selenium Manager downloads nothing for it, and on Windows or Linux `webdriver.Safari()` fails with `Unable to obtain driver for safari`. On a Mac, turn on remote automation once, in Terminal (if macOS refuses, run it again with `sudo` in front):
+
+```
+safaridriver --enable
+```
+
+Then start it:
+
+```python
+driver = webdriver.Safari()
+```
+
+Safari's automation differs from the others' in ways you will notice:
+
+- It runs in separate windows with an orange address bar. Like a private window, each session starts from a clean slate: it can't see your browsing history or AutoFill data.
+- A transparent "glass pane" covers the window while your code runs, so stray clicks and keystrokes can't interfere. You can break through it to stop a stuck script, but that ends the session for good; the window stays open until you close it.
+- Only one Safari session can run at a time, so two notebooks can't both drive Safari.
+- Safari has no headless mode: every session opens a window.
+
+Playwright, later in this chapter, offers another route to Safari's engine. It installs its own build of WebKit, the engine inside Safari, with `playwright install webkit`, and that build runs on Windows and Linux as well as macOS. It is not Safari itself, and Playwright's documentation recommends running it on a Mac for the closest match.
 
 ## Navigating and Finding Elements
 
@@ -691,7 +819,7 @@ When the answer is a browser, the two tools differ in ways that decide which one
 | | Selenium | Playwright |
 |---|---|---|
 | Install | `pip install selenium` | `pip install playwright`, then `playwright install` |
-| Browsers | The one you have installed; Selenium Manager downloads Chrome for Testing if you have none | Its own copies, pinned to each Playwright release |
+| Browsers | Chrome, Firefox, Edge, or Safari, as installed; Selenium Manager downloads Chrome for Testing, Firefox, or Edge if yours is missing | Its own copies of Chromium, Firefox, and WebKit, pinned to each Playwright release |
 | In a notebook | Yes | Only through the async API and `await` |
 | Waiting | Explicit, with `WebDriverWait` | Automatic when you act on or read an element |
 | Recording clicks | Selenium IDE, a separate browser extension | `playwright codegen`, built in |
@@ -783,7 +911,7 @@ When platforms close their APIs and render content exclusively through JavaScrip
 
 - **`NoSuchElementException`**: The element does not exist yet because the page has not finished loading. Add `time.sleep()` or use explicit waits with `WebDriverWait`.
 - **`StaleElementReferenceException`**: The DOM changed between when you found the element and when you tried to interact with it. Re-find the element.
-- **`SessionNotCreatedException: This version of ChromeDriver only supports Chrome version N`**: An older `chromedriver` on your `PATH` is overriding Selenium Manager. Delete it, or set `SE_SKIP_DRIVER_IN_PATH=true` (see "When Selenium Manager Fails" above). If there is no stray driver, a brand-new browser release may have outrun Selenium for a few days; updating the `selenium` package typically fixes it.
+- **`SessionNotCreatedException: This version of ChromeDriver only supports Chrome version N`**: An older `chromedriver` on your `PATH` is overriding Selenium Manager; step 3 of "Before the First Browser" prints `False` when this happens. Delete it, or set `SE_SKIP_DRIVER_IN_PATH=true` (see "When Selenium Manager Fails" above). If there is no stray driver, a brand-new browser release may have outrun Selenium for a few days; updating the `selenium` package typically fixes it.
 - **Memory issues**: Each Selenium driver runs a full browser process. Close drivers promptly with `driver.quit()`.
 - **Playwright: `It looks like you are using Playwright Sync API inside the asyncio loop`**: You ran a sync script in a notebook. Run it from the terminal instead, or switch to the async API.
 - **Playwright: `Executable doesn't exist at ...`**: Playwright's browsers are missing, usually right after you install or upgrade the library. Run `playwright install chromium`.
@@ -796,6 +924,9 @@ The modern web is dynamic: JavaScript renders content after the initial HTML loa
 
 - Selenium documentation: <https://www.selenium.dev/documentation/>
 - Selenium Manager: <https://www.selenium.dev/documentation/selenium_manager/>
+- Selenium's pages on each browser (Chrome, Edge, Firefox, Safari): <https://www.selenium.dev/documentation/webdriver/browsers/>
+- Apple, "About WebDriver for Safari": <https://developer.apple.com/documentation/webkit/about-webdriver-for-safari>
+- Mozilla, geckodriver usage, including Firefox snaps: <https://firefox-source-docs.mozilla.org/testing/geckodriver/Usage.html>
 - Selenium Python bindings: <https://selenium-python.readthedocs.io/>
 - Playwright for Python: <https://playwright.dev/python/>
 - Playwright MCP: <https://playwright.dev/mcp/introduction>
