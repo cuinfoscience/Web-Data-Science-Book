@@ -42,18 +42,26 @@ def preferences(devtools):
         prefs["inspector-view.split-view-state"] = json.dumps({axis: {"size": devtools["size"]}})
     if "layout" in devtools:       # Styles beside the tree (side-by-side) or under it (stacked)
         prefs["sidebar-position"] = json.dumps(LAYOUTS[devtools["layout"]])
-    if "sidebar" in devtools:      # the Styles sidebar's width, or `hidden` for the Elements tree alone
-        # (DevTools 154 applied both in a wide pane, but not with `layout: side-by-side` at 800 px)
+    if "sidebar" in devtools:      # the Styles pane's size: its width beside the tree, its height under it
+        # DevTools 154 keeps the tree/Styles split in `elements-panel-split-view-state` (found by
+        # dragging the splitter and reading the profile back). It honors the size but ignores a
+        # hidden state at 800 px; `layout: stacked, sidebar: 1` leaves the tree the whole width.
+        # `hidden` also writes the older key, which hid the pane in the Oscars figure's wide DevTools.
+        axis = "horizontal" if devtools.get("layout") == "stacked" else "vertical"
         if devtools["sidebar"] in ("hidden", 0, False):
             hidden = {"size": 300, "showMode": "OnlyMain"}
             prefs["elements.styles.sidebar.width"] = json.dumps({"vertical": hidden, "horizontal": hidden})
+            prefs["elements-panel-split-view-state"] = json.dumps({axis: {"size": 100, "showMode": "OnlyMain"}})
         else:
-            prefs["elements.styles.sidebar.width"] = json.dumps({"vertical": {"size": devtools["sidebar"]}})
+            prefs["elements-panel-split-view-state"] = json.dumps({axis: {"size": devtools["sidebar"]}})
     if "overview" in devtools:     # the Network panel's timeline above the request list
         prefs["network-log-show-overview"] = json.dumps(bool(devtools["overview"]))
-    if devtools.get("columns"):    # extra Network columns; DevTools 154 hides Waterfall by default
+    if devtools.get("columns"):    # Network columns to show, [waterfall], or {waterfall: true, initiator: false}
+        columns = devtools["columns"]
+        if not isinstance(columns, dict):
+            columns = {name: True for name in columns}
         prefs["network-log-columns"] = json.dumps(
-            {name: {"visible": True, "title": name.replace("-", " ").title()} for name in devtools["columns"]})
+            {name: {"visible": bool(on), "title": name.replace("-", " ").title()} for name, on in columns.items()})
     return {
         "devtools": {"preferences": prefs},
         # Chrome stores zoom as a level: factor = 1.2 ** level.

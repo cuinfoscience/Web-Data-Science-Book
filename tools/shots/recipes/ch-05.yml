@@ -17,7 +17,9 @@ figures:
     section: "The Inspector Tab"
     url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
     mode: headed
-    devtools: {dock: bottom, size: 330, zoom: 1.25, layout: side-by-side}
+    # The Elements tree alone gets DevTools' whole width, so its rows don't wrap: Styles goes
+    # under it at its smallest, and the crop stops above the breadcrumb bar and Styles' tab bar.
+    devtools: {dock: bottom, size: 330, zoom: 1.25, layout: stacked, sidebar: 1}
     steps:
       - wait: {selector: 'h1#firstHeading'}
       - scroll: {selector: 'h1#firstHeading', offset: 70}
@@ -29,7 +31,7 @@ figures:
     expect:
       status: 200
       text: ['University of Colorado Boulder']
-    crop: {window: true}
+    crop: {top: 0, height: 500}
     drifts: true
     annotate:
       marks:
@@ -41,7 +43,7 @@ figures:
     section: "The Inspector Tab"
     url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
     mode: headed
-    devtools: {dock: bottom, size: 300, zoom: 1.25, layout: side-by-side}
+    devtools: {dock: bottom, size: 300, zoom: 1.25, layout: stacked, sidebar: 1}
     steps:
       - wait: {selector: 'table.infobox'}
       - scroll: {selector: 'table.infobox', offset: 20}
@@ -51,7 +53,7 @@ figures:
       - pointer: {selector: 'table.infobox', at: [0.02, 0.03]}
     expect:
       status: 200
-    crop: {window: true}
+    crop: {top: 0, height: 500}
     drifts: true
     annotate:
       marks:
@@ -64,8 +66,9 @@ figures:
     url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
     mode: headed
     # A first visit, so every row shows a real size and time, not "(memory cache)".
-    devtools: {dock: bottom, size: 360, zoom: 1.25, panel: network, overview: false, columns: [waterfall],
-               first_visit: true}
+    # Initiator is hidden (the text doesn't discuss it) so Name and Type aren't cut short.
+    devtools: {dock: bottom, size: 360, zoom: 1.25, panel: network, overview: false,
+               columns: {waterfall: true, initiator: false}, first_visit: true}
     steps:
       - wait: {network_idle: true}
       # The list follows its newest rows; turn the wheel up over it to reach the page's own request.

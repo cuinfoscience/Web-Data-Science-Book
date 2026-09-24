@@ -135,8 +135,8 @@ How a headed capture runs:
   - `zoom` (1.25 keeps DevTools readable in the book inside the 800×600 limit; 1.75 makes it large enough for print);
   - `size`: the pane's width, or its height when docked at the bottom;
   - `layout`: `side-by-side` puts the Styles pane beside the Elements tree. DevTools' default (`auto`) stacks Styles under the tree in a narrow window, where it can squeeze the tree out entirely;
-  - `sidebar`: the Styles pane's width, or `hidden` for the tree alone. DevTools 154 applied this in a wide pane (the Oscars figure) but not in an 800-pixel window with `layout: side-by-side`;
-  - `overview: false` hides the Network panel's timeline above the request list, and `columns: [waterfall]` adds Network columns that are hidden by default (DevTools 154 hides Waterfall).
+  - `sidebar`: the Styles pane's size, its width beside the tree or its height under it (`layout: stacked`). In an 800-pixel window, `layout: stacked, sidebar: 1` gives the Elements tree DevTools' whole width, so its rows don't wrap, and leaves only Styles' tab bar below it for the crop to cut. `hidden` hid the pane in the Oscars figure's wide DevTools; at 800 pixels DevTools 154 ignores it;
+  - `overview: false` hides the Network panel's timeline above the request list. `columns` shows or hides Network columns: `[waterfall]` adds Waterfall, which DevTools 154 hides by default, and `{waterfall: true, initiator: false}` also drops a column the text doesn't need.
 
   DevTools 154 ignores the stored `panel`, so the toolkit clicks that panel's tab. For `network`, it then reloads the page so the log is complete. That reload is a second visit: it sends the cookies the first load was given and revalidates what it cached. `first_visit: true` clears both before the reload, so the log shows what a first visit sends and receives: every request reaches the network, and none carries a cookie.
 
