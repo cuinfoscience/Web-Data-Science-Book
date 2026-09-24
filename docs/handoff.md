@@ -36,7 +36,10 @@ In this order:
    - `shots import`, for hand captures such as week 1's issue form, isn't built (M4).
 3. **Retake the chapter 7 figures** (AAR P2-1): five are over the size limit, and `x-com-1999`'s caption lacks a date. On 2026-09-24 web.archive.org reset every connection after about 11 seconds; retry. Chapter 8's two tool windows wait for M4.
 4. **Toolkit M4** ([plan](plans/2026-09-24-screenshot-toolkit.md), §8): evidence queries for counts in captions (AAR P1-2), `sync` and `import`, the Selenium and codegen engines, and the `shots-check` CI job (AAR P1-1).
-5. **Align the chapters' User-Agent strings** with `WebDataScience/1.0 (your-email@colorado.edu)`, after the Friday review. Students' #88 and #93 add one to chapter 4's requests.
+5. **Align the chapters' User-Agent strings** with `WebDataScience/1.0 (your-email@colorado.edu)`, after the Friday review.
+   - Students' #88 and #93 add one to chapter 4's requests.
+   - Chapter 7's three top-level requests (Availability, the raw capture, CDX) send none, and week 7's deck copies them. Change the chapter and the deck together, so the slides match the notebook.
+   - The course's week 11 deck calls keyed APIs (Census, FRED, FEC) without one. Week 1's setup handout and week 10's deck already send one (course #56 fixed week 1).
 6. **The course side of the contributor docs.** `handouts/common/revision-framework.md` and week 1's deck still name `claude.md`, now `AGENTS.md`, and the handouts say pull requests have no form.
 7. **Computed outputs.** If they are adopted, run the [plan](plans/2026-09-24-computed-outputs.md)'s M0 pilot on chapter 5.
 
