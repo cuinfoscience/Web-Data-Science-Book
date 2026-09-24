@@ -14,7 +14,12 @@ BEGIN = ("<!-- shots:begin: generated from provenance.json by tools/shots;"
 END = "<!-- shots:end -->"
 KEEP = ("file", "kind", "url", "final_url", "status", "captured", "by", "method", "browser",
         "user_agent", "window", "scale", "javascript", "crop", "clip", "size",
-        "recipe_sha256", "image_sha256", "note")
+        "recipe_sha256", "image_sha256", "note", "text", "parts")
+
+
+def annotated_name(file):
+    """The annotated image's file name: x-com-1999.png -> x-com-1999_annotated.png (.pdf beside it)."""
+    return file.removesuffix(".png") + "_annotated.png"
 
 
 def path(chapter):
@@ -33,8 +38,12 @@ def save(chapter, data):
     path(chapter).write_text(json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False) + "\n")
 
 
-def from_take(take):
-    return {k: take[k] for k in KEEP if k in take}
+def from_take(take, annotated=None):
+    """A take's provenance; `annotated` records the marked-up copy made from it, if any."""
+    entry = {k: take[k] for k in KEEP if k in take}
+    if annotated:
+        entry["annotated"] = annotated
+    return entry
 
 
 def from_legacy(fig, image_sha256, size):
@@ -60,7 +69,8 @@ def table(data):
     rows = ["| File | Kind | Captured | Source | How |", "|---|---|---|---|---|"]
     for fid in sorted(data["figures"]):
         e = data["figures"][fid]
-        rows.append(f"| `{e['file']}` | {e['kind']} | {str(e.get('captured', ''))[:10]} "
+        name = f"`{e['file']}`" + (f" and `{annotated_name(e['file'])}`, `.pdf`" if e.get("annotated") else "")
+        rows.append(f"| {name} | {e['kind']} | {str(e.get('captured', ''))[:10]} "
                     f"| {e.get('url') or ''} | {_how(e)} |")
     return "\n".join(rows) + "\n"
 

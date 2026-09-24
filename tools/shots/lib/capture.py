@@ -1,26 +1,32 @@
-"""Capture one figure: pace, load, run steps, guard, crop, screenshot, log.
+"""Capture one figure: pace, load, run steps, guard, measure, crop, screenshot, log.
 
 Every take is written to tools/shots/out/<chapter>/<figure>/<UTC time>.png,
 with a .json log beside it. A take that fails a guard is named
 <UTC time>.FAILED.png. Nothing here writes to images/; `promote` does that.
+
+The log records what the browser knew at the moment of capture, in the
+take's own pixels: the box of everything the recipe's marks point at, and the
+sizes of the text inside the crop (lib/measure.py). Markers are drawn from the
+first (lib/annotate.py); the legibility check reads the second.
 """
 import datetime
 import hashlib
 import json
 import os
 import random
-import re
 import time
 from urllib.parse import urlparse
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
-from . import crop, guards, steps
-from .env import OUT, rel
+from . import crop, guards, measure, steps
+from .env import OUT, ROOT, rel
+from .recipes import part_figure
 
 # Seconds before the 2nd, 3rd, and 4th attempt (selftest.py shortens them).
 BACKOFF = [int(s) for s in os.environ.get("SHOTS_BACKOFF", "30,60,120").split(",")]
 PACE_FILE = OUT / ".pacing.json"
+LABEL_FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
 
 class PolicyBlock(Exception):
@@ -60,9 +66,9 @@ class Pacer:
 def _expected(page, fig):
     problems = []
     expect = fig.get("expect") or {}
-    for pattern in expect.get("text") or []:
-        if page.get_by_text(re.compile(pattern)).count() == 0:
-            problems.append(f"expected text /{pattern}/ not found")
+    for text in expect.get("text") or []:
+        if page.get_by_text(steps.pattern(text)).count() == 0:
+            problems.append(f"expected text /{text}/ not found")
     for selector in expect.get("selector") or []:
         if page.locator(selector).count() == 0:
             problems.append(f"expected element {selector!r} not found")
@@ -73,35 +79,75 @@ def _stamp():
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
+def _measure_headless(page, fig, rect, full):
+    """Anchors and text sizes, in the take's pixels. Page boxes are in the viewport's
+    CSS pixels; the image starts at the clip's corner, or at the page's for a full page."""
+    scale = fig["scale"]
+    if full:
+        sx, sy, width, height = page.evaluate(
+            "[scrollX, scrollY, document.documentElement.scrollWidth, document.documentElement.scrollHeight]")
+        ox, oy, region = -sx, -sy, [-sx, -sy, width - sx, height - sy]
+    else:
+        ox, oy = rect["x"], rect["y"]
+        region = [ox, oy, ox + rect["width"], oy + rect["height"]]
+    anchors, problems = {}, []
+    for at in measure.marks_anchors(fig):
+        if "xy" in at:
+            anchors[measure.key(at)] = measure.hand_box(at["xy"])
+            continue
+        try:
+            box = measure.page_boxes(page, at, timeout=fig["timeout"])
+        except measure.AnchorError as e:
+            problems.append(str(e))
+            continue
+        anchors[measure.key(at)] = {"box": measure.shifted([v * scale for v in box], ox * scale, oy * scale)}
+    sizes = measure.scaled(page.evaluate(measure.TEXT_SIZES, region), scale)
+    return anchors, measure.summarize(sizes), problems
+
+
+def _result():
+    return {"status": None, "problems": [], "temporary": False, "clip": None, "final_url": None,
+            "steps": [], "error": None, "anchors": {}, "text": None}
+
+
 def _headless(browser, fig, png):
-    """One headless attempt: (status, problems, temporary, clip, final_url, steplog, error)."""
+    """One headless attempt, as a dict: status, problems, temporary (worth retrying),
+    clip, final_url, steps, error (the page never loaded), anchors, and text."""
+    result = _result()
     context = browser.context(fig)
     page = context.new_page()
-    steplog = []
     try:
         try:
             response = page.goto(fig["url"], wait_until="domcontentloaded", timeout=fig["timeout"] * 1000)
         except Exception as e:
-            return None, [], False, None, None, steplog, str(e).splitlines()[0]
-        status = response.status if response else None
+            result["error"] = str(e).splitlines()[0]
+            return result
+        status = result["status"] = response.status if response else None
+        result["final_url"] = page.url
         if guards.retryable(status=status):
-            return status, [f"HTTP status {status}"], True, None, page.url, steplog, None
-        problems = []
+            result.update(problems=[f"HTTP status {status}"], temporary=True)
+            return result
+        problems = result["problems"]
         try:
-            steps.run(page, fig, steplog)
+            steps.run(page, fig, result["steps"])
         except steps.StepError as e:
             problems.append(str(e))
         time.sleep(fig["settle"])
         text = page.evaluate("() => document.body ? document.body.innerText : ''")
-        issues, temporary = guards.page_problems(status, page.title(), text, fig.get("expect") or {})
+        issues, result["temporary"] = guards.page_problems(status, page.title(), text, fig.get("expect") or {})
         problems += issues + _expected(page, fig)
+        result["final_url"] = page.url
         try:
             rect, full = crop.clip(page, fig)
         except crop.CropError as e:
             problems.append(str(e))
             rect, full = None, False
+        if rect or full:
+            result["anchors"], result["text"], missed = _measure_headless(page, fig, rect, full)
+            problems += missed
         page.screenshot(path=str(png), clip=rect, full_page=full, animations="disabled")
-        return status, problems, temporary, rect, page.url, steplog, None
+        result["clip"] = rect
+        return result
     finally:
         context.close()
 
@@ -110,7 +156,7 @@ def capture(browser, fig, pacer, say=print):
     """Return the take's log (a dict). Raises PolicyBlock if the proxy refuses the host."""
     from . import headed
     if fig["mode"] == "composite":
-        return {"ok": False, "skipped": "mode `composite` arrives in milestone M3"}
+        return _composite(browser, fig, pacer, say)
     if fig.get("engine", "playwright") != "playwright":
         return {"ok": False, "skipped": f"engine `{fig['engine']}` (the tool is the figure's subject) "
                                         "arrives in a later milestone"}
@@ -133,8 +179,8 @@ def capture(browser, fig, pacer, say=print):
         else:
             result = _headless(browser, fig, png)
             label = browser.label
-        status, problems, temporary, clip, final_url, steplog, error = result
-        attempt.update({k: v for k, v in (("status", status), ("steps", steplog), ("error", error)) if v})
+        status, problems, error = result["status"], result["problems"], result["error"]
+        attempt.update({k: v for k, v in (("status", status), ("steps", result["steps"]), ("error", error)) if v})
         if error:
             if guards.policy_block(error):
                 host = urlparse(fig["url"].removeprefix("view-source:")).hostname
@@ -147,7 +193,7 @@ def capture(browser, fig, pacer, say=print):
             continue
         if not png.exists():
             attempt["result"] = "; ".join(problems + ["no image was taken"])
-            if temporary and n < fig["retries"]:
+            if result["temporary"] and n < fig["retries"]:
                 continue
             return {"ok": False, "problems": problems + ["no image was taken"], "attempts": attempts}
         problems += guards.image_problems(png)
@@ -155,22 +201,10 @@ def capture(browser, fig, pacer, say=print):
             failed = folder / f"{stamp}.FAILED.png"
             png.rename(failed)
             png = failed
-        with Image.open(png) as img:
-            size = list(img.size)
-        take = {
-            "ok": not problems, "problems": problems,
-            "chapter": fig["chapter"], "figure": fig["id"], "file": fig["file"], "kind": fig["kind"],
-            "url": fig["url"], "final_url": final_url, "status": status,
-            "captured": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
-            "by": "tools/shots", "browser": label, "user_agent": fig["user_agent"],
-            "window": fig["window"], "scale": fig["scale"], "javascript": fig["javascript"],
-            "mode": fig["mode"], "devtools": fig.get("devtools"),
-            "crop": fig.get("crop") or {"window": True}, "clip": clip, "size": size,
-            "recipe_sha256": fig["recipe_sha256"], "image": rel(png), "image_sha256": sha256(png),
-            "attempts": attempts,
-        }
-        png.with_suffix(".json").write_text(json.dumps(take, indent=2) + "\n")
-        if problems and temporary and n < fig["retries"]:
+        take = _log(fig, png, problems, status, result["final_url"], label, result["clip"], attempts)
+        take.update(anchors=result["anchors"], text=result["text"])
+        _write(take, png)
+        if problems and result["temporary"] and n < fig["retries"]:
             say(f"    attempt {n + 1}: {'; '.join(problems)}; will retry")
             continue
         return take
@@ -178,6 +212,77 @@ def capture(browser, fig, pacer, say=print):
     return {"ok": False, "problems": [f"no usable take after {len(attempts)} attempt(s): "
                                       f"{last.get('error') or last.get('result') or last.get('status')}"],
             "attempts": attempts}
+
+
+def _log(fig, png, problems, status, final_url, label, clip, attempts):
+    with Image.open(png) as img:
+        size = list(img.size)
+    return {
+        "ok": not problems, "problems": problems,
+        "chapter": fig["chapter"], "figure": fig["id"], "file": fig["file"], "kind": fig["kind"],
+        "url": fig["url"], "final_url": final_url, "status": status,
+        "captured": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+        "by": "tools/shots", "browser": label, "user_agent": fig["user_agent"],
+        "window": fig["window"], "scale": fig["scale"], "javascript": fig["javascript"],
+        "mode": fig["mode"], "devtools": fig.get("devtools"),
+        "crop": fig.get("crop") or {"window": True}, "clip": clip, "size": size,
+        "recipe_sha256": fig["recipe_sha256"], "image": rel(png), "image_sha256": sha256(png),
+        "attempts": attempts,
+    }
+
+
+def _write(take, png):
+    png.with_suffix(".json").write_text(json.dumps(take, indent=2) + "\n")
+
+
+def _composite(browser, fig, pacer, say):
+    """Capture each part as a figure of its own, then join them side by side, labeled."""
+    parts = []
+    for n in range(len(fig["parts"])):
+        sub = {**part_figure(fig, n), "recipe_sha256": fig["recipe_sha256"]}
+        say(f"  part {n + 1}: {sub['label']}")
+        take = capture(browser, sub, pacer, say)
+        if not take.get("ok"):
+            return {"ok": False, "problems": [f"part {n + 1} ({sub['label']}): "
+                                              + "; ".join(take.get("problems") or ["failed"])]}
+        take["label"] = sub["label"]
+        parts.append(take)
+    folder = OUT / fig["chapter"] / fig["id"]
+    folder.mkdir(parents=True, exist_ok=True)
+    png = folder / f"{_stamp()}.png"
+    join([ROOT / p["image"] for p in parts], [p["label"] for p in parts], fig.get("layout") or {},
+         fig["scale"], png)
+    problems = guards.image_problems(png)
+    take = _log(fig, png, problems, parts[0]["status"], parts[0]["final_url"], parts[0]["browser"], None,
+                [a for p in parts for a in p["attempts"]])
+    take["parts"] = [{k: p.get(k) for k in ("label", "image", "image_sha256", "url", "javascript", "status")}
+                     for p in parts]
+    sizes = measure.merge(*[{float(s): c for s, c in ((p.get("text") or {}).get("sizes") or {}).items()}
+                            for p in parts])
+    take["text"] = measure.summarize(sizes)
+    _write(take, png)
+    return take
+
+
+def join(images, labels, layout, scale, out):
+    """Place images side by side on white, each labeled below it, inside a thin gray frame."""
+    gap, pad = layout.get("gap", 28) * scale, layout.get("pad", 14) * scale
+    size = layout.get("label_px", 28) * scale
+    font = ImageFont.truetype(LABEL_FONT, size)
+    panels = [Image.open(p).convert("RGB") for p in images]
+    tallest = max(p.height for p in panels)
+    label_h = round(size * 1.5)
+    width = sum(p.width for p in panels) + gap * (len(panels) - 1) + 2 * pad
+    height = tallest + label_h + 2 * pad
+    sheet = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(sheet)
+    x = pad
+    for panel, label in zip(panels, labels):
+        sheet.paste(panel, (x, pad))
+        draw.text((x + panel.width / 2, pad + tallest + label_h / 2), label, fill="black", font=font, anchor="mm")
+        x += panel.width + gap
+    draw.rectangle([0, 0, width - 1, height - 1], outline=(200, 200, 200), width=max(1, scale))
+    sheet.save(out)
 
 
 def takes(chapter, fid, ok_only=True):

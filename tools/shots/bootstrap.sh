@@ -4,6 +4,8 @@
 #
 #   bash tools/shots/bootstrap.sh            headless capture (milestone M1)
 #   bash tools/shots/bootstrap.sh --headed   also the virtual display and input tools (M2)
+#   bash tools/shots/bootstrap.sh --tex      also TeX, for drawing markers (M3)
+#   bash tools/shots/bootstrap.sh --headed --tex
 #
 # It never disables certificate checks, never unsets the proxy, and never runs
 # `playwright install` (this environment provides browsers another way).
@@ -13,7 +15,14 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV="$HERE/.venv"
 CHROME_VERSION="${SHOTS_CHROME_VERSION:-154}"
 HEADED=0
-[[ "${1:-}" == "--headed" ]] && HEADED=1
+TEX=0
+for arg in "$@"; do
+  case "$arg" in
+    --headed) HEADED=1 ;;
+    --tex) TEX=1 ;;
+    *) echo "unknown option: $arg" >&2; exit 2 ;;
+  esac
+done
 
 say() { printf '  %s\n' "$*"; }
 
@@ -27,7 +36,18 @@ if [[ $HEADED == 1 ]]; then
   command -v xdotool >/dev/null || need+=(xdotool)
   command -v import >/dev/null || need+=(imagemagick)
 fi
-fc-list 2>/dev/null | grep -qi "Noto Sans" || need+=(fonts-noto-core)
+if [[ $TEX == 1 ]]; then
+  # pdflatex with TikZ, the standalone class, and Helvetica; pdftocairo
+  command -v pdflatex >/dev/null || need+=(texlive-latex-base)
+  kpsewhich tikz.sty >/dev/null 2>&1 || need+=(texlive-pictures)
+  kpsewhich standalone.cls >/dev/null 2>&1 || need+=(texlive-latex-extra)
+  kpsewhich helvet.sty >/dev/null 2>&1 || need+=(texlive-fonts-recommended)
+  command -v pdftocairo >/dev/null || need+=(poppler-utils)
+fi
+# (Read the font list once: `fc-list | grep -q` fails under pipefail when grep stops early.)
+FONTS="$(fc-list 2>/dev/null || true)"
+grep -qi "Noto Sans" <<<"$FONTS" || need+=(fonts-noto-core)
+grep -qi "DejaVu Sans" <<<"$FONTS" || need+=(fonts-dejavu-core)   # composite labels, contact sheets
 if ((${#need[@]})); then
   say "installing: ${need[*]}"
   if command -v apt-get >/dev/null; then

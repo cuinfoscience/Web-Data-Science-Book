@@ -1,11 +1,11 @@
 # Recipes for Chapter 8's figures (ch-08-dynamic-pages.qmd). See tools/shots/README.md.
 #
 # Every figure here shows browser UI (View Source, DevTools, the Chrome for
-# Testing window, the Playwright Inspector) or joins two captures, so none is
-# captured headless. The headed ones run on a virtual display (milestone M2);
-# the two whose subject is a tool itself (the window Selenium opens, Playwright's
-# recorder) need that tool as the engine and wait for a later milestone, as does
-# the side-by-side composite (M3). `legacy:` records how each image was made.
+# Testing window, the Playwright Inspector) or joins two captures. The headed
+# ones run on a virtual display; the composite captures its two parts headless
+# and joins them. The two whose subject is a tool itself (the window Selenium
+# opens, Playwright's recorder) need that tool as the engine and wait for a
+# later milestone (M4). `legacy:` records how each image was made.
 # quotes.toscrape.com is a sandbox built for scraping practice and has no
 # robots.txt.
 chapter: ch-08
@@ -34,6 +34,15 @@ figures:
     section: "Check 2: Turn JavaScript Off"
     url: https://quotes.toscrape.com/js/
     mode: composite     # the page with JavaScript off, then on, side by side, labeled
+    window: [900, 695]
+    parts:
+      - label: JavaScript off
+        javascript: false
+        steps: [{wait: {text: 'Quotes to Scrape'}}]
+      - label: JavaScript on
+        steps: [{wait: {text: 'Albert Einstein'}}]
+    layout: {gap: 28, pad: 15, label_px: 28}
+    legibility: {skip: "the lesson is the empty page beside the full one, not the words"}
     legacy:
       captured: 2026-09-22
       method: two captures of the same page, JavaScript disabled and enabled, joined side by side and labeled

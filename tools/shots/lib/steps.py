@@ -7,6 +7,8 @@
     - hover: {selector: '...'}               or {text: '...'}, or {position: [x, y]}
     - click: {selector: '...'}               or {text: '...'}, or {position: [x, y]}
     - scroll: {selector: '...'}              into view; or {y: 400} to scroll by pixels
+    - scroll: {selector: '...', offset: 175} so the element's top is 175 pixels below
+                                             the window's top
     - press: 'Escape'                        a key
     - settle: 1.5                            seconds, for animation that has no end signal
 
@@ -24,11 +26,29 @@ class StepError(Exception):
     pass
 
 
+def pattern(text):
+    """A recipe's regular expression, ready for Playwright.
+
+    Playwright hands patterns to JavaScript, which has no inline flags, so a
+    leading `(?i)` becomes the ignore-case flag.
+    """
+    if text.startswith("(?i)"):
+        return re.compile(text[4:], re.IGNORECASE)
+    return re.compile(text)
+
+
+def js_pattern(text):
+    """(source, flags) for `new RegExp(source, flags)` in a page or in DevTools."""
+    if text is None:
+        return None, ""
+    return (text[4:], "i") if text.startswith("(?i)") else (text, "")
+
+
 def target(page, arg):
     if "selector" in arg:
         return page.locator(arg["selector"]).first
     if "text" in arg:
-        return page.get_by_text(re.compile(arg["text"])).first
+        return page.get_by_text(pattern(arg["text"])).first
     return None
 
 
@@ -47,7 +67,7 @@ def run(page, fig, log, extra=None):
                 extra[kind](arg)
             elif kind == "wait":
                 if "text" in arg:
-                    page.get_by_text(re.compile(arg["text"])).first.wait_for(state="visible", timeout=ms)
+                    page.get_by_text(pattern(arg["text"])).first.wait_for(state="visible", timeout=ms)
                 if "selector" in arg:
                     page.locator(arg["selector"]).first.wait_for(state=arg.get("state", "visible"), timeout=ms)
                 if arg.get("network_idle"):
@@ -65,7 +85,12 @@ def run(page, fig, log, extra=None):
                 else:
                     raise StepError(f"{kind} needs selector, text, or position")
             elif kind == "scroll":
-                if "selector" in arg:
+                if "selector" in arg and "offset" in arg:
+                    element = page.locator(arg["selector"]).first
+                    element.wait_for(state="attached", timeout=ms)
+                    element.evaluate("(el, offset) => window.scrollTo(0, el.getBoundingClientRect().top"
+                                     " + window.scrollY - offset)", arg["offset"])
+                elif "selector" in arg:
                     page.locator(arg["selector"]).first.scroll_into_view_if_needed(timeout=ms)
                 else:
                     page.mouse.wheel(0, arg.get("y", 0))

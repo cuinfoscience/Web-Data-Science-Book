@@ -1,0 +1,80 @@
+# Course-only figures: made with tools/shots for the INFO 4617 course repo, not
+# for a chapter. `promote` refuses them (their images live in the course repo;
+# `sync`, milestone M4, will copy them there), and `check` only validates them.
+#
+# The two figures here rebuild, from recipes, the week-06 Oscars handout's
+# annotated screenshots, which were captured and marked up by hand on
+# 2026-09-24 (handouts/week-06/img/oscars_card_annotated.tex and
+# oscars_devtools_annotated.tex). They are the regression test for markers
+# (milestone M3): each marker comes from the element it points at, measured
+# at capture time, and should land within a few pixels of the hand-placed one.
+# The week-06 files themselves stay untouched.
+chapter: course
+course: true
+qmd: none
+
+figures:
+  - id: oscars-card
+    kind: capture
+    section: "week-06 handout, Figure 1"
+    url: https://www.oscars.org/oscars/ceremonies/2026
+    window: [1680, 1947]          # the hand capture's viewport
+    scale: 2
+    steps:
+      - click: {text: '(?i)^\s*(use )?necessary cookies only\s*$'}     # Cookiebot: necessary only
+      - wait: {text: '(?i)michael b\. jordan'}
+      - scroll: {selector: 'div.paragraph--type--award-category', offset: 175}
+    # The first card and the top of the next, from 18.5 CSS pixels left of the card.
+    crop: {selector: 'div.paragraph--type--award-category', pad: [13, 0, 0, 18.5], width: 560, height: 595}
+    targets: {handout: {width_in: 2.625}}
+    annotate:
+      width_in: 2.625
+      size: small
+      marks:
+        - {n: 3, at: {selector: '.paragraph--type--award-category .field--name-field-award-category-oscars', box: text}}
+        - {n: 5, at: {selector: '.paragraph--type--award-honoree .field--name-field-honoree-type', box: text}, column: honoree}
+        - {n: 6, at: {selector: '.paragraph--type--award-honoree .field--name-field-award-entities .field__item', box: text}, column: honoree}
+        - {n: 7, at: {selector: '.paragraph--type--award-honoree .field--name-field-award-film', box: text}, column: honoree}
+        - {n: 4, shape: brace, at: {selector: '.paragraph--type--award-honoree'}, x: 202.5}
+        - {n: 2, shape: brace, at: {selector: '.paragraph--type--award-category'}, x: -40}
+        - {n: 1, shape: bracket, at: {selector: '.field--name-field-award-categories'}, x: -1}
+    notes: >-
+      Markers 5-7 share a column past the longest of their three lines; the
+      honoree's and the card's braces are pinned where the hand version put
+      them, in the empty right half of the card.
+
+  - id: oscars-devtools
+    kind: capture
+    section: "week-06 handout, Figure 2"
+    url: https://www.oscars.org/oscars/ceremonies/2026
+    mode: headed
+    window: [1680, 2090]          # the hand capture's window
+    scale: 1
+    devtools: {dock: bottom, zoom: 1.75, size: 1300, sidebar: hidden}
+    steps:
+      - click: {text: '(?i)^\s*(use )?necessary cookies only\s*$'}
+      - wait: {text: '(?i)michael b\. jordan'}
+      - scroll: {selector: 'div.paragraph--type--award-category', offset: 175}
+      - inspect: {selector: '.paragraph--type--award-honoree .field--name-field-award-entities .field__item', selects: 'Michael B'}
+      # Open the film's <div class="field">, three rows down, then select the name again.
+      - tree: {keys: [Down], until: '^<div class="field">\W*</div>$', max: 6}
+      - tree: {keys: [Right]}
+      - inspect: {selector: '.paragraph--type--award-honoree .field--name-field-award-entities .field__item', selects: 'Michael B'}
+    crop: {left: 300, top: 998, width: 1040, height: 824}
+    oversize: "DevTools is zoomed to 175%, so its text reads as a 594×471 capture's would"
+    targets: {handout: {width_in: 5.04}}
+    annotate:
+      width_in: 5.04
+      marks:
+        - {n: 1, at: {devtools: {row: 'field--name-field-award-categories'}}, side: left, x: 30, gap: 7}
+        - {n: 2, at: {devtools: {row: 'paragraph--type--award-category'}}, side: left, x: 30, gap: 7}
+        - {n: 3, at: {devtools: {row: 'field--name-field-award-category-oscars'}}, side: left, x: 30, gap: 7}
+        - {n: 4, at: {devtools: {row: 'paragraph--type--award-honoree'}}, side: left, x: 30, gap: 7}
+        - {n: 5, at: {devtools: {row: 'field--name-field-honoree-type'}}, side: left, x: 30, gap: 7}
+        - {n: 6, at: {devtools: {row: 'field--name-field-award-entities'}}, side: left, x: 30, gap: 7}
+        - {n: 7, at: {devtools: {row: 'field--name-field-award-film'}}, side: left, x: 30, gap: 7}
+        - {label: '← you clicked', at: {devtools: {selected: true}}, x: -4}
+        - {n: 4, shape: brace, label: '4 more honorees', at: {devtools: {row: '^<div class="field__item">\W*</div>$', nth: [0, 3]}}, gap: 13}
+    notes: >-
+      Seven markers in the left margin, each led to the row of a class name the
+      handout's code uses; the four collapsed honorees are one brace.
