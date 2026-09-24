@@ -2,17 +2,62 @@
   "chapter": "ch-08",
   "figures": {
     "javascript-off-on": {
-      "by": "hand-run script, before tools/shots",
-      "captured": "2026-09-22",
+      "browser": "Google Chrome for Testing 154.0.8037.57 (headless, Playwright 1.63.0)",
+      "by": "tools/shots",
+      "captured": "2026-09-24T18:43:51+00:00",
+      "clip": null,
+      "crop": {
+        "window": true
+      },
       "file": "javascript-off-on.png",
-      "image_sha256": "ee3513122ff5cc9e96b26cfbd23acaf36cd013ff48565732346c27221e00930b",
+      "final_url": "https://quotes.toscrape.com/js/",
+      "image_sha256": "bdc3eb8f75d5947e0dfb44df4f2a4db9c16b3eb5028364ed6994bfc87e5d8e25",
+      "javascript": true,
       "kind": "capture",
-      "method": "two captures of the same page, JavaScript disabled and enabled, joined side by side and labeled",
-      "size": [
-        1858,
-        758
+      "parts": [
+        {
+          "image": "tools/shots/out/ch-08/javascript-off-on-part1/20260924T184339Z.png",
+          "image_sha256": "85fe18092fc82f4f0f15ffbda60daaa95fba832a41dacf89acdb2470f6fde1c4",
+          "javascript": false,
+          "label": "JavaScript off",
+          "status": 200,
+          "url": "https://quotes.toscrape.com/js/"
+        },
+        {
+          "image": "tools/shots/out/ch-08/javascript-off-on-part2/20260924T184349Z.png",
+          "image_sha256": "fd1047bbef0a72b62ab6cdb98926edf90e9b9fc3ce79e7ddb43d5c36e2bfdf1b",
+          "javascript": true,
+          "label": "JavaScript on",
+          "status": 200,
+          "url": "https://quotes.toscrape.com/js/"
+        }
       ],
-      "url": "https://quotes.toscrape.com/js/"
+      "recipe_sha256": "62f5d4747ea9133bbe17dd064c28262c8c0502fde0a89c5e34494c0e1e335ebc",
+      "scale": 2,
+      "size": [
+        1596,
+        1184
+      ],
+      "status": 200,
+      "text": {
+        "chars": 332,
+        "median": 36.0,
+        "min": 26.0,
+        "p20": 27.8,
+        "sizes": {
+          "26": 48,
+          "27.8": 25,
+          "32": 66,
+          "36": 165,
+          "82": 28
+        }
+      },
+      "url": "https://quotes.toscrape.com/js/",
+      "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
+      "window": [
+        370,
+        520
+      ]
     },
     "network-tab-json": {
       "browser": "Google Chrome for Testing 154.0.8037.57 (headed on Xvfb, Playwright 1.63.0)",
@@ -85,18 +130,49 @@
       "url": "https://xkcd.com/"
     },
     "view-source-js": {
-      "by": "hand-run script, before tools/shots",
-      "captured": "2026-09-22",
+      "browser": "Google Chrome for Testing 154.0.8037.57 (headed on Xvfb, Playwright 1.63.0)",
+      "by": "tools/shots",
+      "captured": "2026-09-24T18:43:16+00:00",
+      "clip": {
+        "height": 576.0,
+        "width": 800.0,
+        "x": 0.0,
+        "y": 91.0
+      },
+      "crop": {
+        "between": [
+          "td.line-number[value=\"11\"]",
+          "td.line-number[value=\"43\"]"
+        ],
+        "width": 800
+      },
       "file": "view-source-js.png",
-      "image_sha256": "00d1ffd8a9c7dc2f2db798f375c36b0afedc40a022f0ca20dd5d035ce6f3cb3b",
+      "final_url": "https://quotes.toscrape.com/js/",
+      "image_sha256": "2b349f304a2beb52788099d1897d7d122ab12c262b89771938fe8bdea302032b",
+      "javascript": true,
       "kind": "capture",
-      "method": "Chrome for Testing 154 driven by Selenium 4.49, headed on a virtual display (Xvfb), View Source grabbed with ImageMagick import; the top of the source through line 43",
-      "note": "The quotes sit in a script element as `var data = [...]`.",
+      "recipe_sha256": "148183a67d9e8d7125d94b9f8f11a8ca89d6fee65aa2e958ed9e09a7d49d143b",
+      "scale": 2,
       "size": [
-        1100,
-        760
+        1600,
+        1152
       ],
-      "url": "view-source:https://quotes.toscrape.com/js/"
+      "status": 200,
+      "text": {
+        "chars": 550,
+        "median": 26.0,
+        "min": 26.0,
+        "p20": 26.0,
+        "sizes": {
+          "26": 550
+        }
+      },
+      "url": "view-source:https://quotes.toscrape.com/js/",
+      "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
+      "window": [
+        816,
+        720
+      ]
     },
     "xkcd-inspect": {
       "browser": "Google Chrome for Testing 154.0.8037.57 (headed on Xvfb, Playwright 1.63.0)",
