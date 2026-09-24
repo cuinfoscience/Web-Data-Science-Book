@@ -290,13 +290,10 @@ def report_take(fig, take):
         # A DevTools key DevTools doesn't know fails silently: say what it drew instead.
         for level, message in dt.compare(take["devtools"], take.get("devtools_seen"), take["scale"]):
             line(WARN if level == "warn" else "note", f"DevTools: {message}")
-    over = legibility.oversize(take)
-    if over and fig.get("oversize"):
-        line("note", f"{over}; allowed: {fig['oversize']}")
-    elif over:
-        line(WARN, over, "crop to what the text discusses, or zoom DevTools, rather than widen the window "
-                         "(or say why in `oversize:`)")
     results = legibility.judge(fig, take.get("text"), take["size"][0], record)
+    verdict = legibility.size_verdict(fig, take, results)
+    if verdict:
+        line("note" if verdict[0] == "note" else WARN, verdict[1])
     skip = (fig.get("legibility") or {}).get("skip")
     if results and skip and not all(r[-1] for r in results):
         line("note", f"text size: {legibility.describe(results)}; not judged: {skip}")
@@ -462,12 +459,14 @@ def check_markers(fig, entry, chapter, err, warn):
 
 
 def check_size(fig, entry, warn):
-    """The first and soft limit: a figure shows at most 800x600 CSS pixels, or its recipe says why."""
-    over = legibility.oversize(entry)
-    if over and fig.get("oversize"):
-        line("note", f"{fig['id']}: {over}; allowed: {fig['oversize']}")
-    elif over:
-        warn(f"{fig['id']}: {over}")
+    """The first and soft limit: a figure shows at most 800x600 CSS pixels; up to 1024x768 when its
+    recipe says what clutter the room removes and its text passes; beyond that, with a reason."""
+    results = legibility.judge(fig, entry.get("text"), entry["size"][0], entry.get("annotated"))
+    verdict = legibility.size_verdict(fig, entry, results)
+    if verdict and verdict[0] == "note":
+        line("note", f"{fig['id']}: {verdict[1]}")
+    elif verdict:
+        warn(f"{fig['id']}: {verdict[1]}")
 
 
 def check_legibility(fig, entry, err):

@@ -215,6 +215,8 @@ figures:
     targets: {{slides: {{width: 0.35}}}}
   - {{id: wide, kind: capture, url: "{base}/ok", window: [1000, 500]}}
   - {{id: wide-allowed, kind: capture, url: "{base}/ok", window: [1000, 500], oversize: "a test of the reason"}}
+  - {{id: wide-small, kind: capture, url: "{base}/small", window: [1000, 500], oversize: "a test of the reason"}}
+  - {{id: too-wide, kind: capture, url: "{base}/ok", window: [1100, 500]}}
   - id: joined
     kind: capture
     url: "{base}/ok"
@@ -306,15 +308,23 @@ figures:
 
     print("anchors, markers, legibility, composites")
     code, out = captured = shots("capture", "ch-99", "--only", "marks", "marks-2x", "small-text", "joined",
-                                 "wide", "wide-allowed")
+                                 "wide", "wide-allowed", "wide-small", "too-wide")
     marks, marks2, small, joined = newest("marks"), newest("marks-2x"), newest("small-text"), newest("joined")
     said = sections(out)
-    expect("a figure showing more than 800x600 CSS pixels gets a warning (the soft limit)",
-           "shows 1000×500 CSS pixels, over the 800×600 soft limit; the book's column shows its text at 78%"
+    expect("a figure over 800x600 but within 1024x768 gets a warning that asks what clutter the room removes",
+           "warn  shows 1000×500 CSS pixels, over 800×600 but within the relaxed 1024×768 limit; the book's column "
+           "shows its text at 78% of its size on screen; allowed when the extra room removes clutter"
            in said.get("wide", "") and newest("wide").get("ok") is True, said.get("wide"))
-    expect("...which its recipe can allow, with a reason",
-           "allowed: a test of the reason" in said.get("wide-allowed", ""), said.get("wide-allowed"))
-    expect("...and an 800x600 figure is within it", "marks" in said and "soft limit" not in said["marks"],
+    expect("...which a reason in its recipe allows, when its text passes (the relaxed limit)",
+           "note  shows 1000×500" in said.get("wide-allowed", "")
+           and "allowed: a test of the reason" in said.get("wide-allowed", ""), said.get("wide-allowed"))
+    expect("...but not when its text is too small where it is shown, reason or not",
+           "warn  shows 1000×500" in said.get("wide-small", "") and "but its text is too small (book"
+           in said.get("wide-small", "") and "allowed:" not in said.get("wide-small", ""), said.get("wide-small"))
+    expect("a figure beyond 1024x768 without a reason gets a warning",
+           "warn  shows 1100×500 CSS pixels, over the relaxed 1024×768 limit" in said.get("too-wide", ""),
+           said.get("too-wide"))
+    expect("...and an 800x600 figure is within the limit", "marks" in said and "CSS pixels, over" not in said["marks"],
            said.get("marks"))
 
     def anchor(take, at):
@@ -372,11 +382,15 @@ figures:
     print("promote and check, with markers and text sizes")
     code, out = shots("promote", "ch-99", "small-text")
     code, out = shots("promote", "ch-99", "wide")
+    code, out = shots("promote", "ch-99", "wide-allowed")
     code, out = shots("check", "ch-99")
     expect("check fails a promoted image whose text is too small to read",
            code == 1 and "text too small to read: slides 11.7 px" in out, out[-400:])
-    expect("check warns about an approved image over the 800x600 soft limit",
-           "wide: shows 1000×500 CSS pixels, over the 800×600 soft limit" in out, out[-400:])
+    expect("check warns about an approved image over 800x600 whose recipe gives no reason",
+           "warn  wide: shows 1000×500 CSS pixels, over 800×600 but within the relaxed 1024×768 limit" in out,
+           out[-600:])
+    expect("...and notes one within 1024x768 with a reason and legible text",
+           "note  wide-allowed: shows 1000×500" in out and "allowed: a test of the reason" in out, out[-600:])
     if tex_tools:
         code, out = shots("promote", "ch-99", "marks")
         annotated = tmp / "images" / "ch-99" / "marks_annotated.png"

@@ -54,7 +54,11 @@ These come from `slides/common/AUTHORING.md` in the course repo and from the AAR
 - **No logins, no credentials, no student names or work.** A page behind a login is captured by the instructor by hand (M4 adds `import`).
 - **No infobars.** Chrome for Testing puts a notice under the address bar: "Chrome for Testing … is only for automated testing". It is 55 pixels of browser chrome that says nothing about the page. Headed captures pass `--disable-infobars`, which keeps it off. `capture` fails a headed take whose bars above the page are taller than the tab strip and address bar (88 pixels), unless the figure's subject is the bar (`expect: {infobar: true}`, as for ch-08's Selenium window). The figures made before the toolkit ran Chrome without the switch and carried the notice.
 - **Dated captions.** A figure that shows things that change (counts, versions, live pages) says in its caption when it was captured.
-- **At most 800×600 of the screen.** A figure shows at most 800×600 CSS pixels of the screen (1600×1200 image pixels at scale 2). In the book's 778-pixel column its text then stays about the size it had on screen; a whole 1680-pixel window shrinks it to less than half. To show DevTools, zoom DevTools and crop to what the text discusses, rather than widening the window. This is the first check, and a soft one: going over is a warning, and a recipe that needs more says why in `oversize:`.
+- **800×600 of the screen, or up to 1024×768 when that is clearer.** A figure shows 800×600 CSS pixels of the screen by default (1600×1200 image pixels at scale 2). In the book's 778-pixel column its text then stays about the size it had on screen; a whole 1680-pixel window shrinks it to less than half. To show DevTools, zoom DevTools and crop to what the text discusses, rather than widening the window. A figure may relax to 1024×768 when two things are true:
+  - the extra room removes clutter: rows that wrap, columns cut short with "…", panels squeezed together;
+  - its text still passes the legibility check everywhere it is shown. At 1024 pixels wide the book's column shows text at 76% of its size on screen (97% at 800), so on-screen text needs about 14.5 CSS pixels: zoom DevTools to about 150%.
+
+  The recipe says what the room removes, in `oversize:`. This is the first check, and a soft one: going over is a warning. Beyond 1024×768, a recipe needs a reason too.
 
 ## What the chapter 5 pilot settled
 
@@ -113,8 +117,9 @@ figure's record is kept.
    work and no one's personal data. A page behind a login is the
    instructor's to capture by hand.
 3. **Write the rest of the recipe.** Use the smallest window and crop that
-   hold what the brief names: 800×600 CSS pixels at most, or `oversize:`
-   with the reason. For browser UI, add `mode: headed` and a `devtools:` block
+   hold what the brief names: 800×600 CSS pixels by default, or up to
+   1024×768 when the extra room removes clutter and the text still passes,
+   with what it removes in `oversize:`. For browser UI, add `mode: headed` and a `devtools:` block
    that sets the dock, the zoom (125% in most chapter 5 figures), the panel,
    and the panes, columns, and sidebars to hide. Steps wait for a condition;
    none sleeps blindly. Add `annotate:` marks that point at elements or
@@ -260,7 +265,7 @@ How a headed capture runs:
 - **The window:** Chrome for Testing opens on a virtual display sized for the window at its scale. It gets a fresh profile, a debugging port, and no "controlled by automated test software" bar.
 - **DevTools settings:** `devtools:` opens DevTools with the page, from settings written into the profile before launch:
   - `dock` (`right`, `bottom`, `left`);
-  - `zoom` (1.25 keeps DevTools readable in the book inside the 800×600 limit; 1.75 makes it large enough for print);
+  - `zoom` (1.25 keeps DevTools readable in the book inside 800×600, and about 1.5 inside 1024×768; 1.75 makes it large enough for print);
   - `size`: the pane's width, or its height when docked at the bottom;
   - `layout`: `side-by-side` puts the Styles pane beside the Elements tree. DevTools' default (`auto`) stacks Styles under the tree in a narrow window, where it can squeeze the tree out entirely;
   - `sidebar`: the Styles pane's size, its width beside the tree or its height under it (`layout: stacked`). In an 800-pixel window, `layout: stacked, sidebar: 1` gives the Elements tree DevTools' whole width, so its rows don't wrap, and leaves only Styles' tab bar below it for the crop to cut. DevTools 154 can't hide the pane. `hidden` puts it at its smallest, whichever layout DevTools uses: 97 DevTools pixels wide beside the tree, or 57 tall under it. Before the read-back existed, `hidden` set only one layout, so in a narrow pane that DevTools stacked, the Styles pane took most of the height and squeezed the tree;
@@ -358,15 +363,38 @@ so a marker drawn here looks like one in a handout.
 
 ## Legibility
 
-**First, a soft limit on size.** A figure shows at most 800×600 CSS pixels of
-the screen: its image size over its scale. `capture`, `annotate`, `sheet`, and
-`check` warn about a figure over the limit, and say how small the book's
-column will make its text. A recipe that needs more says why, and the warning
-becomes a note:
+**First, a soft limit on size.** A figure shows 800×600 CSS pixels of the
+screen by default: its image size over its scale. It may relax to 1024×768
+when the extra room removes clutter and its text still passes at every target.
+`capture`, `annotate`, `sheet`, and `check` report a figure over 800×600, and
+say how small the book's column will make its text:
+
+| What the figure shows | What the tools say |
+|---|---|
+| up to 800×600 | nothing |
+| up to 1024×768, with a reason in `oversize:` and text that passes at every target | a note |
+| up to 1024×768, without a reason | a warning: say what clutter the room removes, or crop to 800×600 |
+| up to 1024×768, with text too small somewhere it is shown (reason or not) | a warning: go back to 800×600, or zoom the page or DevTools |
+| more than 1024×768, with a reason in `oversize:` | a note |
+| more than 1024×768, without a reason | a warning |
+
+Within 1024×768, the reason is the clutter the extra room removes:
+
+```yaml
+window: [1024, 768]
+devtools: {dock: bottom, size: 460, zoom: 1.5, panel: network}
+oversize: "at 800 pixels wide the Network list cuts Name and Type short with …"
+```
+
+Beyond it, the reason says why the text still reads, as for the week-06 handout's
+DevTools figure:
 
 ```yaml
 oversize: "DevTools is zoomed to 175%, so its text reads as a 594×471 capture's would"
 ```
+
+An image made before the toolkit measured text can't show that its text passes,
+so it gets a warning inside 1024×768 until it is retaken.
 
 **Then, the text itself.** Every take records the size of the text inside its
 crop, counted by character, from the page and from DevTools. The legibility
@@ -469,13 +497,13 @@ It reports **warnings** for:
 - short alt text;
 - a drifting figure whose caption does not give the capture year;
 - marks changed in the recipe since the annotated image was drawn (promote again);
-- a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`).
+- a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
 
-`selftest` runs 68 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 71 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture;
-- the 800×600 soft limit: its warning, a recipe's reason, and `check`;
+- the size limits: 800×600; the relaxed 1024×768, which needs a reason and text that passes; beyond it; and `check`;
 - legibility, with week 08's `infinite_scroll.png` as the failing case; a composite; `sheet`;
 - headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take;
 - the User-Agent and its Client Hints, and a first visit's reload, read back from what the local server receives;

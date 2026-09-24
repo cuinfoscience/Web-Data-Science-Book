@@ -2,6 +2,20 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-09-24 · A screenshot may relax to 1024×768 when that is clearer and still legible
+
+**Decision.**
+- 800×600 CSS pixels stays the default for what a screenshot shows.
+- A screenshot may show up to 1024×768 when both of these hold:
+  - the extra room removes clutter: rows that wrap, columns cut short with "…", panels squeezed together;
+  - its text still passes `tools/shots/run check` everywhere it is shown: 11 pixels in the book, 16 on a 1920-pixel slide, 6 points in print.
+- The recipe says what the room removes, in `oversize:`. The tools warn about a figure in that range that has no reason, has text too small at any target, or has text that was never measured.
+- Beyond 1024×768, a recipe still needs a reason, such as DevTools zoomed to 175% for print.
+
+**Why.** The 800×600 cap fixed tiny text, but under the cap alone some figures came out crammed (see "Figures are readable at both ends", below). The maintainer asked to allow 1024×768 when it keeps text legible and reduces clutter. At 1024 pixels wide, the book's column shows text at 76% of its size on screen, against 97% at 800. So the legibility check, not the size, stays the test: on-screen text needs about 14.5 CSS pixels, which for DevTools means zooming to about 150%.
+
+**Where.** `tools/shots/lib/legibility.py` (`SOFT_LIMIT`, `RELAXED_LIMIT`, and `size_verdict`), `tools/shots/run check`, `tools/shots/README.md` ("The rules" and "Legibility"), `AGENTS.md`, and the course's `slides/common/AUTHORING.md`. *Amends* "A screenshot shows at most 800×600 CSS pixels of the screen", below.
+
 ## 2026-09-24 · No browser banners in figures
 
 **Decision.**
@@ -39,7 +53,7 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 
 **Why.** The 800×600 cap fixed the tiny text of whole-window captures. The chapter 5 pilot then squeezed DevTools into the cap, and the figures came out crammed: the Styles pane took 40% of the width, rows wrapped, and columns were cut short. Separately, the slide rule in `AUTHORING.md` (W/1680 of the text width) was too small for DevTools text by the toolkit's slide threshold. ([AAR](aar/AAR_Web-Data-Science-Book_2026-09-24.md) §5.1, P0-1.)
 
-**Where.** `AGENTS.md` ("Figures and screenshots"), the course's `slides/common/AUTHORING.md` ("How much a screenshot shows"), and `tools/shots/lib/legibility.py`.
+**Where.** `AGENTS.md` ("Figures and screenshots"), the course's `slides/common/AUTHORING.md` ("How much a screenshot shows"), and `tools/shots/lib/legibility.py`. *The cap was relaxed the same day: a figure may show up to 1024×768 when its text still passes (entry above).*
 
 ## 2026-09-24 · Pull requests merge with merge commits; history is never rewritten
 
@@ -80,7 +94,7 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 
 **Why.** Whole-window captures shrank text to 42–71% of its on-screen size in the book's 778-pixel column. DevTools' text came out near 5 pixels.
 
-**Status.** Standing, as the soft limit inside the entry above, "Figures are readable at both ends". The cap is a heuristic that serves that aim. Under the cap alone, the chapter 5 pilot produced crammed figures. ([AAR](aar/AAR_Web-Data-Science-Book_2026-09-24.md) §5.1.)
+**Status.** Standing, as the soft limit inside the entry above, "Figures are readable at both ends". The cap is a heuristic that serves that aim. Under the cap alone, the chapter 5 pilot produced crammed figures. ([AAR](aar/AAR_Web-Data-Science-Book_2026-09-24.md) §5.1.) *Amended the same day: 800×600 is the default, and a figure may relax to 1024×768 when the room removes clutter and its text still passes. See "A screenshot may relax to 1024×768 when that is clearer and still legible", at the top.*
 
 **Where.** `tools/shots/lib/legibility.py` (`SOFT_LIMIT`), `tools/shots/run check`, the course's `slides/common/AUTHORING.md`, and `AGENTS.md`.
 

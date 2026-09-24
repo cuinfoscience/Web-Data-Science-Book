@@ -19,7 +19,7 @@ The maintainer lifted the pause on 2026-09-24 ([`decisions.md`](decisions.md)).
 - **Now:** the chapters 1–4 screenshot back-fill ([plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)), after two gates.
   - The pilot gate is closed. The note is in the [screenshot AAR](aar/2026-09-24-screenshots.md), §9, and in `tools/shots/README.md` ("What the chapter 5 pilot settled").
   - The DevTools effect tests (AAR P0-3) come next, in their own pull request.
-- **Then:** retakes of the 11 chapter 7–8 figures and the 18 slide screenshots that fail the 800×600 limit, and dates for 3 chapter 7–8 captions (AAR P2-1).
+- **Then:** retakes of the 11 chapter 7–8 figures and the 18 slide screenshots that fail the size limit (800×600, or up to 1024×768 when the room removes clutter and the text still passes), and dates for 3 chapter 7–8 captions (AAR P2-1).
 - **Waiting on decisions, not on the pause:** computed figures and tables ([plan](plans/2026-09-24-computed-outputs.md), §9).
 
 ## Waiting on the maintainer
