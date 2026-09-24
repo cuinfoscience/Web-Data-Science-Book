@@ -52,8 +52,10 @@ figures:
     section: "Check 3: Watch the Network Tab"
     url: https://quotes.toscrape.com/scroll
     mode: headed
-    window: [1680, 1000]
-    devtools: {dock: right, panel: network}
+    # DevTools alone, 800×600, as ch-05's network-headers: a 1000-pixel window lets docked
+    # DevTools be 600 tall, and the crop keeps only DevTools. The page scrolls out of view.
+    window: [800, 1000]
+    devtools: {dock: bottom, size: 600, zoom: 1.25, panel: network, overview: false}
     steps:
       - wait: {text: 'Albert Einstein'}
       - devtools_click: {text: '^Fetch/XHR$'}
@@ -69,12 +71,8 @@ figures:
       # Open the quotes array and its first quote, as the chapter's figure does.
       - devtools_click: {text: '^quotes\s*:', at: [0.03, 0.5]}
       - devtools_click: {text: '^0\s*:', at: [0.05, 0.5]}
-    crop: {top: 0, height: 680}
+    crop: {devtools: true}
     drifts: false
-    legacy:
-      captured: 2026-09-22
-      method: Chrome for Testing 154 driven by Selenium 4.49, headed on Xvfb, DevTools docked right and operated with real clicks (xdotool), grabbed with ImageMagick import
-      note: After scrolling, the Fetch/XHR filter lists quotes?page=1 to page=4; Preview shows page 2's JSON.
 
   - id: selenium-chrome-for-testing
     kind: capture
@@ -82,6 +80,9 @@ figures:
     url: https://xkcd.com/
     mode: headed        # the subject is the window Selenium opens, including its automation bar
     engine: selenium
+    # The one figure that keeps Chrome for Testing's "only for automated testing" notice: the
+    # caption and alt text point at it. When the selenium engine arrives, it expects the bar.
+    expect: {infobar: true}
     drifts: true        # xkcd's current comic and the browser version
     legacy:
       captured: 2026-09-22
@@ -93,17 +94,17 @@ figures:
     section: "Extracting Data"
     url: https://xkcd.com/
     mode: headed
-    window: [1680, 1000]
-    devtools: {dock: right, panel: elements}
+    # DevTools alone, 800×600, as network-tab-json: the Elements tree gets the whole width,
+    # so the selected <img> row shows its title and alt attributes wrapped in full.
+    window: [800, 1000]
+    devtools: {dock: bottom, size: 600, zoom: 1.25, layout: stacked, sidebar: 1}
     steps:
       - wait: {selector: '#comic img'}
       - inspect: {selector: '#comic img', selects: '^<img'}
-    crop: {window: true}
+    # DevTools starts 600 pixels up a 1000-pixel window. 530 keeps the breadcrumb bar, the
+    # <img>'s path, and stops above the Styles pane that DevTools won't hide.
+    crop: {top: 400, height: 530}
     drifts: true
-    legacy:
-      captured: 2026-09-22
-      method: Chrome for Testing 154, headed on Xvfb, right-click > Inspect on the comic with real clicks (xdotool), DevTools docked right, grabbed with ImageMagick import
-      note: The selected img has the hover joke in its title attribute and the comic's name in alt.
 
   - id: playwright-codegen
     kind: capture

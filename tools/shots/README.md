@@ -52,6 +52,7 @@ These come from `slides/common/AUTHORING.md` in the course repo and from the AAR
 - **One honest User-Agent** for every request (`Web Data Science/v1 brian.keegan@colorado.edu`, the one the handouts teach). It goes to Chrome as Chrome's own `--user-agent` flag, so the User-Agent Client Hints (`Sec-CH-UA-Platform` and the rest) name the system the capture runs on. Playwright's `user_agent` option rewrites them too, and for a string that names no system it claims Windows. Page loads on one host are 8–30 seconds apart.
 - **Retries:** a 5xx or a dropped connection is retried three times, 30, 60, then 120 seconds apart. A block page, a 403, or a proxy refusal is not retried.
 - **No logins, no credentials, no student names or work.** A page behind a login is captured by the instructor by hand (M4 adds `import`).
+- **No infobars.** Chrome for Testing puts a notice under the address bar: "Chrome for Testing … is only for automated testing". It is 55 pixels of browser chrome that says nothing about the page. Headed captures pass `--disable-infobars`, which keeps it off. `capture` fails a headed take whose bars above the page are taller than the tab strip and address bar (88 pixels), unless the figure's subject is the bar (`expect: {infobar: true}`, as for ch-08's Selenium window). The figures made before the toolkit ran Chrome without the switch and carried the notice.
 - **Dated captions.** A figure that shows things that change (counts, versions, live pages) says in its caption when it was captured.
 - **At most 800×600 of the screen.** A figure shows at most 800×600 CSS pixels of the screen (1600×1200 image pixels at scale 2). In the book's 778-pixel column its text then stays about the size it had on screen; a whole 1680-pixel window shrinks it to less than half. To show DevTools, zoom DevTools and crop to what the text discusses, rather than widening the window. This is the first check, and a soft one: going over is a warning, and a recipe that needs more says why in `oversize:`.
 
@@ -71,7 +72,8 @@ A take fails its guards when:
 - the status is unexpected;
 - the page reads like an error or block page (a Cloudflare challenge, "Access denied," the Wayback Machine's "Fail with status");
 - expected text is missing;
-- the image is nearly blank.
+- the image is nearly blank;
+- in a headed take, an infobar sits above the page (see "No infobars").
 
 A failed take is named `<UTC time>.FAILED.png` and kept for inspection. `promote` refuses it. Nothing but `promote` writes to `images/`.
 
@@ -135,12 +137,26 @@ How a headed capture runs:
   - `zoom` (1.25 keeps DevTools readable in the book inside the 800×600 limit; 1.75 makes it large enough for print);
   - `size`: the pane's width, or its height when docked at the bottom;
   - `layout`: `side-by-side` puts the Styles pane beside the Elements tree. DevTools' default (`auto`) stacks Styles under the tree in a narrow window, where it can squeeze the tree out entirely;
-  - `sidebar`: the Styles pane's size, its width beside the tree or its height under it (`layout: stacked`). In an 800-pixel window, `layout: stacked, sidebar: 1` gives the Elements tree DevTools' whole width, so its rows don't wrap, and leaves only Styles' tab bar below it for the crop to cut. `hidden` hid the pane in the Oscars figure's wide DevTools; at 800 pixels DevTools 154 ignores it;
+  - `sidebar`: the Styles pane's size, its width beside the tree or its height under it (`layout: stacked`). In an 800-pixel window, `layout: stacked, sidebar: 1` gives the Elements tree DevTools' whole width, so its rows don't wrap, and leaves only Styles' tab bar below it for the crop to cut. DevTools 154 can't hide the pane. `hidden` puts it at its smallest, whichever layout DevTools uses: 97 DevTools pixels wide beside the tree, or 57 tall under it. Before the read-back existed, `hidden` set only one layout, so in a narrow pane that DevTools stacked, the Styles pane took most of the height and squeezed the tree;
   - `overview: false` hides the Network panel's timeline above the request list. `columns` shows or hides Network columns: `[waterfall]` adds Waterfall, which DevTools 154 hides by default, and `{waterfall: true, initiator: false}` also drops a column the text doesn't need.
 
   DevTools 154 ignores the stored `panel`, so the toolkit clicks that panel's tab. For `network`, it then reloads the page so the log is complete. That reload is a second visit: it sends the cookies the first load was given and revalidates what it cached. `first_visit: true` clears both before the reload, so the log shows what a first visit sends and receives: every request reaches the network, and none carries a cookie.
 
   Chrome keeps part of the page in view. Docked at the bottom of a 600-pixel window, DevTools gets at most about 360 pixels (about 70% of the area below the browser's bars), whatever `size` says. For a DevTools figure that needs more height, make the window taller and crop to DevTools: `window: [800, 1000]`, `size: 600`, and `crop: {devtools: true}` show 800×600 of DevTools alone, within the soft limit (ch-05's `network-headers`).
+- **Every setting is read back.** A key DevTools doesn't know is ignored without an error. The pilot found two such failures: a Styles-pane key DevTools 154 no longer reads, and a User-Agent option that also rewrote the Client Hints. So before the grab, each headed take reads DevTools' own page for what it drew, and records it in the take's log as `devtools_seen`. The browser's bar height is recorded as `bars`. `capture` then reports each difference from the recipe as a warning beside the take, such as "DevTools: the pane is 463 pixels tall, not 650; Chrome keeps part of the page in view".
+
+  | Setting | Read back from | Selftest |
+  |---|---|---|
+  | `zoom` | DevTools' device pixel ratio over the capture's scale | 125% |
+  | `dock`, `size` | where DevTools leaves room for the page | bottom 400, right 450, left 380; 650 asked in a 700-pixel window is reported |
+  | `layout`, `sidebar` | the Elements panel's tree and Styles boxes | stacked at 120, side by side at 200, `hidden` at its smallest |
+  | `overview`, `columns` | the Network panel's timeline and column headings | timeline off, Waterfall on, Initiator off; DevTools' defaults as the control |
+  | "What's new" marked as seen | no "What's new" panel | shut |
+  | `panel` | the selected tab (a step may change it, so a difference is a note) | the Network figures |
+  | `--disable-infobars` | the browser's bars above the page | 88 pixels; `expect: {infobar: true}` fails without a bar |
+  | `--user-agent`, `first_visit` | the requests a local server receives | since the chapter 5 pilot |
+
+  A new setting gets a row here and a selftest check that reads it back.
 - **Finding DevTools controls:** docked DevTools is itself a web page. The toolkit reads that page over the debugging port to find where a tab, button, request row, or header name is drawn, then clicks it for real with xdotool. No pixel positions are typed into recipes.
 - **Before any step:** it waits for the page's `load` event and for DevTools to draw its Elements tree. DevTools undoes a selection made before then.
 - **The screen grab:** the pointer is parked in the page's bottom-left corner, so hover styles and DevTools' node highlight clear. Then the screen is grabbed.
@@ -328,13 +344,16 @@ It reports **warnings** for:
 - marks changed in the recipe since the annotated image was drawn (promote again);
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`).
 
-`selftest` runs 51 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 68 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture;
 - the 800×600 soft limit: its warning, a recipe's reason, and `check`;
 - legibility, with week 08's `infinite_scroll.png` as the failing case; a composite; `sheet`;
-- headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take.
+- headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take;
+- the User-Agent and its Client Hints, and a first visit's reload, read back from what the local server receives;
+- every DevTools setting read back from what DevTools drew (the table under "Headed figures"), with DevTools' defaults as a control, and a setting DevTools won't honor reported at capture;
+- the infobar guard: no bar above the page, and a recipe that expects one fails without it.
 
 It skips the marker checks if TeX is missing and the headed checks if the virtual display is.
 
@@ -348,7 +367,7 @@ It skips the marker checks if TeX is missing and the headed checks if the virtua
 | `lib/recipes.py` | loading and validating recipes |
 | `lib/browser.py`, `lib/steps.py`, `lib/crop.py` | launching Chrome for Testing, running steps, and cropping |
 | `lib/display.py` | the virtual display, real input, and screen grabs |
-| `lib/devtools.py` | DevTools settings, and reading the DevTools page to find things on screen |
+| `lib/devtools.py` | DevTools settings, reading them back from what DevTools drew, and reading the DevTools page to find things on screen |
 | `lib/headed.py` | one headed attempt: window, DevTools, headed steps, and the crop |
 | `lib/measure.py` | at capture: anchors' boxes and the text's sizes, in the take's pixels |
 | `lib/annotate.py`, `styles/shotmarkers.sty` | markers laid out from anchors, drawn with TikZ to PDF and PNG |

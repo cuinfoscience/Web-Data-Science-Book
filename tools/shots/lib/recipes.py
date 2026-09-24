@@ -14,7 +14,7 @@ HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "ty
 STEPS = PAGE_STEPS | HEADED_STEPS
 CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad",
          "devtools"}
-EXPECTS = {"status", "text", "selector", "block"}
+EXPECTS = {"status", "text", "selector", "block", "infobar"}
 DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout", "overview", "columns", "first_visit"}
 DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
 FIGURE_KEYS = {"id", "file", "kind", "section", "url", "mode", "engine", "steps", "expect", "crop",
@@ -102,6 +102,8 @@ def _problems(chapter, raw):
             out.append(f"{where}: unknown crop key `{key}`")
         for key in set(f.get("expect") or {}) - EXPECTS:
             out.append(f"{where}: unknown expect key `{key}`")
+        if (f.get("expect") or {}).get("infobar") and f.get("mode") != "headed":
+            out.append(f"{where}: `expect: {{infobar: true}}` is for a headed figure, the only kind with browser bars")
         out += [f"{where}: {p}" for p in _annotate_problems(f)]
         for key in set(f.get("targets") or {}) - TARGETS:
             out.append(f"{where}: unknown target `{key}` (one of {sorted(TARGETS)})")

@@ -30,6 +30,7 @@ from urllib.parse import urlparse
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from lib import annotate, legibility                                   # noqa: E402
+from lib import devtools as dt                                          # noqa: E402
 from lib import provenance as prov                                      # noqa: E402
 from lib.capture import Pacer, PolicyBlock, capture, sha256, takes      # noqa: E402
 from lib.compare import compare                                         # noqa: E402
@@ -285,6 +286,10 @@ def report_take(fig, take):
         except annotate.AnnotateError as e:
             line(BAD, f"markers: {e}")
             return 1
+    if take.get("mode") == "headed" and take.get("devtools"):
+        # A DevTools key DevTools doesn't know fails silently: say what it drew instead.
+        for level, message in dt.compare(take["devtools"], take.get("devtools_seen"), take["scale"]):
+            line(WARN if level == "warn" else "note", f"DevTools: {message}")
     over = legibility.oversize(take)
     if over and fig.get("oversize"):
         line("note", f"{over}; allowed: {fig['oversize']}")
