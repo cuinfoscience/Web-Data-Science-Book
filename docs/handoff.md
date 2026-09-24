@@ -1,6 +1,6 @@
 # Hand-off note
 
-**Updated 2026-09-24**, after textbook #141–#146 merged. This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
+**Updated 2026-09-24**, after textbook #141–#146 and course #54 merged. This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
 
 ## Where things stand
 
@@ -16,38 +16,36 @@
   - ch-08: two DevTools figures were retaken within 800×600 (#142). §8.3 now checks Selenium Manager before the first browser, and covers Firefox, Edge, and Safari (#143).
 - **Contributors.** `CONTRIBUTING.md`, a pull request template, and issue forms that point to it (#146). The README acknowledges the AI tools used to write the book (#145).
 - **Project records.** `AGENTS.md` and `docs/` (#139–#141): the AARs, the plans, the decision log, and this note.
-- **Course repository.** Course #54 is open. It carries week 8's Network screenshot without the banner, and `AUTHORING.md`'s no-banner rule and relaxed size limit. It pairs with textbook #142 and #144, which are merged.
+- **Course repository.** Course #54 is merged: week 8's Network screenshot without the banner, and `AUTHORING.md`'s no-banner rule and relaxed size limit. It pairs with textbook #142 and #144.
 
 ## Next
 
 In this order:
 
-1. **Merge course #54**, when the maintainer says.
-2. **Back-fill chapters 1–4** in the [plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)'s order (§4): ch-04, ch-01, ch-02, ch-03.
+1. **Back-fill chapters 1–4** in the [plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)'s order (§4): ch-04, ch-01, ch-02, ch-03.
    - Each chapter is a textbook and course pair of pull requests.
    - Each figure starts from its brief, within 800×600, or within 1024×768 when that is clearer and still legible.
    - Chapter 1 needs a Jupyter server in the container.
    - `shots import`, for hand captures such as week 1's issue form, isn't built (M4). `adopt` records provenance, but it won't crop or redact.
-3. **Retake the chapter 7–8 figures** (AAR P2-1), one chapter per pull request.
+2. **Retake the chapter 7–8 figures** (AAR P2-1), one chapter per pull request.
    - 9 figures are over the size limit, and 2 captions (`x-com-1999`, `selenium-chrome-for-testing`) lack a capture date.
    - The relaxed limit may fit `view-source-js`, which shows 1100×760 now.
    - `selenium-chrome-for-testing` and `playwright-codegen` need M4's Selenium and codegen engines.
    - 18 slide screenshots are over the limit too.
-4. **Toolkit M4** ([plan](plans/2026-09-24-screenshot-toolkit.md), §8). It covers:
+3. **Toolkit M4** ([plan](plans/2026-09-24-screenshot-toolkit.md), §8). It covers:
    - evidence queries for counts in captions (AAR P1-2);
    - `sync` to the course repository, and `import`;
    - the Selenium and codegen engines;
    - the `shots-check` CI job (AAR P1-1).
-5. **The course side of the contributor docs.**
+4. **The course side of the contributor docs.**
    - `handouts/common/revision-framework.md` and week 1's deck still name `claude.md`, now `AGENTS.md`.
    - The handouts say pull requests have no form. The textbook has a template now.
-6. **Computed outputs.** If they are adopted, run the [plan](plans/2026-09-24-computed-outputs.md)'s M0 pilot on chapter 5.
+5. **Computed outputs.** If they are adopted, run the [plan](plans/2026-09-24-computed-outputs.md)'s M0 pilot on chapter 5.
 
 ## Waiting on the maintainer
 
 | Item | What to decide |
 |---|---|
-| Course #54 | Merge it. |
 | Who merges students' pull requests | `CONTRIBUTING.md` says the maintainer, matching the revision framework and `decisions.md`. Week 4's deck says students with write access can. Pick one, and the other document follows. |
 | Notebook sync on browser edits | A pull request edited in GitHub's browser editor can't regenerate its notebook, so the Notebook sync check fails. Either let CI regenerate the notebooks on pull requests (a workflow change), or keep the check and have the maintainer regenerate before merging. `CONTRIBUTING.md` describes the second. |
 | AAR P0-2 | Enable the permission rule that denies force-pushes (untested; test it first). Turn on "Automatically delete head branches" in both repositories. |
