@@ -1,0 +1,310 @@
+"""Headed capture: a real Chrome window on a virtual display, DevTools included.
+
+For figures that show browser UI: DevTools, View Source, menus. Each attempt
+gets a fresh browser profile carrying the recipe's DevTools settings, a
+window at a known place and size, and a debugging port for reading DevTools.
+
+Steps a headed recipe can use, besides the page steps in lib/steps.py:
+
+    - inspect: {selector: '#comic img'}   right-click the element, choose Inspect
+          selects: 'id="comic"'             ...and wait until the selected node matches
+    - tree: {keys: [Down, Right]}          keys in the Elements tree
+    - tree: {keys: [Left], until: 'id="wm-ipp-base"', max: 12}
+    - devtools_click: {text: '^Fetch/XHR$'}    find it in DevTools by its text, click it
+    - devtools_wait: {text: 'quotes\\?page=4'}  wait until DevTools shows it
+    - key: 'ctrl+f'   /   type: 'var data'  real keys, sent to the browser window
+    - pointer: {selector: '#comic img'}    rest the real pointer on it (tooltips)
+
+The pointer is parked outside the window before the screen is grabbed, unless
+the last step placed it on purpose.
+"""
+import json
+import re
+import shutil
+import socket
+import time
+
+from PIL import Image
+
+from . import crop as page_crop
+from . import devtools as dt
+from . import guards
+from . import steps as page_steps
+from .env import OUT, playwright_version, proxy
+
+
+class HeadedError(Exception):
+    pass
+
+
+def _free_port():
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+class Session:
+    """One headed browser for one attempt at one figure."""
+
+    def __init__(self, browser, fig, display):
+        self.fig, self.display = fig, display
+        self.W, self.H = fig["window"]
+        self.S = fig["scale"]
+        self.devtools = fig.get("devtools")
+        self.profile = OUT / ".profiles" / fig["id"]
+        shutil.rmtree(self.profile, ignore_errors=True)
+        (self.profile / "Default").mkdir(parents=True)
+        if self.devtools:
+            (self.profile / "Default" / "Preferences").write_text(json.dumps(dt.preferences(self.devtools)))
+        self.port = _free_port()
+        args = [f"--window-position=0,0", f"--window-size={self.W},{self.H}",
+                f"--force-device-scale-factor={self.S}", f"--remote-debugging-port={self.port}",
+                "--no-first-run", "--no-default-browser-check"]
+        if self.devtools:
+            args.append("--auto-open-devtools-for-tabs")
+        options = {"executable_path": browser.path, "headless": False, "no_viewport": True,
+                   "env": display.env, "args": args, "user_agent": fig["user_agent"],
+                   "java_script_enabled": fig["javascript"],
+                   # No "controlled by automated test software" bar across the window.
+                   "ignore_default_args": ["--enable-automation"]}
+        if proxy():
+            options["proxy"] = {"server": proxy(), "bypass": "localhost,127.0.0.1"}
+        self.context = browser.playwright.chromium.launch_persistent_context(str(self.profile), **options)
+        self.page = self.context.pages[0] if self.context.pages else self.context.new_page()
+        self.frontend = None
+        self.pointer_placed = False
+
+    # ------------------------------------------------------------- geometry
+    def _frontend(self):
+        if self.frontend is None:
+            self.frontend = dt.Frontend(self.port)
+        return self.frontend
+
+    def toolbar(self):
+        """Height of the browser's own bars above the page, in DIPs."""
+        if self.devtools:
+            # Docked DevTools spans the whole area below the bars.
+            found = self._frontend().find(css="body")
+            return self.H - found["height"] * (found["dpr"] / self.S)
+        return self.page.evaluate("window.outerHeight - window.innerHeight")
+
+    def page_point(self, box, at=(0.5, 0.5)):
+        top = self.toolbar()
+        return (round((box["x"] + box["width"] * at[0]) * self.S),
+                round((top + box["y"] + box["height"] * at[1]) * self.S))
+
+    def devtools_point(self, box, dpr, at=(0.5, 0.5)):
+        top = self.toolbar()
+        return (round((box["x"] + box["w"] * at[0]) * dpr),
+                round(top * self.S + (box["y"] + box["h"] * at[1]) * dpr))
+
+    # ------------------------------------------------------------- steps
+    def _box(self, arg):
+        target = page_steps.target(self.page, arg)
+        if target is None:
+            raise page_steps.StepError(f"needs selector or text: {arg!r}")
+        target.wait_for(state="visible", timeout=self.fig["timeout"] * 1000)
+        target.scroll_into_view_if_needed(timeout=self.fig["timeout"] * 1000)
+        box = target.bounding_box()
+        if not box:
+            raise page_steps.StepError(f"{arg!r} has no box on the page")
+        return box
+
+    PICKER = '[aria-label^="Select an element"]'
+
+    def inspect(self, arg):
+        """Select a page element in DevTools with real clicks.
+
+        The default is DevTools' element picker (its "Select an element" button,
+        then a click on the element), because each click can be checked. With
+        `via: menu` it right-clicks and chooses Inspect instead; the context menu
+        has no DOM to wait on, so that route cannot confirm the menu opened.
+        """
+        x, y = self.page_point(self._box(arg), arg.get("at", (0.5, 0.5)))
+        front = self._frontend()
+        pattern = arg.get("selects")
+        chosen = ""
+        for _ in range(2):                   # one retry, for a click DevTools missed
+            if arg.get("via", "picker") == "picker":
+                self.devtools_click({"css": self.PICKER})
+                try:
+                    front.wait_for(css=self.PICKER + '[aria-pressed="true"]', timeout=5)
+                except dt.DevToolsError:
+                    continue                 # the picker did not switch on; try again
+                self.display.xdo("mousemove", x, y)
+                time.sleep(0.4)
+                self.display.xdo("click", 1)
+            else:
+                self.display.xdo("mousemove", x, y)
+                time.sleep(0.3)
+                self.display.xdo("click", 3)
+                time.sleep(1.2)
+                self.display.xdo("key", "Up")    # Inspect is the menu's last item
+                self.display.xdo("key", "Return")
+            deadline = time.monotonic() + 8
+            while time.monotonic() < deadline:
+                chosen = front.selected()
+                if chosen and (not pattern or re.search(pattern, chosen)):
+                    return
+                time.sleep(0.3)
+        raise page_steps.StepError(f"Inspect did not select {pattern or 'a node'} (selected: {chosen[:80]!r})")
+
+    def ready(self):
+        """Wait until the page has loaded and DevTools has drawn its Elements tree.
+
+        DevTools selects <body> once the tree is ready; a pick made before that
+        is undone when DevTools finishes loading.
+        """
+        try:
+            self.page.wait_for_load_state("load", timeout=self.fig["timeout"] * 1000)
+        except Exception:
+            pass                             # a slow subresource; the tree check below decides
+        self._frontend().wait_for(css='li[role="treeitem"].selected', timeout=self.fig["timeout"])
+
+    def tree(self, arg):
+        keys = arg if isinstance(arg, list) else arg.get("keys", [])
+        until, limit = (None, 1) if isinstance(arg, list) else (arg.get("until"), arg.get("max", 1))
+        front = self._frontend()
+        # Keys go to whatever has focus. Click the selected row first, as a person
+        # would, so the tree has it (a selected row can show without focus).
+        self.devtools_click({"css": 'li[role="treeitem"].selected', "at": (0.7, 0.5)})
+        for _ in range(limit if until else 1):
+            if until and re.search(until, front.selected()):
+                return
+            for key in keys:
+                self.display.xdo("key", key)
+                time.sleep(0.25)
+        if until and not re.search(until, front.selected()):
+            raise page_steps.StepError(f"the Elements tree never selected /{until}/")
+
+    def devtools_click(self, arg):
+        found = self._frontend().wait_for(arg.get("text"), arg.get("css"), timeout=self.fig["timeout"])
+        x, y = self.devtools_point(found["boxes"][0], found["dpr"], arg.get("at", (0.5, 0.5)))
+        self.display.xdo("mousemove", x, y)
+        time.sleep(0.2)
+        self.display.xdo("click", arg.get("button", 1))
+        time.sleep(0.4)
+
+    def devtools_wait(self, arg):
+        self._frontend().wait_for(arg.get("text"), arg.get("css"), timeout=self.fig["timeout"])
+
+    def key(self, arg):
+        self.display.xdo("key", arg)
+        time.sleep(0.3)
+
+    def type_text(self, arg):
+        self.display.xdo("type", "--delay", 40, arg)
+        time.sleep(0.3)
+
+    def pointer(self, arg):
+        x, y = self.page_point(self._box(arg), arg.get("at", (0.5, 0.5)))
+        self.display.xdo("mousemove", x, y)
+        self.pointer_placed = True
+
+    def open_panel(self):
+        """Show the recipe's DevTools panel; for Network, reload so the log is complete."""
+        panel = (self.devtools or {}).get("panel", "elements")
+        if panel == "elements":
+            return
+        name = f"^{panel.capitalize()}$"
+        self.devtools_click({"text": name})
+        self._frontend().wait_for(text=name, css='[role="tab"][aria-selected="true"]',
+                                  timeout=self.fig["timeout"])
+        if panel == "network":
+            self.page.reload(wait_until="domcontentloaded", timeout=self.fig["timeout"] * 1000)
+
+    def handlers(self):
+        return {"inspect": self.inspect, "tree": self.tree, "devtools_click": self.devtools_click,
+                "devtools_wait": self.devtools_wait, "key": self.key, "type": self.type_text,
+                "pointer": self.pointer}
+
+    # ------------------------------------------------------------- the picture
+    def crop_rect(self):
+        """The crop, in screen pixels."""
+        crop = self.fig.get("crop") or {"window": True}
+        S, W, H = self.S, self.W, self.H
+        if crop.get("window"):
+            return (0, 0, W * S, H * S)
+        if crop.get("content"):                       # below the browser's bars
+            top = self.toolbar()
+            height = crop.get("height", H - top)
+            return (0, round(top * S), round(crop.get("width", W) * S), round((top + height) * S))
+        if "between" in crop:                         # e.g. two View Source line numbers
+            first, last = (self._box({"selector": s}) for s in crop["between"])  # top of one, bottom of the other
+            pad = crop.get("pad", 0)
+            x0, y0 = self.page_point(first, (0, 0))
+            _, y1 = self.page_point(last, (0, 1))
+            width = crop.get("width", self.page.evaluate("innerWidth"))
+            return (max(0, x0 - pad * S), max(0, y0 - pad * S), round(width * S), y1 + pad * S)
+        if "selector" in crop:
+            box, pad = self._box(crop), crop.get("pad", 0)
+            x0, y0 = self.page_point(box, (0, 0))
+            x1, y1 = self.page_point(box, (1, 1))
+            return (max(0, x0 - pad * S), max(0, y0 - pad * S), x1 + pad * S, y1 + pad * S)
+        left, top = crop.get("left", 0), crop.get("top", 0)
+        return (left * S, top * S, (left + crop.get("width", W - left)) * S,
+                (top + crop.get("height", H - top)) * S)
+
+    def grab(self, path):
+        if not self.pointer_placed:
+            # Park the pointer in the page's bottom-left corner: the page sees it leave
+            # whatever it was over, so hover styles and DevTools' node highlight clear.
+            # (Parking it outside the window, or over the tab strip, leaves them showing.)
+            self.display.xdo("mousemove", 5 * self.S, (self.H - 5) * self.S)
+            time.sleep(1.0)
+        rect = self.crop_rect()
+        raw = path.with_name(path.stem + ".raw.png")
+        self.display.grab(raw)
+        with Image.open(raw) as img:
+            img.crop(rect).save(path)
+        raw.unlink()
+        return {"x": rect[0] / self.S, "y": rect[1] / self.S,
+                "width": (rect[2] - rect[0]) / self.S, "height": (rect[3] - rect[1]) / self.S}
+
+    def close(self):
+        if self.frontend:
+            self.frontend.close()
+        self.context.close()
+        shutil.rmtree(self.profile, ignore_errors=True)
+
+
+def attempt(browser, fig, display, png):
+    """One headed attempt. Returns (status, problems, temporary, clip, final_url, steplog, error)."""
+    session = Session(browser, fig, display)
+    steplog, clip = [], None
+    try:
+        try:
+            response = session.page.goto(fig["url"], wait_until="domcontentloaded",
+                                         timeout=fig["timeout"] * 1000)
+        except Exception as e:
+            return None, [], False, None, None, steplog, str(e).splitlines()[0]
+        status = response.status if response else None
+        if guards.retryable(status=status):
+            return status, [f"HTTP status {status}"], True, None, session.page.url, steplog, None
+        problems = []
+        try:
+            if session.devtools:
+                session.ready()
+                session.open_panel()
+            page_steps.run(session.page, fig, steplog, extra=session.handlers())
+        except (page_steps.StepError, dt.DevToolsError) as e:
+            problems.append(str(e))
+        time.sleep(fig["settle"])
+        text = session.page.evaluate("() => document.body ? document.body.innerText : ''")
+        issues, temporary = guards.page_problems(status, session.page.title(), text, fig.get("expect") or {})
+        problems += issues
+        expect = fig.get("expect") or {}
+        for pattern in expect.get("text") or []:
+            if session.page.get_by_text(re.compile(pattern)).count() == 0:
+                problems.append(f"expected text /{pattern}/ not found")
+        try:
+            clip = session.grab(png)
+        except (page_steps.StepError, page_crop.CropError) as e:
+            problems.append(f"crop failed: {e}")
+        return status, problems, temporary, clip, session.page.url, steplog, None
+    finally:
+        session.close()
+
+
+def label(browser):
+    return f"{browser.version} (headed on Xvfb, Playwright {playwright_version()})"

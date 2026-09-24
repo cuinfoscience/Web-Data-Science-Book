@@ -12,6 +12,9 @@
 
 Playwright's text and CSS locators reach inside open shadow roots, which the
 Wayback Machine's toolbar and calendar use.
+
+Headed figures (mode: headed) add steps that use real input and DevTools;
+see lib/headed.py.
 """
 import re
 import time
@@ -21,7 +24,7 @@ class StepError(Exception):
     pass
 
 
-def _target(page, arg):
+def target(page, arg):
     if "selector" in arg:
         return page.locator(arg["selector"]).first
     if "text" in arg:
@@ -29,13 +32,20 @@ def _target(page, arg):
     return None
 
 
-def run(page, fig, log):
+_target = target
+
+
+def run(page, fig, log, extra=None):
+    """Run the recipe's steps. `extra` maps headed-only step names to handlers."""
     ms = fig["timeout"] * 1000
+    extra = extra or {}
     for step in fig.get("steps") or []:
         (kind, arg), = step.items()
         started = time.monotonic()
         try:
-            if kind == "wait":
+            if kind in extra:
+                extra[kind](arg)
+            elif kind == "wait":
                 if "text" in arg:
                     page.get_by_text(re.compile(arg["text"])).first.wait_for(state="visible", timeout=ms)
                 if "selector" in arg:
@@ -63,6 +73,8 @@ def run(page, fig, log):
                 page.keyboard.press(arg)
             elif kind == "settle":
                 time.sleep(float(arg))
+            else:
+                raise StepError(f"step `{kind}` needs a headed browser (mode: headed)")
         except StepError:
             raise
         except Exception as e:  # Playwright's timeouts and misses

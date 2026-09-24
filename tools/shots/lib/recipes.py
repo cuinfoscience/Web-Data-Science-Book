@@ -9,12 +9,16 @@ from .env import RECIPES, ROOT, rel
 
 KINDS = {"capture", "render", "diagram", "illustration"}
 MODES = {"headless", "headed", "composite"}
-STEPS = {"wait", "hover", "click", "scroll", "press", "settle"}
-CROPS = {"window", "full_page", "top", "left", "width", "height", "selector", "pad"}
+PAGE_STEPS = {"wait", "hover", "click", "scroll", "press", "settle"}
+HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "type", "pointer"}
+STEPS = PAGE_STEPS | HEADED_STEPS
+CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad"}
 EXPECTS = {"status", "text", "selector", "block"}
-FIGURE_KEYS = {"id", "file", "kind", "section", "url", "mode", "steps", "expect", "crop",
+DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar"}
+FIGURE_KEYS = {"id", "file", "kind", "section", "url", "mode", "engine", "steps", "expect", "crop",
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
                "user_agent", "pause", "settle", "timeout", "retries"}
+ENGINES = {"playwright", "selenium", "codegen"}
 DEFAULTS = {
     "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
     "window": [1280, 800],   # CSS pixels
@@ -60,9 +64,17 @@ def _problems(chapter, raw):
             out.append(f"{where}: a capture needs a `url`")
         if f.get("mode", "headless") not in MODES:
             out.append(f"{where}: `mode` must be one of {sorted(MODES)}")
+        if f.get("engine", "playwright") not in ENGINES:
+            out.append(f"{where}: `engine` must be one of {sorted(ENGINES)}")
         for step in f.get("steps") or []:
             if not (isinstance(step, dict) and len(step) == 1 and next(iter(step)) in STEPS):
                 out.append(f"{where}: each step is one of {sorted(STEPS)}, as `- wait: {{...}}`")
+            elif next(iter(step)) in HEADED_STEPS and f.get("mode") != "headed":
+                out.append(f"{where}: step `{next(iter(step))}` needs `mode: headed`")
+        for key in set(f.get("devtools") or {}) - DEVTOOLS:
+            out.append(f"{where}: unknown devtools key `{key}`")
+        if f.get("devtools") and f.get("mode") != "headed":
+            out.append(f"{where}: `devtools` needs `mode: headed`")
         for key in set(f.get("crop") or {}) - CROPS:
             out.append(f"{where}: unknown crop key `{key}`")
         for key in set(f.get("expect") or {}) - EXPECTS:

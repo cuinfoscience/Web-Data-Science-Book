@@ -1,9 +1,11 @@
 # Recipes for Chapter 8's figures (ch-08-dynamic-pages.qmd). See tools/shots/README.md.
 #
 # Every figure here shows browser UI (View Source, DevTools, the Chrome for
-# Testing window, the Playwright Inspector) or joins two captures, so none can
-# be re-captured headless: they wait for milestones M2 (headed) and M3
-# (composites). Until then their `legacy:` blocks record how they were made.
+# Testing window, the Playwright Inspector) or joins two captures, so none is
+# captured headless. The headed ones run on a virtual display (milestone M2);
+# the two whose subject is a tool itself (the window Selenium opens, Playwright's
+# recorder) need that tool as the engine and wait for a later milestone, as does
+# the side-by-side composite (M3). `legacy:` records how each image was made.
 # quotes.toscrape.com is a sandbox built for scraping practice and has no
 # robots.txt.
 chapter: ch-08
@@ -18,9 +20,13 @@ figures:
     section: "Check 1: View Source"
     url: view-source:https://quotes.toscrape.com/js/
     mode: headed
+    window: [1100, 1000]
+    steps:
+      - wait: {text: 'var data'}
+    crop: {between: ['body', 'td.line-number[value="43"]']}   # from the top of the source through line 43
     legacy:
       captured: 2026-09-22
-      method: Chrome for Testing 154 driven by Selenium 4.49, headed on a virtual display (Xvfb), View Source grabbed with ImageMagick import; lines 27–43
+      method: Chrome for Testing 154 driven by Selenium 4.49, headed on a virtual display (Xvfb), View Source grabbed with ImageMagick import; the top of the source through line 43
       note: The quotes sit in a script element as `var data = [...]`.
 
   - id: javascript-off-on
@@ -37,7 +43,24 @@ figures:
     section: "Check 3: Watch the Network Tab"
     url: https://quotes.toscrape.com/scroll
     mode: headed
-    devtools: {panel: network, dock: right, filter: Fetch/XHR}
+    window: [1680, 1000]
+    devtools: {dock: right, panel: network}
+    steps:
+      - wait: {text: 'Albert Einstein'}
+      - devtools_click: {text: '^Fetch/XHR$'}
+      # Each scroll to the bottom makes the page ask its API for the next page.
+      - scroll: {y: 20000}
+      - devtools_wait: {text: 'quotes\?page=2'}
+      - scroll: {y: 20000}
+      - devtools_wait: {text: 'quotes\?page=3'}
+      - scroll: {y: 20000}
+      - devtools_wait: {text: 'quotes\?page=4'}
+      - devtools_click: {text: '^quotes\?page=2$'}
+      - devtools_click: {text: '^Preview$'}
+      # Open the quotes array and its first quote, as the chapter's figure does.
+      - devtools_click: {text: '^quotes\s*:', at: [0.03, 0.5]}
+      - devtools_click: {text: '^0\s*:', at: [0.05, 0.5]}
+    crop: {top: 0, height: 680}
     drifts: false
     legacy:
       captured: 2026-09-22
@@ -49,6 +72,7 @@ figures:
     section: "Setting Up Selenium"
     url: https://xkcd.com/
     mode: headed        # the subject is the window Selenium opens, including its automation bar
+    engine: selenium
     drifts: true        # xkcd's current comic and the browser version
     legacy:
       captured: 2026-09-22
@@ -60,7 +84,12 @@ figures:
     section: "Extracting Data"
     url: https://xkcd.com/
     mode: headed
-    devtools: {panel: elements, dock: right}
+    window: [1680, 1000]
+    devtools: {dock: right, panel: elements}
+    steps:
+      - wait: {selector: '#comic img'}
+      - inspect: {selector: '#comic img', selects: '^<img'}
+    crop: {window: true}
     drifts: true
     legacy:
       captured: 2026-09-22
@@ -72,6 +101,7 @@ figures:
     section: "Recording a Script with Codegen"
     url: https://quotes.toscrape.com/
     mode: headed        # two windows: the browser and the Playwright Inspector
+    engine: codegen
     legacy:
       captured: 2026-09-22
       method: playwright codegen --target python (Playwright 1.63, its bundled Chrome for Testing 153), headed on Xvfb, grabbed with ImageMagick import
