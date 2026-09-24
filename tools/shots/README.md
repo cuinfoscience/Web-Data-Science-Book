@@ -228,11 +228,13 @@ something the next agent would otherwise find out again, add a note here.
 
 ### Captions and notebooks
 
-- **No square brackets in a caption, even inside backticks.**
-  `make_notebooks.py` reads a caption up to its first `]`. A caption that
-  showed `<![CDATA[` left its figure unconverted in the notebook, relative
-  image path and `@fig-` reference included. After `make_notebooks.py`,
-  search the chapter's notebook for a leftover `@fig-`.
+- **Brackets in a caption belong inside backticks.** `make_notebooks.py`
+  once read a caption only up to its first `]`, so a chapter 4 caption that
+  showed `<![CDATA[` left its figure unconverted in the notebook, with a
+  relative image path and a raw `@fig-` reference. Since #151 it reads code
+  spans and balanced brackets whole, and it exits with an error when a figure
+  or reference is left unconverted. A stray `]` outside backticks still ends a
+  caption, and the script says so.
 - **Alt text that names what drifts is rewritten on a retake:** the first
   headline, the first member of the roster. `IMAGES.md` lists what to check.
 
