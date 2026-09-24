@@ -81,6 +81,7 @@ In this order:
 
 - Chapter 6 and course week 6: leave them untouched (maintainer's instruction).
 - Students' branches and pull requests: never merge, edit, or rebase them.
+- Issues a student's open pull request already fixes: leave the fix to it. On 2026-09-24 a chapter 4 fix for #90 had to be withdrawn because #92, the reporter's own pull request, already fixed it. Check the issue's linked pull requests and the open ones on that chapter first.
 
 ## Notes for cloud sessions
 

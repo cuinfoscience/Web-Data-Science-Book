@@ -8,7 +8,7 @@ Before starting work, read `docs/handoff.md` (where work stands, what is paused,
 
 ## Git and Pull Requests
 
-Merge with merge commits. Don't squash, rebase, or force-push a branch someone may have seen. A merge commit keeps the branch inside `main`, so a session that has to reuse one branch starts its next pull request with a fast-forward, and the review history stays readable. Open a new branch for each pull request, and don't base one pull request on another's unmerged branch. Merge only when the maintainer asks, and never merge a student's pull request. If the environment can't delete merged branches, list them in `docs/handoff.md`. The reasons are in `docs/decisions.md`.
+Merge with merge commits. Don't squash, rebase, or force-push a branch someone may have seen. A merge commit keeps the branch inside `main`, so a session that has to reuse one branch starts its next pull request with a fast-forward, and the review history stays readable. Open a new branch for each pull request, and don't base one pull request on another's unmerged branch. Merge only when the maintainer asks, and never merge a student's pull request. Before fixing a reported issue, check whether a student's open pull request already fixes it: the issue's linked pull requests, and the open ones on that chapter. Students' pull requests are course work, so leave the fix to theirs; if it doesn't name the issue, link the two in a comment on the issue. Where your change touches the same lines as a student's open pull request, say so in your description, so the maintainer can merge theirs first. If the environment can't delete merged branches, list them in `docs/handoff.md`. The reasons are in `docs/decisions.md`.
 
 ## Project Overview
 
