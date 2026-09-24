@@ -50,7 +50,7 @@ print(len(soup.select("div.quote")))
 
 Right-click the page and choose **View Page Source** to see exactly what the server sent (@fig-view-source). There is no `<div class="quote">` anywhere in it. The quotes are in the file all the same: a `<script>` near the bottom holds them as a JavaScript array named `data`, and the page's own code turns that array into the boxes you see.
 
-![View Source for `quotes.toscrape.com/js/`. No quote markup, but the quotes themselves sit in a script as a JavaScript array.](images/ch-08/view-source-js.png){#fig-view-source .lightbox fig-alt="Screenshot of Chrome's View Source for quotes.toscrape.com/js/. The HTML has a header with the site title and a login link, then a script tag that loads jquery.js and a second script that begins var data = [ followed by a quote object with tags change, deep-thoughts, thinking, and world, an author object for Albert Einstein, and the text of his quote."}
+![View Source for `quotes.toscrape.com/js/`, from `<body>` to the first quote, with long lines wrapped. No quote markup, but the quotes themselves sit in a script as a JavaScript array.](images/ch-08/view-source-js.png){#fig-view-source .lightbox fig-alt="Screenshot of Chrome's View Source for quotes.toscrape.com/js/, lines 11 to 43. The body opens with a header holding the site title, Quotes to Scrape, and a Login link. Then a script tag loads jquery.js, and a second script begins var data = [ followed by a quote object: tags change, deep-thoughts, thinking, and world; an author object for Albert Einstein; and the text of his quote, wrapped onto a second line."}
 
 Data inside a script is still data your `requests` response already contains. A regular expression can cut the array out, and because it is written in JSON syntax, `json.loads()` (@sec-data-formats) can parse it:
 
@@ -69,7 +69,7 @@ print(len(quotes), quotes[0]["author"]["name"])
 
 A page with its JavaScript switched off shows roughly what `requests` has to work with. In Chrome's developer tools, open the **Command Menu** (Control+Shift+P on Windows and Linux, Command+Shift+P on a Mac), type `javascript`, choose **Disable JavaScript**, and reload the page. @fig-js-off-on shows the result on the quotes page: the title, the login link, and a **Next** button, but no quotes. JavaScript stays off in that tab only while developer tools are open; close them, or run **Enable JavaScript**, to turn it back on. Firefox and Safari have the same switch in their developer settings.
 
-![The same page, `quotes.toscrape.com/js/`, with JavaScript switched off and on.](images/ch-08/javascript-off-on.png){#fig-js-off-on .lightbox fig-alt="Two screenshots side by side. On the left, labeled JavaScript off, the Quotes to Scrape page shows only its title, a Login link, a Next button, and the footer. On the right, labeled JavaScript on, the same page shows quote boxes by Albert Einstein and J.K. Rowling, each with tags."}
+![The same page, `quotes.toscrape.com/js/`, with JavaScript switched off and on, each in a narrow window.](images/ch-08/javascript-off-on.png){#fig-js-off-on .lightbox fig-alt="Two screenshots side by side of the Quotes to Scrape page in a narrow window. On the left, labeled JavaScript off, the page shows only its title, a Login link, a Next button, and the footer, with empty space where the quotes would be. On the right, labeled JavaScript on, the same page shows quote boxes by Albert Einstein and J.K. Rowling, each with its tags."}
 
 ### Check 3: Watch the Network Tab
 
@@ -221,7 +221,7 @@ Driver:  154.0.8037.57
 
 `webdriver.Chrome()` runs Selenium Manager once more, finds what step 2 downloaded in its cache, and starts the pair that step 3 checked. The two numbers should match up to the first dot. A browser window opens (@fig-selenium-cft). This is your programmable browser — every command you issue through the `driver` object happens in that window.
 
-![A browser started by `webdriver.Chrome()` on a machine with no Chrome installed. Selenium Manager downloaded Chrome for Testing, which labels itself as meant only for automation.](images/ch-08/selenium-chrome-for-testing.png){#fig-selenium-cft .lightbox fig-alt="Screenshot of a Chrome for Testing window showing the xkcd home page and the comic Stargazing 5. A bar under the address bar reads Chrome for Testing v154.0.8037.57 is only for automated testing. For regular browsing, use a standard version of Chrome that updates automatically. The comic's hover text is showing as a tooltip."}
+![A browser started by `webdriver.Chrome()` on a machine with no Chrome installed, in September 2026. Selenium Manager downloaded Chrome for Testing, which labels itself as meant only for automation.](images/ch-08/selenium-chrome-for-testing.png){#fig-selenium-cft .lightbox fig-alt="Screenshot of a Chrome for Testing window showing the xkcd home page and the comic Stargazing 5. A bar under the address bar reads Chrome for Testing v154.0.8037.57 is only for automated testing. For regular browsing, use a standard version of Chrome that updates automatically. The comic's hover text is showing as a tooltip."}
 
 ### What Selenium Manager Does
 

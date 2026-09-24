@@ -20,18 +20,20 @@ figures:
     section: "Check 1: View Source"
     brief: >-
       Show that the page's source has no quote markup, yet the quotes are there, in
-      a script, as `var data = [...]`. From the top of the source through line 43:
-      the header, the script tags, and the first quote object, and nothing below.
+      a script, as `var data = [...]`. From `<body>` (line 11) through line 43: the
+      header, the script tags, and the first quote object. The `<head>` above adds
+      nothing to the point, and nothing below line 43 is needed.
     url: view-source:https://quotes.toscrape.com/js/
     mode: headed
-    window: [1100, 1000]
+    # The browser's bars take 88 pixels of the window: 720 leaves room for lines 11-43, wrapped.
+    # 816 wide puts the page's 16-pixel scrollbar just past an 800-pixel crop.
+    window: [816, 720]
     steps:
       - wait: {text: 'var data'}
-    crop: {between: ['body', 'td.line-number[value="43"]']}   # from the top of the source through line 43
-    legacy:
-      captured: 2026-09-22
-      method: Chrome for Testing 154 driven by Selenium 4.49, headed on a virtual display (Xvfb), View Source grabbed with ImageMagick import; the top of the source through line 43
-      note: The quotes sit in a script element as `var data = [...]`.
+      # Line 43, the first quote's text, runs about 140 characters: wrap it rather than widen the window.
+      - click: {selector: 'input[type="checkbox"]'}
+      - scroll: {selector: 'td.line-number[value="11"]', offset: 4}
+    crop: {between: ['td.line-number[value="11"]', 'td.line-number[value="43"]'], width: 800}
 
   - id: javascript-off-on
     kind: capture
@@ -39,11 +41,12 @@ figures:
     brief: >-
       Show the same page with JavaScript off and on, side by side and labeled: off
       has only the title, Login, Next, and the footer; on has the quotes. The
-      lesson is the empty page beside the full one, so its words need not be
-      legible.
+      lesson is the empty page beside the full one. Each page is 370 pixels wide,
+      so the pair fits 800×600 and its words stay legible.
     url: https://quotes.toscrape.com/js/
     mode: composite     # the page with JavaScript off, then on, side by side, labeled
-    window: [900, 695]
+    # Two 370-pixel pages, the gap, and the frame come to 798 pixels, inside 800×600.
+    window: [370, 520]
     parts:
       - label: JavaScript off
         javascript: false
@@ -51,10 +54,6 @@ figures:
       - label: JavaScript on
         steps: [{wait: {text: 'Albert Einstein'}}]
     layout: {gap: 28, pad: 15, label_px: 28}
-    legibility: {skip: "the lesson is the empty page beside the full one, not the words"}
-    legacy:
-      captured: 2026-09-22
-      method: two captures of the same page, JavaScript disabled and enabled, joined side by side and labeled
 
   - id: network-tab-json
     kind: capture
