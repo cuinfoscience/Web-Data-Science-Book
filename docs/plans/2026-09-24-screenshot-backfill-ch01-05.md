@@ -5,8 +5,8 @@
 **Status:** In progress. The plan was proposed on 2026-09-24. The chapter 5 pilot
 is done (textbook #138, course #51), and its gate closed the same day. The gate
 note is in §9 of the screenshot AAR and in `tools/shots/README.md` ("What the
-chapter 5 pilot settled"). Chapter 4 is done, except figure 4-2, which waits on the maintainer (§4). Chapter 1
-is done, except figure 1-4 (§4). Chapters 2 and 3 are next, in §4's order. Implements [P1-4] of
+chapter 5 pilot settled"). Chapter 4 is done, except figure 4-2, which waits on the maintainer (§4). Chapters 1
+and 2 are done, except figures 1-4 and 2-2 (§4). Chapter 3 is next. Implements [P1-4] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md). Depends
 on P0-1 (`make_stubs.py` keeps notes), on P0-3 (what counts as a screenshot),
 and on toolkit milestones M1–M3 in

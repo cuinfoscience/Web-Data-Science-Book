@@ -101,7 +101,7 @@ dated record is in §9 of [the screenshot AAR](../../docs/aar/2026-09-24-screens
 
 ## Field notes
 
-What later captures taught, in chapters 1, 4, 7, and 8 (2026-09-22 to 24): each
+What later captures taught, in chapters 1, 2, 4, 7, and 8 (2026-09-22 to 24): each
 note is a practice and the case behind it. Read the notes for the kind of page
 you're about to capture before writing its recipe. When a capture teaches you
 something the next agent would otherwise find out again, add a note here.
@@ -722,7 +722,7 @@ It reports **warnings** for:
 - marks changed in the recipe since the annotated image was drawn (promote again);
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
 
-`selftest` runs 74 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 76 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - a `scroll` step that scrolls a panel (`within`), not the window;
