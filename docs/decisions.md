@@ -2,6 +2,20 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-09-24 · No browser banners in figures
+
+**Decision.**
+- Figures don't show Chrome for Testing's "only for automated testing" notice, or any other infobar.
+- Headed captures launch Chrome with `--disable-infobars`. `tools/shots` fails a headed take whose bars above the page are taller than the tab strip and address bar.
+- The one exception is a figure whose subject is the bar: ch-08's window opened by Selenium, whose caption points at it. Its recipe says `expect: {infobar: true}`.
+
+**Why.**
+- The notice is 55 pixels of browser chrome that says nothing about the page, and it repeats in every capture that has it.
+- It was in figures made by scripts before the toolkit, which ran Chrome without the switch: ch-08's `network-tab-json` and `xkcd-inspect`, and week 08's `network_json.png`.
+- The toolkit's own captures had it off only because Playwright passes the switch by default.
+
+**Where.** `tools/shots/lib/headed.py` (the switch and the guard), `tools/shots/README.md` ("No infobars"), `AGENTS.md` ("Figures and screenshots"), and the course's `slides/common/AUTHORING.md`.
+
 ## 2026-09-24 · Chapter work resumes
 
 **Decision.** The maintainer lifted the pause set after the chapter 5 pilot. The order of work:
