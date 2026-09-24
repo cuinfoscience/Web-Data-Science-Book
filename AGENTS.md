@@ -1,5 +1,11 @@
 # Web Data Science — Quarto Book
 
+Instructions for AI coding agents (Claude Code, Codex, and any other) and for people extending the book. This is the one instructions file: `CLAUDE.md` only imports it, and an agent that looks for its own file (`GEMINI.md`, `.cursorrules`, and so on) should read this one.
+
+## Project Memory: `docs/`
+
+Before starting work, read `docs/handoff.md` (where work stands, what is paused, what is next) and `docs/decisions.md` (standing decisions and the reasons for them). After-action reports are in `docs/aar/`, plans and roadmaps in `docs/plans/`; `docs/README.md` says how each is kept. When work pauses or a decision is made, update those files in the same pull request.
+
 ## Project Overview
 
 This is a Quarto book for an upper-division undergraduate and master's-level course on web data science taught at the University of Colorado Boulder's Department of Information Science. It covers retrieving, parsing, and analyzing data from the web using Python.
@@ -67,7 +73,9 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
 ```
 web-data-science/
 ├── _quarto.yml          # Project configuration
-├── claude.md            # This file — project instructions
+├── AGENTS.md            # This file — project instructions for agents and people
+├── CLAUDE.md            # Imports AGENTS.md, for Claude Code
+├── docs/                # AARs, plans, the decision log, and the hand-off note
 ├── index.qmd            # Preface
 ├── ch-01-introduction.qmd through ch-15-research-design.qmd
 ├── appendix-ai-disclosure.qmd
@@ -123,7 +131,7 @@ When adding new chapters or updating existing ones:
 
 1. Follow the chapter structure template above
 2. Add the new .qmd file to the `chapters` list in `_quarto.yml`
-3. Use narrative code blocks (`eval: false`) — do not assume API keys or live endpoints
+3. Use narrative code blocks (`eval: false`) — do not assume API keys or live endpoints. (Showing computed charts and tables is proposed in `docs/plans/2026-09-24-computed-outputs.md`; until it is adopted, code stays unexecuted.)
 4. Include at least one cross-reference to another chapter and one to the Missing Manual
 5. Add any new references to `references.bib`
 6. Test the build with `quarto preview` before committing
