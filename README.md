@@ -93,10 +93,12 @@ Web-Data-Science-Book/
 ├── appendix-ai-disclosure.qmd
 ├── appendix-further.qmd
 ├── notebooks/                   # Companion Jupyter notebooks (generated)
-├── tools/                       # Maintenance scripts (notebook generation)
+├── tools/                       # Maintenance scripts (notebooks, prose lint, the screenshot toolkit)
 ├── references.bib               # BibTeX bibliography
 ├── book/                        # Rendered book output
-├── claude.md                    # Editorial guidelines for AI-assisted authoring
+├── docs/                        # Project records: AARs, plans, decision log, hand-off note
+├── AGENTS.md                    # Instructions for AI agents and contributors
+├── CLAUDE.md                    # Imports AGENTS.md, for Claude Code
 ├── LICENSE                      # CC BY-NC-SA 4.0
 └── README.md
 ```
@@ -128,7 +130,13 @@ Contributions are welcome. If you find an error, have a suggestion, or want to p
 - **Errata and small fixes**: open an [issue](https://github.com/cuinfoscience/Web-Data-Science-Book/issues) or a pull request
 - **Larger contributions**: open a [discussion](https://github.com/cuinfoscience/Web-Data-Science-Book/discussions) first to coordinate
 
-The `claude.md` file documents editorial voice, formatting conventions, and chapter structure for anyone — human or AI — extending the book.
+[`AGENTS.md`](AGENTS.md) documents editorial voice, formatting conventions, and chapter structure for anyone — human or AI — extending the book.
+
+## For AI Agents
+
+Instructions for AI coding agents — Claude Code, Codex, and others — are in [`AGENTS.md`](AGENTS.md). If your agent looks for its own instructions file (`CLAUDE.md`, `GEMINI.md`, `.cursorrules`, and so on), point it at `AGENTS.md`: the repository keeps one set of instructions, and `CLAUDE.md` only imports it.
+
+Project records are in [`docs/`](docs/): after-action reports, plans and roadmaps, the decision log ([`docs/decisions.md`](docs/decisions.md)), and the hand-off note ([`docs/handoff.md`](docs/handoff.md)) that says where work stands. Read the hand-off note before starting, and update it when you stop.
 
 ## AI Disclosure
 

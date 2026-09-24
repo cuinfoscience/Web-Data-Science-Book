@@ -2,9 +2,9 @@
 
 Capture, check, and record the book's screenshots, so that every figure can
 be made again the same way and says where it came from. The plan and the
-after-action report behind it are in the course repo:
-`docs/plans/2026-09-24-screenshot-toolkit.md` and
-`docs/aar/2026-09-24-screenshots.md`.
+after-action report behind it are in this repo's `docs/`:
+[`docs/plans/2026-09-24-screenshot-toolkit.md`](../../docs/plans/2026-09-24-screenshot-toolkit.md) and
+[`docs/aar/2026-09-24-screenshots.md`](../../docs/aar/2026-09-24-screenshots.md).
 
 Done so far:
 
