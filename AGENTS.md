@@ -1,6 +1,6 @@
 # Web Data Science — Quarto Book
 
-Instructions for AI coding agents (Claude Code, Codex, and any other) and for people extending the book. This is the one instructions file: `CLAUDE.md` only imports it, and an agent that looks for its own file (`GEMINI.md`, `.cursorrules`, and so on) should read this one.
+Instructions for AI coding agents (Claude Code, Codex, and any other) and for people extending the book. This is the one instructions file: `CLAUDE.md` only imports it, and an agent that looks for its own file (`GEMINI.md`, `.cursorrules`, and so on) should read this one. A person contributing for the first time should start with [`CONTRIBUTING.md`](CONTRIBUTING.md), which walks through issues and pull requests step by step; the parts of this file about `docs/` and merging are for maintainers and agents.
 
 ## Project Memory: `docs/`
 
