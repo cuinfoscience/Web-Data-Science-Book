@@ -80,7 +80,7 @@ Jupyter Notebooks are interactive computing environments that keep your code, do
 jupyter notebook
 ```
 
-The command is the same on macOS, Linux, and Windows. Jupyter prints a few lines of log in the terminal and opens a browser tab listing the files in the folder you started it from. Keep the terminal open while you work, because closing it stops Jupyter. To make a notebook, choose **New** and then **Notebook**, and pick the Python 3 kernel if Jupyter asks: started from `webdata`, it is that environment's Python.
+The command is the same on macOS, Linux, and Windows. Jupyter prints a few lines of log in the terminal and opens a browser tab listing the files in the folder you started it from. Keep the terminal open while you work, because closing it stops Jupyter. To open a notebook you have, such as this chapter's companion notebook, click its name. To make a new one, choose **New** and then **Python 3 (ipykernel)** (@fig-jupyter-new-menu): started from `webdata`, that kernel is that environment's Python.
 
 A notebook consists of cells. **Code cells** contain Python that you can execute with Shift+Enter. **Markdown cells** contain formatted text for documentation. The ability to interleave code with narrative explanation makes notebooks ideal for the kind of exploratory, iterative work that characterizes web data science.
 
@@ -89,6 +89,12 @@ A notebook consists of cells. **Code cells** contain Python that you can execute
 print("Hello, web data science!")
 # Output: Hello, web data science!
 ```
+
+In the companion notebook, this code cell sits under a Markdown cell that holds the paragraph above, as @fig-jupyter-cells shows.
+
+![Jupyter's file list in the browser, in Jupyter Notebook 7.6, September 2026. The folder holds this chapter's companion notebook ①: click a name to open it. **New** ② opens a menu whose first item, **Python 3 (ipykernel)** ③, makes a new notebook.](images/ch-01/jupyter-new-menu_annotated.png){#fig-jupyter-new-menu .lightbox fig-alt="Screenshot of Jupyter's file list in a browser, with the Files and Running tabs, and a toolbar with New, Upload, and a refresh button. Marker 1: ch-01-introduction.ipynb, the one file in the folder. Marker 2: the New button, whose menu is open. Marker 3: its first item, Python 3 (ipykernel), above Terminal, Console, New File, and New Folder."}
+
+![The companion notebook in Jupyter, September 2026. A Markdown cell ① holds the chapter's text. Below it, the first code cell has run: its prompt reads `[1]:` ②, and its output ③ is under it. The kernel, Python 3 (ipykernel), is named at the right of the toolbar ④. **Not Trusted**, above it, is Jupyter's label for a notebook you didn't make on this computer; it doesn't stop cells from running.](images/ch-01/jupyter-cells_annotated.png){#fig-jupyter-cells .lightbox fig-alt="Screenshot of the notebook ch-01-introduction in Jupyter, with the menus File to Help, Not Trusted at the right, and a toolbar ending in marker 4, the kernel Python 3 (ipykernel). Marker 1: a Markdown cell, the paragraph beginning A notebook consists of cells. Marker 2: a code cell's prompt, [1]:, beside a comment and a print call for Hello, web data science! Marker 3: its output, Hello, web data science!"}
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -163,7 +169,9 @@ print(response.text[:500])
 # You'll see raw HTML: <!DOCTYPE html>, <head>, <title>, etc.
 ```
 
-This is raw HTML — not yet useful for analysis. In @sec-data-formats and @sec-static-pages, you will learn to parse this HTML into structured data using BeautifulSoup. For now, the point is that retrieving a web page programmatically is as simple as `requests.get(url)`.
+This is raw HTML — not yet useful for analysis. It is the page before a browser draws it, as @fig-article-view-source shows side by side. In @sec-data-formats and @sec-static-pages, you will learn to parse this HTML into structured data using BeautifulSoup. For now, the point is that retrieving a web page programmatically is as simple as `requests.get(url)`.
+
+![The chapter's Wikipedia article, September 2026. On the left, the page as Chrome draws it. On the right, the same address in Chrome's View Source (Ctrl+U; Option-Command-U on a Mac): the HTML the server sends, which `requests.get()` returns as `response.text`. Line 5's `<title>` is the heading on the left. The source's long lines run past the right edge.](images/ch-01/article-view-source.png){#fig-article-view-source .lightbox fig-alt="Two screenshots side by side. Left, labeled What you see: the Wikipedia article University of Colorado Boulder in Chrome, with its title, 38 languages, the Article and Talk tabs, coordinates, and an infobox with the university's seal. Right, labeled What requests gets: View Source of the same page, lines 1 to 29 of HTML, from DOCTYPE html and head to title University of Colorado Boulder - Wikipedia and on."}
 
 ### Calling Your First API
 
