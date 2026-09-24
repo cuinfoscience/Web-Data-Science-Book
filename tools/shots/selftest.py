@@ -372,6 +372,11 @@ figures:
     found = robots.barred(rules, agent, "https://example.org/private/page")
     expect("...and the capture's own User-Agent first; agents with no group of their own fall under *",
            found[:1] == [agent] and len(found) == 1 + len(robots.CLAUDE_AGENTS), str(found))
+    found = robots.findings("api.example.org", "User-agent: *\nDisallow: /\n", agent,
+                            [("json", "https://api.example.org/v1/forecast", True),
+                             ("page", "https://api.example.org/about", False)])
+    expect("a disallowed API response marked api_client is a note; a disallowed page is still a warning",
+           [level for level, _, _ in found] == ["note", "warn"] and "API client" in found[0][1], str(found))
 
     print("promote")
     code, out = shots("capture", "ch-99", "--only", "flaky")

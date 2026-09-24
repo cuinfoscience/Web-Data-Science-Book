@@ -41,7 +41,7 @@ tools/shots/run check                             # before a PR
 - **`doctor`** answers whether capture works in this session. Do not reuse an earlier session's answer:
   - it checks the proxy, the browser, a real headless capture of example.com, and a real headed one with DevTools open;
   - it checks for TeX, and fails if a recipe has markers and TeX is missing;
-  - with a chapter, it makes one request to each host that chapter's recipes use, a composite's parts included, and reads that host's robots.txt for the capture's User-Agent, noting any group addressed to Claude's agents (see "Field notes"). It warns when a host's `Crawl-delay` is longer than the pause its figures start at. A server on this machine (`localhost`), such as chapter 1's Jupyter, is asked at the figure's own address instead: robots.txt doesn't apply to it;
+  - with a chapter, it makes one request to each host that chapter's recipes use, a composite's parts included, and reads that host's robots.txt for the capture's User-Agent, noting any group addressed to Claude's agents (see "Field notes"). A disallowed page is a warning, unless its figure is an API's response marked `api_client: true`, which is a note. It warns when a host's `Crawl-delay` is longer than the pause its figures start at, and when robots.txt answers with something other than the file (EUR-Lex's browser check once answered 202 and an empty page). A server on this machine (`localhost`), such as chapter 1's Jupyter, is asked at the figure's own address instead: robots.txt doesn't apply to it;
   - it reports a proxy refusal as a policy block, which you report rather than route around. A host that a figure expects not to answer (`expect: {error: ...}`) is checked against public DNS instead, as `capture` does (see "Refusals and dead hosts").
 
 ## The rules
@@ -120,11 +120,20 @@ something the next agent would otherwise find out again, add a note here.
 - **robots.txt is per host.** feeds.bbci.co.uk allows what
   www.bbc.co.uk forbids, and feeds.npr.org has no robots.txt at all (404).
   Check the host in the figure's own URL.
-- **An API host's `Disallow: /` is a question for the maintainer.**
-  api.open-meteo.com and api.twitter.com disallow every path, while chapter 2
-  says robots.txt addresses crawlers and that API clients follow the API's own
-  terms. Leave such a figure, or such a part of one, out and ask, as the
-  back-fill did with figure 4-2 and with Twitter's part of figure 3-1.
+- **An API's response is captured as an API client.** api.open-meteo.com
+  and api.twitter.com disallow every path. The maintainer decided on
+  2026-09-24 that a figure of the request a chapter's own code makes is
+  captured anyway, one request per take, as chapter 2's distinction between
+  crawlers and API clients allows (`docs/decisions.md`). Mark it
+  `api_client: true`, on the figure or on a composite's part, and `doctor`
+  reports the disallow as a note. robots.txt still governs every other page:
+  leave such a figure out and ask.
+- **Design against a stand-in to keep to one request.** Chrome lays out a
+  JSON or XML file the same way whatever serves it, so a local server that
+  returns a copy of the response's shape is enough to work out the steps,
+  crop, and marks (`tools/shots/.venv/bin/python -m http.server`, or a few
+  lines of `http.server`). Then point the recipe at the real address and
+  capture once, as figure 4-2 was made.
 - **Keep to a host's `Crawl-delay`.** EUR-Lex's robots.txt asks for 10
   seconds between requests, so its figure sets `pause: [12, 30]`; `doctor`
   warns when a figure's pause starts below a host's delay.
@@ -349,6 +358,28 @@ something the next agent would otherwise find out again, add a note here.
   disallows every path, which leaves 3-3 to the archive's copy.
   `images/ch-03/IMAGES.md` keeps both draft recipes.
 
+### Chrome's JSON viewer (chapters 3 and 4)
+
+- **Pretty-print's checkbox can't be selected.** Chrome draws its bar in a
+  closed shadow root, which no selector, Playwright's included, reaches. The
+  recipe clicks where it is drawn, `click: {position: [104, 9]}`, and the next
+  step, `wait: {text: '"daily": \{'}`, fails the take unless the text was
+  reformatted. The bar shows the box ticked or not, so the figure says which
+  view it is.
+- **How Pretty-print lays JSON out.** A list of strings gets one item to a
+  line; a list of numbers stays on one line, which wraps in a narrow window
+  (figure 4-2 needs 600 pixels). It rewrites numbers, too: a whole number
+  loses its `.0` (`1635.0` becomes `1635`), which Python keeps, so say so in
+  the caption.
+- **Crop from the bar, not the body.** The body's top edge sits 13 pixels
+  down, where its margin and the `<pre>`'s collapse, so `between: ['body',
+  'pre']` clips the bar. Start at `.json-formatter-container` (0 to 20
+  pixels).
+- **Mark lines with `match`.** The pretty-printed text is one `<pre>`, as a
+  plain-text file is, so a line or a run of lines is a `match` anchor:
+  `{match: '^\s*"time": \[(?:\n.*){8}', in: 'pre'}` is the `time` list,
+  opening bracket to closing one.
+
 ### When a host is down
 
 - **Tell an outage from a refusal.** On 2026-09-24,
@@ -507,6 +538,7 @@ One YAML file per chapter in `recipes/`. A figure:
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top; add `within: '.panel'` for a page that scrolls a panel rather than the window, as Jupyter does.
 - **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`. `{between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 12, 0]}` is a band from the top of one element to the bottom of another; `left` and `width` default to the window.
 - **Refusals as subjects:** `expect: {status: 403}` for a refusal with a body, `expect: {block: true}` for a block page, and `expect: {error: 'ERR_NAME_NOT_RESOLVED|…'}` for a host that doesn't answer, whose take is Chrome's own error page (see "Refusals and dead hosts" under Field notes).
+- **An API's response:** `api_client: true`, on the figure or on a composite's part, marks the request a chapter's own code makes, captured as an API client where robots.txt disallows it (see "Before the recipe" under Field notes). It changes what `doctor` says, not the capture, so it stays out of the recipe's hash.
 - **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls.
 - **Other modes:** `mode: headed` and `mode: composite` are below. An `engine:` other than Playwright (M4) marks a figure that `capture` skips with a note.
 - **Patterns** are regular expressions. A leading `(?i)` ignores case; the tool turns it into JavaScript's `i` flag, because Playwright and DevTools evaluate patterns in JavaScript, which has no inline flags.
@@ -778,9 +810,10 @@ It reports **warnings** for:
 - marks changed in the recipe since the annotated image was drawn (promote again);
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
 
-`selftest` runs 86 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 87 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
+- robots.txt: groups for Claude's agents, and a disallowed API response marked `api_client` reported as a note while a disallowed page stays a warning;
 - refusals: a host that doesn't answer shown as Chrome's error page, and a failure when that page loads after all; behind a stand-in proxy that opens no tunnels, public DNS (a stand-in too) telling a dead host from a policy block in `capture` and `doctor`, and an unexpected tunnel failure still a policy block; a script check's 202 and reload; robots.txt's `Crawl-delay`;
 - a `scroll` step that scrolls a panel (`within`), not the window;
 - anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture;

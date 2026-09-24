@@ -2,11 +2,11 @@
 #
 # The last chapter of the back-fill after the chapter 5 pilot
 # (docs/plans/2026-09-24-screenshot-backfill-ch01-05.md, §4): refusals and
-# retired services. Left out for now:
+# retired services. The third of 3-1's endpoints, Twitter API v1.1, is an API's
+# response: api.twitter.com's robots.txt disallows every path for all but
+# Googlebot and Bingbot, and it is captured as an API client (docs/decisions.md,
+# 2026-09-24). Left out for now:
 #
-# - The third of 3-1's endpoints, Twitter API v1.1: api.twitter.com's
-#   robots.txt disallows every path for the course's User-Agent. It is the
-#   question figure 4-2 waits on (docs/handoff.md, "Waiting on the maintainer").
 # - 3-2, CrowdTangle's last capture in the Wayback Machine, and 3-3, Reddit's
 #   June 2023 post on API pricing: web.archive.org reset every connection from
 #   this session on 2026-09-24, and reddit.com's robots.txt now disallows every
@@ -25,13 +25,14 @@ figures:
     kind: capture
     section: "Dead-Endpoint Forensics"
     brief: >-
-      Show two of the section's retired endpoints as a browser meets them, one
-      above the other. Pushshift answers: a 403 with one line of JSON,
-      {"detail":"Not authenticated"}, so the service still runs and turns you
-      away. CrowdTangle doesn't: no HTTP response comes back, and what shows
-      is Chrome's own error page, which nothing from CrowdTangle is in. Each
-      part is labeled with its host and what its failure means. The third
-      endpoint, Twitter v1.1, waits for the maintainer (see the header).
+      Show the section's three retired endpoints as a browser meets them, one
+      above another, in the chapter's order. Pushshift answers: a 403 with one
+      line of JSON, {"detail":"Not authenticated"}, so the service still runs
+      and turns you away. CrowdTangle doesn't: no HTTP response comes back, and
+      what shows is Chrome's own error page, which nothing from CrowdTangle is
+      in. Twitter v1.1 answers too: a 400 with error 215, "Bad Authentication
+      data.", so the endpoint still runs for those who pay. Each part is
+      labeled with its host and what its failure means.
     mode: composite
     window: [560, 400]
     parts:
@@ -47,6 +48,11 @@ figures:
         expect: {error: 'ERR_NAME_NOT_RESOLVED|ERR_TUNNEL_CONNECTION_FAILED', text: ['api\.crowdtangle\.com']}
         # The icon through the error's name, from Chrome's 24-pixel indent, so it lines up with the JSON.
         crop: {between: ['.icon', '.error-code'], pad: [4, 0, 14, 0], left: 24}
+      - label: "api.twitter.com answers: a 400, error 215, in JSON"
+        url: https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=nasa
+        api_client: true      # robots.txt disallows every path; see the header
+        expect: {status: 400, text: ['Bad Authentication data']}
+        crop: {top: 0, height: 56}      # Chrome's Pretty-print bar and the one line of JSON
     layout: {direction: column, gap: 12, pad: 12, label_px: 15}
     drifts: true        # endpoints are retired, gated, or restored
 

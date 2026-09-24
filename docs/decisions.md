@@ -2,6 +2,17 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-09-24 · A figure of an API's response is captured as an API client
+
+**Decision.**
+- A figure that shows an API's response, the request a chapter's own code makes, is captured even where the API host's robots.txt disallows the path. It sends the course's User-Agent and makes one request per take, at the chapter's own address.
+- robots.txt still governs every other page a figure loads. A recipe marks an API's response with `api_client: true`, and `doctor` then reports the disallow as a note instead of a warning.
+- The first two: the Open-Meteo forecast in chapter 4 (figure 4-2), and Twitter API v1.1's part of chapter 3's figure on retired endpoints.
+
+**Why.** api.open-meteo.com's robots.txt disallows every path, and api.twitter.com's disallows every path for all but Googlebot and Bingbot, so the back-fill had left both figures out and asked. Chapter 2 says robots.txt addresses crawlers, and that deliberate API clients follow the API's own terms; the chapters' code sends every reader to both endpoints.
+
+**Where.** `tools/shots/lib/recipes.py` (`api_client`), `tools/shots/lib/robots.py` and `tools/shots/shots.py` (`doctor`), `tools/shots/README.md` ("Field notes"), and `AGENTS.md`. *Amends* "The course's User-Agent is the one robots.txt is read for", below.
+
 ## 2026-09-24 · Students' pull requests merge after a Friday code-review standup
 
 **Decision.**

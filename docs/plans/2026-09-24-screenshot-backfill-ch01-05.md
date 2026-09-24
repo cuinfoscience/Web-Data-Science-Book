@@ -5,9 +5,8 @@
 **Status:** In progress. The plan was proposed on 2026-09-24. The chapter 5 pilot
 is done (textbook #138, course #51), and its gate closed the same day. The gate
 note is in §9 of the screenshot AAR and in `tools/shots/README.md` ("What the
-chapter 5 pilot settled"). Chapter 4 is done, except figure 4-2, which waits on the maintainer (§4). Chapters 1
-and 2 are done, except figures 1-4 and 2-2 (§4). Chapter 3 is done, except 3-2 and 3-3, which wait for
-web.archive.org, and Twitter's part of 3-1, which waits on the maintainer (§4). Implements [P1-4] of
+chapter 5 pilot settled"). Chapter 4 is done. Chapters 1 and 2 are done, except figures 1-4 and
+2-2 (§4). Chapter 3 is done, except 3-2 and 3-3, which wait for web.archive.org (§4). Implements [P1-4] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md). Depends
 on P0-1 (`make_stubs.py` keeps notes), on P0-3 (what counts as a screenshot),
 and on toolkit milestones M1–M3 in
@@ -99,7 +98,7 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
 
 - **Slides:** copies of 4-1 and 4-2 go to week-04 for "XML → DataFrame: the real House roster" and "JSON: peel the onion on a live API," for the instructor to place.
 - **Handout:** 4-3 and 4-4 go into `handouts/week-04/img/` for `rss-feeds.md`. The step "View the page source … search for `type="application/rss+xml"`" gets 4-4.
-- **Done 2026-09-24:** 4-1, 4-3, and 4-4, with the course copies. 4-3 shows BBC News's science and environment feed: Chrome draws a feed as a tree only when it is served as `text/xml` or `application/xml`, and the Guardian's robots.txt disallows Claude's agents. 4-4 marks the feed's address with a numbered marker, because a box around line 33 covered its line number. **4-2 is left out** until the maintainer decides: api.open-meteo.com's robots.txt disallows every path, though chapter 2 treats `robots.txt` as addressed to crawlers rather than API clients (`docs/handoff.md`, "Waiting on the maintainer"). `images/ch-04/IMAGES.md` has the details.
+- **Done 2026-09-24:** 4-1, 4-3, and 4-4, with the course copies. 4-3 shows BBC News's science and environment feed: Chrome draws a feed as a tree only when it is served as `text/xml` or `application/xml`, and the Guardian's robots.txt disallows Claude's agents. 4-4 marks the feed's address with a numbered marker, because a box around line 33 covered its line number. **4-2 followed the same day,** once the maintainer decided that a figure of an API's response, the request a chapter's own code makes, is captured as an API client, although api.open-meteo.com's robots.txt disallows every path (`docs/decisions.md`). It is `forecast-json`: the chapter's request in Chrome's JSON view with Pretty-print ticked, marking `daily_units`, `daily`, `time`, and `temperature_2m_max`. `images/ch-04/IMAGES.md` has the details.
 
 ### Chapter 1 — Introduction
 
@@ -160,8 +159,8 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
 - **Slides:** week-03's Friday frames ("Step 4 — attach the issue," "Step 5 — review basics") are offered real signed-out captures of a public issue and PR.
 - **Placeholders:** the unused `ad_observatory.png` is left to the instructor, whose `meta-research-privacy.png` already covers that case.
 - **Done 2026-09-24:** two figures, and a toolkit that can show a host that doesn't answer.
-  - **3-1 is `dead-endpoints`** (figure 3.2), two of the three endpoints stacked: Pushshift's 403 in JSON above Chrome's own error page for CrowdTangle, whose names no longer resolve. Behind the session's proxy, a dead host fails as a refused one does, so the toolkit gained `expect: {error: ...}` with a public-DNS check before a take is kept.
-  - **Twitter's part of 3-1 waits on the maintainer:** api.twitter.com's robots.txt disallows every path, the question 4-2 raised. `images/ch-03/IMAGES.md` has the part ready.
+  - **3-1 is `dead-endpoints`** (figure 3.2), the three endpoints stacked: Pushshift's 403 in JSON, Chrome's own error page for CrowdTangle, whose names no longer resolve, and Twitter v1.1's 400 in JSON. Behind the session's proxy, a dead host fails as a refused one does, so the toolkit gained `expect: {error: ...}` with a public-DNS check before a take is kept.
+  - **Twitter's part of 3-1 followed the maintainer's API-client decision** (`docs/decisions.md`); api.twitter.com's robots.txt disallows every path. The first version, merged in #158, showed two endpoints.
   - **3-4 is `dsa-article-40`** (figure 3.1): Article 40 from its heading through paragraph 4, boxed, on EUR-Lex, whose robots.txt asks for 10 seconds between requests.
   - **3-2 and 3-3 wait for web.archive.org,** which reset every connection from the session. reddit.com's robots.txt now disallows every path, so 3-3 can only come from the archive; confirm first that Reddit itself stated $0.24 per 1,000 calls. Both draft recipes are in `images/ch-03/IMAGES.md`.
   - **3-5 is skipped:** optional, and the chapter's take-home exercise asks students to find OpenAlex's rate-limit headers themselves.
