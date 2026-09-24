@@ -27,7 +27,7 @@ ANNOTATE = {"width_in", "size", "border", "marks"}
 MARK_KEYS = {"n", "at", "shape", "side", "gap", "x", "y", "lead", "column", "label"}
 SHAPES = {"marker", "brace", "bracket", "box", "label"}
 SIDES = {"right", "left", "above", "below"}
-PAGE_AT = {"selector", "text", "box", "nth", "all"}
+PAGE_AT = {"selector", "text", "match", "in", "box", "nth", "all"}
 DEVTOOLS_AT = {"row", "selected", "text", "css", "nth", "all"}
 BOX_MODES = {"element", "text", "first-line"}
 # Where a figure is shown, for the legibility check (lib/legibility.py).
@@ -149,8 +149,8 @@ def _composite_problems(f):
 
 
 def _at_problems(at, headed):
-    if not isinstance(at, dict) or len(set(at) & {"selector", "text", "devtools", "xy"}) != 1:
-        return ["`at` names one of selector, text, devtools, or xy"]
+    if not isinstance(at, dict) or len(set(at) & {"selector", "text", "match", "devtools", "xy"}) != 1:
+        return ["`at` names one of selector, text, match, devtools, or xy"]
     out = []
     if "xy" in at:
         xy = at["xy"]
@@ -170,6 +170,10 @@ def _at_problems(at, headed):
         out += [f"unknown anchor key `{k}`" for k in set(at) - PAGE_AT]
         if at.get("box", "element") not in BOX_MODES:
             out.append(f"`box` is one of {sorted(BOX_MODES)}")
+        if "in" in at and "match" not in at:
+            out.append("`in` goes with `match`: the element whose text the pattern searches")
+        if "match" in at and at.get("box", "text") == "element":
+            out.append("a `match` anchor is the matched text's box: `box` is text or first-line")
     return out
 
 

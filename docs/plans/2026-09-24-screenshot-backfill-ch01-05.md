@@ -130,6 +130,13 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
 
 - **Slides:** week-02's two renders stay, recorded as `kind: render`. 2-1 is offered as their real-browser counterpart, and the instructor chooses.
 - **Placeholders:** the four unused placeholders are the instructor's call to delete or keep.
+- **Done 2026-09-24:** two figures.
+  - **2-1 is `robots-txt-wikipedia`:** the file in Chrome, from the comment welcoming "friendly, low-speed bots" through the generic block's `Disallow` rules. The toolkit gained `match:` anchors and scrolling for it, because a plain-text file is one text node.
+  - **2-3 is `wikimedia-ua-policy`:** the policy's request for a User-Agent with contact information, its example, and its generic format. It moved to foundation.wikimedia.org.
+  - **2-2 waits for the Friday review:** students' #50, #63, and #79 revise the paragraphs it would sit beside.
+  - **2-4 is dropped:** chapter 5's `network-headers` shows the Headers pane, and captures send the course's User-Agent, not a browser's.
+  - **2-5 is skipped** (optional).
+  - **Course:** copies of both go to `slides/week-02/img/`, offered beside the deck's two renders.
 
 ### Chapter 3 — The Post-API Age
 

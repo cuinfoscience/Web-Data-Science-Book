@@ -228,6 +228,32 @@ something the next agent would otherwise find out again, add a note here.
   (`p20` × 1920 × 0.875) of `\textwidth`, both in image pixels. Chapter 4's
   roster: 16 × 1602 ÷ (26 × 1920 × 0.875) = 0.59.
 
+### Plain text and wiki pages (chapter 2)
+
+- **A plain-text file is one text node.** Chrome shows robots.txt as one
+  `<pre>`, so neither a selector nor a text pattern can pick out a line.
+  `match:` searches the element's text with `^` and `$` at each line, and
+  scrolls to or marks what it finds: `{match: '^User-agent: \*$', in: 'pre'}`.
+  A multi-line pattern (`'^Allow: .*(?:\nAllow: .*)*'`) gives a brace the
+  whole run of lines. End the pattern before a line's newline; a range that
+  includes it can reach into the next line.
+- **Plain text leaves the right side empty.** robots.txt's lines stop short
+  of 600 pixels, so its figure is 600 wide, not 800, and the figure block's
+  `width="78%"` shows it at its size on screen. A narrow crop with no width
+  set fills the book's column: a 460-pixel crop of 16-pixel text would show
+  at 27 pixels.
+- **A page can move as it scrolls.** Scrolling Wikimedia's policy page past
+  its header turned on the skin's sticky header, and the page's own header
+  left the flow, lifting the content 40 pixels after the scroll step placed
+  it. The `match` scroll measures again and corrects, up to three times.
+- **Mark a block from its edge.** A marker aimed at a phrase that starts
+  mid-line needs a leader line across the text. On the policy figure each
+  marker sits at the left of its block (the paragraph, the example), and
+  the caption names the sentence.
+- **Crop to the text column.** At 800 pixels, the policy's text shares the
+  width with a navigation box. The crop is the 460-pixel column, in a
+  window 700 tall, so it starts below the page's floating contents button.
+
 ### Captions and notebooks
 
 - **Brackets in a caption belong inside backticks.** `make_notebooks.py`
@@ -392,6 +418,7 @@ One YAML file per chapter in `recipes/`. A figure:
 - **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-07 and ch-08 recipes set 1280×800, the window their images were made in; they are over the soft limit until they are retaken.)
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top.
 - **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`.
+- **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls.
 - **Other modes:** `mode: headed` and `mode: composite` are below. An `engine:` other than Playwright (M4) marks a figure that `capture` skips with a note.
 - **Patterns** are regular expressions. A leading `(?i)` ignores case; the tool turns it into JavaScript's `i` flag, because Playwright and DevTools evaluate patterns in JavaScript, which has no inline flags.
 - **Quoting:** quote any YAML value that contains ` #`, or everything after it becomes a comment. In single quotes, a backslash is literal: write `'quotes\?page=2'`.
@@ -489,6 +516,7 @@ annotate:
 What a mark can point `at`:
 
 - a page element: `selector:` or `text:` (a pattern). `box: element` (the default for a selector) is the element's box; `box: text` (the default for text) is the box of its words, and `box: first-line` of their first line;
+- a match inside an element's text: `match:` (a pattern; `^` and `$` match at each line) with `in:` (a selector, the page's body by default). It is the box of the matched characters, across line breaks. A plain-text file, such as a robots.txt, is one `<pre>` with one text node, so no element stands for one of its lines: `{match: '^User-agent: \*$', in: 'pre'}` does;
 - something in DevTools: `devtools: {row: …}` is an Elements-tree row, from its disclosure triangle to the end of its first line; `{selected: true}` is the selected row; `{text: …}` or `{css: …}` is anything else DevTools draws;
 - `nth: 2` picks a match (from 0), `nth: [0, 3]` joins a run of matches into one box, and `all: true` joins them all;
 - `xy: [x, y]` in image pixels, as a last resort. The tool flags it, because it will not follow the page.
@@ -662,6 +690,7 @@ It reports **warnings** for:
 - the guards, retries, `promote`, and `check`;
 - anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture;
 - the size limits: 800×600; the relaxed 1024×768, which needs a reason and text that passes; beyond it; and `check`;
+- `match`: a line of a plain-text file scrolled to its offset, and a match's box across line breaks;
 - legibility, with week 08's `infinite_scroll.png` as the failing case; a composite; `sheet`;
 - headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take;
 - the User-Agent and its Client Hints, and a first visit's reload, read back from what the local server receives;

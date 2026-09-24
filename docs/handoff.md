@@ -16,6 +16,7 @@
 - **Chapters.**
   - ch-01: the setup works as written (#152). Jupyter installs into `webdata`, terminal commands are shell blocks, and the first request sends a User-Agent.
   - ch-04 has three figures from the back-fill and fixes for #84, #87, and #132 (#149). Figure 4-2 (Open-Meteo's JSON) is left out; see the table below.
+  - ch-02: the back-fill's pull request adds Wikipedia's robots.txt at its generic block and Wikimedia's User-Agent policy, and `tools/shots` gains `match:` anchors for lines of plain text. Reddit's robots.txt (2-2) waits for the Friday review, since students' #50, #63, and #79 revise its paragraphs.
   - ch-05 has four DevTools figures from the pilot (#138).
   - ch-08: its View Source and JavaScript off/on figures are within the size limit, and the Selenium caption is dated (#142, #148). §8.3 checks Selenium Manager before the first browser (#143).
 - **Decisions on 2026-09-24** ([`decisions.md`](decisions.md)): robots.txt is read for the course's User-Agent, and examples send one; the book recommends Python 3.14; students' pull requests merge after a code-review standup in class on a Friday.

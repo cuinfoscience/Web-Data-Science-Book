@@ -50,6 +50,10 @@ PAGES = {
 PAGES["/ua"] = PAGES["/ok"]
 PAGES["/cookie"] = (200, "<title>Cookie</title><h1>A page that sets a cookie</h1>"
                          + "<p>" + "Something to look at. " * 40 + "</p>")
+# A plain-text file as Chrome shows one: all of it in one <pre>, one text node.
+PAGES["/plain"] = (200, "<!DOCTYPE html><title>Plain</title><body style='margin:0'>"
+                        "<pre style='margin:0;font:16px monospace;line-height:20px'>"
+                        + "\n".join(f"line {n}" for n in range(1, 121)) + "</pre>")
 FLAKY = {"count": 0}      # /flaky works once, then answers 502
 SEEN = {}                 # path: the headers of each request for it, in order
 # What Chrome's User-Agent Client Hints should say on this machine.
@@ -214,6 +218,14 @@ figures:
     url: "{base}/small"
     window: [555, 400]
     targets: {{slides: {{width: 0.35}}}}
+  - id: plain-lines
+    kind: capture
+    url: "{base}/plain"
+    steps: [{{scroll: {{match: '^line 60$', in: 'pre', offset: 100}}}}]
+    annotate:
+      marks:
+        - {{n: 1, at: {{match: '^line 60$', in: 'pre'}}}}
+        - {{n: 2, at: {{match: '^line 61\\nline 62$', in: 'pre'}}}}
   - {{id: wide, kind: capture, url: "{base}/ok", window: [1000, 500]}}
   - {{id: wide-allowed, kind: capture, url: "{base}/ok", window: [1000, 500], oversize: "a test of the reason"}}
   - {{id: wide-small, kind: capture, url: "{base}/small", window: [1000, 500], oversize: "a test of the reason"}}
@@ -352,6 +364,14 @@ figures:
     expect("a text anchor is the text's own box, not the element's", 39 <= title[0] <= 41
            and title[2] < 300 and 28 <= title[1] and title[3] <= 72, str(title))
     expect("the take records its text sizes", (marks.get("text") or {}).get("median") == 16.0, str(marks.get("text")))
+    code, out = shots("capture", "ch-99", "--only", "plain-lines")
+    plain = newest("plain-lines")
+    one = anchor(plain, {"match": "^line 60$", "in": "pre"}) or [0, 0, 0, 0]
+    two = anchor(plain, {"match": "^line 61\\nline 62$", "in": "pre"}) or [0, 0, 0, 0]
+    expect("a scroll step with `match` puts a line of a plain-text file at its offset",
+           abs(one[1] - 100) <= 1, str(one) + out[-300:])
+    expect("...and a `match` anchor is the matched lines' box, across line breaks",
+           two[1] >= one[3] - 1 and 30 <= two[3] - two[1] <= 45 and two[2] - two[0] < 200, str(two))
     tex_tools = all(shutil.which(t) for t in ("pdflatex", "pdftocairo"))
     if tex_tools:
         stem = tmp / "out" / "ch-99" / "marks" / (Path(marks.get("image", "x.png")).name.removesuffix(".png") + ".annotated")
