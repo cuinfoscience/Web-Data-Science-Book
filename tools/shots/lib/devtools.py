@@ -49,6 +49,11 @@ def preferences(devtools):
             prefs["elements.styles.sidebar.width"] = json.dumps({"vertical": hidden, "horizontal": hidden})
         else:
             prefs["elements.styles.sidebar.width"] = json.dumps({"vertical": {"size": devtools["sidebar"]}})
+    if "overview" in devtools:     # the Network panel's timeline above the request list
+        prefs["network-log-show-overview"] = json.dumps(bool(devtools["overview"]))
+    if devtools.get("columns"):    # extra Network columns; DevTools 154 hides Waterfall by default
+        prefs["network-log-columns"] = json.dumps(
+            {name: {"visible": True, "title": name.replace("-", " ").title()} for name in devtools["columns"]})
     return {
         "devtools": {"preferences": prefs},
         # Chrome stores zoom as a level: factor = 1.2 ** level.

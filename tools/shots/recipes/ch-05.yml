@@ -1,0 +1,109 @@
+# Recipes for Chapter 5's figures (ch-05-protocols.qmd). See tools/shots/README.md.
+#
+# The chapter-5 pilot of the back-fill plan (INFO4617-Fall2026
+# docs/plans/2026-09-24-screenshot-backfill-ch01-05.md). The running example
+# is the chapter's own page, the University of Colorado Boulder article on
+# English Wikipedia. Every figure keeps within the 800×600 soft limit: an
+# 800×600 window, DevTools docked at the bottom and zoomed to 125%.
+chapter: ch-05
+qmd: ch-05-protocols.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: inspector-heading
+    kind: capture
+    section: "The Inspector Tab"
+    url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
+    mode: headed
+    devtools: {dock: bottom, size: 330, zoom: 1.25, layout: side-by-side}
+    steps:
+      - wait: {selector: 'h1#firstHeading'}
+      - scroll: {selector: 'h1#firstHeading', offset: 70}
+      # The heading is a block as wide as the page; its words are a <span> inside it.
+      # Picking the empty right end of the block selects the <h1> itself.
+      - inspect: {selector: 'h1#firstHeading', at: [0.97, 0.5], selects: '^<h1'}
+      # Resting on the node in the tree makes DevTools highlight the heading on the page.
+      - pointer: {devtools: {css: 'li[role="treeitem"].selected'}}
+    expect:
+      status: 200
+      text: ['University of Colorado Boulder']
+    crop: {window: true}
+    drifts: true
+    annotate:
+      marks:
+        - {n: 1, at: {selector: 'h1#firstHeading .mw-page-title-main', box: text}}
+        - {n: 2, at: {devtools: {selected: true}}, side: left, x: 12, gap: 5}
+
+  - id: element-picker
+    kind: capture
+    section: "The Inspector Tab"
+    url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
+    mode: headed
+    devtools: {dock: bottom, size: 300, zoom: 1.25, layout: side-by-side}
+    steps:
+      - wait: {selector: 'table.infobox'}
+      - scroll: {selector: 'table.infobox', offset: 20}
+      - devtools_click: {css: '[aria-label^="Select an element"]'}
+      - devtools_wait: {css: '[aria-label^="Select an element"][aria-pressed="true"]'}
+      # Rest near the infobox's top-left corner, in view (the box is far taller than the window).
+      - pointer: {selector: 'table.infobox', at: [0.02, 0.03]}
+    expect:
+      status: 200
+    crop: {window: true}
+    drifts: true
+    annotate:
+      marks:
+        - {n: 1, shape: box, at: {devtools: {css: '[aria-label^="Select an element"]'}}, side: below}
+        - {n: 2, at: {devtools: {row: '^<table class="infobox'}}, side: left, x: 12, gap: 5}
+
+  - id: network-requests
+    kind: capture
+    section: "The Network Tab"
+    url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
+    mode: headed
+    # A first visit, so every row shows a real size and time, not "(memory cache)".
+    devtools: {dock: bottom, size: 360, zoom: 1.25, panel: network, overview: false, columns: [waterfall],
+               first_visit: true}
+    steps:
+      - wait: {network_idle: true}
+      # The list follows its newest rows; turn the wheel up over it to reach the page's own request.
+      - devtools_click: {text: '^200$', button: 4, repeat: 30}
+      - devtools_wait: {text: '^University_of_Colorado_Boulder$'}
+      # Opening the panel put the cursor in its Filter box; a click on the summary line takes it out.
+      - devtools_click: {text: '^\d+ requests$'}
+    expect:
+      status: 200
+    crop: {window: true}
+    drifts: true
+
+  - id: network-headers
+    kind: capture
+    section: "The Network Tab"
+    url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
+    mode: headed
+    # DevTools alone, 800×600. In a 600-pixel window Chrome keeps DevTools under about
+    # 360 pixels; a 1000-pixel window lets it be 600, and the crop keeps only DevTools.
+    window: [800, 1000]
+    devtools: {dock: bottom, size: 600, zoom: 1.2, panel: network, overview: false, first_visit: true}
+    steps:
+      - wait: {network_idle: true}
+      - devtools_click: {text: '^200$', button: 4, repeat: 30}
+      - devtools_click: {text: '^University_of_Colorado_Boulder$'}
+      # Room for the whole request: hide the filter bar (figure 5-4 shows it) and fold General
+      # (its Remote Address is the capture's proxy) and the response headers, then scroll to the end.
+      - devtools_click: {css: 'devtools-button[aria-label="Filter"]'}
+      - devtools_click: {css: summary, text: '^General$'}
+      - devtools_click: {css: summary, text: '^Response headers'}
+      - devtools_click: {css: summary, text: '^Request headers', button: 5, repeat: 15}
+      - devtools_wait: {text: '^User-Agent$'}
+    expect:
+      status: 200
+    crop: {devtools: true}
+    drifts: true
+    annotate:
+      marks:
+        # In the empty right-hand end of their rows.
+        - {n: 1, shape: brace, at: {devtools: {css: '.header-name', text: '^Sec-Ch-Ua', all: true}}, x: -50}
+        - {n: 2, at: {devtools: {css: '.header-value', text: '^Web Data Science'}}, x: -35, lead: false}
