@@ -17,12 +17,18 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 
 ## Notes
 
-- None of these is captured headless: each shows browser UI or joins two
-  captures. `view-source-js`, `network-tab-json`, and `xkcd-inspect` are headed
-  captures (tools/shots milestone M2). `javascript-off-on` waits for
-  composites (M3). `selenium-chrome-for-testing` and `playwright-codegen` show
-  the tool itself, so they need that tool as the engine (M4); until then their
-  recipes record how they were made.
+- Each figure shows browser UI or joins two captures. `view-source-js`,
+  `network-tab-json`, and `xkcd-inspect` are headed captures (tools/shots
+  milestone M2). `javascript-off-on` is a composite (M3): two headless captures
+  of the same page, JavaScript off and on, joined and labeled; a take on
+  2026-09-24 scored 2/64 against the approved image.
+  `selenium-chrome-for-testing` and `playwright-codegen` show the tool itself,
+  so they need that tool as the engine (M4); until then their recipes record
+  how they were made.
+- The DevTools figures show the whole 1680-pixel window, so their DevTools
+  text comes to about 5 pixels in the book's 778-pixel column (the lightbox
+  enlarges it). A retake is judged by the legibility check (tools/shots
+  README, "Legibility").
 - Chrome for Testing labels its own window "only for automated testing";
   `selenium-chrome-for-testing.png` keeps that bar because it is the lesson.
 - `xkcd-inspect.png` and `selenium-chrome-for-testing.png` show the comic

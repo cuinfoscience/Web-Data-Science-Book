@@ -10,33 +10,37 @@ Done so far:
 
 - **M1:** headless captures, guards, retries, provenance, and `check`.
 - **M2:** headed captures of browser UI (DevTools, View Source), with real input on a virtual display.
+- **M3:** numbered markers placed from what the browser measured, a legibility check at each size a figure is shown, side-by-side composites, and contact sheets.
 
 Still to come:
 
-- **M3:** annotation, legibility checks, and composites.
 - **M4:** evidence queries, copying figures into the course repo, CI, and the two ch-08 figures whose subject is a tool itself (the window Selenium opens, Playwright's recorder).
 
 ## Quick start
 
 ```bash
-bash tools/shots/bootstrap.sh --headed            # once per container; safe to re-run
+bash tools/shots/bootstrap.sh --headed --tex      # once per container; safe to re-run
 tools/shots/run doctor ch-07                      # every time, first: can this session capture?
 tools/shots/run capture ch-07                     # takes go to tools/shots/out/ch-07/<figure>/
+tools/shots/run sheet ch-07                       # look at every take at the size it will be shown
 tools/shots/run compare ch-07 wayback-calendar    # same picture as the approved image?
 tools/shots/run promote ch-07 wayback-calendar    # copy the take into images/ch-07/, record it
 tools/shots/run check                             # before a PR
 ```
 
-- **`bootstrap.sh`** does five things:
+- **`bootstrap.sh`** does five things, plus two optional ones:
   - installs what is missing;
   - creates `tools/shots/.venv` with the pinned packages in `requirements.txt`;
   - fetches Chrome for Testing at a pinned major version (154) through Selenium Manager;
   - makes sure Chrome trusts the session proxy's certificate;
-  - with `--headed`, adds the virtual display (Xvfb), real input (xdotool), and screen grabs (ImageMagick) that headed figures need.
+  - installs fonts, so pages in other scripts render as text and labels have a face;
+  - with `--headed`, it adds the virtual display (Xvfb), real input (xdotool), and screen grabs (ImageMagick) that headed figures need;
+  - with `--tex`, it adds pdflatex with TikZ and pdftocairo, which draw markers.
 
   It never runs `playwright install` and never turns off certificate checks.
 - **`doctor`** answers whether capture works in this session. Do not reuse an earlier session's answer:
   - it checks the proxy, the browser, a real headless capture of example.com, and a real headed one with DevTools open;
+  - it checks for TeX, and fails if a recipe has markers and TeX is missing;
   - with a chapter, it makes one request to each host that chapter's recipes use;
   - it reports a proxy refusal as a policy block, which you report rather than route around.
 
@@ -94,8 +98,10 @@ One YAML file per chapter in `recipes/`. A figure:
 ```
 
 - **Defaults:** a 1280×800 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them.
-- **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal).
-- **Other modes:** `mode: headed` is below. `mode: composite` (M3) and an `engine:` other than Playwright (M4) mark figures that `capture` skips with a note.
+- **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top.
+- **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`.
+- **Other modes:** `mode: headed` and `mode: composite` are below. An `engine:` other than Playwright (M4) marks a figure that `capture` skips with a note.
+- **Patterns** are regular expressions. A leading `(?i)` ignores case; the tool turns it into JavaScript's `i` flag, because Playwright and DevTools evaluate patterns in JavaScript, which has no inline flags.
 - **Quoting:** quote any YAML value that contains ` #`, or everything after it becomes a comment. In single quotes, a backslash is literal: write `'quotes\?page=2'`.
 
 ## Headed figures
@@ -144,13 +150,141 @@ Crops for headed figures are in window coordinates:
 - `{between: ['body', 'td.line-number[value="43"]']}`: from the top of one element to the bottom of another, which is how View Source is cut at a line;
 - `{selector: …, pad: 8}`: one element.
 
+`devtools: {sidebar: hidden}` shows the Elements tree alone, without the Styles pane.
+
+## Markers
+
+A figure with numbered markers lists them under `annotate:`. Each mark points
+`at` something, and the browser measures where that is at the moment of
+capture, so a retake moves the markers with the page. Nothing is placed by
+typing in pixel positions.
+
+```yaml
+annotate:
+  width_in: 2.625        # the whole figure's printed width; sets the markers' scale
+  size: small            # 11-point markers, or small ones (8.5 points)
+  marks:
+    - {n: 3, at: {selector: '.field--name-field-award-category-oscars', box: text}}
+    - {n: 5, at: {selector: '.field--name-field-honoree-type', box: text}, column: honoree}
+    - {n: 4, shape: brace, at: {selector: '.paragraph--type--award-honoree'}, x: 202.5}
+    - {n: 1, shape: bracket, at: {selector: '.field--name-field-award-categories'}, x: -1}
+    - {n: 2, at: {devtools: {row: 'paragraph--type--award-category'}}, side: left, x: 30, gap: 7}
+    - {label: '← you clicked', at: {devtools: {selected: true}}, x: -4}
+```
+
+What a mark can point `at`:
+
+- a page element: `selector:` or `text:` (a pattern). `box: element` (the default for a selector) is the element's box; `box: text` (the default for text) is the box of its words, and `box: first-line` of their first line;
+- something in DevTools: `devtools: {row: …}` is an Elements-tree row, from its disclosure triangle to the end of its first line; `{selected: true}` is the selected row; `{text: …}` or `{css: …}` is anything else DevTools draws;
+- `nth: 2` picks a match (from 0), `nth: [0, 3]` joins a run of matches into one box, and `all: true` joins them all;
+- `xy: [x, y]` in image pixels, as a last resort. The tool flags it, because it will not follow the page.
+
+A mark's `shape`:
+
+- `marker` (the default with a number `n`): a numbered circle on the thing's `side` (right, left, above, or below), `gap` CSS pixels away (4 by default). A dotted leader line joins the circle to its thing whenever they end up apart.
+- `brace`: a curly brace along the thing's side, spanning it. Its number, or its `label`, sits just past the brace's tip.
+- `bracket`: an open bracket. When the thing runs past the picture's edge, the bracket runs past it too and ends in an arrow.
+- `box`: a rounded box around the thing, with its number beside it.
+- `label` (the default without a number): text beside the thing. With a number as well, the marker follows the text: "4 more honorees ④".
+
+Placement:
+
+- `x` and `y` pin a mark to a place in the crop, in CSS pixels, counted from the right or bottom edge when negative. Pins are for choices about the figure's own empty space, such as a column of markers in DevTools' margin. They are not a way to reach the thing.
+- Markers with the same `column` share one line, just past the widest of their things.
+- Markers on one line that would overlap spread apart evenly, keep their order, and get leader lines.
+- A marker that would touch another mark's brace or bracket moves back toward its own thing.
+- A label over the picture gets a white backing.
+
+`capture` draws the markers on every passing take, beside it:
+`<UTC time>.annotated.pdf` for slides and handouts (vector), and `.png` for the
+book, at one pixel per pixel of the screenshot. `annotate` redraws them from
+an existing take after you change the marks, with no new capture; changing
+what a mark points at does need a new capture. `promote` draws them once more,
+from the recipe as it is then, and copies both files into `images/` as
+`<figure>_annotated.png` and `.pdf`. The styles are the course handouts'
+(`styles/shotmarkers.sty` copies `handoutmarkers.sty` from the course repo),
+so a marker drawn here looks like one in a handout.
+
+## Legibility
+
+Every take records the size of the text inside its crop, counted by
+character, from the page and from DevTools. The legibility check works out
+how tall that text will be where the figure is shown:
+
+| Target | Recipe | Shown at | Threshold |
+|---|---|---|---|
+| book | on for every chapter figure; `targets: {book: false}` turns it off | the HTML book's column, 778 pixels in a 1280-pixel-wide window, or the image's own width if narrower | 11 px |
+| slides | `targets: {slides: {width: 0.8}}`, the share of a course slide's text width | a slide 1920 pixels wide | 16 px |
+| handout | `targets: {handout: {width_in: 5.04}}` | print | 6 pt |
+
+The size judged is the one that four in five characters reach or exceed, so a
+footer does not fail a figure but small main text does. `capture` reports it
+for every take. `check` fails a promoted image under a threshold, unless its
+recipe says why the words don't matter: `legibility: {skip: "the lesson is
+the empty page"}`. The thresholds are the plan's starting values; the chapter 5
+pilot calibrates them.
+
+Known cases, measured or computed from the images:
+
+- Week 08's `infinite_scroll.png`, dropped because it could not be read on its slide: DevTools text at 11 pixels, in a 555-pixel crop, on 35% of the slide's text width. That is 11.7 pixels on a 1920-pixel slide, under 16. The selftest checks this case.
+- Week 08's `xkcd_inspect.png` read well: the same text on half the text width comes to 16.7 pixels.
+- The week-06 handout's DevTools figure measures 6.7 points in print. Its card figure measures 5.2 points, which is readable at the edge; at 3 inches wide it would pass.
+- Full-window DevTools captures in the book's column (`network-tab-json`, `xkcd-inspect`) come to about 5 pixels. The book's lightbox lets a reader enlarge them. Whether that counts is the pilot's question.
+
+## Composites
+
+`mode: composite` captures each of its `parts` as a figure of its own, then
+joins them side by side on white, each labeled below, inside a thin frame:
+
+```yaml
+- id: javascript-off-on
+  url: https://quotes.toscrape.com/js/
+  mode: composite
+  window: [900, 695]
+  parts:
+    - {label: JavaScript off, javascript: false, steps: [{wait: {text: 'Quotes to Scrape'}}]}
+    - {label: JavaScript on, steps: [{wait: {text: 'Albert Einstein'}}]}
+  layout: {gap: 28, pad: 15, label_px: 28}     # CSS pixels
+```
+
+A part can set its own `url`, `steps`, `expect`, `crop`, `javascript`,
+`window`, `scale`, `mode` (headless or headed), and `devtools`. Each part is
+paced, guarded, and retried like any take, and the joined take lists its parts.
+
+## Contact sheets
+
+`sheet ch-NN` draws each figure's newest take, with its markers if it has
+any, at the size each of its targets shows it: the book's column, its share
+of a 1920-pixel slide, a handout at 96 pixels per inch. The measured text size
+and the verdict are written above each one. Look at the sheet before a pull
+request, and attach it to the pull request, so a reviewer sees what readers
+will see.
+
+## Course-only figures
+
+`recipes/course.yml` holds figures made for the course repo rather than a
+chapter. `capture`, `annotate`, and `sheet` work on them. `promote` refuses
+them, because their images live in the course repo (`sync`, in M4, will copy
+them there), and `check` only validates their recipes. The two figures there
+rebuild the week-06 Oscars handout's annotated screenshots and are the
+regression test for markers. Every mark lands within 10 image pixels (5 CSS
+pixels) of where it was placed by hand. In the DevTools figure, markers, the
+label, and the brace are within 2.5 pixels, and leader lines within 6: the hand
+version stopped leaders closer to a triangle than to text. On the 2× card
+figure the largest difference, 9.6 pixels, is where the hand version bent its
+column of markers.
+
 ## Provenance
 
 - **`images/<chapter>/provenance.json`** records, for each image:
   - its kind and source URL;
   - when it was captured, and by whom (the tool, or a hand-run script before it);
   - the browser, User-Agent, window, scale, and crop;
-  - a hash of the recipe and of the image.
+  - a hash of the recipe and of the image;
+  - the sizes of its text, which `check` judges;
+  - for a composite, its parts;
+  - for an image with markers, hashes of the annotated PNG and PDF, the printed width they were drawn for, and a hash of the marks.
+- **The recipe's hash** covers what decides the capture. Marks, targets, and legibility settings are left out, so changing them needs no new take.
 - **Existing images:** `adopt` records ones made before the toolkit, from their recipe's `legacy:` block.
 - **`images/<chapter>/IMAGES.md`** gets a table generated from `provenance.json`, between `<!-- shots:begin -->` and `<!-- shots:end -->`. Everything outside the markers is for people, and the tool never touches it: what a figure shows that is easy to miss, and what a retake needs.
 
@@ -162,19 +296,26 @@ Crops for headed figures are in window coordinates:
 - an image without provenance;
 - an image changed after its provenance was recorded (replaced by hand);
 - a kind that disagrees with the recipe;
+- an annotated PNG or PDF that is missing, or changed after it was drawn;
+- text too small to read at one of the figure's targets (see Legibility);
 - a figure block with no `fig-alt`;
 - an out-of-date `IMAGES.md` table.
 
 It reports **warnings** for:
 
-- a figure not used in its chapter;
+- a figure not used in its chapter (a figure may use either `<figure>.png` or `<figure>_annotated.png`);
 - short alt text;
-- a drifting figure whose caption does not give the capture year.
+- a drifting figure whose caption does not give the capture year;
+- marks changed in the recipe since the annotated image was drawn (promote again).
 
-`selftest` runs 24 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 46 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
-- headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, and View Source cut at a line.
+- anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG; `annotate` without a new capture;
+- legibility, with week 08's `infinite_scroll.png` as the failing case; a composite; `sheet`;
+- headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take.
+
+It skips the marker checks if TeX is missing and the headed checks if the virtual display is.
 
 ## Files
 
@@ -188,10 +329,14 @@ It reports **warnings** for:
 | `lib/display.py` | the virtual display, real input, and screen grabs |
 | `lib/devtools.py` | DevTools settings, and reading the DevTools page to find things on screen |
 | `lib/headed.py` | one headed attempt: window, DevTools, headed steps, and the crop |
+| `lib/measure.py` | at capture: anchors' boxes and the text's sizes, in the take's pixels |
+| `lib/annotate.py`, `styles/shotmarkers.sty` | markers laid out from anchors, drawn with TikZ to PDF and PNG |
+| `lib/legibility.py` | text size at each target, against the thresholds |
+| `lib/sheet.py` | contact sheets |
 | `lib/guards.py` | error and block pages, retries, and policy blocks |
-| `lib/capture.py` | one figure, start to finish, and the take log |
+| `lib/capture.py` | one figure, start to finish, composites, and the take log |
 | `lib/compare.py` | take against approved image |
 | `lib/provenance.py` | `provenance.json` and the `IMAGES.md` table |
 | `selftest.py` | the offline test |
-| `recipes/` | one YAML file per chapter |
-| `out/`, `.venv/` | takes and the virtual environment (git-ignored) |
+| `recipes/` | one YAML file per chapter, and `course.yml` for course-only figures |
+| `out/`, `.venv/` | takes, markers, contact sheets, and the virtual environment (git-ignored) |

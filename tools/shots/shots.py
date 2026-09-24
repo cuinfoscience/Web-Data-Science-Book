@@ -5,12 +5,14 @@
     tools/shots/run list [ch-NN]              recipes, approved images, and takes
     tools/shots/run capture ch-NN [--only ID ...]
     tools/shots/run compare ch-NN ID          newest take against the approved image
+    tools/shots/run annotate ch-NN ID [--take PATH]   redraw a take's markers after editing them
+    tools/shots/run sheet ch-NN [--only ID ...]   each newest take at the size it will be shown
     tools/shots/run promote ch-NN ID [--take PATH]
     tools/shots/run adopt ch-NN [--only ID ...]   record provenance for images made before tools/shots
-    tools/shots/run check [ch-NN ...]         recipes, provenance, and the chapter's figure blocks
+    tools/shots/run check [ch-NN ...]         recipes, provenance, legibility, markers, figure blocks
     tools/shots/run status                    every figure's kind and age
     tools/shots/run clean [ch-NN]             delete old takes
-    tools/shots/run selftest                  offline test of the guards and promote
+    tools/shots/run selftest                  offline test of the guards, promote, and markers
 """
 import argparse
 import datetime
@@ -27,6 +29,7 @@ from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from lib import annotate, legibility                                   # noqa: E402
 from lib import provenance as prov                                      # noqa: E402
 from lib.capture import Pacer, PolicyBlock, capture, sha256, takes      # noqa: E402
 from lib.compare import compare                                         # noqa: E402
@@ -95,6 +98,18 @@ def cmd_doctor(args):
              "bash tools/shots/bootstrap.sh --headed")
     else:
         failed |= doctor_headed()
+    marked = [f"{f['chapter']}/{f['id']}" for c in (args.chapters or chapters())
+              for f in load(c)["figures"] if f.get("annotate")]
+    missing = annotate.tools_missing()
+    if missing and marked:
+        failed = True
+        line(BAD, f"{len(marked)} figure(s) have markers ({marked[0]}, ...), which need {', '.join(missing)}",
+             "bash tools/shots/bootstrap.sh --tex")
+    elif missing:
+        line(WARN, f"markers need {', '.join(missing)}; no recipe here uses them yet",
+             "bash tools/shots/bootstrap.sh --tex, when one does")
+    else:
+        line(GOOD, "TeX for markers (pdflatex, TikZ, pdftocairo)")
     for chapter in args.chapters:
         failed |= doctor_chapter(chapter)
     print("Ready to capture." if not failed else "Not ready; fix the FAIL lines first.")
@@ -116,7 +131,8 @@ def doctor_headed():
             response = session.page.goto("https://example.com/", wait_until="domcontentloaded", timeout=60000)
             session.ready()
             OUT.mkdir(parents=True, exist_ok=True)
-            session.grab(OUT / "doctor-headed.png")
+            session.park()
+            session.grab(OUT / "doctor-headed.png", session.crop_rect())
         finally:
             session.close()
         with Image.open(OUT / "doctor-headed.png") as img:
@@ -246,6 +262,7 @@ def cmd_capture(args):
                     line(GOOD if c["similar"] else WARN,
                          f"against the approved image: distance {c['distance']}/64"
                          f"{'' if c['similar'] else ' - looks different; check it before promoting'}")
+                bad += report_take(fig, take)
             else:
                 bad += 1
                 where = f" ({take['image']})" if take.get("image") else ""
@@ -255,11 +272,73 @@ def cmd_capture(args):
     return 1 if bad else 0
 
 
+def report_take(fig, take):
+    """Draw a passing take's markers, if its recipe has any, and say how legible it will be.
+    Returns 1 if the markers could not be drawn."""
+    record = None
+    if fig.get("annotate"):
+        try:
+            record = annotate.build(fig, take)
+            line(GOOD, f"markers: {rel(annotate.stem_for(take))}.png and .pdf")
+            for warning in record["warnings"]:
+                line(WARN, warning)
+        except annotate.AnnotateError as e:
+            line(BAD, f"markers: {e}")
+            return 1
+    results = legibility.judge(fig, take.get("text"), take["size"][0], record)
+    skip = (fig.get("legibility") or {}).get("skip")
+    if results and skip and not all(r[-1] for r in results):
+        line("note", f"text size: {legibility.describe(results)}; not judged: {skip}")
+    elif results:
+        line(GOOD if all(r[-1] for r in results) else WARN, "text size: " + legibility.describe(results))
+    return 0
+
+
 def _take(args):
     if args.take:
         return json.loads(Path(args.take).with_suffix(".json").read_text())
     found = takes(args.chapter, args.id)
     return found[0] if found else None
+
+
+def cmd_annotate(args):
+    fig = figure(load(args.chapter), args.id)
+    if not fig.get("annotate"):
+        print(f"{args.chapter}/{args.id} has no `annotate:` block")
+        return 1
+    take = _take(args)
+    if not take:
+        print(f"no passing take of {args.chapter}/{args.id}; run capture first")
+        return 1
+    print(f"{args.chapter}/{args.id}  ({take['image']})")
+    return report_take(fig, take)
+
+
+def cmd_sheet(args):
+    from lib import sheet
+    recipe = load(args.chapter)
+    entries = []
+    for fig in recipe["figures"]:
+        if args.only and fig["id"] not in args.only:
+            continue
+        found = takes(args.chapter, fig["id"])
+        if not found:
+            continue
+        take, record, path = found[0], None, ROOT / found[0]["image"]
+        if fig.get("annotate"):
+            stem = annotate.stem_for(take)
+            try:
+                record = json.loads(Path(f"{stem}.json").read_text())
+                path = Path(f"{stem}.png")
+            except FileNotFoundError:
+                line(WARN, f"{fig['id']}: no markers drawn on its newest take (run annotate)")
+        entries.append((fig, take, record, path))
+    if not entries:
+        print(f"no passing takes in {args.chapter}; run capture first")
+        return 1
+    for path in sheet.write(args.chapter, entries):
+        print(f"wrote {path}")
+    return 0
 
 
 def cmd_compare(args):
@@ -277,6 +356,10 @@ def cmd_compare(args):
 def cmd_promote(args):
     recipe = load(args.chapter)
     fig = figure(recipe, args.id)
+    if recipe["course"]:
+        print(f"{args.chapter} holds course-only figures, which go to the course repo, not images/ "
+              "(`sync`, milestone M4). Use the take and its markers from tools/shots/out/.")
+        return 1
     take = _take(args)
     if not take:
         print(f"no passing take of {args.chapter}/{args.id}; run capture first")
@@ -287,14 +370,30 @@ def cmd_promote(args):
     if take["recipe_sha256"] != fig["recipe_sha256"]:
         print("the recipe changed after this take; capture again")
         return 1
+    record = None
+    if fig.get("annotate"):
+        try:                             # drawn fresh, from this take and the recipe's marks as they are now
+            record = annotate.build(fig, take)
+        except annotate.AnnotateError as e:
+            print(f"cannot draw the markers: {e}")
+            return 1
     source, target = ROOT / take["image"], IMAGES / args.chapter / fig["file"]
     if target.exists():
         c = compare(source, target)
         print(f"replacing {rel(target)} (distance {c['distance']}/64 from the old image)")
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(source, target)
+    annotated = None
+    if record:
+        stem = annotate.stem_for(take)
+        png = IMAGES / args.chapter / prov.annotated_name(fig["file"])
+        shutil.copyfile(f"{stem}.png", png)
+        shutil.copyfile(f"{stem}.pdf", png.with_suffix(".pdf"))
+        annotated = {"png_sha256": sha256(png), "pdf_sha256": sha256(png.with_suffix(".pdf")),
+                     **{k: record[k] for k in ("annotate_sha256", "width_in", "unit_in", "warnings")}}
+        print(f"markers -> {rel(png)} and {rel(png.with_suffix('.pdf'))}")
     data = prov.load(args.chapter)
-    data["figures"][fig["id"]] = prov.from_take(take)
+    data["figures"][fig["id"]] = prov.from_take(take, annotated)
     prov.save(args.chapter, data)
     print(f"promoted {take['image']} -> {rel(target)}")
     print(prov.write_images_md(args.chapter, recipe["qmd"], data))
@@ -332,6 +431,37 @@ def figure_block(qmd_text, chapter, file):
     return pattern.search(qmd_text)
 
 
+def check_markers(fig, entry, chapter, err, warn):
+    """An annotated image must match its record, and its marks the recipe's."""
+    annotated = entry.get("annotated")
+    if fig.get("annotate") and not annotated:
+        if entry.get("by") == "tools/shots":
+            warn(f"{fig['id']}: its recipe has marks but no annotated image was recorded (promote again)")
+        return
+    if not annotated:
+        return
+    png = IMAGES / chapter / prov.annotated_name(fig["file"])
+    for path, key in ((png, "png_sha256"), (png.with_suffix(".pdf"), "pdf_sha256")):
+        if not path.exists():
+            err(f"{fig['id']}: {rel(path)} is missing")
+        elif sha256(path) != annotated.get(key):
+            err(f"{fig['id']}: {rel(path)} changed after it was drawn")
+    if fig.get("annotate") and annotated.get("annotate_sha256") != annotate.annotate_sha256(fig):
+        warn(f"{fig['id']}: the recipe's marks changed since the markers were drawn (promote again)")
+
+
+def check_legibility(fig, entry, err):
+    if not entry.get("text"):
+        return                           # made before the toolkit measured text: nothing to judge
+    results = legibility.judge(fig, entry["text"], entry["size"][0], entry.get("annotated"))
+    small = [r for r in results if not r[-1]]
+    if small and (fig.get("legibility") or {}).get("skip"):
+        line("note", f"{fig['id']}: text is small ({legibility.describe(small)}); "
+                     f"not judged: {fig['legibility']['skip']}")
+    elif small:
+        err(f"{fig['id']}: text too small to read: {legibility.describe(small)}")
+
+
 def cmd_check(args):
     errors = warnings = 0
 
@@ -352,6 +482,9 @@ def cmd_check(args):
         except RecipeError as e:
             err(str(e))
             continue
+        if recipe["course"]:
+            line(GOOD, f"{len(recipe['figures'])} course-only recipe(s) valid; their images live in the course repo")
+            continue
         data = prov.load(chapter)
         qmd = ROOT / recipe["qmd"] if recipe["qmd"] else None
         text = qmd.read_text() if qmd and qmd.exists() else ""
@@ -370,7 +503,11 @@ def cmd_check(args):
                     err(f"{fig['id']}: {rel(image)} changed after its provenance was recorded")
                 if entry.get("kind") != fig["kind"]:
                     err(f"{fig['id']}: provenance says {entry.get('kind')}, recipe says {fig['kind']}")
+                check_markers(fig, entry, chapter, err, warn)
+                check_legibility(fig, entry, err)
             block = figure_block(text, chapter, fig["file"])
+            if not block and entry and entry.get("annotated"):
+                block = figure_block(text, chapter, prov.annotated_name(fig["file"]))
             if not block:
                 warn(f"{fig['id']}: not used in {recipe['qmd']}")
                 continue
@@ -397,19 +534,20 @@ def cmd_check(args):
 # ---------------------------------------------------------------- clean / selftest
 def cmd_clean(args):
     removed = 0
-    for chapter_dir in sorted(OUT.glob("ch-*")):
-        if args.chapters and chapter_dir.name not in args.chapters:
+    for chapter_dir in sorted([*OUT.glob("ch-*"), OUT / "course"]):
+        if not chapter_dir.is_dir() or (args.chapters and chapter_dir.name not in args.chapters):
             continue
         for fig_dir in sorted(p for p in chapter_dir.iterdir() if p.is_dir()):
-            logs = sorted(fig_dir.glob("*.json"), reverse=True)
+            logs = sorted((p for p in fig_dir.glob("*.json") if ".annotated." not in p.name), reverse=True)
             keep = {logs[0]} if logs else set()
             newest_ok = next((p for p in logs if json.loads(p.read_text()).get("ok")), None)
             if newest_ok:
                 keep.add(newest_ok)
             for log in logs:
                 if log not in keep:
-                    log.unlink()
-                    log.with_suffix(".png").unlink(missing_ok=True)
+                    stamp = log.name.split(".")[0]           # the take's image, log, and markers
+                    for path in fig_dir.glob(f"{stamp}.*"):
+                        path.unlink()
                     removed += 1
     print(f"removed {removed} old take(s)")
     return 0
@@ -428,9 +566,11 @@ def main():
     p = sub.add_parser("status"); p.set_defaults(fn=cmd_status)
     p = sub.add_parser("capture"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
     p.set_defaults(fn=cmd_capture)
-    for name, fn in (("compare", cmd_compare), ("promote", cmd_promote)):
+    for name, fn in (("compare", cmd_compare), ("promote", cmd_promote), ("annotate", cmd_annotate)):
         p = sub.add_parser(name); p.add_argument("chapter"); p.add_argument("id"); p.add_argument("--take")
         p.set_defaults(fn=fn)
+    p = sub.add_parser("sheet"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
+    p.set_defaults(fn=cmd_sheet)
     p = sub.add_parser("adopt"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
     p.add_argument("--force", action="store_true"); p.set_defaults(fn=cmd_adopt)
     p = sub.add_parser("check"); p.add_argument("chapters", nargs="*"); p.set_defaults(fn=cmd_check)

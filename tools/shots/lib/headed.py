@@ -28,7 +28,7 @@ from PIL import Image
 
 from . import crop as page_crop
 from . import devtools as dt
-from . import guards
+from . import guards, measure
 from . import steps as page_steps
 from .env import OUT, playwright_version, proxy
 
@@ -57,7 +57,7 @@ class Session:
         if self.devtools:
             (self.profile / "Default" / "Preferences").write_text(json.dumps(dt.preferences(self.devtools)))
         self.port = _free_port()
-        args = [f"--window-position=0,0", f"--window-size={self.W},{self.H}",
+        args = ["--window-position=0,0", f"--window-size={self.W},{self.H}",
                 f"--force-device-scale-factor={self.S}", f"--remote-debugging-port={self.port}",
                 "--no-first-run", "--no-default-browser-check"]
         if self.devtools:
@@ -266,22 +266,59 @@ class Session:
             width = crop.get("width", self.page.evaluate("innerWidth"))
             return (max(0, x0 - pad * S), max(0, y0 - pad * S), round(width * S), y1 + pad * S)
         if "selector" in crop:
-            box, pad = self._box(crop), crop.get("pad", 0)
-            x0, y0 = self.page_point(box, (0, 0))
-            x1, y1 = self.page_point(box, (1, 1))
-            return (max(0, x0 - pad * S), max(0, y0 - pad * S), x1 + pad * S, y1 + pad * S)
+            box = self._box(crop)
+            x, y, w, h = page_crop.around((box["x"], box["y"], box["width"], box["height"]), crop)
+            x0, y0 = self.page_point({"x": x, "y": y, "width": w, "height": h}, (0, 0))
+            return (max(0, x0), max(0, y0), x0 + round(w * S), y0 + round(h * S))
         left, top = crop.get("left", 0), crop.get("top", 0)
         return (left * S, top * S, (left + crop.get("width", W - left)) * S,
                 (top + crop.get("height", H - top)) * S)
 
-    def grab(self, path):
-        if not self.pointer_placed:
-            # Park the pointer in the page's bottom-left corner: the page sees it leave
-            # whatever it was over, so hover styles and DevTools' node highlight clear.
-            # (Parking it outside the window, or over the tab strip, leaves them showing.)
-            self.display.xdo("mousemove", 5 * self.S, (self.H - 5) * self.S)
-            time.sleep(1.0)
-        rect = self.crop_rect()
+    def park(self):
+        """Park the pointer in the page's bottom-left corner, unless a step placed it on purpose.
+
+        The page sees the pointer leave whatever it was over, so hover styles and
+        DevTools' node highlight clear. (Parking it outside the window, or over
+        the tab strip, leaves them showing.) With DevTools docked at the bottom,
+        the page's corner is above DevTools, not the window's.
+        """
+        if self.pointer_placed:
+            return
+        bottom = self.toolbar() + self.page.evaluate("innerHeight") - 5
+        self.display.xdo("mousemove", 5 * self.S, round(bottom * self.S))
+        time.sleep(1.0)
+
+    def measure(self, rect):
+        """Anchors and text sizes inside the crop, in image pixels; and any anchor that failed."""
+        S, top = self.S, self.toolbar()
+        anchors, problems = {}, []
+        for at in measure.marks_anchors(self.fig):
+            try:
+                if "xy" in at:
+                    anchors[measure.key(at)] = measure.hand_box(at["xy"])
+                    continue
+                if "devtools" in at:
+                    box, dpr = measure.devtools_boxes(self._frontend(), at["devtools"])
+                    screen = [box[0] * dpr, top * S + box[1] * dpr, box[2] * dpr, top * S + box[3] * dpr]
+                else:
+                    box = measure.page_boxes(self.page, at, timeout=self.fig["timeout"])
+                    screen = [box[0] * S, (top + box[1]) * S, box[2] * S, (top + box[3]) * S]
+                anchors[measure.key(at)] = {"box": measure.shifted(screen, rect[0], rect[1])}
+            except (measure.AnchorError, dt.DevToolsError) as e:
+                problems.append(str(e))
+        width, height = self.page.evaluate("[innerWidth, innerHeight]")
+        region = [max(0, rect[0] / S), max(0, rect[1] / S - top),
+                  min(width, rect[2] / S), min(height, rect[3] / S - top)]
+        sizes = measure.scaled(self.page.evaluate(measure.TEXT_SIZES, region), S)
+        if self.devtools:
+            front = self._frontend()
+            dpr = front.evaluate("devicePixelRatio")
+            region = [rect[0] / dpr, (rect[1] - top * S) / dpr, rect[2] / dpr, (rect[3] - top * S) / dpr]
+            found = front.evaluate(f"({measure.TEXT_SIZES})({json.dumps(region)})")
+            sizes = measure.merge(sizes, measure.scaled(found, dpr))
+        return anchors, measure.summarize(sizes), problems
+
+    def grab(self, path, rect):
         raw = path.with_name(path.stem + ".raw.png")
         self.display.grab(raw)
         with Image.open(raw) as img:
@@ -298,39 +335,50 @@ class Session:
 
 
 def attempt(browser, fig, display, png):
-    """One headed attempt. Returns (status, problems, temporary, clip, final_url, steplog, error)."""
+    """One headed attempt, as a dict: status, problems, temporary, clip, final_url, steps,
+    error, anchors, text (see capture._headless)."""
     session = Session(browser, fig, display)
-    steplog, clip = [], None
+    result = {"status": None, "problems": [], "temporary": False, "clip": None, "final_url": None,
+              "steps": [], "error": None, "anchors": {}, "text": None}
     try:
         try:
             response = session.page.goto(fig["url"], wait_until="domcontentloaded",
                                          timeout=fig["timeout"] * 1000)
         except Exception as e:
-            return None, [], False, None, None, steplog, str(e).splitlines()[0]
-        status = response.status if response else None
+            result["error"] = str(e).splitlines()[0]
+            return result
+        status = result["status"] = response.status if response else None
+        result["final_url"] = session.page.url
         if guards.retryable(status=status):
-            return status, [f"HTTP status {status}"], True, None, session.page.url, steplog, None
-        problems = []
+            result.update(problems=[f"HTTP status {status}"], temporary=True)
+            return result
+        problems = result["problems"]
         try:
             if session.devtools:
                 session.ready()
                 session.open_panel()
-            page_steps.run(session.page, fig, steplog, extra=session.handlers())
+            page_steps.run(session.page, fig, result["steps"], extra=session.handlers())
         except (page_steps.StepError, dt.DevToolsError) as e:
             problems.append(str(e))
         time.sleep(fig["settle"])
         text = session.page.evaluate("() => document.body ? document.body.innerText : ''")
-        issues, temporary = guards.page_problems(status, session.page.title(), text, fig.get("expect") or {})
+        issues, result["temporary"] = guards.page_problems(status, session.page.title(), text,
+                                                           fig.get("expect") or {})
         problems += issues
         expect = fig.get("expect") or {}
-        for pattern in expect.get("text") or []:
-            if session.page.get_by_text(re.compile(pattern)).count() == 0:
-                problems.append(f"expected text /{pattern}/ not found")
+        for text in expect.get("text") or []:
+            if session.page.get_by_text(page_steps.pattern(text)).count() == 0:
+                problems.append(f"expected text /{text}/ not found")
+        result["final_url"] = session.page.url
         try:
-            clip = session.grab(png)
+            session.park()
+            rect = session.crop_rect()
+            result["anchors"], result["text"], missed = session.measure(rect)
+            problems += missed
+            result["clip"] = session.grab(png, rect)
         except (page_steps.StepError, page_crop.CropError) as e:
             problems.append(f"crop failed: {e}")
-        return status, problems, temporary, clip, session.page.url, steplog, None
+        return result
     finally:
         session.close()
 

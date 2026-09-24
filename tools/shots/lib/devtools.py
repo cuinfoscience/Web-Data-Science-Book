@@ -37,8 +37,12 @@ def preferences(devtools):
     if "size" in devtools:         # the DevTools pane's width (docked right or left) or height (bottom)
         axis = "horizontal" if devtools.get("dock") == "bottom" else "vertical"
         prefs["inspector-view.split-view-state"] = json.dumps({axis: {"size": devtools["size"]}})
-    if "sidebar" in devtools:      # the Styles sidebar's width
-        prefs["elements.styles.sidebar.width"] = json.dumps({"vertical": {"size": devtools["sidebar"]}})
+    if "sidebar" in devtools:      # the Styles sidebar's width, or `hidden` for the Elements tree alone
+        if devtools["sidebar"] in ("hidden", 0, False):
+            hidden = {"size": 300, "showMode": "OnlyMain"}
+            prefs["elements.styles.sidebar.width"] = json.dumps({"vertical": hidden, "horizontal": hidden})
+        else:
+            prefs["elements.styles.sidebar.width"] = json.dumps({"vertical": {"size": devtools["sidebar"]}})
     return {
         "devtools": {"preferences": prefs},
         # Chrome stores zoom as a level: factor = 1.2 ** level.
@@ -56,7 +60,8 @@ _FIND = r"""
     for (const el of root.querySelectorAll('*')) {
       if (el.shadowRoot) walk(el.shadowRoot);
       if (css && !el.matches(css)) continue;
-      const text = (el.innerText || el.textContent || '').trim();
+      // DevTools breaks attributes with zero-width spaces (class=​"field"); match without them.
+      const text = (el.innerText || el.textContent || '').replace(/​/g, '').trim();
       if (re && !re.test(text)) continue;
       const r = el.getBoundingClientRect();
       if (r.width < 2 || r.height < 2 || r.bottom < 0 || r.top > innerHeight) continue;
@@ -105,8 +110,12 @@ class Frontend:
             raise DevToolsError(f"DevTools script failed: {result['exceptionDetails'].get('text')}")
         return result.get("result", {}).get("value")
 
-    def find(self, text=None, css=None, flags=""):
+    def find(self, text=None, css=None):
         """Boxes of visible elements matching text (a regex) and/or css, innermost first."""
+        if text is not None and text.startswith("(?i)"):    # JavaScript has no inline flags
+            text, flags = text[4:], "i"
+        else:
+            flags = ""
         call = f"{_FIND}({json.dumps(text)}, {json.dumps(flags)}, {json.dumps(css)})"
         return json.loads(self.evaluate(call))
 
