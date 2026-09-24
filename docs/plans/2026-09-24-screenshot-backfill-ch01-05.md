@@ -2,7 +2,10 @@
 
 > Moved here on 2026-09-24 from the course repo (`cuinfoscience/INFO4617-Fall2026`, `docs/plans/2026-09-24-screenshot-backfill-ch01-05.md`), so the toolkit's records sit beside its code. It was written there: "this repo" means the course repo, and paths under `slides/`, `handouts/`, and `syllabus/` are the course repo's.
 
-**Status:** Proposed, 2026-09-24. Implements [P1-4] of
+**Status:** In progress. The plan was proposed on 2026-09-24. The chapter 5 pilot
+is done (textbook #138, course #51), and its gate closed the same day. The gate
+note is in §9 of the screenshot AAR and in `tools/shots/README.md` ("What the
+chapter 5 pilot settled"). Chapters 1–4 are next, in §4's order. Implements [P1-4] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md). Depends
 on P0-1 (`make_stubs.py` keeps notes), on P0-3 (what counts as a screenshot),
 and on toolkit milestones M1–M3 in

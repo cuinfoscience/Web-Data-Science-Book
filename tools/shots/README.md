@@ -56,6 +56,45 @@ These come from `slides/common/AUTHORING.md` in the course repo and from the AAR
 - **Dated captions.** A figure that shows things that change (counts, versions, live pages) says in its caption when it was captured.
 - **At most 800×600 of the screen.** A figure shows at most 800×600 CSS pixels of the screen (1600×1200 image pixels at scale 2). In the book's 778-pixel column its text then stays about the size it had on screen; a whole 1680-pixel window shrinks it to less than half. To show DevTools, zoom DevTools and crop to what the text discusses, rather than widening the window. This is the first check, and a soft one: going over is a warning, and a recipe that needs more says why in `oversize:`.
 
+## What the chapter 5 pilot settled
+
+The back-fill plan made the chapter 5 pilot (#138, 2026-09-24) a gate before
+chapters 1–4. These are the conventions it settled for later figures. The
+dated record is in §9 of [the screenshot AAR](../../docs/aar/2026-09-24-screenshots.md).
+
+- **Pick what a page or DevTools can show.** Native context menus (Copy
+  selector, Copy as cURL) are drawn outside both, where steps and anchors
+  can't reach, so the pilot skipped them. A few figures of what the prose
+  asks the reader to find beat many: four of the eight candidates were enough.
+- **Scope, then zoom.** Without these settings, the first takes under the
+  800×600 cap came out crammed.
+  - Zoom DevTools to 125%.
+  - `layout: stacked, sidebar: 1` gives the Elements tree the full width.
+  - `columns:` and `overview: false` hide what the text doesn't discuss.
+  - A taller window cropped to DevTools (`crop: {devtools: true}`) gives the
+    Network panel room.
+- **Thresholds held.** The pilot's figures measure 12.8–14.6 pixels in the
+  book. On slides, DevTools captures need 0.56–0.58 of the text width.
+- **Markers.**
+  - Numbered markers sit on measured anchors.
+  - A brace marks a block of rows, and a box marks a control.
+  - Nothing can mark an overlay Chrome draws itself, such as the picker's
+    size label, so the caption names it.
+  - Markers are drawn at the book's scale. On a slide at 0.75 of the text
+    width they come out about half size, and a marker size per target is
+    still to do.
+- **Captions and alt text.**
+  - Date the caption ("in September 2026").
+  - Say what the capture setup changes that a reader would see: a first visit
+    (`first_visit: true`), or HTTP/1.1 through the proxy.
+  - Don't claim a route the capture didn't take.
+  - The pilot's alt text ran 400–433 characters, transcribing what a reader
+    needs from the figure.
+- **Review.** The pull request's review table, one row per figure, is where
+  figures are kept or cut. Its columns are section, what it shows, region,
+  text size, markers, and notes. Copy anything a retake needs into
+  `IMAGES.md`, because the pull request's text isn't in the repository.
+
 ## Making a figure, start to finish
 
 One figure, from the request to the merged pull request. Each step names its
@@ -343,8 +382,8 @@ The size judged is the one that four in five characters reach or exceed, so a
 footer does not fail a figure but small main text does. `capture` reports it
 for every take. `check` fails a promoted image under a threshold, unless its
 recipe says why the words don't matter: `legibility: {skip: "the lesson is
-the empty page"}`. The thresholds are the plan's starting values; the chapter 5
-pilot calibrates them.
+the empty page"}`. The thresholds began as the plan's starting values, and the
+chapter 5 pilot kept them (see "What the chapter 5 pilot settled").
 
 Known cases, measured or computed from the images:
 
