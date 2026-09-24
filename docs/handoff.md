@@ -12,6 +12,7 @@
 
   The selftest passes 71 of 71. `check` reports 0 errors and 11 warnings: 9 chapter 7–8 figures over the size limit, and 2 captions without a capture date.
 - **Chapters.**
+  - ch-04 has three figures from the back-fill: the House roster and a BBC feed in Chrome's XML tree, and View Source searched for a feed's address. Figure 4-2 (Open-Meteo's JSON) is dropped: api.open-meteo.com's robots.txt disallows every path.
   - ch-05 has four DevTools figures from the pilot (#138).
   - ch-08: two DevTools figures were retaken within 800×600 (#142). §8.3 now checks Selenium Manager before the first browser, and covers Firefox, Edge, and Safari (#143).
 - **Contributors.** `CONTRIBUTING.md`, a pull request template, and issue forms that point to it (#146). The README acknowledges the AI tools used to write the book (#145).
@@ -22,7 +23,7 @@
 
 In this order:
 
-1. **Back-fill chapters 1–4** in the [plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)'s order (§4): ch-04, ch-01, ch-02, ch-03.
+1. **Back-fill chapters 1–3** in the [plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)'s order (§4): ch-01, ch-02, ch-03. Chapter 4 is done.
    - Each chapter is a textbook and course pair of pull requests.
    - Each figure starts from its brief, within 800×600, or within 1024×768 when that is clearer and still legible.
    - Chapter 1 needs a Jupyter server in the container.
@@ -52,7 +53,8 @@ In this order:
 | AAR P1-1 | The `shots-check` CI workflow, part of M4. |
 | AAR P1-3 | Fix the review skill's session collector. This belongs to whoever maintains the skill, not this repository. |
 | Computed outputs | The four questions in the plan's §9. |
-| Chapters 1–4 back-fill | <ul><li>Week 01's look-alikes (`issue_form.png`, `pr_review.png`): use a real public issue and pull request that aren't a student's, or capture them by hand.</li><li>The unused placeholders (week 02's four, week 03's `ad_observatory`, week 05's `dev_tools_network`): delete or keep.</li><li>Figure 1-1: should it replace `anaconda_jupyter.png` in `setup.md`?</li></ul> |
+| Chapter 4's starter feeds | The Changelog's robots.txt (`changelog.com`) disallows every path, feed included, so a student who follows Step 1 can't use it. Keep it as a lesson in that check, or replace it in the chapter and in the course's `rss-feeds.md`. |
+| Chapters 1–3 back-fill | <ul><li>Week 01's look-alikes (`issue_form.png`, `pr_review.png`): use a real public issue and pull request that aren't a student's, or capture them by hand.</li><li>The unused placeholders (week 02's four, week 03's `ad_observatory`, week 05's `dev_tools_network`): delete or keep.</li><li>Figure 1-1: should it replace `anaconda_jupyter.png` in `setup.md`?</li></ul> |
 
 ## Known issues
 
