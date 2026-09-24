@@ -8,7 +8,7 @@ Before starting work, read `docs/handoff.md` (where work stands, what is paused,
 
 ## Git and Pull Requests
 
-Merge with merge commits. Don't squash, rebase, or force-push a branch someone may have seen. A merge commit keeps the branch inside `main`, so a session that has to reuse one branch starts its next pull request with a fast-forward, and the review history stays readable. Open a new branch for each pull request, and don't base one pull request on another's unmerged branch. Merge only when the maintainer asks, and never merge a student's pull request. Before fixing a reported issue, check whether a student's open pull request already fixes it: the issue's linked pull requests, and the open ones on that chapter. Students' pull requests are course work, so leave the fix to theirs; if it doesn't name the issue, link the two in a comment on the issue. Where your change touches the same lines as a student's open pull request, say so in your description, so the maintainer can merge theirs first. If the environment can't delete merged branches, list them in `docs/handoff.md`. The reasons are in `docs/decisions.md`.
+Merge with merge commits. Don't squash, rebase, or force-push a branch someone may have seen. A merge commit keeps the branch inside `main`, so a session that has to reuse one branch starts its next pull request with a fast-forward, and the review history stays readable. Open a new branch for each pull request, and don't base one pull request on another's unmerged branch. Merge only when the maintainer asks. Students' pull requests are merged by the maintainer after a code-review standup in class on a Friday; never merge one yourself. Before fixing a reported issue, check whether a student's open pull request already fixes it: the issue's linked pull requests, and the open ones on that chapter. Students' pull requests are course work, so leave the fix to theirs; if it doesn't name the issue, link the two in a comment on the issue. Where your change touches the same lines as a student's open pull request, say so in your description, so the maintainer can merge theirs first. Write "fixes #N", "closes #N", or "resolves #N" only where your change fixes #N: GitHub closes the issue when the commit reaches `main`, even from a sentence about someone else's pull request. On 2026-09-24, "already fixes #90" in a commit message closed an issue that a student's open pull request was still fixing. If the environment can't delete merged branches, list them in `docs/handoff.md`. The reasons are in `docs/decisions.md`.
 
 ## Project Overview
 
@@ -32,7 +32,7 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
 ### Dependencies
 
 - Quarto 1.4+
-- Python 3.10+ via Anaconda
+- Python 3.14 via Anaconda (3.13 also works); on 3.14, gensim comes from conda-forge
 - Jupyter (for rendering .qmd files with Python code)
 - Key Python libraries: requests, beautifulsoup4, lxml, pandas, numpy, scipy, matplotlib, seaborn, selenium, pypdf, praw, spotipy, atproto, Mastodon.py, openai, anthropic, gensim, nltk, scapy, dnspython
 
@@ -42,6 +42,7 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
 - **Tone**: Formal but approachable, engaging, and supportive. Think "experienced mentor explaining things clearly" rather than "textbook lecturing." Occasional humor is welcome, but keep it dry and relevant.
 - **Audience**: Advanced undergraduates and early-career master's students with some Python experience. They know loops, functions, lists, and dictionaries, but may not have experience with web protocols, APIs, or HTML parsing.
 - **Code style**: Narrative code blocks with comments. Code is set to `eval: false` globally — students run code themselves. Include expected output as comments where it helps comprehension. Use meaningful variable names and include docstrings in functions. **Each comment lives on one line — never hard-wrap a comment sentence across lines**; let the editor soft-wrap. This applies to the Recommended Exercises scaffold cells and every other code block.
+- **Requests in code**: every live request in an example sends a User-Agent with the reader's address, `WebDataScience/1.0 (your-email@colorado.edu)`, as chapter 1 does, and never the library default, which Wikipedia refuses with a 403. The book's own tools send the course's User-Agent, `Web Data Science/v1 brian.keegan@colorado.edu`, and robots.txt is read for it (`docs/decisions.md`).
 - **Chapter structure**: Each chapter follows a consistent pattern:
   1. Learning objectives (bulleted list in a callout)
   2. Conceptual introduction with motivation

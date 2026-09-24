@@ -50,7 +50,7 @@ This book is written in [Quarto](https://quarto.org/). To build it locally:
 ### Prerequisites
 
 - [Quarto 1.4+](https://quarto.org/docs/get-started/)
-- Python 3.10+ (the [Anaconda](https://www.anaconda.com/download) distribution is recommended)
+- Python 3.14; 3.13 also works (the [Anaconda](https://www.anaconda.com/download) distribution is recommended)
 - Jupyter (`pip install jupyter`) — Quarto uses it to process the book's executable code cells
 
 ### Python dependencies
@@ -59,9 +59,10 @@ The code blocks in the book reference these libraries. Most students will not ne
 
 ```bash
 pip install requests beautifulsoup4 lxml pandas numpy scipy \
-            matplotlib seaborn selenium pypdf gensim nltk \
+            matplotlib seaborn selenium pypdf nltk \
             scapy dnspython praw spotipy atproto Mastodon.py \
             openai anthropic
+conda install -c conda-forge gensim   # chapter 7; PyPI has no Python 3.14 build of gensim yet
 ```
 
 ### Build commands

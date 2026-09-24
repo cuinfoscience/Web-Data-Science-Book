@@ -2,6 +2,39 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-09-24 · Students' pull requests merge after a Friday code-review standup
+
+**Decision.**
+- Students' pull requests are merged in class, after a code-review standup on a Friday. Each author presents the change, a classmate reviews it, and the maintainer merges the approved ones with merge commits.
+- Nobody merges a student's pull request at other times, and agents never merge one.
+- The first session is on the course's roadmap: `docs/plans/2026-09-24-friday-code-review.md` in the course repository.
+
+**Why.** About 40 student pull requests were open. Some overlapped, and four conflicted with `main` after the merges of #148–#152. Reviewing them together turns the backlog into the review practice the revision framework grades, and a merge in front of the class shows what happens next. Week 4's deck had told students they could merge their own, while `CONTRIBUTING.md` said the maintainer merges; this settles it.
+
+**Where.** `CONTRIBUTING.md` ("Review and merge"), `AGENTS.md`, and, in the course repository, `handouts/common/revision-framework.md` and week 4's deck.
+
+## 2026-09-24 · Recommend Python 3.14
+
+**Decision.**
+- The book recommends Python 3.14; 3.13 also works. Chapter 1's setup creates `webdata` with `python=3.14`.
+- gensim, used in chapter 7, publishes no 3.14 wheels on PyPI as of September 2026. On 3.14 it comes from conda-forge (`conda install -c conda-forge gensim`), which builds it for 3.14.
+- The CI workflows run 3.14 as well.
+
+**Why.** The book named four versions (3.10 or later, 3.11 or later, 3.12 or later, and 3.12 in chapter 1's setup), and a student asked which one to use (#31). Every other library the book installs publishes 3.14 builds on PyPI, checked on 2026-09-24.
+
+**Where.** `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, the preface (`index.qmd`), chapter 1's setup, chapter 7's gensim note, `.github/workflows/`, and the course's `handouts/week-01/setup.md`.
+
+## 2026-09-24 · The course's User-Agent is the one robots.txt is read for
+
+**Decision.**
+- Every request the book's tools and scripts make for the maintainer sends the course's User-Agent, `Web Data Science/v1 brian.keegan@colorado.edu` (see the 2026-09-23 entry). None goes out with a library default, such as `python-requests/2.34`, or with a Claude agent's string.
+- robots.txt is read for that User-Agent. A group addressed only to Claude's agents (`ClaudeBot`, `Claude-User`, and the rest) doesn't govern the book's captures; `doctor` lists such groups as a note, so they stay visible.
+- Code examples send a User-Agent of the same form with the reader's own address, `WebDataScience/1.0 (your-email@colorado.edu)`, as chapter 1 does. The chapters' other strings are aligned once students' open pull requests on the same lines are reviewed.
+
+**Why.** Wikipedia refuses the library default with a 403 (#5), so an example without a User-Agent fails as written. The chapter 4 back-fill had treated robots.txt groups for Claude's agents as binding on captures that send the course's User-Agent. The maintainer decided that the course's User-Agent, which names the project and a contact, is the identity robots.txt is read for.
+
+**Where.** `tools/shots/lib/recipes.py` (`DEFAULTS`), `tools/shots/shots.py` (`doctor`), `tools/shots/README.md` ("Field notes"), and `AGENTS.md`. *Amends* "One honest identity for captures and examples", below.
+
 ## 2026-09-24 · A screenshot may relax to 1024×768 when that is clearer and still legible
 
 **Decision.**

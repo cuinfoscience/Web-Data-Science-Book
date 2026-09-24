@@ -490,6 +490,8 @@ Swap this wrapper into the collection loop and your pipeline gains two propertie
 
 To measure how much a document changed between versions, you can use a bag-of-words approach. This technique represents each document as a vector of word frequencies, ignoring word order, and then measures the similarity between vectors.
 
+The code below uses gensim and NLTK, which chapter 1's core install doesn't include. In a terminal where `webdata` is active, install both with `conda install -c conda-forge gensim nltk`. For Python 3.14, conda-forge has gensim ready to install, and PyPI, where `pip` looks, doesn't yet (September 2026).
+
 ```{python}
 from gensim.utils import simple_preprocess
 from nltk.corpus import stopwords

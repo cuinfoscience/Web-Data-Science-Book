@@ -37,7 +37,7 @@ from lib.compare import compare                                         # noqa: 
 from lib.env import IMAGES, OUT, ROOT, TOOL, chrome_path, chrome_version, proxy, rel  # noqa: E402
 from lib.recipes import DEFAULTS, RecipeError, chapters, figure, load   # noqa: E402
 
-GOOD, WARN, BAD = "ok", "warn", "FAIL"
+GOOD, NOTE, WARN, BAD = "ok", "note", "warn", "FAIL"
 
 
 def line(mark, text, fix=None):
@@ -185,9 +185,9 @@ def doctor_chapter(chapter):
                 line(WARN, f"{host}: robots.txt disallows {urlparse(page).path} ({fig['id']})",
                      "one page view per figure; decide whether that fits the site's rules")
             claude = [name for name in names if name != agent]
-            if claude:
-                line(WARN, f"{host}: robots.txt disallows {urlparse(page).path} for {', '.join(claude)} ({fig['id']})",
-                     "an AI agent makes this capture: leave the page out, or ask the maintainer")
+            if claude and agent not in names:
+                line(NOTE, f"{host}: robots.txt disallows {urlparse(page).path} for {', '.join(claude)} ({fig['id']})",
+                     "captures send the course's User-Agent, which it allows (docs/decisions.md, 2026-09-24)")
     return failed
 
 
