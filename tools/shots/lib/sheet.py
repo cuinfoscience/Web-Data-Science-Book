@@ -69,15 +69,16 @@ def blocks(entries):
             title += f"  ·  annotated at {annotated['width_in']:g} in"
             if annotated.get("warnings"):
                 title += "  ·  " + "; ".join(annotated["warnings"])
-        over = legibility.oversize(take)
-        note = (over + (f"; allowed: {fig['oversize']}" if fig.get("oversize") else "")) if over else ""
+        verdict = legibility.size_verdict(
+            fig, take, legibility.judge(fig, take.get("text"), take["size"][0], annotated))
+        note = verdict[1] if verdict else ""
         height = MARGIN + 40 + (30 if note else 0) + sum(max(t.height for t, _, _ in r) + 40 + GAP for r in rows)
         block = Image.new("RGB", (WIDTH, height), "white")
         draw = ImageDraw.Draw(block)
         draw.text((MARGIN, MARGIN), title, fill="black", font=bold)
         y = MARGIN + 40
-        if note:                         # the soft limit on what a figure shows
-            draw.text((MARGIN, y), note, fill=(110, 110, 110) if fig.get("oversize") else (190, 0, 0), font=font)
+        if note:                         # the soft limit on what a figure shows: gray when allowed
+            draw.text((MARGIN, y), note, fill=(110, 110, 110) if verdict[0] == "note" else (190, 0, 0), font=font)
             y += 30
         for r in rows:
             x = MARGIN

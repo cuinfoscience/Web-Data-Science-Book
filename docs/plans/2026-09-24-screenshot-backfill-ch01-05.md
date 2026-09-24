@@ -2,7 +2,10 @@
 
 > Moved here on 2026-09-24 from the course repo (`cuinfoscience/INFO4617-Fall2026`, `docs/plans/2026-09-24-screenshot-backfill-ch01-05.md`), so the toolkit's records sit beside its code. It was written there: "this repo" means the course repo, and paths under `slides/`, `handouts/`, and `syllabus/` are the course repo's.
 
-**Status:** Proposed, 2026-09-24. Implements [P1-4] of
+**Status:** In progress. The plan was proposed on 2026-09-24. The chapter 5 pilot
+is done (textbook #138, course #51), and its gate closed the same day. The gate
+note is in §9 of the screenshot AAR and in `tools/shots/README.md` ("What the
+chapter 5 pilot settled"). Chapters 1–4 are next, in §4's order. Implements [P1-4] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md). Depends
 on P0-1 (`make_stubs.py` keeps notes), on P0-3 (what counts as a screenshot),
 and on toolkit milestones M1–M3 in
@@ -21,7 +24,7 @@ These come from the scoping questions answered on 2026-09-24:
 - **Fewer than 10 figures per chapter.** Add a figure only where the prose asks the reader to find something on screen. The candidates below run 4–8 per chapter.
 - **No approved shot list in advance.** The candidates are a starting point. The PR is where each figure is accepted, cut, or swapped.
 - **Real captures only** (pending P0-3). Pages behind a login go to the instructor with a capture checklist. Hand captures arrive as files on a branch, because pasted images reach the session as pictures it can see but not crop or redact.
-- **At most 800×600 of the screen** (P1-5, added 2026-09-24): each capture shows at most 800×600 CSS pixels, at 2×, so its text reads at book and slide size. That means a small window, a crop to what the text discusses, and DevTools zoomed rather than widened. A figure that needs more says why in its recipe. The same rule sizes the slide copies: an 800-pixel capture takes at least `0.48\textwidth`.
+- **At most 800×600 of the screen** (P1-5, added 2026-09-24): each capture shows at most 800×600 CSS pixels, at 2×, so its text reads at book and slide size. That means a small window, a crop to what the text discusses, and DevTools zoomed rather than widened. A figure that needs more says why in its recipe. (Relaxed 2026-09-24: up to 1024×768 when the extra room removes clutter and the text still passes at every target; see `docs/decisions.md`.) The same rule sizes the slide copies: an 800-pixel capture takes at least `0.48\textwidth`.
 - **Slides and handouts get copies, with notes.** A figure replaces a placeholder under the same file name, or fills a frame that has no image and describes exactly what the figure shows. Otherwise it goes into `img/` with notes, for the instructor to place. Memes stay: "never ship a diagram where a meme lands better" (`AUTHORING.md`).
 
 ## 2. Where things stand (audit, 2026-09-24)

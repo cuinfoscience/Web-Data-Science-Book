@@ -18,12 +18,16 @@ The starting thresholds come from the toolkit plan: 11 pixels in the book and
 one could read it on its slide, measures 11.7 there. For print, 6 points is
 the usual floor for small print.
 
-Before any of that, a first and soft limit: a figure shows at most 800×600
-CSS pixels of the screen (1600×1200 image pixels at the default scale of 2).
-A capture no wider than the book's column keeps its text at about the size it
-had on screen; a whole 1680-pixel window shrinks it to less than half. Going
-over is a warning, not an error, and a recipe that needs more says why:
-`oversize: "the lesson is the whole page's layout"`.
+Before any of that, a first and soft limit on how much of the screen a figure
+shows. By default it is 800×600 CSS pixels (1600×1200 image pixels at the
+default scale of 2): a capture no wider than the book's column keeps its text
+at about the size it had on screen, while a whole 1680-pixel window shrinks it
+to less than half. A figure may relax to 1024×768 when the extra room removes
+clutter (rows that wrap, columns cut short with "…", panels squeezed together)
+and its text still passes everywhere it is shown; its recipe says what the room
+removes: `oversize: "at 800 pixels wide the Network columns are cut short"`.
+Beyond 1024×768 a recipe needs a reason too. Going over is a warning, not an
+error; text too small to read is the error, judged above.
 """
 BOOK_PX = 778
 SLIDE_PX = 1920
@@ -31,7 +35,8 @@ SLIDE_TEXT = 398.34 / 455.24     # the course decks' text width over paper width
 PT_PER_IN = 72.27
 THRESHOLDS = {"book": 11.0, "slides": 16.0, "handout": 6.0}
 UNITS = {"book": "px", "slides": "px", "handout": "pt"}
-SOFT_LIMIT = (800, 600)          # CSS pixels a figure shows, at most, before a warning
+SOFT_LIMIT = (800, 600)          # CSS pixels a figure shows by default
+RELAXED_LIMIT = (1024, 768)      # ...and at most, when the room removes clutter and the text still passes
 
 
 def region(entry):
@@ -41,15 +46,55 @@ def region(entry):
     return round(entry["size"][0] / scale), round(entry["size"][1] / scale)
 
 
+def _within(limit, width, height):
+    return width <= limit[0] and height <= limit[1]
+
+
 def oversize(entry):
-    """'' within the soft limit; otherwise what the figure shows, and what that does in the book."""
+    """'' within 800×600; otherwise what the figure shows, which limit that is within or over,
+    and what the book's column does to its text."""
     width, height = region(entry)
-    if width <= SOFT_LIMIT[0] and height <= SOFT_LIMIT[1]:
+    if _within(SOFT_LIMIT, width, height):
         return ""
-    said = f"shows {width}×{height} CSS pixels, over the {SOFT_LIMIT[0]}×{SOFT_LIMIT[1]} soft limit"
+    soft, relaxed = "{}×{}".format(*SOFT_LIMIT), "{}×{}".format(*RELAXED_LIMIT)
+    if _within(RELAXED_LIMIT, width, height):
+        said = f"shows {width}×{height} CSS pixels, over {soft} but within the relaxed {relaxed} limit"
+    else:
+        said = f"shows {width}×{height} CSS pixels, over the relaxed {relaxed} limit"
     if width > BOOK_PX:
         said += f"; the book's column shows its text at {round(100 * BOOK_PX / width)}% of its size on screen"
     return said
+
+
+def size_verdict(fig, entry, results):
+    """The soft limit's verdict on a take or an approved image: None within 800×600, otherwise
+    ("note" or "warn", message). `results` are its legibility results (judge()).
+
+    Up to 1024×768, a figure needs both conditions of the relaxed limit: a reason in `oversize:`
+    (the clutter the extra room removes) and text that passes at every target. An image whose text
+    was never measured can't show the second. Beyond 1024×768, a figure needs a reason."""
+    said = oversize(entry)
+    if not said:
+        return None
+    reason = fig.get("oversize")
+    if _within(RELAXED_LIMIT, *region(entry)):
+        small = [r for r in results if not r[-1]]
+        if small and not (fig.get("legibility") or {}).get("skip"):
+            return "warn", (f"{said}, but its text is too small ({describe(small)}); the relaxed limit is only "
+                            "for text that passes wherever the figure is shown: go back to 800×600, or zoom "
+                            "the page or DevTools")
+        if entry.get("text") is None:
+            return "warn", (f"{said}, but its text was never measured, so the relaxed limit can't be confirmed; "
+                            "retake it with tools/shots")
+        if reason:
+            return "note", f"{said}; allowed: {reason}"
+        return "warn", (f"{said}; allowed when the extra room removes clutter (rows that wrap, columns cut short "
+                        "with \"…\", squeezed panels): say what it removes in `oversize:`, or crop to "
+                        + "{}×{}".format(*SOFT_LIMIT))
+    if reason:
+        return "note", f"{said}; allowed: {reason}"
+    return "warn", (f"{said}: crop to what the text discusses, or zoom DevTools, rather than widen the window "
+                    "(or say why in `oversize:`)")
 
 
 def targets(fig):

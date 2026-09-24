@@ -30,6 +30,7 @@ from urllib.parse import urlparse
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from lib import annotate, legibility                                   # noqa: E402
+from lib import devtools as dt                                          # noqa: E402
 from lib import provenance as prov                                      # noqa: E402
 from lib.capture import Pacer, PolicyBlock, capture, sha256, takes      # noqa: E402
 from lib.compare import compare                                         # noqa: E402
@@ -285,13 +286,14 @@ def report_take(fig, take):
         except annotate.AnnotateError as e:
             line(BAD, f"markers: {e}")
             return 1
-    over = legibility.oversize(take)
-    if over and fig.get("oversize"):
-        line("note", f"{over}; allowed: {fig['oversize']}")
-    elif over:
-        line(WARN, over, "crop to what the text discusses, or zoom DevTools, rather than widen the window "
-                         "(or say why in `oversize:`)")
+    if take.get("mode") == "headed" and take.get("devtools"):
+        # A DevTools key DevTools doesn't know fails silently: say what it drew instead.
+        for level, message in dt.compare(take["devtools"], take.get("devtools_seen"), take["scale"]):
+            line(WARN if level == "warn" else "note", f"DevTools: {message}")
     results = legibility.judge(fig, take.get("text"), take["size"][0], record)
+    verdict = legibility.size_verdict(fig, take, results)
+    if verdict:
+        line("note" if verdict[0] == "note" else WARN, verdict[1])
     skip = (fig.get("legibility") or {}).get("skip")
     if results and skip and not all(r[-1] for r in results):
         line("note", f"text size: {legibility.describe(results)}; not judged: {skip}")
@@ -457,12 +459,14 @@ def check_markers(fig, entry, chapter, err, warn):
 
 
 def check_size(fig, entry, warn):
-    """The first and soft limit: a figure shows at most 800x600 CSS pixels, or its recipe says why."""
-    over = legibility.oversize(entry)
-    if over and fig.get("oversize"):
-        line("note", f"{fig['id']}: {over}; allowed: {fig['oversize']}")
-    elif over:
-        warn(f"{fig['id']}: {over}")
+    """The first and soft limit: a figure shows at most 800x600 CSS pixels; up to 1024x768 when its
+    recipe says what clutter the room removes and its text passes; beyond that, with a reason."""
+    results = legibility.judge(fig, entry.get("text"), entry["size"][0], entry.get("annotated"))
+    verdict = legibility.size_verdict(fig, entry, results)
+    if verdict and verdict[0] == "note":
+        line("note", f"{fig['id']}: {verdict[1]}")
+    elif verdict:
+        warn(f"{fig['id']}: {verdict[1]}")
 
 
 def check_legibility(fig, entry, err):
@@ -497,6 +501,10 @@ def cmd_check(args):
         except RecipeError as e:
             err(str(e))
             continue
+        for fig in recipe["figures"]:
+            if not (fig.get("brief") or "").strip():
+                warn(f"{fig['id']}: its recipe has no `brief:`, the request the figure answers "
+                     "(what it shows, for which paragraph, what it leaves out)")
         if recipe["course"]:
             line(GOOD, f"{len(recipe['figures'])} course-only recipe(s) valid; their images live in the course repo")
             continue

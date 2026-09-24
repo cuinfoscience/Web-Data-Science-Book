@@ -39,6 +39,14 @@ class HeadedError(Exception):
     pass
 
 
+# Chrome 154's own bars above the page, the tab strip and the address bar, in DIPs.
+# An infobar adds its height: Chrome for Testing's "only for automated testing"
+# notice makes it 143. `--disable-infobars` keeps that notice off; the guard
+# fails a take whose bars are taller anyway, unless the recipe expects an infobar.
+BARS = 88
+BARS_SLACK = 12
+
+
 def _free_port():
     with socket.socket() as s:
         s.bind(("127.0.0.1", 0))
@@ -60,9 +68,12 @@ class Session:
             (self.profile / "Default" / "Preferences").write_text(json.dumps(dt.preferences(self.devtools)))
         self.port = _free_port()
         # The User-Agent as Chrome's own flag, so the Client Hints stay truthful (see lib/browser.py).
+        # --disable-infobars: no Chrome for Testing notice under the address bar ("only for
+        # automated testing", 55 pixels tall). Playwright passes it too, but only by default;
+        # figures made without it before the toolkit carried the notice.
         args = ["--window-position=0,0", f"--window-size={self.W},{self.H}", f"--user-agent={fig['user_agent']}",
                 f"--force-device-scale-factor={self.S}", f"--remote-debugging-port={self.port}",
-                "--no-first-run", "--no-default-browser-check"]
+                "--no-first-run", "--no-default-browser-check", "--disable-infobars"]
         if self.devtools:
             args.append("--auto-open-devtools-for-tabs")
         options = {"executable_path": browser.path, "headless": False, "no_viewport": True,
@@ -90,6 +101,29 @@ class Session:
             found = self._frontend().find(css="body")
             return self.H - found["height"] * (found["dpr"] / self.S)
         return self.page.evaluate("window.outerHeight - window.innerHeight")
+
+    def bars_problems(self, result):
+        """Record the browser's bars above the page; an infobar among them is a problem.
+
+        A recipe whose subject is an infobar says so with `expect: {infobar: true}`,
+        and then the guard requires one.
+        """
+        bars = result["bars"] = round(self.toolbar(), 1)
+        infobar = bars > BARS + BARS_SLACK
+        if (self.fig.get("expect") or {}).get("infobar"):
+            return [] if infobar else ["the recipe expects an infobar above the page, and there is none"]
+        if infobar:
+            return [f"the browser's bars above the page are {bars:.0f} pixels tall, {bars - BARS:.0f} more than "
+                    "its tab strip and address bar: an infobar, such as Chrome for Testing's \"only for automated "
+                    "testing\" notice, is in the way"]
+        return []
+
+    def devtools_seen(self):
+        """What DevTools drew, read back from its own page (lib/devtools.py)."""
+        try:
+            return self._frontend().state()
+        except dt.DevToolsError as e:
+            return {"error": str(e)}
 
     def page_point(self, box, at=(0.5, 0.5)):
         top = self.toolbar()
@@ -369,7 +403,7 @@ def attempt(browser, fig, display, png):
     error, anchors, text (see capture._headless)."""
     session = Session(browser, fig, display)
     result = {"status": None, "problems": [], "temporary": False, "clip": None, "final_url": None,
-              "steps": [], "error": None, "anchors": {}, "text": None}
+              "steps": [], "error": None, "anchors": {}, "text": None, "bars": None, "devtools_seen": None}
     try:
         try:
             response = session.page.goto(fig["url"], wait_until="domcontentloaded",
@@ -386,6 +420,8 @@ def attempt(browser, fig, display, png):
         try:
             if session.devtools:
                 session.ready()
+            problems += session.bars_problems(result)
+            if session.devtools:
                 session.open_panel()
             page_steps.run(session.page, fig, result["steps"], extra=session.handlers())
         except (page_steps.StepError, dt.DevToolsError) as e:
@@ -405,6 +441,8 @@ def attempt(browser, fig, display, png):
             rect = session.crop_rect()
             result["anchors"], result["text"], missed = session.measure(rect)
             problems += missed
+            if session.devtools:
+                result["devtools_seen"] = session.devtools_seen()
             result["clip"] = session.grab(png, rect)
         except (page_steps.StepError, page_crop.CropError) as e:
             problems.append(f"crop failed: {e}")

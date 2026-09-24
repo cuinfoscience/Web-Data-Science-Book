@@ -14,10 +14,10 @@ HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "ty
 STEPS = PAGE_STEPS | HEADED_STEPS
 CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad",
          "devtools"}
-EXPECTS = {"status", "text", "selector", "block"}
+EXPECTS = {"status", "text", "selector", "block", "infobar"}
 DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout", "overview", "columns", "first_visit"}
 DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
-FIGURE_KEYS = {"id", "file", "kind", "section", "url", "mode", "engine", "steps", "expect", "crop",
+FIGURE_KEYS = {"id", "file", "kind", "section", "brief", "url", "mode", "engine", "steps", "expect", "crop",
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
                "user_agent", "pause", "settle", "timeout", "retries",
                "annotate", "targets", "legibility", "parts", "layout", "oversize"}
@@ -38,11 +38,12 @@ PART_KEYS = {"label", "url", "steps", "expect", "crop", "javascript", "window", 
              "devtools", "settle", "timeout"}
 LAYOUT = {"gap", "pad", "label_px"}
 # Settings that decide how a take is drawn on or judged, not how it is captured.
-# Changing them needs no new take, so they stay out of the recipe's hash.
-NOT_CAPTURE = ("legacy", "notes", "annotate", "targets", "legibility", "oversize")
+# Changing them needs no new take, so they stay out of the recipe's hash. So does
+# the brief: the request the figure answers, in words.
+NOT_CAPTURE = ("brief", "legacy", "notes", "annotate", "targets", "legibility", "oversize")
 DEFAULTS = {
     "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
-    "window": [800, 600],    # CSS pixels; also the soft limit on what a figure shows (lib/legibility.py)
+    "window": [800, 600],    # CSS pixels; the default limit on what a figure shows, 1024×768 relaxed (lib/legibility.py)
     "scale": 2,              # device pixels per CSS pixel
     "pause": [8, 30],        # seconds between page loads on one host
     "settle": 1.0,           # seconds to let rendering finish after the last step
@@ -102,13 +103,18 @@ def _problems(chapter, raw):
             out.append(f"{where}: unknown crop key `{key}`")
         for key in set(f.get("expect") or {}) - EXPECTS:
             out.append(f"{where}: unknown expect key `{key}`")
+        if (f.get("expect") or {}).get("infobar") and f.get("mode") != "headed":
+            out.append(f"{where}: `expect: {{infobar: true}}` is for a headed figure, the only kind with browser bars")
         out += [f"{where}: {p}" for p in _annotate_problems(f)]
         for key in set(f.get("targets") or {}) - TARGETS:
             out.append(f"{where}: unknown target `{key}` (one of {sorted(TARGETS)})")
         for key in set(f.get("legibility") or {}) - LEGIBILITY:
             out.append(f"{where}: unknown legibility key `{key}`")
         if "oversize" in f and not (isinstance(f["oversize"], str) and f["oversize"].strip()):
-            out.append(f"{where}: `oversize` is the reason a figure shows more than 800×600, as a sentence")
+            out.append(f"{where}: `oversize` is the reason a figure shows more than 800×600, as a sentence "
+                       "(up to 1024×768: the clutter the extra room removes)")
+        if "brief" in f and not (isinstance(f["brief"], str) and f["brief"].strip()):
+            out.append(f"{where}: `brief` is the request the figure answers, in sentences")
         out += [f"{where}: {p}" for p in _composite_problems(f)]
     return out
 

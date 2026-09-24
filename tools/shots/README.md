@@ -52,8 +52,135 @@ These come from `slides/common/AUTHORING.md` in the course repo and from the AAR
 - **One honest User-Agent** for every request (`Web Data Science/v1 brian.keegan@colorado.edu`, the one the handouts teach). It goes to Chrome as Chrome's own `--user-agent` flag, so the User-Agent Client Hints (`Sec-CH-UA-Platform` and the rest) name the system the capture runs on. Playwright's `user_agent` option rewrites them too, and for a string that names no system it claims Windows. Page loads on one host are 8–30 seconds apart.
 - **Retries:** a 5xx or a dropped connection is retried three times, 30, 60, then 120 seconds apart. A block page, a 403, or a proxy refusal is not retried.
 - **No logins, no credentials, no student names or work.** A page behind a login is captured by the instructor by hand (M4 adds `import`).
+- **No infobars.** Chrome for Testing puts a notice under the address bar: "Chrome for Testing … is only for automated testing". It is 55 pixels of browser chrome that says nothing about the page. Headed captures pass `--disable-infobars`, which keeps it off. `capture` fails a headed take whose bars above the page are taller than the tab strip and address bar (88 pixels), unless the figure's subject is the bar (`expect: {infobar: true}`, as for ch-08's Selenium window). The figures made before the toolkit ran Chrome without the switch and carried the notice.
 - **Dated captions.** A figure that shows things that change (counts, versions, live pages) says in its caption when it was captured.
-- **At most 800×600 of the screen.** A figure shows at most 800×600 CSS pixels of the screen (1600×1200 image pixels at scale 2). In the book's 778-pixel column its text then stays about the size it had on screen; a whole 1680-pixel window shrinks it to less than half. To show DevTools, zoom DevTools and crop to what the text discusses, rather than widening the window. This is the first check, and a soft one: going over is a warning, and a recipe that needs more says why in `oversize:`.
+- **800×600 of the screen, or up to 1024×768 when that is clearer.** A figure shows 800×600 CSS pixels of the screen by default (1600×1200 image pixels at scale 2). In the book's 778-pixel column its text then stays about the size it had on screen; a whole 1680-pixel window shrinks it to less than half. To show DevTools, zoom DevTools and crop to what the text discusses, rather than widening the window. A figure may relax to 1024×768 when two things are true:
+  - the extra room removes clutter: rows that wrap, columns cut short with "…", panels squeezed together;
+  - its text still passes the legibility check everywhere it is shown. At 1024 pixels wide the book's column shows text at 76% of its size on screen (97% at 800), so on-screen text needs about 14.5 CSS pixels: zoom DevTools to about 150%.
+
+  The recipe says what the room removes, in `oversize:`. This is the first check, and a soft one: going over is a warning. Beyond 1024×768, a recipe needs a reason too.
+
+## What the chapter 5 pilot settled
+
+The back-fill plan made the chapter 5 pilot (#138, 2026-09-24) a gate before
+chapters 1–4. These are the conventions it settled for later figures. The
+dated record is in §9 of [the screenshot AAR](../../docs/aar/2026-09-24-screenshots.md).
+
+- **Pick what a page or DevTools can show.** Native context menus (Copy
+  selector, Copy as cURL) are drawn outside both, where steps and anchors
+  can't reach, so the pilot skipped them. A few figures of what the prose
+  asks the reader to find beat many: four of the eight candidates were enough.
+- **Scope, then zoom.** Without these settings, the first takes under the
+  800×600 cap came out crammed.
+  - Zoom DevTools to 125%.
+  - `layout: stacked, sidebar: 1` gives the Elements tree the full width.
+  - `columns:` and `overview: false` hide what the text doesn't discuss.
+  - A taller window cropped to DevTools (`crop: {devtools: true}`) gives the
+    Network panel room.
+- **Thresholds held.** The pilot's figures measure 12.8–14.6 pixels in the
+  book. On slides, DevTools captures need 0.56–0.58 of the text width.
+- **Markers.**
+  - Numbered markers sit on measured anchors.
+  - A brace marks a block of rows, and a box marks a control.
+  - Nothing can mark an overlay Chrome draws itself, such as the picker's
+    size label, so the caption names it.
+  - Markers are drawn at the book's scale. On a slide at 0.75 of the text
+    width they come out about half size, and a marker size per target is
+    still to do.
+- **Captions and alt text.**
+  - Date the caption ("in September 2026").
+  - Say what the capture setup changes that a reader would see: a first visit
+    (`first_visit: true`), or HTTP/1.1 through the proxy.
+  - Don't claim a route the capture didn't take.
+  - The pilot's alt text ran 400–433 characters, transcribing what a reader
+    needs from the figure.
+- **Review.** The pull request's review table, one row per figure, is where
+  figures are kept or cut. Its columns are section, what it shows, region,
+  text size, markers, and notes. Copy anything a retake needs into
+  `IMAGES.md`, because the pull request's text isn't in the repository.
+
+## Making a figure, start to finish
+
+One figure, from the request to the merged pull request. Each step names its
+command or file; the table after the steps says where each part of a
+figure's record is kept.
+
+1. **Write the brief first.** Before any capture, write the figure's `brief:`
+   in its recipe: what the reader should see, for which paragraph, and what
+   the figure leaves out. Two to five plain sentences. It is the request the
+   figure answers. A reviewer can judge a take against it, and so can
+   whoever retakes the figure a year later, when the page has changed. The
+   recipes here have one for every figure; `check` warns about a figure
+   without one.
+2. **Check the session and the page.** Run `tools/shots/run doctor ch-NN` in
+   this session. The page must load signed out, and show no student names or
+   work and no one's personal data. A page behind a login is the
+   instructor's to capture by hand.
+3. **Write the rest of the recipe.** Use the smallest window and crop that
+   hold what the brief names: 800×600 CSS pixels by default, or up to
+   1024×768 when the extra room removes clutter and the text still passes,
+   with what it removes in `oversize:`. For browser UI, add `mode: headed` and a `devtools:` block
+   that sets the dock, the zoom (125% in most chapter 5 figures), the panel,
+   and the panes, columns, and sidebars to hide. Steps wait for a condition;
+   none sleeps blindly. Add `annotate:` marks that point at elements or
+   DevTools rows, `targets:` for each place the figure is shown, and
+   `drifts: true` if it shows anything that changes.
+4. **Capture, and read what it says.** `tools/shots/run capture ch-NN
+   <figure>`. A failed guard names the problem: an error page, missing text,
+   an infobar. Read the warnings on a passing take too: a DevTools setting
+   that DevTools did not honor, a figure over the soft limit, and the text
+   size at each target.
+5. **Look at the contact sheet.** `tools/shots/run sheet ch-NN` shows each
+   take at the size its readers will see. Look for text too small to read; a
+   wrapped row or a column cut short with "…", which means too much is in
+   view; traces of the capture (the proxy's address, headers naming its IP
+   address or location); and any bar under the address bar. Then hold the
+   take against the brief: it should show what the brief asks for and
+   nothing the brief leaves out. If not, change the recipe and capture again.
+   `annotate` redraws markers without a new capture.
+6. **Promote.** `tools/shots/run promote ch-NN <figure>` copies the take into
+   `images/ch-NN/`, draws its markers once more, and records it in
+   `provenance.json` and the `IMAGES.md` table. Outside the table, write in
+   `IMAGES.md` what a retake needs to know: what the figure shows that is
+   easy to miss, and why it looks the way it does.
+7. **Write the figure block.** The caption says what to notice, gives the
+   capture's month and year if the figure drifts, and names Chrome's own
+   overlays, which get no marker. The `fig-alt` transcribes the text and
+   numbers a reader needs, in 280–440 characters. Then run
+   `tools/shots/run check`.
+8. **Build.** Regenerate the notebooks (`python tools/make_notebooks.py`),
+   run `python tools/trope_lint.py` on the changed chapter, and render it
+   with Quarto.
+9. **Make the course copies.** A slide or handout that uses the figure gets
+   a copy in the course repo's `slides/week-NN/img/` (or the handout's
+   `img/`), cropped to what the slide discusses and keeping the file name
+   the deck uses. Update the image's row in `stubs.tsv` (its size and what
+   it shows) and its notes in `IMAGES.md`, then regenerate the table with
+   `cd slides && python3 common/make_stubs.py week-NN`. On a 1920-pixel
+   slide its text must reach 16 pixels.
+10. **Open the pull requests.** Open one in the textbook and one in the
+    course repo, together, each on a new branch. The textbook PR's
+    description has the review table: for each figure, its section, what it
+    shows, kind, markers, alt text, capture date, and legibility result.
+    Attach the contact sheet. Merge with a merge commit, when the maintainer
+    asks.
+
+### Where each piece lives
+
+| Piece | Where |
+|---|---|
+| The request: what the reader should see, for which paragraph, and what the figure leaves out | the recipe's `brief:` |
+| How to capture it: the page, window, DevTools, steps, and crop | the rest of the figure's recipe in `recipes/` |
+| Markers | the recipe's `annotate:` |
+| Where it is shown, and the reason for any exception | the recipe's `targets:`, `oversize:`, and `legibility: {skip: …}` |
+| How an image made before the toolkit was made | the recipe's `legacy:` |
+| What the reader is told | the chapter's figure block: the caption and `fig-alt` |
+| What was captured, when, how, and the hashes that tie image to recipe | `images/ch-NN/provenance.json` |
+| What a retake needs to know | `images/ch-NN/IMAGES.md`, outside the generated table |
+| Every take, its log, and its markers | `tools/shots/out/ch-NN/<figure>/` (not committed) |
+| Copies on slides and handouts | the course repo's `img/` folders, each with `stubs.tsv` and `IMAGES.md` |
+| Which figures were accepted, and why | the PR's review table. It lives on GitHub, not in the repo, so copy anything a retake needs into `IMAGES.md`. |
+| The plans, and the decisions behind these rules | `docs/plans/`, `docs/decisions.md`, and `docs/aar/` |
 
 ## How a capture works
 
@@ -71,7 +198,8 @@ A take fails its guards when:
 - the status is unexpected;
 - the page reads like an error or block page (a Cloudflare challenge, "Access denied," the Wayback Machine's "Fail with status");
 - expected text is missing;
-- the image is nearly blank.
+- the image is nearly blank;
+- in a headed take, an infobar sits above the page (see "No infobars").
 
 A failed take is named `<UTC time>.FAILED.png` and kept for inspection. `promote` refuses it. Nothing but `promote` writes to `images/`.
 
@@ -85,6 +213,10 @@ One YAML file per chapter in `recipes/`. A figure:
 - id: x-com-1999                 # the image is images/ch-07/x-com-1999.png
   kind: capture                  # capture | render | diagram | illustration
   section: "Broken and Missing Captures"
+  brief: >-                      # the request the figure answers, in sentences
+    Show a capture whose HTML was saved but whose images were not: x.com on
+    November 14, 1999, with broken-image icons and their alt text above the
+    signup form and the X.com Corporation footer, under the Wayback toolbar.
   url: https://web.archive.org/web/19991114081850/http://x.com/
   steps:                         # each step waits for a condition; none sleeps blindly
     - wait: {selector: '#wm-ipp-base'}
@@ -98,6 +230,7 @@ One YAML file per chapter in `recipes/`. A figure:
     method: headless Playwright (Node), 1280×800 window at 1×, top 610 pixels
 ```
 
+- **The brief** is for people: what the reader should see, for which paragraph, and what the figure leaves out (step 1 of "Making a figure"). The tool doesn't read it, and it stays out of the recipe's hash, so rewording it needs no new take.
 - **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-07 and ch-08 recipes set 1280×800, the window their images were made in; they are over the soft limit until they are retaken.)
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top.
 - **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`.
@@ -132,15 +265,29 @@ How a headed capture runs:
 - **The window:** Chrome for Testing opens on a virtual display sized for the window at its scale. It gets a fresh profile, a debugging port, and no "controlled by automated test software" bar.
 - **DevTools settings:** `devtools:` opens DevTools with the page, from settings written into the profile before launch:
   - `dock` (`right`, `bottom`, `left`);
-  - `zoom` (1.25 keeps DevTools readable in the book inside the 800×600 limit; 1.75 makes it large enough for print);
+  - `zoom` (1.25 keeps DevTools readable in the book inside 800×600, and about 1.5 inside 1024×768; 1.75 makes it large enough for print);
   - `size`: the pane's width, or its height when docked at the bottom;
   - `layout`: `side-by-side` puts the Styles pane beside the Elements tree. DevTools' default (`auto`) stacks Styles under the tree in a narrow window, where it can squeeze the tree out entirely;
-  - `sidebar`: the Styles pane's size, its width beside the tree or its height under it (`layout: stacked`). In an 800-pixel window, `layout: stacked, sidebar: 1` gives the Elements tree DevTools' whole width, so its rows don't wrap, and leaves only Styles' tab bar below it for the crop to cut. `hidden` hid the pane in the Oscars figure's wide DevTools; at 800 pixels DevTools 154 ignores it;
+  - `sidebar`: the Styles pane's size, its width beside the tree or its height under it (`layout: stacked`). In an 800-pixel window, `layout: stacked, sidebar: 1` gives the Elements tree DevTools' whole width, so its rows don't wrap, and leaves only Styles' tab bar below it for the crop to cut. DevTools 154 can't hide the pane. `hidden` puts it at its smallest, whichever layout DevTools uses: 97 DevTools pixels wide beside the tree, or 57 tall under it. Before the read-back existed, `hidden` set only one layout, so in a narrow pane that DevTools stacked, the Styles pane took most of the height and squeezed the tree;
   - `overview: false` hides the Network panel's timeline above the request list. `columns` shows or hides Network columns: `[waterfall]` adds Waterfall, which DevTools 154 hides by default, and `{waterfall: true, initiator: false}` also drops a column the text doesn't need.
 
   DevTools 154 ignores the stored `panel`, so the toolkit clicks that panel's tab. For `network`, it then reloads the page so the log is complete. That reload is a second visit: it sends the cookies the first load was given and revalidates what it cached. `first_visit: true` clears both before the reload, so the log shows what a first visit sends and receives: every request reaches the network, and none carries a cookie.
 
   Chrome keeps part of the page in view. Docked at the bottom of a 600-pixel window, DevTools gets at most about 360 pixels (about 70% of the area below the browser's bars), whatever `size` says. For a DevTools figure that needs more height, make the window taller and crop to DevTools: `window: [800, 1000]`, `size: 600`, and `crop: {devtools: true}` show 800×600 of DevTools alone, within the soft limit (ch-05's `network-headers`).
+- **Every setting is read back.** A key DevTools doesn't know is ignored without an error. The pilot found two such failures: a Styles-pane key DevTools 154 no longer reads, and a User-Agent option that also rewrote the Client Hints. So before the grab, each headed take reads DevTools' own page for what it drew, and records it in the take's log as `devtools_seen`. The browser's bar height is recorded as `bars`. `capture` then reports each difference from the recipe as a warning beside the take, such as "DevTools: the pane is 463 pixels tall, not 650; Chrome keeps part of the page in view".
+
+  | Setting | Read back from | Selftest |
+  |---|---|---|
+  | `zoom` | DevTools' device pixel ratio over the capture's scale | 125% |
+  | `dock`, `size` | where DevTools leaves room for the page | bottom 400, right 450, left 380; 650 asked in a 700-pixel window is reported |
+  | `layout`, `sidebar` | the Elements panel's tree and Styles boxes | stacked at 120, side by side at 200, `hidden` at its smallest |
+  | `overview`, `columns` | the Network panel's timeline and column headings | timeline off, Waterfall on, Initiator off; DevTools' defaults as the control |
+  | "What's new" marked as seen | no "What's new" panel | shut |
+  | `panel` | the selected tab (a step may change it, so a difference is a note) | the Network figures |
+  | `--disable-infobars` | the browser's bars above the page | 88 pixels; `expect: {infobar: true}` fails without a bar |
+  | `--user-agent`, `first_visit` | the requests a local server receives | since the chapter 5 pilot |
+
+  A new setting gets a row here and a selftest check that reads it back.
 - **Finding DevTools controls:** docked DevTools is itself a web page. The toolkit reads that page over the debugging port to find where a tab, button, request row, or header name is drawn, then clicks it for real with xdotool. No pixel positions are typed into recipes.
 - **Before any step:** it waits for the page's `load` event and for DevTools to draw its Elements tree. DevTools undoes a selection made before then.
 - **The screen grab:** the pointer is parked in the page's bottom-left corner, so hover styles and DevTools' node highlight clear. Then the screen is grabbed.
@@ -216,15 +363,38 @@ so a marker drawn here looks like one in a handout.
 
 ## Legibility
 
-**First, a soft limit on size.** A figure shows at most 800×600 CSS pixels of
-the screen: its image size over its scale. `capture`, `annotate`, `sheet`, and
-`check` warn about a figure over the limit, and say how small the book's
-column will make its text. A recipe that needs more says why, and the warning
-becomes a note:
+**First, a soft limit on size.** A figure shows 800×600 CSS pixels of the
+screen by default: its image size over its scale. It may relax to 1024×768
+when the extra room removes clutter and its text still passes at every target.
+`capture`, `annotate`, `sheet`, and `check` report a figure over 800×600, and
+say how small the book's column will make its text:
+
+| What the figure shows | What the tools say |
+|---|---|
+| up to 800×600 | nothing |
+| up to 1024×768, with a reason in `oversize:` and text that passes at every target | a note |
+| up to 1024×768, without a reason | a warning: say what clutter the room removes, or crop to 800×600 |
+| up to 1024×768, with text too small somewhere it is shown (reason or not) | a warning: go back to 800×600, or zoom the page or DevTools |
+| more than 1024×768, with a reason in `oversize:` | a note |
+| more than 1024×768, without a reason | a warning |
+
+Within 1024×768, the reason is the clutter the extra room removes:
+
+```yaml
+window: [1024, 768]
+devtools: {dock: bottom, size: 460, zoom: 1.5, panel: network}
+oversize: "at 800 pixels wide the Network list cuts Name and Type short with …"
+```
+
+Beyond it, the reason says why the text still reads, as for the week-06 handout's
+DevTools figure:
 
 ```yaml
 oversize: "DevTools is zoomed to 175%, so its text reads as a 594×471 capture's would"
 ```
+
+An image made before the toolkit measured text can't show that its text passes,
+so it gets a warning inside 1024×768 until it is retaken.
 
 **Then, the text itself.** Every take records the size of the text inside its
 crop, counted by character, from the page and from DevTools. The legibility
@@ -240,8 +410,8 @@ The size judged is the one that four in five characters reach or exceed, so a
 footer does not fail a figure but small main text does. `capture` reports it
 for every take. `check` fails a promoted image under a threshold, unless its
 recipe says why the words don't matter: `legibility: {skip: "the lesson is
-the empty page"}`. The thresholds are the plan's starting values; the chapter 5
-pilot calibrates them.
+the empty page"}`. The thresholds began as the plan's starting values, and the
+chapter 5 pilot kept them (see "What the chapter 5 pilot settled").
 
 Known cases, measured or computed from the images:
 
@@ -303,7 +473,7 @@ column of markers.
   - the sizes of its text, which `check` judges;
   - for a composite, its parts;
   - for an image with markers, hashes of the annotated PNG and PDF, the printed width they were drawn for, and a hash of the marks.
-- **The recipe's hash** covers what decides the capture. Marks, targets, and legibility settings are left out, so changing them needs no new take.
+- **The recipe's hash** covers what decides the capture. The brief, `notes:`, `legacy:`, marks, targets, `oversize:`, and legibility settings are left out, so changing them needs no new take.
 - **Existing images:** `adopt` records ones made before the toolkit, from their recipe's `legacy:` block.
 - **`images/<chapter>/IMAGES.md`** gets a table generated from `provenance.json`, between `<!-- shots:begin -->` and `<!-- shots:end -->`. Everything outside the markers is for people, and the tool never touches it: what a figure shows that is easy to miss, and what a retake needs.
 
@@ -322,19 +492,23 @@ column of markers.
 
 It reports **warnings** for:
 
+- a figure whose recipe has no `brief:`;
 - a figure not used in its chapter (a figure may use either `<figure>.png` or `<figure>_annotated.png`);
 - short alt text;
 - a drifting figure whose caption does not give the capture year;
 - marks changed in the recipe since the annotated image was drawn (promote again);
-- a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`).
+- a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
 
-`selftest` runs 51 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 71 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture;
-- the 800×600 soft limit: its warning, a recipe's reason, and `check`;
+- the size limits: 800×600; the relaxed 1024×768, which needs a reason and text that passes; beyond it; and `check`;
 - legibility, with week 08's `infinite_scroll.png` as the failing case; a composite; `sheet`;
-- headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take.
+- headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take;
+- the User-Agent and its Client Hints, and a first visit's reload, read back from what the local server receives;
+- every DevTools setting read back from what DevTools drew (the table under "Headed figures"), with DevTools' defaults as a control, and a setting DevTools won't honor reported at capture;
+- the infobar guard: no bar above the page, and a recipe that expects one fails without it.
 
 It skips the marker checks if TeX is missing and the headed checks if the virtual display is.
 
@@ -348,7 +522,7 @@ It skips the marker checks if TeX is missing and the headed checks if the virtua
 | `lib/recipes.py` | loading and validating recipes |
 | `lib/browser.py`, `lib/steps.py`, `lib/crop.py` | launching Chrome for Testing, running steps, and cropping |
 | `lib/display.py` | the virtual display, real input, and screen grabs |
-| `lib/devtools.py` | DevTools settings, and reading the DevTools page to find things on screen |
+| `lib/devtools.py` | DevTools settings, reading them back from what DevTools drew, and reading the DevTools page to find things on screen |
 | `lib/headed.py` | one headed attempt: window, DevTools, headed steps, and the crop |
 | `lib/measure.py` | at capture: anchors' boxes and the text's sizes, in the take's pixels |
 | `lib/annotate.py`, `styles/shotmarkers.sty` | markers laid out from anchors, drawn with TikZ to PDF and PNG |

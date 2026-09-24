@@ -339,11 +339,11 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 |---|---|---|---|---|---|---|---|
 | P0-1 | P0 | `AGENTS.md`, `AUTHORING.md` | definition | Two-sided legibility; scope, then zoom; `check` is the one threshold | maintainer | Applied 2026-09-24 (see note) | Figures failing `check` at any target: 29 → 0 new; figures redone for cramming: 3 → 0 |
 | P0-2 | P0 | `AGENTS.md`, `docs/decisions.md`, `.claude/settings.json`, repo setting | definition + permission | Merge commits, new branch per PR, no force-push | maintainer | Decided; text applied 2026-09-24; permission and repo setting open | Force-pushes: ~6 → 0; squash merges by the agent: 12 → 0; stop-hook unpushed warnings: 2 → 0 |
-| P0-3 | P0 | `selftest.py`, `AGENTS.md` | tool config + definition | Effect test per external setting; a real figure before "done" | auto + maintainer | Text applied 2026-09-24; effect tests open | Toolkit bugs found after merge: 5 → ≤1; settings with an effect test: 3 of 8 → 8 of 8 |
+| P0-3 | P0 | `selftest.py`, `AGENTS.md` | tool config + definition | Effect test per external setting; a real figure before "done" | auto + maintainer | Applied 2026-09-24: text, then a read-back of every setting (see note) | Toolkit bugs found after merge: 5 → ≤1; settings with an effect test: 3 of 8 → 8 of 8 |
 | P1-1 | P1 | `.github/workflows/shots-check.yml` | CI | `check` on PRs that change images | maintainer | Proposed | Image PRs merged without `check` in CI: all → 0 |
 | P1-2 | P1 | `AGENTS.md`, `CLAUDE.md`, `docs/` | layout | One instruction file; records beside the code | auto | Applied | Instruction files found by the collector: 0 → 1; earlier AARs found: 0 → 2 |
 | P1-3 | P1 | skill collector | tool config | Read `queued_command`; wider correction pattern | skill maintainer | Proposed | Steering messages counted: 0 of 8 → 8 of 8 |
-| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | Deferred | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
+| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 2 of 11 ch-07/08 figures retaken, 1 of 3 captions dated (see note) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
 | P2-2 | P2 | `docs/plans/` | plan | Computed outputs | maintainer | Proposed | Plan decided, yes or no |
 
 ### Resolution notes
@@ -352,6 +352,11 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 - **P0-1.** Applied to `AGENTS.md` ("Figures and screenshots") and to the course repository's `slides/common/AUTHORING.md` ("How much a screenshot shows"), in a changed form. The proposal said `check` "gives the slide width to use", but `check` has no such output. It measures text size at each target the recipe names, and fails text under 11 pixels in the book, 16 on a 1920-pixel slide, or 6 points in print. The applied text describes that. `AUTHORING.md` keeps W/1680 as a starting point for a page's own text, notes that DevTools needs more, and names `check` as the judge.
 - **P0-2.** `AGENTS.md` gained "Git and Pull Requests". It adds one rule from `docs/decisions.md` that the proposal lacked: merge only when the maintainer asks, and never merge a student's pull request. Still open: the permission rule that denies force-pushes (untested), and GitHub's automatic deletion of merged branches.
 - **P0-3.** `AGENTS.md` gained the "done" rule for `tools/shots` changes. Still open: effect tests for the DevTools layout preferences (Styles split, overview, columns).
+
+**2026-09-24, later: P0-3's effect tests, and the Chrome for Testing notice.**
+- **Every setting is read back.** Each headed take now reads DevTools' own page for what it drew, records it, and `capture` reports any difference from the recipe. The selftest checks each setting, 68 of 68 in all. The metric was "settings with an effect test: 3 of 8 → 8 of 8". Every setting the toolkit sends to Chrome or DevTools now has one, listed in the table under "Headed figures" in `tools/shots/README.md`.
+- **The read-back found a bug on its first run,** the kind §5.2 predicts. `sidebar: hidden` set the Styles pane's size for only one layout, so in a narrow pane that DevTools stacked, the pane took 325 pixels and squeezed the tree. DevTools 154 can't hide the pane at all. `hidden` now means "at its smallest" in both layouts, and the README says so.
+- **The maintainer found a banner the checks had missed.** Chrome for Testing's "only for automated testing" notice appeared in three chapter 8 figures and one week-8 slide, all made by scripts before the toolkit. The toolkit had it off only because Playwright passes `--disable-infobars` by default. The switch is now explicit, and a guard fails any headed take with an infobar. `network-tab-json` and `xkcd-inspect` were retaken within 800×600, with text at 13.4 pixels in the book. That counts toward P2-1. The Selenium figure keeps the notice, because the notice is its subject.
 
 ## Appendix A — Design sketch: why each part exists
 

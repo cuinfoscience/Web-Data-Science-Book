@@ -8,6 +8,12 @@ Docked DevTools is itself a web page (devtools://devtools/...). With the
 browser's debugging port open, the toolkit reads that page's DOM, through its
 shadow roots, to find where a panel, a request row, or a header name is
 drawn, and clicks it for real with xdotool. No pixel offsets are typed in.
+
+A key DevTools doesn't know fails silently, so every setting is read back:
+`Frontend.state()` measures what DevTools drew (its zoom, where it docked and
+how large, the Styles pane, the Network timeline and columns, a "What's new"
+panel), and `compare()` says where that differs from the recipe. Each headed
+take records the state, and `capture` reports the differences.
 """
 import json
 import math
@@ -44,16 +50,14 @@ def preferences(devtools):
         prefs["sidebar-position"] = json.dumps(LAYOUTS[devtools["layout"]])
     if "sidebar" in devtools:      # the Styles pane's size: its width beside the tree, its height under it
         # DevTools 154 keeps the tree/Styles split in `elements-panel-split-view-state` (found by
-        # dragging the splitter and reading the profile back). It honors the size but ignores a
-        # hidden state at 800 px; `layout: stacked, sidebar: 1` leaves the tree the whole width.
-        # `hidden` also writes the older key, which hid the pane in the Oscars figure's wide DevTools.
-        axis = "horizontal" if devtools.get("layout") == "stacked" else "vertical"
-        if devtools["sidebar"] in ("hidden", 0, False):
-            hidden = {"size": 300, "showMode": "OnlyMain"}
-            prefs["elements.styles.sidebar.width"] = json.dumps({"vertical": hidden, "horizontal": hidden})
-            prefs["elements-panel-split-view-state"] = json.dumps({axis: {"size": 100, "showMode": "OnlyMain"}})
-        else:
-            prefs["elements-panel-split-view-state"] = json.dumps({axis: {"size": devtools["sidebar"]}})
+        # dragging the splitter and reading the profile back), one size per layout. Both are
+        # written, because DevTools stacks the pane under the tree in a narrow window even when
+        # the recipe gives no layout. It can't hide the pane: it ignores a hidden state and keeps
+        # the pane at least 97 DevTools pixels wide beside the tree, or 57 tall under it (the
+        # read-back found both). `hidden` asks for the smallest, whichever layout DevTools uses.
+        size = 1 if devtools["sidebar"] in ("hidden", 0, False) else devtools["sidebar"]
+        prefs["elements-panel-split-view-state"] = json.dumps({"vertical": {"size": size},
+                                                               "horizontal": {"size": size}})
     if "overview" in devtools:     # the Network panel's timeline above the request list
         prefs["network-log-show-overview"] = json.dumps(bool(devtools["overview"]))
     if devtools.get("columns"):    # Network columns to show, [waterfall], or {waterfall: true, initiator: false}
@@ -98,6 +102,139 @@ _FIND = r"""
 
 class DevToolsError(Exception):
     pass
+
+
+# Runs inside the DevTools page. What DevTools drew, in its own CSS pixels:
+# the area it leaves for the page, the main panel shown, the Elements panel's
+# tree/Styles split, the Network timeline and columns, and any "What's new".
+_STATE = r"""
+(() => {
+  const all = [];
+  const walk = (root) => { for (const el of root.querySelectorAll('*')) { all.push(el); if (el.shadowRoot) walk(el.shadowRoot); } };
+  walk(document);
+  const box = (el) => {
+    if (!el) return null;
+    const r = el.getBoundingClientRect(), st = getComputedStyle(el);
+    if (r.width < 1 || r.height < 1 || st.display === 'none' || st.visibility === 'hidden') return null;
+    return [r.x, r.y, r.width, r.height].map(v => Math.round(v * 10) / 10);
+  };
+  const has = (el, c) => el.classList && el.classList.contains(c);
+  const inside = (el, host) => { for (let n = el; n; n = n.parentNode || n.host) if (n === host) return true; return false; };
+  const shown = (test) => all.filter(el => test(el) && box(el));
+  const page = shown(el => has(el, 'device-mode-view'))[0];
+  const tab = shown(el => has(el, 'tabbed-pane-header-tab') && has(el, 'selected') && /^tab-/.test(el.id)
+                     && el.closest('.tabbed-pane-header')
+                     && el.closest('.tabbed-pane-header').getAttribute('aria-label') === 'Main toolbar')[0];
+  const panel = shown(el => has(el, 'panel') && has(el, 'elements'))[0];
+  let elements = null;
+  if (panel) {   // the outer split: the tree is its main side, Styles its sidebar
+    const main = all.find(el => has(el, 'shadow-split-widget-main') && inside(el, panel) && box(el));
+    const side = all.find(el => has(el, 'shadow-split-widget-sidebar') && inside(el, panel));
+    elements = {main: box(main), sidebar: box(side)};
+  }
+  return JSON.stringify({
+    dpr: devicePixelRatio, width: innerWidth, height: innerHeight,
+    page_area: page ? box(page) : null,
+    panel: tab ? tab.id.replace(/^tab-/, '') : null,
+    elements,
+    overview: shown(el => el.id === 'network-overview-panel').length > 0,
+    columns: shown(el => el.tagName === 'TH' && /(\S+)-column\b/.test(el.className))
+      .map(el => el.className.match(/(\S+)-column\b/)[1]),
+    waterfall: shown(el => has(el, 'network-waterfall-view')).length > 0,
+    whats_new: shown(el => el.id === 'tab-release-note' || (has(el, 'panel') && has(el, 'whats-new'))).length > 0,
+  });
+})()
+"""
+
+# The smallest Styles pane DevTools 154 draws, in DevTools pixels (read back).
+SMALLEST = {"side-by-side": 97, "stacked": 57}
+
+
+def layout(seen, scale):
+    """Where DevTools docked and how large, and its Styles pane, in window (CSS) pixels.
+
+    `seen` is `Frontend.state()`. DevTools' own pixels are the window's divided by
+    its zoom: devicePixelRatio is the capture's scale times DevTools' zoom.
+    """
+    k = seen["dpr"] / scale
+    out = {"zoom": round(k, 3), "dock": None, "pane": None, "styles": None}
+    if seen.get("page_area"):
+        x, y, w, h = seen["page_area"]
+        dock = "left" if x > 1 else ("bottom" if w >= seen["width"] - 1 else "right")
+        extent = {"bottom": seen["height"] - h, "right": seen["width"] - w, "left": x}[dock]
+        out.update(dock=dock, pane=round(extent * k, 1))
+    el = seen.get("elements") or {}
+    main, side = el.get("main"), el.get("sidebar")
+    if main and side:
+        stacked = side[1] >= main[1] + main[3] - 2
+        own = side[3] if stacked else side[2]
+        name = "stacked" if stacked else "side-by-side"
+        out["styles"] = {"layout": name, "size": round(own * k, 1), "smallest": own <= SMALLEST[name] + 2}
+    elif main:
+        out["styles"] = {"layout": None, "size": 0, "smallest": True}
+    return out
+
+
+def compare(devtools, seen, scale):
+    """Where what DevTools drew differs from the recipe's `devtools:` block.
+
+    Returns [(level, message)]: "warn" when DevTools didn't do what the recipe
+    asks, "note" for something the recipe can't ask for (DevTools can't hide
+    the Styles pane) or that a step may have changed on purpose.
+    """
+    if not seen or seen.get("error"):
+        return [("warn", "its layout could not be read back" + (f": {seen['error']}" if seen else ""))]
+    out, got = [], layout(seen, scale)
+    zoom = float(devtools.get("zoom", 1.0))
+    if abs(got["zoom"] - zoom) > 0.01:
+        out.append(("warn", f"it is zoomed to {got['zoom']:.0%}, not {zoom:.0%}"))
+    want = devtools.get("dock", "right")
+    if got["dock"] is None:
+        out.append(("warn", "it shows no area for the page, so its dock and size can't be read"))
+    elif got["dock"] != want:
+        out.append(("warn", f"it is docked {got['dock']}, not {want}"))
+    elif "size" in devtools and abs(got["pane"] - devtools["size"]) > 2:
+        shape = "tall" if want == "bottom" else "wide"
+        out.append(("warn", f"the pane is {got['pane']:.0f} pixels {shape}, not {devtools['size']}"
+                            + ("; Chrome keeps part of the page in view" if got["pane"] < devtools["size"] else "")))
+    panel = devtools.get("panel", "elements")
+    if seen.get("panel") != panel:
+        out.append(("note", f"it shows the {seen.get('panel')} panel at the grab; the recipe opened {panel}"))
+    styles = got["styles"]
+    if styles:
+        where = {"stacked": "under", "side-by-side": "beside"}
+        if devtools.get("layout") in where and styles["layout"] and styles["layout"] != devtools["layout"]:
+            out.append(("warn", f"the Styles pane is {where[styles['layout']]} the tree, "
+                                f"not {where[devtools['layout']]} it"))
+        asked = devtools.get("sidebar")
+        shape = "tall" if styles["layout"] == "stacked" else "wide"
+        if asked in ("hidden", 0, False):
+            if not styles["smallest"]:
+                out.append(("warn", f"the Styles pane is {styles['size']:.0f} pixels {shape}, not at its smallest"))
+            elif styles["layout"]:
+                out.append(("note", f"DevTools can't hide the Styles pane; it is at its smallest, "
+                                    f"{styles['size']:.0f} pixels {shape}"))
+        elif isinstance(asked, (int, float)) and abs(styles["size"] - asked) > 2:
+            if not (styles["smallest"] and styles["size"] > asked):     # asked for less than DevTools allows
+                out.append(("warn", f"the Styles pane is {styles['size']:.0f} pixels {shape}, not {asked}"))
+    if seen.get("panel") == "network":
+        if "overview" in devtools and seen["overview"] != bool(devtools["overview"]):
+            out.append(("warn", f"the timeline is {'shown' if seen['overview'] else 'hidden'}, "
+                                f"not {'shown' if devtools['overview'] else 'hidden'}"))
+        columns = devtools.get("columns") or {}
+        if not isinstance(columns, dict):
+            columns = {name: True for name in columns}
+        if set(seen["columns"]) <= {"name"} and not seen["waterfall"]:
+            columns = {}            # a request is open: its details replace every column but Name
+        for name, on in columns.items():
+            there = seen["waterfall"] if name == "waterfall" else name in seen["columns"]
+            if there != bool(on):
+                out.append(("warn", f"the {name} column is {'shown' if there else 'hidden'}, "
+                                    f"not {'shown' if on else 'hidden'}"))
+    if seen.get("whats_new"):
+        out.append(("warn", "it opened its \"What's new\" panel: `releaseNoteVersionSeen` no longer "
+                            "matches this Chrome"))
+    return out
 
 
 class Frontend:
@@ -179,6 +316,10 @@ class Frontend:
         found = self.find(css='li[role="treeitem"].selected')
         texts = [box["text"] for box in found["boxes"] if box["text"]]
         return texts[0] if texts else ""
+
+    def state(self):
+        """What DevTools drew (see _STATE); `layout()` and `compare()` read it."""
+        return json.loads(self.evaluate(_STATE))
 
     def close(self):
         self._ws.close()
