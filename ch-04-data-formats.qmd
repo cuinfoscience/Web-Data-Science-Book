@@ -151,7 +151,8 @@ from bs4 import BeautifulSoup
 
 url = "https://clerk.house.gov/xml/lists/MemberData.xml"
 response = requests.get(url)
-soup = BeautifulSoup(response.text, "xml")
+# Pass the bytes, not response.text: the server names no character set, so .text would guess wrong
+soup = BeautifulSoup(response.content, "xml")
 
 # When was this snapshot published?
 print(soup.find("MemberData")["publish-date"])
@@ -173,6 +174,8 @@ from collections import Counter
 print(Counter(parties))
 # Counter({'R': 221, 'D': 217, '': 2, 'I': 1})
 ```
+
+Notice `response.content` rather than `response.text`. The Clerk's server labels the file `text/xml` without naming a character set, so `requests` falls back to ISO-8859-1, and `.text` would turn Linda T. Sánchez into "Linda T. SÃ¡nchez". Given the raw bytes, BeautifulSoup reads the encoding the file declares in its first line, UTF-8, and every name comes out right.
 
 Why 441 rather than 435? The file includes the six non-voting delegates and resident commissioner alongside the 435 voting representatives. Your exact counts will also drift as members resign and seats are filled — which is why the `publish-date` attribute matters. Record it alongside your data so your analysis documents exactly which snapshot of Congress it describes.
 
@@ -324,7 +327,7 @@ This list-of-dictionaries-to-DataFrame pipeline is the standard way to convert A
 
 ### Parsing JSON Strings
 
-When you receive JSON data from the web (as a string), you need to parse it into Python objects:
+When you receive JSON data from the web (as a string), you need to parse it into Python objects. Python's built-in [`json` module](https://docs.python.org/3/library/json.html) does the work; its documentation lists every option these functions take:
 
 ```{python}
 import json
@@ -422,6 +425,8 @@ print(f"Elevation: {elevation} meters")
 # Elevation: 1635.0 meters
 ```
 
+The address in `url` is only half of the request. Opened on its own in a browser, `https://api.open-meteo.com/v1/forecast` returns an empty page, because the parameters are what ask for a forecast. `requests` adds them to the address for you, and `print(response.url)` shows the full URL it sent, which you can paste into a browser to see the same JSON.
+
 The strategy is always the same: start with `type()` and `.keys()` at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:
 
 ```{python}
@@ -513,9 +518,11 @@ AP and Reuters are conspicuously absent: both discontinued their public RSS feed
 |---|---|
 | Data Skeptic | `https://dataskeptic.libsyn.com/rss` |
 | Planet Money (NPR) | `https://feeds.npr.org/510289/podcast.xml` |
-| The Changelog | `https://changelog.com/podcast/feed` |
+| Talk Python To Me | `https://talkpython.fm/episodes/rss` |
 | Data Engineering Podcast | no single published URL — find it on [dataengineeringpodcast.com](https://www.dataengineeringpodcast.com/) using the technique below |
 | The PolicyViz Podcast | no single published URL — find it on [policyviz.com/podcast](https://policyviz.com/podcast/) using the technique below |
+
+The Changelog, a software podcast, was on this list until a reader ran Step 1's check on it: its `robots.txt` disallows every path, its feed included. That check is worth running on every feed, this list's included.
 
 **Finding a feed this list doesn't cover.** Most sites don't advertise their feed on the homepage:
 
@@ -600,6 +607,7 @@ RSS (Really Simple Syndication) deserves special mention as an early experiment 
 - **Parser selection**: Use `"xml"` for XML documents and `"html.parser"` or `"lxml"` for HTML. Using the wrong parser produces unexpected results.
 - **`json.JSONDecodeError`**: The string is not valid JSON. Common causes include trailing commas, single quotes (JSON requires double quotes), or the response containing HTML error pages instead of JSON.
 - **`KeyError` in dictionaries**: The key does not exist. Use `.get("key", default_value)` for safe access.
+- **Garbled accented letters, such as `SÃ¡nchez` for `Sánchez`**: `requests` decoded the body with the wrong character set, usually because the server's `Content-Type` header names none; `requests` then falls back to ISO-8859-1. Pass `response.content` to BeautifulSoup so the parser reads the encoding the document declares, or set `response.encoding = "utf-8"` before reading `response.text`.
 - **Confusion between `json.loads()` and `json.load()`**: `loads` parses a **s**tring; `load` parses a **f**ile object.
 
 ## Key Takeaways
