@@ -13,22 +13,25 @@
   - the computed-outputs plan ([`plans/2026-09-24-computed-outputs.md`](plans/2026-09-24-computed-outputs.md)).
 - **The AAR's P0 text is applied.** `AGENTS.md` now has the two-sided legibility rule, "Git and Pull Requests", and the "done" rule for `tools/shots`. The course's `AUTHORING.md` has the legibility rule. The AAR's resolution note records what changed from the proposals.
 
-## Paused
+## Resumed
 
-The maintainer paused this work on 2026-09-24. Don't start any of it until they resume it:
-- the back-fill of chapters 1–4 ([plan](plans/2026-09-24-screenshot-backfill-ch01-05.md));
-- retakes of the 11 chapter 7–8 figures and 18 slide screenshots that fail the size limit (800×600, or up to 1024×768 when the room removes clutter and the text still passes), and dates for 3 chapter 7–8 captions (AAR P2-1);
-- computed figures and tables ([plan](plans/2026-09-24-computed-outputs.md)).
+The maintainer lifted the pause on 2026-09-24 ([`decisions.md`](decisions.md)).
+- **Now:** the chapters 1–4 screenshot back-fill ([plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)), after two gates.
+  - The pilot gate is closed. The note is in the [screenshot AAR](aar/2026-09-24-screenshots.md), §9, and in `tools/shots/README.md` ("What the chapter 5 pilot settled").
+  - The DevTools effect tests (AAR P0-3) come next, in their own pull request.
+- **Then:** retakes of the 11 chapter 7–8 figures and the 18 slide screenshots that fail the size limit (800×600, or up to 1024×768 when the room removes clutter and the text still passes), and dates for 3 chapter 7–8 captions (AAR P2-1).
+- **Waiting on decisions, not on the pause:** computed figures and tables ([plan](plans/2026-09-24-computed-outputs.md), §9).
 
 ## Waiting on the maintainer
 
 | Item | What to decide |
 |---|---|
 | AAR P0-2 | The policy and its text are in place. Still open: enable the permission rule that denies force-pushes (untested; test it first), and turn on GitHub's "Automatically delete head branches" in both repositories. |
-| AAR P0-3 | The "done" rule is in place. Still open: effect tests for the DevTools layout preferences. This is mechanical work, due before the next toolkit change. |
+| AAR P0-3 | Done once the read-back pull request merges: every setting the toolkit sends to Chrome or DevTools is read back, and the selftest checks each one. |
 | AAR P1-1 | Add the `shots-check` CI workflow, which runs only on pull requests that change images. |
 | AAR P1-3 | Fix the review skill's session collector. This belongs to whoever maintains the skill, not this repository. |
 | Computed outputs | The four questions in the plan's §9. |
+| Chapters 1–4 back-fill | Week 01's look-alikes (`issue_form.png`, `pr_review.png`): use a real public issue and pull request that aren't a student's, or capture them by hand. The unused placeholders (week 02's four, week 03's `ad_observatory`, week 05's `dev_tools_network`): delete or keep. Figure 1-1: should it replace `anaconda_jupyter.png` in `setup.md`? |
 
 ## Known issues
 
@@ -38,7 +41,10 @@ The maintainer paused this work on 2026-09-24. Don't start any of it until they 
   - The course repository, closed without merging: `claude/swartz-ca-frames` (#23). Delete it only if #23 won't be revived. GitHub can restore it from the closed pull request.
   - Keep `main`, `gh-pages`, every branch with an open pull request (students' included), and the course session's branch, `claude/info-4617-fall-2026-syllabus-07ahb8`.
 - **Course CI.** On course #51, the week-7 and week-8 deck builds sat in "Install TeX Live" (apt) for more than 30 minutes. That pull request changed neither deck, and it merged at the maintainer's instruction. The build on `main` after the merge passed. If the stall recurs, cache the TeX install or build inside a TeX Live container.
-- **Toolkit.** Three of the eight settings the toolkit sends to Chrome or DevTools have tests that read the effect back. The DevTools layout preferences have none (AAR P0-3). M4, counts in captions checked against recorded queries, is still planned.
+- **Toolkit.**
+  - Every setting the toolkit sends to Chrome or DevTools is read back (`tools/shots/README.md`, "Headed figures").
+  - Headed captures run with `--disable-infobars`, and a guard fails any take with an infobar. The one figure allowed to keep Chrome for Testing's notice is ch-08's `selenium-chrome-for-testing`, because the notice is its subject; the same goes for week 8's `selenium_browser.png`.
+  - M4, which checks counts in captions against recorded queries, is still planned.
 
 ## Hands off
 
@@ -52,10 +58,12 @@ The maintainer paused this work on 2026-09-24. Don't start any of it until they 
 - HTTPS goes through the session's proxy. Never turn off TLS verification. Captures through the proxy use HTTP/1.1, and captions that show protocol details say so.
 - Quarto isn't installed system-wide. Download a release into the session's scratch directory. The computed-outputs tests used 1.10.18.
 
-## Next, when work resumes
+## Next
 
-1. Finish P0-2: test and enable the force-push deny rule, and turn on automatic branch deletion.
-2. Add the missing effect tests (P0-3) before changing the toolkit again.
+1. Add the DevTools effect tests (P0-3) before changing the toolkit again.
+2. Back-fill chapters 1–4 in the plan's order, ch-04, ch-01, ch-02, ch-03, each as a textbook and course pair of pull requests.
+   - Chapter 1 needs a Jupyter server in the container.
+   - `shots import`, for hand captures, was never built. `adopt` can record their provenance, but it won't crop or redact.
 3. Retake the chapter 7–8 figures and the slide screenshots under P0-1, one chapter per pull request.
-4. Back-fill chapters 1–4 by the plan.
+4. Finish P0-2: test and enable the force-push deny rule, and turn on automatic branch deletion.
 5. If computed outputs are adopted, run the plan's M0 pilot on chapter 5.

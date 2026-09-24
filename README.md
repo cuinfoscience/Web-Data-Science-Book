@@ -155,3 +155,5 @@ This book is released under the [Creative Commons Attribution-NonCommercial-Shar
 ## Acknowledgements
 
 This book grew out of the INFO 4871/5871 Web Data Science course at the University of Colorado Boulder. It has benefited from the questions, frustrations, and insights of many cohorts of students. The author also gratefully acknowledges the journalists, researchers, and civic technologists whose work demonstrates why web data fluency matters for the public interest.
+
+AI tools, chiefly Anthropic's Claude, helped draft and revise the book's text, code, and tooling, under the author's direction and review; the [AI Coauthorship and Responsible Disclosure appendix](https://cuinfoscience.github.io/Web-Data-Science-Book/appendix-ai-disclosure.html) describes how.

@@ -15,18 +15,46 @@
       "url": "https://quotes.toscrape.com/js/"
     },
     "network-tab-json": {
-      "by": "hand-run script, before tools/shots",
-      "captured": "2026-09-22",
+      "browser": "Google Chrome for Testing 154.0.8037.57 (headed on Xvfb, Playwright 1.63.0)",
+      "by": "tools/shots",
+      "captured": "2026-09-24T17:36:21+00:00",
+      "clip": {
+        "height": 599.5,
+        "width": 800.0,
+        "x": 0.0,
+        "y": 400.5
+      },
+      "crop": {
+        "devtools": true
+      },
       "file": "network-tab-json.png",
-      "image_sha256": "26a0c35e62eb927b05ab499c260fbe11aedb0a828708ebf47abba173dbccd640",
+      "final_url": "https://quotes.toscrape.com/scroll",
+      "image_sha256": "b25c08fd3602d22a9710a352221c999d6fa19ff373818f822d8eccbcb02ce021",
+      "javascript": true,
       "kind": "capture",
-      "method": "Chrome for Testing 154 driven by Selenium 4.49, headed on Xvfb, DevTools docked right and operated with real clicks (xdotool), grabbed with ImageMagick import",
-      "note": "After scrolling, the Fetch/XHR filter lists quotes?page=1 to page=4; Preview shows page 2's JSON.",
+      "recipe_sha256": "bc1227a8943a88177cbdf17efa419970c5e534a93f11984b3c5bb678db4aff79",
+      "scale": 2,
       "size": [
-        1680,
-        680
+        1600,
+        1199
       ],
-      "url": "https://quotes.toscrape.com/scroll"
+      "status": 200,
+      "text": {
+        "chars": 996,
+        "median": 27.5,
+        "min": 27.5,
+        "p20": 27.5,
+        "sizes": {
+          "27.5": 728,
+          "30": 268
+        }
+      },
+      "url": "https://quotes.toscrape.com/scroll",
+      "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
+      "window": [
+        800,
+        1000
+      ]
     },
     "playwright-codegen": {
       "by": "hand-run script, before tools/shots",
@@ -71,18 +99,49 @@
       "url": "view-source:https://quotes.toscrape.com/js/"
     },
     "xkcd-inspect": {
-      "by": "hand-run script, before tools/shots",
-      "captured": "2026-09-22",
+      "browser": "Google Chrome for Testing 154.0.8037.57 (headed on Xvfb, Playwright 1.63.0)",
+      "by": "tools/shots",
+      "captured": "2026-09-24T17:37:00+00:00",
+      "clip": {
+        "height": 530.0,
+        "width": 800.0,
+        "x": 0.0,
+        "y": 400.0
+      },
+      "crop": {
+        "height": 530,
+        "top": 400
+      },
       "file": "xkcd-inspect.png",
-      "image_sha256": "25f54211bea618bba74368aa13196120d165959267d3b5106d95194326eeb044",
+      "final_url": "https://xkcd.com/",
+      "image_sha256": "dca763c2b24ac072e1469cf5f5bc6ea02a1e68529c287cddcebc739a415172bc",
+      "javascript": true,
       "kind": "capture",
-      "method": "Chrome for Testing 154, headed on Xvfb, right-click > Inspect on the comic with real clicks (xdotool), DevTools docked right, grabbed with ImageMagick import",
-      "note": "The selected img has the hover joke in its title attribute and the comic's name in alt.",
+      "recipe_sha256": "114c909df765786ffd1ee8bad3f5e054edac65bb50581ca46cb723629ce6037d",
+      "scale": 2,
       "size": [
-        1680,
-        1000
+        1600,
+        1060
       ],
-      "url": "https://xkcd.com/"
+      "status": 200,
+      "text": {
+        "chars": 974,
+        "median": 27.5,
+        "min": 21.2,
+        "p20": 27.5,
+        "sizes": {
+          "21.2": 17,
+          "27.5": 867,
+          "30": 89,
+          "32": 1
+        }
+      },
+      "url": "https://xkcd.com/",
+      "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
+      "window": [
+        800,
+        1000
+      ]
     }
   }
 }

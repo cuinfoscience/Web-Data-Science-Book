@@ -15,6 +15,12 @@ figures:
   - id: inspector-heading
     kind: capture
     section: "The Inspector Tab"
+    brief: >-
+      Show that selecting an element links the page and the Elements tree: the
+      article's title shaded on the page (marker 1) while its <h1 id="firstHeading">
+      node is selected in the tree (marker 2), with Chrome's label giving the tag,
+      id, classes, and size. Leave out the Styles pane and the breadcrumb bar, and
+      give the tree DevTools' whole width so its rows don't wrap.
     url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
     mode: headed
     # The Elements tree alone gets DevTools' whole width, so its rows don't wrap: Styles goes
@@ -41,6 +47,11 @@ figures:
   - id: element-picker
     kind: capture
     section: "The Inspector Tab"
+    brief: >-
+      Show the element picker finding a node from the page: the picker switched on
+      (marker 1), the pointer resting on the article's infobox, Chrome shading and
+      labeling the infobox, and the infobox's row highlighted in the Elements tree
+      (marker 2). The caption names Chrome's label rather than marking it.
     url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
     mode: headed
     devtools: {dock: bottom, size: 300, zoom: 1.25, layout: stacked, sidebar: 1}
@@ -63,6 +74,13 @@ figures:
   - id: network-requests
     kind: capture
     section: "The Network Tab"
+    brief: >-
+      Show how many requests one page makes: the article's own document as the first
+      row, then the stylesheets, scripts, and images it asked for, with the Name,
+      Status, Type, Size, Time, and Waterfall columns and the "N requests" summary.
+      Take it on a first visit, so every row has a real size and time rather than
+      "(memory cache)". Hide the timeline and the Initiator column, which the text
+      doesn't discuss, so the other columns aren't cut short.
     url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
     mode: headed
     # A first visit, so every row shows a real size and time, not "(memory cache)".
@@ -84,6 +102,13 @@ figures:
   - id: network-headers
     kind: capture
     section: "The Network Tab"
+    brief: >-
+      Show the request headers the browser sent for the article, in its Headers
+      tab: the Sec-Ch-Ua Client Hints as a group (marker 1) and the User-Agent
+      value (marker 2), which is the book's own identification. Fold General, whose
+      Remote Address is the capture's proxy, and the response headers, whose
+      x-client-ip and GeoIP cookie name where the capture ran; the text needs
+      neither, and the whole request then fits.
     url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
     mode: headed
     # DevTools alone, 800×600. In a 600-pixel window Chrome keeps DevTools under about

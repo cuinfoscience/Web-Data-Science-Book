@@ -20,6 +20,9 @@ from pathlib import Path
 from PIL import Image, ImageChops
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from lib import devtools as dt                   # noqa: E402  (to read a take's DevTools state)
+from lib.headed import BARS, BARS_SLACK          # noqa: E402
 
 PAGES = {
     "/ok": (200, "<title>Selftest</title><h1>Hello from the selftest</h1>"
@@ -142,6 +145,45 @@ figures:
       - devtools_click: {{text: '^cookie$'}}
       - devtools_wait: {{text: '^Headers$'}}
     crop: {{devtools: true}}
+  # Each DevTools setting, read back from what DevTools drew.
+  - id: headed-stacked
+    kind: capture
+    url: "{base}/tree"
+    mode: headed
+    window: [900, 700]
+    devtools: {{dock: bottom, size: 400, zoom: 1.25, layout: stacked, sidebar: 120}}
+    steps: [{{inspect: {{selector: '#target', selects: '^<h1'}}}}]
+  - id: headed-beside
+    kind: capture
+    url: "{base}/tree"
+    mode: headed
+    window: [900, 600]
+    devtools: {{dock: right, size: 450, layout: side-by-side, sidebar: 200}}
+  - id: headed-left-hidden
+    kind: capture
+    url: "{base}/tree"
+    mode: headed
+    window: [900, 600]
+    devtools: {{dock: left, size: 380, sidebar: hidden}}
+  - id: headed-columns
+    kind: capture
+    url: "{base}/tree"
+    mode: headed
+    window: [900, 700]
+    devtools: {{dock: bottom, size: 400, panel: network, overview: false, columns: {{waterfall: true, initiator: false}}}}
+    steps: [{{devtools_wait: {{text: '^tree$'}}}}]
+  - id: headed-too-tall
+    kind: capture
+    url: "{base}/tree"
+    mode: headed
+    window: [900, 700]
+    devtools: {{dock: bottom, size: 650}}
+  - id: headed-expects-infobar
+    kind: capture
+    url: "{base}/tree"
+    mode: headed
+    window: [900, 600]
+    expect: {{infobar: true}}
   - id: headed-source
     kind: capture
     url: "view-source:{base}/tree"
@@ -402,6 +444,58 @@ figures:
                and chosen[1] > row[1], f"row {row}, selected {chosen}, heading {heading}")
         expect("DevTools' own text is counted too, at its size (11 pixels at 100%)",
                "11" in ((take.get("text") or {}).get("sizes") or {}), str(take.get("text")))
+
+        # Every setting the toolkit writes for DevTools, read back from what DevTools drew.
+        print("  DevTools settings, read back")
+        bars = inspect_take.get("bars") or 0
+        expect("no infobar above the page: the bars are the tab strip and address bar alone "
+               "(Chrome for Testing's notice is off)", 0 < bars <= BARS + BARS_SLACK, str(bars))
+        code, out = shots("capture", "ch-99", "--only", "headed-stacked", "headed-beside", "headed-left-hidden",
+                          "headed-columns", "headed-too-tall", "headed-expects-infobar")
+        said = sections(out)
+
+        def seen(fid):
+            take = newest(fid)
+            return take, dt.layout(take["devtools_seen"], take["scale"]) if take.get("devtools_seen") else {}
+
+        take, got = seen("headed-stacked")
+        styles = got.get("styles") or {}
+        expect("zoom: DevTools is drawn at 125%", got.get("zoom") == 1.25, str(got))
+        expect("dock and size: docked at the bottom, 400 pixels tall",
+               got.get("dock") == "bottom" and abs((got.get("pane") or 0) - 400) <= 2, str(got))
+        expect("layout and sidebar: the Styles pane under the tree, 120 pixels tall",
+               styles.get("layout") == "stacked" and abs(styles.get("size", 0) - 120) <= 2, str(styles))
+        expect("the \"What's new\" panel stays shut (releaseNoteVersionSeen)",
+               (take.get("devtools_seen") or {}).get("whats_new") is False, str(take.get("devtools_seen")))
+        expect("...and capture reports nothing out of place", "DevTools:" not in said.get("headed-stacked", ""),
+               said.get("headed-stacked"))
+        take, got = seen("headed-beside")
+        styles = got.get("styles") or {}
+        expect("docked right, 450 pixels wide, the Styles pane beside the tree at 200",
+               got.get("dock") == "right" and abs((got.get("pane") or 0) - 450) <= 2
+               and styles.get("layout") == "side-by-side" and abs(styles.get("size", 0) - 200) <= 2, str(got))
+        take, got = seen("headed-left-hidden")
+        styles = got.get("styles") or {}
+        expect("docked left, 380 pixels wide; `hidden` leaves the Styles pane at its smallest, "
+               "though DevTools stacks it here", got.get("dock") == "left" and abs((got.get("pane") or 0) - 380) <= 2
+               and styles.get("layout") == "stacked" and styles.get("smallest") is True, str(got))
+        take = newest("headed-columns")
+        net = take.get("devtools_seen") or {}
+        expect("Network: timeline hidden, Waterfall shown, Initiator hidden",
+               net.get("panel") == "network" and net.get("overview") is False and net.get("waterfall") is True
+               and "initiator" not in (net.get("columns") or []) and "name" in (net.get("columns") or []), str(net))
+        # A Network take with no request open (an open one leaves only the Name column).
+        default = newest("headed-second-visit").get("devtools_seen") or {}
+        expect("...where DevTools' defaults are the other way round (read back from a Network take without them)",
+               default.get("overview") is True and default.get("waterfall") is False
+               and "initiator" in (default.get("columns") or []), str(default))
+        expect("a setting DevTools doesn't honor is reported at capture (650 pixels asked, Chrome keeps less)",
+               "DevTools: the pane is" in said.get("headed-too-tall", "") and "not 650" in said.get("headed-too-tall", ""),
+               said.get("headed-too-tall"))
+        wants = newest("headed-expects-infobar")
+        expect("the infobar guard reads the browser's bars: a recipe expecting an infobar fails without one",
+               wants.get("ok") is False and "expects an infobar" in " ".join(wants.get("problems", [])),
+               str(wants.get("problems")))
     else:
         print("  skip  headed tests: Xvfb, xdotool, or ImageMagick missing (bash tools/shots/bootstrap.sh --headed)")
 
