@@ -42,7 +42,7 @@ LAYOUT = {"gap", "pad", "label_px"}
 NOT_CAPTURE = ("legacy", "notes", "annotate", "targets", "legibility", "oversize")
 DEFAULTS = {
     "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
-    "window": [800, 600],    # CSS pixels; also the soft limit on what a figure shows (lib/legibility.py)
+    "window": [800, 600],    # CSS pixels; the default limit on what a figure shows, 1024×768 relaxed (lib/legibility.py)
     "scale": 2,              # device pixels per CSS pixel
     "pause": [8, 30],        # seconds between page loads on one host
     "settle": 1.0,           # seconds to let rendering finish after the last step
@@ -108,7 +108,8 @@ def _problems(chapter, raw):
         for key in set(f.get("legibility") or {}) - LEGIBILITY:
             out.append(f"{where}: unknown legibility key `{key}`")
         if "oversize" in f and not (isinstance(f["oversize"], str) and f["oversize"].strip()):
-            out.append(f"{where}: `oversize` is the reason a figure shows more than 800×600, as a sentence")
+            out.append(f"{where}: `oversize` is the reason a figure shows more than 800×600, as a sentence "
+                       "(up to 1024×768: the clutter the extra room removes)")
         out += [f"{where}: {p}" for p in _composite_problems(f)]
     return out
 

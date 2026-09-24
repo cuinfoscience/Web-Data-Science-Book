@@ -17,7 +17,7 @@
 
 The maintainer paused this work on 2026-09-24. Don't start any of it until they resume it:
 - the back-fill of chapters 1–4 ([plan](plans/2026-09-24-screenshot-backfill-ch01-05.md));
-- retakes of the 11 chapter 7–8 figures and 18 slide screenshots that fail the 800×600 limit, and dates for 3 chapter 7–8 captions (AAR P2-1);
+- retakes of the 11 chapter 7–8 figures and 18 slide screenshots that fail the size limit (800×600, or up to 1024×768 when the room removes clutter and the text still passes), and dates for 3 chapter 7–8 captions (AAR P2-1);
 - computed figures and tables ([plan](plans/2026-09-24-computed-outputs.md)).
 
 ## Waiting on the maintainer
