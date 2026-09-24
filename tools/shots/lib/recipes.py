@@ -12,9 +12,10 @@ MODES = {"headless", "headed", "composite"}
 PAGE_STEPS = {"wait", "hover", "click", "scroll", "press", "settle"}
 HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "type", "pointer"}
 STEPS = PAGE_STEPS | HEADED_STEPS
-CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad"}
+CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad",
+         "devtools"}
 EXPECTS = {"status", "text", "selector", "block"}
-DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout"}
+DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout", "overview", "columns", "first_visit"}
 DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
 FIGURE_KEYS = {"id", "file", "kind", "section", "url", "mode", "engine", "steps", "expect", "crop",
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
@@ -93,6 +94,10 @@ def _problems(chapter, raw):
             out.append(f"{where}: devtools `layout` is one of {sorted(DEVTOOLS_LAYOUTS)}")
         if f.get("devtools") and f.get("mode") != "headed":
             out.append(f"{where}: `devtools` needs `mode: headed`")
+        if (f.get("devtools") or {}).get("first_visit") and f["devtools"].get("panel") != "network":
+            out.append(f"{where}: devtools `first_visit` needs `panel: network`")
+        if (f.get("crop") or {}).get("devtools") and not f.get("devtools"):
+            out.append(f"{where}: `crop: {{devtools: true}}` needs a `devtools:` block")
         for key in set(f.get("crop") or {}) - CROPS:
             out.append(f"{where}: unknown crop key `{key}`")
         for key in set(f.get("expect") or {}) - EXPECTS:

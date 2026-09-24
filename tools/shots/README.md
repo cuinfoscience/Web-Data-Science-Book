@@ -49,7 +49,7 @@ tools/shots/run check                             # before a PR
 These come from `slides/common/AUTHORING.md` in the course repo and from the AAR:
 
 - **Real or labeled.** A screenshot is a real capture of a real page. Diagrams and renders are welcome, marked with their `kind`. Never rebuild a real site's interface with invented content.
-- **One honest User-Agent** for every request (`Web Data Science/v1 brian.keegan@colorado.edu`, the one the handouts teach). Page loads on one host are 8–30 seconds apart.
+- **One honest User-Agent** for every request (`Web Data Science/v1 brian.keegan@colorado.edu`, the one the handouts teach). It goes to Chrome as Chrome's own `--user-agent` flag, so the User-Agent Client Hints (`Sec-CH-UA-Platform` and the rest) name the system the capture runs on. Playwright's `user_agent` option rewrites them too, and for a string that names no system it claims Windows. Page loads on one host are 8–30 seconds apart.
 - **Retries:** a 5xx or a dropped connection is retried three times, 30, 60, then 120 seconds apart. A block page, a 403, or a proxy refusal is not retried.
 - **No logins, no credentials, no student names or work.** A page behind a login is captured by the instructor by hand (M4 adds `import`).
 - **Dated captions.** A figure that shows things that change (counts, versions, live pages) says in its caption when it was captured.
@@ -135,9 +135,12 @@ How a headed capture runs:
   - `zoom` (1.25 keeps DevTools readable in the book inside the 800×600 limit; 1.75 makes it large enough for print);
   - `size`: the pane's width, or its height when docked at the bottom;
   - `layout`: `side-by-side` puts the Styles pane beside the Elements tree. DevTools' default (`auto`) stacks Styles under the tree in a narrow window, where it can squeeze the tree out entirely;
-  - `sidebar`: the Styles pane's width, or `hidden` for the tree alone. DevTools 154 applied this in a wide pane (the Oscars figure) but not in an 800-pixel window with `layout: side-by-side`.
+  - `sidebar`: the Styles pane's size, its width beside the tree or its height under it (`layout: stacked`). In an 800-pixel window, `layout: stacked, sidebar: 1` gives the Elements tree DevTools' whole width, so its rows don't wrap, and leaves only Styles' tab bar below it for the crop to cut. `hidden` hid the pane in the Oscars figure's wide DevTools; at 800 pixels DevTools 154 ignores it;
+  - `overview: false` hides the Network panel's timeline above the request list. `columns` shows or hides Network columns: `[waterfall]` adds Waterfall, which DevTools 154 hides by default, and `{waterfall: true, initiator: false}` also drops a column the text doesn't need.
 
-  DevTools 154 ignores the stored `panel`, so the toolkit clicks that panel's tab. For `network`, it then reloads the page so the log is complete.
+  DevTools 154 ignores the stored `panel`, so the toolkit clicks that panel's tab. For `network`, it then reloads the page so the log is complete. That reload is a second visit: it sends the cookies the first load was given and revalidates what it cached. `first_visit: true` clears both before the reload, so the log shows what a first visit sends and receives: every request reaches the network, and none carries a cookie.
+
+  Chrome keeps part of the page in view. Docked at the bottom of a 600-pixel window, DevTools gets at most about 360 pixels (about 70% of the area below the browser's bars), whatever `size` says. For a DevTools figure that needs more height, make the window taller and crop to DevTools: `window: [800, 1000]`, `size: 600`, and `crop: {devtools: true}` show 800×600 of DevTools alone, within the soft limit (ch-05's `network-headers`).
 - **Finding DevTools controls:** docked DevTools is itself a web page. The toolkit reads that page over the debugging port to find where a tab, button, request row, or header name is drawn, then clicks it for real with xdotool. No pixel positions are typed into recipes.
 - **Before any step:** it waits for the page's `load` event and for DevTools to draw its Elements tree. DevTools undoes a selection made before then.
 - **The screen grab:** the pointer is parked in the page's bottom-left corner, so hover styles and DevTools' node highlight clear. Then the screen is grabbed.
@@ -146,12 +149,13 @@ Headed steps, in addition to the ones above:
 
 - `inspect: {selector: …}` (or `text:`) selects the element in DevTools. By default it clicks DevTools' "Select an element" button, checks the button switched on, then clicks the element. `via: menu` right-clicks and chooses Inspect instead, which can't confirm the menu opened. `selects:` is a pattern the selected node must match; one retry is made if it doesn't.
 - `tree: {keys: [Left], until: '^<center', max: 24}` clicks the empty right-hand end of the selected row, so the Elements tree has keyboard focus, and checks that it does. Clicking the node's own text could start editing its tag, which would swallow the keys. Then it presses keys until the selected node matches.
-- `devtools_click: {text: '^Fetch/XHR$'}` and `devtools_wait: {text: 'quotes\?page=4'}` click or wait for something in DevTools, found by its text (a pattern) or `css:`. DevTools may break a row into pieces ("quotes", ":", a value), so match with `\s*` between them.
-- `key: 'ctrl+f'`, `type: 'var data'`, and `pointer: {selector: …}` are real keys, real typing, and the real pointer resting on an element, for tooltips.
+- `devtools_click: {text: '^Fetch/XHR$'}` and `devtools_wait: {text: 'quotes\?page=4'}` click or wait for something in DevTools, found by its text (a pattern) or `css:`. DevTools may break a row into pieces ("quotes", ":", a value), so match with `\s*` between them. `button: 3` right-clicks; buttons 4 and 5 turn the wheel up and down over the thing found, `repeat` times: `{text: '^200$', button: 4, repeat: 30}` scrolls a request list back to its first row.
+- `key: 'ctrl+f'`, `type: 'var data'`, and `pointer: {selector: …}` are real keys, real typing, and the real pointer resting on an element, for tooltips. `pointer: {devtools: {css: 'li[role="treeitem"].selected'}}` rests it on something in DevTools instead: on a tree row, DevTools highlights that element on the page.
 
 Crops for headed figures are in window coordinates:
 
 - `{window: true}`: the whole window;
+- `{devtools: true}`: the docked DevTools pane alone;
 - `{content: true, height: 760}`: below the browser's own bars;
 - `{top: 0, height: 680}`: a band of the window;
 - `{between: ['body', 'td.line-number[value="43"]']}`: from the top of one element to the bottom of another, which is how View Source is cut at a line;

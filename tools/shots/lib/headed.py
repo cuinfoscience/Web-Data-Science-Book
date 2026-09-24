@@ -14,9 +14,11 @@ Steps a headed recipe can use, besides the page steps in lib/steps.py:
     - devtools_wait: {text: 'quotes\\?page=4'}  wait until DevTools shows it
     - key: 'ctrl+f'   /   type: 'var data'  real keys, sent to the browser window
     - pointer: {selector: '#comic img'}    rest the real pointer on it (tooltips)
+    - pointer: {devtools: {text: '^<h1'}}  ...or on something in DevTools: a tree row, which
+                                             makes DevTools highlight its element on the page
 
-The pointer is parked outside the window before the screen is grabbed, unless
-the last step placed it on purpose.
+The pointer is parked in the page's corner before the screen is grabbed,
+unless a step placed it on purpose.
 """
 import json
 import re
@@ -57,13 +59,14 @@ class Session:
         if self.devtools:
             (self.profile / "Default" / "Preferences").write_text(json.dumps(dt.preferences(self.devtools)))
         self.port = _free_port()
-        args = ["--window-position=0,0", f"--window-size={self.W},{self.H}",
+        # The User-Agent as Chrome's own flag, so the Client Hints stay truthful (see lib/browser.py).
+        args = ["--window-position=0,0", f"--window-size={self.W},{self.H}", f"--user-agent={fig['user_agent']}",
                 f"--force-device-scale-factor={self.S}", f"--remote-debugging-port={self.port}",
                 "--no-first-run", "--no-default-browser-check"]
         if self.devtools:
             args.append("--auto-open-devtools-for-tabs")
         options = {"executable_path": browser.path, "headless": False, "no_viewport": True,
-                   "env": display.env, "args": args, "user_agent": fig["user_agent"],
+                   "env": display.env, "args": args,
                    "java_script_enabled": fig["javascript"],
                    # No "controlled by automated test software" bar across the window.
                    "ignore_default_args": ["--enable-automation"]}
@@ -207,11 +210,13 @@ class Session:
             raise page_steps.StepError(f"the Elements tree did not take focus (focus is on {focused!r})")
 
     def devtools_click(self, arg):
+        """Click something in DevTools; `button: 3` right-clicks, and buttons 4 and 5 turn the
+        wheel up and down over it, `repeat` times (to scroll a list to its top, say)."""
         found = self._frontend().wait_for(arg.get("text"), arg.get("css"), timeout=self.fig["timeout"])
         x, y = self.devtools_point(found["boxes"][0], found["dpr"], arg.get("at", (0.5, 0.5)))
         self.display.xdo("mousemove", x, y)
         time.sleep(0.2)
-        self.display.xdo("click", arg.get("button", 1))
+        self.display.xdo("click", "--repeat", arg.get("repeat", 1), "--delay", 60, arg.get("button", 1))
         time.sleep(0.4)
 
     def devtools_wait(self, arg):
@@ -226,12 +231,23 @@ class Session:
         time.sleep(0.3)
 
     def pointer(self, arg):
-        x, y = self.page_point(self._box(arg), arg.get("at", (0.5, 0.5)))
+        if "devtools" in arg:
+            spec = arg["devtools"]
+            found = self._frontend().wait_for(spec.get("text"), spec.get("css"), timeout=self.fig["timeout"])
+            x, y = self.devtools_point(found["boxes"][0], found["dpr"], arg.get("at", (0.5, 0.5)))
+        else:
+            x, y = self.page_point(self._box(arg), arg.get("at", (0.5, 0.5)))
         self.display.xdo("mousemove", x, y)
+        time.sleep(0.6)                      # let a hover highlight or tooltip appear
         self.pointer_placed = True
 
     def open_panel(self):
-        """Show the recipe's DevTools panel; for Network, reload so the log is complete."""
+        """Show the recipe's DevTools panel; for Network, reload so the log is complete.
+
+        The reload is a second visit: it sends the cookies the first load was given
+        and revalidates what that load cached. With `first_visit: true` both are
+        cleared first, so the log shows what a first visit sends and receives.
+        """
         panel = (self.devtools or {}).get("panel", "elements")
         if panel == "elements":
             return
@@ -240,6 +256,11 @@ class Session:
         self._frontend().wait_for(text=name, css='[role="tab"][aria-selected="true"]',
                                   timeout=self.fig["timeout"])
         if panel == "network":
+            if self.devtools.get("first_visit"):
+                cdp = self.context.new_cdp_session(self.page)
+                cdp.send("Network.clearBrowserCookies")
+                cdp.send("Network.clearBrowserCache")
+                cdp.detach()
             self.page.reload(wait_until="domcontentloaded", timeout=self.fig["timeout"] * 1000)
 
     def handlers(self):
@@ -254,6 +275,15 @@ class Session:
         S, W, H = self.S, self.W, self.H
         if crop.get("window"):
             return (0, 0, W * S, H * S)
+        if crop.get("devtools"):                      # the docked DevTools pane alone
+            top = self.toolbar()
+            width, height = self.page.evaluate("[innerWidth, innerHeight]")
+            dock = self.devtools.get("dock", "right")
+            if dock == "bottom":
+                return (0, round((top + height) * S), W * S, H * S)
+            if dock == "right":
+                return (round(width * S), round(top * S), W * S, H * S)
+            return (0, round(top * S), round((W - width) * S), H * S)
         if crop.get("content"):                       # below the browser's bars
             top = self.toolbar()
             height = crop.get("height", H - top)

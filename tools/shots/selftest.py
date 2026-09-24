@@ -43,7 +43,13 @@ PAGES = {
     "/small": (200, "<!DOCTYPE html><title>Small</title><body style='margin:8px;font:11px sans-serif'>"
                     + "<p>quotes?page=2 {has_next: true, page: 2, quotes: [...]}</p>" * 30),
 }
+PAGES["/ua"] = PAGES["/ok"]
+PAGES["/cookie"] = (200, "<title>Cookie</title><h1>A page that sets a cookie</h1>"
+                         + "<p>" + "Something to look at. " * 40 + "</p>")
 FLAKY = {"count": 0}      # /flaky works once, then answers 502
+SEEN = {}                 # path: the headers of each request for it, in order
+# What Chrome's User-Agent Client Hints should say on this machine.
+PLATFORM = {"linux": '"Linux"', "darwin": '"macOS"', "win32": '"Windows"'}.get(sys.platform)
 
 
 def sections(output):
@@ -60,6 +66,7 @@ def sections(output):
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
+        SEEN.setdefault(self.path, []).append({k.lower(): v for k, v in self.headers.items()})
         if self.path == "/flaky":
             FLAKY["count"] += 1
             status, body = PAGES["/ok"] if FLAKY["count"] == 1 else PAGES["/gateway"]
@@ -69,6 +76,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(data)))
+        if self.path == "/cookie":
+            self.send_header("Set-Cookie", "visit=1; Path=/")
         self.end_headers()
         self.wfile.write(data)
 
@@ -96,6 +105,7 @@ figures:
   - {{id: blank, kind: capture, url: "{base}/blank"}}
   - {{id: missing-text, kind: capture, url: "{base}/ok", expect: {{text: ["Not on the page"]}}}}
   - {{id: flaky, kind: capture, url: "{base}/flaky", retries: 0}}
+  - {{id: ua, kind: capture, url: "{base}/ua"}}
   - id: headed-inspect
     kind: capture
     url: "{base}/tree"
@@ -115,6 +125,23 @@ figures:
     steps:
       - devtools_click: {{text: '^tree$'}}
       - devtools_wait: {{text: '^Headers$'}}
+  - id: headed-second-visit
+    kind: capture
+    url: "{base}/cookie"
+    mode: headed
+    window: [900, 700]
+    devtools: {{dock: bottom, size: 300, panel: network}}
+    steps: [{{devtools_wait: {{text: '^cookie$'}}}}]
+  - id: headed-first-visit
+    kind: capture
+    url: "{base}/cookie"
+    mode: headed
+    window: [900, 700]
+    devtools: {{dock: bottom, size: 300, panel: network, first_visit: true}}
+    steps:
+      - devtools_click: {{text: '^cookie$'}}
+      - devtools_wait: {{text: '^Headers$'}}
+    crop: {{devtools: true}}
   - id: headed-source
     kind: capture
     url: "view-source:{base}/tree"
@@ -205,6 +232,11 @@ figures:
     expect("a blank page fails", "nearly blank" in " ".join(newest("blank").get("problems", [])))
     expect("missing expected text fails", "not found" in " ".join(newest("missing-text").get("problems", [])))
     expect("failed takes are named .FAILED.png", bl.get("image", "").endswith(".FAILED.png"))
+    code, out = shots("capture", "ch-99", "--only", "ua")
+    sent = (SEEN.get("/ua") or [{}])[-1]
+    expect("requests carry the one User-Agent, and Client Hints that name this machine's system",
+           sent.get("user-agent") == "Web Data Science/v1 brian.keegan@colorado.edu"
+           and sent.get("sec-ch-ua-platform") == PLATFORM, str(sent))
 
     print("promote")
     code, out = shots("capture", "ch-99", "--only", "flaky")
@@ -330,6 +362,20 @@ figures:
         expect("View Source is cropped from the page top through a given line",
                source_take.get("ok") is True and 0 < source_take.get("size", [0, 0])[1] < 600,
                str(source_take.get("problems")) + str(source_take.get("size")))
+        code, out = shots("capture", "ch-99", "--only", "headed-second-visit")
+        second = SEEN.get("/cookie", [])
+        expect("the Network panel's reload is a second visit: it sends the cookie the first load got",
+               len(second) >= 2 and "visit=1" in second[-1].get("cookie", ""), str(second))
+        expect("...and a headed browser's Client Hints name this machine's system too",
+               second and second[-1].get("sec-ch-ua-platform") == PLATFORM, str(second[-1:]))
+        SEEN.pop("/cookie", None)
+        code, out = shots("capture", "ch-99", "--only", "headed-first-visit")
+        first, take = SEEN.get("/cookie", []), newest("headed-first-visit")
+        expect("with first_visit, the reload sends no cookie", take.get("ok") is True and len(first) >= 2
+               and "cookie" not in first[-1], str(take.get("problems")) + str(first) + out[-300:])
+        expect("crop: {devtools: true} is the docked DevTools pane alone",
+               (take.get("size") or [0, 0])[0] == 900 and abs((take.get("size") or [0, 0])[1] - 300) <= 2,
+               str(take.get("size")))
         code, out = shots("capture", "ch-99", "--only", "headed-marks")
         take = newest("headed-marks")
         row = anchor(take, {"devtools": {"row": "^<section"}})
