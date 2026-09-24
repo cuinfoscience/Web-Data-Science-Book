@@ -20,7 +20,7 @@ DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
 FIGURE_KEYS = {"id", "file", "kind", "section", "brief", "url", "mode", "engine", "steps", "expect", "crop",
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
                "user_agent", "pause", "settle", "timeout", "retries",
-               "annotate", "targets", "legibility", "parts", "layout", "oversize"}
+               "annotate", "targets", "legibility", "parts", "layout", "oversize", "api_client"}
 ENGINES = {"playwright", "selenium", "codegen"}
 # Annotation (lib/annotate.py): marks placed from what the browser measured.
 ANNOTATE = {"width_in", "size", "border", "marks"}
@@ -36,13 +36,13 @@ LEGIBILITY = {"skip"}
 # A composite (mode: composite) joins captures of its parts side by side, or one
 # above the next (`layout: {direction: column}`).
 PART_KEYS = {"label", "url", "steps", "expect", "crop", "javascript", "window", "scale", "mode",
-             "devtools", "settle", "timeout"}
+             "devtools", "settle", "timeout", "api_client"}
 LAYOUT = {"gap", "pad", "label_px", "direction"}
 DIRECTIONS = {"row", "column"}
 # Settings that decide how a take is drawn on or judged, not how it is captured.
 # Changing them needs no new take, so they stay out of the recipe's hash. So does
 # the brief: the request the figure answers, in words.
-NOT_CAPTURE = ("brief", "legacy", "notes", "annotate", "targets", "legibility", "oversize")
+NOT_CAPTURE = ("brief", "legacy", "notes", "annotate", "targets", "legibility", "oversize", "api_client")
 DEFAULTS = {
     "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
     "window": [800, 600],    # CSS pixels; the default limit on what a figure shows, 1024×768 relaxed (lib/legibility.py)
@@ -119,6 +119,10 @@ def _problems(chapter, raw):
                        "(up to 1024×768: the clutter the extra room removes)")
         if "brief" in f and not (isinstance(f["brief"], str) and f["brief"].strip()):
             out.append(f"{where}: `brief` is the request the figure answers, in sentences")
+        for n, holder in enumerate([f] + [p for p in f.get("parts") or [] if isinstance(p, dict)]):
+            if "api_client" in holder and not isinstance(holder["api_client"], bool):
+                out.append(f"{where}{f' part {n}' if n else ''}: `api_client` is true for a figure of an API's "
+                           "response (docs/decisions.md, 2026-09-24), or false")
         out += [f"{where}: {p}" for p in _composite_problems(f)]
     return out
 
@@ -263,11 +267,12 @@ def figure(recipe, fid):
 
 
 def loads(fig):
-    """Each page a figure loads, with what its recipe expects of it: the figure's own page,
-    or each composite part's (a part without a `url` loads the figure's)."""
+    """Each page a figure loads, as (url, what the recipe expects of it, api_client): the
+    figure's own page, or each composite part's (a part without a `url` loads the figure's)."""
     if fig.get("mode") == "composite":
-        return [(part.get("url") or fig.get("url"), part.get("expect") or {}) for part in fig.get("parts") or []]
-    return [(fig["url"], fig.get("expect") or {})] if fig.get("url") else []
+        return [(part.get("url") or fig.get("url"), part.get("expect") or {},
+                 part.get("api_client", fig.get("api_client", False))) for part in fig.get("parts") or []]
+    return [(fig["url"], fig.get("expect") or {}, fig.get("api_client", False))] if fig.get("url") else []
 
 
 def part_figure(fig, n):

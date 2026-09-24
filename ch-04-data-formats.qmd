@@ -425,7 +425,9 @@ print(f"Elevation: {elevation} meters")
 # Elevation: 1635.0 meters
 ```
 
-The address in `url` is only half of the request. Opened on its own in a browser, `https://api.open-meteo.com/v1/forecast` returns an empty page, because the parameters are what ask for a forecast. `requests` adds them to the address for you, and `print(response.url)` shows the full URL it sent, which you can paste into a browser to see the same JSON.
+The address in `url` is only half of the request. Opened on its own in a browser, `https://api.open-meteo.com/v1/forecast` returns an empty page, because the parameters are what ask for a forecast. `requests` adds them to the address for you, and `print(response.url)` shows the full URL it sent, which you can paste into a browser to see the same JSON (@fig-forecast-json).
+
+![The chapter's Open-Meteo request, its full URL pasted into Chrome with **Pretty-print** ticked, September 2026. Beside the location, the top level holds two dictionaries: `daily_units` ① gives each list's unit, and `daily` ② holds the data. Its `time` ③ and `temperature_2m_max` ④ are parallel lists, one entry for each of seven days, so `data["daily"]["temperature_2m_max"][0]` is the first day's high. Pretty-print drops a whole number's `.0` (1635), which Python keeps (1635.0).](images/ch-04/forecast-json_annotated.png){#fig-forecast-json .lightbox width="78%" fig-alt="Screenshot of Chrome's JSON view with Pretty-print ticked: the forecast as indented JSON, from latitude, longitude, and timezone America/Denver to elevation 1635. Marker 1: daily_units, with time iso8601 and °C for both temperatures. Marker 2: daily. Marker 3: its time list, seven dates from 2026-09-24 to 2026-09-30. Marker 4: temperature_2m_max, seven numbers on one line, above temperature_2m_min."}
 
 The strategy is always the same: start with `type()` and `.keys()` at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:
 

@@ -3,12 +3,11 @@
 # The first chapter of the back-fill after the chapter 5 pilot
 # (docs/plans/2026-09-24-screenshot-backfill-ch01-05.md, §4). Chrome shows an
 # XML file that has no stylesheet as a tree; the first two figures show real XML
-# that way, and the third finds a feed's address in a page's source. Every
-# host's robots.txt allows the fetch, including for AI agents. Left out:
+# that way, and the third finds a feed's address in a page's source. The fourth,
+# the chapter's Open-Meteo forecast in Chrome's JSON view, is an API's response:
+# api.open-meteo.com's robots.txt disallows every path, and it is captured as an
+# API client (docs/decisions.md, 2026-09-24). Left out:
 #
-# - The Open-Meteo figure (4-2): api.open-meteo.com's robots.txt disallows every path.
-#   Whether an API client may capture it anyway is the maintainer's decision
-#   (docs/handoff.md).
 # - The Guardian and the BBC's main site: their robots.txt files disallow Claude's
 #   agents, and the back-fill honored that, so no figure comes from them. Since
 #   2026-09-24, captures follow the rules for the course's User-Agent instead
@@ -57,6 +56,38 @@ figures:
         - {n: 4, at: {text: '^<member-info>$', nth: 0}}
         - {n: 3, at: {text: '^<member>$', nth: 1}}
     drifts: true        # the publish date and the roster change
+
+  - id: forecast-json
+    kind: capture
+    section: "Handling Deeply Nested JSON"
+    brief: >-
+      Show what the chapter's Open-Meteo request returns when its full URL (the
+      one print(response.url) shows) is pasted into Chrome, with Pretty-print
+      ticked: the whole response, so the reader sees the nesting the code walks.
+      daily_units (marker 1) holds each list's unit; daily (2) holds the data,
+      where time (3, a brace over the list) and temperature_2m_max (4) are
+      parallel lists, one entry per day.
+    url: https://api.open-meteo.com/v1/forecast?latitude=40.01&longitude=-105.27&daily=temperature_2m_max%2Ctemperature_2m_min&timezone=America%2FDenver
+    api_client: true      # robots.txt disallows every path; see the header
+    window: [600, 520]    # wide enough that the temperature lines don't wrap
+    steps:
+      - wait: {selector: 'pre'}
+      # Pretty-print's checkbox is in a closed shadow root, which no selector reaches,
+      # so it is clicked where Chrome draws it; the next step checks that it worked.
+      - click: {position: [104, 9]}
+      - wait: {text: '"daily": \{'}
+    expect:
+      text: ['"temperature_2m_max": \[']
+    # Chrome's Pretty-print bar through the last brace. The body starts 13 pixels down
+    # (its margin and the <pre>'s collapse), so the crop starts at the bar itself.
+    crop: {between: ['.json-formatter-container', 'pre'], pad: [0, 0, 8, 0]}
+    annotate:
+      marks:
+        - {n: 1, at: {match: '^\s*"daily_units": \{$', in: 'pre'}}
+        - {n: 2, at: {match: '^\s*"daily": \{$', in: 'pre'}}
+        - {n: 3, shape: brace, at: {match: '^\s*"time": \[(?:\n.*){8}', in: 'pre'}}
+        - {n: 4, at: {match: '^\s*"temperature_2m_max": \[.*$', in: 'pre'}}
+    drifts: true          # a new forecast every day
 
   - id: rss-feed-xml
     kind: capture

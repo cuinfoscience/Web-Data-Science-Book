@@ -158,11 +158,11 @@ def doctor_chapter(chapter):
     recipe = load(chapter)
     by_host = {}
     for fig in recipe["figures"]:
-        for url, expect in loads(fig):      # a composite's parts can each load another host
+        for url, expect, api_client in loads(fig):      # a composite's parts can each load another host
             if url and host_of(url):
-                by_host.setdefault(host_of(url), []).append((fig, url, expect))
+                by_host.setdefault(host_of(url), []).append((fig, url, expect, api_client))
     for host, pages in sorted(by_host.items()):
-        figs = [fig for fig, _, _ in pages]
+        figs = [fig for fig, *_ in pages]
         agent = figs[0]["user_agent"]
         if host in ("localhost", "127.0.0.1", "::1"):
             # A server on this machine, such as chapter 1's Jupyter: robots.txt doesn't apply,
@@ -180,13 +180,19 @@ def doctor_chapter(chapter):
         try:
             with urllib.request.urlopen(request, timeout=30) as r:
                 text = r.read().decode("utf-8", "replace")
+            if r.status != 200 or not text.strip():
+                # EUR-Lex sometimes answers with 202 and an empty page that runs a browser
+                # check: that is not a robots.txt with no rules, so it can't be read as one.
+                line(WARN, f"{host}: robots.txt answered {r.status} with {'nothing' if not text.strip() else 'a page'}, "
+                           "not the file", "run doctor again, or read the file in a browser")
+                continue
             line(GOOD, f"{host}: reachable (robots.txt {r.status})")
         except urllib.error.HTTPError as e:
             line(GOOD if e.code in (404, 410) else WARN, f"{host}: robots.txt answered {e.code}")
             continue
         except Exception as e:
             reason = str(getattr(e, "reason", e))
-            if all(expect.get("error") for _, _, expect in pages):
+            if all(expect.get("error") for _, _, expect, _ in pages):
                 # The subject is a host that no longer answers. Behind the proxy, a refused
                 # host fails the same way, so public DNS decides, as it does in `capture`.
                 try:
@@ -213,22 +219,15 @@ def doctor_chapter(chapter):
         delay = robots.crawl_delay(text, agent)
         if delay:
             slowest = min(fig["pause"][0] for fig in figs)
+            asks = f"{host}: robots.txt asks for {delay:g} second{'' if delay == 1 else 's'} between requests"
             if slowest < delay:
-                line(WARN, f"{host}: robots.txt asks for {delay:g} seconds between requests; "
-                           f"the recipe's pause starts at {slowest:g}", f"set `pause: [{delay:g}, 30]` on its figures")
+                line(WARN, f"{asks}; the recipe's pause starts at {slowest:g}",
+                     f"set `pause: [{delay:g}, 30]` on its figures")
             else:
-                line(NOTE, f"{host}: robots.txt asks for {delay:g} seconds between requests; "
-                           f"the recipe's pause starts at {slowest:g}")
-        for fig, url, _ in pages:
-            page = url.removeprefix("view-source:")
-            names = robots.barred(text, agent, page)
-            if agent in names:
-                line(WARN, f"{host}: robots.txt disallows {urlparse(page).path} ({fig['id']})",
-                     "one page view per figure; decide whether that fits the site's rules")
-            claude = [name for name in names if name != agent]
-            if claude and agent not in names:
-                line(NOTE, f"{host}: robots.txt disallows {urlparse(page).path} for {', '.join(claude)} ({fig['id']})",
-                     "captures send the course's User-Agent, which it allows (docs/decisions.md, 2026-09-24)")
+                line(NOTE, f"{asks}; the recipe's pause starts at {slowest:g}")
+        for level, message, fix in robots.findings(host, text, agent, [(fig["id"], url, api_client)
+                                                                        for fig, url, _, api_client in pages]):
+            line(WARN if level == "warn" else NOTE, message, fix)
     return failed
 
 

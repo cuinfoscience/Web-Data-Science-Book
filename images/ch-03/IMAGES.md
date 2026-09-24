@@ -7,7 +7,7 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 <!-- shots:begin: generated from provenance.json by tools/shots; edits between these markers are replaced -->
 | File | Kind | Captured | Source | How |
 |---|---|---|---|---|
-| `dead-endpoints.png` | capture | 2026-09-24 | https://api.pushshift.io/reddit/search/submission/?q=test&size=1; https://api.crowdtangle.com/posts | tools/shots: Google Chrome for Testing 154.0.8037.57, 560×400 at 2× |
+| `dead-endpoints.png` | capture | 2026-09-24 | https://api.pushshift.io/reddit/search/submission/?q=test&size=1; https://api.crowdtangle.com/posts; https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=nasa | tools/shots: Google Chrome for Testing 154.0.8037.57, 560×400 at 2× |
 | `dsa-article-40.png` and `dsa-article-40_annotated.png`, `.pdf` | capture | 2026-09-24 | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2065 | tools/shots: Google Chrome for Testing 154.0.8037.57, 800×700 at 2× |
 <!-- shots:end -->
 
@@ -19,7 +19,8 @@ captured on 2026-09-24. Recipes: `tools/shots/recipes/ch-03.yml`.
 
 ### `dead-endpoints` (figure 3.2, "Dead-Endpoint Forensics")
 
-Plan item 3-1: two of the section's three retired endpoints, stacked.
+Plan item 3-1: the section's three retired endpoints, stacked in the
+chapter's order.
 
 - **Pushshift answers.** Its 403 is one line of JSON, `{"detail":"Not
   authenticated"}`, under Chrome's Pretty-print bar. The server header is
@@ -37,21 +38,14 @@ Plan item 3-1: two of the section's three retired endpoints, stacked.
 - **The crop** runs from Chrome's icon to the error's name
   (`.icon` to `.error-code`), from the page's 24-pixel indent, so the error
   page lines up with the JSON above it.
-- **Left out: Twitter API v1.1,** the section's third endpoint.
-  api.twitter.com's robots.txt disallows every path for every agent but
-  Googlebot and Bingbot, the question figure 4-2 waits on. If the maintainer
-  approves a capture as an API client, add this part between the other two:
-
-  ```yaml
-  - label: "api.twitter.com answers: error 215, in JSON"
-    url: https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=nasa
-    expect: {status: 400, text: ['Bad Authentication data']}
-    crop: {top: 0, height: 56}
-  ```
-
-  On 2026-09-24 the reconnaissance script sent one request to that URL
-  (400, error 215, as the chapter prints) before it read the host's
-  robots.txt. No capture was made.
+- **Twitter API v1.1 answers too:** a 400 with one line of JSON, error 215,
+  "Bad Authentication data." api.twitter.com's robots.txt disallows every
+  path for every agent but Googlebot and Bingbot, and the part is an API's
+  response, captured as an API client (`api_client: true`; the maintainer's
+  decision of 2026-09-24 in `docs/decisions.md`). It joined the figure after
+  that decision, so the first version, merged in #158, showed two endpoints.
+  Before the decision, the reconnaissance script had sent one request to the
+  same URL before reading the host's robots.txt.
 
 ### `dsa-article-40` (figure 3.1, "Exemption")
 
