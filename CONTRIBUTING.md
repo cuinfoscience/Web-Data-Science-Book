@@ -122,7 +122,7 @@ regenerate them before merging.
 
 ### On your computer
 
-You need Python 3.11 or later with Jupyter (`pip install jupyter`), and
+You need Python 3.14 (3.13 also works) with Jupyter (`pip install jupyter`), and
 [Quarto](https://quarto.org/docs/get-started/) 1.4 or later to build the book.
 [GitHub Desktop](https://desktop.github.com/), the
 [`gh` command-line tool](https://cli.github.com/), and plain `git` all work.
@@ -229,8 +229,11 @@ same branch, and the checks run again.
   classmates.
 - Answer each comment in its thread. Push your fixes to the same branch. Don't
   open a new pull request.
-- The maintainer merges, with a merge commit. Don't merge your own pull request
-  or a classmate's, even if GitHub shows you the button.
+- Students' pull requests are merged in class, after a code-review standup on a
+  Friday: you present your change, a classmate reviews it, and the maintainer
+  merges the approved ones with a merge commit. Other pull requests are merged
+  by the maintainer the same way. Don't merge your own pull request or a
+  classmate's, even if GitHub shows you the button.
 - Not every pull request is merged. A closed one can still be a useful report,
   and in the course you are graded on the proposal and the review, not on the
   merge.

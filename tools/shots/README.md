@@ -41,7 +41,7 @@ tools/shots/run check                             # before a PR
 - **`doctor`** answers whether capture works in this session. Do not reuse an earlier session's answer:
   - it checks the proxy, the browser, a real headless capture of example.com, and a real headed one with DevTools open;
   - it checks for TeX, and fails if a recipe has markers and TeX is missing;
-  - with a chapter, it makes one request to each host that chapter's recipes use, and reads that host's robots.txt for the capture's User-Agent and for Claude's agents (see "Field notes");
+  - with a chapter, it makes one request to each host that chapter's recipes use, and reads that host's robots.txt for the capture's User-Agent, noting any group addressed to Claude's agents (see "Field notes");
   - it reports a proxy refusal as a policy block, which you report rather than route around.
 
 ## The rules
@@ -108,13 +108,15 @@ something the next agent would otherwise find out again, add a note here.
 
 ### Before the recipe
 
-- **Read every group in a host's robots.txt, including those for AI agents.** An AI agent makes
-  these captures for the maintainer, so a group addressed to Claude's agents
-  (`Claude-User`, `ClaudeBot`, `Claude-SearchBot`, `Claude-Web`,
-  `anthropic-ai`) applies to it, whatever User-Agent the browser sends. The
-  Guardian disallows four of these names and www.bbc.co.uk three, so chapter 4
-  has no figure from either. `doctor ch-NN` warns about both kinds of rule
-  (`lib/robots.py`).
+- **Read robots.txt for the course's User-Agent.** Captures send
+  `Web Data Science/v1 brian.keegan@colorado.edu`, and robots.txt is read for
+  it: the `*` group, unless a group names it. A group addressed only to
+  Claude's agents (`Claude-User`, `ClaudeBot`, `Claude-SearchBot`,
+  `Claude-Web`, `anthropic-ai`) doesn't govern captures (`docs/decisions.md`,
+  2026-09-24). `doctor ch-NN` warns when the course's User-Agent is
+  disallowed, and lists groups for Claude's agents as a note (`lib/robots.py`).
+  The Guardian and www.bbc.co.uk have such groups; chapter 4's back-fill,
+  captured before the decision, took no figure from either.
 - **robots.txt is per host.** feeds.bbci.co.uk allows what
   www.bbc.co.uk forbids, and feeds.npr.org has no robots.txt at all (404).
   Check the host in the figure's own URL.
