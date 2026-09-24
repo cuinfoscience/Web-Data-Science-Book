@@ -165,15 +165,20 @@ class Session:
         keys = arg if isinstance(arg, list) else arg.get("keys", [])
         until, limit = (None, 1) if isinstance(arg, list) else (arg.get("until"), arg.get("max", 1))
         front = self._frontend()
+        time.sleep(0.8)                      # let DevTools finish revealing a just-picked node
         self.focus_tree()
+        seen = [front.selected()[:40]]
         for _ in range(limit if until else 1):
-            if until and re.search(until, front.selected()):
+            if until and re.search(until, seen[-1]):
                 return
             for key in keys:
                 self.display.xdo("key", key)
-                time.sleep(0.25)
+                time.sleep(0.35)
+            seen.append(front.selected()[:40])
         if until and not re.search(until, front.selected()):
-            raise page_steps.StepError(f"the Elements tree never selected /{until}/")
+            path = " > ".join(dict.fromkeys(seen))     # each distinct selection, in order
+            raise page_steps.StepError(f"the Elements tree never selected /{until}/ "
+                                       f"(focus: {front.evaluate(self._FOCUSED)!r}; went: {path})")
 
     # The deepest focused element in DevTools, through its shadow roots.
     _FOCUSED = """(() => { let a = document.activeElement;
@@ -187,11 +192,12 @@ class Session:
         node's own text could start editing its tag, which swallows the keys.
         """
         front = self._frontend()
-        row = front.wait_for(css='li[role="treeitem"].selected', timeout=self.fig["timeout"])
-        tree = front.wait_for(css='ol[role="tree"]', timeout=self.fig["timeout"])
-        r, t = row["boxes"][0], tree["boxes"][0]
+        found = front.selected_row()
+        if not found:
+            raise page_steps.StepError("the Elements tree has no selected row")
+        r, t = found["row"], found["tree"]
         right_end = {"x": t["x"] + t["w"] - 16, "y": r["y"], "w": 1, "h": r["h"]}
-        x, y = self.devtools_point(right_end, row["dpr"], (0, 0.5))
+        x, y = self.devtools_point(right_end, found["dpr"], (0, 0.5))
         self.display.xdo("mousemove", x, y)
         time.sleep(0.2)
         self.display.xdo("click", 1)

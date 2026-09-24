@@ -120,6 +120,32 @@ class Frontend:
                 raise DevToolsError(f"DevTools never showed {text or css!r}")
             time.sleep(0.4)
 
+    _SELECTED_ROW = r"""
+    (() => {
+      const walk = (root) => {
+        for (const el of root.querySelectorAll('li[role="treeitem"].selected')) {
+          const tree = el.closest('[role="tree"]');
+          const r = el.getBoundingClientRect();
+          if (tree && r.width > 1 && r.height > 1 && (el.innerText || '').trim()) {
+            const t = tree.getBoundingClientRect();
+            return {row: {x: r.x, y: r.y, w: r.width, h: r.height},
+                    tree: {x: t.x, y: t.y, w: t.width, h: t.height}};
+          }
+        }
+        for (const el of root.querySelectorAll('*')) {
+          if (el.shadowRoot) { const found = walk(el.shadowRoot); if (found) return found; }
+        }
+        return null;
+      };
+      const found = walk(document);
+      return JSON.stringify(found && Object.assign(found, {dpr: devicePixelRatio}));
+    })()
+    """
+
+    def selected_row(self):
+        """The Elements tree's selected row and the tree it sits in, or None."""
+        return json.loads(self.evaluate(self._SELECTED_ROW))
+
     def selected(self):
         """Text of the selected node in the Elements tree, or ''."""
         found = self.find(css='li[role="treeitem"].selected')

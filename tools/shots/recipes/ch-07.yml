@@ -90,11 +90,11 @@ figures:
     steps:
       - wait: {selector: '#wm-ipp-base'}
       - wait: {text: 'Welcome to Thefacebook'}
-      # Inspect a word of the 2004 page, then climb the Elements tree to the page's
-      # own <center>: the body then shows the toolbar insert first, the comment that
-      # ends it, and Thefacebook's markup after it.
-      - inspect: {text: 'Welcome to Thefacebook!'}
-      - tree: {keys: [Left], until: '^<center', max: 24}
+      # Pick the 2004 page's own <center> in its empty left margin (the 700-pixel
+      # table is centered inside it), so DevTools selects <center> itself. The body
+      # then shows the toolbar insert, the comment that ends it, and Thefacebook's
+      # markup. (Climbing from a word of the page takes three nested tables.)
+      - inspect: {selector: 'center', at: [0.02, 0.5], selects: '^<center'}
     expect:
       text: ['Welcome to Thefacebook']
     crop: {top: 0, height: 615}
