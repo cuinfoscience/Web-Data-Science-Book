@@ -612,7 +612,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <section id="the-availability-api" class="level2" data-number="7.6">
 <h2 data-number="7.6" class="anchored" data-anchor-id="the-availability-api"><span class="header-section-number">7.6</span> The Availability API</h2>
 <p>The simplest way to check whether the Wayback Machine has a snapshot of a URL is the Availability API:</p>
-<div id="9cc575a5" class="cell" data-execution_count="1">
+<div id="793d9b95" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://www.cnn.com"</span></span>
@@ -633,7 +633,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <span id="cb2-18"><a href="#cb2-18" aria-label="18"></a>    <span class="bu">print</span>(<span class="st">"No snapshot available near this date"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The API returns the closest snapshot to your requested timestamp. Before you retrieve it, recall what the Inspector showed you: a snapshot URL like <code>https://web.archive.org/web/20000815052826/http://www.cnn.com/</code> does <em>not</em> return the page exactly as it was captured. It returns the page wrapped, with the archive’s scripts injected and its links, scripts, and image references rewritten to point back into the archive; a browser gets the toolbar as well. That is convenient for browsing but poisonous for measurement — counts of links, scripts, and images, and even text length, will include the archive’s scaffolding along with the original page. Just as <code>im_</code> asked for an image, the <code>id_</code> flag after the timestamp (<code>.../web/20000815052826id_/http://www.cnn.com/</code>) asks for the original capture, unmodified. The tradeoff is that <code>id_</code> returns the rawest form of the capture: relative links are left unresolved and the page may not render nicely in a browser. For measurement, raw is exactly what you want.</p>
-<div id="6399b49d" class="cell" data-execution_count="2">
+<div id="9f8b997b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="co"># Append id_ to the timestamp to request the original, unmodified capture — no Wayback toolbar, no rewritten links</span></span>
@@ -650,7 +650,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <section id="comparing-multiple-snapshots" class="level3" data-number="7.6.1">
 <h3 data-number="7.6.1" class="anchored" data-anchor-id="comparing-multiple-snapshots"><span class="header-section-number">7.6.1</span> Comparing Multiple Snapshots</h3>
 <p>A single historical snapshot is interesting; comparing snapshots across time is where the real research value lies. Let us retrieve CNN’s homepage at three different points in history and see how the web has evolved:</p>
-<div id="7671ee44" class="cell" data-execution_count="3">
+<div id="3486e915" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="im">import</span> requests</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
@@ -699,7 +699,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <span id="cb4-46"><a href="#cb4-46" aria-label="46"></a>        stats.append(result)</span>
 <span id="cb4-47"><a href="#cb4-47" aria-label="47"></a>    time.sleep(<span class="dv">2</span>)  <span class="co"># Be respectful of the Archive</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="3e08cd98" class="cell" data-execution_count="4">
+<div id="4cb9a7c9" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a>comparison <span class="op">=</span> pd.DataFrame(stats)</span>
@@ -717,7 +717,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <section id="the-cdx-server-api" class="level2" data-number="7.7">
 <h2 data-number="7.7" class="anchored" data-anchor-id="the-cdx-server-api"><span class="header-section-number">7.7</span> The CDX Server API</h2>
 <p>The Availability API finds one snapshot near a date. The CDX Server API lets you query the entire history of snapshots for a URL, which is essential for longitudinal research:</p>
-<div id="7dae88e8" class="cell" data-execution_count="5">
+<div id="bf242efa" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a></span>
@@ -744,7 +744,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 </div>
 <p>Two of these parameters do server-side filtering that saves you cleanup work later. The <code>filter=statuscode:200</code> parameter returns only successful captures, so failed requests and redirects never reach your DataFrame. The <code>collapse=digest</code> parameter drops consecutive captures whose content hash is identical — the Archive often captures a page daily even when nothing changed, and collapsing on digest keeps one capture per distinct version. While developing, it is also worth adding <code>"limit": 100</code> to cap the response at a manageable size until your code works.</p>
 <p>You can visualize how frequently the page was captured and how its size changed over time:</p>
-<div id="f5f99ec5" class="cell" data-execution_count="6">
+<div id="174a6b71" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
@@ -765,7 +765,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <section id="filtering-and-analyzing-cdx-data" class="level3" data-number="7.7.1">
 <h3 data-number="7.7.1" class="anchored" data-anchor-id="filtering-and-analyzing-cdx-data"><span class="header-section-number">7.7.1</span> Filtering and Analyzing CDX Data</h3>
 <p>The raw CDX feed includes every capture attempt — failed requests, redirects, and duplicate captures that can skew your analysis. Because our query already filtered to status 200 and collapsed identical captures on the server side, the DataFrame arrives analysis-ready; had you omitted those parameters, the equivalent pandas filter would be <code>df[df["statuscode"] == "200"]</code>. Prefer the server-side version: it transfers less data and leaves less cleanup code to maintain.</p>
-<div id="c780a01e" class="cell" data-execution_count="7">
+<div id="38413976" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co"># Every row is already a successful, distinct capture (filtered server-side), so we can go straight to trend analysis</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>df_ok <span class="op">=</span> df.set_index(<span class="st">"timestamp"</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a></span>
@@ -779,7 +779,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <span id="cb8-11"><a href="#cb8-11" aria-label="11"></a>yearly <span class="op">=</span> df_ok.resample(<span class="st">"YS"</span>).agg(mean_size<span class="op">=</span>(<span class="st">"length"</span>, <span class="st">"mean"</span>))</span>
 <span id="cb8-12"><a href="#cb8-12" aria-label="12"></a><span class="bu">print</span>(yearly.tail(<span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="42dc272c" class="cell" data-execution_count="8">
+<div id="dbf16cb2" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>quarterly[<span class="st">"captures"</span>].plot(ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
@@ -802,7 +802,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <p>A current research project explores how social media platforms’ terms of service have evolved. Let us track changes in Facebook’s Terms of Service by retrieving content at regular intervals.</p>
 <section id="generating-date-ranges" class="level3" data-number="7.8.1">
 <h3 data-number="7.8.1" class="anchored" data-anchor-id="generating-date-ranges"><span class="header-section-number">7.8.1</span> Generating Date Ranges</h3>
-<div id="f63490e6" class="cell" data-execution_count="9">
+<div id="cd16e364" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="co"># Generate quarterly dates from 2005 to 2024</span></span>
@@ -812,7 +812,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 </section>
 <section id="retrieving-historical-content" class="level3" data-number="7.8.2">
 <h3 data-number="7.8.2" class="anchored" data-anchor-id="retrieving-historical-content"><span class="header-section-number">7.8.2</span> Retrieving Historical Content</h3>
-<div id="e86f88ea" class="cell" data-execution_count="10">
+<div id="62fd2101" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a></span>
@@ -877,7 +877,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <section id="collecting-the-history" class="level3" data-number="7.8.3">
 <h3 data-number="7.8.3" class="anchored" data-anchor-id="collecting-the-history"><span class="header-section-number">7.8.3</span> Collecting the History</h3>
 <p>The function retrieves one snapshot; a loop over the quarterly dates assembles the history. Note where the <code>time.sleep()</code> lives — in the loop, between requests, just as in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a> — and that failed retrievals (returned as <code>None</code>) are simply skipped rather than crashing the run:</p>
-<div id="4a0b105a" class="cell" data-execution_count="11">
+<div id="2d43b9ea" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a>results <span class="op">=</span> []</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="cf">for</span> date <span class="kw">in</span> dates:</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>    <span class="bu">print</span>(<span class="ss">f"Fetching snapshot near </span><span class="sc">{</span>date<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">..."</span>)</span>
@@ -893,7 +893,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <section id="serializing-data" class="level3" data-number="7.8.4">
 <h3 data-number="7.8.4" class="anchored" data-anchor-id="serializing-data"><span class="header-section-number">7.8.4</span> Serializing Data</h3>
 <p>Once you have collected historical content, save it so you do not need to re-scrape:</p>
-<div id="a57a607b" class="cell" data-execution_count="12">
+<div id="3546b1c9" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="im">import</span> json</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a><span class="co"># Save the results collected by the loop above:</span></span>
@@ -908,7 +908,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <section id="caching-raw-captures" class="level3" data-number="7.8.5">
 <h3 data-number="7.8.5" class="anchored" data-anchor-id="caching-raw-captures"><span class="header-section-number">7.8.5</span> Caching Raw Captures</h3>
 <p>Serializing your final results is one half of a reproducible workflow. The other half is caching each raw capture as you fetch it, so that re-running the collection loop never re-downloads something you already have:</p>
-<div id="a72181a8" class="cell" data-execution_count="13">
+<div id="97bea830" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="im">import</span> os</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a>os.makedirs(<span class="st">"wayback_cache"</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
@@ -934,7 +934,8 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <section id="document-similarity-with-bag-of-words" class="level2" data-number="7.9">
 <h2 data-number="7.9" class="anchored" data-anchor-id="document-similarity-with-bag-of-words"><span class="header-section-number">7.9</span> Document Similarity with Bag-of-Words</h2>
 <p>To measure how much a document changed between versions, you can use a bag-of-words approach. This technique represents each document as a vector of word frequencies, ignoring word order, and then measures the similarity between vectors.</p>
-<div id="208cd712" class="cell" data-execution_count="14">
+<p>The code below uses gensim and NLTK, which chapter 1’s core install doesn’t include. In a terminal where <code>webdata</code> is active, install both with <code>conda install -c conda-forge gensim nltk</code>. For Python 3.14, conda-forge has gensim ready to install, and PyPI, where <code>pip</code> looks, doesn’t yet (September 2026).</p>
+<div id="a3d0b6fa" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="im">import</span> nltk</span>
@@ -957,7 +958,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <span id="cb15-20"><a href="#cb15-20" aria-label="20"></a><span class="bu">print</span>(<span class="ss">f"Version 2 tokens: </span><span class="sc">{</span><span class="bu">len</span>(doc_v2)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Using gensim’s dictionary and bag-of-words tools, you can build a corpus and compute similarity:</p>
-<div id="5c8c25de" class="cell" data-execution_count="15">
+<div id="26919c07" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a><span class="co"># Build a dictionary mapping words to IDs</span></span>
@@ -976,7 +977,7 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <section id="visualizing-document-change-over-time" class="level3" data-number="7.9.1">
 <h3 data-number="7.9.1" class="anchored" data-anchor-id="visualizing-document-change-over-time"><span class="header-section-number">7.9.1</span> Visualizing Document Change Over Time</h3>
 <p>The bag-of-words similarity measure tells you how similar two documents are, but plotting similarity between <em>consecutive</em> versions over time creates a “change timeline” — a visual record of when and how much a document evolved:</p>
-<div id="b67e2d07" class="cell" data-execution_count="16">
+<div id="32178498" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
@@ -1034,33 +1035,33 @@ Figure&nbsp;7.5: Chrome’s Elements panel on the February 12, 2004 capture of <
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will reconstruct the archival history of one website you care about, then measure how much its earliest and latest captures differ.</p>
 <p><strong>Step 1 — Choose a page and query its history.</strong> Pick a website that has existed for at least ten years (your high school, a news outlet, a company). Define your <code>HEADERS</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), then query the CDX Server API for its capture history, using the chapter’s parameters: <code>output=json</code>, <code>fl=timestamp,original,statuscode,length</code>, filtering for status 200 and collapsing on digest. Remember from <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> that <code>archive.org</code> answers 429 when busy — treat that as an outcome, wait, and retry.</p>
-<div id="f9d24559" class="cell" data-execution_count="17">
+<div id="505403ca" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Step 1: Query the CDX API for your chosen page's capture history.</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a><span class="co"># Handle a 429 by waiting and retrying rather than crashing.</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Build the capture DataFrame.</strong> The first row of the response is the column headers. Build a DataFrame from the rest, convert <code>timestamp</code> with <code>pd.to_datetime()</code> (format <code>"%Y%m%d%H%M%S"</code>), and convert <code>length</code> to numeric. Print the date range and total number of captures.</p>
-<div id="4cbe4e79" class="cell" data-execution_count="18">
+<div id="1585c837" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="co"># Step 2: Build a DataFrame of captures with real datetimes and numeric lengths. Print the date range and capture count.</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Plot the archival record.</strong> Make two plots: captures per year (a bar chart from grouping on the timestamp’s year), and page size over time. Mark any visible gaps or jumps.</p>
-<div id="dff0f2de" class="cell" data-execution_count="19">
+<div id="f641f2d7" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 3: Plot captures per year and page size over time.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Retrieve two raw captures.</strong> Take the earliest and the most recent capture. Fetch each snapshot with the <code>id_</code> suffix on the timestamp — the chapter explains why the toolbar-wrapped version would poison your measurements — sleeping between requests, and cache both pages to local files as you did in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>.</p>
-<div id="a03d22a7" class="cell" data-execution_count="20">
+<div id="39c3aee5" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># Step 4: Fetch the earliest and latest captures with the id_ suffix, politely, and cache both to disk.</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Measure the change.</strong> Extract the visible text of both cached captures with BeautifulSoup, preprocess each with the chapter’s <code>preprocess_document()</code> (tokenize, lowercase, remove stopwords), and compute the bag-of-words similarity between them.</p>
-<div id="ee110e71" class="cell" data-execution_count="21">
+<div id="dc8daa9b" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># Step 5: Extract text from both captures, preprocess, and compute their similarity.</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: How thoroughly is your page archived, and were there gaps — years with few or no captures? What does the similarity score say about how much the page changed, and does skimming the two cached files agree? What would a researcher relying on this page’s archival record need to be careful about (recall the chapter’s warnings on capture-frequency bias)?</p>
-<div id="8a804e62" class="cell" data-execution_count="22">
+<div id="54350f55" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -2102,199 +2103,201 @@ Rogers, Richard. 2019. <em>Doing Digital Methods</em>. SAGE Publications.
 <span id="cb24-516"><a href="#cb24-516" aria-label="490"></a></span>
 <span id="cb24-517"><a href="#cb24-517" aria-label="491"></a>To measure how much a document changed between versions, you can use a bag-of-words approach. This technique represents each document as a vector of word frequencies, ignoring word order, and then measures the similarity between vectors.</span>
 <span id="cb24-518"><a href="#cb24-518" aria-label="492"></a></span>
-<span id="cb24-521"><a href="#cb24-521" aria-label="493"></a><span class="in">```{python}</span></span>
-<span id="cb24-522"><a href="#cb24-522" aria-label="494"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
-<span id="cb24-523"><a href="#cb24-523" aria-label="495"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
-<span id="cb24-524"><a href="#cb24-524" aria-label="496"></a><span class="im">import</span> nltk</span>
-<span id="cb24-525"><a href="#cb24-525" aria-label="497"></a></span>
-<span id="cb24-526"><a href="#cb24-526" aria-label="498"></a><span class="co"># Download stopwords (first time only)</span></span>
-<span id="cb24-527"><a href="#cb24-527" aria-label="499"></a><span class="co"># nltk.download('stopwords')</span></span>
-<span id="cb24-528"><a href="#cb24-528" aria-label="500"></a></span>
-<span id="cb24-529"><a href="#cb24-529" aria-label="501"></a>stop_words <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">'english'</span>))</span>
+<span id="cb24-519"><a href="#cb24-519" aria-label="493"></a>The code below uses gensim and NLTK, which chapter 1's core install doesn't include. In a terminal where <span class="in">`webdata`</span> is active, install both with <span class="in">`conda install -c conda-forge gensim nltk`</span>. For Python 3.14, conda-forge has gensim ready to install, and PyPI, where <span class="in">`pip`</span> looks, doesn't yet (September 2026).</span>
+<span id="cb24-520"><a href="#cb24-520" aria-label="494"></a></span>
+<span id="cb24-523"><a href="#cb24-523" aria-label="495"></a><span class="in">```{python}</span></span>
+<span id="cb24-524"><a href="#cb24-524" aria-label="496"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
+<span id="cb24-525"><a href="#cb24-525" aria-label="497"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
+<span id="cb24-526"><a href="#cb24-526" aria-label="498"></a><span class="im">import</span> nltk</span>
+<span id="cb24-527"><a href="#cb24-527" aria-label="499"></a></span>
+<span id="cb24-528"><a href="#cb24-528" aria-label="500"></a><span class="co"># Download stopwords (first time only)</span></span>
+<span id="cb24-529"><a href="#cb24-529" aria-label="501"></a><span class="co"># nltk.download('stopwords')</span></span>
 <span id="cb24-530"><a href="#cb24-530" aria-label="502"></a></span>
-<span id="cb24-531"><a href="#cb24-531" aria-label="503"></a><span class="kw">def</span> preprocess_document(text):</span>
-<span id="cb24-532"><a href="#cb24-532" aria-label="504"></a>    <span class="co">"""Tokenize, lowercase, and remove stopwords from a document."""</span></span>
-<span id="cb24-533"><a href="#cb24-533" aria-label="505"></a>    tokens <span class="op">=</span> simple_preprocess(text)  <span class="co"># Tokenize and lowercase</span></span>
-<span id="cb24-534"><a href="#cb24-534" aria-label="506"></a>    <span class="cf">return</span> [token <span class="cf">for</span> token <span class="kw">in</span> tokens <span class="cf">if</span> token <span class="kw">not</span> <span class="kw">in</span> stop_words]</span>
-<span id="cb24-535"><a href="#cb24-535" aria-label="507"></a></span>
-<span id="cb24-536"><a href="#cb24-536" aria-label="508"></a><span class="co"># Preprocess two versions of the ToS</span></span>
-<span id="cb24-537"><a href="#cb24-537" aria-label="509"></a>doc_v1 <span class="op">=</span> preprocess_document(results[<span class="dv">0</span>][<span class="st">"content"</span>])</span>
-<span id="cb24-538"><a href="#cb24-538" aria-label="510"></a>doc_v2 <span class="op">=</span> preprocess_document(results[<span class="op">-</span><span class="dv">1</span>][<span class="st">"content"</span>])</span>
-<span id="cb24-539"><a href="#cb24-539" aria-label="511"></a></span>
-<span id="cb24-540"><a href="#cb24-540" aria-label="512"></a><span class="bu">print</span>(<span class="ss">f"Version 1 tokens: </span><span class="sc">{</span><span class="bu">len</span>(doc_v1)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb24-541"><a href="#cb24-541" aria-label="513"></a><span class="bu">print</span>(<span class="ss">f"Version 2 tokens: </span><span class="sc">{</span><span class="bu">len</span>(doc_v2)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb24-542"><a href="#cb24-542" aria-label="514"></a><span class="in">```</span></span>
-<span id="cb24-543"><a href="#cb24-543" aria-label="515"></a></span>
-<span id="cb24-544"><a href="#cb24-544" aria-label="516"></a>Using gensim's dictionary and bag-of-words tools, you can build a corpus and compute similarity:</span>
+<span id="cb24-531"><a href="#cb24-531" aria-label="503"></a>stop_words <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">'english'</span>))</span>
+<span id="cb24-532"><a href="#cb24-532" aria-label="504"></a></span>
+<span id="cb24-533"><a href="#cb24-533" aria-label="505"></a><span class="kw">def</span> preprocess_document(text):</span>
+<span id="cb24-534"><a href="#cb24-534" aria-label="506"></a>    <span class="co">"""Tokenize, lowercase, and remove stopwords from a document."""</span></span>
+<span id="cb24-535"><a href="#cb24-535" aria-label="507"></a>    tokens <span class="op">=</span> simple_preprocess(text)  <span class="co"># Tokenize and lowercase</span></span>
+<span id="cb24-536"><a href="#cb24-536" aria-label="508"></a>    <span class="cf">return</span> [token <span class="cf">for</span> token <span class="kw">in</span> tokens <span class="cf">if</span> token <span class="kw">not</span> <span class="kw">in</span> stop_words]</span>
+<span id="cb24-537"><a href="#cb24-537" aria-label="509"></a></span>
+<span id="cb24-538"><a href="#cb24-538" aria-label="510"></a><span class="co"># Preprocess two versions of the ToS</span></span>
+<span id="cb24-539"><a href="#cb24-539" aria-label="511"></a>doc_v1 <span class="op">=</span> preprocess_document(results[<span class="dv">0</span>][<span class="st">"content"</span>])</span>
+<span id="cb24-540"><a href="#cb24-540" aria-label="512"></a>doc_v2 <span class="op">=</span> preprocess_document(results[<span class="op">-</span><span class="dv">1</span>][<span class="st">"content"</span>])</span>
+<span id="cb24-541"><a href="#cb24-541" aria-label="513"></a></span>
+<span id="cb24-542"><a href="#cb24-542" aria-label="514"></a><span class="bu">print</span>(<span class="ss">f"Version 1 tokens: </span><span class="sc">{</span><span class="bu">len</span>(doc_v1)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-543"><a href="#cb24-543" aria-label="515"></a><span class="bu">print</span>(<span class="ss">f"Version 2 tokens: </span><span class="sc">{</span><span class="bu">len</span>(doc_v2)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-544"><a href="#cb24-544" aria-label="516"></a><span class="in">```</span></span>
 <span id="cb24-545"><a href="#cb24-545" aria-label="517"></a></span>
-<span id="cb24-548"><a href="#cb24-548" aria-label="518"></a><span class="in">```{python}</span></span>
-<span id="cb24-549"><a href="#cb24-549" aria-label="519"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
-<span id="cb24-550"><a href="#cb24-550" aria-label="520"></a></span>
-<span id="cb24-551"><a href="#cb24-551" aria-label="521"></a><span class="co"># Build a dictionary mapping words to IDs</span></span>
-<span id="cb24-552"><a href="#cb24-552" aria-label="522"></a>documents <span class="op">=</span> [doc_v1, doc_v2]</span>
-<span id="cb24-553"><a href="#cb24-553" aria-label="523"></a>dictionary <span class="op">=</span> corpora.Dictionary(documents)</span>
-<span id="cb24-554"><a href="#cb24-554" aria-label="524"></a></span>
-<span id="cb24-555"><a href="#cb24-555" aria-label="525"></a><span class="co"># Convert documents to bag-of-words vectors</span></span>
-<span id="cb24-556"><a href="#cb24-556" aria-label="526"></a>corpus <span class="op">=</span> [dictionary.doc2bow(doc) <span class="cf">for</span> doc <span class="kw">in</span> documents]</span>
-<span id="cb24-557"><a href="#cb24-557" aria-label="527"></a></span>
-<span id="cb24-558"><a href="#cb24-558" aria-label="528"></a><span class="co"># Compute similarity</span></span>
-<span id="cb24-559"><a href="#cb24-559" aria-label="529"></a>index <span class="op">=</span> similarities.SparseMatrixSimilarity(corpus, num_features<span class="op">=</span><span class="bu">len</span>(dictionary))</span>
-<span id="cb24-560"><a href="#cb24-560" aria-label="530"></a>sims <span class="op">=</span> index[corpus[<span class="dv">0</span>]]</span>
-<span id="cb24-561"><a href="#cb24-561" aria-label="531"></a><span class="bu">print</span>(<span class="ss">f"Similarity between versions: </span><span class="sc">{</span>sims[<span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb24-562"><a href="#cb24-562" aria-label="532"></a><span class="co"># 1.0 = identical, 0.0 = completely different</span></span>
-<span id="cb24-563"><a href="#cb24-563" aria-label="533"></a><span class="in">```</span></span>
-<span id="cb24-564"><a href="#cb24-564" aria-label="534"></a></span>
-<span id="cb24-565"><a href="#cb24-565" aria-label="535"></a><span class="fu">### Visualizing Document Change Over Time</span></span>
+<span id="cb24-546"><a href="#cb24-546" aria-label="518"></a>Using gensim's dictionary and bag-of-words tools, you can build a corpus and compute similarity:</span>
+<span id="cb24-547"><a href="#cb24-547" aria-label="519"></a></span>
+<span id="cb24-550"><a href="#cb24-550" aria-label="520"></a><span class="in">```{python}</span></span>
+<span id="cb24-551"><a href="#cb24-551" aria-label="521"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
+<span id="cb24-552"><a href="#cb24-552" aria-label="522"></a></span>
+<span id="cb24-553"><a href="#cb24-553" aria-label="523"></a><span class="co"># Build a dictionary mapping words to IDs</span></span>
+<span id="cb24-554"><a href="#cb24-554" aria-label="524"></a>documents <span class="op">=</span> [doc_v1, doc_v2]</span>
+<span id="cb24-555"><a href="#cb24-555" aria-label="525"></a>dictionary <span class="op">=</span> corpora.Dictionary(documents)</span>
+<span id="cb24-556"><a href="#cb24-556" aria-label="526"></a></span>
+<span id="cb24-557"><a href="#cb24-557" aria-label="527"></a><span class="co"># Convert documents to bag-of-words vectors</span></span>
+<span id="cb24-558"><a href="#cb24-558" aria-label="528"></a>corpus <span class="op">=</span> [dictionary.doc2bow(doc) <span class="cf">for</span> doc <span class="kw">in</span> documents]</span>
+<span id="cb24-559"><a href="#cb24-559" aria-label="529"></a></span>
+<span id="cb24-560"><a href="#cb24-560" aria-label="530"></a><span class="co"># Compute similarity</span></span>
+<span id="cb24-561"><a href="#cb24-561" aria-label="531"></a>index <span class="op">=</span> similarities.SparseMatrixSimilarity(corpus, num_features<span class="op">=</span><span class="bu">len</span>(dictionary))</span>
+<span id="cb24-562"><a href="#cb24-562" aria-label="532"></a>sims <span class="op">=</span> index[corpus[<span class="dv">0</span>]]</span>
+<span id="cb24-563"><a href="#cb24-563" aria-label="533"></a><span class="bu">print</span>(<span class="ss">f"Similarity between versions: </span><span class="sc">{</span>sims[<span class="dv">1</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb24-564"><a href="#cb24-564" aria-label="534"></a><span class="co"># 1.0 = identical, 0.0 = completely different</span></span>
+<span id="cb24-565"><a href="#cb24-565" aria-label="535"></a><span class="in">```</span></span>
 <span id="cb24-566"><a href="#cb24-566" aria-label="536"></a></span>
-<span id="cb24-567"><a href="#cb24-567" aria-label="537"></a>The bag-of-words similarity measure tells you how similar two documents are, but plotting similarity between *consecutive* versions over time creates a "change timeline" — a visual record of when and how much a document evolved:</span>
+<span id="cb24-567"><a href="#cb24-567" aria-label="537"></a><span class="fu">### Visualizing Document Change Over Time</span></span>
 <span id="cb24-568"><a href="#cb24-568" aria-label="538"></a></span>
-<span id="cb24-571"><a href="#cb24-571" aria-label="539"></a><span class="in">```{python}</span></span>
-<span id="cb24-572"><a href="#cb24-572" aria-label="540"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
-<span id="cb24-573"><a href="#cb24-573" aria-label="541"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
-<span id="cb24-574"><a href="#cb24-574" aria-label="542"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
-<span id="cb24-575"><a href="#cb24-575" aria-label="543"></a></span>
-<span id="cb24-576"><a href="#cb24-576" aria-label="544"></a>stop_words <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">"english"</span>))</span>
+<span id="cb24-569"><a href="#cb24-569" aria-label="539"></a>The bag-of-words similarity measure tells you how similar two documents are, but plotting similarity between *consecutive* versions over time creates a "change timeline" — a visual record of when and how much a document evolved:</span>
+<span id="cb24-570"><a href="#cb24-570" aria-label="540"></a></span>
+<span id="cb24-573"><a href="#cb24-573" aria-label="541"></a><span class="in">```{python}</span></span>
+<span id="cb24-574"><a href="#cb24-574" aria-label="542"></a><span class="im">from</span> gensim <span class="im">import</span> corpora, similarities</span>
+<span id="cb24-575"><a href="#cb24-575" aria-label="543"></a><span class="im">from</span> gensim.utils <span class="im">import</span> simple_preprocess</span>
+<span id="cb24-576"><a href="#cb24-576" aria-label="544"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
 <span id="cb24-577"><a href="#cb24-577" aria-label="545"></a></span>
-<span id="cb24-578"><a href="#cb24-578" aria-label="546"></a><span class="co"># Preprocess all versions</span></span>
-<span id="cb24-579"><a href="#cb24-579" aria-label="547"></a>processed_docs <span class="op">=</span> []</span>
-<span id="cb24-580"><a href="#cb24-580" aria-label="548"></a><span class="cf">for</span> r <span class="kw">in</span> results:</span>
-<span id="cb24-581"><a href="#cb24-581" aria-label="549"></a>    <span class="cf">if</span> r <span class="kw">and</span> r.get(<span class="st">"content"</span>):</span>
-<span id="cb24-582"><a href="#cb24-582" aria-label="550"></a>        tokens <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> simple_preprocess(r[<span class="st">"content"</span>]) <span class="cf">if</span> t <span class="kw">not</span> <span class="kw">in</span> stop_words]</span>
-<span id="cb24-583"><a href="#cb24-583" aria-label="551"></a>        processed_docs.append(tokens)</span>
-<span id="cb24-584"><a href="#cb24-584" aria-label="552"></a></span>
-<span id="cb24-585"><a href="#cb24-585" aria-label="553"></a><span class="co"># Build dictionary and corpus</span></span>
-<span id="cb24-586"><a href="#cb24-586" aria-label="554"></a>dictionary <span class="op">=</span> corpora.Dictionary(processed_docs)</span>
-<span id="cb24-587"><a href="#cb24-587" aria-label="555"></a>corpus <span class="op">=</span> [dictionary.doc2bow(doc) <span class="cf">for</span> doc <span class="kw">in</span> processed_docs]</span>
-<span id="cb24-588"><a href="#cb24-588" aria-label="556"></a></span>
-<span id="cb24-589"><a href="#cb24-589" aria-label="557"></a><span class="co"># Compute similarity between consecutive versions</span></span>
-<span id="cb24-590"><a href="#cb24-590" aria-label="558"></a>change_scores <span class="op">=</span> []</span>
-<span id="cb24-591"><a href="#cb24-591" aria-label="559"></a>index <span class="op">=</span> similarities.SparseMatrixSimilarity(corpus, num_features<span class="op">=</span><span class="bu">len</span>(dictionary))</span>
-<span id="cb24-592"><a href="#cb24-592" aria-label="560"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(corpus)):</span>
-<span id="cb24-593"><a href="#cb24-593" aria-label="561"></a>    sim <span class="op">=</span> index[corpus[i<span class="op">-</span><span class="dv">1</span>]][i]</span>
-<span id="cb24-594"><a href="#cb24-594" aria-label="562"></a>    change_scores.append(<span class="dv">1</span> <span class="op">-</span> sim)  <span class="co"># Convert similarity to change score</span></span>
-<span id="cb24-595"><a href="#cb24-595" aria-label="563"></a></span>
-<span id="cb24-596"><a href="#cb24-596" aria-label="564"></a><span class="co"># Plot the change timeline</span></span>
-<span id="cb24-597"><a href="#cb24-597" aria-label="565"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
-<span id="cb24-598"><a href="#cb24-598" aria-label="566"></a>plt.plot(<span class="bu">range</span>(<span class="bu">len</span>(change_scores)), change_scores, marker<span class="op">=</span><span class="st">"o"</span>)</span>
-<span id="cb24-599"><a href="#cb24-599" aria-label="567"></a>plt.xlabel(<span class="st">"Version Transition"</span>)</span>
-<span id="cb24-600"><a href="#cb24-600" aria-label="568"></a>plt.ylabel(<span class="st">"Change Score (0 = identical, 1 = completely different)"</span>)</span>
-<span id="cb24-601"><a href="#cb24-601" aria-label="569"></a>plt.title(<span class="st">"Document Change Over Time"</span>)</span>
-<span id="cb24-602"><a href="#cb24-602" aria-label="570"></a>plt.tight_layout()</span>
-<span id="cb24-603"><a href="#cb24-603" aria-label="571"></a>plt.show()</span>
-<span id="cb24-604"><a href="#cb24-604" aria-label="572"></a><span class="in">```</span></span>
-<span id="cb24-605"><a href="#cb24-605" aria-label="573"></a></span>
-<span id="cb24-606"><a href="#cb24-606" aria-label="574"></a>Spikes in this timeline correspond to major revisions — a new Terms of Service policy, a site redesign, or a significant content update. By cross-referencing these spikes with real-world events (a data breach, a regulatory action, a public controversy), you can begin to tell a story about *why* the document changed, not just *that* it changed. This kind of temporal analysis is at the heart of longitudinal web research.</span>
+<span id="cb24-578"><a href="#cb24-578" aria-label="546"></a>stop_words <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">"english"</span>))</span>
+<span id="cb24-579"><a href="#cb24-579" aria-label="547"></a></span>
+<span id="cb24-580"><a href="#cb24-580" aria-label="548"></a><span class="co"># Preprocess all versions</span></span>
+<span id="cb24-581"><a href="#cb24-581" aria-label="549"></a>processed_docs <span class="op">=</span> []</span>
+<span id="cb24-582"><a href="#cb24-582" aria-label="550"></a><span class="cf">for</span> r <span class="kw">in</span> results:</span>
+<span id="cb24-583"><a href="#cb24-583" aria-label="551"></a>    <span class="cf">if</span> r <span class="kw">and</span> r.get(<span class="st">"content"</span>):</span>
+<span id="cb24-584"><a href="#cb24-584" aria-label="552"></a>        tokens <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> simple_preprocess(r[<span class="st">"content"</span>]) <span class="cf">if</span> t <span class="kw">not</span> <span class="kw">in</span> stop_words]</span>
+<span id="cb24-585"><a href="#cb24-585" aria-label="553"></a>        processed_docs.append(tokens)</span>
+<span id="cb24-586"><a href="#cb24-586" aria-label="554"></a></span>
+<span id="cb24-587"><a href="#cb24-587" aria-label="555"></a><span class="co"># Build dictionary and corpus</span></span>
+<span id="cb24-588"><a href="#cb24-588" aria-label="556"></a>dictionary <span class="op">=</span> corpora.Dictionary(processed_docs)</span>
+<span id="cb24-589"><a href="#cb24-589" aria-label="557"></a>corpus <span class="op">=</span> [dictionary.doc2bow(doc) <span class="cf">for</span> doc <span class="kw">in</span> processed_docs]</span>
+<span id="cb24-590"><a href="#cb24-590" aria-label="558"></a></span>
+<span id="cb24-591"><a href="#cb24-591" aria-label="559"></a><span class="co"># Compute similarity between consecutive versions</span></span>
+<span id="cb24-592"><a href="#cb24-592" aria-label="560"></a>change_scores <span class="op">=</span> []</span>
+<span id="cb24-593"><a href="#cb24-593" aria-label="561"></a>index <span class="op">=</span> similarities.SparseMatrixSimilarity(corpus, num_features<span class="op">=</span><span class="bu">len</span>(dictionary))</span>
+<span id="cb24-594"><a href="#cb24-594" aria-label="562"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(corpus)):</span>
+<span id="cb24-595"><a href="#cb24-595" aria-label="563"></a>    sim <span class="op">=</span> index[corpus[i<span class="op">-</span><span class="dv">1</span>]][i]</span>
+<span id="cb24-596"><a href="#cb24-596" aria-label="564"></a>    change_scores.append(<span class="dv">1</span> <span class="op">-</span> sim)  <span class="co"># Convert similarity to change score</span></span>
+<span id="cb24-597"><a href="#cb24-597" aria-label="565"></a></span>
+<span id="cb24-598"><a href="#cb24-598" aria-label="566"></a><span class="co"># Plot the change timeline</span></span>
+<span id="cb24-599"><a href="#cb24-599" aria-label="567"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb24-600"><a href="#cb24-600" aria-label="568"></a>plt.plot(<span class="bu">range</span>(<span class="bu">len</span>(change_scores)), change_scores, marker<span class="op">=</span><span class="st">"o"</span>)</span>
+<span id="cb24-601"><a href="#cb24-601" aria-label="569"></a>plt.xlabel(<span class="st">"Version Transition"</span>)</span>
+<span id="cb24-602"><a href="#cb24-602" aria-label="570"></a>plt.ylabel(<span class="st">"Change Score (0 = identical, 1 = completely different)"</span>)</span>
+<span id="cb24-603"><a href="#cb24-603" aria-label="571"></a>plt.title(<span class="st">"Document Change Over Time"</span>)</span>
+<span id="cb24-604"><a href="#cb24-604" aria-label="572"></a>plt.tight_layout()</span>
+<span id="cb24-605"><a href="#cb24-605" aria-label="573"></a>plt.show()</span>
+<span id="cb24-606"><a href="#cb24-606" aria-label="574"></a><span class="in">```</span></span>
 <span id="cb24-607"><a href="#cb24-607" aria-label="575"></a></span>
-<span id="cb24-608"><a href="#cb24-608" aria-label="576"></a>The change score visualization complements the CDX analysis from earlier in this chapter. CDX data tells you *how often* the page was captured and how its size changed; the change timeline tells you *how different* consecutive versions are from each other. Together, they create a multi-dimensional picture of a document's evolution. A page might be captured frequently but change very little (a stable, well-maintained site), or captured infrequently but show dramatic changes between captures (a site that undergoes periodic major overhauls).</span>
+<span id="cb24-608"><a href="#cb24-608" aria-label="576"></a>Spikes in this timeline correspond to major revisions — a new Terms of Service policy, a site redesign, or a significant content update. By cross-referencing these spikes with real-world events (a data breach, a regulatory action, a public controversy), you can begin to tell a story about *why* the document changed, not just *that* it changed. This kind of temporal analysis is at the heart of longitudinal web research.</span>
 <span id="cb24-609"><a href="#cb24-609" aria-label="577"></a></span>
-<span id="cb24-610"><a href="#cb24-610" aria-label="578"></a>You can also extend this approach beyond consecutive comparisons. Computing pairwise similarity between *all* versions produces a similarity matrix that you can visualize as a heatmap. Clusters of similar versions reveal stable periods; off-diagonal dissimilarities reveal turning points. For research on platform governance, these turning points often align with public controversies, regulatory actions, or leadership changes — patterns that would be invisible without longitudinal data.</span>
+<span id="cb24-610"><a href="#cb24-610" aria-label="578"></a>The change score visualization complements the CDX analysis from earlier in this chapter. CDX data tells you *how often* the page was captured and how its size changed; the change timeline tells you *how different* consecutive versions are from each other. Together, they create a multi-dimensional picture of a document's evolution. A page might be captured frequently but change very little (a stable, well-maintained site), or captured infrequently but show dramatic changes between captures (a site that undergoes periodic major overhauls).</span>
 <span id="cb24-611"><a href="#cb24-611" aria-label="579"></a></span>
-<span id="cb24-612"><a href="#cb24-612" aria-label="580"></a>The combination of the Wayback Machine's historical data with computational text analysis techniques creates a powerful research methodology. You are not just reading old web pages — you are measuring institutional behavior over time, producing evidence that can inform policy debates, academic research, and public accountability. This is precisely the kind of public interest data science that @sec-post-api describes.</span>
+<span id="cb24-612"><a href="#cb24-612" aria-label="580"></a>You can also extend this approach beyond consecutive comparisons. Computing pairwise similarity between *all* versions produces a similarity matrix that you can visualize as a heatmap. Clusters of similar versions reveal stable periods; off-diagonal dissimilarities reveal turning points. For research on platform governance, these turning points often align with public controversies, regulatory actions, or leadership changes — patterns that would be invisible without longitudinal data.</span>
 <span id="cb24-613"><a href="#cb24-613" aria-label="581"></a></span>
-<span id="cb24-614"><a href="#cb24-614" aria-label="582"></a>::: {.callout-tip}</span>
-<span id="cb24-615"><a href="#cb24-615" aria-label="583"></a><span class="fu">## Missing Manual Reference</span></span>
-<span id="cb24-616"><a href="#cb24-616" aria-label="584"></a>For more on data serialization formats including JSON, CSV, and pickle, see *Missing Manual* Chapter 20: Data File Formats.</span>
-<span id="cb24-617"><a href="#cb24-617" aria-label="585"></a>:::</span>
-<span id="cb24-618"><a href="#cb24-618" aria-label="586"></a></span>
-<span id="cb24-619"><a href="#cb24-619" aria-label="587"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb24-614"><a href="#cb24-614" aria-label="582"></a>The combination of the Wayback Machine's historical data with computational text analysis techniques creates a powerful research methodology. You are not just reading old web pages — you are measuring institutional behavior over time, producing evidence that can inform policy debates, academic research, and public accountability. This is precisely the kind of public interest data science that @sec-post-api describes.</span>
+<span id="cb24-615"><a href="#cb24-615" aria-label="583"></a></span>
+<span id="cb24-616"><a href="#cb24-616" aria-label="584"></a>::: {.callout-tip}</span>
+<span id="cb24-617"><a href="#cb24-617" aria-label="585"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb24-618"><a href="#cb24-618" aria-label="586"></a>For more on data serialization formats including JSON, CSV, and pickle, see *Missing Manual* Chapter 20: Data File Formats.</span>
+<span id="cb24-619"><a href="#cb24-619" aria-label="587"></a>:::</span>
 <span id="cb24-620"><a href="#cb24-620" aria-label="588"></a></span>
-<span id="cb24-621"><a href="#cb24-621" aria-label="589"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
+<span id="cb24-621"><a href="#cb24-621" aria-label="589"></a><span class="fu">## Recommended Exercises</span></span>
 <span id="cb24-622"><a href="#cb24-622" aria-label="590"></a></span>
-<span id="cb24-623"><a href="#cb24-623" aria-label="591"></a>You will reconstruct the archival history of one website you care about, then measure how much its earliest and latest captures differ.</span>
+<span id="cb24-623"><a href="#cb24-623" aria-label="591"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
 <span id="cb24-624"><a href="#cb24-624" aria-label="592"></a></span>
-<span id="cb24-625"><a href="#cb24-625" aria-label="593"></a>**Step 1 — Choose a page and query its history.** Pick a website that has existed for at least ten years (your high school, a news outlet, a company). Define your <span class="in">`HEADERS`</span> (@sec-ethics), then query the CDX Server API for its capture history, using the chapter's parameters: <span class="in">`output=json`</span>, <span class="in">`fl=timestamp,original,statuscode,length`</span>, filtering for status 200 and collapsing on digest. Remember from @sec-post-api that <span class="in">`archive.org`</span> answers 429 when busy — treat that as an outcome, wait, and retry.</span>
+<span id="cb24-625"><a href="#cb24-625" aria-label="593"></a>You will reconstruct the archival history of one website you care about, then measure how much its earliest and latest captures differ.</span>
 <span id="cb24-626"><a href="#cb24-626" aria-label="594"></a></span>
-<span id="cb24-629"><a href="#cb24-629" aria-label="595"></a><span class="in">```{python}</span></span>
-<span id="cb24-630"><a href="#cb24-630" aria-label="596"></a><span class="co"># Step 1: Query the CDX API for your chosen page's capture history.</span></span>
-<span id="cb24-631"><a href="#cb24-631" aria-label="597"></a><span class="co"># Handle a 429 by waiting and retrying rather than crashing.</span></span>
-<span id="cb24-632"><a href="#cb24-632" aria-label="598"></a><span class="co"># Your code here</span></span>
-<span id="cb24-633"><a href="#cb24-633" aria-label="599"></a><span class="in">```</span></span>
-<span id="cb24-634"><a href="#cb24-634" aria-label="600"></a></span>
-<span id="cb24-635"><a href="#cb24-635" aria-label="601"></a>**Step 2 — Build the capture DataFrame.** The first row of the response is the column headers. Build a DataFrame from the rest, convert <span class="in">`timestamp`</span> with <span class="in">`pd.to_datetime()`</span> (format <span class="in">`"%Y%m%d%H%M%S"`</span>), and convert <span class="in">`length`</span> to numeric. Print the date range and total number of captures.</span>
+<span id="cb24-627"><a href="#cb24-627" aria-label="595"></a>**Step 1 — Choose a page and query its history.** Pick a website that has existed for at least ten years (your high school, a news outlet, a company). Define your <span class="in">`HEADERS`</span> (@sec-ethics), then query the CDX Server API for its capture history, using the chapter's parameters: <span class="in">`output=json`</span>, <span class="in">`fl=timestamp,original,statuscode,length`</span>, filtering for status 200 and collapsing on digest. Remember from @sec-post-api that <span class="in">`archive.org`</span> answers 429 when busy — treat that as an outcome, wait, and retry.</span>
+<span id="cb24-628"><a href="#cb24-628" aria-label="596"></a></span>
+<span id="cb24-631"><a href="#cb24-631" aria-label="597"></a><span class="in">```{python}</span></span>
+<span id="cb24-632"><a href="#cb24-632" aria-label="598"></a><span class="co"># Step 1: Query the CDX API for your chosen page's capture history.</span></span>
+<span id="cb24-633"><a href="#cb24-633" aria-label="599"></a><span class="co"># Handle a 429 by waiting and retrying rather than crashing.</span></span>
+<span id="cb24-634"><a href="#cb24-634" aria-label="600"></a><span class="co"># Your code here</span></span>
+<span id="cb24-635"><a href="#cb24-635" aria-label="601"></a><span class="in">```</span></span>
 <span id="cb24-636"><a href="#cb24-636" aria-label="602"></a></span>
-<span id="cb24-639"><a href="#cb24-639" aria-label="603"></a><span class="in">```{python}</span></span>
-<span id="cb24-640"><a href="#cb24-640" aria-label="604"></a><span class="co"># Step 2: Build a DataFrame of captures with real datetimes and numeric lengths. Print the date range and capture count.</span></span>
-<span id="cb24-641"><a href="#cb24-641" aria-label="605"></a><span class="co"># Your code here</span></span>
-<span id="cb24-642"><a href="#cb24-642" aria-label="606"></a><span class="in">```</span></span>
-<span id="cb24-643"><a href="#cb24-643" aria-label="607"></a></span>
-<span id="cb24-644"><a href="#cb24-644" aria-label="608"></a>**Step 3 — Plot the archival record.** Make two plots: captures per year (a bar chart from grouping on the timestamp's year), and page size over time. Mark any visible gaps or jumps.</span>
+<span id="cb24-637"><a href="#cb24-637" aria-label="603"></a>**Step 2 — Build the capture DataFrame.** The first row of the response is the column headers. Build a DataFrame from the rest, convert <span class="in">`timestamp`</span> with <span class="in">`pd.to_datetime()`</span> (format <span class="in">`"%Y%m%d%H%M%S"`</span>), and convert <span class="in">`length`</span> to numeric. Print the date range and total number of captures.</span>
+<span id="cb24-638"><a href="#cb24-638" aria-label="604"></a></span>
+<span id="cb24-641"><a href="#cb24-641" aria-label="605"></a><span class="in">```{python}</span></span>
+<span id="cb24-642"><a href="#cb24-642" aria-label="606"></a><span class="co"># Step 2: Build a DataFrame of captures with real datetimes and numeric lengths. Print the date range and capture count.</span></span>
+<span id="cb24-643"><a href="#cb24-643" aria-label="607"></a><span class="co"># Your code here</span></span>
+<span id="cb24-644"><a href="#cb24-644" aria-label="608"></a><span class="in">```</span></span>
 <span id="cb24-645"><a href="#cb24-645" aria-label="609"></a></span>
-<span id="cb24-648"><a href="#cb24-648" aria-label="610"></a><span class="in">```{python}</span></span>
-<span id="cb24-649"><a href="#cb24-649" aria-label="611"></a><span class="co"># Step 3: Plot captures per year and page size over time.</span></span>
-<span id="cb24-650"><a href="#cb24-650" aria-label="612"></a><span class="co"># Your code here</span></span>
-<span id="cb24-651"><a href="#cb24-651" aria-label="613"></a><span class="in">```</span></span>
-<span id="cb24-652"><a href="#cb24-652" aria-label="614"></a></span>
-<span id="cb24-653"><a href="#cb24-653" aria-label="615"></a>**Step 4 — Retrieve two raw captures.** Take the earliest and the most recent capture. Fetch each snapshot with the <span class="in">`id_`</span> suffix on the timestamp — the chapter explains why the toolbar-wrapped version would poison your measurements — sleeping between requests, and cache both pages to local files as you did in @sec-static-pages.</span>
+<span id="cb24-646"><a href="#cb24-646" aria-label="610"></a>**Step 3 — Plot the archival record.** Make two plots: captures per year (a bar chart from grouping on the timestamp's year), and page size over time. Mark any visible gaps or jumps.</span>
+<span id="cb24-647"><a href="#cb24-647" aria-label="611"></a></span>
+<span id="cb24-650"><a href="#cb24-650" aria-label="612"></a><span class="in">```{python}</span></span>
+<span id="cb24-651"><a href="#cb24-651" aria-label="613"></a><span class="co"># Step 3: Plot captures per year and page size over time.</span></span>
+<span id="cb24-652"><a href="#cb24-652" aria-label="614"></a><span class="co"># Your code here</span></span>
+<span id="cb24-653"><a href="#cb24-653" aria-label="615"></a><span class="in">```</span></span>
 <span id="cb24-654"><a href="#cb24-654" aria-label="616"></a></span>
-<span id="cb24-657"><a href="#cb24-657" aria-label="617"></a><span class="in">```{python}</span></span>
-<span id="cb24-658"><a href="#cb24-658" aria-label="618"></a><span class="co"># Step 4: Fetch the earliest and latest captures with the id_ suffix, politely, and cache both to disk.</span></span>
-<span id="cb24-659"><a href="#cb24-659" aria-label="619"></a><span class="co"># Your code here</span></span>
-<span id="cb24-660"><a href="#cb24-660" aria-label="620"></a><span class="in">```</span></span>
-<span id="cb24-661"><a href="#cb24-661" aria-label="621"></a></span>
-<span id="cb24-662"><a href="#cb24-662" aria-label="622"></a>**Step 5 — Measure the change.** Extract the visible text of both cached captures with BeautifulSoup, preprocess each with the chapter's <span class="in">`preprocess_document()`</span> (tokenize, lowercase, remove stopwords), and compute the bag-of-words similarity between them.</span>
+<span id="cb24-655"><a href="#cb24-655" aria-label="617"></a>**Step 4 — Retrieve two raw captures.** Take the earliest and the most recent capture. Fetch each snapshot with the <span class="in">`id_`</span> suffix on the timestamp — the chapter explains why the toolbar-wrapped version would poison your measurements — sleeping between requests, and cache both pages to local files as you did in @sec-static-pages.</span>
+<span id="cb24-656"><a href="#cb24-656" aria-label="618"></a></span>
+<span id="cb24-659"><a href="#cb24-659" aria-label="619"></a><span class="in">```{python}</span></span>
+<span id="cb24-660"><a href="#cb24-660" aria-label="620"></a><span class="co"># Step 4: Fetch the earliest and latest captures with the id_ suffix, politely, and cache both to disk.</span></span>
+<span id="cb24-661"><a href="#cb24-661" aria-label="621"></a><span class="co"># Your code here</span></span>
+<span id="cb24-662"><a href="#cb24-662" aria-label="622"></a><span class="in">```</span></span>
 <span id="cb24-663"><a href="#cb24-663" aria-label="623"></a></span>
-<span id="cb24-666"><a href="#cb24-666" aria-label="624"></a><span class="in">```{python}</span></span>
-<span id="cb24-667"><a href="#cb24-667" aria-label="625"></a><span class="co"># Step 5: Extract text from both captures, preprocess, and compute their similarity.</span></span>
-<span id="cb24-668"><a href="#cb24-668" aria-label="626"></a><span class="co"># Your code here</span></span>
-<span id="cb24-669"><a href="#cb24-669" aria-label="627"></a><span class="in">```</span></span>
-<span id="cb24-670"><a href="#cb24-670" aria-label="628"></a></span>
-<span id="cb24-671"><a href="#cb24-671" aria-label="629"></a>**Step 6 — Interpret.** In four to six sentences: How thoroughly is your page archived, and were there gaps — years with few or no captures? What does the similarity score say about how much the page changed, and does skimming the two cached files agree? What would a researcher relying on this page's archival record need to be careful about (recall the chapter's warnings on capture-frequency bias)?</span>
+<span id="cb24-664"><a href="#cb24-664" aria-label="624"></a>**Step 5 — Measure the change.** Extract the visible text of both cached captures with BeautifulSoup, preprocess each with the chapter's <span class="in">`preprocess_document()`</span> (tokenize, lowercase, remove stopwords), and compute the bag-of-words similarity between them.</span>
+<span id="cb24-665"><a href="#cb24-665" aria-label="625"></a></span>
+<span id="cb24-668"><a href="#cb24-668" aria-label="626"></a><span class="in">```{python}</span></span>
+<span id="cb24-669"><a href="#cb24-669" aria-label="627"></a><span class="co"># Step 5: Extract text from both captures, preprocess, and compute their similarity.</span></span>
+<span id="cb24-670"><a href="#cb24-670" aria-label="628"></a><span class="co"># Your code here</span></span>
+<span id="cb24-671"><a href="#cb24-671" aria-label="629"></a><span class="in">```</span></span>
 <span id="cb24-672"><a href="#cb24-672" aria-label="630"></a></span>
-<span id="cb24-675"><a href="#cb24-675" aria-label="631"></a><span class="in">```{python}</span></span>
-<span id="cb24-676"><a href="#cb24-676" aria-label="632"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
-<span id="cb24-677"><a href="#cb24-677" aria-label="633"></a><span class="in">```</span></span>
-<span id="cb24-678"><a href="#cb24-678" aria-label="634"></a></span>
-<span id="cb24-679"><a href="#cb24-679" aria-label="635"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb24-673"><a href="#cb24-673" aria-label="631"></a>**Step 6 — Interpret.** In four to six sentences: How thoroughly is your page archived, and were there gaps — years with few or no captures? What does the similarity score say about how much the page changed, and does skimming the two cached files agree? What would a researcher relying on this page's archival record need to be careful about (recall the chapter's warnings on capture-frequency bias)?</span>
+<span id="cb24-674"><a href="#cb24-674" aria-label="632"></a></span>
+<span id="cb24-677"><a href="#cb24-677" aria-label="633"></a><span class="in">```{python}</span></span>
+<span id="cb24-678"><a href="#cb24-678" aria-label="634"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb24-679"><a href="#cb24-679" aria-label="635"></a><span class="in">```</span></span>
 <span id="cb24-680"><a href="#cb24-680" aria-label="636"></a></span>
-<span id="cb24-681"><a href="#cb24-681" aria-label="637"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
+<span id="cb24-681"><a href="#cb24-681" aria-label="637"></a><span class="fu">## Additional Exercises</span></span>
 <span id="cb24-682"><a href="#cb24-682" aria-label="638"></a></span>
-<span id="cb24-683"><a href="#cb24-683" aria-label="639"></a><span class="ss">1. </span>**Policy tracking.** Track the evolution of a policy document of your choice (a university's academic integrity policy, a company's privacy policy, or a government agency's FAQ page) over at least five time points using the Wayback Machine. Visualize how document length changes and identify periods of major revision.</span>
+<span id="cb24-683"><a href="#cb24-683" aria-label="639"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
 <span id="cb24-684"><a href="#cb24-684" aria-label="640"></a></span>
-<span id="cb24-685"><a href="#cb24-685" aria-label="641"></a><span class="ss">2. </span>**CDX analysis.** Use the CDX Server API to compare the snapshot frequency and page size trends for two competing organizations (e.g., two news outlets, two universities, or two tech companies). What does the capture frequency tell you about the organizations' web presence?</span>
+<span id="cb24-685"><a href="#cb24-685" aria-label="641"></a><span class="ss">1. </span>**Policy tracking.** Track the evolution of a policy document of your choice (a university's academic integrity policy, a company's privacy policy, or a government agency's FAQ page) over at least five time points using the Wayback Machine. Visualize how document length changes and identify periods of major revision.</span>
 <span id="cb24-686"><a href="#cb24-686" aria-label="642"></a></span>
-<span id="cb24-687"><a href="#cb24-687" aria-label="643"></a><span class="ss">3. </span>**Document similarity.** Compute pairwise document similarity across all versions of your tracked document from Exercise 1. Create a heatmap or matrix visualization. Which version transitions involved the largest changes?</span>
+<span id="cb24-687"><a href="#cb24-687" aria-label="643"></a><span class="ss">2. </span>**CDX analysis.** Use the CDX Server API to compare the snapshot frequency and page size trends for two competing organizations (e.g., two news outlets, two universities, or two tech companies). What does the capture frequency tell you about the organizations' web presence?</span>
 <span id="cb24-688"><a href="#cb24-688" aria-label="644"></a></span>
-<span id="cb24-689"><a href="#cb24-689" aria-label="645"></a><span class="ss">4. </span>**Government web archive.** Use the CDX Server API to analyze the archival history of a government website (e.g., a state legislature, a federal agency, or a city government). How frequently was the page captured? Are there gaps in coverage? How has the page size changed over time? Write a brief analysis of what the archival patterns reveal about the site's evolution.</span>
+<span id="cb24-689"><a href="#cb24-689" aria-label="645"></a><span class="ss">3. </span>**Document similarity.** Compute pairwise document similarity across all versions of your tracked document from Exercise 1. Create a heatmap or matrix visualization. Which version transitions involved the largest changes?</span>
 <span id="cb24-690"><a href="#cb24-690" aria-label="646"></a></span>
-<span id="cb24-691"><a href="#cb24-691" aria-label="647"></a></span>
-<span id="cb24-692"><a href="#cb24-692" aria-label="648"></a><span class="ss">5. </span>**Graduate extension (INFO 5617).** Either read the chapter on website history in @rogers2019doing and write a critical assessment connecting its archival methods to the techniques in this chapter, or use the CDX Server API to reconstruct the editorial evolution of a news organization's homepage across at least ten years, sampling snapshots at regular intervals. Whichever path you choose, produce a methods write-up that squarely addresses the limitations of Wayback data as a research source: the toolbar injection and link rewriting that the <span class="in">`id_`</span> suffix avoids, capture-frequency bias (heavily trafficked pages are archived far more often, so observed "change" is confounded with attention), and the gaps where no capture exists at all.</span>
+<span id="cb24-691"><a href="#cb24-691" aria-label="647"></a><span class="ss">4. </span>**Government web archive.** Use the CDX Server API to analyze the archival history of a government website (e.g., a state legislature, a federal agency, or a city government). How frequently was the page captured? Are there gaps in coverage? How has the page size changed over time? Write a brief analysis of what the archival patterns reveal about the site's evolution.</span>
+<span id="cb24-692"><a href="#cb24-692" aria-label="648"></a></span>
 <span id="cb24-693"><a href="#cb24-693" aria-label="649"></a></span>
-<span id="cb24-694"><a href="#cb24-694" aria-label="650"></a>::: {.callout-note}</span>
-<span id="cb24-695"><a href="#cb24-695" aria-label="651"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb24-696"><a href="#cb24-696" aria-label="652"></a>The Wayback Machine embodies the value of **ownership** discussed in @sec-post-api — it is collectively governed, freely accessible, and exists to preserve the web as a public resource. When platforms delete content, change their policies, or redesign their sites, the Wayback Machine often provides the only independent record of what existed before.</span>
-<span id="cb24-697"><a href="#cb24-697" aria-label="653"></a>:::</span>
-<span id="cb24-698"><a href="#cb24-698" aria-label="654"></a></span>
-<span id="cb24-699"><a href="#cb24-699" aria-label="655"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb24-694"><a href="#cb24-694" aria-label="650"></a><span class="ss">5. </span>**Graduate extension (INFO 5617).** Either read the chapter on website history in @rogers2019doing and write a critical assessment connecting its archival methods to the techniques in this chapter, or use the CDX Server API to reconstruct the editorial evolution of a news organization's homepage across at least ten years, sampling snapshots at regular intervals. Whichever path you choose, produce a methods write-up that squarely addresses the limitations of Wayback data as a research source: the toolbar injection and link rewriting that the <span class="in">`id_`</span> suffix avoids, capture-frequency bias (heavily trafficked pages are archived far more often, so observed "change" is confounded with attention), and the gaps where no capture exists at all.</span>
+<span id="cb24-695"><a href="#cb24-695" aria-label="651"></a></span>
+<span id="cb24-696"><a href="#cb24-696" aria-label="652"></a>::: {.callout-note}</span>
+<span id="cb24-697"><a href="#cb24-697" aria-label="653"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb24-698"><a href="#cb24-698" aria-label="654"></a>The Wayback Machine embodies the value of **ownership** discussed in @sec-post-api — it is collectively governed, freely accessible, and exists to preserve the web as a public resource. When platforms delete content, change their policies, or redesign their sites, the Wayback Machine often provides the only independent record of what existed before.</span>
+<span id="cb24-699"><a href="#cb24-699" aria-label="655"></a>:::</span>
 <span id="cb24-700"><a href="#cb24-700" aria-label="656"></a></span>
-<span id="cb24-701"><a href="#cb24-701" aria-label="657"></a>Brewster Kahle founded the Internet Archive with the vision of creating a "library of everything" — a comprehensive, freely accessible archive of human knowledge. The Wayback Machine, launched in 2001, has become indispensable for journalists investigating corporate claims, lawyers establishing timelines of events, and researchers conducting longitudinal studies of online content.</span>
+<span id="cb24-701"><a href="#cb24-701" aria-label="657"></a><span class="fu">## Social History and Public Interest</span></span>
 <span id="cb24-702"><a href="#cb24-702" aria-label="658"></a></span>
-<span id="cb24-703"><a href="#cb24-703" aria-label="659"></a>The Internet Archive is a nonprofit that serves more than a trillion archived pages free of charge, and the Wayback Machine is often slow: it regularly answers with <span class="in">`502 Bad Gateway`</span> or a "Temporarily Offline" notice. The Archive has also weathered deliberate attacks and lawsuits. In October 2024, a data breach exposed the records of about 31 million users, and a wave of distributed denial-of-service attacks knocked the Archive offline until the Wayback Machine resumed, read-only, on October 13. In *Hachette v. Internet Archive*, a federal appeals court ruled against the Archive's lending of scanned books in 2024, and in September 2025 the Archive settled a lawsuit in which major record labels had sought up to $621 million over its digitized 78 rpm records. Its continued operation depends on the support of its users and donors.</span>
+<span id="cb24-703"><a href="#cb24-703" aria-label="659"></a>Brewster Kahle founded the Internet Archive with the vision of creating a "library of everything" — a comprehensive, freely accessible archive of human knowledge. The Wayback Machine, launched in 2001, has become indispensable for journalists investigating corporate claims, lawyers establishing timelines of events, and researchers conducting longitudinal studies of online content.</span>
 <span id="cb24-704"><a href="#cb24-704" aria-label="660"></a></span>
-<span id="cb24-705"><a href="#cb24-705" aria-label="661"></a>Journalists have been among the most creative users of the Wayback Machine. When politicians delete social media posts or companies quietly change their terms of service, archived versions provide accountability. Legal teams use archived web pages as evidence in intellectual property disputes, contract disagreements, and regulatory investigations — establishing what a website said on a specific date can be the difference between winning and losing a case. Researchers in fields from political science to public health use longitudinal snapshots to study how organizations communicate about crises, how policy language evolves, and how online communities form and fragment over time.</span>
+<span id="cb24-705"><a href="#cb24-705" aria-label="661"></a>The Internet Archive is a nonprofit that serves more than a trillion archived pages free of charge, and the Wayback Machine is often slow: it regularly answers with <span class="in">`502 Bad Gateway`</span> or a "Temporarily Offline" notice. The Archive has also weathered deliberate attacks and lawsuits. In October 2024, a data breach exposed the records of about 31 million users, and a wave of distributed denial-of-service attacks knocked the Archive offline until the Wayback Machine resumed, read-only, on October 13. In *Hachette v. Internet Archive*, a federal appeals court ruled against the Archive's lending of scanned books in 2024, and in September 2025 the Archive settled a lawsuit in which major record labels had sought up to $621 million over its digitized 78 rpm records. Its continued operation depends on the support of its users and donors.</span>
 <span id="cb24-706"><a href="#cb24-706" aria-label="662"></a></span>
-<span id="cb24-707"><a href="#cb24-707" aria-label="663"></a>The Internet Archive's work also raises fundamental questions about the right to be forgotten versus the public's right to know. The European Union's GDPR includes provisions allowing individuals to request deletion of personal data, which can conflict with the archival mission. Some organizations have requested that the Wayback Machine remove their content. These tensions mirror the broader conflicts between openness, oversight, and ownership that @sec-post-api explores — the same data that enables accountability can also enable surveillance, and the infrastructure that preserves public knowledge can also preserve content that individuals wish to retract.</span>
+<span id="cb24-707"><a href="#cb24-707" aria-label="663"></a>Journalists have been among the most creative users of the Wayback Machine. When politicians delete social media posts or companies quietly change their terms of service, archived versions provide accountability. Legal teams use archived web pages as evidence in intellectual property disputes, contract disagreements, and regulatory investigations — establishing what a website said on a specific date can be the difference between winning and losing a case. Researchers in fields from political science to public health use longitudinal snapshots to study how organizations communicate about crises, how policy language evolves, and how online communities form and fragment over time.</span>
 <span id="cb24-708"><a href="#cb24-708" aria-label="664"></a></span>
-<span id="cb24-709"><a href="#cb24-709" aria-label="665"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb24-709"><a href="#cb24-709" aria-label="665"></a>The Internet Archive's work also raises fundamental questions about the right to be forgotten versus the public's right to know. The European Union's GDPR includes provisions allowing individuals to request deletion of personal data, which can conflict with the archival mission. Some organizations have requested that the Wayback Machine remove their content. These tensions mirror the broader conflicts between openness, oversight, and ownership that @sec-post-api explores — the same data that enables accountability can also enable surveillance, and the infrastructure that preserves public knowledge can also preserve content that individuals wish to retract.</span>
 <span id="cb24-710"><a href="#cb24-710" aria-label="666"></a></span>
-<span id="cb24-711"><a href="#cb24-711" aria-label="667"></a><span class="ss">- </span>**Wayback Machine rate limiting**: Space your requests with <span class="in">`time.sleep()`</span>. The service is free and community-maintained; do not abuse it.</span>
-<span id="cb24-712"><a href="#cb24-712" aria-label="668"></a><span class="ss">- </span>**`502 Bad Gateway`, "Temporarily Offline," or dropped connections**: These usually mean the Archive is overloaded, not that your code is wrong. Wait 30 to 90 seconds, retry, and slow your request rate; the retrying session from @sec-protocols handles this if you give it a longer <span class="in">`backoff_factor`</span>. While this chapter's screenshots were being made in September 2026, roughly half of the first requests to the Archive failed this way and then succeeded on a retry.</span>
-<span id="cb24-713"><a href="#cb24-713" aria-label="669"></a><span class="ss">- </span>**Incomplete archived pages**: Many snapshots are missing CSS, images, or JavaScript-rendered content. The text content is usually preserved, but visual rendering may be broken. Open **About this capture** to see when each embedded file was saved, and the Network tab (@sec-protocols) to see which files failed to load.</span>
-<span id="cb24-714"><a href="#cb24-714" aria-label="670"></a><span class="ss">- </span>**CDX data inconsistencies**: Some entries may have missing fields or redirect status codes instead of actual content. Filter your data carefully.</span>
-<span id="cb24-715"><a href="#cb24-715" aria-label="671"></a><span class="ss">- </span>**NLTK download errors**: Run <span class="in">`nltk.download('stopwords')`</span> once in a fresh Python session to download the stopwords corpus.</span>
-<span id="cb24-716"><a href="#cb24-716" aria-label="672"></a></span>
-<span id="cb24-717"><a href="#cb24-717" aria-label="673"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb24-711"><a href="#cb24-711" aria-label="667"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb24-712"><a href="#cb24-712" aria-label="668"></a></span>
+<span id="cb24-713"><a href="#cb24-713" aria-label="669"></a><span class="ss">- </span>**Wayback Machine rate limiting**: Space your requests with <span class="in">`time.sleep()`</span>. The service is free and community-maintained; do not abuse it.</span>
+<span id="cb24-714"><a href="#cb24-714" aria-label="670"></a><span class="ss">- </span>**`502 Bad Gateway`, "Temporarily Offline," or dropped connections**: These usually mean the Archive is overloaded, not that your code is wrong. Wait 30 to 90 seconds, retry, and slow your request rate; the retrying session from @sec-protocols handles this if you give it a longer <span class="in">`backoff_factor`</span>. While this chapter's screenshots were being made in September 2026, roughly half of the first requests to the Archive failed this way and then succeeded on a retry.</span>
+<span id="cb24-715"><a href="#cb24-715" aria-label="671"></a><span class="ss">- </span>**Incomplete archived pages**: Many snapshots are missing CSS, images, or JavaScript-rendered content. The text content is usually preserved, but visual rendering may be broken. Open **About this capture** to see when each embedded file was saved, and the Network tab (@sec-protocols) to see which files failed to load.</span>
+<span id="cb24-716"><a href="#cb24-716" aria-label="672"></a><span class="ss">- </span>**CDX data inconsistencies**: Some entries may have missing fields or redirect status codes instead of actual content. Filter your data carefully.</span>
+<span id="cb24-717"><a href="#cb24-717" aria-label="673"></a><span class="ss">- </span>**NLTK download errors**: Run <span class="in">`nltk.download('stopwords')`</span> once in a fresh Python session to download the stopwords corpus.</span>
 <span id="cb24-718"><a href="#cb24-718" aria-label="674"></a></span>
-<span id="cb24-719"><a href="#cb24-719" aria-label="675"></a>The web is not permanent, and the Wayback Machine is your most important tool for longitudinal web research. Explore it by hand before you query it: the calendar shows which captures exist and what status each one returned, **About this capture** shows how a replayed page was assembled, and the Inspector shows what the archive added. The Availability API finds specific snapshots; the CDX Server enumerates the full history; and BeautifulSoup parses archived pages just like current ones, as long as you request them with <span class="in">`id_`</span>. Document similarity techniques give you quantitative tools for measuring change over time. Always serialize your scraped data — you may not be able to re-scrape it later, and the page you studied today may be gone tomorrow.</span>
+<span id="cb24-719"><a href="#cb24-719" aria-label="675"></a><span class="fu">## Key Takeaways</span></span>
 <span id="cb24-720"><a href="#cb24-720" aria-label="676"></a></span>
-<span id="cb24-721"><a href="#cb24-721" aria-label="677"></a><span class="fu">## Further Reading</span></span>
+<span id="cb24-721"><a href="#cb24-721" aria-label="677"></a>The web is not permanent, and the Wayback Machine is your most important tool for longitudinal web research. Explore it by hand before you query it: the calendar shows which captures exist and what status each one returned, **About this capture** shows how a replayed page was assembled, and the Inspector shows what the archive added. The Availability API finds specific snapshots; the CDX Server enumerates the full history; and BeautifulSoup parses archived pages just like current ones, as long as you request them with <span class="in">`id_`</span>. Document similarity techniques give you quantitative tools for measuring change over time. Always serialize your scraped data — you may not be able to re-scrape it later, and the page you studied today may be gone tomorrow.</span>
 <span id="cb24-722"><a href="#cb24-722" aria-label="678"></a></span>
-<span id="cb24-723"><a href="#cb24-723" aria-label="679"></a><span class="ss">- </span>Using the Wayback Machine (Internet Archive Help Center): <span class="ot">&lt;https://help.archive.org/help/using-the-wayback-machine/&gt;</span></span>
-<span id="cb24-724"><a href="#cb24-724" aria-label="680"></a><span class="ss">- </span>Internet Archive Wayback Machine APIs: <span class="ot">&lt;https://archive.org/help/wayback_api.php&gt;</span></span>
-<span id="cb24-725"><a href="#cb24-725" aria-label="681"></a><span class="ss">- </span>CDX Server API: <span class="ot">&lt;https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server&gt;</span></span>
-<span id="cb24-726"><a href="#cb24-726" aria-label="682"></a><span class="ss">- </span>gensim documentation: <span class="ot">&lt;https://radimrehurek.com/gensim/&gt;</span></span>
-<span id="cb24-727"><a href="#cb24-727" aria-label="683"></a><span class="ss">- </span>End of Term Web Archive: <span class="ot">&lt;https://eotarchive.org/&gt;</span></span>
-<span id="cb24-728"><a href="#cb24-728" aria-label="684"></a><span class="ss">- </span>@rogers2019doing — Chapter on web historiography</span>
-<span id="cb24-729"><a href="#cb24-729" aria-label="685"></a><span class="ss">- </span>@arora2016using — A methods guide to mining archived websites for social science research</span>
+<span id="cb24-723"><a href="#cb24-723" aria-label="679"></a><span class="fu">## Further Reading</span></span>
+<span id="cb24-724"><a href="#cb24-724" aria-label="680"></a></span>
+<span id="cb24-725"><a href="#cb24-725" aria-label="681"></a><span class="ss">- </span>Using the Wayback Machine (Internet Archive Help Center): <span class="ot">&lt;https://help.archive.org/help/using-the-wayback-machine/&gt;</span></span>
+<span id="cb24-726"><a href="#cb24-726" aria-label="682"></a><span class="ss">- </span>Internet Archive Wayback Machine APIs: <span class="ot">&lt;https://archive.org/help/wayback_api.php&gt;</span></span>
+<span id="cb24-727"><a href="#cb24-727" aria-label="683"></a><span class="ss">- </span>CDX Server API: <span class="ot">&lt;https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server&gt;</span></span>
+<span id="cb24-728"><a href="#cb24-728" aria-label="684"></a><span class="ss">- </span>gensim documentation: <span class="ot">&lt;https://radimrehurek.com/gensim/&gt;</span></span>
+<span id="cb24-729"><a href="#cb24-729" aria-label="685"></a><span class="ss">- </span>End of Term Web Archive: <span class="ot">&lt;https://eotarchive.org/&gt;</span></span>
+<span id="cb24-730"><a href="#cb24-730" aria-label="686"></a><span class="ss">- </span>@rogers2019doing — Chapter on web historiography</span>
+<span id="cb24-731"><a href="#cb24-731" aria-label="687"></a><span class="ss">- </span>@arora2016using — A methods guide to mining archived websites for social science research</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
