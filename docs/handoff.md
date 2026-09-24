@@ -27,7 +27,7 @@ The maintainer lifted the pause on 2026-09-24 ([`decisions.md`](decisions.md)).
 | Item | What to decide |
 |---|---|
 | AAR P0-2 | The policy and its text are in place. Still open: enable the permission rule that denies force-pushes (untested; test it first), and turn on GitHub's "Automatically delete head branches" in both repositories. |
-| AAR P0-3 | The "done" rule is in place. Still open: effect tests for the DevTools layout preferences. This is mechanical work, due before the next toolkit change. |
+| AAR P0-3 | Done once the read-back pull request merges: every setting the toolkit sends to Chrome or DevTools is read back, and the selftest checks each one. |
 | AAR P1-1 | Add the `shots-check` CI workflow, which runs only on pull requests that change images. |
 | AAR P1-3 | Fix the review skill's session collector. This belongs to whoever maintains the skill, not this repository. |
 | Computed outputs | The four questions in the plan's §9. |
@@ -41,7 +41,10 @@ The maintainer lifted the pause on 2026-09-24 ([`decisions.md`](decisions.md)).
   - The course repository, closed without merging: `claude/swartz-ca-frames` (#23). Delete it only if #23 won't be revived. GitHub can restore it from the closed pull request.
   - Keep `main`, `gh-pages`, every branch with an open pull request (students' included), and the course session's branch, `claude/info-4617-fall-2026-syllabus-07ahb8`.
 - **Course CI.** On course #51, the week-7 and week-8 deck builds sat in "Install TeX Live" (apt) for more than 30 minutes. That pull request changed neither deck, and it merged at the maintainer's instruction. The build on `main` after the merge passed. If the stall recurs, cache the TeX install or build inside a TeX Live container.
-- **Toolkit.** Three of the eight settings the toolkit sends to Chrome or DevTools have tests that read the effect back. The DevTools layout preferences have none (AAR P0-3). M4, counts in captions checked against recorded queries, is still planned.
+- **Toolkit.**
+  - Every setting the toolkit sends to Chrome or DevTools is read back (`tools/shots/README.md`, "Headed figures").
+  - Headed captures run with `--disable-infobars`, and a guard fails any take with an infobar. The one figure allowed to keep Chrome for Testing's notice is ch-08's `selenium-chrome-for-testing`, because the notice is its subject; the same goes for week 8's `selenium_browser.png`.
+  - M4, which checks counts in captions against recorded queries, is still planned.
 
 ## Hands off
 

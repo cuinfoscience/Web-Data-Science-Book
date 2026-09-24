@@ -18,6 +18,10 @@ figures:
   - id: view-source-js
     kind: capture
     section: "Check 1: View Source"
+    brief: >-
+      Show that the page's source has no quote markup, yet the quotes are there, in
+      a script, as `var data = [...]`. From the top of the source through line 43:
+      the header, the script tags, and the first quote object, and nothing below.
     url: view-source:https://quotes.toscrape.com/js/
     mode: headed
     window: [1100, 1000]
@@ -32,6 +36,11 @@ figures:
   - id: javascript-off-on
     kind: capture
     section: "Check 2: Turn JavaScript Off"
+    brief: >-
+      Show the same page with JavaScript off and on, side by side and labeled: off
+      has only the title, Login, Next, and the footer; on has the quotes. The
+      lesson is the empty page beside the full one, so its words need not be
+      legible.
     url: https://quotes.toscrape.com/js/
     mode: composite     # the page with JavaScript off, then on, side by side, labeled
     window: [900, 695]
@@ -50,10 +59,17 @@ figures:
   - id: network-tab-json
     kind: capture
     section: "Check 3: Watch the Network Tab"
+    brief: >-
+      Show the JSON a scrolling page loads: the Network tab filtered to Fetch/XHR
+      after three scrolls, listing quotes?page=1 through page=4, with page 2's
+      Preview open to its first quote (author, tags, text). DevTools alone; the
+      page adds nothing here.
     url: https://quotes.toscrape.com/scroll
     mode: headed
-    window: [1680, 1000]
-    devtools: {dock: right, panel: network}
+    # DevTools alone, 800×600, as ch-05's network-headers: a 1000-pixel window lets docked
+    # DevTools be 600 tall, and the crop keeps only DevTools. The page scrolls out of view.
+    window: [800, 1000]
+    devtools: {dock: bottom, size: 600, zoom: 1.25, panel: network, overview: false}
     steps:
       - wait: {text: 'Albert Einstein'}
       - devtools_click: {text: '^Fetch/XHR$'}
@@ -69,19 +85,23 @@ figures:
       # Open the quotes array and its first quote, as the chapter's figure does.
       - devtools_click: {text: '^quotes\s*:', at: [0.03, 0.5]}
       - devtools_click: {text: '^0\s*:', at: [0.05, 0.5]}
-    crop: {top: 0, height: 680}
+    crop: {devtools: true}
     drifts: false
-    legacy:
-      captured: 2026-09-22
-      method: Chrome for Testing 154 driven by Selenium 4.49, headed on Xvfb, DevTools docked right and operated with real clicks (xdotool), grabbed with ImageMagick import
-      note: After scrolling, the Fetch/XHR filter lists quotes?page=1 to page=4; Preview shows page 2's JSON.
 
   - id: selenium-chrome-for-testing
     kind: capture
     section: "Setting Up Selenium"
+    brief: >-
+      Show the window webdriver.Chrome() opens on a machine with no Chrome, after
+      Selenium Manager downloaded Chrome for Testing. Its "only for automated
+      testing" bar is the point, so this is the one figure that keeps it. Any
+      page will do; xkcd is the page the chapter's lab uses.
     url: https://xkcd.com/
     mode: headed        # the subject is the window Selenium opens, including its automation bar
     engine: selenium
+    # The one figure that keeps Chrome for Testing's "only for automated testing" notice: the
+    # caption and alt text point at it. When the selenium engine arrives, it expects the bar.
+    expect: {infobar: true}
     drifts: true        # xkcd's current comic and the browser version
     legacy:
       captured: 2026-09-22
@@ -91,23 +111,33 @@ figures:
   - id: xkcd-inspect
     kind: capture
     section: "Extracting Data"
+    brief: >-
+      Show where the comic's hover joke and name live: the Elements tree with the
+      comic's <img> selected inside div#comic, its title and alt attributes
+      wrapped in full, down to the breadcrumb bar. Leave out the page and the
+      Styles pane.
     url: https://xkcd.com/
     mode: headed
-    window: [1680, 1000]
-    devtools: {dock: right, panel: elements}
+    # DevTools alone, 800×600, as network-tab-json: the Elements tree gets the whole width,
+    # so the selected <img> row shows its title and alt attributes wrapped in full.
+    window: [800, 1000]
+    devtools: {dock: bottom, size: 600, zoom: 1.25, layout: stacked, sidebar: 1}
     steps:
       - wait: {selector: '#comic img'}
       - inspect: {selector: '#comic img', selects: '^<img'}
-    crop: {window: true}
+    # DevTools starts 600 pixels up a 1000-pixel window. 530 keeps the breadcrumb bar, the
+    # <img>'s path, and stops above the Styles pane that DevTools won't hide.
+    crop: {top: 400, height: 530}
     drifts: true
-    legacy:
-      captured: 2026-09-22
-      method: Chrome for Testing 154, headed on Xvfb, right-click > Inspect on the comic with real clicks (xdotool), DevTools docked right, grabbed with ImageMagick import
-      note: The selected img has the hover joke in its title attribute and the comic's name in alt.
 
   - id: playwright-codegen
     kind: capture
     section: "Recording a Script with Codegen"
+    brief: >-
+      Show codegen turning clicks into code: the recording browser on the left,
+      after two clicks (the tag "change", then an "(about)" link), with the
+      locator tooltip over the author's name; the Inspector on the right with
+      the Python it wrote.
     url: https://quotes.toscrape.com/
     mode: headed        # two windows: the browser and the Playwright Inspector
     engine: codegen

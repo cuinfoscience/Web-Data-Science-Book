@@ -203,6 +203,8 @@ def capture(browser, fig, pacer, say=print):
             png = failed
         take = _log(fig, png, problems, status, result["final_url"], label, result["clip"], attempts)
         take.update(anchors=result["anchors"], text=result["text"])
+        # Headed takes: the browser's bars above the page, and what DevTools drew (read back).
+        take.update({k: result[k] for k in ("bars", "devtools_seen") if result.get(k) is not None})
         _write(take, png)
         if problems and result["temporary"] and n < fig["retries"]:
             say(f"    attempt {n + 1}: {'; '.join(problems)}; will retry")
