@@ -29,6 +29,7 @@
 - **Course repository.**
   - Course #55 is merged: week 4's figures for the RSS handout and slides, Jupyter in week 1's setup, and `AUTHORING.md`'s notes on copies and the field notes.
   - Course #57 is merged: copies of chapters 1 and 2's figures, offered to week 1's setup handout and week 2's deck; neither changed.
+  - Course #58 pairs with this note's pull request: copies of chapter 3's figures, offered to week 3's deck, which didn't change, and `make_stubs.py`'s markers in weeks 2 and 3's `IMAGES.md`.
   - Course #56 is merged. It adds the roadmap for the Friday code review (`docs/plans/2026-09-24-friday-code-review.md`) and the merge rule in the revision framework, the pull request walkthrough, and week 4's FAQ. It also puts Python 3.14 in week 1's setup and gensim from conda-forge in week 7's deck.
 
 ## Next
