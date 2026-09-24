@@ -1,0 +1,118 @@
+# Recipes for Chapter 1's figures (ch-01-introduction.qmd). See tools/shots/README.md.
+#
+# The second chapter of the back-fill after the chapter 5 pilot
+# (docs/plans/2026-09-24-screenshot-backfill-ch01-05.md, §4).
+#
+# The Jupyter figures need a real Jupyter server on this machine, set up with
+# the chapter's own commands, and the chapter's companion notebook in its folder.
+# images/ch-01/IMAGES.md has the commands; in short:
+#
+#   conda create -n webdata python=3.14 && conda activate webdata
+#   pip install notebook requests beautifulsoup4 pandas matplotlib seaborn
+#   cp notebooks/ch-01-introduction.ipynb <folder>/     (regenerated first)
+#   cd <folder> && jupyter notebook --no-browser --ip=127.0.0.1 --port=8888 \
+#       --IdentityProvider.token='' --ServerApp.password=''
+#
+# No token, so the address holds no secret, and the server listens only on this
+# machine. Before each take of jupyter-cells, close the notebook's kernel
+# session, so the cell's prompt reads [1].
+#
+# Left out: figure 1-4, the pageviews API's JSON in Chrome. On 2026-09-24
+# Wikimedia's REST API answered this cloud session's address with 429 ("You are
+# making too many requests to the API") on the first request, and again that
+# evening: the limit counts everyone who shares the address. images/ch-01/IMAGES.md
+# keeps its draft recipe, to capture from another network.
+chapter: ch-01
+qmd: ch-01-introduction.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: jupyter-new-menu
+    kind: capture
+    section: "Jupyter Notebooks"
+    brief: >-
+      Show where a notebook comes from: Jupyter's file list as it opens in the
+      browser, with the chapter's companion notebook in it (marker 1) and the
+      New menu open (2) at its first item, Python 3 (ipykernel) (3), which makes
+      a new notebook. Jupyter Notebook 7 names the kernel there, not "Notebook",
+      so the chapter says so. Leave out the empty rows below the file.
+    url: http://localhost:8888/tree
+    window: [824, 600]
+    oversize: "at 800 pixels wide, Jupyter's New menu runs 15 pixels past the window's edge"
+    steps:
+      - wait: {text: '^ch-01-introduction\.ipynb$'}
+      - click: {selector: '[data-jp-item-name="new-dropdown"] .lm-MenuBar-item'}
+      - wait: {selector: '.lm-Menu .lm-Menu-item'}
+    expect:
+      text: ['Python 3 \(ipykernel\)']
+    crop: {top: 0, height: 300}
+    annotate:
+      marks:
+        - {n: 1, at: {text: '^ch-01-introduction\.ipynb$'}}
+        - {n: 2, at: {selector: '[data-jp-item-name="new-dropdown"]'}, side: above}
+        - {n: 3, at: {selector: '.lm-Menu .lm-Menu-item', nth: 0}, side: left}
+    drifts: true        # the file's age, and Jupyter's look from version to version
+
+  - id: jupyter-cells
+    kind: capture
+    section: "Jupyter Notebooks"
+    brief: >-
+      Show a notebook's two kinds of cell, in the chapter's companion notebook:
+      a Markdown cell holding the chapter's paragraph on cells (marker 1), and
+      under it the first code cell, run, with its prompt [1]: (2) and its output,
+      "Hello, web data science!" (3). The kernel's name, Python 3 (ipykernel),
+      is at the toolbar's right end (4). Keep Jupyter's title, menus, and
+      toolbar; leave out the cells below the one that ran.
+    url: http://localhost:8888/notebooks/ch-01-introduction.ipynb
+    steps:
+      - wait: {selector: '.jp-CodeCell'}
+      - click: {selector: '.jp-CodeCell:has-text("Hello, web data science!") .jp-InputPrompt'}
+      - press: 'Control+Enter'          # runs the cell and leaves it selected
+      - wait: {selector: '.jp-OutputArea-output'}
+      # Jupyter scrolls its notebook panel, not the window. At 350 the panel's
+      # first line of text leaves room under the kernel's name for marker 4.
+      - scroll: {selector: '.jp-CodeCell:has-text("Hello, web data science!")', offset: 350,
+                 within: '.jp-WindowedPanel-outer'}
+      - wait: {selector: '.jp-RenderedMarkdown p:has-text("A notebook consists of cells")'}
+    expect:
+      text: ['Hello, web data science!', 'Python 3 \(ipykernel\)']
+    crop: {top: 0, height: 453}   # to the bottom of the code cell's frame
+    annotate:
+      marks:
+        # A text pattern would also match the Markdown cell's hidden source editor.
+        - {n: 1, at: {selector: '.jp-RenderedMarkdown p:has-text("A notebook consists of cells")'}, side: left}
+        - {n: 2, at: {selector: '.jp-CodeCell:has-text("Hello, web data science!") .jp-InputPrompt', box: text}, side: left}
+        # The <pre> itself: a range over its wrapper includes the <pre>'s full-width box.
+        - {n: 3, at: {selector: '.jp-OutputArea-output pre', box: text}}
+        - {n: 4, at: {selector: '.jp-KernelName', box: text}, side: below}
+    drifts: true        # "Last Checkpoint", and Jupyter's look from version to version
+
+  - id: article-view-source
+    kind: capture
+    section: "Meet `requests`"
+    brief: >-
+      Show the sentence "instead of rendering the reply, it hands the whole
+      thing to you": the chapter's Wikipedia article as Chrome draws it, beside
+      View Source of the same address, the HTML that requests.get() returns in
+      response.text. The title on the left is the <title> line on the right.
+      Labeled "What you see" and "What requests gets". Each side is 370 pixels
+      wide, so the pair fits 800×600 and its text stays legible.
+    url: https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
+    mode: composite
+    window: [370, 520]
+    parts:
+      - label: What you see
+        steps: [{wait: {selector: '#firstHeading'}}]
+        crop: {top: 0, height: 512}      # as tall as the source beside it
+      - label: What requests gets
+        url: view-source:https://en.wikipedia.org/wiki/University_of_Colorado_Boulder
+        mode: headed
+        # Chrome won't draw a normal window much under 500 pixels wide, so the
+        # window is wider and the crop takes 370 pixels of its page.
+        window: [520, 640]
+        steps: [{wait: {text: 'University of Colorado Boulder - Wikipedia'}}]
+        crop: {between: ['body', 'td.line-number[value="29"]'], width: 370}   # to the end of line 29
+    layout: {gap: 28, pad: 15, label_px: 26}
+    drifts: true        # the article, and Wikipedia's markup

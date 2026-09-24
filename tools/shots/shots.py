@@ -161,6 +161,18 @@ def doctor_chapter(chapter):
             by_host.setdefault(host_of(fig["url"]), []).append(fig)
     for host, figs in sorted(by_host.items()):
         agent = figs[0]["user_agent"]
+        if host in ("localhost", "127.0.0.1", "::1"):
+            # A server on this machine, such as chapter 1's Jupyter: robots.txt doesn't apply,
+            # and it listens on its own port, so ask the figure's own address.
+            address = figs[0]["url"]
+            try:
+                with urllib.request.urlopen(address, timeout=10) as r:
+                    line(GOOD, f"{host}: a server on this machine answers {urlparse(address).netloc} "
+                               f"({r.status}); robots.txt doesn't apply")
+            except Exception as e:
+                line(WARN, f"{host}: nothing answers {urlparse(address).netloc} "
+                           f"({str(getattr(e, 'reason', e))})", "start the server the chapter's recipes describe")
+            continue
         request = urllib.request.Request(f"https://{host}/robots.txt", headers={"User-Agent": agent})
         try:
             with urllib.request.urlopen(request, timeout=30) as r:

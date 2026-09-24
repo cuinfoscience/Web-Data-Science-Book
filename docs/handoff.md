@@ -12,9 +12,11 @@
   - the README's "Field notes" record what the captures taught (#150), and `doctor` reads each host's robots.txt for the course's User-Agent, listing groups for Claude's agents as a note;
   - `tools/make_notebooks.py` reads brackets inside code spans in captions, and fails when a figure or `@fig-` reference is left unconverted (#151).
 
-  The selftest passes 73 of 73. `check` reports 0 errors and 8 warnings: six in chapter 7 (five figures over the size limit, one undated caption), and two in chapter 8 (the Selenium and codegen windows, which need M4).
+  - `scroll` steps can scroll a panel (`within:`), as Jupyter needs, and `doctor` asks a local server (`localhost`) at its own address.
+
+  The selftest passes 74 of 74. `check` reports 0 errors and 8 warnings: six in chapter 7 (five figures over the size limit, one undated caption), and two in chapter 8 (the Selenium and codegen windows, which need M4).
 - **Chapters.**
-  - ch-01: the setup works as written (#152). Jupyter installs into `webdata`, terminal commands are shell blocks, and the first request sends a User-Agent.
+  - ch-01: the setup works as written (#152). Jupyter installs into `webdata`, terminal commands are shell blocks, and the first request sends a User-Agent. The back-fill's pull request adds three figures: Jupyter's **New** menu, the companion notebook's cells, and the article beside View Source. It also corrects **New** → **Notebook**: Notebook 7's menu lists **Python 3 (ipykernel)**. Figure 1-4 (the pageviews JSON) is left out; see "Next".
   - ch-04 has three figures from the back-fill and fixes for #84, #87, and #132 (#149). Figure 4-2 (Open-Meteo's JSON) is left out; see the table below.
   - ch-05 has four DevTools figures from the pilot (#138).
   - ch-08: its View Source and JavaScript off/on figures are within the size limit, and the Selenium caption is dated (#142, #148). §8.3 checks Selenium Manager before the first browser (#143).
@@ -30,9 +32,10 @@
 In this order:
 
 1. **The first Friday code-review standup** for students' pull requests, on the course's roadmap ([plan](https://github.com/cuinfoscience/INFO4617-Fall2026/blob/main/docs/plans/2026-09-24-friday-code-review.md)). Before it, prepare the plan's review table: every open student pull request with its chapter, the issue it fixes, its checks, and any conflict or duplicate.
-2. **Back-fill chapters 1–3** in the [plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)'s order (§4): ch-01, ch-02, ch-03.
-   - ch-01: 1-1 and 1-2 can be made now that Jupyter installs into `webdata`. 1-3 pairs the article with View Source, as a composite. 1-4 (the pageviews API in Chrome's JSON view) got 429 from Wikimedia on the session's first request: the shared cloud address was over Wikimedia's limit. Try once later, or capture it from another network.
-   - Each chapter is a textbook and course pair of pull requests, and each figure starts from its brief.
+2. **Back-fill chapters 2 and 3** in the [plan](plans/2026-09-24-screenshot-backfill-ch01-05.md)'s order (§4): ch-02, then ch-03.
+   - Each chapter is a textbook and course pair of pull requests, and each figure starts from its brief. Read the plan's §4 table and the README's field notes first.
+   - Students' open pull requests touch both chapters: #50, #54, #56, #59, #63, and #79 edit chapter 2; #80 and #95 edit chapter 3. Keep figure blocks off the lines they change, or name the overlap in the description.
+   - Chapter 1's figure 1-4 (the pageviews API in Chrome's JSON view) waits for another network: Wikimedia's REST API answered 429 twice on 2026-09-24, to the session's shared address. `images/ch-01/IMAGES.md` has a draft recipe.
    - `shots import`, for hand captures such as week 1's issue form, isn't built (M4).
 3. **Retake the chapter 7 figures** (AAR P2-1): five are over the size limit, and `x-com-1999`'s caption lacks a date. On 2026-09-24 web.archive.org reset every connection after about 11 seconds; retry. Chapter 8's two tool windows wait for M4.
 4. **Toolkit M4** ([plan](plans/2026-09-24-screenshot-toolkit.md), §8): evidence queries for counts in captions (AAR P1-2), `sync` and `import`, the Selenium and codegen engines, and the `shots-check` CI job (AAR P1-1).
@@ -53,7 +56,7 @@ In this order:
 | AAR P1-1 | The `shots-check` CI workflow, part of M4. |
 | AAR P1-3 | Fix the review skill's session collector. This belongs to whoever maintains the skill, not this repository. |
 | Computed outputs | The four questions in the plan's §9. |
-| Chapters 1–3 back-fill | <ul><li>Week 01's look-alikes (`issue_form.png`, `pr_review.png`): use a real public issue and pull request that aren't a student's, or capture them by hand.</li><li>The unused placeholders (week 02's four, week 03's `ad_observatory`, week 05's `dev_tools_network`): delete or keep.</li><li>Figure 1-1: should it replace `anaconda_jupyter.png` in `setup.md`?</li></ul> |
+| Chapters 1–3 back-fill | <ul><li>Week 01's look-alikes (`issue_form.png`, `pr_review.png`): use a real public issue and pull request that aren't a student's, or capture them by hand.</li><li>The unused placeholders (week 02's four, week 03's `ad_observatory`, week 05's `dev_tools_network`): delete or keep.</li><li>Week 1's setup handout: should `jupyter-new-menu_annotated.png` or `jupyter-cells_annotated.png` (copies of figures 1.1 and 1.2 in the course's `handouts/week-01/img/`) replace `anaconda_jupyter.png`? The handout's "Make a new notebook" is the step figure 1.1 shows.</li><li>Week 1's `book_website.png` and `github_repo.png` sit in a 0.35-wide column, where a live capture's text is legible only when cropped to about 480 CSS pixels. Widen the column, or accept a tight crop, before they are retaken live.</li></ul> |
 
 ## Known issues
 

@@ -43,6 +43,12 @@ PAGES = {
                     + "Words to measure, enough of them to count. " * 12 + "</p>"
                     "<div id='box' style='left:500px;top:120px;width:120px;height:80px;background:#ddd'>Box</div>"
                     "<div id='tall' style='left:680px;top:260px;width:60px;height:700px;background:#eef'></div>"),
+    # A page that scrolls a panel, not the window, as Jupyter does.
+    "/panel": (200, "<!DOCTYPE html><title>Panel</title><body style='margin:0;overflow:hidden'>"
+                    "<div id='panel' style='position:absolute;top:0;left:0;width:800px;height:600px;"
+                    "overflow-y:auto'><div style='height:1500px'></div>"
+                    "<h2 id='deep' style='margin:0;line-height:30px'>Deep in the panel</h2>"
+                    "<div style='height:1500px'></div></div></body>"),
     # Small text, as week-08's dropped infinite_scroll.png had: DevTools' 11 pixels at 100%.
     "/small": (200, "<!DOCTYPE html><title>Small</title><body style='margin:8px;font:11px sans-serif'>"
                     + "<p>quotes?page=2 {has_next: true, page: 2, quotes: [...]}</p>" * 30),
@@ -209,6 +215,12 @@ figures:
     url: "{base}/marks"
     scale: 2
     annotate: {{marks: [{{n: 1, at: {{selector: '#box'}}}}]}}
+  - id: scroll-within
+    kind: capture
+    url: "{base}/panel"
+    steps: [{{scroll: {{selector: '#deep', offset: 100, within: '#panel'}}}}]
+    expect: {{text: ['Deep in the panel']}}
+    annotate: {{marks: [{{n: 1, at: {{selector: '#deep'}}}}]}}
   - id: small-text
     kind: capture
     url: "{base}/small"
@@ -320,7 +332,7 @@ figures:
 
     print("anchors, markers, legibility, composites")
     code, out = captured = shots("capture", "ch-99", "--only", "marks", "marks-2x", "small-text", "joined",
-                                 "wide", "wide-allowed", "wide-small", "too-wide")
+                                 "wide", "wide-allowed", "wide-small", "too-wide", "scroll-within")
     marks, marks2, small, joined = newest("marks"), newest("marks-2x"), newest("small-text"), newest("joined")
     said = sections(out)
     expect("a figure over 800x600 but within 1024x768 gets a warning that asks what clutter the room removes",
@@ -348,6 +360,9 @@ figures:
     expect("an anchor is recorded at capture, in the take's pixels", box == [500, 120, 620, 200], str(box))
     box2 = anchor(marks2, {"selector": "#box"})
     expect("...at scale 2 as well", box2 == [1000, 240, 1240, 400], str(box2))
+    deep = anchor(newest("scroll-within"), {"selector": "#deep"}) or [0, 0, 0, 0]
+    expect("a scroll step with `within` scrolls that panel, putting the element at its offset",
+           deep[1] == 100 and deep[3] == 130, str(deep))
     title = anchor(marks, {"selector": "#title", "box": "text"}) or [0, 0, 0, 0]
     expect("a text anchor is the text's own box, not the element's", 39 <= title[0] <= 41
            and title[2] < 300 and 28 <= title[1] and title[3] <= 72, str(title))
