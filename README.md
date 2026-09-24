@@ -6,6 +6,8 @@ This book teaches advanced undergraduates and master's students how to retrieve,
 
 A theoretical thread on the **post-API age** — the structural pressures of *enclosure*, *exemption*, and *erosion* shaping access to web data, and the counter-values of *openness*, *oversight*, and *ownership* — runs throughout the book.
 
+> **Help improve this book.** Found something broken, missing, or unclear? You don't need to know git or the fix. [File an issue](https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new/choose) in a few minutes, or read **[CONTRIBUTING.md](CONTRIBUTING.md)** to make the change yourself.
+
 ## Book Contents
 
 The book is organized into four parts plus appendices:
@@ -92,16 +94,20 @@ Web-Data-Science-Book/
 ├── appendix-notebooks.qmd       # Index of companion notebooks
 ├── appendix-ai-disclosure.qmd
 ├── appendix-further.qmd
-├── notebooks/                   # Companion Jupyter notebooks (generated)
+├── notebooks/                   # Companion Jupyter notebooks (generated from the chapters; don't edit)
+├── images/                      # Figures, one folder per chapter, each with provenance.json
 ├── tools/                       # Maintenance scripts (notebooks, prose lint, the screenshot toolkit)
 ├── references.bib               # BibTeX bibliography
-├── book/                        # Rendered book output
 ├── docs/                        # Project records: AARs, plans, decision log, hand-off note
-├── AGENTS.md                    # Instructions for AI agents and contributors
+├── .github/                     # Issue forms, the pull request template, and CI checks
+├── CONTRIBUTING.md              # How to report a problem or change the book
+├── AGENTS.md                    # Style guide and instructions for AI agents and contributors
 ├── CLAUDE.md                    # Imports AGENTS.md, for Claude Code
 ├── LICENSE                      # CC BY-NC-SA 4.0
 └── README.md
 ```
+
+`quarto render` writes the rendered book to `book/`, which is not kept in the repository.
 
 ## Companion Resource: The Missing Manual
 
@@ -115,7 +121,7 @@ Each chapter follows a consistent structure:
 2. **Conceptual motivation** — why this matters
 3. **Library/framework introduction** — what tools you will use
 4. **Guided tutorial** with narrative code blocks
-5. **Exercises** (5 per chapter, graduated from guided to open-ended, plus a graduate extension for INFO 5617 students)
+5. **Exercises**: Recommended Exercises (one guided build of 5–7 steps, whose code cells hold only prompts) and Additional Exercises (open-ended, ending with a graduate extension for INFO 5617 students)
 6. **Social history and public interest** sidebar
 7. **Common debugging issues**
 8. **Key takeaways**
@@ -125,12 +131,13 @@ The book uses second person ("you") and addresses the reader as a student learni
 
 ## Contributing
 
-Contributions are welcome. If you find an error, have a suggestion, or want to propose an exercise:
+Contributions are welcome, and first-time contributors are the reason this section exists. **Start with [CONTRIBUTING.md](CONTRIBUTING.md)**: it walks through each step, in the browser or on your computer.
 
-- **Errata and small fixes**: open an [issue](https://github.com/cuinfoscience/Web-Data-Science-Book/issues) or a pull request
-- **Larger contributions**: open a [discussion](https://github.com/cuinfoscience/Web-Data-Science-Book/discussions) first to coordinate
+- **Report a problem or an idea**: [choose an issue form](https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new/choose). *Something is wrong* is for errors, dead links, and outdated screenshots; a *Gap report* is for anything missing or unclear that stopped you; a *Suggestion* is for anything that would make the book better. Every chapter page links to the forms (**Report an issue**).
+- **Fix it yourself**: open a pull request that changes the chapter's `.qmd` file, not the generated notebooks. **Edit this page** on any chapter page opens the file in GitHub's editor. The pull request template asks for the location, the problem, why it matters, and your change.
+- **Larger contributions**: open a [discussion](https://github.com/cuinfoscience/Web-Data-Science-Book/discussions) first to coordinate.
 
-[`AGENTS.md`](AGENTS.md) documents editorial voice, formatting conventions, and chapter structure for anyone — human or AI — extending the book.
+Students in INFO 4617/5617 contribute as part of the course; its [revision framework](https://github.com/cuinfoscience/INFO4617-Fall2026/blob/main/handouts/common/revision-framework.md) explains how. [`AGENTS.md`](AGENTS.md) is the full style guide, for anyone, human or AI, extending the book.
 
 ## For AI Agents
 

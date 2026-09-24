@@ -15,11 +15,17 @@ body:
         [Something is wrong](https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new?template=bug_report.yml).
         Those two get priority, so put it there if it fits.
 
+        **Finish the title** after `Suggestion:`: say what you would change, and where, for example
+        `Suggestion: Ch. 10 add a table comparing the Wikipedia APIs`. New here?
+        [CONTRIBUTING.md](https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/CONTRIBUTING.md)
+        explains the three forms and what happens after you file.
+
   - type: dropdown
     id: chapter
     attributes:
       label: Which chapter?
       options:
+        - "The preface"
         - "Ch. 1 — Introduction to Web Data Science"
         - "Ch. 2 — Ethics, Law, and Responsible Data Collection"
         - "Ch. 3 — The Post-API Age"
@@ -84,6 +90,14 @@ body:
       placeholder: "It gives a reader without a legal background somewhere to start before the case discussion."
     validations:
       required: true
+
+  - type: textarea
+    id: ai
+    attributes:
+      label: Did an AI tool help you write this?
+      description: Optional. If one did, name it and say what it did, for example "an AI assistant drafted the second paragraph". The course asks for this, and the book discloses its own AI use in Appendix B.
+    validations:
+      required: false
 
   - type: checkboxes
     id: checks
