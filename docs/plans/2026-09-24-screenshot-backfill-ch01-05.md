@@ -123,7 +123,7 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
   - **1-3 is `article-view-source`**, a labeled composite at 370 pixels a side: the article, and View Source of the same address.
   - **1-4 is left out:** Wikimedia's REST API answered this cloud session's address with 429 twice on 2026-09-24. `images/ch-01/IMAGES.md` keeps a draft recipe, for a capture from another network.
   - **1-5 is skipped** (optional).
-  - **Course:** copies of the two Jupyter figures go into week-01's `img/`, offered to `setup.md`; replacing `anaconda_jupyter.png` is the instructor's call. `book_website.png` and `github_repo.png` stay: in the deck's 0.35-wide column, a live capture's text is legible only when cropped to about 480 CSS pixels, which cuts the page's text short, so the column width is the instructor's call first. `issue_form.png` and `pr_review.png` wait on the maintainer's choice of a public issue and pull request that aren't a student's.
+  - **Course:** copies of the two Jupyter figures go into `handouts/week-01/img/`, offered to `setup.md`; replacing `anaconda_jupyter.png` is the instructor's call. `book_website.png` and `github_repo.png` stay: in the deck's 0.35-wide column, a live capture's text is legible only when cropped to about 480 CSS pixels, which cuts the page's text short, so the column width is the instructor's call first. `issue_form.png` and `pr_review.png` wait on the maintainer's choice of a public issue and pull request that aren't a student's.
 
 ### Chapter 2 — Ethics, Law, and Responsible Data Collection
 
