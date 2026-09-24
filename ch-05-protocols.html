@@ -519,7 +519,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <h2 data-number="5.4" class="anchored" data-anchor-id="tcpip-the-transport-layer"><span class="header-section-number">5.4</span> TCP/IP: The Transport Layer</h2>
 <p>Every computer on a public network has an IP address — a numerical identifier that functions like a postal address. IPv4 addresses are formatted as four numbers separated by dots (e.g., <code>151.101.130.133</code>), allowing for about 4.3 billion unique addresses. IPv6 uses a longer hexadecimal format to support a vastly larger address space.</p>
 <p>You can find your own computer’s IP address programmatically:</p>
-<div id="6e14dbfa" class="cell" data-execution_count="1">
+<div id="94af9b65" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> socket</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co"># Your computer's hostname on the local network</span></span>
@@ -532,7 +532,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 </div>
 <p>Be aware that on many Linux and macOS systems this lookup returns a loopback address like <code>127.0.0.1</code> or <code>127.0.1.1</code> — an address that simply means “this machine” — rather than your network-assigned IP, so the public-IP query below is the more reliable way to see how the internet identifies you.</p>
 <p>To see your <em>public</em> IP address (as seen by servers on the internet), you can query an external service:</p>
-<div id="1087fe6a" class="cell" data-execution_count="2">
+<div id="226a06f8" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>response <span class="op">=</span> requests.get(<span class="st">"https://api.ipify.org?format=json"</span>)</span>
@@ -569,14 +569,14 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 </div>
 </div>
 <p>If your machine will not cooperate — a locked-down lab computer, no administrator rights, or Npcap will not install — skip ahead to the terminal-based backup at the end of this section. You will still see exactly what a traceroute reveals; you just will not be doing it from Python.</p>
-<div id="7ca05bf8" class="cell" data-execution_count="3">
+<div id="8da65c62" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">from</span> scapy.<span class="bu">all</span> <span class="im">import</span> traceroute</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co"># Trace the path to Wikipedia</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-label="4"></a>result, unans <span class="op">=</span> traceroute(<span class="st">"en.wikipedia.org"</span>, maxttl<span class="op">=</span><span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:</p>
-<div id="de1bd745" class="cell" data-execution_count="4">
+<div id="3a773550" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="kw">def</span> geolocate_ip(ip):</span>
@@ -619,7 +619,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <p>Every message this chapter has described — a DNS lookup, an HTTP request, a traceroute probe — ultimately travels as a sequence of <strong>packets</strong>: small chunks of data, each wrapped in its own headers that carry routing and delivery information separately from whatever payload it carries. TCP breaks a message into packets on the way out and reassembles them in order on the way in; that reassembly is exactly what lets <code>requests</code> hand you back one clean <code>Response</code> object instead of a pile of disconnected fragments.</p>
 <p><strong>Packet sniffing</strong> means capturing these packets as they pass across a network interface, rather than only sending and receiving your own application’s requests the normal way. This is a meaningfully more invasive capability than anything else in this chapter. A traceroute or a DNS lookup only ever touches traffic you generated. A packet sniffer running on a shared network — campus wifi, a coffee-shop hotspot, an office LAN — can, depending on the network’s configuration, see <em>other people’s</em> traffic too: which sites they are visiting, and on an unencrypted connection, potentially some of what they are sending. Capturing your own traffic on your own machine is unambiguously fine. Capturing other people’s traffic without their knowledge or consent is a real privacy question, and sometimes a legal one — <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> covers consent and authorized access in more depth, and it applies here as much as it does to scraping.</p>
 <p>For that reason, the only sniffing this book has you do is on <strong>loopback traffic you generate yourself, to a server running on your own machine</strong>. Nothing here ever touches a shared network or anyone else’s packets.</p>
-<div id="d20b97ae" class="cell" data-execution_count="5">
+<div id="27f7f19e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="im">import</span> threading</span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="im">from</span> http.server <span class="im">import</span> HTTPServer, SimpleHTTPRequestHandler</span>
@@ -657,7 +657,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <section id="dns-the-address-book" class="level2" data-number="5.5">
 <h2 data-number="5.5" class="anchored" data-anchor-id="dns-the-address-book"><span class="header-section-number">5.5</span> DNS: The Address Book</h2>
 <p>The Domain Name System translates human-readable domain names (like <code>en.wikipedia.org</code>) into IP addresses that computers can route to. You can perform DNS lookups programmatically with the <code>dnspython</code> library:</p>
-<div id="cebf3e59" class="cell" data-execution_count="6">
+<div id="75aaf2af" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="im">import</span> dns.resolver</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a><span class="co"># Look up the IP address for Wikipedia</span></span>
@@ -707,7 +707,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <section id="diagnosing-http-errors" class="level3" data-number="5.6.1">
 <h3 data-number="5.6.1" class="anchored" data-anchor-id="diagnosing-http-errors"><span class="header-section-number">5.6.1</span> Diagnosing HTTP Errors</h3>
 <p>When a request fails, the status code tells you <em>what</em> went wrong, but diagnosing <em>why</em> requires looking at the full response. A diagnostic function can help:</p>
-<div id="5c30067b" class="cell" data-execution_count="7">
+<div id="6503df4a" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a><span class="kw">def</span> diagnose_request(url, headers<span class="op">=</span><span class="va">None</span>):</span>
@@ -732,7 +732,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <span id="cb14-22"><a href="#cb14-22" aria-label="22"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Nonexistent_Page_12345"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a <code>User-Agent</code> header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:</p>
-<div id="e2577193" class="cell" data-execution_count="8">
+<div id="b4595eb8" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="kw">def</span> get_with_backoff(url, headers<span class="op">=</span><span class="va">None</span>, max_retries<span class="op">=</span><span class="dv">3</span>):</span>
@@ -753,7 +753,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <section id="making-api-requests-with-custom-headers" class="level3" data-number="5.6.2">
 <h3 data-number="5.6.2" class="anchored" data-anchor-id="making-api-requests-with-custom-headers"><span class="header-section-number">5.6.2</span> Making API Requests with Custom Headers</h3>
 <p>Let us retrieve data from the Wikimedia pageviews API. This API requires a meaningful <code>User-Agent</code> header — if you send the default <code>requests</code> User-Agent, you will get a 403 error:</p>
-<div id="d394e437" class="cell" data-execution_count="9">
+<div id="e4689003" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a>article <span class="op">=</span> <span class="st">"University_of_Colorado_Boulder"</span></span>
@@ -776,7 +776,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 </div>
 <p><strong>From the terminal.</strong> The same check, inspectable without Python: <code>curl -I</code> fetches only the response headers — a fast way to confirm a status code without downloading the body — and <code>curl -v</code> shows the entire request and response, close to what the Network tab’s Headers pane showed you earlier in this chapter. Both work alongside <code>-A</code> to set a User-Agent the same way the <code>headers</code> dictionary above does. See “<code>curl</code> and <code>wget</code>” later in this chapter for these tools as full alternatives to <code>requests</code>.</p>
 <p>Now convert the response to a DataFrame and plot it:</p>
-<div id="def8f94f" class="cell" data-execution_count="10">
+<div id="2588e73f" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a></span>
@@ -798,7 +798,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <p>Every request this chapter has made has honestly identified itself — <code>WebDataScience/1.0 (your-email@colorado.edu)</code>, a real contact address a server operator could actually use to reach you. <strong>User-Agent spoofing</strong> means sending a <code>User-Agent</code> header that claims to be something you are not: a specific browser, operating system, or device you are not actually running. It is worth understanding both because you will encounter it — some sites behave differently depending on what you claim to be — and because doing it yourself raises questions this book has otherwise been able to sidestep by simply identifying itself truthfully.</p>
 <p>There are legitimate, unremarkable reasons to change a <code>User-Agent</code>: testing how your own site renders on a phone without owning one, checking whether a page serves a simplified version to older browsers, or working around a service that blocks a legitimate research tool’s honest identification for no defensible reason. There are also reasons that are not legitimate, covered below.</p>
 <p>Mechanically, spoofing is nothing more than the <code>headers</code> dictionary you already know how to build — just with a value that describes a browser and device you are not actually using:</p>
-<div id="dd537e66" class="cell" data-execution_count="11">
+<div id="80a61e6e" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a><span class="co"># An honest identification, like every other request in this book</span></span>
@@ -839,7 +839,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <h3 data-number="5.6.4" class="anchored" data-anchor-id="connections-sessions-and-retries"><span class="header-section-number">5.6.4</span> Connections, Sessions, and Retries</h3>
 <p>Every bare <code>requests.get()</code> call does more work than it appears to: it opens a fresh TCP connection to the server, performs the TLS handshake, sends the request, and tears the connection back down. For a single request, that overhead is negligible. But the chapters ahead will have you making dozens or hundreds of requests to the same host — one per Wikipedia article, one per bill, one per archived page — and paying the connection setup cost every time is wasteful for both you and the server.</p>
 <p>A <code>requests.Session</code> object fixes this. A Session keeps the underlying connection open and reuses it for subsequent requests to the same host, and it remembers headers, so you set your <code>User-Agent</code> once instead of passing it to every call. A Session can also carry a retry policy: rather than hand-rolling backoff logic like the <code>get_with_backoff()</code> function you wrote earlier, you can mount a <code>Retry</code> configuration that automatically retries rate limits and transient server errors with exponentially increasing delays — and it honors any <code>Retry-After</code> header the server sends:</p>
-<div id="a584c03a" class="cell" data-execution_count="12">
+<div id="188d3793" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="im">from</span> requests.adapters <span class="im">import</span> HTTPAdapter</span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a><span class="im">from</span> urllib3.util.retry <span class="im">import</span> Retry</span>
@@ -917,7 +917,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 <p>URLs (Uniform Resource Locators) have a well-defined structure:</p>
 <pre><code>scheme://userinfo@host:port/path?query#fragment</code></pre>
 <p>Never write regular expressions to parse URLs. Use the <a href="https://docs.python.org/3/library/urllib.parse.html"><code>urllib.parse</code></a> module instead:</p>
-<div id="7c320c42" class="cell" data-execution_count="13">
+<div id="0c55564a" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlparse, parse_qs</span>
 <span id="cb26-2"><a href="#cb26-2" aria-label="2"></a></span>
 <span id="cb26-3"><a href="#cb26-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://api.census.gov/data/2022/acs/acs5?get=NAME,B01001_001E&amp;for=place:07850&amp;in=state:08"</span></span>
@@ -938,7 +938,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 <h3 data-number="5.7.1" class="anchored" data-anchor-id="building-urls-programmatically"><span class="header-section-number">5.7.1</span> Building URLs Programmatically</h3>
 <p>Web APIs expect the values you supply in one of two places, and you need to recognize which pattern you are dealing with before you can build the URL correctly.</p>
 <p>Both patterns below build URLs with Python’s <strong>f-strings</strong> — a compact way to embed variables and expressions directly inside a string, written <code>f"...{expression}..."</code>. This is an intermediate Python feature: an f-string evaluates whatever sits inside the curly braces and inserts the result directly into the string at that position.</p>
-<div id="f35de190" class="cell" data-execution_count="14">
+<div id="66f53489" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-label="1"></a>name <span class="op">=</span> <span class="st">"Boulder"</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-label="2"></a>count <span class="op">=</span> <span class="dv">3</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-label="3"></a></span>
@@ -952,7 +952,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 </div>
 <p>An f-string can also span multiple lines by placing several adjacent string literals next to each other — Python concatenates them automatically, which is how the URL-building code below builds one long string across several lines without a single <code>+</code>. The <a href="https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals">Python tutorial’s section on formatted string literals</a> covers the full syntax, including format specifiers (<code>{value:.2f}</code> for two decimal places, and similar) that come up less often in this book but are worth knowing exist.</p>
 <p><strong>Path-segment APIs</strong> embed each value at a fixed position in the URL’s path. The Wikimedia pageviews endpoint you used earlier works this way: project, access method, agent, article, granularity, and date range are all path segments in a required order. Build these URLs with an f-string over the components — but URL-encode any component that might contain special characters using <code>urllib.parse.quote</code>, because a stray slash or space inside a path segment produces a URL the server cannot route:</p>
-<div id="dcb611fb" class="cell" data-execution_count="15">
+<div id="9c56a133" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-label="1"></a><span class="im">from</span> urllib.parse <span class="im">import</span> quote</span>
 <span id="cb28-2"><a href="#cb28-2" aria-label="2"></a></span>
 <span id="cb28-3"><a href="#cb28-3" aria-label="3"></a><span class="co"># Each value occupies a fixed position in the path</span></span>
@@ -975,7 +975,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 </div>
 <p>The encoding matters more than this example suggests: a band like “AC/DC” has a slash in its article title, and <code>quote("AC/DC", safe="")</code> correctly produces <code>AC%2FDC</code>. Paste the raw title into your f-string instead, and the API would interpret the slash as a path separator and return a 404.</p>
 <p><strong>Query-parameter APIs</strong> instead accept <code>key=value</code> pairs after a <code>?</code>, where order does not matter and many parameters are optional. The MediaWiki Action API — Wikipedia’s general-purpose API, which you will explore in <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a> — works this way. The <code>urlencode</code> function converts a dictionary into a properly escaped query string:</p>
-<div id="0dcefee1" class="cell" data-execution_count="16">
+<div id="2c73d242" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-label="1"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlencode</span>
 <span id="cb29-2"><a href="#cb29-2" aria-label="2"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-label="3"></a>base_url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
@@ -991,7 +991,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 <span id="cb29-13"><a href="#cb29-13" aria-label="13"></a><span class="co"># action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For query-parameter APIs, the <code>requests</code> library can do this encoding for you: pass the dictionary as the <code>params</code> argument. This is the preferred approach for API calls:</p>
-<div id="7704b346" class="cell" data-execution_count="17">
+<div id="c8bec764" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-label="1"></a>response <span class="op">=</span> requests.get(base_url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
 <span id="cb30-2"><a href="#cb30-2" aria-label="2"></a><span class="bu">print</span>(response.url)  <span class="co"># The full URL that requests actually built</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-label="3"></a><span class="co"># https://en.wikipedia.org/w/api.php?action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span>
@@ -1005,32 +1005,32 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will build a URL diagnostic tool from the protocol layers this chapter covered — DNS, HTTP status codes, headers, and redirects — and use it to profile five real URLs.</p>
 <p><strong>Step 1 — Take a URL apart.</strong> Use <code>urlparse()</code> on three URLs of different shapes — a plain page, a URL with a query string, and one of the API URLs from earlier chapters. For each, print the scheme, netloc, path, and query.</p>
-<div id="27ee2120" class="cell" data-execution_count="18">
+<div id="73b1d670" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-label="1"></a><span class="co"># Step 1: urlparse three different URLs and print their components.</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Resolve a name.</strong> Use <code>dns.resolver</code> to look up the A records for <code>en.wikipedia.org</code> and two other domains you choose. Print the IP addresses. Do any share an address?</p>
-<div id="c386b965" class="cell" data-execution_count="19">
+<div id="5f24ac89" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-label="1"></a><span class="co"># Step 2: Resolve A records for three domains and print the IPs.</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Request with named headers.</strong> Define your <code>HEADERS</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>) and request one of the three URLs from Step 1. Print the status code and three response headers: <code>Content-Type</code>, <code>Server</code>, and <code>Content-Length</code> (or the length of <code>response.content</code> if the header is absent).</p>
-<div id="b37b7d40" class="cell" data-execution_count="20">
+<div id="686ad89a" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-label="1"></a><span class="co"># Step 3: Make a request with your HEADERS and print the status code and three response headers.</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Write <code>diagnose_url()</code>.</strong> Wrap Step 3 in a function <code>diagnose_url(url)</code> that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check <code>response.history</code>, and if it redirected, print where it ended up. Include a docstring.</p>
-<div id="e5ee4241" class="cell" data-execution_count="21">
+<div id="043431ae" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-label="1"></a><span class="co"># Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring.</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Profile five URLs.</strong> Run <code>diagnose_url()</code> on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an <code>http://</code> address of a site that upgrades you to <code>https://</code>), an API endpoint, and a site that blocks automated access (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> showed you one).</p>
-<div id="71c100b7" class="cell" data-execution_count="22">
+<div id="ff708cfe" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-label="1"></a><span class="co"># Step 5: Diagnose five URLs -- working, 404, redirect, API, and blocked.</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the blocked site, what layer refused you — and how do you know it was the site rather than your network (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>)?</p>
-<div id="fb417b62" class="cell" data-execution_count="23">
+<div id="42fa2169" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
