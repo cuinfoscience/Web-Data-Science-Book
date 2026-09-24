@@ -165,9 +165,7 @@ class Session:
         keys = arg if isinstance(arg, list) else arg.get("keys", [])
         until, limit = (None, 1) if isinstance(arg, list) else (arg.get("until"), arg.get("max", 1))
         front = self._frontend()
-        # Keys go to whatever has focus. Click the selected row first, as a person
-        # would, so the tree has it (a selected row can show without focus).
-        self.devtools_click({"css": 'li[role="treeitem"].selected', "at": (0.7, 0.5)})
+        self.focus_tree()
         for _ in range(limit if until else 1):
             if until and re.search(until, front.selected()):
                 return
@@ -176,6 +174,31 @@ class Session:
                 time.sleep(0.25)
         if until and not re.search(until, front.selected()):
             raise page_steps.StepError(f"the Elements tree never selected /{until}/")
+
+    # The deepest focused element in DevTools, through its shadow roots.
+    _FOCUSED = """(() => { let a = document.activeElement;
+        while (a && a.shadowRoot && a.shadowRoot.activeElement) a = a.shadowRoot.activeElement;
+        return a ? (a.getAttribute('role') || a.tagName.toLowerCase()) : ''; })()"""
+
+    def focus_tree(self):
+        """Give the Elements tree keyboard focus, as a person would: click the selected row.
+
+        The click lands in the empty right-hand end of the row. Clicking the
+        node's own text could start editing its tag, which swallows the keys.
+        """
+        front = self._frontend()
+        row = front.wait_for(css='li[role="treeitem"].selected', timeout=self.fig["timeout"])
+        tree = front.wait_for(css='ol[role="tree"]', timeout=self.fig["timeout"])
+        r, t = row["boxes"][0], tree["boxes"][0]
+        right_end = {"x": t["x"] + t["w"] - 16, "y": r["y"], "w": 1, "h": r["h"]}
+        x, y = self.devtools_point(right_end, row["dpr"], (0, 0.5))
+        self.display.xdo("mousemove", x, y)
+        time.sleep(0.2)
+        self.display.xdo("click", 1)
+        time.sleep(0.4)
+        focused = front.evaluate(self._FOCUSED)
+        if focused not in ("tree", "treeitem"):
+            raise page_steps.StepError(f"the Elements tree did not take focus (focus is on {focused!r})")
 
     def devtools_click(self, arg):
         found = self._frontend().wait_for(arg.get("text"), arg.get("css"), timeout=self.fig["timeout"])
