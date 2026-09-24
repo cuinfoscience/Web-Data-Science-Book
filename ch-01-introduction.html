@@ -102,6 +102,9 @@ div.csl-indent {
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-b9b87f1ee5f3efc80085e05a1cdeb0ef.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -488,12 +491,33 @@ div.csl-indent {
 <h3 data-number="1.3.2" class="anchored" data-anchor-id="jupyter-notebooks"><span class="header-section-number">1.3.2</span> Jupyter Notebooks</h3>
 <p>Jupyter Notebooks are interactive computing environments that keep your code, documentation, and results in a single file. Start Jupyter from the same terminal, with <code>webdata</code> active:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="ex">jupyter</span> notebook</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The command is the same on macOS, Linux, and Windows. Jupyter prints a few lines of log in the terminal and opens a browser tab listing the files in the folder you started it from. Keep the terminal open while you work, because closing it stops Jupyter. To make a notebook, choose <strong>New</strong> and then <strong>Notebook</strong>, and pick the Python 3 kernel if Jupyter asks: started from <code>webdata</code>, it is that environment’s Python.</p>
+<p>The command is the same on macOS, Linux, and Windows. Jupyter prints a few lines of log in the terminal and opens a browser tab listing the files in the folder you started it from. Keep the terminal open while you work, because closing it stops Jupyter. To open a notebook you have, such as this chapter’s companion notebook, click its name. To make a new one, choose <strong>New</strong> and then <strong>Python 3 (ipykernel)</strong> (<a href="#fig-jupyter-new-menu" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>): started from <code>webdata</code>, that kernel is that environment’s Python.</p>
 <p>A notebook consists of cells. <strong>Code cells</strong> contain Python that you can execute with Shift+Enter. <strong>Markdown cells</strong> contain formatted text for documentation. The ability to interleave code with narrative explanation makes notebooks ideal for the kind of exploratory, iterative work that characterizes web data science.</p>
-<div id="b0af587f" class="cell" data-execution_count="1">
+<div id="b2c338d2" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># This is a code cell. When you run it, Python executes the code and displays any output below the cell.</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="bu">print</span>(<span class="st">"Hello, web data science!"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="co"># Output: Hello, web data science!</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>In the companion notebook, this code cell sits under a Markdown cell that holds the paragraph above, as <a href="#fig-jupyter-cells" class="quarto-xref">Figure&nbsp;<span>1.2</span></a> shows.</p>
+<div id="fig-jupyter-new-menu" class="lightbox quarto-float quarto-figure quarto-figure-center anchored" alt="Screenshot of Jupyter's file list in a browser, with the Files and Running tabs, and a toolbar with New, Upload, and a refresh button. Marker 1: ch-01-introduction.ipynb, the one file in the folder. Marker 2: the New button, whose menu is open. Marker 3: its first item, Python 3 (ipykernel), above Terminal, Console, New File, and New Folder.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-jupyter-new-menu-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="images/ch-01/jupyter-new-menu_annotated.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1.1: Jupyter’s file list in the browser, in Jupyter Notebook 7.6, September 2026. The folder holds this chapter’s companion notebook ①: click a name to open it. New ② opens a menu whose first item, Python 3 (ipykernel) ③, makes a new notebook."><img src="images/ch-01/jupyter-new-menu_annotated.png" class="img-fluid figure-img" alt="Screenshot of Jupyter's file list in a browser, with the Files and Running tabs, and a toolbar with New, Upload, and a refresh button. Marker 1: ch-01-introduction.ipynb, the one file in the folder. Marker 2: the New button, whose menu is open. Marker 3: its first item, Python 3 (ipykernel), above Terminal, Console, New File, and New Folder."></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-jupyter-new-menu-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: Jupyter’s file list in the browser, in Jupyter Notebook 7.6, September 2026. The folder holds this chapter’s companion notebook ①: click a name to open it. <strong>New</strong> ② opens a menu whose first item, <strong>Python 3 (ipykernel)</strong> ③, makes a new notebook.
+</figcaption>
+</figure>
+</div>
+<div id="fig-jupyter-cells" class="lightbox quarto-float quarto-figure quarto-figure-center anchored" alt="Screenshot of the notebook ch-01-introduction in Jupyter, with the menus File to Help, Not Trusted at the right, and a toolbar ending in marker 4, the kernel Python 3 (ipykernel). Marker 1: a Markdown cell, the paragraph beginning A notebook consists of cells. Marker 2: a code cell's prompt, [1]:, beside a comment and a print call for Hello, web data science! Marker 3: its output, Hello, web data science!">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-jupyter-cells-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="images/ch-01/jupyter-cells_annotated.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;1.2: The companion notebook in Jupyter, September 2026. A Markdown cell ① holds the chapter’s text. Below it, the first code cell has run: its prompt reads [1]: ②, and its output ③ is under it. The kernel, Python 3 (ipykernel), is named at the right of the toolbar ④. Not Trusted, above it, is Jupyter’s label for a notebook you didn’t make on this computer; it doesn’t stop cells from running."><img src="images/ch-01/jupyter-cells_annotated.png" class="img-fluid figure-img" alt="Screenshot of the notebook ch-01-introduction in Jupyter, with the menus File to Help, Not Trusted at the right, and a toolbar ending in marker 4, the kernel Python 3 (ipykernel). Marker 1: a Markdown cell, the paragraph beginning A notebook consists of cells. Marker 2: a code cell's prompt, [1]:, beside a comment and a print call for Hello, web data science! Marker 3: its output, Hello, web data science!"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-jupyter-cells-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.2: The companion notebook in Jupyter, September 2026. A Markdown cell ① holds the chapter’s text. Below it, the first code cell has run: its prompt reads <code>[1]:</code> ②, and its output ③ is under it. The kernel, Python 3 (ipykernel), is named at the right of the toolbar ④. <strong>Not Trusted</strong>, above it, is Jupyter’s label for a notebook you didn’t make on this computer; it doesn’t stop cells from running.
+</figcaption>
+</figure>
 </div>
 <div class="callout callout-style-simple callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -512,7 +536,7 @@ div.csl-indent {
 <section id="core-libraries" class="level3" data-number="1.3.3">
 <h3 data-number="1.3.3" class="anchored" data-anchor-id="core-libraries"><span class="header-section-number">1.3.3</span> Core Libraries</h3>
 <p>This book uses several Python libraries extensively. You installed the core ones into <code>webdata</code> along with Jupyter; later chapters install more as they need them, with the same <code>pip install</code> in a terminal where <code>webdata</code> is active. For now, confirm in a notebook that the core libraries import without error:</p>
-<div id="2bb68aa2" class="cell" data-execution_count="2">
+<div id="90eebff8" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -531,7 +555,7 @@ div.csl-indent {
 <p>Nearly everything in this book starts with the <a href="https://requests.readthedocs.io/"><code>requests</code></a> library. It is the standard way to fetch things from the web in Python — its documentation calls it “HTTP for Humans.” When you type a URL, your browser sends a request across the internet, receives a reply, and renders that reply as a page. <code>requests</code> does the same sending and receiving, but instead of rendering the reply, it hands the whole thing to <em>you</em>, as a Python object you can inspect, parse, and analyze.</p>
 <p>Why this library and not another? Python ships with a built-in module for the job (<code>urllib</code>), but it is verbose where <code>requests</code> is direct: fetching a page is one readable line, and the library quietly handles the details — character encodings, redirects, connection management — that you should not have to think about in week one. And <code>requests</code> is the ecosystem’s common ground: the scraping and API libraries you will meet later in this book are built on top of it, imitate its interface, or assume you will pair them with it, so the habits you form here transfer everywhere. What actually happens on the wire when a request is sent — protocols, servers, DNS, the anatomy of HTTP itself — is a story worth telling properly, and <a href="ch-05-protocols.html" class="quarto-xref"><span>Chapter 5</span></a> tells it. For now, treat <code>requests</code> as a well-made black box: ask for a page, get a reply.</p>
 <p>Here you will retrieve the Wikipedia article for the University of Colorado Boulder. Wikipedia refuses requests that don’t say who is sending them, answering <code>requests</code>’ default with a 403, so this one carries a <code>User-Agent</code> header that names you. Put your own email address in it; <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> explains why sites ask for this.</p>
-<div id="a3ddd74c" class="cell" data-execution_count="3">
+<div id="dc45f9f4" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co"># Identify yourself: Wikipedia answers the library's default User-Agent with a 403</span></span>
@@ -547,7 +571,7 @@ div.csl-indent {
 <span id="cb6-13"><a href="#cb6-13" aria-label="13"></a><span class="bu">print</span>(<span class="bu">len</span>(response.text))    <span class="co"># Number of characters in the HTML</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>That <code>response</code> variable is a <strong>Response object</strong> — you will handle one every time you touch the web from now on. It is the parcel the server sent back, still in its packaging: not just the page you asked for, but everything about the exchange — whether it succeeded, what kind of document came back, the document itself in two forms, and a record of how you got there. A quick tour of the parts you will actually use:</p>
-<div id="fedd7dce" class="cell" data-execution_count="4">
+<div id="5e0af432" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># What kind of document did the server send?</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="bu">print</span>(response.headers[<span class="st">"Content-Type"</span>])</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="co"># text/html; charset=UTF-8</span></span>
@@ -562,16 +586,26 @@ div.csl-indent {
 </div>
 <p>The <strong>status code</strong> you printed above is the server’s three-digit verdict on your request: codes starting with 2 mean success, 4 means something is wrong with your request, and the full taxonomy waits in <a href="ch-05-protocols.html" class="quarto-xref"><span>Chapter 5</span></a>. The <strong>headers</strong> are a dictionary of metadata about the reply, and <code>Content-Type</code> is the one you will consult most — it is how you know whether you received HTML to parse, JSON to decode, or something else entirely. The body comes in two forms: <strong><code>.text</code></strong> is the decoded string you will use for web pages, while <strong><code>.content</code></strong> is the raw bytes, which matters when the thing you retrieved is not text at all — a PDF (<a href="ch-09-pdfs.html" class="quarto-xref"><span>Chapter 9</span></a>) or an image has no meaningful <code>.text</code>. And <strong><code>.url</code></strong> with <strong><code>.history</code></strong> tell you where you actually landed: servers routinely redirect requests, and these attributes preserve the trail. One more member of the family, <code>.json()</code>, parses a JSON body into a Python dictionary — this page is HTML so there is nothing for it to parse here, but you will use it within the next few paragraphs.</p>
 <p>You can inspect the first 500 characters of the body:</p>
-<div id="5b7cd461" class="cell" data-execution_count="5">
+<div id="ab99a2fa" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="bu">print</span>(response.text[:<span class="dv">500</span>])</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a><span class="co"># You'll see raw HTML: &lt;!DOCTYPE html&gt;, &lt;head&gt;, &lt;title&gt;, etc.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>This is raw HTML — not yet useful for analysis. In <a href="ch-04-data-formats.html" class="quarto-xref"><span>Chapter 4</span></a> and <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, you will learn to parse this HTML into structured data using BeautifulSoup. For now, the point is that retrieving a web page programmatically is as simple as <code>requests.get(url)</code>.</p>
+<p>This is raw HTML — not yet useful for analysis. It is the page before a browser draws it, as <a href="#fig-article-view-source" class="quarto-xref">Figure&nbsp;<span>1.3</span></a> shows side by side. In <a href="ch-04-data-formats.html" class="quarto-xref"><span>Chapter 4</span></a> and <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, you will learn to parse this HTML into structured data using BeautifulSoup. For now, the point is that retrieving a web page programmatically is as simple as <code>requests.get(url)</code>.</p>
+<div id="fig-article-view-source" class="lightbox quarto-float quarto-figure quarto-figure-center anchored" alt="Two screenshots side by side. Left, labeled What you see: the Wikipedia article University of Colorado Boulder in Chrome, with its title, 38 languages, the Article and Talk tabs, coordinates, and an infobox with the university's seal. Right, labeled What requests gets: View Source of the same page, lines 1 to 29 of HTML, from DOCTYPE html and head to title University of Colorado Boulder - Wikipedia and on.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-article-view-source-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="images/ch-01/article-view-source.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;1.3: The chapter’s Wikipedia article, September 2026. On the left, the page as Chrome draws it. On the right, the same address in Chrome’s View Source (Ctrl+U; Option-Command-U on a Mac): the HTML the server sends, which requests.get() returns as response.text. Line 5’s <title> is the heading on the left. The source’s long lines run past the right edge."><img src="images/ch-01/article-view-source.png" class="img-fluid figure-img" alt="Two screenshots side by side. Left, labeled What you see: the Wikipedia article University of Colorado Boulder in Chrome, with its title, 38 languages, the Article and Talk tabs, coordinates, and an infobox with the university's seal. Right, labeled What requests gets: View Source of the same page, lines 1 to 29 of HTML, from DOCTYPE html and head to title University of Colorado Boulder - Wikipedia and on."></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-article-view-source-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.3: The chapter’s Wikipedia article, September 2026. On the left, the page as Chrome draws it. On the right, the same address in Chrome’s View Source (Ctrl+U; Option-Command-U on a Mac): the HTML the server sends, which <code>requests.get()</code> returns as <code>response.text</code>. Line 5’s <code>&lt;title&gt;</code> is the heading on the left. The source’s long lines run past the right edge.
+</figcaption>
+</figure>
+</div>
 </section>
 <section id="calling-your-first-api" class="level3" data-number="1.4.2">
 <h3 data-number="1.4.2" class="anchored" data-anchor-id="calling-your-first-api"><span class="header-section-number">1.4.2</span> Calling Your First API</h3>
 <p>You can also retrieve data in JSON format from an API. Here is a request to the Wikimedia pageviews API, which returns the number of times a Wikipedia article was viewed on a given day:</p>
-<div id="f0e44312" class="cell" data-execution_count="6">
+<div id="300c1081" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>api_url <span class="op">=</span> <span class="st">"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
@@ -590,7 +624,7 @@ div.csl-indent {
 <section id="from-response-to-dataframe" class="level3" data-number="1.4.3">
 <h3 data-number="1.4.3" class="anchored" data-anchor-id="from-response-to-dataframe"><span class="header-section-number">1.4.3</span> From Response to DataFrame</h3>
 <p>The <code>data["items"]</code> key contains a list of dictionaries, one per day, each with fields like <code>timestamp</code>, <code>views</code>, <code>article</code>, and <code>project</code>. This is exactly the kind of structure that pandas can convert into a DataFrame with a single call:</p>
-<div id="68c6000b" class="cell" data-execution_count="7">
+<div id="47964cc7" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="co"># Convert the list of dictionaries into a DataFrame</span></span>
@@ -619,7 +653,7 @@ div.csl-indent {
 <section id="saving-your-work" class="level3" data-number="1.4.4">
 <h3 data-number="1.4.4" class="anchored" data-anchor-id="saving-your-work"><span class="header-section-number">1.4.4</span> Saving Your Work</h3>
 <p>Once you have data in a DataFrame, save it to disk — a core practice of responsible web data science:</p>
-<div id="2cbe8718" class="cell" data-execution_count="8">
+<div id="e6ab52c0" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Save to CSV</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>df.to_csv(<span class="st">"cu_boulder_pageviews.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a></span>
@@ -660,37 +694,37 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter.</p>
 <p>Since this is the first chapter, the assignment is deliberately modest: prove that your environment works, then run the retrieve–parse–analyze loop once, end to end, on an article you choose.</p>
 <p><strong>Step 1 — Verify your environment.</strong> Import <code>requests</code>, <code>pandas</code> (as <code>pd</code>), and <code>matplotlib.pyplot</code> (as <code>plt</code>). If any import fails, revisit the setup section before going further.</p>
-<div id="5f989e59" class="cell" data-execution_count="9">
+<div id="01531235" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Step 1: Import requests, pandas as pd, and matplotlib.pyplot as plt.</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Make your first request.</strong> Use <code>requests.get()</code> to retrieve any web page you choose, sending a <code>User-Agent</code> header with your email as the chapter does. Print the status code and the length of <code>response.text</code>.</p>
-<div id="a6bd4c28" class="cell" data-execution_count="10">
+<div id="a5aa0968" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 2: Retrieve a web page and print the status code and response length.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Call the pageviews API.</strong> Pick a Wikipedia article you are curious about. Using the pageviews API URL pattern from this chapter — including the <code>User-Agent</code> header with your email — retrieve its daily views for one full month, and parse the response with <code>.json()</code>.</p>
-<div id="dcca428c" class="cell" data-execution_count="11">
+<div id="a340c4a7" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 3: Build the pageviews URL for your article, request it with a User-Agent header, and parse the JSON response.</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Build a DataFrame.</strong> Convert <code>data["items"]</code> into a DataFrame, and convert the <code>timestamp</code> column into a real date with <code>pd.to_datetime()</code>, as the chapter demonstrates.</p>
-<div id="cd317e40" class="cell" data-execution_count="12">
+<div id="31092c7b" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 4: Convert data["items"] to a DataFrame and add a proper date column.</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Plot the time series.</strong> Create a line plot of daily views across your month, with labeled axes and a title naming the article.</p>
-<div id="7113a3e8" class="cell" data-execution_count="13">
+<div id="00640f93" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Step 5: Plot daily views over time with labeled axes and a title.</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Save and reload.</strong> Save the DataFrame to a CSV file with <code>to_csv()</code>, then load it back with <code>pd.read_csv()</code> and print how many rows you recovered.</p>
-<div id="5df7bdca" class="cell" data-execution_count="14">
+<div id="ab06fe68" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># Step 6: Save the DataFrame to CSV, load it back, and print the row count.</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In three to five sentences: What was the highest-traffic day, and can you connect it to a real-world event? What does the status code from Step 2 mean? And why did Step 6 matter — what can you now do without touching the network again?</p>
-<div id="3c26d7f5" class="cell" data-execution_count="15">
+<div id="9c8fe0ba" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1312,7 +1346,7 @@ Wing, Jeannette M. 2006. <span>“Computational Thinking.”</span> <em>Communic
 <span id="cb19-80"><a href="#cb19-80" aria-label="80"></a><span class="ex">jupyter</span> notebook</span>
 <span id="cb19-81"><a href="#cb19-81" aria-label="81"></a><span class="in">```</span></span>
 <span id="cb19-82"><a href="#cb19-82" aria-label="82"></a></span>
-<span id="cb19-83"><a href="#cb19-83" aria-label="83"></a>The command is the same on macOS, Linux, and Windows. Jupyter prints a few lines of log in the terminal and opens a browser tab listing the files in the folder you started it from. Keep the terminal open while you work, because closing it stops Jupyter. To make a notebook, choose **New** and then **Notebook**, and pick the Python 3 kernel if Jupyter asks: started from <span class="in">`webdata`</span>, it is that environment's Python.</span>
+<span id="cb19-83"><a href="#cb19-83" aria-label="83"></a>The command is the same on macOS, Linux, and Windows. Jupyter prints a few lines of log in the terminal and opens a browser tab listing the files in the folder you started it from. Keep the terminal open while you work, because closing it stops Jupyter. To open a notebook you have, such as this chapter's companion notebook, click its name. To make a new one, choose **New** and then **Python 3 (ipykernel)** (@fig-jupyter-new-menu): started from <span class="in">`webdata`</span>, that kernel is that environment's Python.</span>
 <span id="cb19-84"><a href="#cb19-84" aria-label="84"></a></span>
 <span id="cb19-85"><a href="#cb19-85" aria-label="85"></a>A notebook consists of cells. **Code cells** contain Python that you can execute with Shift+Enter. **Markdown cells** contain formatted text for documentation. The ability to interleave code with narrative explanation makes notebooks ideal for the kind of exploratory, iterative work that characterizes web data science.</span>
 <span id="cb19-86"><a href="#cb19-86" aria-label="86"></a></span>
@@ -1322,271 +1356,311 @@ Wing, Jeannette M. 2006. <span>“Computational Thinking.”</span> <em>Communic
 <span id="cb19-92"><a href="#cb19-92" aria-label="90"></a><span class="co"># Output: Hello, web data science!</span></span>
 <span id="cb19-93"><a href="#cb19-93" aria-label="91"></a><span class="in">```</span></span>
 <span id="cb19-94"><a href="#cb19-94" aria-label="92"></a></span>
-<span id="cb19-95"><a href="#cb19-95" aria-label="93"></a>::: {.callout-tip}</span>
-<span id="cb19-96"><a href="#cb19-96" aria-label="94"></a><span class="fu">## Missing Manual Reference</span></span>
-<span id="cb19-97"><a href="#cb19-97" aria-label="95"></a>For a thorough introduction to Jupyter Notebooks — cell types, execution order, keyboard shortcuts, kernel management, and common pitfalls — see *Missing Manual* Chapter 16: Jupyter.</span>
-<span id="cb19-98"><a href="#cb19-98" aria-label="96"></a>:::</span>
-<span id="cb19-99"><a href="#cb19-99" aria-label="97"></a></span>
-<span id="cb19-100"><a href="#cb19-100" aria-label="98"></a><span class="fu">### Core Libraries</span></span>
-<span id="cb19-101"><a href="#cb19-101" aria-label="99"></a></span>
-<span id="cb19-102"><a href="#cb19-102" aria-label="100"></a>This book uses several Python libraries extensively. You installed the core ones into <span class="in">`webdata`</span> along with Jupyter; later chapters install more as they need them, with the same <span class="in">`pip install`</span> in a terminal where <span class="in">`webdata`</span> is active. For now, confirm in a notebook that the core libraries import without error:</span>
-<span id="cb19-103"><a href="#cb19-103" aria-label="101"></a></span>
-<span id="cb19-106"><a href="#cb19-106" aria-label="102"></a><span class="in">```{python}</span></span>
-<span id="cb19-107"><a href="#cb19-107" aria-label="103"></a><span class="im">import</span> requests</span>
-<span id="cb19-108"><a href="#cb19-108" aria-label="104"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb19-109"><a href="#cb19-109" aria-label="105"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb19-110"><a href="#cb19-110" aria-label="106"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
-<span id="cb19-111"><a href="#cb19-111" aria-label="107"></a></span>
-<span id="cb19-112"><a href="#cb19-112" aria-label="108"></a><span class="bu">print</span>(<span class="st">"All core libraries loaded successfully."</span>)</span>
-<span id="cb19-113"><a href="#cb19-113" aria-label="109"></a><span class="in">```</span></span>
-<span id="cb19-114"><a href="#cb19-114" aria-label="110"></a></span>
-<span id="cb19-115"><a href="#cb19-115" aria-label="111"></a>If an import fails with <span class="in">`ModuleNotFoundError`</span>, the notebook is running a different Python than <span class="in">`webdata`</span>. Close Jupyter, run <span class="in">`conda activate webdata`</span> in the terminal, and start <span class="in">`jupyter notebook`</span> again.</span>
-<span id="cb19-116"><a href="#cb19-116" aria-label="112"></a></span>
-<span id="cb19-117"><a href="#cb19-117" aria-label="113"></a><span class="fu">## Your First Request</span></span>
-<span id="cb19-118"><a href="#cb19-118" aria-label="114"></a></span>
-<span id="cb19-119"><a href="#cb19-119" aria-label="115"></a>Let us preview the loop that structures every chapter in this book: **retrieve** data from the web, **parse** it into a usable structure, and **analyze** it to produce insight.</span>
+<span id="cb19-95"><a href="#cb19-95" aria-label="93"></a>In the companion notebook, this code cell sits under a Markdown cell that holds the paragraph above, as @fig-jupyter-cells shows.</span>
+<span id="cb19-96"><a href="#cb19-96" aria-label="94"></a></span>
+<span id="cb19-97"><a href="#cb19-97" aria-label="95"></a><span class="al">![Jupyter's file list in the browser, in Jupyter Notebook 7.6, September 2026. The folder holds this chapter's companion notebook ①: click a name to open it. **New** ② opens a menu whose first item, **Python 3 (ipykernel)** ③, makes a new notebook.](images/ch-01/jupyter-new-menu_annotated.png)</span>{#fig-jupyter-new-menu .lightbox fig-alt="Screenshot of Jupyter's file list in a browser, with the Files and Running tabs, and a toolbar with New, Upload, and a refresh button. Marker 1: ch-01-introduction.ipynb, the one file in the folder. Marker 2: the New button, whose menu is open. Marker 3: its first item, Python 3 (ipykernel), above Terminal, Console, New File, and New Folder."}</span>
+<span id="cb19-98"><a href="#cb19-98" aria-label="96"></a></span>
+<span id="cb19-99"><a href="#cb19-99" aria-label="97"></a>!<span class="co">[</span><span class="ot">The companion notebook in Jupyter, September 2026. A Markdown cell ① holds the chapter's text. Below it, the first code cell has run: its prompt reads `[1]:` ②, and its output ③ is under it. The kernel, Python 3 (ipykernel), is named at the right of the toolbar ④. **Not Trusted**, above it, is Jupyter's label for a notebook you didn't make on this computer; it doesn't stop cells from running.</span><span class="co">](images/ch-01/jupyter-cells_annotated.png)</span>{#fig-jupyter-cells .lightbox fig-alt="Screenshot of the notebook ch-01-introduction in Jupyter, with the menus File to Help, Not Trusted at the right, and a toolbar ending in marker 4, the kernel Python 3 (ipykernel). Marker 1: a Markdown cell, the paragraph beginning A notebook consists of cells. Marker 2: a code cell's prompt, <span class="co">[</span><span class="ot">1</span><span class="co">]</span>:, beside a comment and a print call for Hello, web data science! Marker 3: its output, Hello, web data science!"}</span>
+<span id="cb19-100"><a href="#cb19-100" aria-label="98"></a></span>
+<span id="cb19-101"><a href="#cb19-101" aria-label="99"></a>::: {.callout-tip}</span>
+<span id="cb19-102"><a href="#cb19-102" aria-label="100"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb19-103"><a href="#cb19-103" aria-label="101"></a>For a thorough introduction to Jupyter Notebooks — cell types, execution order, keyboard shortcuts, kernel management, and common pitfalls — see *Missing Manual* Chapter 16: Jupyter.</span>
+<span id="cb19-104"><a href="#cb19-104" aria-label="102"></a>:::</span>
+<span id="cb19-105"><a href="#cb19-105" aria-label="103"></a></span>
+<span id="cb19-106"><a href="#cb19-106" aria-label="104"></a><span class="fu">### Core Libraries</span></span>
+<span id="cb19-107"><a href="#cb19-107" aria-label="105"></a></span>
+<span id="cb19-108"><a href="#cb19-108" aria-label="106"></a>This book uses several Python libraries extensively. You installed the core ones into <span class="in">`webdata`</span> along with Jupyter; later chapters install more as they need them, with the same <span class="in">`pip install`</span> in a terminal where <span class="in">`webdata`</span> is active. For now, confirm in a notebook that the core libraries import without error:</span>
+<span id="cb19-109"><a href="#cb19-109" aria-label="107"></a></span>
+<span id="cb19-112"><a href="#cb19-112" aria-label="108"></a><span class="in">```{python}</span></span>
+<span id="cb19-113"><a href="#cb19-113" aria-label="109"></a><span class="im">import</span> requests</span>
+<span id="cb19-114"><a href="#cb19-114" aria-label="110"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb19-115"><a href="#cb19-115" aria-label="111"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb19-116"><a href="#cb19-116" aria-label="112"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb19-117"><a href="#cb19-117" aria-label="113"></a></span>
+<span id="cb19-118"><a href="#cb19-118" aria-label="114"></a><span class="bu">print</span>(<span class="st">"All core libraries loaded successfully."</span>)</span>
+<span id="cb19-119"><a href="#cb19-119" aria-label="115"></a><span class="in">```</span></span>
 <span id="cb19-120"><a href="#cb19-120" aria-label="116"></a></span>
-<span id="cb19-121"><a href="#cb19-121" aria-label="117"></a><span class="fu">### Meet `requests`</span></span>
+<span id="cb19-121"><a href="#cb19-121" aria-label="117"></a>If an import fails with <span class="in">`ModuleNotFoundError`</span>, the notebook is running a different Python than <span class="in">`webdata`</span>. Close Jupyter, run <span class="in">`conda activate webdata`</span> in the terminal, and start <span class="in">`jupyter notebook`</span> again.</span>
 <span id="cb19-122"><a href="#cb19-122" aria-label="118"></a></span>
-<span id="cb19-123"><a href="#cb19-123" aria-label="119"></a>Nearly everything in this book starts with the <span class="co">[</span><span class="ot">`requests`</span><span class="co">](https://requests.readthedocs.io/)</span> library. It is the standard way to fetch things from the web in Python — its documentation calls it "HTTP for Humans." When you type a URL, your browser sends a request across the internet, receives a reply, and renders that reply as a page. <span class="in">`requests`</span> does the same sending and receiving, but instead of rendering the reply, it hands the whole thing to *you*, as a Python object you can inspect, parse, and analyze.</span>
+<span id="cb19-123"><a href="#cb19-123" aria-label="119"></a><span class="fu">## Your First Request</span></span>
 <span id="cb19-124"><a href="#cb19-124" aria-label="120"></a></span>
-<span id="cb19-125"><a href="#cb19-125" aria-label="121"></a>Why this library and not another? Python ships with a built-in module for the job (<span class="in">`urllib`</span>), but it is verbose where <span class="in">`requests`</span> is direct: fetching a page is one readable line, and the library quietly handles the details — character encodings, redirects, connection management — that you should not have to think about in week one. And <span class="in">`requests`</span> is the ecosystem's common ground: the scraping and API libraries you will meet later in this book are built on top of it, imitate its interface, or assume you will pair them with it, so the habits you form here transfer everywhere. What actually happens on the wire when a request is sent — protocols, servers, DNS, the anatomy of HTTP itself — is a story worth telling properly, and @sec-protocols tells it. For now, treat <span class="in">`requests`</span> as a well-made black box: ask for a page, get a reply.</span>
+<span id="cb19-125"><a href="#cb19-125" aria-label="121"></a>Let us preview the loop that structures every chapter in this book: **retrieve** data from the web, **parse** it into a usable structure, and **analyze** it to produce insight.</span>
 <span id="cb19-126"><a href="#cb19-126" aria-label="122"></a></span>
-<span id="cb19-127"><a href="#cb19-127" aria-label="123"></a>Here you will retrieve the Wikipedia article for the University of Colorado Boulder. Wikipedia refuses requests that don't say who is sending them, answering <span class="in">`requests`</span>' default with a 403, so this one carries a <span class="in">`User-Agent`</span> header that names you. Put your own email address in it; @sec-ethics explains why sites ask for this.</span>
+<span id="cb19-127"><a href="#cb19-127" aria-label="123"></a><span class="fu">### Meet `requests`</span></span>
 <span id="cb19-128"><a href="#cb19-128" aria-label="124"></a></span>
-<span id="cb19-131"><a href="#cb19-131" aria-label="125"></a><span class="in">```{python}</span></span>
-<span id="cb19-132"><a href="#cb19-132" aria-label="126"></a><span class="im">import</span> requests</span>
-<span id="cb19-133"><a href="#cb19-133" aria-label="127"></a></span>
-<span id="cb19-134"><a href="#cb19-134" aria-label="128"></a><span class="co"># Identify yourself: Wikipedia answers the library's default User-Agent with a 403</span></span>
-<span id="cb19-135"><a href="#cb19-135" aria-label="129"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
-<span id="cb19-136"><a href="#cb19-136" aria-label="130"></a></span>
-<span id="cb19-137"><a href="#cb19-137" aria-label="131"></a><span class="co"># Retrieve the page</span></span>
-<span id="cb19-138"><a href="#cb19-138" aria-label="132"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/wiki/University_of_Colorado_Boulder"</span></span>
-<span id="cb19-139"><a href="#cb19-139" aria-label="133"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
-<span id="cb19-140"><a href="#cb19-140" aria-label="134"></a></span>
-<span id="cb19-141"><a href="#cb19-141" aria-label="135"></a><span class="co"># Check the response</span></span>
-<span id="cb19-142"><a href="#cb19-142" aria-label="136"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200 means success</span></span>
-<span id="cb19-143"><a href="#cb19-143" aria-label="137"></a><span class="bu">print</span>(<span class="bu">type</span>(response))        <span class="co"># &lt;class 'requests.models.Response'&gt;</span></span>
-<span id="cb19-144"><a href="#cb19-144" aria-label="138"></a><span class="bu">print</span>(<span class="bu">len</span>(response.text))    <span class="co"># Number of characters in the HTML</span></span>
-<span id="cb19-145"><a href="#cb19-145" aria-label="139"></a><span class="in">```</span></span>
+<span id="cb19-129"><a href="#cb19-129" aria-label="125"></a>Nearly everything in this book starts with the <span class="co">[</span><span class="ot">`requests`</span><span class="co">](https://requests.readthedocs.io/)</span> library. It is the standard way to fetch things from the web in Python — its documentation calls it "HTTP for Humans." When you type a URL, your browser sends a request across the internet, receives a reply, and renders that reply as a page. <span class="in">`requests`</span> does the same sending and receiving, but instead of rendering the reply, it hands the whole thing to *you*, as a Python object you can inspect, parse, and analyze.</span>
+<span id="cb19-130"><a href="#cb19-130" aria-label="126"></a></span>
+<span id="cb19-131"><a href="#cb19-131" aria-label="127"></a>Why this library and not another? Python ships with a built-in module for the job (<span class="in">`urllib`</span>), but it is verbose where <span class="in">`requests`</span> is direct: fetching a page is one readable line, and the library quietly handles the details — character encodings, redirects, connection management — that you should not have to think about in week one. And <span class="in">`requests`</span> is the ecosystem's common ground: the scraping and API libraries you will meet later in this book are built on top of it, imitate its interface, or assume you will pair them with it, so the habits you form here transfer everywhere. What actually happens on the wire when a request is sent — protocols, servers, DNS, the anatomy of HTTP itself — is a story worth telling properly, and @sec-protocols tells it. For now, treat <span class="in">`requests`</span> as a well-made black box: ask for a page, get a reply.</span>
+<span id="cb19-132"><a href="#cb19-132" aria-label="128"></a></span>
+<span id="cb19-133"><a href="#cb19-133" aria-label="129"></a>Here you will retrieve the Wikipedia article for the University of Colorado Boulder. Wikipedia refuses requests that don't say who is sending them, answering <span class="in">`requests`</span>' default with a 403, so this one carries a <span class="in">`User-Agent`</span> header that names you. Put your own email address in it; @sec-ethics explains why sites ask for this.</span>
+<span id="cb19-134"><a href="#cb19-134" aria-label="130"></a></span>
+<span id="cb19-137"><a href="#cb19-137" aria-label="131"></a><span class="in">```{python}</span></span>
+<span id="cb19-138"><a href="#cb19-138" aria-label="132"></a><span class="im">import</span> requests</span>
+<span id="cb19-139"><a href="#cb19-139" aria-label="133"></a></span>
+<span id="cb19-140"><a href="#cb19-140" aria-label="134"></a><span class="co"># Identify yourself: Wikipedia answers the library's default User-Agent with a 403</span></span>
+<span id="cb19-141"><a href="#cb19-141" aria-label="135"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb19-142"><a href="#cb19-142" aria-label="136"></a></span>
+<span id="cb19-143"><a href="#cb19-143" aria-label="137"></a><span class="co"># Retrieve the page</span></span>
+<span id="cb19-144"><a href="#cb19-144" aria-label="138"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/wiki/University_of_Colorado_Boulder"</span></span>
+<span id="cb19-145"><a href="#cb19-145" aria-label="139"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
 <span id="cb19-146"><a href="#cb19-146" aria-label="140"></a></span>
-<span id="cb19-147"><a href="#cb19-147" aria-label="141"></a>That <span class="in">`response`</span> variable is a **Response object** — you will handle one every time you touch the web from now on. It is the parcel the server sent back, still in its packaging: not just the page you asked for, but everything about the exchange — whether it succeeded, what kind of document came back, the document itself in two forms, and a record of how you got there. A quick tour of the parts you will actually use:</span>
-<span id="cb19-148"><a href="#cb19-148" aria-label="142"></a></span>
-<span id="cb19-151"><a href="#cb19-151" aria-label="143"></a><span class="in">```{python}</span></span>
-<span id="cb19-152"><a href="#cb19-152" aria-label="144"></a><span class="co"># What kind of document did the server send?</span></span>
-<span id="cb19-153"><a href="#cb19-153" aria-label="145"></a><span class="bu">print</span>(response.headers[<span class="st">"Content-Type"</span>])</span>
-<span id="cb19-154"><a href="#cb19-154" aria-label="146"></a><span class="co"># text/html; charset=UTF-8</span></span>
-<span id="cb19-155"><a href="#cb19-155" aria-label="147"></a></span>
-<span id="cb19-156"><a href="#cb19-156" aria-label="148"></a><span class="co"># The body, decoded to text for you -- and the same body as raw bytes</span></span>
-<span id="cb19-157"><a href="#cb19-157" aria-label="149"></a><span class="bu">print</span>(<span class="bu">type</span>(response.text))     <span class="co"># &lt;class 'str'&gt;</span></span>
-<span id="cb19-158"><a href="#cb19-158" aria-label="150"></a><span class="bu">print</span>(<span class="bu">type</span>(response.content))  <span class="co"># &lt;class 'bytes'&gt;</span></span>
-<span id="cb19-159"><a href="#cb19-159" aria-label="151"></a></span>
-<span id="cb19-160"><a href="#cb19-160" aria-label="152"></a><span class="co"># Where you ended up, and how -- redirects leave a trail</span></span>
-<span id="cb19-161"><a href="#cb19-161" aria-label="153"></a><span class="bu">print</span>(response.url)      <span class="co"># https://en.wikipedia.org/wiki/University_of_Colorado_Boulder</span></span>
-<span id="cb19-162"><a href="#cb19-162" aria-label="154"></a><span class="bu">print</span>(response.history)  <span class="co"># [] -- no redirects this time</span></span>
-<span id="cb19-163"><a href="#cb19-163" aria-label="155"></a><span class="in">```</span></span>
-<span id="cb19-164"><a href="#cb19-164" aria-label="156"></a></span>
-<span id="cb19-165"><a href="#cb19-165" aria-label="157"></a>The **status code** you printed above is the server's three-digit verdict on your request: codes starting with 2 mean success, 4 means something is wrong with your request, and the full taxonomy waits in @sec-protocols. The **headers** are a dictionary of metadata about the reply, and `Content-Type` is the one you will consult most — it is how you know whether you received HTML to parse, JSON to decode, or something else entirely. The body comes in two forms: **`.text`** is the decoded string you will use for web pages, while **`.content`** is the raw bytes, which matters when the thing you retrieved is not text at all — a PDF (@sec-pdfs) or an image has no meaningful `.text`. And **`.url`** with **`.history`** tell you where you actually landed: servers routinely redirect requests, and these attributes preserve the trail. One more member of the family, <span class="in">`.json()`</span>, parses a JSON body into a Python dictionary — this page is HTML so there is nothing for it to parse here, but you will use it within the next few paragraphs.</span>
-<span id="cb19-166"><a href="#cb19-166" aria-label="158"></a></span>
-<span id="cb19-167"><a href="#cb19-167" aria-label="159"></a>You can inspect the first 500 characters of the body:</span>
-<span id="cb19-168"><a href="#cb19-168" aria-label="160"></a></span>
-<span id="cb19-171"><a href="#cb19-171" aria-label="161"></a><span class="in">```{python}</span></span>
-<span id="cb19-172"><a href="#cb19-172" aria-label="162"></a><span class="bu">print</span>(response.text[:<span class="dv">500</span>])</span>
-<span id="cb19-173"><a href="#cb19-173" aria-label="163"></a><span class="co"># You'll see raw HTML: &lt;!DOCTYPE html&gt;, &lt;head&gt;, &lt;title&gt;, etc.</span></span>
-<span id="cb19-174"><a href="#cb19-174" aria-label="164"></a><span class="in">```</span></span>
-<span id="cb19-175"><a href="#cb19-175" aria-label="165"></a></span>
-<span id="cb19-176"><a href="#cb19-176" aria-label="166"></a>This is raw HTML — not yet useful for analysis. In @sec-data-formats and @sec-static-pages, you will learn to parse this HTML into structured data using BeautifulSoup. For now, the point is that retrieving a web page programmatically is as simple as <span class="in">`requests.get(url)`</span>.</span>
-<span id="cb19-177"><a href="#cb19-177" aria-label="167"></a></span>
-<span id="cb19-178"><a href="#cb19-178" aria-label="168"></a><span class="fu">### Calling Your First API</span></span>
-<span id="cb19-179"><a href="#cb19-179" aria-label="169"></a></span>
-<span id="cb19-180"><a href="#cb19-180" aria-label="170"></a>You can also retrieve data in JSON format from an API. Here is a request to the Wikimedia pageviews API, which returns the number of times a Wikipedia article was viewed on a given day:</span>
+<span id="cb19-147"><a href="#cb19-147" aria-label="141"></a><span class="co"># Check the response</span></span>
+<span id="cb19-148"><a href="#cb19-148" aria-label="142"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200 means success</span></span>
+<span id="cb19-149"><a href="#cb19-149" aria-label="143"></a><span class="bu">print</span>(<span class="bu">type</span>(response))        <span class="co"># &lt;class 'requests.models.Response'&gt;</span></span>
+<span id="cb19-150"><a href="#cb19-150" aria-label="144"></a><span class="bu">print</span>(<span class="bu">len</span>(response.text))    <span class="co"># Number of characters in the HTML</span></span>
+<span id="cb19-151"><a href="#cb19-151" aria-label="145"></a><span class="in">```</span></span>
+<span id="cb19-152"><a href="#cb19-152" aria-label="146"></a></span>
+<span id="cb19-153"><a href="#cb19-153" aria-label="147"></a>That <span class="in">`response`</span> variable is a **Response object** — you will handle one every time you touch the web from now on. It is the parcel the server sent back, still in its packaging: not just the page you asked for, but everything about the exchange — whether it succeeded, what kind of document came back, the document itself in two forms, and a record of how you got there. A quick tour of the parts you will actually use:</span>
+<span id="cb19-154"><a href="#cb19-154" aria-label="148"></a></span>
+<span id="cb19-157"><a href="#cb19-157" aria-label="149"></a><span class="in">```{python}</span></span>
+<span id="cb19-158"><a href="#cb19-158" aria-label="150"></a><span class="co"># What kind of document did the server send?</span></span>
+<span id="cb19-159"><a href="#cb19-159" aria-label="151"></a><span class="bu">print</span>(response.headers[<span class="st">"Content-Type"</span>])</span>
+<span id="cb19-160"><a href="#cb19-160" aria-label="152"></a><span class="co"># text/html; charset=UTF-8</span></span>
+<span id="cb19-161"><a href="#cb19-161" aria-label="153"></a></span>
+<span id="cb19-162"><a href="#cb19-162" aria-label="154"></a><span class="co"># The body, decoded to text for you -- and the same body as raw bytes</span></span>
+<span id="cb19-163"><a href="#cb19-163" aria-label="155"></a><span class="bu">print</span>(<span class="bu">type</span>(response.text))     <span class="co"># &lt;class 'str'&gt;</span></span>
+<span id="cb19-164"><a href="#cb19-164" aria-label="156"></a><span class="bu">print</span>(<span class="bu">type</span>(response.content))  <span class="co"># &lt;class 'bytes'&gt;</span></span>
+<span id="cb19-165"><a href="#cb19-165" aria-label="157"></a></span>
+<span id="cb19-166"><a href="#cb19-166" aria-label="158"></a><span class="co"># Where you ended up, and how -- redirects leave a trail</span></span>
+<span id="cb19-167"><a href="#cb19-167" aria-label="159"></a><span class="bu">print</span>(response.url)      <span class="co"># https://en.wikipedia.org/wiki/University_of_Colorado_Boulder</span></span>
+<span id="cb19-168"><a href="#cb19-168" aria-label="160"></a><span class="bu">print</span>(response.history)  <span class="co"># [] -- no redirects this time</span></span>
+<span id="cb19-169"><a href="#cb19-169" aria-label="161"></a><span class="in">```</span></span>
+<span id="cb19-170"><a href="#cb19-170" aria-label="162"></a></span>
+<span id="cb19-171"><a href="#cb19-171" aria-label="163"></a>The **status code** you printed above is the server's three-digit verdict on your request: codes starting with 2 mean success, 4 means something is wrong with your request, and the full taxonomy waits in @sec-protocols. The **headers** are a dictionary of metadata about the reply, and `Content-Type` is the one you will consult most — it is how you know whether you received HTML to parse, JSON to decode, or something else entirely. The body comes in two forms: **`.text`** is the decoded string you will use for web pages, while **`.content`** is the raw bytes, which matters when the thing you retrieved is not text at all — a PDF (@sec-pdfs) or an image has no meaningful `.text`. And **`.url`** with **`.history`** tell you where you actually landed: servers routinely redirect requests, and these attributes preserve the trail. One more member of the family, <span class="in">`.json()`</span>, parses a JSON body into a Python dictionary — this page is HTML so there is nothing for it to parse here, but you will use it within the next few paragraphs.</span>
+<span id="cb19-172"><a href="#cb19-172" aria-label="164"></a></span>
+<span id="cb19-173"><a href="#cb19-173" aria-label="165"></a>You can inspect the first 500 characters of the body:</span>
+<span id="cb19-174"><a href="#cb19-174" aria-label="166"></a></span>
+<span id="cb19-177"><a href="#cb19-177" aria-label="167"></a><span class="in">```{python}</span></span>
+<span id="cb19-178"><a href="#cb19-178" aria-label="168"></a><span class="bu">print</span>(response.text[:<span class="dv">500</span>])</span>
+<span id="cb19-179"><a href="#cb19-179" aria-label="169"></a><span class="co"># You'll see raw HTML: &lt;!DOCTYPE html&gt;, &lt;head&gt;, &lt;title&gt;, etc.</span></span>
+<span id="cb19-180"><a href="#cb19-180" aria-label="170"></a><span class="in">```</span></span>
 <span id="cb19-181"><a href="#cb19-181" aria-label="171"></a></span>
-<span id="cb19-184"><a href="#cb19-184" aria-label="172"></a><span class="in">```{python}</span></span>
-<span id="cb19-185"><a href="#cb19-185" aria-label="173"></a><span class="im">import</span> requests</span>
-<span id="cb19-186"><a href="#cb19-186" aria-label="174"></a></span>
-<span id="cb19-187"><a href="#cb19-187" aria-label="175"></a>api_url <span class="op">=</span> <span class="st">"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
-<span id="cb19-188"><a href="#cb19-188" aria-label="176"></a>article <span class="op">=</span> <span class="st">"University_of_Colorado_Boulder"</span></span>
-<span id="cb19-189"><a href="#cb19-189" aria-label="177"></a>url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>api_url<span class="sc">}</span><span class="ss">/en.wikipedia/all-access/all-agents/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
-<span id="cb19-190"><a href="#cb19-190" aria-label="178"></a></span>
-<span id="cb19-191"><a href="#cb19-191" aria-label="179"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
-<span id="cb19-192"><a href="#cb19-192" aria-label="180"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
-<span id="cb19-193"><a href="#cb19-193" aria-label="181"></a></span>
-<span id="cb19-194"><a href="#cb19-194" aria-label="182"></a>data <span class="op">=</span> response.json()  <span class="co"># Parse the JSON response into a Python dictionary</span></span>
-<span id="cb19-195"><a href="#cb19-195" aria-label="183"></a><span class="bu">print</span>(<span class="bu">type</span>(data))        <span class="co"># &lt;class 'dict'&gt;</span></span>
-<span id="cb19-196"><a href="#cb19-196" aria-label="184"></a><span class="bu">print</span>(data.keys())       <span class="co"># What keys are in the response?</span></span>
-<span id="cb19-197"><a href="#cb19-197" aria-label="185"></a><span class="in">```</span></span>
+<span id="cb19-182"><a href="#cb19-182" aria-label="172"></a>This is raw HTML — not yet useful for analysis. It is the page before a browser draws it, as @fig-article-view-source shows side by side. In @sec-data-formats and @sec-static-pages, you will learn to parse this HTML into structured data using BeautifulSoup. For now, the point is that retrieving a web page programmatically is as simple as <span class="in">`requests.get(url)`</span>.</span>
+<span id="cb19-183"><a href="#cb19-183" aria-label="173"></a></span>
+<span id="cb19-184"><a href="#cb19-184" aria-label="174"></a><span class="al">![The chapter's Wikipedia article, September 2026. On the left, the page as Chrome draws it. On the right, the same address in Chrome's View Source (Ctrl+U; Option-Command-U on a Mac): the HTML the server sends, which `requests.get()` returns as `response.text`. Line 5's `&lt;title&gt;` is the heading on the left. The source's long lines run past the right edge.](images/ch-01/article-view-source.png)</span>{#fig-article-view-source .lightbox fig-alt="Two screenshots side by side. Left, labeled What you see: the Wikipedia article University of Colorado Boulder in Chrome, with its title, 38 languages, the Article and Talk tabs, coordinates, and an infobox with the university's seal. Right, labeled What requests gets: View Source of the same page, lines 1 to 29 of HTML, from DOCTYPE html and head to title University of Colorado Boulder - Wikipedia and on."}</span>
+<span id="cb19-185"><a href="#cb19-185" aria-label="175"></a></span>
+<span id="cb19-186"><a href="#cb19-186" aria-label="176"></a><span class="fu">### Calling Your First API</span></span>
+<span id="cb19-187"><a href="#cb19-187" aria-label="177"></a></span>
+<span id="cb19-188"><a href="#cb19-188" aria-label="178"></a>You can also retrieve data in JSON format from an API. Here is a request to the Wikimedia pageviews API, which returns the number of times a Wikipedia article was viewed on a given day:</span>
+<span id="cb19-189"><a href="#cb19-189" aria-label="179"></a></span>
+<span id="cb19-192"><a href="#cb19-192" aria-label="180"></a><span class="in">```{python}</span></span>
+<span id="cb19-193"><a href="#cb19-193" aria-label="181"></a><span class="im">import</span> requests</span>
+<span id="cb19-194"><a href="#cb19-194" aria-label="182"></a></span>
+<span id="cb19-195"><a href="#cb19-195" aria-label="183"></a>api_url <span class="op">=</span> <span class="st">"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
+<span id="cb19-196"><a href="#cb19-196" aria-label="184"></a>article <span class="op">=</span> <span class="st">"University_of_Colorado_Boulder"</span></span>
+<span id="cb19-197"><a href="#cb19-197" aria-label="185"></a>url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>api_url<span class="sc">}</span><span class="ss">/en.wikipedia/all-access/all-agents/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
 <span id="cb19-198"><a href="#cb19-198" aria-label="186"></a></span>
-<span id="cb19-199"><a href="#cb19-199" aria-label="187"></a>Notice two things. First, as with the article, you included a custom <span class="in">`User-Agent`</span> header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the <span class="in">`.json()`</span> method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate.</span>
-<span id="cb19-200"><a href="#cb19-200" aria-label="188"></a></span>
-<span id="cb19-201"><a href="#cb19-201" aria-label="189"></a><span class="fu">### From Response to DataFrame</span></span>
-<span id="cb19-202"><a href="#cb19-202" aria-label="190"></a></span>
-<span id="cb19-203"><a href="#cb19-203" aria-label="191"></a>The <span class="in">`data["items"]`</span> key contains a list of dictionaries, one per day, each with fields like <span class="in">`timestamp`</span>, <span class="in">`views`</span>, <span class="in">`article`</span>, and <span class="in">`project`</span>. This is exactly the kind of structure that pandas can convert into a DataFrame with a single call:</span>
-<span id="cb19-204"><a href="#cb19-204" aria-label="192"></a></span>
-<span id="cb19-207"><a href="#cb19-207" aria-label="193"></a><span class="in">```{python}</span></span>
-<span id="cb19-208"><a href="#cb19-208" aria-label="194"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb19-209"><a href="#cb19-209" aria-label="195"></a></span>
-<span id="cb19-210"><a href="#cb19-210" aria-label="196"></a><span class="co"># Convert the list of dictionaries into a DataFrame</span></span>
-<span id="cb19-211"><a href="#cb19-211" aria-label="197"></a>df <span class="op">=</span> pd.DataFrame(data[<span class="st">"items"</span>])</span>
-<span id="cb19-212"><a href="#cb19-212" aria-label="198"></a><span class="bu">print</span>(df.head())</span>
-<span id="cb19-213"><a href="#cb19-213" aria-label="199"></a><span class="co"># You'll see columns: project, article, granularity, timestamp, access, agent, views</span></span>
-<span id="cb19-214"><a href="#cb19-214" aria-label="200"></a></span>
-<span id="cb19-215"><a href="#cb19-215" aria-label="201"></a><span class="co"># The timestamp column looks like "2026010100" — convert it to a proper date</span></span>
-<span id="cb19-216"><a href="#cb19-216" aria-label="202"></a>df[<span class="st">"date"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">00"</span>)</span>
+<span id="cb19-199"><a href="#cb19-199" aria-label="187"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb19-200"><a href="#cb19-200" aria-label="188"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb19-201"><a href="#cb19-201" aria-label="189"></a></span>
+<span id="cb19-202"><a href="#cb19-202" aria-label="190"></a>data <span class="op">=</span> response.json()  <span class="co"># Parse the JSON response into a Python dictionary</span></span>
+<span id="cb19-203"><a href="#cb19-203" aria-label="191"></a><span class="bu">print</span>(<span class="bu">type</span>(data))        <span class="co"># &lt;class 'dict'&gt;</span></span>
+<span id="cb19-204"><a href="#cb19-204" aria-label="192"></a><span class="bu">print</span>(data.keys())       <span class="co"># What keys are in the response?</span></span>
+<span id="cb19-205"><a href="#cb19-205" aria-label="193"></a><span class="in">```</span></span>
+<span id="cb19-206"><a href="#cb19-206" aria-label="194"></a></span>
+<span id="cb19-207"><a href="#cb19-207" aria-label="195"></a>Notice two things. First, as with the article, you included a custom <span class="in">`User-Agent`</span> header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the <span class="in">`.json()`</span> method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate.</span>
+<span id="cb19-208"><a href="#cb19-208" aria-label="196"></a></span>
+<span id="cb19-209"><a href="#cb19-209" aria-label="197"></a><span class="fu">### From Response to DataFrame</span></span>
+<span id="cb19-210"><a href="#cb19-210" aria-label="198"></a></span>
+<span id="cb19-211"><a href="#cb19-211" aria-label="199"></a>The <span class="in">`data["items"]`</span> key contains a list of dictionaries, one per day, each with fields like <span class="in">`timestamp`</span>, <span class="in">`views`</span>, <span class="in">`article`</span>, and <span class="in">`project`</span>. This is exactly the kind of structure that pandas can convert into a DataFrame with a single call:</span>
+<span id="cb19-212"><a href="#cb19-212" aria-label="200"></a></span>
+<span id="cb19-215"><a href="#cb19-215" aria-label="201"></a><span class="in">```{python}</span></span>
+<span id="cb19-216"><a href="#cb19-216" aria-label="202"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb19-217"><a href="#cb19-217" aria-label="203"></a></span>
-<span id="cb19-218"><a href="#cb19-218" aria-label="204"></a><span class="co"># Plot the time series</span></span>
-<span id="cb19-219"><a href="#cb19-219" aria-label="205"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb19-220"><a href="#cb19-220" aria-label="206"></a></span>
-<span id="cb19-221"><a href="#cb19-221" aria-label="207"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
-<span id="cb19-222"><a href="#cb19-222" aria-label="208"></a>plt.plot(df[<span class="st">"date"</span>], df[<span class="st">"views"</span>])</span>
-<span id="cb19-223"><a href="#cb19-223" aria-label="209"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
-<span id="cb19-224"><a href="#cb19-224" aria-label="210"></a>plt.ylabel(<span class="st">"Daily Pageviews"</span>)</span>
-<span id="cb19-225"><a href="#cb19-225" aria-label="211"></a>plt.title(<span class="ss">f"Wikipedia Pageviews: </span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb19-226"><a href="#cb19-226" aria-label="212"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">45</span>)</span>
-<span id="cb19-227"><a href="#cb19-227" aria-label="213"></a>plt.tight_layout()</span>
-<span id="cb19-228"><a href="#cb19-228" aria-label="214"></a>plt.show()</span>
-<span id="cb19-229"><a href="#cb19-229" aria-label="215"></a><span class="in">```</span></span>
-<span id="cb19-230"><a href="#cb19-230" aria-label="216"></a></span>
-<span id="cb19-231"><a href="#cb19-231" aria-label="217"></a>This retrieve-parse-DataFrame-visualize pipeline is the fundamental pattern of this book. In every subsequent chapter, you will repeat these steps with different data sources: retrieve HTML pages, XML feeds, JSON API responses, or PDF documents; parse them into structured records; convert those records into a pandas DataFrame; and analyze or visualize the result. The specifics change — BeautifulSoup for HTML, <span class="in">`json.loads()`</span> for JSON, regular expressions for messy text — but the loop remains the same. Recognizing this pattern early will help you approach each new chapter with a clear mental model of what you are trying to accomplish.</span>
-<span id="cb19-232"><a href="#cb19-232" aria-label="218"></a></span>
-<span id="cb19-233"><a href="#cb19-233" aria-label="219"></a>The DataFrame also gives you immediate analytical power. You can compute summary statistics with <span class="in">`df["views"].describe()`</span>, identify the highest-traffic day with <span class="in">`df.loc[df["views"].idxmax()]`</span>, or resample the data to weekly totals. These operations are not the focus of this chapter, but they illustrate why getting data into a DataFrame is such a valuable intermediate step.</span>
-<span id="cb19-234"><a href="#cb19-234" aria-label="220"></a></span>
-<span id="cb19-235"><a href="#cb19-235" aria-label="221"></a><span class="fu">### Saving Your Work</span></span>
-<span id="cb19-236"><a href="#cb19-236" aria-label="222"></a></span>
-<span id="cb19-237"><a href="#cb19-237" aria-label="223"></a>Once you have data in a DataFrame, save it to disk — a core practice of responsible web data science:</span>
+<span id="cb19-218"><a href="#cb19-218" aria-label="204"></a><span class="co"># Convert the list of dictionaries into a DataFrame</span></span>
+<span id="cb19-219"><a href="#cb19-219" aria-label="205"></a>df <span class="op">=</span> pd.DataFrame(data[<span class="st">"items"</span>])</span>
+<span id="cb19-220"><a href="#cb19-220" aria-label="206"></a><span class="bu">print</span>(df.head())</span>
+<span id="cb19-221"><a href="#cb19-221" aria-label="207"></a><span class="co"># You'll see columns: project, article, granularity, timestamp, access, agent, views</span></span>
+<span id="cb19-222"><a href="#cb19-222" aria-label="208"></a></span>
+<span id="cb19-223"><a href="#cb19-223" aria-label="209"></a><span class="co"># The timestamp column looks like "2026010100" — convert it to a proper date</span></span>
+<span id="cb19-224"><a href="#cb19-224" aria-label="210"></a>df[<span class="st">"date"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">00"</span>)</span>
+<span id="cb19-225"><a href="#cb19-225" aria-label="211"></a></span>
+<span id="cb19-226"><a href="#cb19-226" aria-label="212"></a><span class="co"># Plot the time series</span></span>
+<span id="cb19-227"><a href="#cb19-227" aria-label="213"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb19-228"><a href="#cb19-228" aria-label="214"></a></span>
+<span id="cb19-229"><a href="#cb19-229" aria-label="215"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb19-230"><a href="#cb19-230" aria-label="216"></a>plt.plot(df[<span class="st">"date"</span>], df[<span class="st">"views"</span>])</span>
+<span id="cb19-231"><a href="#cb19-231" aria-label="217"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
+<span id="cb19-232"><a href="#cb19-232" aria-label="218"></a>plt.ylabel(<span class="st">"Daily Pageviews"</span>)</span>
+<span id="cb19-233"><a href="#cb19-233" aria-label="219"></a>plt.title(<span class="ss">f"Wikipedia Pageviews: </span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb19-234"><a href="#cb19-234" aria-label="220"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">45</span>)</span>
+<span id="cb19-235"><a href="#cb19-235" aria-label="221"></a>plt.tight_layout()</span>
+<span id="cb19-236"><a href="#cb19-236" aria-label="222"></a>plt.show()</span>
+<span id="cb19-237"><a href="#cb19-237" aria-label="223"></a><span class="in">```</span></span>
 <span id="cb19-238"><a href="#cb19-238" aria-label="224"></a></span>
-<span id="cb19-241"><a href="#cb19-241" aria-label="225"></a><span class="in">```{python}</span></span>
-<span id="cb19-242"><a href="#cb19-242" aria-label="226"></a><span class="co"># Save to CSV</span></span>
-<span id="cb19-243"><a href="#cb19-243" aria-label="227"></a>df.to_csv(<span class="st">"cu_boulder_pageviews.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb19-244"><a href="#cb19-244" aria-label="228"></a></span>
-<span id="cb19-245"><a href="#cb19-245" aria-label="229"></a><span class="co"># Later, load it back without making another API request</span></span>
-<span id="cb19-246"><a href="#cb19-246" aria-label="230"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"cu_boulder_pageviews.csv"</span>)</span>
-<span id="cb19-247"><a href="#cb19-247" aria-label="231"></a><span class="bu">print</span>(<span class="ss">f"Loaded </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> rows from disk."</span>)</span>
-<span id="cb19-248"><a href="#cb19-248" aria-label="232"></a><span class="in">```</span></span>
-<span id="cb19-249"><a href="#cb19-249" aria-label="233"></a></span>
-<span id="cb19-250"><a href="#cb19-250" aria-label="234"></a>Serialization — saving your data to a file — matters for three reasons. First, courtesy: every API call consumes server resources, and re-requesting data you already have is wasteful. Second, reproducibility: if you save the data you retrieved on a specific date, your analysis can be reproduced even if the API changes or goes offline. Third, the data itself may change — Wikipedia pageview counts are finalized after a short delay, and an article's content can be edited at any moment. The version you retrieved is a snapshot, and saving it preserves that snapshot. You will explore JSON serialization for more complex data structures in @sec-data-formats.</span>
-<span id="cb19-251"><a href="#cb19-251" aria-label="235"></a></span>
-<span id="cb19-252"><a href="#cb19-252" aria-label="236"></a><span class="fu">## Documentation as Professional Practice</span></span>
-<span id="cb19-253"><a href="#cb19-253" aria-label="237"></a></span>
-<span id="cb19-254"><a href="#cb19-254" aria-label="238"></a>Your previous classes may have discouraged using online resources. The training wheels are off now. Finding, reading, interpreting, and applying documentation is an essential professional skill, and it is the primary way that working programmers, data scientists, and researchers learn to use new tools.</span>
-<span id="cb19-255"><a href="#cb19-255" aria-label="239"></a></span>
-<span id="cb19-256"><a href="#cb19-256" aria-label="240"></a>Bookmark the documentation for the libraries you will use throughout this book:</span>
+<span id="cb19-239"><a href="#cb19-239" aria-label="225"></a>This retrieve-parse-DataFrame-visualize pipeline is the fundamental pattern of this book. In every subsequent chapter, you will repeat these steps with different data sources: retrieve HTML pages, XML feeds, JSON API responses, or PDF documents; parse them into structured records; convert those records into a pandas DataFrame; and analyze or visualize the result. The specifics change — BeautifulSoup for HTML, <span class="in">`json.loads()`</span> for JSON, regular expressions for messy text — but the loop remains the same. Recognizing this pattern early will help you approach each new chapter with a clear mental model of what you are trying to accomplish.</span>
+<span id="cb19-240"><a href="#cb19-240" aria-label="226"></a></span>
+<span id="cb19-241"><a href="#cb19-241" aria-label="227"></a>The DataFrame also gives you immediate analytical power. You can compute summary statistics with <span class="in">`df["views"].describe()`</span>, identify the highest-traffic day with <span class="in">`df.loc[df["views"].idxmax()]`</span>, or resample the data to weekly totals. These operations are not the focus of this chapter, but they illustrate why getting data into a DataFrame is such a valuable intermediate step.</span>
+<span id="cb19-242"><a href="#cb19-242" aria-label="228"></a></span>
+<span id="cb19-243"><a href="#cb19-243" aria-label="229"></a><span class="fu">### Saving Your Work</span></span>
+<span id="cb19-244"><a href="#cb19-244" aria-label="230"></a></span>
+<span id="cb19-245"><a href="#cb19-245" aria-label="231"></a>Once you have data in a DataFrame, save it to disk — a core practice of responsible web data science:</span>
+<span id="cb19-246"><a href="#cb19-246" aria-label="232"></a></span>
+<span id="cb19-249"><a href="#cb19-249" aria-label="233"></a><span class="in">```{python}</span></span>
+<span id="cb19-250"><a href="#cb19-250" aria-label="234"></a><span class="co"># Save to CSV</span></span>
+<span id="cb19-251"><a href="#cb19-251" aria-label="235"></a>df.to_csv(<span class="st">"cu_boulder_pageviews.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb19-252"><a href="#cb19-252" aria-label="236"></a></span>
+<span id="cb19-253"><a href="#cb19-253" aria-label="237"></a><span class="co"># Later, load it back without making another API request</span></span>
+<span id="cb19-254"><a href="#cb19-254" aria-label="238"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"cu_boulder_pageviews.csv"</span>)</span>
+<span id="cb19-255"><a href="#cb19-255" aria-label="239"></a><span class="bu">print</span>(<span class="ss">f"Loaded </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> rows from disk."</span>)</span>
+<span id="cb19-256"><a href="#cb19-256" aria-label="240"></a><span class="in">```</span></span>
 <span id="cb19-257"><a href="#cb19-257" aria-label="241"></a></span>
-<span id="cb19-258"><a href="#cb19-258" aria-label="242"></a><span class="ss">- </span>**requests**: <span class="co">[</span><span class="ot">requests.readthedocs.io</span><span class="co">](https://requests.readthedocs.io/)</span></span>
-<span id="cb19-259"><a href="#cb19-259" aria-label="243"></a><span class="ss">- </span>**BeautifulSoup**: <span class="co">[</span><span class="ot">crummy.com/software/BeautifulSoup/bs4/doc</span><span class="co">](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)</span></span>
-<span id="cb19-260"><a href="#cb19-260" aria-label="244"></a><span class="ss">- </span>**pandas**: <span class="co">[</span><span class="ot">pandas.pydata.org/docs</span><span class="co">](https://pandas.pydata.org/docs/)</span></span>
-<span id="cb19-261"><a href="#cb19-261" aria-label="245"></a><span class="ss">- </span>**matplotlib**: <span class="co">[</span><span class="ot">matplotlib.org/stable</span><span class="co">](https://matplotlib.org/stable/)</span></span>
-<span id="cb19-262"><a href="#cb19-262" aria-label="246"></a></span>
-<span id="cb19-263"><a href="#cb19-263" aria-label="247"></a>When you encounter an error or do not know how to do something, start with the official documentation. If that does not help, search for the specific error message. When asking for help — from a classmate, an instructor, or an AI tool — "it's not working" is not an actionable request. Describe what you tried, what you expected to happen, what actually happened, and what the error message says.</span>
-<span id="cb19-264"><a href="#cb19-264" aria-label="248"></a></span>
-<span id="cb19-265"><a href="#cb19-265" aria-label="249"></a>::: {.callout-tip}</span>
-<span id="cb19-266"><a href="#cb19-266" aria-label="250"></a><span class="fu">## Missing Manual Reference</span></span>
-<span id="cb19-267"><a href="#cb19-267" aria-label="251"></a>For strategies on asking effective technical questions and reading official documentation, see *Missing Manual* Chapter 2: Asking Technical Questions and Chapter 5: Reading Official Documentation.</span>
-<span id="cb19-268"><a href="#cb19-268" aria-label="252"></a>:::</span>
-<span id="cb19-269"><a href="#cb19-269" aria-label="253"></a></span>
-<span id="cb19-270"><a href="#cb19-270" aria-label="254"></a><span class="fu">## Recommended Exercises</span></span>
-<span id="cb19-271"><a href="#cb19-271" aria-label="255"></a></span>
-<span id="cb19-272"><a href="#cb19-272" aria-label="256"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter.</span>
-<span id="cb19-273"><a href="#cb19-273" aria-label="257"></a></span>
-<span id="cb19-274"><a href="#cb19-274" aria-label="258"></a>Since this is the first chapter, the assignment is deliberately modest: prove that your environment works, then run the retrieve–parse–analyze loop once, end to end, on an article you choose.</span>
-<span id="cb19-275"><a href="#cb19-275" aria-label="259"></a></span>
-<span id="cb19-276"><a href="#cb19-276" aria-label="260"></a>**Step 1 — Verify your environment.** Import <span class="in">`requests`</span>, <span class="in">`pandas`</span> (as <span class="in">`pd`</span>), and <span class="in">`matplotlib.pyplot`</span> (as <span class="in">`plt`</span>). If any import fails, revisit the setup section before going further.</span>
+<span id="cb19-258"><a href="#cb19-258" aria-label="242"></a>Serialization — saving your data to a file — matters for three reasons. First, courtesy: every API call consumes server resources, and re-requesting data you already have is wasteful. Second, reproducibility: if you save the data you retrieved on a specific date, your analysis can be reproduced even if the API changes or goes offline. Third, the data itself may change — Wikipedia pageview counts are finalized after a short delay, and an article's content can be edited at any moment. The version you retrieved is a snapshot, and saving it preserves that snapshot. You will explore JSON serialization for more complex data structures in @sec-data-formats.</span>
+<span id="cb19-259"><a href="#cb19-259" aria-label="243"></a></span>
+<span id="cb19-260"><a href="#cb19-260" aria-label="244"></a><span class="fu">## Documentation as Professional Practice</span></span>
+<span id="cb19-261"><a href="#cb19-261" aria-label="245"></a></span>
+<span id="cb19-262"><a href="#cb19-262" aria-label="246"></a>Your previous classes may have discouraged using online resources. The training wheels are off now. Finding, reading, interpreting, and applying documentation is an essential professional skill, and it is the primary way that working programmers, data scientists, and researchers learn to use new tools.</span>
+<span id="cb19-263"><a href="#cb19-263" aria-label="247"></a></span>
+<span id="cb19-264"><a href="#cb19-264" aria-label="248"></a>Bookmark the documentation for the libraries you will use throughout this book:</span>
+<span id="cb19-265"><a href="#cb19-265" aria-label="249"></a></span>
+<span id="cb19-266"><a href="#cb19-266" aria-label="250"></a><span class="ss">- </span>**requests**: <span class="co">[</span><span class="ot">requests.readthedocs.io</span><span class="co">](https://requests.readthedocs.io/)</span></span>
+<span id="cb19-267"><a href="#cb19-267" aria-label="251"></a><span class="ss">- </span>**BeautifulSoup**: <span class="co">[</span><span class="ot">crummy.com/software/BeautifulSoup/bs4/doc</span><span class="co">](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)</span></span>
+<span id="cb19-268"><a href="#cb19-268" aria-label="252"></a><span class="ss">- </span>**pandas**: <span class="co">[</span><span class="ot">pandas.pydata.org/docs</span><span class="co">](https://pandas.pydata.org/docs/)</span></span>
+<span id="cb19-269"><a href="#cb19-269" aria-label="253"></a><span class="ss">- </span>**matplotlib**: <span class="co">[</span><span class="ot">matplotlib.org/stable</span><span class="co">](https://matplotlib.org/stable/)</span></span>
+<span id="cb19-270"><a href="#cb19-270" aria-label="254"></a></span>
+<span id="cb19-271"><a href="#cb19-271" aria-label="255"></a>When you encounter an error or do not know how to do something, start with the official documentation. If that does not help, search for the specific error message. When asking for help — from a classmate, an instructor, or an AI tool — "it's not working" is not an actionable request. Describe what you tried, what you expected to happen, what actually happened, and what the error message says.</span>
+<span id="cb19-272"><a href="#cb19-272" aria-label="256"></a></span>
+<span id="cb19-273"><a href="#cb19-273" aria-label="257"></a>::: {.callout-tip}</span>
+<span id="cb19-274"><a href="#cb19-274" aria-label="258"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb19-275"><a href="#cb19-275" aria-label="259"></a>For strategies on asking effective technical questions and reading official documentation, see *Missing Manual* Chapter 2: Asking Technical Questions and Chapter 5: Reading Official Documentation.</span>
+<span id="cb19-276"><a href="#cb19-276" aria-label="260"></a>:::</span>
 <span id="cb19-277"><a href="#cb19-277" aria-label="261"></a></span>
-<span id="cb19-280"><a href="#cb19-280" aria-label="262"></a><span class="in">```{python}</span></span>
-<span id="cb19-281"><a href="#cb19-281" aria-label="263"></a><span class="co"># Step 1: Import requests, pandas as pd, and matplotlib.pyplot as plt.</span></span>
-<span id="cb19-282"><a href="#cb19-282" aria-label="264"></a><span class="co"># Your code here</span></span>
-<span id="cb19-283"><a href="#cb19-283" aria-label="265"></a><span class="in">```</span></span>
-<span id="cb19-284"><a href="#cb19-284" aria-label="266"></a></span>
-<span id="cb19-285"><a href="#cb19-285" aria-label="267"></a>**Step 2 — Make your first request.** Use <span class="in">`requests.get()`</span> to retrieve any web page you choose, sending a <span class="in">`User-Agent`</span> header with your email as the chapter does. Print the status code and the length of <span class="in">`response.text`</span>.</span>
-<span id="cb19-286"><a href="#cb19-286" aria-label="268"></a></span>
-<span id="cb19-289"><a href="#cb19-289" aria-label="269"></a><span class="in">```{python}</span></span>
-<span id="cb19-290"><a href="#cb19-290" aria-label="270"></a><span class="co"># Step 2: Retrieve a web page and print the status code and response length.</span></span>
-<span id="cb19-291"><a href="#cb19-291" aria-label="271"></a><span class="co"># Your code here</span></span>
-<span id="cb19-292"><a href="#cb19-292" aria-label="272"></a><span class="in">```</span></span>
-<span id="cb19-293"><a href="#cb19-293" aria-label="273"></a></span>
-<span id="cb19-294"><a href="#cb19-294" aria-label="274"></a>**Step 3 — Call the pageviews API.** Pick a Wikipedia article you are curious about. Using the pageviews API URL pattern from this chapter — including the <span class="in">`User-Agent`</span> header with your email — retrieve its daily views for one full month, and parse the response with <span class="in">`.json()`</span>.</span>
-<span id="cb19-295"><a href="#cb19-295" aria-label="275"></a></span>
-<span id="cb19-298"><a href="#cb19-298" aria-label="276"></a><span class="in">```{python}</span></span>
-<span id="cb19-299"><a href="#cb19-299" aria-label="277"></a><span class="co"># Step 3: Build the pageviews URL for your article, request it with a User-Agent header, and parse the JSON response.</span></span>
-<span id="cb19-300"><a href="#cb19-300" aria-label="278"></a><span class="co"># Your code here</span></span>
-<span id="cb19-301"><a href="#cb19-301" aria-label="279"></a><span class="in">```</span></span>
-<span id="cb19-302"><a href="#cb19-302" aria-label="280"></a></span>
-<span id="cb19-303"><a href="#cb19-303" aria-label="281"></a>**Step 4 — Build a DataFrame.** Convert <span class="in">`data["items"]`</span> into a DataFrame, and convert the <span class="in">`timestamp`</span> column into a real date with <span class="in">`pd.to_datetime()`</span>, as the chapter demonstrates.</span>
-<span id="cb19-304"><a href="#cb19-304" aria-label="282"></a></span>
-<span id="cb19-307"><a href="#cb19-307" aria-label="283"></a><span class="in">```{python}</span></span>
-<span id="cb19-308"><a href="#cb19-308" aria-label="284"></a><span class="co"># Step 4: Convert data["items"] to a DataFrame and add a proper date column.</span></span>
-<span id="cb19-309"><a href="#cb19-309" aria-label="285"></a><span class="co"># Your code here</span></span>
-<span id="cb19-310"><a href="#cb19-310" aria-label="286"></a><span class="in">```</span></span>
-<span id="cb19-311"><a href="#cb19-311" aria-label="287"></a></span>
-<span id="cb19-312"><a href="#cb19-312" aria-label="288"></a>**Step 5 — Plot the time series.** Create a line plot of daily views across your month, with labeled axes and a title naming the article.</span>
-<span id="cb19-313"><a href="#cb19-313" aria-label="289"></a></span>
-<span id="cb19-316"><a href="#cb19-316" aria-label="290"></a><span class="in">```{python}</span></span>
-<span id="cb19-317"><a href="#cb19-317" aria-label="291"></a><span class="co"># Step 5: Plot daily views over time with labeled axes and a title.</span></span>
-<span id="cb19-318"><a href="#cb19-318" aria-label="292"></a><span class="co"># Your code here</span></span>
-<span id="cb19-319"><a href="#cb19-319" aria-label="293"></a><span class="in">```</span></span>
-<span id="cb19-320"><a href="#cb19-320" aria-label="294"></a></span>
-<span id="cb19-321"><a href="#cb19-321" aria-label="295"></a>**Step 6 — Save and reload.** Save the DataFrame to a CSV file with <span class="in">`to_csv()`</span>, then load it back with <span class="in">`pd.read_csv()`</span> and print how many rows you recovered.</span>
-<span id="cb19-322"><a href="#cb19-322" aria-label="296"></a></span>
-<span id="cb19-325"><a href="#cb19-325" aria-label="297"></a><span class="in">```{python}</span></span>
-<span id="cb19-326"><a href="#cb19-326" aria-label="298"></a><span class="co"># Step 6: Save the DataFrame to CSV, load it back, and print the row count.</span></span>
-<span id="cb19-327"><a href="#cb19-327" aria-label="299"></a><span class="co"># Your code here</span></span>
-<span id="cb19-328"><a href="#cb19-328" aria-label="300"></a><span class="in">```</span></span>
-<span id="cb19-329"><a href="#cb19-329" aria-label="301"></a></span>
-<span id="cb19-330"><a href="#cb19-330" aria-label="302"></a>**Step 7 — Interpret.** In three to five sentences: What was the highest-traffic day, and can you connect it to a real-world event? What does the status code from Step 2 mean? And why did Step 6 matter — what can you now do without touching the network again?</span>
-<span id="cb19-331"><a href="#cb19-331" aria-label="303"></a></span>
-<span id="cb19-334"><a href="#cb19-334" aria-label="304"></a><span class="in">```{python}</span></span>
-<span id="cb19-335"><a href="#cb19-335" aria-label="305"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span>
-<span id="cb19-336"><a href="#cb19-336" aria-label="306"></a><span class="in">```</span></span>
-<span id="cb19-337"><a href="#cb19-337" aria-label="307"></a></span>
-<span id="cb19-338"><a href="#cb19-338" aria-label="308"></a><span class="fu">## Additional Exercises</span></span>
-<span id="cb19-339"><a href="#cb19-339" aria-label="309"></a></span>
-<span id="cb19-340"><a href="#cb19-340" aria-label="310"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
-<span id="cb19-341"><a href="#cb19-341" aria-label="311"></a></span>
-<span id="cb19-342"><a href="#cb19-342" aria-label="312"></a><span class="ss">1. </span>**Exploring the Response object.** Use the <span class="in">`dir()`</span> function on a <span class="in">`requests.Response`</span> object to list all its attributes and methods. Identify three attributes not discussed in this chapter and use the <span class="in">`help()`</span> function or online documentation to figure out what they do. Write a brief explanation of each in a Markdown cell.</span>
-<span id="cb19-343"><a href="#cb19-343" aria-label="313"></a></span>
-<span id="cb19-344"><a href="#cb19-344" aria-label="314"></a><span class="ss">2. </span>**POST vs. GET.** Read the <span class="in">`requests`</span> library documentation and find the method for making a POST request. In a Markdown cell, explain how POST differs from GET and describe a scenario where you would use each. What kind of data does a POST request typically send, and why would an API require it instead of GET?</span>
+<span id="cb19-278"><a href="#cb19-278" aria-label="262"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb19-279"><a href="#cb19-279" aria-label="263"></a></span>
+<span id="cb19-280"><a href="#cb19-280" aria-label="264"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter.</span>
+<span id="cb19-281"><a href="#cb19-281" aria-label="265"></a></span>
+<span id="cb19-282"><a href="#cb19-282" aria-label="266"></a>Since this is the first chapter, the assignment is deliberately modest: prove that your environment works, then run the retrieve–parse–analyze loop once, end to end, on an article you choose.</span>
+<span id="cb19-283"><a href="#cb19-283" aria-label="267"></a></span>
+<span id="cb19-284"><a href="#cb19-284" aria-label="268"></a>**Step 1 — Verify your environment.** Import <span class="in">`requests`</span>, <span class="in">`pandas`</span> (as <span class="in">`pd`</span>), and <span class="in">`matplotlib.pyplot`</span> (as <span class="in">`plt`</span>). If any import fails, revisit the setup section before going further.</span>
+<span id="cb19-285"><a href="#cb19-285" aria-label="269"></a></span>
+<span id="cb19-288"><a href="#cb19-288" aria-label="270"></a><span class="in">```{python}</span></span>
+<span id="cb19-289"><a href="#cb19-289" aria-label="271"></a><span class="co"># Step 1: Import requests, pandas as pd, and matplotlib.pyplot as plt.</span></span>
+<span id="cb19-290"><a href="#cb19-290" aria-label="272"></a><span class="co"># Your code here</span></span>
+<span id="cb19-291"><a href="#cb19-291" aria-label="273"></a><span class="in">```</span></span>
+<span id="cb19-292"><a href="#cb19-292" aria-label="274"></a></span>
+<span id="cb19-293"><a href="#cb19-293" aria-label="275"></a>**Step 2 — Make your first request.** Use <span class="in">`requests.get()`</span> to retrieve any web page you choose, sending a <span class="in">`User-Agent`</span> header with your email as the chapter does. Print the status code and the length of <span class="in">`response.text`</span>.</span>
+<span id="cb19-294"><a href="#cb19-294" aria-label="276"></a></span>
+<span id="cb19-297"><a href="#cb19-297" aria-label="277"></a><span class="in">```{python}</span></span>
+<span id="cb19-298"><a href="#cb19-298" aria-label="278"></a><span class="co"># Step 2: Retrieve a web page and print the status code and response length.</span></span>
+<span id="cb19-299"><a href="#cb19-299" aria-label="279"></a><span class="co"># Your code here</span></span>
+<span id="cb19-300"><a href="#cb19-300" aria-label="280"></a><span class="in">```</span></span>
+<span id="cb19-301"><a href="#cb19-301" aria-label="281"></a></span>
+<span id="cb19-302"><a href="#cb19-302" aria-label="282"></a>**Step 3 — Call the pageviews API.** Pick a Wikipedia article you are curious about. Using the pageviews API URL pattern from this chapter — including the <span class="in">`User-Agent`</span> header with your email — retrieve its daily views for one full month, and parse the response with <span class="in">`.json()`</span>.</span>
+<span id="cb19-303"><a href="#cb19-303" aria-label="283"></a></span>
+<span id="cb19-306"><a href="#cb19-306" aria-label="284"></a><span class="in">```{python}</span></span>
+<span id="cb19-307"><a href="#cb19-307" aria-label="285"></a><span class="co"># Step 3: Build the pageviews URL for your article, request it with a User-Agent header, and parse the JSON response.</span></span>
+<span id="cb19-308"><a href="#cb19-308" aria-label="286"></a><span class="co"># Your code here</span></span>
+<span id="cb19-309"><a href="#cb19-309" aria-label="287"></a><span class="in">```</span></span>
+<span id="cb19-310"><a href="#cb19-310" aria-label="288"></a></span>
+<span id="cb19-311"><a href="#cb19-311" aria-label="289"></a>**Step 4 — Build a DataFrame.** Convert <span class="in">`data["items"]`</span> into a DataFrame, and convert the <span class="in">`timestamp`</span> column into a real date with <span class="in">`pd.to_datetime()`</span>, as the chapter demonstrates.</span>
+<span id="cb19-312"><a href="#cb19-312" aria-label="290"></a></span>
+<span id="cb19-315"><a href="#cb19-315" aria-label="291"></a><span class="in">```{python}</span></span>
+<span id="cb19-316"><a href="#cb19-316" aria-label="292"></a><span class="co"># Step 4: Convert data["items"] to a DataFrame and add a proper date column.</span></span>
+<span id="cb19-317"><a href="#cb19-317" aria-label="293"></a><span class="co"># Your code here</span></span>
+<span id="cb19-318"><a href="#cb19-318" aria-label="294"></a><span class="in">```</span></span>
+<span id="cb19-319"><a href="#cb19-319" aria-label="295"></a></span>
+<span id="cb19-320"><a href="#cb19-320" aria-label="296"></a>**Step 5 — Plot the time series.** Create a line plot of daily views across your month, with labeled axes and a title naming the article.</span>
+<span id="cb19-321"><a href="#cb19-321" aria-label="297"></a></span>
+<span id="cb19-324"><a href="#cb19-324" aria-label="298"></a><span class="in">```{python}</span></span>
+<span id="cb19-325"><a href="#cb19-325" aria-label="299"></a><span class="co"># Step 5: Plot daily views over time with labeled axes and a title.</span></span>
+<span id="cb19-326"><a href="#cb19-326" aria-label="300"></a><span class="co"># Your code here</span></span>
+<span id="cb19-327"><a href="#cb19-327" aria-label="301"></a><span class="in">```</span></span>
+<span id="cb19-328"><a href="#cb19-328" aria-label="302"></a></span>
+<span id="cb19-329"><a href="#cb19-329" aria-label="303"></a>**Step 6 — Save and reload.** Save the DataFrame to a CSV file with <span class="in">`to_csv()`</span>, then load it back with <span class="in">`pd.read_csv()`</span> and print how many rows you recovered.</span>
+<span id="cb19-330"><a href="#cb19-330" aria-label="304"></a></span>
+<span id="cb19-333"><a href="#cb19-333" aria-label="305"></a><span class="in">```{python}</span></span>
+<span id="cb19-334"><a href="#cb19-334" aria-label="306"></a><span class="co"># Step 6: Save the DataFrame to CSV, load it back, and print the row count.</span></span>
+<span id="cb19-335"><a href="#cb19-335" aria-label="307"></a><span class="co"># Your code here</span></span>
+<span id="cb19-336"><a href="#cb19-336" aria-label="308"></a><span class="in">```</span></span>
+<span id="cb19-337"><a href="#cb19-337" aria-label="309"></a></span>
+<span id="cb19-338"><a href="#cb19-338" aria-label="310"></a>**Step 7 — Interpret.** In three to five sentences: What was the highest-traffic day, and can you connect it to a real-world event? What does the status code from Step 2 mean? And why did Step 6 matter — what can you now do without touching the network again?</span>
+<span id="cb19-339"><a href="#cb19-339" aria-label="311"></a></span>
+<span id="cb19-342"><a href="#cb19-342" aria-label="312"></a><span class="in">```{python}</span></span>
+<span id="cb19-343"><a href="#cb19-343" aria-label="313"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb19-344"><a href="#cb19-344" aria-label="314"></a><span class="in">```</span></span>
 <span id="cb19-345"><a href="#cb19-345" aria-label="315"></a></span>
-<span id="cb19-346"><a href="#cb19-346" aria-label="316"></a><span class="ss">3. </span>**Multi-article comparison.** Retrieve daily pageview data for three Wikipedia articles of your choice over the same month. Save each to a separate CSV file using <span class="in">`df.to_csv()`</span>. Load all three back with <span class="in">`pd.read_csv()`</span> and create a single plot with all three time series on the same axes, with a legend identifying each article. Which article had the most variable traffic, and can you hypothesize why?</span>
+<span id="cb19-346"><a href="#cb19-346" aria-label="316"></a><span class="fu">## Additional Exercises</span></span>
 <span id="cb19-347"><a href="#cb19-347" aria-label="317"></a></span>
-<span id="cb19-348"><a href="#cb19-348" aria-label="318"></a><span class="ss">4. </span>**Graduate extension (INFO 5617).** Read the computational social science manifesto by @lazer2009computational — a short, field-defining argument about what digital trace data makes possible. Identify three specific claims the authors make about the promise or the perils of studying society through digital traces, such as claims about data access, privacy, or the capacity of academic institutions to compete with industry. For each claim, write a paragraph connecting it to a concrete technique or data source covered in this book's table of contents, and assess whether the claim has held up in the years since publication. Submit your response as a Jupyter Notebook that uses Markdown cells for the written analysis.</span>
+<span id="cb19-348"><a href="#cb19-348" aria-label="318"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
 <span id="cb19-349"><a href="#cb19-349" aria-label="319"></a></span>
-<span id="cb19-350"><a href="#cb19-350" aria-label="320"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb19-350"><a href="#cb19-350" aria-label="320"></a><span class="ss">1. </span>**Exploring the Response object.** Use the <span class="in">`dir()`</span> function on a <span class="in">`requests.Response`</span> object to list all its attributes and methods. Identify three attributes not discussed in this chapter and use the <span class="in">`help()`</span> function or online documentation to figure out what they do. Write a brief explanation of each in a Markdown cell.</span>
 <span id="cb19-351"><a href="#cb19-351" aria-label="321"></a></span>
-<span id="cb19-352"><a href="#cb19-352" aria-label="322"></a>Web data science emerged at the intersection of several traditions. Computational social scientists in the 2000s and 2010s recognized that the web was generating behavioral data at unprecedented scale — traces of how people communicate, collaborate, and organize <span class="co">[</span><span class="ot">@lazer2009computational</span><span class="co">]</span>. Data journalists discovered that web scraping could hold institutions accountable by making nominally public data actually analyzable. Civic technologists built tools to make government data accessible to citizens.</span>
+<span id="cb19-352"><a href="#cb19-352" aria-label="322"></a><span class="ss">2. </span>**POST vs. GET.** Read the <span class="in">`requests`</span> library documentation and find the method for making a POST request. In a Markdown cell, explain how POST differs from GET and describe a scenario where you would use each. What kind of data does a POST request typically send, and why would an API require it instead of GET?</span>
 <span id="cb19-353"><a href="#cb19-353" aria-label="323"></a></span>
-<span id="cb19-354"><a href="#cb19-354" aria-label="324"></a>All three traditions treat data fluency as a form of power that should serve the public interest. As you develop your skills throughout this book, you will encounter recurring questions about who benefits from web data collection, who is harmed by it, and what obligations come with the ability to automate access to information at scale.</span>
+<span id="cb19-354"><a href="#cb19-354" aria-label="324"></a><span class="ss">3. </span>**Multi-article comparison.** Retrieve daily pageview data for three Wikipedia articles of your choice over the same month. Save each to a separate CSV file using <span class="in">`df.to_csv()`</span>. Load all three back with <span class="in">`pd.read_csv()`</span> and create a single plot with all three time series on the same axes, with a legend identifying each article. Which article had the most variable traffic, and can you hypothesize why?</span>
 <span id="cb19-355"><a href="#cb19-355" aria-label="325"></a></span>
-<span id="cb19-356"><a href="#cb19-356" aria-label="326"></a>Some of the most consequential data science work of the past decade has come from this tradition. ProPublica's "Machine Bias" investigation in 2016 used scraped court records to reveal racial bias in criminal risk assessment algorithms — a finding that shaped national policy debates about algorithmic fairness. The Markup's "Citizen Browser" project recruited a panel of real users to study how Facebook's news feed algorithm distributed political content, producing evidence that would have been impossible to obtain through the platform's official research tools. These projects combined technical scraping skills with domain expertise and ethical frameworks to produce knowledge that served the public interest.</span>
+<span id="cb19-356"><a href="#cb19-356" aria-label="326"></a><span class="ss">4. </span>**Graduate extension (INFO 5617).** Read the computational social science manifesto by @lazer2009computational — a short, field-defining argument about what digital trace data makes possible. Identify three specific claims the authors make about the promise or the perils of studying society through digital traces, such as claims about data access, privacy, or the capacity of academic institutions to compete with industry. For each claim, write a paragraph connecting it to a concrete technique or data source covered in this book's table of contents, and assess whether the claim has held up in the years since publication. Submit your response as a Jupyter Notebook that uses Markdown cells for the written analysis.</span>
 <span id="cb19-357"><a href="#cb19-357" aria-label="327"></a></span>
-<span id="cb19-358"><a href="#cb19-358" aria-label="328"></a>The intellectual roots of web data science run deeper than any single investigation. The computational social science manifesto by @lazer2009computational articulated a vision of research that works from the "digital traces" left by online behavior — search queries, social media posts, hyperlink structures, editing histories — to answer questions at population scale. These traces are not designed for research; they are byproducts of ordinary activity. The researcher's task is to transform them into meaningful evidence while respecting the privacy and dignity of the people who generated them. You will meet this tension — between the analytical power of digital trace data and the ethical obligations it creates — in every chapter of this book.</span>
+<span id="cb19-358"><a href="#cb19-358" aria-label="328"></a><span class="fu">## Social History and Public Interest</span></span>
 <span id="cb19-359"><a href="#cb19-359" aria-label="329"></a></span>
-<span id="cb19-360"><a href="#cb19-360" aria-label="330"></a>::: {.callout-note}</span>
-<span id="cb19-361"><a href="#cb19-361" aria-label="331"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb19-362"><a href="#cb19-362" aria-label="332"></a>The tools you learn in this book are not neutral. Web data collection can serve **openness** — making public information practically accessible — or it can enable surveillance and exploitation. The ethical frameworks in @sec-ethics and the public interest framing in @sec-post-api will help you navigate this tension throughout the course.</span>
-<span id="cb19-363"><a href="#cb19-363" aria-label="333"></a>:::</span>
-<span id="cb19-364"><a href="#cb19-364" aria-label="334"></a></span>
-<span id="cb19-365"><a href="#cb19-365" aria-label="335"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb19-366"><a href="#cb19-366" aria-label="336"></a></span>
-<span id="cb19-367"><a href="#cb19-367" aria-label="337"></a><span class="ss">- </span>**`jupyter: command not found`** (or "not recognized" on Windows): Jupyter isn't installed in the active environment. Run <span class="in">`conda activate webdata`</span>, then <span class="in">`pip install notebook`</span>, and start <span class="in">`jupyter notebook`</span> again.</span>
-<span id="cb19-368"><a href="#cb19-368" aria-label="338"></a><span class="ss">- </span>**`ModuleNotFoundError`**: A library is not installed in the Python your notebook runs. In a terminal where <span class="in">`webdata`</span> is active (the prompt starts with <span class="in">`(webdata)`</span>), run <span class="in">`pip install library-name`</span>, then restart your Jupyter kernel. If the library is installed and the error remains, Jupyter was started from another environment: run <span class="in">`import sys; print(sys.executable)`</span> in the notebook, and check that the path includes <span class="in">`webdata`</span>.</span>
-<span id="cb19-369"><a href="#cb19-369" aria-label="339"></a><span class="ss">- </span>**`ConnectionError`**: Your computer cannot reach the server. Check your internet connection; if you are on a university network, try a different network.</span>
-<span id="cb19-370"><a href="#cb19-370" aria-label="340"></a><span class="ss">- </span>**Status code 403 (Forbidden)**: The server rejected your request, often because you did not include a <span class="in">`User-Agent`</span> header; Wikipedia refuses <span class="in">`requests`</span>' default. Send one with your email, as this chapter's requests do, and see @sec-ethics for more on headers.</span>
-<span id="cb19-371"><a href="#cb19-371" aria-label="341"></a><span class="ss">- </span>**Cells running out of order**: Jupyter cells can be executed in any order, which leads to stale variables. When in doubt, restart the kernel and run all cells from the top.</span>
+<span id="cb19-360"><a href="#cb19-360" aria-label="330"></a>Web data science emerged at the intersection of several traditions. Computational social scientists in the 2000s and 2010s recognized that the web was generating behavioral data at unprecedented scale — traces of how people communicate, collaborate, and organize <span class="co">[</span><span class="ot">@lazer2009computational</span><span class="co">]</span>. Data journalists discovered that web scraping could hold institutions accountable by making nominally public data actually analyzable. Civic technologists built tools to make government data accessible to citizens.</span>
+<span id="cb19-361"><a href="#cb19-361" aria-label="331"></a></span>
+<span id="cb19-362"><a href="#cb19-362" aria-label="332"></a>All three traditions treat data fluency as a form of power that should serve the public interest. As you develop your skills throughout this book, you will encounter recurring questions about who benefits from web data collection, who is harmed by it, and what obligations come with the ability to automate access to information at scale.</span>
+<span id="cb19-363"><a href="#cb19-363" aria-label="333"></a></span>
+<span id="cb19-364"><a href="#cb19-364" aria-label="334"></a>Some of the most consequential data science work of the past decade has come from this tradition. ProPublica's "Machine Bias" investigation in 2016 used scraped court records to reveal racial bias in criminal risk assessment algorithms — a finding that shaped national policy debates about algorithmic fairness. The Markup's "Citizen Browser" project recruited a panel of real users to study how Facebook's news feed algorithm distributed political content, producing evidence that would have been impossible to obtain through the platform's official research tools. These projects combined technical scraping skills with domain expertise and ethical frameworks to produce knowledge that served the public interest.</span>
+<span id="cb19-365"><a href="#cb19-365" aria-label="335"></a></span>
+<span id="cb19-366"><a href="#cb19-366" aria-label="336"></a>The intellectual roots of web data science run deeper than any single investigation. The computational social science manifesto by @lazer2009computational articulated a vision of research that works from the "digital traces" left by online behavior — search queries, social media posts, hyperlink structures, editing histories — to answer questions at population scale. These traces are not designed for research; they are byproducts of ordinary activity. The researcher's task is to transform them into meaningful evidence while respecting the privacy and dignity of the people who generated them. You will meet this tension — between the analytical power of digital trace data and the ethical obligations it creates — in every chapter of this book.</span>
+<span id="cb19-367"><a href="#cb19-367" aria-label="337"></a></span>
+<span id="cb19-368"><a href="#cb19-368" aria-label="338"></a>::: {.callout-note}</span>
+<span id="cb19-369"><a href="#cb19-369" aria-label="339"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb19-370"><a href="#cb19-370" aria-label="340"></a>The tools you learn in this book are not neutral. Web data collection can serve **openness** — making public information practically accessible — or it can enable surveillance and exploitation. The ethical frameworks in @sec-ethics and the public interest framing in @sec-post-api will help you navigate this tension throughout the course.</span>
+<span id="cb19-371"><a href="#cb19-371" aria-label="341"></a>:::</span>
 <span id="cb19-372"><a href="#cb19-372" aria-label="342"></a></span>
-<span id="cb19-373"><a href="#cb19-373" aria-label="343"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb19-373"><a href="#cb19-373" aria-label="343"></a><span class="fu">## Common Issues to Debug</span></span>
 <span id="cb19-374"><a href="#cb19-374" aria-label="344"></a></span>
-<span id="cb19-375"><a href="#cb19-375" aria-label="345"></a>The web is a data source unlike any other — massive, messy, and politically contested. Working with it takes the habits of documentation, skepticism, and ethical reflection that distinguish a data scientist from someone who can run a script. Every technique in this book follows the same basic loop: retrieve data from the web, parse it into a usable structure, and analyze it to produce knowledge. You now have your environment set up and have made your first request. The rest of the book builds from here.</span>
-<span id="cb19-376"><a href="#cb19-376" aria-label="346"></a></span>
-<span id="cb19-377"><a href="#cb19-377" aria-label="347"></a><span class="fu">## Further Reading</span></span>
-<span id="cb19-378"><a href="#cb19-378" aria-label="348"></a></span>
-<span id="cb19-379"><a href="#cb19-379" aria-label="349"></a><span class="ss">- </span><span class="in">`requests`</span> library documentation: <span class="ot">&lt;https://requests.readthedocs.io/&gt;</span></span>
-<span id="cb19-380"><a href="#cb19-380" aria-label="350"></a><span class="ss">- </span>Jupyter Notebook documentation: <span class="ot">&lt;https://jupyter-notebook.readthedocs.io/&gt;</span></span>
-<span id="cb19-381"><a href="#cb19-381" aria-label="351"></a><span class="ss">- </span>@wilson2017good — practical guidance on scientific computing workflows</span>
-<span id="cb19-382"><a href="#cb19-382" aria-label="352"></a><span class="ss">- </span>@salganik2018bit — Chapter 1: Introduction, for an overview of social research in the digital age</span>
+<span id="cb19-375"><a href="#cb19-375" aria-label="345"></a><span class="ss">- </span>**`jupyter: command not found`** (or "not recognized" on Windows): Jupyter isn't installed in the active environment. Run <span class="in">`conda activate webdata`</span>, then <span class="in">`pip install notebook`</span>, and start <span class="in">`jupyter notebook`</span> again.</span>
+<span id="cb19-376"><a href="#cb19-376" aria-label="346"></a><span class="ss">- </span>**`ModuleNotFoundError`**: A library is not installed in the Python your notebook runs. In a terminal where <span class="in">`webdata`</span> is active (the prompt starts with <span class="in">`(webdata)`</span>), run <span class="in">`pip install library-name`</span>, then restart your Jupyter kernel. If the library is installed and the error remains, Jupyter was started from another environment: run <span class="in">`import sys; print(sys.executable)`</span> in the notebook, and check that the path includes <span class="in">`webdata`</span>.</span>
+<span id="cb19-377"><a href="#cb19-377" aria-label="347"></a><span class="ss">- </span>**`ConnectionError`**: Your computer cannot reach the server. Check your internet connection; if you are on a university network, try a different network.</span>
+<span id="cb19-378"><a href="#cb19-378" aria-label="348"></a><span class="ss">- </span>**Status code 403 (Forbidden)**: The server rejected your request, often because you did not include a <span class="in">`User-Agent`</span> header; Wikipedia refuses <span class="in">`requests`</span>' default. Send one with your email, as this chapter's requests do, and see @sec-ethics for more on headers.</span>
+<span id="cb19-379"><a href="#cb19-379" aria-label="349"></a><span class="ss">- </span>**Cells running out of order**: Jupyter cells can be executed in any order, which leads to stale variables. When in doubt, restart the kernel and run all cells from the top.</span>
+<span id="cb19-380"><a href="#cb19-380" aria-label="350"></a></span>
+<span id="cb19-381"><a href="#cb19-381" aria-label="351"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb19-382"><a href="#cb19-382" aria-label="352"></a></span>
+<span id="cb19-383"><a href="#cb19-383" aria-label="353"></a>The web is a data source unlike any other — massive, messy, and politically contested. Working with it takes the habits of documentation, skepticism, and ethical reflection that distinguish a data scientist from someone who can run a script. Every technique in this book follows the same basic loop: retrieve data from the web, parse it into a usable structure, and analyze it to produce knowledge. You now have your environment set up and have made your first request. The rest of the book builds from here.</span>
+<span id="cb19-384"><a href="#cb19-384" aria-label="354"></a></span>
+<span id="cb19-385"><a href="#cb19-385" aria-label="355"></a><span class="fu">## Further Reading</span></span>
+<span id="cb19-386"><a href="#cb19-386" aria-label="356"></a></span>
+<span id="cb19-387"><a href="#cb19-387" aria-label="357"></a><span class="ss">- </span><span class="in">`requests`</span> library documentation: <span class="ot">&lt;https://requests.readthedocs.io/&gt;</span></span>
+<span id="cb19-388"><a href="#cb19-388" aria-label="358"></a><span class="ss">- </span>Jupyter Notebook documentation: <span class="ot">&lt;https://jupyter-notebook.readthedocs.io/&gt;</span></span>
+<span id="cb19-389"><a href="#cb19-389" aria-label="359"></a><span class="ss">- </span>@wilson2017good — practical guidance on scientific computing workflows</span>
+<span id="cb19-390"><a href="#cb19-390" aria-label="360"></a><span class="ss">- </span>@salganik2018bit — Chapter 1: Introduction, for an overview of social research in the digital age</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/edit/main/ch-01-introduction.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new/choose" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer><script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/edit/main/ch-01-introduction.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new/choose" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
+</body></html>
