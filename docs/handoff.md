@@ -10,7 +10,7 @@
   - every recipe figure has a `brief:`, and `tools/shots/README.md` ("Making a figure, start to finish") goes from the brief to a merged pull request;
   - the size limit has two tiers: 800×600 by default, and up to 1024×768 when the extra room removes clutter and the text still passes.
 
-  The selftest passes 71 of 71. `check` reports 0 errors and 11 warnings: 9 chapter 7–8 figures over the size limit, and 2 captions without a capture date.
+  The selftest passes 73 of 73. `check` reports 0 errors and 11 warnings: 9 chapter 7–8 figures over the size limit, and 2 captions without a capture date.
 - **Chapters.**
   - ch-04 has three figures from the back-fill: the House roster and a BBC feed in Chrome's XML tree, and View Source searched for a feed's address. Figure 4-2 (Open-Meteo's JSON) is left out until the maintainer decides (see the table below).
   - ch-05 has four DevTools figures from the pilot (#138).
@@ -49,6 +49,7 @@ In this order:
 |---|---|
 | Who merges students' pull requests | `CONTRIBUTING.md` says the maintainer, matching the revision framework and `decisions.md`. Week 4's deck says students with write access can. Pick one, and the other document follows. |
 | Notebook sync on browser edits | A pull request edited in GitHub's browser editor can't regenerate its notebook, so the Notebook sync check fails. Either let CI regenerate the notebooks on pull requests (a workflow change), or keep the check and have the maintainer regenerate before merging. `CONTRIBUTING.md` describes the second. |
+| robots.txt rules for AI agents | The chapter 4 back-fill read a robots.txt group addressed to Claude's agents (`ClaudeBot`, `Claude-User`, and others) as applying to captures, though the browser sends the course's User-Agent. So chapter 4 has no Guardian or www.bbc.co.uk figure, and `doctor` now warns about such groups. Confirm the practice and it goes into `decisions.md`, or say otherwise. |
 | AAR P0-2 | Enable the permission rule that denies force-pushes (untested; test it first). Turn on "Automatically delete head branches" in both repositories. |
 | AAR P1-1 | The `shots-check` CI workflow, part of M4. |
 | AAR P1-3 | Fix the review skill's session collector. This belongs to whoever maintains the skill, not this repository. |
@@ -82,11 +83,13 @@ In this order:
 
 - Chapter 6 and course week 6: leave them untouched (maintainer's instruction).
 - Students' branches and pull requests: never merge, edit, or rebase them.
+- Issues a student's open pull request already fixes: leave the fix to it. On 2026-09-24 a chapter 4 fix for #90 had to be withdrawn because #92, the reporter's own pull request, already fixed it. Check the issue's linked pull requests and the open ones on that chapter first.
 
 ## Notes for cloud sessions
 
 - Don't retry the branch-deletion refusal (HTTP 403). List the branches here instead.
 - Don't run `playwright install`. The toolkit uses Chrome for Testing through `tools/shots/bootstrap.sh`, and the container already has Chromium.
+- Before a capture, read the "Field notes" in `tools/shots/README.md`, and add to them what the capture teaches.
 - HTTPS goes through the session's proxy. Never turn off TLS verification. Captures through the proxy use HTTP/1.1, and captions that show protocol details say so.
 - Quarto isn't installed system-wide. Download a release into the session's scratch directory. The computed-outputs tests used 1.10.18.
 - **Merging several pull requests that touch the same files.**

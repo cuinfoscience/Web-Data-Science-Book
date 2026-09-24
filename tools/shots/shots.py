@@ -23,7 +23,6 @@ import subprocess
 import sys
 import urllib.error
 import urllib.request
-import urllib.robotparser
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -32,6 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib import annotate, legibility                                   # noqa: E402
 from lib import devtools as dt                                          # noqa: E402
 from lib import provenance as prov                                      # noqa: E402
+from lib import robots                                                  # noqa: E402
 from lib.capture import Pacer, PolicyBlock, capture, sha256, takes      # noqa: E402
 from lib.compare import compare                                         # noqa: E402
 from lib.env import IMAGES, OUT, ROOT, TOOL, chrome_path, chrome_version, proxy, rel  # noqa: E402
@@ -178,13 +178,16 @@ def doctor_chapter(chapter):
             else:
                 line(WARN, f"{host}: not reachable now ({reason})")
             continue
-        robots = urllib.robotparser.RobotFileParser()
-        robots.parse(text.splitlines())
         for fig in figs:
             page = fig["url"].removeprefix("view-source:")
-            if not robots.can_fetch(agent, page):
+            names = robots.barred(text, agent, page)
+            if agent in names:
                 line(WARN, f"{host}: robots.txt disallows {urlparse(page).path} ({fig['id']})",
                      "one page view per figure; decide whether that fits the site's rules")
+            claude = [name for name in names if name != agent]
+            if claude:
+                line(WARN, f"{host}: robots.txt disallows {urlparse(page).path} for {', '.join(claude)} ({fig['id']})",
+                     "an AI agent makes this capture: leave the page out, or ask the maintainer")
     return failed
 
 
