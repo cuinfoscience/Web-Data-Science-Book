@@ -10,8 +10,10 @@
 #   Whether an API client may capture it anyway is the maintainer's decision
 #   (docs/handoff.md).
 # - The Guardian and the BBC's main site: their robots.txt files disallow Claude's
-#   agents, so no figure comes from them. The BBC's feeds are served from
-#   feeds.bbci.co.uk, whose robots.txt allows them.
+#   agents, and the back-fill honored that, so no figure comes from them. Since
+#   2026-09-24, captures follow the rules for the course's User-Agent instead
+#   (docs/decisions.md). The BBC's feeds are on feeds.bbci.co.uk, which allows
+#   every agent.
 chapter: ch-04
 qmd: ch-04-data-formats.qmd
 defaults:
