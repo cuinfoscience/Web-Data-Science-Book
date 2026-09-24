@@ -6,11 +6,12 @@
 
 - **Screenshot toolkit, `tools/shots`.** Milestones M1–M3 are merged (#135–#137). The selftest passes 56 of 56 checks.
 - **Chapter 5 pilot.** Merged. Four DevTools figures are in `ch-05-protocols.qmd` (#138). The course deck for week 5 uses one of them, and the course repository keeps copies of all four with notes (course #51).
-- **The pull request that adds this note** (branch `claude/docs-agents-md`) does four things:
-  - renames `claude.md` to `AGENTS.md`, with `CLAUDE.md` importing it;
-  - adds `docs/`, and moves the screenshot AAR and plans here from the course repository;
-  - adds the sprint's AAR ([`aar/AAR_Web-Data-Science-Book_2026-09-24.md`](aar/AAR_Web-Data-Science-Book_2026-09-24.md));
-  - adds the computed-outputs plan ([`plans/2026-09-24-computed-outputs.md`](plans/2026-09-24-computed-outputs.md)).
+- **Project records.** Merged in #139, with course #52 leaving pointers:
+  - `AGENTS.md`, renamed from `claude.md`;
+  - `docs/`, including the screenshot AAR and plans moved from the course repository;
+  - the sprint's AAR ([`aar/AAR_Web-Data-Science-Book_2026-09-24.md`](aar/AAR_Web-Data-Science-Book_2026-09-24.md));
+  - the computed-outputs plan ([`plans/2026-09-24-computed-outputs.md`](plans/2026-09-24-computed-outputs.md)).
+- **The AAR's P0 text is applied.** `AGENTS.md` now has the two-sided legibility rule, "Git and Pull Requests", and the "done" rule for `tools/shots`. The course's `AUTHORING.md` has the legibility rule. The AAR's resolution note records what changed from the proposals.
 
 ## Paused
 
@@ -23,9 +24,8 @@ The maintainer paused this work on 2026-09-24. Don't start any of it until they 
 
 | Item | What to decide |
 |---|---|
-| AAR P0-1 | Apply the two-sided legibility wording to `AGENTS.md` and the course's `AUTHORING.md`? |
-| AAR P0-2 | The policy is decided ([`decisions.md`](decisions.md)). Still open: add its text to `AGENTS.md`; enable the permission rule that denies force-pushes (untested); turn on GitHub's "Automatically delete head branches" in both repositories. |
-| AAR P0-3 | Add effect tests for the DevTools preferences (mechanical), and the "done" rule for toolkit changes (text). |
+| AAR P0-2 | The policy and its text are in place. Still open: enable the permission rule that denies force-pushes (untested; test it first), and turn on GitHub's "Automatically delete head branches" in both repositories. |
+| AAR P0-3 | The "done" rule is in place. Still open: effect tests for the DevTools layout preferences. This is mechanical work, due before the next toolkit change. |
 | AAR P1-1 | Add the `shots-check` CI workflow, which runs only on pull requests that change images. |
 | AAR P1-3 | Fix the review skill's session collector. This belongs to whoever maintains the skill, not this repository. |
 | Computed outputs | The four questions in the plan's §9. |
@@ -33,7 +33,7 @@ The maintainer paused this work on 2026-09-24. Don't start any of it until they 
 ## Known issues
 
 - **Merged branches that the session could not delete.** The cloud session's git proxy refuses branch deletion with HTTP 403, so these remain. Delete them by hand, or turn on automatic deletion so they stop piling up.
-  - This repository, merged into `main`: `add-ci`, `ch06-strategy-framework`, `claude/ch04-refresh-live-data`, `claude/ch04-rss-directory-links`, `claude/ch04-rss-starter-feeds`, `claude/ch04-swap-rss-links`, `claude/ch05-protocols-expansion`, `claude/ch05-protocols-terminal-tools`, `claude/ch07-wayback-background`, `claude/ch08-selenium-manager-playwright`, `claude/pilot-ch05`, `claude/shots-toolkit-m1`, `claude/shots-toolkit-m2`, `claude/shots-toolkit-m3`, `fix-notebook-drift`, and `fix-oscars-403-headers`. Also merged: the head branch of #53, a student's pull request merged on 2026-09-04.
+  - This repository, merged into `main`: `add-ci`, `ch06-strategy-framework`, `claude/ch04-refresh-live-data`, `claude/ch04-rss-directory-links`, `claude/ch04-rss-starter-feeds`, `claude/ch04-swap-rss-links`, `claude/ch05-protocols-expansion`, `claude/ch05-protocols-terminal-tools`, `claude/ch07-wayback-background`, `claude/ch08-selenium-manager-playwright`, `claude/pilot-ch05`, `claude/shots-toolkit-m1`, `claude/shots-toolkit-m2`, `claude/shots-toolkit-m3`, `fix-notebook-drift`, `fix-oscars-403-headers`, and `claude/docs-agents-md`. Also merged: the head branch of #53, a student's pull request merged on 2026-09-04.
   - The course repository, merged into `main`: `add-slides-ci`, `claude/detrope-week02-images`, `claude/week-01-screenshots-2aiqhh`, `claude/week-02-expansion`, `claude/week-04-rss-feeds-handout`, `claude/wk02-fixes`, `fix-oscars-403-headers-slides`, `overleaf-2026-08-24-0430`, and `overleaf-2026-08-24-0500`.
   - The course repository, closed without merging: `claude/swartz-ca-frames` (#23). Delete it only if #23 won't be revived. GitHub can restore it from the closed pull request.
   - Keep `main`, `gh-pages`, every branch with an open pull request (students' included), and the course session's branch, `claude/info-4617-fall-2026-syllabus-07ahb8`.
@@ -54,7 +54,7 @@ The maintainer paused this work on 2026-09-24. Don't start any of it until they 
 
 ## Next, when work resumes
 
-1. Decide the AAR's P0 actions, and apply the agreed text to `AGENTS.md` and the course's `AUTHORING.md`.
+1. Finish P0-2: test and enable the force-push deny rule, and turn on automatic branch deletion.
 2. Add the missing effect tests (P0-3) before changing the toolkit again.
 3. Retake the chapter 7–8 figures and the slide screenshots under P0-1, one chapter per pull request.
 4. Back-fill chapters 1–4 by the plan.

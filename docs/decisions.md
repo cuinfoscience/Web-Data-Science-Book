@@ -2,6 +2,19 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-09-24 · Figures are readable at both ends
+
+**Decision.**
+- A figure is scoped to what its paragraph discusses, then enlarged. Text too small and a figure too crammed both fail the reader.
+- Crop to the subject, and hide the panels, columns, and sidebars the text doesn't mention.
+- Enlarge by zooming the application, not by widening the window.
+- `tools/shots/run check` is the one place that judges text size: 11 pixels in the book's column, 16 on a 1920-pixel slide, 6 points in print.
+- The 800×600 cap stays, as a soft limit inside this rule.
+
+**Why.** The 800×600 cap fixed the tiny text of whole-window captures. The chapter 5 pilot then squeezed DevTools into the cap, and the figures came out crammed: the Styles pane took 40% of the width, rows wrapped, and columns were cut short. Separately, the slide rule in `AUTHORING.md` (W/1680 of the text width) was too small for DevTools text by the toolkit's slide threshold. ([AAR](aar/AAR_Web-Data-Science-Book_2026-09-24.md) §5.1, P0-1.)
+
+**Where.** `AGENTS.md` ("Figures and screenshots"), the course's `slides/common/AUTHORING.md` ("How much a screenshot shows"), and `tools/shots/lib/legibility.py`.
+
 ## 2026-09-24 · Pull requests merge with merge commits; history is never rewritten
 
 **Decision.**
@@ -13,7 +26,7 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 
 **Why.** Squash merges left the session's branch behind `main` after every merge. It had to be reset and force-pushed, about six times in one day, and one stacked pull request had to be rebased. The review history became hard to follow, and the maintainer asked why. ([AAR](aar/AAR_Web-Data-Science-Book_2026-09-24.md) §5.3.)
 
-**Where.** This log, and `AGENTS.md` once the AAR's P0-2 text is applied. A permission rule denying force-pushes is proposed and untested (P0-2). *Supersedes* the squash merges used up to #138.
+**Where.** This log, and `AGENTS.md` ("Git and Pull Requests"). A permission rule that denies force-pushes is proposed and untested (P0-2). *Supersedes* the squash merges used up to #138.
 
 ## 2026-09-24 · Pause chapter work after the chapter 5 pilot
 
@@ -39,7 +52,7 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 
 **Why.** Whole-window captures shrank text to 42–71% of its on-screen size in the book's 778-pixel column. DevTools' text came out near 5 pixels.
 
-**Status.** Standing, but re-diagnosed. The cap is a heuristic that serves the real aim, text readable where the figure is shown. Under the cap, the chapter 5 pilot produced crammed figures. The AAR proposes stating the aim at both ends, too small and too crammed, as P0-1. That wording is not yet applied. ([AAR](aar/AAR_Web-Data-Science-Book_2026-09-24.md) §5.1.)
+**Status.** Standing, as the soft limit inside the entry above, "Figures are readable at both ends". The cap is a heuristic that serves that aim. Under the cap alone, the chapter 5 pilot produced crammed figures. ([AAR](aar/AAR_Web-Data-Science-Book_2026-09-24.md) §5.1.)
 
 **Where.** `tools/shots/lib/legibility.py` (`SOFT_LIMIT`), `tools/shots/run check`, the course's `slides/common/AUTHORING.md`, and `AGENTS.md`.
 
