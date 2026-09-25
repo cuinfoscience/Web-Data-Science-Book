@@ -11,9 +11,9 @@ Done so far:
 - **M1:** headless captures, guards, retries, provenance, and `check`.
 - **M2:** headed captures of browser UI (DevTools, View Source), with real input on a virtual display.
 - **M3:** numbered markers placed from what the browser measured, a legibility check at each size a figure is shown, side-by-side composites, and contact sheets.
-- **M4, begun:** engines for the two ch-08 figures whose subject is a tool itself: the window Selenium opens, and Playwright's recorder (see Engines).
+- **M4, begun:** engines for the two ch-08 figures whose subject is a tool itself: the window Selenium opens, and Playwright's recorder (see Engines); and evidence queries, the queries behind the numbers and claims in captions (see Evidence).
 
-Still to come, the rest of M4: evidence queries, copying figures into the course repo (`sync`, `import`), and CI.
+Still to come, the rest of M4: copying figures into the course repo (`sync`, `import`), and CI.
 
 ## Quick start
 
@@ -24,6 +24,7 @@ tools/shots/run capture ch-07                     # takes go to tools/shots/out/
 tools/shots/run sheet ch-07                       # look at every take at the size it will be shown
 tools/shots/run compare ch-07 wayback-calendar    # same picture as the approved image?
 tools/shots/run promote ch-07 wayback-calendar    # copy the take into images/ch-07/, record it
+tools/shots/run evidence ch-07                    # run the queries behind the captions' claims
 tools/shots/run check                             # before a PR
 ```
 
@@ -951,6 +952,55 @@ JavaScript off alone, playwright.dev, and the window Selenium opens
 - **Existing images:** `adopt` records ones made before the toolkit, from their recipe's `legacy:` block.
 - **`images/<chapter>/IMAGES.md`** gets a table generated from `provenance.json`, between `<!-- shots:begin -->` and `<!-- shots:end -->`. Everything outside the markers is for people, and the tool never touches it: what a figure shows that is easy to miss, and what a retake needs.
 
+## Evidence
+
+A count, a date, or a claim a figure's caption or paragraph rests on comes
+from a query whose limit and paging are recorded beside the figure (AAR P1-2).
+The recipe lists the queries under `evidence:`, each with the claim it backs:
+
+```yaml
+evidence:
+  - id: facebook-2005-statuses
+    claim: >-
+      facebook.com's captures were 200s until April 8, 2005, 403s from April 10,
+      and 200s again from August 6.
+    url: https://web.archive.org/cdx/search/cdx
+    params: {url: facebook.com, from: '20050301', to: '20050831', output: json,
+             fl: 'timestamp,statuscode', limit: 1000, showResumeKey: 'true'}
+    page: resume_key          # follow the CDX resume key until the API stops returning one
+    summary: {runs: statuscode}
+```
+
+- **`evidence ch-NN`** runs each query as captures load pages: with the
+  course User-Agent, 8–30 seconds between requests to one host, and retries
+  after a 5xx or a dropped connection. It saves every response under `out/`.
+- **Complete, or it fails.** A query is complete only when its last page says
+  so: a CDX page without a resume key, or, without paging, fewer rows than
+  `limit`. A page that returns exactly its limit and can't page fails, and so
+  does one whose resume key the query doesn't follow. That is the check that
+  would have caught week 7's first account of x.com's images: a 25-row answer
+  to a query with more (course PR #44).
+- **The record:** a complete run goes into `provenance.json`, under
+  `evidence`: each request with its URL and rows, the total, the date, and a
+  summary. `IMAGES.md` lists each query and its claim under the figures.
+- **Summaries:** `{group_by: urlkey, count: statuscode}` counts each group's
+  values and gives its first and last timestamps; `{runs: statuscode}` gives
+  each stretch of one value, in the API's order, with its first and last
+  timestamps and its rows.
+- **`check`** warns about a figure whose evidence was never run to its end, or
+  whose query or claim changed after it ran, so the claim on record is the one
+  the data was read against. Reading the summary against the claim is still a
+  person's job; `evidence` prints it.
+- **Robots.txt:** `doctor` reads it for each query's host too, as for an API a
+  chapter's code calls (`api_client`).
+
+The first two, in chapter 7 (2026-09-25), confirmed the calendar paragraph's
+dates and corrected one of the x.com paragraph's: the spacer image was saved
+twice, on April 29 and May 5, 2000, not only in April. The x.com query also
+showed that "captured only as 404s", in the figure's notes, was wrong: the six
+images' later captures are redirects. Their first captures were 404s, and none
+was ever a 200.
+
 ## Checks
 
 `check` reports **errors**, which exit 1:
@@ -971,9 +1021,10 @@ It reports **warnings** for:
 - short alt text;
 - a drifting figure whose caption does not give the capture year;
 - marks changed in the recipe since the annotated image was drawn (promote again);
-- a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
+- a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility);
+- evidence never run to its end, or whose query or claim changed after it ran (see Evidence).
 
-`selftest` runs 109 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 119 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - a stylesheet whose connection drops, which fails a take whose text is all there and is retried, beside one answered with a 404, which passes, and a recipe that accepts lost files, whose log names them; an aborted stylesheet counts, an aborted image or script doesn't;
@@ -991,7 +1042,8 @@ It reports **warnings** for:
 - the infobar guard: no bar above the page, and a recipe that expects one fails without it;
 - the engines' recipe rules (`mode: headed`, their own steps, window crops, `inspector` for codegen alone);
 - the Selenium engine: the window `webdriver.Chrome()` opens, with Chrome for Testing's bar and the versions recorded;
-- the codegen engine: a real click written as a line of the recorder's script, both windows grabbed, and the Inspector's code counted at its stylesheet's size.
+- the codegen engine: a real click written as a line of the recorder's script, both windows grabbed, and the Inspector's code counted at its stylesheet's size;
+- evidence, against a stand-in CDX server: a query paged to its end, its summaries and its listing in `IMAGES.md`, a page that returns exactly its limit and one whose resume key is left unfollowed failing, and `check` on evidence never run, a changed query, and a reworded claim.
 
 It skips the marker checks if TeX is missing and the headed checks if the virtual display is.
 
@@ -1018,6 +1070,7 @@ It skips the marker checks if TeX is missing and the headed checks if the virtua
 | `lib/capture.py` | one figure, start to finish, composites, and the take log |
 | `lib/compare.py` | take against approved image |
 | `lib/provenance.py` | `provenance.json` and the `IMAGES.md` table |
+| `lib/evidence.py` | the queries behind captions' claims: paging, the complete-or-fail rule, summaries, and staleness |
 | `selftest.py` | the offline test |
 | `recipes/` | one YAML file per chapter, and `course.yml` for course-only figures |
 | `out/`, `.venv/` | takes, markers, contact sheets, and the virtual environment (git-ignored) |

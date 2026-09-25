@@ -49,6 +49,18 @@ figures:
       740 pixels wide the figure fits the book's column, so the calendar's 10.5-pixel day
       numbers show at 11 pixels
     drifts: true        # "Saved N times" and the capture circles change every day
+    # The paragraph under the figure reads the calendar's colors as dates. The CDX API gives
+    # them exactly: every capture of the address from March to August 2005, in time order.
+    evidence:
+      - id: facebook-2005-statuses
+        claim: >-
+          facebook.com's captures were 200s until April 8, 2005, 403s from April 10,
+          and 200s again from August 6.
+        url: https://web.archive.org/cdx/search/cdx
+        params: {url: facebook.com, from: '20050301', to: '20050831', output: json,
+                 fl: 'timestamp,statuscode', limit: 1000, showResumeKey: 'true'}
+        page: resume_key
+        summary: {runs: statuscode}
 
   - id: facebook-2004
     kind: capture
@@ -124,6 +136,21 @@ figures:
       text: ['X\.com Corporation', '[0-9,]+ captures']
     crop: {window: true}
     drifts: true        # the toolbar's capture count
+    # The paragraph and caption say the page's images were never saved. The page's seven
+    # <img> files are in images/ (four more, in ../images/, sit in commented-out script).
+    # Every capture of each, ever: a query cut at 25 rows once suggested otherwise (course #44).
+    evidence:
+      - id: x-com-images
+        claim: >-
+          None of six of the page's seven images was ever captured with a 200: their first
+          captures, in August and September 2000, were 404s, and later ones redirects or 404s.
+          Only the seventh, spacer.gif, was saved successfully, on April 29 and May 5, 2000.
+        url: https://web.archive.org/cdx/search/cdx
+        params: {url: 'x.com/images/', matchType: prefix, output: json, fl: 'urlkey,timestamp,statuscode',
+                 filter: 'urlkey:com,x\)/images/(about_btn|contact_btn|employment_btn|main_x|management_btn|spacer|x_righton)\.gif',
+                 limit: 1000, showResumeKey: 'true'}
+        page: resume_key
+        summary: {group_by: urlkey, count: statuscode}
 
   - id: devtools-archived-page
     kind: capture

@@ -93,6 +93,19 @@ def table(data):
         name = f"`{e['file']}`" + (f" and `{annotated_name(e['file'])}`, `.pdf`" if e.get("annotated") else "")
         rows.append(f"| {name} | {e['kind']} | {str(e.get('captured', ''))[:10]} "
                     f"| {_source(e)} | {_how(e)} |")
+    return "\n".join(rows) + "\n" + evidence_table(data)
+
+
+def evidence_table(data):
+    """The queries behind the captions' claims (lib/evidence.py), after the figures' table."""
+    records = [(fid, e) for fid, found in sorted((data.get("evidence") or {}).items()) for e in found]
+    if not records:
+        return ""
+    rows = ["", "Evidence behind the captions (`tools/shots/run evidence`):", "",
+            "| Figure | Query | Claim | Rows | Requests | Fetched |", "|---|---|---|---|---|---|"]
+    for fid, e in records:
+        rows.append(f"| `{fid}` | `{e['id']}`: {e['url']} | {e['claim']} | {e['rows']:,} "
+                    f"| {len(e['requests'])} | {str(e.get('fetched', ''))[:10]} |")
     return "\n".join(rows) + "\n"
 
 

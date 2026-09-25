@@ -12,6 +12,13 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 | `facebook-2004.png` | capture | 2026-09-25 | https://web.archive.org/web/20040121224607/http://facebook.com/ | tools/shots: Google Chrome for Testing 154.0.8037.57, 778×600 at 2×, closed shadow roots opened |
 | `wayback-calendar.png` | capture | 2026-09-25 | https://web.archive.org/web/2005*/facebook.com | tools/shots: Google Chrome for Testing 154.0.8037.57, 800×1100 at 2× |
 | `x-com-1999.png` | capture | 2026-09-25 | https://web.archive.org/web/19991114081850/http://x.com/ | tools/shots: Google Chrome for Testing 154.0.8037.57, 700×600 at 2×, closed shadow roots opened |
+
+Evidence behind the captions (`tools/shots/run evidence`):
+
+| Figure | Query | Claim | Rows | Requests | Fetched |
+|---|---|---|---|---|---|
+| `wayback-calendar` | `facebook-2005-statuses`: https://web.archive.org/cdx/search/cdx | facebook.com's captures were 200s until April 8, 2005, 403s from April 10, and 200s again from August 6. | 116 | 1 | 2026-09-25 |
+| `x-com-1999` | `x-com-images`: https://web.archive.org/cdx/search/cdx | None of six of the page's seven images was ever captured with a 200: their first captures, in August and September 2000, were 404s, and later ones redirects or 404s. Only the seventh, spacer.gif, was saved successfully, on April 29 and May 5, 2000. | 204 | 1 | 2026-09-25 |
 <!-- shots:end -->
 
 ## Notes
@@ -36,9 +43,9 @@ recipe's `oversize:` explains. Recipes: `tools/shots/recipes/ch-07.yml`.
 - `wayback-calendar.png`: at 800 pixels wide the calendar sets three months
   to a row, so reaching August's blue circles takes three rows. The
   histogram shows 2004 to 2019, the years around the one selected. The CDX
-  API gives the colors' boundaries: 200 until April 8, 2005 (still
-  AboutFace's page, by the raw capture's title), 403 from April 10, and 200
-  again from August 6.
+  API gives the colors' boundaries (evidence `facebook-2005-statuses`): 200
+  until April 8, 2005 (still AboutFace's page, by the raw capture's title),
+  403 from April 10 to August 4, and 200 again from August 6.
 - `facebook-2004.png`: the page is 823 pixels wide and most of its text is
   11 pixels, so the window is 778 pixels wide, the book's column, and its
   edge cuts the last of the banner's four photos. The archive answered 502
@@ -51,10 +58,12 @@ recipe's `oversize:` explains. Recipes: `tools/shots/recipes/ch-07.yml`.
   panel, and waits for "alexa_dv". The panel is translucent, so the 2004
   page shows faintly behind it.
 - `x-com-1999.png`: the images are broken because the archive never saved
-  them: six of the seven the page references were captured only as 404s, in
-  August and September 2000 (CDX API, full query). An early query capped at
-  25 rows suggested otherwise; see course PR #44. The page's fine print is 10
-  pixels, so the window is 700 pixels wide.
+  them. None of six of the page's seven images was ever captured with a 200:
+  their first captures, in August and September 2000, were 404s, and later
+  ones redirects or 404s. `spacer.gif` alone was saved, on April 29 and May 5,
+  2000. The evidence `x-com-images` in the table above is the full query; an
+  early one capped at 25 rows suggested otherwise (course PR #44). The page's
+  fine print is 10 pixels, so the window is 700 pixels wide.
 - `devtools-archived-page.png` is a headed capture, with DevTools docked at
   the bottom and zoomed to 125%. The recipe picks the page's own `<center>`
   in its empty left margin, a third of the way down, because its top is

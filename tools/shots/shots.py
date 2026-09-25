@@ -9,7 +9,8 @@
     tools/shots/run sheet ch-NN [--only ID ...]   each newest take at the size it will be shown
     tools/shots/run promote ch-NN ID [--take PATH]
     tools/shots/run adopt ch-NN [--only ID ...]   record provenance for images made before tools/shots
-    tools/shots/run check [ch-NN ...]         recipes, provenance, legibility, markers, figure blocks
+    tools/shots/run evidence ch-NN [--only ID ...]   run the queries behind the captions' claims
+    tools/shots/run check [ch-NN ...]         recipes, provenance, legibility, markers, figure blocks, evidence
     tools/shots/run status                    every figure's kind and age
     tools/shots/run clean [ch-NN]             delete old takes
     tools/shots/run selftest                  offline test of the guards, promote, and markers
@@ -161,6 +162,9 @@ def doctor_chapter(chapter):
         for url, expect, api_client in loads(fig):      # a composite's parts can each load another host
             if url and host_of(url):
                 by_host.setdefault(host_of(url), []).append((fig, url, expect, api_client))
+        for q in fig.get("evidence") or []:              # an evidence query is an API's, asked as a client
+            if host_of(q["url"]):
+                by_host.setdefault(host_of(q["url"]), []).append((fig, q["url"], {}, True))
     for host, pages in sorted(by_host.items()):
         figs = [fig for fig, *_ in pages]
         agent = figs[0]["user_agent"]
@@ -589,13 +593,56 @@ def cmd_check(args):
                      f"it was captured (for example, 'in {year}')")
         for fid in set(data["figures"]) - ids:
             warn(f"provenance.json has `{fid}`, which no recipe describes")
+        from lib import evidence as ev
+        recorded = data.get("evidence") or {}
+        for fig in recipe["figures"]:
+            for problem in ev.stale(fig, recorded.get(fig["id"])):
+                warn(f"{fig['id']}: {problem}")
+        for fid in set(recorded) - ids:
+            warn(f"provenance.json has evidence for `{fid}`, which no recipe describes")
         md = IMAGES / chapter / "IMAGES.md"
-        if data["figures"]:
+        if data["figures"] or data.get("evidence"):
             current = md.read_text() if md.exists() else ""
             if prov.table(data) not in current:
                 err(f"{rel(md)}: table out of date (run adopt or promote to rewrite it)")
     print(f"{errors} error(s), {warnings} warning(s)")
     return 1 if errors else 0
+
+
+# ---------------------------------------------------------------- evidence
+def cmd_evidence(args):
+    from lib import evidence as ev
+    recipe = load(args.chapter)
+    figs = [f for f in recipe["figures"] if f.get("evidence") and (not args.only or f["id"] in args.only)]
+    if not figs:
+        print(f"no figure in {args.chapter}{' of ' + ', '.join(args.only) if args.only else ''} lists evidence")
+        return 1 if args.only else 0
+    pacer, bad = Pacer(), 0
+    data = prov.load(args.chapter)
+    for fig in figs:
+        print(f"{args.chapter}/{fig['id']}")
+        found = {e["id"]: e for e in (data.get("evidence") or {}).get(fig["id"], [])}
+        for q in fig["evidence"]:
+            print(f"  {q['id']}: {q['claim']}")
+            try:
+                record = ev.run(args.chapter, fig, q, pacer, say=print)
+            except ev.EvidenceError as e:
+                line(BAD, str(e), "the claim can't cite this query until it runs to its end")
+                bad += 1
+                continue
+            found[q["id"]] = record
+            line(GOOD, f"{record['rows']:,} row(s) in {len(record['requests'])} request(s), complete; "
+                       f"responses in {record['responses']}")
+            for key, value in (record.get("summary") or {}).items():
+                print(f"    {key}: {json.dumps(value)[:600]}")
+        data.setdefault("evidence", {})[fig["id"]] = [found[q["id"]] for q in fig["evidence"] if q["id"] in found]
+    if recipe["course"]:
+        print("course-only figures keep no provenance here; the records are in tools/shots/out/")
+    else:
+        prov.save(args.chapter, data)
+        print(f"recorded in {rel(prov.path(args.chapter))}")
+        print(prov.write_images_md(args.chapter, recipe["qmd"], data))
+    return 1 if bad else 0
 
 
 # ---------------------------------------------------------------- clean / selftest
@@ -640,6 +687,8 @@ def main():
     p.set_defaults(fn=cmd_sheet)
     p = sub.add_parser("adopt"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
     p.add_argument("--force", action="store_true"); p.set_defaults(fn=cmd_adopt)
+    p = sub.add_parser("evidence"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
+    p.set_defaults(fn=cmd_evidence)
     p = sub.add_parser("check"); p.add_argument("chapters", nargs="*"); p.set_defaults(fn=cmd_check)
     p = sub.add_parser("clean"); p.add_argument("chapters", nargs="*"); p.set_defaults(fn=cmd_clean)
     p = sub.add_parser("selftest"); p.set_defaults(fn=cmd_selftest)
