@@ -111,11 +111,25 @@ def _result():
             "steps": [], "error": None, "anchors": {}, "text": None}
 
 
+# `open_shadow: true`: a shadow root the page asks to have closed is made open instead,
+# before any of the page's scripts run. A closed root is drawn like any other, but no
+# selector reaches it, Playwright's included, so no step could wait for its text and the
+# text measure couldn't count it. The Wayback Machine's toolbar is one (chapter 7).
+OPEN_SHADOW = """(() => {
+  const attach = Element.prototype.attachShadow;
+  Element.prototype.attachShadow = function (init) {
+    return attach.call(this, Object.assign({}, init, {mode: 'open'}));
+  };
+})();"""
+
+
 def _headless(browser, fig, png):
     """One headless attempt, as a dict: status, problems, temporary (worth retrying),
     clip, final_url, steps, error (the page never loaded), anchors, and text."""
     result = _result()
     context = browser.context(fig)
+    if fig.get("open_shadow"):
+        context.add_init_script(OPEN_SHADOW)
     page = context.new_page()
     expect = fig.get("expect") or {}
     # The status of each document the tab loads. A site that checks the browser with a
@@ -123,14 +137,17 @@ def _headless(browser, fig, png):
     loaded = []
     page.on("response", lambda r: loaded.append(r.status)
             if r.request.is_navigation_request() and r.frame == page.main_frame else None)
-    # The page's own files that failed before any response came back (guards.dropped).
-    # Chrome also fails a file it refused after an answer, such as a stylesheet that got a
-    # 404, which is the page as it is; so a request that was answered doesn't count.
+    # The page's own files that failed (guards.dropped): no answer at all, or a server
+    # error. Chrome also fails a file it refused after an answer, such as a stylesheet
+    # that got a 404, which is the page as it is; so an answered request counts only
+    # when the answer was a 5xx.
     host, failed, answered = urlparse(fig["url"]).hostname, [], set()
+    own = lambda request: request.resource_type in guards.DRAWN and urlparse(request.url).hostname == host
     page.on("response", lambda r: answered.add(r.request))
+    page.on("response", lambda r: failed.append((r.request.resource_type, r.url, f"HTTP {r.status}"))
+            if r.status >= 500 and own(r.request) else None)
     page.on("requestfailed", lambda r: failed.append((r.resource_type, r.url, r.failure))
-            if r.resource_type in guards.DRAWN and urlparse(r.url).hostname == host
-            and r not in answered else None)
+            if own(r) and r not in answered else None)
     try:
         try:
             response = page.goto(fig["url"], wait_until="domcontentloaded", timeout=fig["timeout"] * 1000)
@@ -286,7 +303,7 @@ def _log(fig, png, problems, status, final_url, label, clip, attempts):
         "mode": fig["mode"], "devtools": fig.get("devtools"),
         "crop": fig.get("crop") or {"window": True}, "clip": clip, "size": size,
         "recipe_sha256": fig["recipe_sha256"], "image": rel(png), "image_sha256": sha256(png),
-        "attempts": attempts,
+        "attempts": attempts, **({"open_shadow": True} if fig.get("open_shadow") else {}),
     }
 
 
@@ -315,7 +332,7 @@ def _composite(browser, fig, pacer, say):
     take = _log(fig, png, problems, parts[0]["status"], parts[0]["final_url"], parts[0]["browser"], None,
                 [a for p in parts for a in p["attempts"]])
     take["parts"] = [{k: p.get(k) for k in ("label", "image", "image_sha256", "url", "javascript", "status",
-                                            "first_status", "error", "dns", "dropped") if k in p}
+                                            "first_status", "error", "dns", "dropped", "open_shadow") if k in p}
                      for p in parts]
     sizes = measure.merge(*[{float(s): c for s, c in ((p.get("text") or {}).get("sizes") or {}).items()}
                             for p in parts])

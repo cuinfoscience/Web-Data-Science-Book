@@ -20,7 +20,7 @@ DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
 FIGURE_KEYS = {"id", "file", "kind", "section", "brief", "url", "mode", "engine", "steps", "expect", "crop",
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
                "user_agent", "pause", "settle", "timeout", "retries",
-               "annotate", "targets", "legibility", "parts", "layout", "oversize", "api_client"}
+               "annotate", "targets", "legibility", "parts", "layout", "oversize", "api_client", "open_shadow"}
 ENGINES = {"playwright", "selenium", "codegen"}
 # Annotation (lib/annotate.py): marks placed from what the browser measured.
 ANNOTATE = {"width_in", "size", "border", "marks"}
@@ -36,7 +36,7 @@ LEGIBILITY = {"skip"}
 # A composite (mode: composite) joins captures of its parts side by side, or one
 # above the next (`layout: {direction: column}`).
 PART_KEYS = {"label", "url", "steps", "expect", "crop", "javascript", "window", "scale", "mode",
-             "devtools", "settle", "timeout", "api_client"}
+             "devtools", "settle", "timeout", "api_client", "open_shadow"}
 LAYOUT = {"gap", "pad", "label_px", "direction"}
 DIRECTIONS = {"row", "column"}
 # Settings that decide how a take is drawn on or judged, not how it is captured.
@@ -123,6 +123,11 @@ def _problems(chapter, raw):
             if "api_client" in holder and not isinstance(holder["api_client"], bool):
                 out.append(f"{where}{f' part {n}' if n else ''}: `api_client` is true for a figure of an API's "
                            "response (docs/decisions.md, 2026-09-24), or false")
+            if "open_shadow" in holder and not isinstance(holder["open_shadow"], bool):
+                out.append(f"{where}{f' part {n}' if n else ''}: `open_shadow` is true or false")
+            if holder.get("open_shadow") and holder.get("mode", "headless") == "headed":
+                out.append(f"{where}{f' part {n}' if n else ''}: `open_shadow` is for a headless capture; "
+                           "DevTools reaches closed shadow roots on its own")
         out += [f"{where}: {p}" for p in _composite_problems(f)]
     return out
 

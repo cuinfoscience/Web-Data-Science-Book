@@ -383,7 +383,33 @@ something the next agent would otherwise find out again, add a note here.
   for tooltips and crosspost previews on nearly every load, while the post
   looks right; that recipe accepts the loss (`expect: {all_files: false}`).
 - **Scroll before a crop far down the page.** A `between` crop is cut from
-  the window, so an element 1,100 pixels down needs a `scroll` step first.
+  the window, so an element 1,100 pixels down needs a `scroll` step first,
+  or a window tall enough to hold the whole crop (chapter 7's calendar:
+  `window: [800, 1100]`). The window's height isn't what the figure shows;
+  the crop is.
+- **The toolbar is in a closed shadow root.** The playback script calls
+  `attachShadow({mode: "closed"})`, so no selector, text wait, or hover
+  reaches the toolbar's count or its **About this capture** panel. The M1
+  recipe's hover by text never worked; its legacy image was clicked by
+  position. `open_shadow: true` opens the root (see Recipes), and the
+  toolbar's own ids work: `#wm-expand` is the About button, `#wm-capinfo`
+  its panel.
+- **The toolbar changes with the window.** Below 1,100 pixels wide it drops
+  its logo and its strip chart of captures by year, and keeps the address,
+  the capture count with its date range, and the capture's date with its
+  arrows. From 1,100 the strip chart is back, over the count until about
+  1,280, where the logo returns too. Chapter 7's figures keep under 800, so
+  its text says what a narrow window leaves out.
+- **The count is a second request.** The toolbar's "N captures" and its date
+  range come from `/__wb/sparkline`. On 2026-09-25 that request failed on
+  some loads while the page loaded, and the toolbar showed neither, which
+  no guard noticed. The recipes wait for the count's text.
+- **The calendar's summary line uses no-break spaces**:
+  `Saved&nbsp;<strong>8,516,745 times</strong>&nbsp;<span>between …`. A
+  plain space in a pattern doesn't match `&nbsp;`; `\s` does.
+- **At 800 pixels wide the calendar sets three months to a row**, each 240
+  by 210 pixels, and its histogram shows about 15 years around the selected
+  one: 2004 to 2019 for 2005.
 
 ### Chrome's JSON viewer (chapters 3 and 4)
 
@@ -417,7 +443,10 @@ something the next agent would otherwise find out again, add a note here.
   report it, and don't route around it. On 2026-09-25 it answered again, but
   not every time. The relay's log showed tunnels opened and closed 11 seconds
   later with no answer, and the CDX API answered one query with a 504. The
-  30-, 60-, and 120-second retries got through.
+  30-, 60-, and 120-second retries got through. From about 01:30 UTC it
+  reset connections again, and answered some page loads with its "Fail with
+  status: 502" page and some of a page's images with 502; half an hour of
+  retries got chapter 7's five figures through.
 - **A 429 on the first request is the session's address, not your pace.**
   On 2026-09-24, Wikimedia's REST API answered the chapter 1 pageviews URL
   with 429 ("You are making too many requests") before any other request had
@@ -553,12 +582,15 @@ One YAML file per chapter in `recipes/`. A figure:
     November 14, 1999, with broken-image icons and their alt text above the
     signup form and the X.com Corporation footer, under the Wayback toolbar.
   url: https://web.archive.org/web/19991114081850/http://x.com/
+  window: [700, 600]             # CSS pixels: the page and its toolbar, and no more
+  open_shadow: true              # the toolbar's closed shadow root, opened (see Field notes)
   steps:                         # each step waits for a condition; none sleeps blindly
     - wait: {selector: '#wm-ipp-base'}
-    - wait: {text: 'X\.com Corporation'}   # a regular expression; reaches into shadow DOM
+    - wait: {text: 'X\.com Corporation'}   # a regular expression; reaches into open shadow roots
+    - wait: {text: '[0-9,]+ captures'}     # the toolbar's count, which a second request fetches
   expect:                        # guards beyond the defaults
-    text: ['X\.com Corporation']
-  crop: {top: 0, height: 610}    # CSS pixels; or {window: true}, {selector: ..., pad: 8}
+    text: ['X\.com Corporation', '[0-9,]+ captures']
+  crop: {window: true}           # or {top: 0, height: 610}, {selector: ..., pad: 8}, in CSS pixels
   drifts: true                   # shows things that change: the caption must say when
   legacy:                        # how an image made before tools/shots was made
     captured: 2026-09-22
@@ -566,11 +598,12 @@ One YAML file per chapter in `recipes/`. A figure:
 ```
 
 - **The brief** is for people: what the reader should see, for which paragraph, and what the figure leaves out (step 1 of "Making a figure"). The tool doesn't read it, and it stays out of the recipe's hash, so rewording it needs no new take.
-- **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-07 and ch-08 recipes set 1280×800, the window their images were made in; they are over the soft limit until they are retaken.)
+- **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-08 recipes set 1280×800, the window their images were made in; its two tool windows are over the soft limit until M4 retakes them.)
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top; add `within: '.panel'` for a page that scrolls a panel rather than the window, as Jupyter does.
 - **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`. `{between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 12, 0]}` is a band from the top of one element to the bottom of another; `left` and `width` default to the window.
 - **Pages that lose files:** `expect: {all_files: false}` accepts a page whose own files fail on every load, when the ones lost don't show. Reddit's archived stylesheets for tooltips and crosspost previews came back aborted on most loads, while the post's own styles loaded (chapter 3's `reddit-api-pricing`).
 - **Refusals as subjects:** `expect: {status: 403}` for a refusal with a body, `expect: {block: true}` for a block page, and `expect: {error: 'ERR_NAME_NOT_RESOLVED|…'}` for a host that doesn't answer, whose take is Chrome's own error page (see "Refusals and dead hosts" under Field notes).
+- **Closed shadow roots:** `open_shadow: true` makes a shadow root that the page asks to have closed open instead, before any of the page's scripts run. A closed root is drawn like any other, but no selector reaches it, Playwright's included: no step can wait for its text or hover its buttons, and the text measure can't count it. The page looks the same; only its scripts could tell, since `element.shadowRoot` returns the root rather than `null`. The Wayback Machine's toolbar is one (chapter 7). Headless captures only: DevTools reaches closed roots on its own.
 - **An API's response:** `api_client: true`, on the figure or on a composite's part, marks the request a chapter's own code makes, captured as an API client where robots.txt disallows it (see "Before the recipe" under Field notes). It changes what `doctor` says, not the capture, so it stays out of the recipe's hash.
 - **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls.
 - **Other modes:** `mode: headed` and `mode: composite` are below. An `engine:` other than Playwright (M4) marks a figure that `capture` skips with a note.
@@ -758,7 +791,7 @@ Known cases, measured or computed from the images:
 - Week 08's `infinite_scroll.png`, dropped because it could not be read on its slide: DevTools text at 11 pixels, in a 555-pixel crop, on 35% of the slide's text width. That is 11.7 pixels on a 1920-pixel slide, under 16. The selftest checks this case.
 - Week 08's `xkcd_inspect.png` read well: the same text on half the text width comes to 16.7 pixels.
 - The week-06 handout's DevTools figure measures 6.7 points in print. Its card figure measures 5.2 points, which is readable at the edge; at 3 inches wide it would pass.
-- Every ch-07 and ch-08 figure shows 1100–1858 CSS pixels across, so the book's column shows its text at 42–71% of its size on screen. In the full-window DevTools captures (`network-tab-json`, `xkcd-inspect`), DevTools' text comes to about 5 pixels. `check` flags all eleven against the soft limit; they are due to be retaken within it.
+- Before their retakes, every ch-07 and ch-08 figure showed 1100–1858 CSS pixels across, so the book's column showed its text at 42–71% of its size on screen; in the full-window DevTools captures (`network-tab-json`, `xkcd-inspect`), DevTools' text came to about 5 pixels. Retaken within the limit, chapter 7's five measure 11–13.4 pixels in the book (2026-09-25). Chapter 8's two tool windows wait for M4.
 
 ## Composites
 
@@ -843,10 +876,11 @@ It reports **warnings** for:
 - marks changed in the recipe since the annotated image was drawn (promote again);
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
 
-`selftest` runs 93 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 96 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - a stylesheet whose connection drops, which fails a take whose text is all there and is retried, beside one answered with a 404, which passes, and a recipe that accepts lost files, whose log names them; an aborted stylesheet counts, an aborted image or script doesn't;
+- text in a closed shadow root, which no step or guard can find, and `open_shadow: true`, which opens the root for steps, guards, and the text measure;
 - robots.txt: groups for Claude's agents, and a disallowed API response marked `api_client` reported as a note while a disallowed page stays a warning;
 - refusals: a host that doesn't answer shown as Chrome's error page, and a failure when that page loads after all; behind a stand-in proxy that opens no tunnels, public DNS (a stand-in too) telling a dead host from a policy block in `capture` and `doctor`, and an unexpected tunnel failure still a policy block; a script check's 202 and reload; robots.txt's `Crawl-delay`;
 - a `scroll` step that scrolls a panel (`within`), not the window;
