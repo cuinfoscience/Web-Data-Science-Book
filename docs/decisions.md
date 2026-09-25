@@ -2,6 +2,17 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-09-25 · The course's User-Agent takes the form the chapters teach
+
+**Decision.**
+- The book's tools and captures send `WebDataScience/1.0 (brian.keegan@colorado.edu)`: a name and version, then contact information in parentheses, the form chapter 1 teaches. It replaces `Web Data Science/v1 brian.keegan@colorado.edu`, and names the same project and contact.
+- Examples keep `WebDataScience/1.0 (your-email@colorado.edu)`, with the reader's own address.
+- An image captured before this keeps its record, which names the old string. A retake sends the new one.
+
+**Why.** Wikimedia's API gateway gives a request with no identifying User-Agent 10 requests a minute, shared by every such request from its address, and "a compliant User-Agent header" 200 (mediawiki.org, "Wikimedia APIs/Rate limits"). The old string wasn't in that form. The pageviews API answered it with 429 on the first request, four times on 2026-09-24, and figure 1-4 was put down to the session's network. On 2026-09-25 the same session got 200 with the new string. The maintainer diagnosed it and approved the change.
+
+**Where.** `tools/shots/lib/recipes.py` (the default), `tools/shots/README.md`, and `AGENTS.md`. *Supersedes* the User-Agent string in "The course's User-Agent is the one robots.txt is read for" and "One honest identity for captures and examples", below; the rest of both stands. Chapter 6 and week 6's Oscars handout, which the maintainer keeps, still show the old string.
+
 ## 2026-09-24 · A figure of an API's response is captured as an API client
 
 **Decision.**
@@ -36,6 +47,8 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 **Where.** `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, the preface (`index.qmd`), chapter 1's setup, chapter 7's gensim note, `.github/workflows/`, and the course's `handouts/week-01/setup.md`.
 
 ## 2026-09-24 · The course's User-Agent is the one robots.txt is read for
+
+*The User-Agent string here is superseded by [2026-09-25 · The course's User-Agent takes the form the chapters teach](#2026-09-25--the-courses-user-agent-takes-the-form-the-chapters-teach); the rest stands.*
 
 **Decision.**
 - Every request the book's tools and scripts make for the maintainer sends the course's User-Agent, `Web Data Science/v1 brian.keegan@colorado.edu` (see the 2026-09-23 entry). None goes out with a library default, such as `python-requests/2.34`, or with a Claude agent's string.
@@ -165,6 +178,8 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 **Where.** The course's `slides/common/AUTHORING.md` ("What counts as a screenshot"), and the toolkit's provenance and `check`. `check` matches each image against its recorded capture.
 
 ## 2026-09-23 · One honest identity for captures and examples
+
+*The User-Agent string here is superseded by [2026-09-25 · The course's User-Agent takes the form the chapters teach](#2026-09-25--the-courses-user-agent-takes-the-form-the-chapters-teach); the rest stands.*
 
 **Decision.**
 - Captures and the book's request examples identify themselves with one User-Agent: `Web Data Science/v1 brian.keegan@colorado.edu`.
