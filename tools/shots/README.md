@@ -840,6 +840,29 @@ version stopped leaders closer to a triangle than to text. On the 2× card
 figure the largest difference, 9.6 pixels, is where the hand version bent its
 column of markers.
 
+The eleven `week07-*` figures remake week 7's slide screenshots (2026-09-25),
+which the deck's frames show at 35–100% of the text width. They taught four
+things about slides:
+
+- **Crop for the column, not the page.** A frame's column sets the crop:
+  text at p20 CSS pixels reaches 16 on a 1920-pixel slide only in a crop
+  narrower than `width × 1680 × p20 / 16`. x.com's 1999 page, in a 35%
+  column, is its top 560 pixels; AboutFace's two quoted lines, in a 44%
+  column, are two small crops stacked, 271 pixels wide.
+- **Height is the other limit.** A slide's text area is about 200 points
+  tall, so a tall image in a narrow column runs off it: April and August
+  stacked whole were 265 points. `latexmk` reports it as an overfull vbox;
+  each crop keeps only the weeks where the color changes.
+- **Accept lost files that don't show.** A crop of the toolbar alone doesn't
+  show the page's own images and stylesheets, which the archive failed on
+  every load on 2026-09-25, so those recipes set `expect: {all_files: false}`.
+  So do x.com's, whose images are broken whatever the archive answers.
+- **Some small text can't reach 16.** The toolbar's date range under its
+  count is 9 pixels at any width, and the strip of bars needs the toolbar
+  1,100 pixels wide or more, so on a full-width slide it comes to 14.5. The
+  recipe says why in `legibility: {skip: …}`: the count and the date the
+  frame discusses read at 19.
+
 ## Provenance
 
 - **`images/<chapter>/provenance.json`** records, for each image:
