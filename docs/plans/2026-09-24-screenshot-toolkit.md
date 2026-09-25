@@ -4,7 +4,14 @@
 
 **Status:** M1–M3 merged (#135–#137). After the chapter 5 pilot, #142 added a read-back of every
 DevTools setting, the no-infobar guard, and a `brief:` for every figure, and #144 added the relaxed
-1024×768 size limit. M4 (§8) is next. Proposed 2026-09-24. Implements [P0-2] of
+1024×768 size limit. M4 is done: the engines (#164), evidence queries (#165), `sync` (#166), and
+`import` and the CI job (2026-09-25). Both of M4's tests passed: the x.com CDX evidence re-ran
+"complete", and `sync` reproduced all 25 course copies byte for byte. Four things differ from
+§6–§8. `import` takes the page from the recipe (`mode: hand`), not `--url`, and adds `--browser`.
+Its redaction boxes are rectangles only; redaction by selector, for the toolkit's own captures,
+isn't built. No scan reads a screenshot for email addresses, since an import has no page text.
+And the CI job runs plain `check`, which never loads a page, so it needs no `--offline`.
+Proposed 2026-09-24. Implements [P0-2] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md), and
 carries the checks behind [P1-2] and [P1-3]. The back-fill of chapters 1–5 that
 uses it is planned separately in

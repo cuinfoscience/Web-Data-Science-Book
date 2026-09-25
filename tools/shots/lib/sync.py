@@ -217,7 +217,7 @@ def sync(recipe, fig, course, to, name=None, take=None, annotated=False):
     with Image.open(copied) as img:
         size = f"{img.width}x{img.height}"
     keep = ("url", "final_url", "captured", "browser", "user_agent", "window", "scale", "size", "kind",
-            "open_shadow", "engine", "by", "method")
+            "open_shadow", "engine", "by", "method", "imported", "redacted")
     record["files"][name] = {
         "figure": f"{recipe['chapter']}/{fig['id']}",
         "copied_from": rel(files[0][0]),

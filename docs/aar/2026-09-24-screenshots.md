@@ -274,7 +274,7 @@ All of these live in the transcript, so the next session would have to find them
 | ID | Priority | Target | Change | Owner | Status |
 |----|----------|--------|--------|-------|--------|
 | P0-1 | P0 | `slides/common/make_stubs.py`, `AUTHORING.md` | Generated table between markers; never overwrite notes; stop hiding the output | auto-applyable | **Applied** (2026-09-24) — see §9 |
-| P0-2 | P0 | textbook `tools/shots/` | Build the screenshot toolkit per the plan | maintainer review | Plan approved (merged, #48); M1–M3 **merged** (textbook #135–#137) |
+| P0-2 | P0 | textbook `tools/shots/` | Build the screenshot toolkit per the plan | maintainer review | Plan approved (merged, #48); M1–M3 **merged** (textbook #135–#137); M4 **done**: engines, evidence, and `sync` (#164–#166), then `import` and CI (2026-09-25) |
 | P0-3 | P0 | `AUTHORING.md`, week-01 images | Decide what counts as a screenshot; label every image's kind | maintainer decision | **Resolved: option (a)**, real or labeled — rule in `AUTHORING.md`; week-01's look-alikes replaced in the ch-01 back-fill |
 | P1-1 | P1 | textbook `images/ch-07`, `images/ch-08` | Provenance notes for the 11 existing figures | auto-applyable | **Applied** (merged with M1, textbook #135): `provenance.json` and `IMAGES.md` for all 11 |
 | P1-2 | P1 | `AUTHORING.md`, textbook `claude.md`, toolkit | Numbers in captions need a complete, recorded query | auto-applyable + P0-2 | Rules **applied** in `AUTHORING.md` and the textbook's `claude.md` (#135); the toolkit's query check **applied** in M4 (`tools/shots/run evidence`, 2026-09-25) |

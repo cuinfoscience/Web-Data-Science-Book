@@ -371,6 +371,28 @@ figures:
     evidence:
       - {{id: unfollowed, claim: "a resume key left unfollowed", url: "{base}/cdx",
           params: {{url: 'example.com/', output: json, limit: 2, showResumeKey: 'true'}}}}
+  # A form behind a login: a person takes the screenshot, and `import` makes it a take.
+  - id: hand-form
+    kind: capture
+    mode: hand
+    url: "https://example.org/form"
+    hand: {{why: "the form needs a signed-in account", text_px: 16}}
+    window: [450, 350]
+    scale: 2
+    crop: {{top: 20, left: 0, width: 400, height: 300}}
+    redact:
+      - {{box: [350, 25, 40, 30], why: "the account's avatar"}}
+    annotate:
+      marks:
+        - {{n: 1, at: {{xy: [100, 100, 200, 40]}}}}
+  - id: hand-small
+    kind: capture
+    mode: hand
+    url: "https://example.org/form"
+    hand: {{why: "the form needs a signed-in account", text_px: 5}}
+    window: [450, 350]
+    scale: 2
+    crop: {{top: 20, left: 0, width: 400, height: 300}}
   - id: selenium-window
     kind: capture
     url: "{base}/tree"
@@ -784,6 +806,87 @@ figures:
     code, out = shots("sync", "ch-99", "wide", "--to", "slides/week-99/img", "--course", str(course))
     expect("a figure not committed as it is can't be synced: the record names a commit",
            code == 1 and "commit" in out, out[-300:])
+
+    print("import (a person's screenshot of a page behind a login)")
+    from PIL import ImageCms, ImageDraw, ImageFont, PngImagePlugin
+    from lib.capture import sha256
+    # 450x350 CSS pixels at scale 2, with an avatar at CSS [355, 28] to [385, 52], a note
+    # naming the computer, and a color profile: all three must stay out of the take.
+    raw = Image.new("RGB", (900, 700), "white")
+    draw = ImageDraw.Draw(raw)
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 32)
+    for n in range(8):
+        draw.text((40, 130 + 60 * n), "A field of the form, and its label", fill="black", font=font)
+    draw.rectangle([710, 56, 769, 103], fill=(220, 0, 0))
+    note = PngImagePlugin.PngInfo()
+    note.add_text("Author", "A. Person's laptop")
+    raw.save(tmp / "screenshot.png", pnginfo=note,
+             icc_profile=ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes())
+    code, out = shots("capture", "ch-99", "--only", "hand-form")
+    expect("capture leaves a hand capture to a person, and says how to import it",
+           code == 0 and "import ch-99 hand-form" in out and not (tmp / "out" / "ch-99" / "hand-form").exists(),
+           out[-300:])
+    code, out = shots("import", "ch-99", "hand-form", "--file", str(tmp / "screenshot.png"), "--by", "A. Person",
+                      "--date", "2026-09-20", "--browser", "Chrome 141 on macOS 15")
+    take = newest("hand-form")
+    expect("import makes a take of the crop, 400x300 CSS pixels at scale 2",
+           take.get("ok") is True and take.get("size") == [800, 600] and (code == 0 or not tex_tools),
+           str(take.get("problems")) + out[-300:])
+    shot = Image.open(take["image"]) if take.get("image") else Image.new("RGB", (1, 1))
+    pixels = shot.convert("RGB")
+    colors = lambda img: {c for _, c in img.getcolors(1 << 24)}            # noqa: E731
+    expect("...the avatar's box is black, and none of its red is left",
+           colors(pixels.crop((700, 10, 780, 70))) == {(0, 0, 0)}
+           and not any(r > 150 and g < 80 and b < 80 for r, g, b in colors(pixels)), str(take.get("redacted")))
+    expect("...the screenshot's metadata stays behind: the note naming the computer and the color profile",
+           "Author" not in shot.info and "icc_profile" not in shot.info, str(sorted(shot.info)))
+    expect("...the take names who took it and when, the screenshot's hash, and what was blacked out",
+           take.get("by") == "A. Person" and take.get("captured") == "2026-09-20"
+           and (take.get("raw") or {}).get("sha256") == sha256(tmp / "screenshot.png")
+           and [r.get("why") for r in take.get("redacted") or []] == ["the account's avatar"], str(take)[:400])
+    expect("...and the text size its recipe declares, which the legibility check judges",
+           take.get("text") == {"declared": 16, "p20": 32.0}
+           and "text size (declared in the recipe): book 31.1 px (ok)" in out, str(take.get("text")) + out[-300:])
+    code, out = shots("import", "ch-99", "hand-small", "--file", str(tmp / "screenshot.png"), "--by", "A. Person",
+                      "--date", "2026-09-20")
+    expect("a declared size too small to read gets the warning a measured one does",
+           "text size (declared in the recipe): book" in out and "(under 11)" in out, out[-300:])
+    raw.resize((400, 300)).save(tmp / "small.png")
+    code, out = shots("import", "ch-99", "hand-small", "--file", str(tmp / "small.png"), "--by", "A. Person",
+                      "--date", "2026-09-20")
+    expect("a crop past the screenshot's edge is refused, with a question about the scale",
+           code == 1 and "past the screenshot" in out and "devicePixelRatio" in out, out[-300:])
+    code, out = shots("import", "ch-99", "hand-small", "--file", str(tmp / "screenshot.png"), "--by", "A. Person",
+                      "--date", "2999-01-01")
+    expect("so is a date in the future", code == 1 and "in the future" in out, out[-300:])
+    code, out = shots("import", "ch-99", "ok", "--file", str(tmp / "screenshot.png"), "--by", "A. Person",
+                      "--date", "2026-09-20")
+    expect("...and a figure the toolkit captures itself", code == 1 and "mode: hand" in out, out[-300:])
+    bad = recipe_rules._problems("ch-98", {"chapter": "ch-98", "figures": [
+        {"id": "a", "kind": "capture", "url": "https://example.org/", "mode": "hand", "hand": {"why": "a login"},
+         "steps": [{"wait": {"text": "Form"}}], "annotate": {"marks": [{"n": 1, "at": {"selector": "h1"}}]}},
+        {"id": "b", "kind": "capture", "url": "https://example.org/", "redact": [{"box": [0, 0, 10, 10], "why": "a name"}]}]})
+    expect("a hand capture declares its text size, has no steps, and places its marks by `xy`",
+           any("(a)" in b and "text_px" in b for b in bad) and any("(a)" in b and "`steps`" in b for b in bad)
+           and any("(a)" in b and "`xy`" in b for b in bad), bad)
+    expect("...and `redact` boxes are for hand captures alone", any("(b)" in b and "mode: hand" in b for b in bad), bad)
+    if tex_tools:
+        code, out = shots("promote", "ch-99", "hand-form")
+        entry = json.loads((images / "ch-99" / "provenance.json").read_text())["figures"].get("hand-form") or {}
+        md = (images / "ch-99" / "IMAGES.md").read_text()
+        expect("promote records the person, not the toolkit, and IMAGES.md says the screenshot was imported",
+               code == 0 and entry.get("by") == "A. Person" and entry.get("imported")
+               and "A. Person: screenshot by hand in Chrome 141 on macOS 15; imported by tools/shots, 1 area "
+                   "blacked out" in md and (images / "ch-99" / "hand-form_annotated.png").exists(), out[-300:] + md[-300:])
+        code, out = shots("check", "ch-99")
+        expect("check accepts it, judging the declared text size",
+               not any(l.lstrip().startswith("FAIL") and "hand-form" in l for l in out.splitlines()), out[-600:])
+        recipe_file.write_text(recipe_file.read_text().replace("xy: [100, 100, 200, 40]", "xy: [120, 100, 200, 40]"))
+        code, out = shots("annotate", "ch-99", "hand-form")
+        expect("a mark moved by `xy` is redrawn from the take it has; a spot typed in needs no new take",
+               code == 0, out[-300:])
+    else:
+        print("  skip  promoting an import with markers: pdflatex or pdftocairo missing")
 
     print("headed (virtual display, real input, DevTools)")
     if all(shutil.which(tool) for tool in ("Xvfb", "xdotool", "import")):

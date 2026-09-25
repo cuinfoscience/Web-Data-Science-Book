@@ -8,7 +8,8 @@ import yaml
 from .env import RECIPES, ROOT, rel
 
 KINDS = {"capture", "render", "diagram", "illustration"}
-MODES = {"headless", "headed", "composite"}
+# `hand`: a person takes the screenshot, and `import` makes it a take (lib/hand.py).
+MODES = {"headless", "headed", "composite", "hand"}
 PAGE_STEPS = {"wait", "hover", "click", "scroll", "press", "settle"}
 HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "type", "pointer"}
 STEPS = PAGE_STEPS | HEADED_STEPS
@@ -21,7 +22,7 @@ FIGURE_KEYS = {"id", "file", "kind", "section", "brief", "url", "mode", "engine"
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
                "user_agent", "pause", "settle", "timeout", "retries",
                "annotate", "targets", "legibility", "parts", "layout", "oversize", "api_client", "open_shadow",
-               "inspector", "https_upgrades", "evidence"}
+               "inspector", "https_upgrades", "evidence", "hand", "redact"}
 ENGINES = {"playwright", "selenium", "codegen"}
 # The selenium engine (lib/engine_selenium.py) drives its window through Selenium alone.
 SELENIUM_STEPS = {"wait", "scroll", "pointer", "settle"}
@@ -160,6 +161,9 @@ def _problems(chapter, raw):
         if "evidence" in f:
             from .evidence import problems as evidence_problems
             out += [f"{where}: {p}" for p in evidence_problems(f["evidence"])]
+        if f.get("mode") == "hand" or "hand" in f or "redact" in f:
+            from .hand import problems as hand_problems
+            out += [f"{where}: {p}" for p in hand_problems(f)]
     return out
 
 
@@ -308,7 +312,10 @@ def figure(recipe, fid):
 
 def loads(fig):
     """Each page a figure loads, as (url, what the recipe expects of it, api_client): the
-    figure's own page, or each composite part's (a part without a `url` loads the figure's)."""
+    figure's own page, or each composite part's (a part without a `url` loads the figure's).
+    A hand capture loads none: a person's browser does, as a person."""
+    if fig.get("mode") == "hand":
+        return []
     if fig.get("mode") == "composite":
         return [(part.get("url") or fig.get("url"), part.get("expect") or {},
                  part.get("api_client", fig.get("api_client", False))) for part in fig.get("parts") or []]
