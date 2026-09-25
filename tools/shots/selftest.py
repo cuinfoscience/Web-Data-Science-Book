@@ -742,6 +742,49 @@ figures:
     expect("...or when its claim is reworded, so the claim on record is the one checked",
            "evidence `runs`: the claim changed" in out, out[-600:])
 
+    print("sync (copies in the course repo, with their records)")
+    images = tmp / "images"
+    git = ["git", "-c", "user.name=selftest", "-c", "user.email=selftest@example.org"]
+    subprocess.run(["git", "init", "-q"], cwd=images, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=images, check=True)
+    subprocess.run([*git, "commit", "-qm", "promoted"], cwd=images, check=True)
+    course = tmp / "course"
+    week = course / "slides" / "week-99" / "img"
+    week.mkdir(parents=True)
+    (week / "IMAGES.md").write_text("# Images for `week-99`\n\nA note a person wrote.\n\n## Listed in `stubs.tsv`\n\n"
+                                    "<!-- stubs:begin: generated -->\n| File | Size | Should show |\n|---|---|---|\n"
+                                    "<!-- stubs:end -->\n")
+    (week / "stubs.tsv").write_text("# filename\tWIDTHxHEIGHT\tdescription\ncopy.png\t10x10\ta wide page\n")
+    code, out = shots("sync", "ch-99", "wide-allowed", "--to", "slides/week-99/img", "--as", "copy.png",
+                      "--course", str(course))
+    record = json.loads((week / "shots.json").read_text()) if (week / "shots.json").exists() else {"files": {}}
+    entry = record["files"].get("copy.png") or {}
+    md = (week / "IMAGES.md").read_text()
+    same = (week / "copy.png").exists() and (week / "copy.png").read_bytes() == (images / "ch-99" / "wide-allowed.png").read_bytes()
+    expect("sync copies an approved figure into a course folder, under the deck's name", code == 0 and same,
+           out[-300:])
+    expect("...records it beside the copy: the figure, the commit it came from, and both hashes",
+           entry.get("figure") == "ch-99/wide-allowed" and len(entry.get("textbook_commit") or "") == 40
+           and entry.get("sha256") == entry.get("source_sha256"), str(entry)[:300])
+    expect("...lists it in IMAGES.md, before the stubs table, keeping what a person wrote",
+           "A note a person wrote." in md and "`copy.png`" in md
+           and md.index("shots:begin") < md.index("## Listed in `stubs.tsv`"), md[-500:])
+    expect("...and sets its size in stubs.tsv", "copy.png\t1000x500\t" in (week / "stubs.tsv").read_text(),
+           (week / "stubs.tsv").read_text())
+    code, out = shots("synced", "--course", str(course))
+    expect("synced finds the copy as it was copied", code == 0 and "as copied from ch-99/wide-allowed" in out, out[-300:])
+    if (week / "copy.png").exists():
+        (week / "copy.png").write_bytes((week / "copy.png").read_bytes() + b"x")
+    code, out = shots("synced", "--course", str(course))
+    expect("...and a copy changed by hand", code == 1 and "changed by hand" in out, out[-300:])
+    code, out = shots("sync", "ch-99", "wide-allowed", "--to", "slides/week-99/img", "--as", "copy.png", "--annotated",
+                      "--course", str(course))
+    expect("--annotated needs a figure with markers", code == 1 and "no markers" in out, out[-300:])
+    subprocess.run(["git", "rm", "-q", "--cached", "ch-99/wide.png"], cwd=images, check=True)
+    code, out = shots("sync", "ch-99", "wide", "--to", "slides/week-99/img", "--course", str(course))
+    expect("a figure not committed as it is can't be synced: the record names a commit",
+           code == 1 and "commit" in out, out[-300:])
+
     print("headed (virtual display, real input, DevTools)")
     if all(shutil.which(tool) for tool in ("Xvfb", "xdotool", "import")):
         code, out = shots("capture", "ch-99", "--only", "headed-inspect", "headed-network", "headed-source")
