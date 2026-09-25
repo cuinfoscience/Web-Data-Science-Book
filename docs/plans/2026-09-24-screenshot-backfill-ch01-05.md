@@ -68,7 +68,7 @@ These come from the scoping questions answered on 2026-09-24:
 - **`pr_review.png`:** replace it with a real capture: the signed-out "Files changed" view of a public textbook PR that revises chapter 5 and has an inline review comment. Use a PR by the instructor or a TA, or crop out names and avatars; GitHub hides large diffs from signed-out viewers, so pick a small one. If no suitable PR exists, capture one after a Friday review produces a real comment, rather than posting a comment to make the picture.
 - **The Inspector frame:** 5-1 fills "Inspecting a page: the Inspector tab," which has no image and describes exactly what 5-1 shows.
 - **The rest:** copies of 5-2 to 5-8 go into `img/` with notes. The Network frame keeps the instructor's own capture.
-- **The unused placeholder:** `dev_tools_network.png` gets deleted, since 5-4 covers its description. It is the instructor's call.
+- **The unused placeholder:** `dev_tools_network.png` gets deleted, since 5-4 covers its description. It is the instructor's call. Deleted on 2026-09-25 (course #69).
 
 **Pilot gate.** Once the pilot PRs are reviewed, record what review changed as a dated resolution note in the AAR and in the toolkit README:
 
@@ -124,6 +124,7 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
   - **1-4 was made on 2026-09-25.** On 2026-09-24 Wikimedia's REST API answered it with 429, which was put down to the session's shared address. The cause was the toolkit's User-Agent, whose form Wikimedia's API rate-limits as unidentified; with the form chapter 1 teaches, the same session got 200 (`docs/decisions.md`, 2026-09-25).
   - **1-5 is skipped** (optional).
   - **Course:** copies of the two Jupyter figures go into `handouts/week-01/img/`, offered to `setup.md`; replacing `anaconda_jupyter.png` is the instructor's call. `book_website.png` and `github_repo.png` stay: in the deck's 0.35-wide column, a live capture's text is legible only when cropped to about 480 CSS pixels, which cuts the page's text short, so the column width is the instructor's call first. `issue_form.png` and `pr_review.png` wait on the maintainer's choice of a public issue and pull request that aren't a student's.
+  - **Course, 2026-09-25 (course #69):** `setup.md` shows figure 1.1 in place of `anaconda_jupyter.png`, which is deleted. `book_website.png` is retaken live without widening the column or cropping the text short: the course recipe `week01-book-website` loads the site 480 pixels wide, where it reflows, and opens its chapter list (25.8 pixels on a 1,920-pixel slide). `github_repo.png`, `issue_form.png`, and `pr_review.png` have `mode: hand` recipes in `course.yml` (`week01-github-repo`, `week01-issue-form`, `pr-review`) and wait for the maintainer's screenshots, since a cloud session can't reach github.com beyond its own repositories.
 
 ### Chapter 2 — Ethics, Law, and Responsible Data Collection
 
@@ -136,7 +137,7 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
 | 2-5 | Terms of Service as Quasi-Law | A platform's terms, the clause on automated collection, only if it loads signed out | box |
 
 - **Slides:** week-02's two renders stay, recorded as `kind: render`. 2-1 is offered as their real-browser counterpart, and the instructor chooses.
-- **Placeholders:** the four unused placeholders are the instructor's call to delete or keep.
+- **Placeholders:** the four unused placeholders are the instructor's call to delete or keep. Deleted on 2026-09-25 (course #69).
 - **Done 2026-09-24:** two figures.
   - **2-1 is `robots-txt-wikipedia`:** the file in Chrome, from the comment welcoming "friendly, low-speed bots" through the generic block's `Disallow` rules. The toolkit gained `match:` anchors and scrolling for it, because a plain-text file is one text node.
   - **2-3 is `wikimedia-ua-policy`:** the policy's request for a User-Agent with contact information, its example, and its generic format. It moved to foundation.wikimedia.org.
@@ -157,7 +158,7 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
 
 - **3-1:** a figure about refusals, so its recipe expects the refusals (toolkit §7.5). The chapter's table of status codes stays, and the figure shows what a reader meets.
 - **Slides:** week-03's Friday frames ("Step 4 — attach the issue," "Step 5 — review basics") are offered real signed-out captures of a public issue and PR.
-- **Placeholders:** the unused `ad_observatory.png` is left to the instructor, whose `meta-research-privacy.png` already covers that case.
+- **Placeholders:** the unused `ad_observatory.png` is left to the instructor, whose `meta-research-privacy.png` already covers that case. It and the deck's four other unused placeholders were deleted on 2026-09-25 (course #69).
 - **Done 2026-09-24:** two figures, and a toolkit that can show a host that doesn't answer.
   - **3-1 is `dead-endpoints`** (figure 3.2), the three endpoints stacked: Pushshift's 403 in JSON, Chrome's own error page for CrowdTangle, whose names no longer resolve, and Twitter v1.1's 400 in JSON. Behind the session's proxy, a dead host fails as a refused one does, so the toolkit gained `expect: {error: ...}` with a public-DNS check before a take is kept.
   - **Twitter's part of 3-1 followed the maintainer's API-client decision** (`docs/decisions.md`); api.twitter.com's robots.txt disallows every path. The first version, merged in #158, showed two endpoints.
