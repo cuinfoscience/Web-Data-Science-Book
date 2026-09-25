@@ -343,7 +343,7 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 | P1-1 | P1 | `.github/workflows/shots-check.yml` | CI | `check` on PRs that change images | maintainer | Proposed | Image PRs merged without `check` in CI: all → 0 |
 | P1-2 | P1 | `AGENTS.md`, `CLAUDE.md`, `docs/` | layout | One instruction file; records beside the code | auto | Applied | Instruction files found by the collector: 0 → 1; earlier AARs found: 0 → 2 |
 | P1-3 | P1 | skill collector | tool config | Read `queued_command`; wider correction pattern | skill maintainer | Proposed | Steering messages counted: 0 of 8 → 8 of 8 |
-| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 9 of 11 ch-07/08 figures retaken, 3 of 3 captions dated; week 7's slides remade, weeks 1 and 8's next (see notes) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
+| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 9 of 11 ch-07/08 figures retaken, 3 of 3 captions dated; week 7's slides remade, and 3 of week 8's 6 that fell short; the rest wait (see notes) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
 | P2-2 | P2 | `docs/plans/` | plan | Computed outputs | maintainer | Proposed | Plan decided, yes or no |
 
 ### Resolution notes
@@ -365,6 +365,7 @@ stated in the preface. That now conflicts with the aim of showing computed figur
   - The guard for lost files counted only requests that got no answer. An image answered with a 502 left a hole where AboutFace's banner was, and the take passed. A 5xx answer now counts.
   - A crop whose element was missing ended the whole run instead of failing its take.
 - **Week 7's slides, the same day.** 12 of its 15 Wayback screenshots were remade, and the other 3 already met the slide rule. Eleven come from course recipes cropped for their frames' columns, and one is a copy of figure 7.3. On a 1,920-pixel slide their text went from 6–15 pixels to 16–30. The exceptions are the two toolbar strips, whose 9-pixel date ranges come to 14.4–14.5; their recipes say why. Weeks 1 and 8's slides are what P2-1 has left.
+- **Week 8's slides, the same day.** Six of its screenshots fell short of the slide rule. Three were remade from course recipes in 480-pixel windows: the JavaScript off/on pair, JavaScript off alone, and playwright.dev. Their text went from about 7–11 pixels to 18–19.6, and no frame needed a change. The other three wait: the Selenium and codegen windows for M4, and the pull request view for a session that can read github.com's robots.txt, since a cloud session reaches github.com only for its own repositories. Week 1's screenshots wait on the maintainer's decisions (the hand-off's table). Everything P2-1 has left is blocked on one of those three.
 
 ## Appendix A — Design sketch: why each part exists
 
