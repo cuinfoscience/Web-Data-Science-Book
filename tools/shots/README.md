@@ -756,10 +756,11 @@ and shows its locator), and `settle`.
 
 ## Hand captures
 
-A page behind a login is the one kind of figure a person takes: the toolkit
-never signs in. The recipe says so with `mode: hand`, and `import` turns the
-person's screenshot into a take, which `sheet`, `promote`, and `sync` treat
-like any other.
+A person takes two kinds of figure: a page behind a login, since the toolkit
+never signs in, and a page the session can't reach, such as github.com beyond
+the session's own repositories. The recipe says so with `mode: hand`, and
+`import` turns the person's screenshot into a take, which `sheet`, `promote`,
+and `sync` treat like any other.
 
 ```yaml
 - id: issue-form
@@ -822,9 +823,13 @@ tools/shots/run import course issue-form --file issue.png --by "A. Person" --dat
   `doctor` doesn't read robots.txt for it, because a person's browser loads the
   page, as a person.
 
-No recipe uses it yet. Its first candidate is week 1's issue form
-(`issue_form.png`), if the maintainer chooses a hand capture over a public
-issue (see "Waiting on the maintainer" in `docs/handoff.md`).
+Three course recipes wait for their screenshots (2026-09-25): `pr-review`,
+one image for weeks 1, 8, and 13's `pr_review.png`; `week01-issue-form`, a
+filled-in Gap report, not submitted; and `week01-github-repo`, the textbook's
+repository signed out. Each gives the steps in its `hand:` block. Their crop
+and redaction boxes are set from the screenshot before it is imported: in a
+column 35% of the slide wide, a crop wider than about 440 CSS pixels makes
+12-pixel text too small.
 
 ## Markers
 
