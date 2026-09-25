@@ -6,7 +6,7 @@
 is done (textbook #138, course #51), and its gate closed the same day. The gate
 note is in §9 of the screenshot AAR and in `tools/shots/README.md` ("What the
 chapter 5 pilot settled"). Chapter 4 is done. Chapter 1 is done, figure 1-4 included (2026-09-25). Chapter 2 is done, except
-figure 2-2 (§4). Chapter 3 is done (§4). Implements [P1-4] of
+figure 2-2's placement (§4). Chapter 3 is done (§4). Implements [P1-4] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md). Depends
 on P0-1 (`make_stubs.py` keeps notes), on P0-3 (what counts as a screenshot),
 and on toolkit milestones M1–M3 in
@@ -140,7 +140,7 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
 - **Done 2026-09-24:** two figures.
   - **2-1 is `robots-txt-wikipedia`:** the file in Chrome, from the comment welcoming "friendly, low-speed bots" through the generic block's `Disallow` rules. The toolkit gained `match:` anchors and scrolling for it, because a plain-text file is one text node.
   - **2-3 is `wikimedia-ua-policy`:** the policy's request for a User-Agent with contact information, its example, and its generic format. It moved to foundation.wikimedia.org.
-  - **2-2 waits for the Friday review:** students' #50, #63, and #79 revise the paragraphs it would sit beside.
+  - **2-2's image is made (2026-09-25); its figure block waits for the Friday review:** #50, #63, and #79 revise the paragraphs it sits beside. The file loaded from this cloud session.
   - **2-4 is dropped:** chapter 5's `network-headers` shows the Headers pane, and captures send the course's User-Agent, not a browser's.
   - **2-5 is skipped** (optional).
   - **Course:** copies of both go to `slides/week-02/img/`, offered beside the deck's two renders.
