@@ -553,7 +553,7 @@ You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset
 # Your code here
 ```
 
-**Step 2 — Cache the raw HTML.** Save `response.text` to a local file before parsing anything, and re-read it from disk. Every later step should parse the cached file, not re-request the page — while you debug, Wikipedia's servers should be hit exactly once.
+**Step 2 — Cache the raw HTML.** Save `response.text` to a local file before parsing anything, and re-read it from disk. Every later step should parse the cached file, not re-request the page — while you debug, Wikipedia's servers should be hit exactly once. To cache a raw html to your disk, follow this open("{filename}.html", "w", encoding="utf-8").write(response.text)
 
 ```{python}
 # Step 2: Save response.text to a local file, then read it back from disk.
