@@ -742,6 +742,7 @@ The web's protocol stack was designed as public infrastructure — open standard
 - **`wget --random-wait` has no visible effect**: It only randomizes a wait time you already set with `--wait`; used alone, with no base wait to randomize, it does nothing.
 - **403 from Wikimedia API**: You forgot the custom `User-Agent` header.
 - **DNS results varying by location**: Normal — content delivery networks return different IPs based on your geographic location.
+- **`dns.resolver` raises `NoNameservers ... answered REFUSED`**: The kernel is querying campus resolvers (CU's are in the `128.138.x.x` range), which only answer recursive queries from on-campus addresses. `dnspython` reads DNS settings once per process, so a kernel started on campus or on VPN keeps them after you get home, even though `scutil --dns` shows your current ones. `requests` and your browser keep working, which makes it look specific to this exercise. Restart the kernel; if that doesn't fix it, build your own resolver with `r = dns.resolver.Resolver()`, set `r.nameservers = ["8.8.8.8", "1.1.1.1"]`, and call `r.resolve(...)` instead of `dns.resolver.resolve(...)`.
 - **URL encoding issues**: Use `urllib.parse.quote()` for article titles with spaces or special characters.
 
 ## Key Takeaways
