@@ -3,12 +3,21 @@
 # The Wayback Machine answers 502 or drops the connection on many first
 # attempts; the toolkit retries politely (30, 60, then 120 seconds apart) and
 # fails a take whose page says "Fail with status" or "upstream request failed".
-# Its toolbar and calendar live in shadow DOM, which the text and CSS
-# locators below reach into.
+#
+# Its toolbar lives in a closed shadow root (the playback script calls
+# attachShadow({mode: "closed"})), which no selector reaches, so the figures that
+# show it set `open_shadow: true`. The toolbar is responsive: below 1,100 pixels
+# wide it drops its logo and its strip chart of captures by year, keeping the
+# address, the capture count, and the date with its arrows. Its capture count
+# arrives from a second request (/__wb/sparkline), which failed on some loads on
+# 2026-09-25, so those figures wait for the count.
+#
+# Every figure keeps within 800×600 except the calendar, which needs three rows
+# of months (its `oversize:` says why).
 chapter: ch-07
 qmd: ch-07-archives.qmd
 defaults:
-  window: [1280, 800]
+  window: [800, 600]
   scale: 2
 
 figures:
@@ -22,17 +31,24 @@ figures:
       caption explains them: size is how many captures a day holds, color is the
       status code the crawler received.
     url: https://web.archive.org/web/2005*/facebook.com
+    window: [800, 1100]     # tall enough to hold the crop, which is cut from the window
     steps:
-      - wait: {text: 'Saved [0-9,]+ times'}
+      # The summary line joins "Saved", the count, and "between" with no-break spaces
+      # (&nbsp;), which a plain space in a pattern doesn't match; \s does.
+      - wait: {text: 'Saved\s[0-9,]+\stimes'}
       - wait: {network_idle: true}
     expect:
-      text: ['Saved [0-9,]+ times']
-    crop: {window: true}
+      text: ['Saved\s[0-9,]+\stimes']
+    # At 800 pixels wide the calendar sets three months to a row, each 210 pixels tall,
+    # so January to August takes three rows: from the summary line to the bottom of
+    # July's row, as wide as the histogram.
+    crop: {between: ['.captures-range-info', '.calendar-grid .month:nth-child(7)'], left: 30, width: 740,
+           pad: [8, 0, 4, 0]}
+    oversize: >-
+      three rows of months are needed to reach August, when the circles turn blue again; at
+      740 pixels wide the figure fits the book's column, so the calendar's 10.5-pixel day
+      numbers show at 11 pixels
     drifts: true        # "Saved N times" and the capture circles change every day
-    legacy:
-      captured: 2026-09-22
-      method: headless Playwright (Node), 1280×800 window at 1×, the whole window
-      note: Shows "Saved 8,461,424 times between December 12, 1998 and September 22, 2026."
 
   - id: facebook-2004
     kind: capture
@@ -40,17 +56,25 @@ figures:
     brief: >-
       Show what a replayed capture looks like: facebook.com on January 21, 2004,
       two weeks before Thefacebook launched, when the domain belonged to
-      AboutFace, with the Wayback toolbar across the top.
+      AboutFace ("The first name in directories"), with the Wayback toolbar
+      across the top: the address, the count of captures, and the capture's date
+      with its arrows. AboutFace's pitch to schools and colleges, "Eliminate the
+      need for printed facebooks," is in view.
     url: https://web.archive.org/web/20040121224607/http://facebook.com/
+    # Most of the page's text is 11 pixels, so the figure is no wider than the book's
+    # column (778 pixels), which shows it at that size. The page is 823 pixels wide,
+    # so the window's edge cuts the last of its four photos.
+    window: [778, 600]
+    open_shadow: true
     steps:
       - wait: {selector: '#wm-ipp-base'}
       - wait: {text: 'AboutFace'}
+      - wait: {text: '[0-9,]+ captures'}
+      - wait: {network_idle: true}
     expect:
-      text: ['AboutFace']
+      text: ['AboutFace', 'Eliminate the need for printed facebooks', '[0-9,]+ captures']
     crop: {window: true}
-    legacy:
-      captured: 2026-09-22
-      method: headless Playwright (Node), 1280×800 window at 1×, the whole window
+    drifts: true        # the toolbar's capture count and date range
 
   - id: about-this-capture
     kind: capture
@@ -62,20 +86,22 @@ figures:
       and the panel. "Collected by" loads after the panel opens; the first take
       missed it, so wait for it.
     url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
+    open_shadow: true
     steps:
       - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: '[0-9,]+ captures'}
       # The panel's "Collected by" section loads on hover (from /__wb/provenance),
       # so hover the control first, then open it and wait for that section.
-      - hover: {text: '(?i)about this capture'}
-      - click: {text: '(?i)about this capture'}
+      - hover: {selector: '#wm-expand'}
+      - click: {selector: '#wm-expand'}
       - wait: {text: '(?i)collected by'}
+      - wait: {text: 'alexa_dv'}
+      - wait: {network_idle: true}
     expect:
-      text: ['(?i)collected by', '(?i)timestamps']
-    crop: {top: 0, height: 240}
-    legacy:
-      captured: 2026-09-22
-      method: headless Playwright (Node), 1280×800 window at 1×, top 240 pixels, after hovering and clicking About this capture by position
-      note: 'Retaken 2026-09-22 (course PR #44) because the first take missed "Collected by".'
+      text: ['(?i)collected by', '(?i)timestamps', 'logo-left\.jpg']
+    # The toolbar and the open panel, and none of the page below.
+    crop: {between: ['#wm-ipp', '#wm-capinfo'], pad: [0, 0, 6, 0]}
+    drifts: true        # the toolbar's capture count and date range
 
   - id: x-com-1999
     kind: capture
@@ -85,20 +111,19 @@ figures:
       November 14, 1999, with broken-image icons and their alt text above the
       signup form and the X.com Corporation footer, under the Wayback toolbar.
     url: https://web.archive.org/web/19991114081850/http://x.com/
+    # The page is 560 pixels wide, and its fine print ("Register your email address")
+    # is 10 pixels: in a 700-pixel window the book's column shows it at 11.
+    window: [700, 600]
+    open_shadow: true
     steps:
       - wait: {selector: '#wm-ipp-base'}
       - wait: {text: 'X\.com Corporation'}
+      - wait: {text: '[0-9,]+ captures'}
+      - wait: {network_idle: true}
     expect:
-      text: ['X\.com Corporation']
-    crop: {top: 0, height: 610}
+      text: ['X\.com Corporation', '[0-9,]+ captures']
+    crop: {window: true}
     drifts: true        # the toolbar's capture count
-    legacy:
-      captured: 2026-09-22
-      method: headless Playwright (Node), 1280×800 window at 1×, top 610 pixels
-      note: >-
-        The toolbar showed 83,190 captures. Why the images are broken: of the seven
-        images the page references, six were only ever captured as 404s (CDX API,
-        full query, not the first 25 rows; see course PR #44).
 
   - id: devtools-archived-page
     kind: capture
@@ -111,20 +136,23 @@ figures:
       DevTools, so the reader can match the toolbar to its markup.
     url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
     mode: headed
-    window: [1680, 1000]
-    devtools: {dock: right, panel: elements}
+    # DevTools docked at the bottom and zoomed to 125%, the tree given its whole width;
+    # the crop stops above the breadcrumb bar and the Styles pane's tabs.
+    window: [800, 680]
+    devtools: {dock: bottom, size: 380, zoom: 1.25, panel: elements, layout: stacked, sidebar: 1}
     steps:
       - wait: {selector: '#wm-ipp-base'}
       - wait: {text: 'Welcome to Thefacebook'}
       # Pick the 2004 page's own <center> in its empty left margin (the 700-pixel
       # table is centered inside it), so DevTools selects <center> itself. The body
       # then shows the toolbar insert, the comment that ends it, and Thefacebook's
-      # markup. (Climbing from a word of the page takes three nested tables.)
-      - inspect: {selector: 'center', at: [0.02, 0.5], selects: '^<center'}
+      # markup. (Climbing from a word of the page takes three nested tables.) The
+      # <center> starts under the pinned toolbar, so pick a third of the way down.
+      - inspect: {selector: 'center', at: [0.02, 0.3], selects: '^<center'}
+      # Picking scrolls <center> into view, 76 pixels up under the toolbar; put the
+      # page back at its top, as it opens.
+      - scroll: {selector: 'html', offset: 0}
     expect:
       text: ['Welcome to Thefacebook']
-    crop: {top: 0, height: 615}
-    legacy:
-      captured: 2026-09-22
-      method: Chrome on a virtual display (Xvfb) with DevTools docked right, grabbed with ImageMagick import
-      note: The Elements panel shows div#wm-ipp-base, the END WAYBACK TOOLBAR INSERT comment, then the page's own center element.
+    crop: {top: 0, height: 572}
+    drifts: true        # the toolbar's capture count, and DevTools' own version

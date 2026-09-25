@@ -14,7 +14,7 @@ BEGIN = ("<!-- shots:begin: generated from provenance.json by tools/shots;"
 END = "<!-- shots:end -->"
 KEEP = ("file", "kind", "url", "final_url", "status", "first_status", "error", "dns", "captured", "by",
         "method", "browser", "user_agent", "window", "scale", "javascript", "crop", "clip", "size",
-        "recipe_sha256", "image_sha256", "note", "text", "parts", "dropped")
+        "recipe_sha256", "image_sha256", "note", "text", "parts", "dropped", "open_shadow")
 
 
 def annotated_name(file):
@@ -61,7 +61,8 @@ def _how(entry):
     if entry.get("by") == "tools/shots":
         width, height = entry.get("window", ["?", "?"])
         browser = entry.get("browser", "").split(" (")[0]
-        return f"tools/shots: {browser}, {width}×{height} at {entry.get('scale')}×"
+        opened = ", closed shadow roots opened" if entry.get("open_shadow") else ""
+        return f"tools/shots: {browser}, {width}×{height} at {entry.get('scale')}×{opened}"
     return f"{entry.get('by')}: {entry.get('method', '')}"
 
 

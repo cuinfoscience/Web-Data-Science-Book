@@ -65,23 +65,30 @@ DROPPED = ("ERR_CONNECTION_RESET", "ERR_CONNECTION_CLOSED", "ERR_EMPTY_RESPONSE"
 
 
 def dropped(failures):
-    """Problems for the page's own files that failed before any response came back, as
-    (resource type, URL, Chrome's error), and whether all of them look temporary. A lost
-    stylesheet leaves a take that passes every other guard but shows the page half
-    drawn (web.archive.org, 2026-09-25). An HTTP error isn't a failure here: an
+    """Problems for the page's own files that failed, as (resource type, URL, Chrome's
+    error or "HTTP 5xx"), and whether all of them look temporary. A lost stylesheet
+    leaves a take that passes every other guard but shows the page half drawn
+    (web.archive.org, 2026-09-25), and a lost image leaves a hole where a page's banner
+    was. Two kinds of failure count: a request that got no answer at all, and a server
+    error (5xx), the archive failing now, as it answered 502 for one of AboutFace's
+    images on one load and drew it on the next. Any other answer isn't a failure: an
     archive's 404 for a file it never saved is the page as it is, and the caller leaves
-    out any request that got an answer. ERR_ABORTED counts only for a stylesheet: an
-    image or script is aborted when the page itself cancels it, but web.archive.org's
-    stylesheets came back aborted, unanswered, on one load and whole on the next."""
+    out any request that got one. ERR_ABORTED counts only for a stylesheet: an image or
+    script is aborted when the page itself cancels it, but web.archive.org's stylesheets
+    came back aborted, unanswered, on one load and whole on the next."""
     def counts(kind, error):
         return "ERR_ABORTED" not in (error or "") or kind == "stylesheet"
+
+    def temporary(error):
+        return any(e in (error or "") for e in DROPPED + ("ERR_ABORTED",)) or bool(
+            re.fullmatch(r"HTTP 5\d\d", error or ""))
     failures = [f for f in failures if counts(f[0], f[2])]
     if not failures:
         return [], False
     kinds = "/".join(sorted({kind for kind, _, _ in failures}))
     _, url, error = failures[0]
     return ([f"{len(failures)} of the page's own files ({kinds}) didn't load: {error} for {url[:120]}"],
-            all(any(e in (err or "") for e in DROPPED + ("ERR_ABORTED",)) for _, _, err in failures))
+            all(temporary(err) for _, _, err in failures))
 
 
 def image_problems(path):

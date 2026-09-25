@@ -19,6 +19,16 @@ class CropError(Exception):
     pass
 
 
+def _box(page, selector):
+    """An element's box in the window, or None when nothing matches. Playwright waits for
+    a match, and raises when none comes; a page that came back as an error page has none
+    (web.archive.org, 2026-09-25), and that is a failed take, not a crash."""
+    try:
+        return page.locator(selector).first.bounding_box(timeout=5000)
+    except Exception:
+        return None
+
+
 def pads(crop):
     """A crop's `pad` as (top, right, bottom, left): one number, or four as in CSS."""
     pad = crop.get("pad", 0)
@@ -45,7 +55,7 @@ def clip(page, fig):
     if crop.get("window"):
         return {"x": 0, "y": 0, "width": width, "height": height}, False
     if "between" in crop:
-        first, last = (page.locator(s).first.bounding_box() for s in crop["between"])
+        first, last = (_box(page, s) for s in crop["between"])
         if not (first and last):
             raise CropError(f"crop `between` {crop['between']!r}: an element matched nothing visible")
         top, _, bottom, _ = pads(crop)
@@ -53,7 +63,7 @@ def clip(page, fig):
         rect = {"x": x, "y": y, "width": crop.get("width", width - x),
                 "height": last["y"] + last["height"] + bottom - y}
     elif "selector" in crop:
-        box = page.locator(crop["selector"]).first.bounding_box()
+        box = _box(page, crop["selector"])
         if not box:
             raise CropError(f"crop selector {crop['selector']!r} matched nothing visible")
         x, y, w, h = around((box["x"], box["y"], box["width"], box["height"]), crop)

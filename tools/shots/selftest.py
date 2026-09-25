@@ -74,6 +74,13 @@ PAGES["/styled"] = (200, "<title>Styled</title><link rel='stylesheet' href='/dro
                          "<h1>A styled page</h1><p>" + "Something to look at. " * 40 + "</p>")
 PAGES["/styled-404"] = (200, "<title>Styled</title><link rel='stylesheet' href='/missing.css'>"
                              "<h1>A styled page</h1><p>" + "Something to look at. " * 40 + "</p>")
+PAGES["/imaged"] = (200, "<title>Imaged</title><h1>A page with a picture</h1><img src='/picture-502.png'>"
+                         "<p>" + "Something to look at. " * 40 + "</p>")
+PAGES["/picture-502.png"] = (502, "Bad Gateway")
+# Text in a closed shadow root, as the Wayback Machine's toolbar keeps its capture count.
+PAGES["/closed-shadow"] = (200, "<title>Closed</title><h1>Outside the root</h1><div id='host'></div>"
+                                "<script>document.getElementById('host').attachShadow({mode: 'closed'})"
+                                ".innerHTML = '<p style=\"font-size:20px\">Inside a closed root</p>';</script>")
 # Public DNS over HTTPS, as dns.google answers it: no address for the dead host, one for the refused host.
 DNS = {"dead-host.test": {"Status": 3},
        "refused-host.test": {"Status": 0, "Answer": [{"name": "refused-host.test.", "type": 1, "data": "192.0.2.1"}]}}
@@ -171,6 +178,11 @@ figures:
   - {{id: dropped-style, kind: capture, url: "{base}/styled", expect: {{text: ['A styled page']}}}}
   - {{id: missing-style, kind: capture, url: "{base}/styled-404", expect: {{text: ['A styled page']}}}}
   - {{id: dropped-allowed, kind: capture, url: "{base}/styled", expect: {{text: ['A styled page'], all_files: false}}}}
+  - {{id: image-502, kind: capture, url: "{base}/imaged", expect: {{text: ['A page with a picture']}}}}
+  - {{id: crop-missing, kind: capture, url: "{base}/ok", crop: {{between: ['#not-on-the-page', 'h1']}}}}
+  - {{id: shadow-closed, kind: capture, url: "{base}/closed-shadow", expect: {{text: ['Inside a closed root']}}}}
+  - {{id: shadow-opened, kind: capture, url: "{base}/closed-shadow", open_shadow: true,
+      steps: [{{wait: {{text: 'Inside a closed root'}}}}], expect: {{text: ['Inside a closed root']}}}}
   - id: headed-inspect
     kind: capture
     url: "{base}/tree"
@@ -383,11 +395,31 @@ figures:
     da = newest("dropped-allowed")
     expect("a recipe that accepts lost files passes, and its log names them",
            da.get("ok") is True and "didn't load" in " ".join(da.get("dropped", [])), str(da.get("problems")))
+    code, out = shots("capture", "ch-99", "--only", "image-502")
+    im = newest("image-502")
+    expect("an image the server answers with a 502 fails the take, and it is retried",
+           im.get("ok") is False and "HTTP 502" in " ".join(im.get("problems", []))
+           and len(im.get("attempts", [])) == 2, str(im.get("problems")) + str(im.get("attempts")))
+    code, out = shots("capture", "ch-99", "--only", "crop-missing")
+    cm = newest("crop-missing")
+    expect("a crop whose element isn't on the page fails the take and the run goes on",
+           code == 1 and cm.get("ok") is False and "matched nothing visible" in " ".join(cm.get("problems", []))
+           and "Traceback" not in out, str(cm.get("problems")) + out[-300:])
+    code, out = shots("capture", "ch-99", "--only", "shadow-closed", "shadow-opened")
+    sc, so = newest("shadow-closed"), newest("shadow-opened")
+    expect("text in a closed shadow root is out of every selector's reach",
+           sc.get("ok") is False and "not found" in " ".join(sc.get("problems", [])), str(sc.get("problems")))
+    expect("`open_shadow: true` opens it: the step waits for its text, the guard finds it, and the log says so",
+           so.get("ok") is True and so.get("open_shadow") is True, str(so.get("problems")))
+    expect("...and the text measure counts it (20 pixels, beside the heading's 32)",
+           20.0 in [float(k) for k in ((so.get("text") or {}).get("sizes") or {})], str(so.get("text")))
     lost = guards.dropped([("stylesheet", "https://web.archive.org/x.css", "net::ERR_ABORTED")])
     expect("an aborted stylesheet is a lost one, worth another try", lost[0] and lost[1] is True, str(lost))
     kept = guards.dropped([("image", "https://example.org/a.png", "net::ERR_ABORTED"),
                            ("script", "https://example.org/a.js", "net::ERR_ABORTED")])
     expect("...but an aborted image or script is the page cancelling it", kept == ([], False), str(kept))
+    served = guards.dropped([("image", "https://web.archive.org/a.gif", "HTTP 502")])
+    expect("a 5xx answer is a lost file, worth another try", served[0] and served[1] is True, str(served))
 
     print("robots.txt")
     rules = ("User-agent: *\nDisallow: /private/\n\n"

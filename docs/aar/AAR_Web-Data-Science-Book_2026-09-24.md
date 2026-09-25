@@ -343,7 +343,7 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 | P1-1 | P1 | `.github/workflows/shots-check.yml` | CI | `check` on PRs that change images | maintainer | Proposed | Image PRs merged without `check` in CI: all → 0 |
 | P1-2 | P1 | `AGENTS.md`, `CLAUDE.md`, `docs/` | layout | One instruction file; records beside the code | auto | Applied | Instruction files found by the collector: 0 → 1; earlier AARs found: 0 → 2 |
 | P1-3 | P1 | skill collector | tool config | Read `queued_command`; wider correction pattern | skill maintainer | Proposed | Steering messages counted: 0 of 8 → 8 of 8 |
-| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 2 of 11 ch-07/08 figures retaken, 1 of 3 captions dated (see note) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
+| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 9 of 11 ch-07/08 figures retaken, 3 of 3 captions dated; the slide screenshots are next (see notes) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
 | P2-2 | P2 | `docs/plans/` | plan | Computed outputs | maintainer | Proposed | Plan decided, yes or no |
 
 ### Resolution notes
@@ -357,6 +357,13 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 - **Every setting is read back.** Each headed take now reads DevTools' own page for what it drew, records it, and `capture` reports any difference from the recipe. The selftest checks each setting, 68 of 68 in all. The metric was "settings with an effect test: 3 of 8 → 8 of 8". Every setting the toolkit sends to Chrome or DevTools now has one, listed in the table under "Headed figures" in `tools/shots/README.md`.
 - **The read-back found a bug on its first run,** the kind §5.2 predicts. `sidebar: hidden` set the Styles pane's size for only one layout, so in a narrow pane that DevTools stacked, the pane took 325 pixels and squeezed the tree. DevTools 154 can't hide the pane at all. `hidden` now means "at its smallest" in both layouts, and the README says so.
 - **The maintainer found a banner the checks had missed.** Chrome for Testing's "only for automated testing" notice appeared in three chapter 8 figures and one week-8 slide, all made by scripts before the toolkit. The toolkit had it off only because Playwright passes `--disable-infobars` by default. The switch is now explicit, and a guard fails any headed take with an infobar. `network-tab-json` and `xkcd-inspect` were retaken within 800×600, with text at 13.4 pixels in the book. That counts toward P2-1. The Selenium figure keeps the notice, because the notice is its subject.
+
+**2026-09-25: chapter 7's retakes.**
+- **Where P2-1 stands.** All five chapter 7 figures were retaken within the size limit, and every caption dated. `check` flags no chapter 7 figure now, and no caption in chapters 7 and 8. Of the 11 chapter 7–8 figures, 9 are retaken; chapter 8's two tool windows wait for M4. The slide screenshots for weeks 1, 7, and 8 are next.
+- **The retakes found three gaps in the toolkit.** Each is now in the selftest:
+  - The Wayback toolbar keeps its parts in a closed shadow root, which no selector reached, so a recipe couldn't wait for its capture count or open its About panel. `open_shadow: true` opens it.
+  - The guard for lost files counted only requests that got no answer. An image answered with a 502 left a hole where AboutFace's banner was, and the take passed. A 5xx answer now counts.
+  - A crop whose element was missing ended the whole run instead of failing its take.
 
 ## Appendix A — Design sketch: why each part exists
 
