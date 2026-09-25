@@ -52,7 +52,7 @@ DIRECTIONS = {"row", "column"}
 NOT_CAPTURE = ("brief", "legacy", "notes", "annotate", "targets", "legibility", "oversize", "api_client",
                "evidence")
 DEFAULTS = {
-    "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
+    "user_agent": "WebDataScience/1.0 (brian.keegan@colorado.edu)",
     "window": [800, 600],    # CSS pixels; the default limit on what a figure shows, 1024×768 relaxed (lib/legibility.py)
     "scale": 2,              # device pixels per CSS pixel
     "pause": [8, 30],        # seconds between page loads on one host

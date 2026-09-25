@@ -343,7 +343,7 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 | P1-1 | P1 | `.github/workflows/shots-check.yml` | CI | `check` on PRs that change images | maintainer | Applied 2026-09-25, when its pull request merges (see note) | Image PRs merged without `check` in CI: all → 0 |
 | P1-2 | P1 | `AGENTS.md`, `CLAUDE.md`, `docs/` | layout | One instruction file; records beside the code | auto | Applied | Instruction files found by the collector: 0 → 1; earlier AARs found: 0 → 2 |
 | P1-3 | P1 | skill collector | tool config | Read `queued_command`; wider correction pattern | skill maintainer | Proposed | Steering messages counted: 0 of 8 → 8 of 8 |
-| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 11 of 11 ch-07/08 figures retaken, 3 of 3 captions dated; week 7's slides remade, and 5 of week 8's 6 that fell short; the rest wait (see notes) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
+| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 11 of 11 ch-07/08 figures retaken, 3 of 3 captions dated; week 7's slides remade, 5 of week 8's 6 that fell short, and week 1's book website; three hand captures wait for the maintainer (see notes) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
 | P2-2 | P2 | `docs/plans/` | plan | Computed outputs | maintainer | Proposed | Plan decided, yes or no |
 
 ### Resolution notes
@@ -379,6 +379,10 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 
   Rehearsed in a clean environment, it passed `main` in under a second and failed an image changed by one byte. None of the 39 open student pull requests changes those paths, so it runs on none of them. `AGENTS.md` now says CI repeats the check, in place of the proposal's line asking a pull request to state that `check` passes. The same pull request adds `import`, M4's last piece: a person's screenshot of a page behind a login, made a take with its `redact:` boxes blacked out and its metadata left behind. Its first candidate, week 1's issue form, waits on the maintainer.
 
+**2026-09-25, later: the User-Agent, and week 1's slides.**
+- **A 429 that was the User-Agent.** Figure 1-4 was put down to the session's shared address for a day, and the hand-off, the README, and `images/ch-01/IMAGES.md` all said to try another network. The maintainer pointed to the User-Agent. Wikimedia's APIs treat any User-Agent not in the form `name/version (contact)` as unidentified and allow it 10 requests a minute, shared by its address. The toolkit's own string, set in one place as Appendix A asks, was in the wrong form. With the form the chapters teach, the same session got 200, and the three records were corrected. For porting: an honest identity must also follow the format the target sites publish, and Appendix B's User-Agent row now says so.
+- **Week 1's slides.** `book_website.png` is retaken live, 480 pixels wide with its chapter list open. Its text comes to 25.8 pixels on the slide, without widening the column or cropping the text short. `github_repo.png`, `issue_form.png`, and `pr_review.png` (weeks 1, 8, and 13) have `mode: hand` recipes, the first to use `import`, and wait for the maintainer's screenshots. P2-1 has nothing left that a session can do.
+
 ## Appendix A — Design sketch: why each part exists
 
 ```
@@ -404,7 +408,7 @@ recipe (YAML per chapter)
 
 | Setting | Where | This book's value |
 |---|---|---|
-| User-Agent and contact | `tools/shots/lib/recipes.py` `DEFAULTS["user_agent"]` | `Web Data Science/v1 brian.keegan@colorado.edu`; replace with your own |
+| User-Agent and contact | `tools/shots/lib/recipes.py` `DEFAULTS["user_agent"]` | `WebDataScience/1.0 (brian.keegan@colorado.edu)` since 2026-09-25; replace with your own, keeping the form `name/version (contact)`. Wikimedia's APIs rate-limit any other form as unidentified: the old `Web Data Science/v1 brian.keegan@colorado.edu` got 429 on its first request |
 | Pacing and retries | `recipes.py` `DEFAULTS["pause"]`, `["retries"]`; `lib/capture.py` `BACKOFF` (`SHOTS_BACKOFF`) | 8–30 s; 30/60/120 s |
 | Window, scale, soft cap | `recipes.py` `DEFAULTS["window"]`, `["scale"]`; `lib/legibility.py` `SOFT_LIMIT` | 800×600 at 2× |
 | Display targets | `lib/legibility.py` `BOOK_PX`, `SLIDE_PX`, `SLIDE_TEXT`, `THRESHOLDS`; `lib/annotate.py` `BOOK_WIDTH_IN` | 778-px column; 1920-px slides, 16:9 beamer text width; 11 px / 16 px / 6 pt |
