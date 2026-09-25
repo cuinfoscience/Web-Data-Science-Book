@@ -5,8 +5,8 @@
 **Status:** In progress. The plan was proposed on 2026-09-24. The chapter 5 pilot
 is done (textbook #138, course #51), and its gate closed the same day. The gate
 note is in §9 of the screenshot AAR and in `tools/shots/README.md` ("What the
-chapter 5 pilot settled"). Chapter 4 is done. Chapters 1 and 2 are done, except figures 1-4 and
-2-2 (§4). Chapter 3 is done (§4). Implements [P1-4] of
+chapter 5 pilot settled"). Chapter 4 is done. Chapter 1 is done, figure 1-4 included (2026-09-25). Chapter 2 is done, except
+figure 2-2 (§4). Chapter 3 is done (§4). Implements [P1-4] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md). Depends
 on P0-1 (`make_stubs.py` keeps notes), on P0-3 (what counts as a screenshot),
 and on toolkit milestones M1–M3 in
@@ -121,7 +121,7 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
   - **1-1 became two figures** from a real Jupyter Notebook 7.6 server set up with the chapter's own commands: `jupyter-new-menu` (the file list with **New** open) and `jupyter-cells` (the companion notebook's Markdown cell above its first code cell, run, with the kernel's name). Notebook 7's **New** menu lists the kernel, **Python 3 (ipykernel)**, not **Notebook**, so the chapter's instruction changed to match.
   - **1-2 is dropped.** Since #152 the chapter says to start Jupyter from `webdata` and pick the Python 3 kernel; a picker listing `webdata` beside `base` would need an extra package the chapter doesn't install.
   - **1-3 is `article-view-source`**, a labeled composite at 370 pixels a side: the article, and View Source of the same address.
-  - **1-4 is left out:** Wikimedia's REST API answered this cloud session's address with 429 twice on 2026-09-24. `images/ch-01/IMAGES.md` keeps a draft recipe, for a capture from another network.
+  - **1-4 was made on 2026-09-25.** On 2026-09-24 Wikimedia's REST API answered it with 429, which was put down to the session's shared address. The cause was the toolkit's User-Agent, whose form Wikimedia's API rate-limits as unidentified; with the form chapter 1 teaches, the same session got 200 (`docs/decisions.md`, 2026-09-25).
   - **1-5 is skipped** (optional).
   - **Course:** copies of the two Jupyter figures go into `handouts/week-01/img/`, offered to `setup.md`; replacing `anaconda_jupyter.png` is the instructor's call. `book_website.png` and `github_repo.png` stay: in the deck's 0.35-wide column, a live capture's text is legible only when cropped to about 480 CSS pixels, which cuts the page's text short, so the column width is the instructor's call first. `issue_form.png` and `pr_review.png` wait on the maintainer's choice of a public issue and pull request that aren't a student's.
 

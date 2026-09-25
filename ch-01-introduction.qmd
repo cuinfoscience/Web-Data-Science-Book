@@ -192,7 +192,9 @@ print(type(data))        # <class 'dict'>
 print(data.keys())       # What keys are in the response?
 ```
 
-Notice two things. First, as with the article, you included a custom `User-Agent` header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the `.json()` method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate.
+Notice two things. First, as with the article, you included a custom `User-Agent` header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the `.json()` method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate. To see that structure before Python has it, paste the same URL into Chrome and tick **Pretty-print**, as @fig-pageviews-json shows.
+
+![The pageviews API's answer to the chapter's URL in Chrome, with **Pretty-print** ticked, September 2026. The response is a dictionary whose one key, `items` ①, holds a list with one dictionary per day ②. Each day has a `timestamp` ③, written year, month, day, and hour, and its `views` ④: the two fields the plot below is drawn from.](images/ch-01/pageviews-json_annotated.png){#fig-pageviews-json .lightbox fig-alt="Chrome's JSON viewer with the Pretty-print box ticked, showing the response's start. After the opening brace comes the key items, opening a list, and the first day's dictionary: project en.wikipedia, article University_of_Colorado_Boulder, granularity daily, timestamp 2026010100, access all-access, agent all-agents, and views 657. The second day repeats the fields, with timestamp 2026010200 and views 761, and a third begins."}
 
 ### From Response to DataFrame
 

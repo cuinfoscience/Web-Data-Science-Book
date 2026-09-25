@@ -17,11 +17,12 @@
 # machine. Before each take of jupyter-cells, close the notebook's kernel
 # session, so the cell's prompt reads [1].
 #
-# Left out: figure 1-4, the pageviews API's JSON in Chrome. On 2026-09-24
-# Wikimedia's REST API answered this cloud session's address with 429 ("You are
-# making too many requests to the API") on the first request, and again that
-# evening: the limit counts everyone who shares the address. images/ch-01/IMAGES.md
-# keeps its draft recipe, to capture from another network.
+# Figure 1-4, the pageviews API's JSON in Chrome, needs the course's User-Agent in
+# the form Wikimedia's API accepts: a name and version, then contact information in
+# parentheses. The old `Web Data Science/v1 ...` string got 429 on the first request,
+# four times on 2026-09-24, because Wikimedia rate-limits an unidentified client to
+# 10 requests a minute, shared across its address. See the README's field note
+# "A 429 on the first request can be the User-Agent".
 chapter: ch-01
 qmd: ch-01-introduction.qmd
 defaults:
@@ -116,3 +117,32 @@ figures:
         crop: {between: ['body', 'td.line-number[value="29"]'], width: 370}   # to the end of line 29
     layout: {gap: 28, pad: 15, label_px: 26}
     drifts: true        # the article, and Wikipedia's markup
+
+  - id: pageviews-json
+    kind: capture
+    section: "Calling Your First API"
+    brief: >-
+      Show what the chapter's pageviews request gets back: the same URL pasted
+      into Chrome, with Pretty-print ticked. The response's one key, items
+      (marker 1), is a list with one dictionary per day (2, a brace over the
+      first), and each holds the timestamp (3) and views (4) that "From Response
+      to DataFrame" turns into columns. Show the first two days; the list goes on.
+    url: https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/University_of_Colorado_Boulder/daily/20260101/20260131
+    api_client: true      # the request chapter 1's code makes; wikimedia.org has no robots.txt
+    window: [600, 520]
+    steps:
+      - wait: {selector: 'pre'}
+      # Pretty-print's checkbox is in a closed shadow root, clicked where Chrome
+      # draws it, as in ch-04's forecast-json; the next step checks that it worked.
+      - click: {position: [104, 9]}
+      - wait: {text: '"items": \['}
+    expect:
+      text: ['"timestamp": "2026010100"']
+    crop: {top: 0, height: 348}   # two days, and the third's brace: the list goes on
+    annotate:
+      marks:
+        - {n: 1, at: {match: '^\s*"items": \[$', in: 'pre'}}
+        - {n: 2, shape: brace, at: {match: '^[ ]+\{(?:\n.*){8}', in: 'pre'}}
+        - {n: 3, at: {match: '^\s*"timestamp": "2026010100",$', in: 'pre'}}
+        - {n: 4, at: {match: '^\s*"views": \d+$', in: 'pre'}}
+    drifts: true          # Chrome's JSON viewer changes; the counts are January 2026's
