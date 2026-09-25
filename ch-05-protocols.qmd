@@ -156,6 +156,11 @@ from scapy.all import traceroute
 # Trace the path to Wikipedia
 result, unans = traceroute("en.wikipedia.org", maxttl=20)
 ```
+::: {.callout-note}
+## If Scapy Returns No Answers
+
+On some systems, especially macOS, `scapy` may print `Received 0 packets, got 0 answers` if the notebook does not have permission to send or capture raw network packets. This does not necessarily mean that the destination is unreachable. As a simpler check on macOS or Linux, run `traceroute en.wikipedia.org` in the terminal. If `scapy` is required, you may need to run your environment with administrator privileges.
+:::
 
 Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:
 
