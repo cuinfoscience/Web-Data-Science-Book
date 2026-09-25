@@ -57,6 +57,33 @@ def page_problems(status, title, text, expect):
     return problems, bool(hits) and all(temporary for _, temporary in hits)
 
 
+# Resource types that change what a take shows. XHR, fetch, and pings don't.
+DRAWN = {"stylesheet", "image", "font", "script", "media"}
+# Chrome's errors for a connection that dropped, rather than one refused or never made.
+DROPPED = ("ERR_CONNECTION_RESET", "ERR_CONNECTION_CLOSED", "ERR_EMPTY_RESPONSE", "ERR_TIMED_OUT",
+           "ERR_CONNECTION_TIMED_OUT", "ERR_TUNNEL_CONNECTION_FAILED", "ERR_HTTP2_PROTOCOL_ERROR")
+
+
+def dropped(failures):
+    """Problems for the page's own files that failed before any response came back, as
+    (resource type, URL, Chrome's error), and whether all of them look temporary. A lost
+    stylesheet leaves a take that passes every other guard but shows the page half
+    drawn (web.archive.org, 2026-09-25). An HTTP error isn't a failure here: an
+    archive's 404 for a file it never saved is the page as it is, and the caller leaves
+    out any request that got an answer. ERR_ABORTED counts only for a stylesheet: an
+    image or script is aborted when the page itself cancels it, but web.archive.org's
+    stylesheets came back aborted, unanswered, on one load and whole on the next."""
+    def counts(kind, error):
+        return "ERR_ABORTED" not in (error or "") or kind == "stylesheet"
+    failures = [f for f in failures if counts(f[0], f[2])]
+    if not failures:
+        return [], False
+    kinds = "/".join(sorted({kind for kind, _, _ in failures}))
+    _, url, error = failures[0]
+    return ([f"{len(failures)} of the page's own files ({kinds}) didn't load: {error} for {url[:120]}"],
+            all(any(e in (err or "") for e in DROPPED + ("ERR_ABORTED",)) for _, _, err in failures))
+
+
 def image_problems(path):
     """Problems visible in the image itself."""
     with Image.open(path) as img:

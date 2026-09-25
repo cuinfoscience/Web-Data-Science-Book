@@ -5,15 +5,11 @@
 # retired services. The third of 3-1's endpoints, Twitter API v1.1, is an API's
 # response: api.twitter.com's robots.txt disallows every path for all but
 # Googlebot and Bingbot, and it is captured as an API client (docs/decisions.md,
-# 2026-09-24). Left out for now:
-#
-# - 3-2, CrowdTangle's last capture in the Wayback Machine, and 3-3, Reddit's
-#   June 2023 post on API pricing: web.archive.org reset every connection from
-#   this session on 2026-09-24, and reddit.com's robots.txt now disallows every
-#   path, so 3-3 can only come from an archived copy. images/ch-03/IMAGES.md
-#   keeps their draft recipes.
-# - 3-5, OpenAlex's rate-limit headers: optional, and the chapter's take-home
-#   exercise asks students to find those headers themselves.
+# 2026-09-24). 3-2, CrowdTangle's last capture, and 3-3, Reddit's June 2023
+# post on API pricing, come from the Wayback Machine (captured 2026-09-25):
+# reddit.com's robots.txt now disallows every path, so 3-3 can only come from
+# the archive's copy. Left out: 3-5, OpenAlex's rate-limit headers, which are
+# optional, and the chapter's take-home exercise asks students to find them.
 chapter: ch-03
 qmd: ch-03-post-api.qmd
 defaults:
@@ -55,6 +51,82 @@ figures:
         crop: {top: 0, height: 56}      # Chrome's Pretty-print bar and the one line of JSON
     layout: {direction: column, gap: 12, pad: 12, label_px: 15}
     drifts: true        # endpoints are retired, gated, or restored
+
+  - id: crowdtangle-last-capture
+    kind: capture
+    section: "Dead-Endpoint Forensics"
+    brief: >-
+      Show the archive's last capture of CrowdTangle's site, the one the
+      chapter's last_snapshot() finds: www.crowdtangle.com on 14 August 2024.
+      Above, the Wayback Machine's toolbar gives the capture's date and the
+      address's captures, 2012 to December 2024 (every one after this is a
+      redirect), and covers the page's own banner. Below, the same capture
+      without the toolbar, where the banner reads "CrowdTangle will no longer
+      be available after August 14, 2024."
+    mode: composite
+    window: [776, 600]    # 800 wide with the composite's padding
+    parts:
+      - label: "The capture of 14 August 2024, under the Wayback Machine's toolbar"
+        url: https://web.archive.org/web/20240814023608/https://www.crowdtangle.com/
+        steps:
+          - wait: {selector: '#wm-ipp-base'}
+          - wait: {network_idle: true}
+        expect: {text: ['(?i)crowdtangle']}
+        crop: {top: 0, height: 112}     # the toolbar and the page's black navigation bar
+      - label: "The same capture without the toolbar (the archive's if_ view)"
+        # The page's banner is Bootstrap's navbar-fixed-top, pinned where the
+        # toolbar is pinned, so only the view without the toolbar shows it.
+        url: https://web.archive.org/web/20240814023608if_/https://www.crowdtangle.com/
+        steps:
+          - wait: {text: 'no longer be available after August 14, 2024'}
+          - wait: {network_idle: true}
+        expect: {text: ['no longer be available after August 14, 2024']}
+        crop: {top: 0, height: 345}     # the banner through the page's headline
+    layout: {direction: column, gap: 12, pad: 12, label_px: 15}
+    drifts: true        # the toolbar's count of captures
+
+  - id: reddit-api-pricing
+    kind: capture
+    section: "Enclosure"
+    brief: >-
+      Show Reddit's 2023 price in Reddit's own words: u/spez's post in r/reddit
+      on 9 June 2023, "Addressing the community about changes to our API", as
+      the Wayback Machine saved it a minute after it went up. Above, its title
+      and byline; below, the item "Premium Enterprise API / Third-party apps":
+      $0.24 per 1K API calls from 1 July 2023, and Apollo, Reddit is Fun, and
+      Sync closing before then. reddit.com's robots.txt now disallows every
+      path, so the figure comes from the archive's copy on old.reddit.com.
+    mode: composite
+    window: [776, 600]
+    parts:
+      - label: "u/spez in r/reddit, 9 June 2023"
+        url: https://web.archive.org/web/20230609174525/https://old.reddit.com/r/reddit/comments/145bram/addressing_the_community_about_changes_to_our_api/
+        steps:
+          - wait: {selector: '#siteTable .thing p.tagline'}
+          - wait: {network_idle: true}
+        # Reddit's archived stylesheets for tooltips and crosspost previews come back
+        # aborted on most loads; the post's own styles load, so the take is judged by
+        # eye on the contact sheet, and its log names the files it lost.
+        expect: {text: ['Addressing the community about changes to our API'], all_files: false}
+        # The title through the byline, in the post's column; the sidebar and the
+        # sign-up banner above the post are left out.
+        crop: {between: ['#siteTable .thing p.title', '#siteTable .thing p.tagline'],
+               left: 0, width: 470, pad: [6, 0, 6, 0]}
+      - label: "The same post: its item on paid access"
+        url: https://web.archive.org/web/20230609174525/https://old.reddit.com/r/reddit/comments/145bram/addressing_the_community_about_changes_to_our_api/
+        steps:
+          - wait: {text: '\$0\.24 per 1K API calls'}
+          - wait: {network_idle: true}
+          # The item is 1,100 pixels down, and a crop is taken from the window. The
+          # toolbar stays pinned to the window's top as the page scrolls, over its
+          # first 65 pixels, so the item stops 96 pixels down.
+          - scroll: {selector: '#siteTable .expando .md > ul:first-of-type > li:nth-of-type(3)', offset: 96}
+        expect: {text: ['\$0\.24 per 1K API calls', 'Apollo, Reddit is Fun, and Sync'], all_files: false}
+        # The third item of the post's first list, "Premium Enterprise API / Third-party apps".
+        crop: {between: ['#siteTable .expando .md > ul:first-of-type > li:nth-of-type(3)',
+                         '#siteTable .expando .md > ul:first-of-type > li:nth-of-type(3)'],
+               left: 44, width: 426, pad: [6, 0, 6, 0]}
+    layout: {direction: column, gap: 12, pad: 12, label_px: 15}
 
   - id: dsa-article-40
     kind: capture

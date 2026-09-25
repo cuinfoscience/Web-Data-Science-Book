@@ -6,7 +6,7 @@
 is done (textbook #138, course #51), and its gate closed the same day. The gate
 note is in §9 of the screenshot AAR and in `tools/shots/README.md` ("What the
 chapter 5 pilot settled"). Chapter 4 is done. Chapters 1 and 2 are done, except figures 1-4 and
-2-2 (§4). Chapter 3 is done, except 3-2 and 3-3, which wait for web.archive.org (§4). Implements [P1-4] of
+2-2 (§4). Chapter 3 is done (§4). Implements [P1-4] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md). Depends
 on P0-1 (`make_stubs.py` keeps notes), on P0-3 (what counts as a screenshot),
 and on toolkit milestones M1–M3 in
@@ -162,9 +162,13 @@ Order: **ch-04, ch-01, ch-02, ch-03.**
   - **3-1 is `dead-endpoints`** (figure 3.2), the three endpoints stacked: Pushshift's 403 in JSON, Chrome's own error page for CrowdTangle, whose names no longer resolve, and Twitter v1.1's 400 in JSON. Behind the session's proxy, a dead host fails as a refused one does, so the toolkit gained `expect: {error: ...}` with a public-DNS check before a take is kept.
   - **Twitter's part of 3-1 followed the maintainer's API-client decision** (`docs/decisions.md`); api.twitter.com's robots.txt disallows every path. The first version, merged in #158, showed two endpoints.
   - **3-4 is `dsa-article-40`** (figure 3.1): Article 40 from its heading through paragraph 4, boxed, on EUR-Lex, whose robots.txt asks for 10 seconds between requests.
-  - **3-2 and 3-3 wait for web.archive.org,** which reset every connection from the session. reddit.com's robots.txt now disallows every path, so 3-3 can only come from the archive; confirm first that Reddit itself stated $0.24 per 1,000 calls. Both draft recipes are in `images/ch-03/IMAGES.md`.
+  - **3-2 and 3-3 waited for web.archive.org,** which reset every connection from the session on 2026-09-24.
   - **3-5 is skipped:** optional, and the chapter's take-home exercise asks students to find OpenAlex's rate-limit headers themselves.
   - **Course:** copies of both figures go to `slides/week-03/img/` with notes, for the instructor to place. The Friday frames' issue and pull request wait on the maintainer's choice, as week 1's do.
+- **Done 2026-09-25:** 3-2 and 3-3, from the Wayback Machine, which answered again, though not every time.
+  - **3-3 is `reddit-api-pricing`**, in Enclosure: u/spez's post of 9 June 2023, from old.reddit.com's copy archived a minute after it went up. Its title and byline are stacked over its item "Premium Enterprise API / Third-party apps": $0.24 per 1K API calls from 1 July 2023, and Apollo, Reddit is Fun, and Sync closing. The archive's JSON of the thread confirmed that Reddit itself stated the price. It has no box, since a composite can't carry marks; the crop is the item, and the caption quotes it.
+  - **3-2 is `crowdtangle-last-capture`**, in Dead-Endpoint Forensics rather than Enclosure, beside the `last_snapshot()` output it shows. The capture of 14 August 2024 appears twice, under the toolbar and in the archive's `if_` view without it. The toolbar covers the page's banner, "CrowdTangle will no longer be available after August 14, 2024". The address's later captures, until December 2024, are redirects, and the chapter's sentence now says so.
+  - **The toolkit gained a guard:** the archive aborted some of a page's stylesheets on each load, and takes that showed the page unstyled passed every text check. A take now fails when a file from the page's host fails before any answer, and is retried.
 
 ## 5. The pull-request handout
 `handouts/common/pull-request-walkthrough.md` shows GitHub's web editor, which
