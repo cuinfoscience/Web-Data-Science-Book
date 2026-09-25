@@ -208,12 +208,10 @@ def _headless(browser, fig, png):
 
 def capture(browser, fig, pacer, say=print):
     """Return the take's log (a dict). Raises PolicyBlock if the proxy refuses the host."""
-    from . import headed
+    from . import engine_codegen, engine_selenium, headed
     if fig["mode"] == "composite":
         return _composite(browser, fig, pacer, say)
-    if fig.get("engine", "playwright") != "playwright":
-        return {"ok": False, "skipped": f"engine `{fig['engine']}` (the tool is the figure's subject) "
-                                        "arrives in a later milestone"}
+    engine = fig.get("engine", "playwright")
     folder = OUT / fig["chapter"] / fig["id"]
     folder.mkdir(parents=True, exist_ok=True)
     attempts = []
@@ -226,7 +224,15 @@ def capture(browser, fig, pacer, say=print):
         attempts.append(attempt)
         stamp = _stamp()
         png = folder / f"{stamp}.png"
-        if fig["mode"] == "headed":
+        if engine == "codegen":
+            display = browser.display(*engine_codegen.screen_size(fig))
+            result = engine_codegen.attempt(browser, fig, display, png)
+            label = engine_codegen.label(browser)
+        elif engine == "selenium":
+            display = browser.display(fig["window"][0] * fig["scale"], fig["window"][1] * fig["scale"])
+            result = engine_selenium.attempt(browser, fig, display, png)
+            label = engine_selenium.label(browser)
+        elif fig["mode"] == "headed":
             display = browser.display(fig["window"][0] * fig["scale"], fig["window"][1] * fig["scale"])
             result = headed.attempt(browser, fig, display, png)
             label = headed.label(browser)
@@ -275,8 +281,9 @@ def capture(browser, fig, pacer, say=print):
         # A page reloaded after a script check, or never loaded: what the browser met first.
         take.update({k: v for k, v in (("first_status", result.get("first_status")), ("error", error),
                                        ("dns", attempt.get("dns"))) if v})
-        # Headed takes: the browser's bars above the page, and what DevTools drew (read back).
-        take.update({k: result[k] for k in ("bars", "devtools_seen") if result.get(k) is not None})
+        # Headed takes: the browser's bars above the page, what DevTools drew (read back), and the
+        # versions an engine ran (Chrome and ChromeDriver under Selenium), and the script codegen wrote.
+        take.update({k: result[k] for k in ("bars", "devtools_seen", "engine", "recorded") if result.get(k) is not None})
         if result.get("dropped"):
             take["dropped"] = result["dropped"]      # files lost on a page whose recipe accepts that
         _write(take, png)

@@ -1,6 +1,6 @@
 # Hand-off note
 
-**Updated 2026-09-25**, after textbook #148–#152 and #154–#162 and courses #55–#62 merged, with the recipes for week 8's slide screenshots that this note's pull request adds; the course pull request paired with it holds the images. This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
+**Updated 2026-09-25**, after textbook #148–#152 and #154–#163 and courses #55–#63 merged, with the first part of toolkit M4 that this note's pull request adds: the Selenium and codegen engines, and chapter 8's two tool windows retaken with them. The course pull request paired with it holds week 8's copies. This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
 
 ## Where things stand
 
@@ -17,8 +17,9 @@
   - A figure of an API's response is marked `api_client: true` and captured as an API client where robots.txt disallows it; `doctor` reports that as a note, and still warns about any other disallowed page.
   - A take fails when a file from the page's own host (a stylesheet, image, font, or script) fails before any answer, or gets a server error (5xx), and is retried. On 2026-09-25 web.archive.org aborted some stylesheets on each load, and answered 502 for AboutFace's banner on one load and drew it on the next; those takes passed every text check.
   - `open_shadow: true` opens a closed shadow root, as the Wayback toolbar's is, so steps can wait for its capture count and hover its buttons, and the text measure counts it. A crop whose element is missing fails its take instead of ending the run.
+  - M4's engines make a figure whose subject is a tool with that tool. `engine: selenium` drives the window `webdriver.Chrome()` opens through Selenium alone. `engine: codegen` runs codegen's recorder in Chrome for Testing and feeds it real clicks; `playwright codegen` itself can't run, because it wants Playwright's own Chromium build, which the toolkit never installs. The README's "Engines" says what the codegen engine had to work around: the Inspector's scale, its unreachable text, the script written only at close, and Playwright turning off HTTPS-Upgrades.
 
-  The selftest passes 99 of 99. `check` reports 0 errors and 2 warnings: chapter 8's Selenium and codegen windows, which need M4.
+  The selftest passes 109 of 109. `check` reports 0 errors and 0 warnings.
 - **Chapters.**
   - ch-01: the setup works as written (#152). Jupyter installs into `webdata`, terminal commands are shell blocks, and the first request sends a User-Agent. #155 adds three figures: Jupyter's **New** menu, the companion notebook's cells, and the article beside View Source. It also corrects the instruction to choose **New** and then **Notebook**: Notebook 7's menu lists **Python 3 (ipykernel)**. Figure 1-4 (the pageviews JSON) is left out; see "Next".
   - ch-02: #156 adds Wikipedia's robots.txt at its generic block and Wikimedia's User-Agent policy, and `tools/shots` gains `match:` anchors for lines of plain text. Reddit's robots.txt (2-2) waits for the Friday review, since students' #50, #63, and #79 revise its paragraphs.
@@ -26,7 +27,7 @@
   - ch-04 has all four of the back-fill's figures: three in #149, with fixes for #84, #87, and #132, and the Open-Meteo forecast in Chrome's JSON view (4-2) in #159.
   - ch-05 has four DevTools figures from the pilot (#138).
   - ch-07: #161 retook its five Wayback figures within the size limit and dated every caption. Its counts and the calendar's colors follow the new takes, checked against the archive's APIs on 2026-09-25: 20,394,311 captures of google.com, 8,516,745 of facebook.com, and 94,893 of x.com; facebook.com's captures were 200s until April 8, 2005, not through March. Below 1,100 pixels wide the toolbar has no strip chart, so the toolbar paragraph now says what a wider window adds.
-  - ch-08: its View Source and JavaScript off/on figures are within the size limit, and the Selenium caption is dated (#142, #148). §8.3 checks Selenium Manager before the first browser (#143).
+  - ch-08: its View Source and JavaScript off/on figures are within the size limit, and the Selenium caption is dated (#142, #148). §8.3 checks Selenium Manager before the first browser (#143). This note's pull request retakes its two tool windows with the engines: the Selenium window, 800×600, and codegen's browser above its Inspector, 800×534, with captions and alt text to match. Every chapter 7 and 8 figure is now within the size limit.
 - **Decisions on 2026-09-24** ([`decisions.md`](decisions.md)): robots.txt is read for the course's User-Agent, and examples send one; a figure of an API's response is captured as an API client; the book recommends Python 3.14; students' pull requests merge after a code-review standup in class on a Friday.
 - **Contributors.** `CONTRIBUTING.md`, a pull request template, and issue forms that point to it (#146). The README acknowledges the AI tools used to write the book (#145).
 - **Project records.** `AGENTS.md` and `docs/`: the AARs, the plans, the decision log, and this note.
@@ -38,7 +39,8 @@
   - Course #60 is merged: the Friday review table in `docs/plans/2026-09-24-friday-code-review-table.md`, and the Friday plan scheduled for week 7's Friday, October 2, with what that day's frames need from the table.
   - Course #61 is merged: week 3's copies of chapter 3's two archive figures, offered to its frames on Reddit's pricing and CrowdTangle.
   - Course #62 is merged: week 7's slide screenshots, remade from the `week07-*` recipes in `tools/shots/recipes/course.yml` (#162), with a copy of chapter 7's figure 7.3. Their text now reaches 16 pixels on a 1,920-pixel slide; the old crops showed it at 6 to 15. Four frames were resized to fit, and three frames' facts changed with the new takes.
-  - The course pull request paired with this note's remakes three of week 8's slide screenshots from the `week08-*` recipes, in 480-pixel windows: the JavaScript off/on pair, JavaScript off alone, and playwright.dev. Their text went from about 7–11 pixels to 18–19.6 on a 1,920-pixel slide, and no frame changed.
+  - Course #63 is merged: three of week 8's slide screenshots, remade from the `week08-*` recipes in 480-pixel windows (#163). Their text went from about 7–11 pixels to 18–19.6 on a 1,920-pixel slide.
+  - The course pull request paired with this note's copies the two tool windows into week 8: `selenium_browser.png`, a crop to the bar's first sentence for its 35% column (18.5 pixels), and `codegen.png`, figure 8.6 (16.2 pixels in its 55% column). No frame changed.
   - Course #56 is merged. It adds the roadmap for the Friday code review (`docs/plans/2026-09-24-friday-code-review.md`) and the merge rule in the revision framework, the pull request walkthrough, and week 4's FAQ. It also puts Python 3.14 in week 1's setup and gensim from conda-forge in week 7's deck.
 
 ## Next
@@ -52,8 +54,7 @@ In this order:
 3. **The rest of AAR P2-1** is blocked; each item needs a course recipe cropped for its frame's column, as weeks 7 and 8's have (`tools/shots/README.md`, "Course-only figures").
    - Week 1's screenshots wait for the maintainer (see the table below).
    - Week 8's `pr_review.png` waits for a session that can read github.com's robots.txt for the course's User-Agent. A cloud session reaches github.com only for its own repositories, so the request is refused (403).
-   - The Selenium and codegen windows, chapter 8's figures and week 8's copies, wait for M4.
-4. **Toolkit M4** ([plan](plans/2026-09-24-screenshot-toolkit.md), §8): evidence queries for counts in captions (AAR P1-2), `sync` and `import`, the Selenium and codegen engines, and the `shots-check` CI job (AAR P1-1).
+4. **The rest of toolkit M4** ([plan](plans/2026-09-24-screenshot-toolkit.md), §8): evidence queries for counts in captions (AAR P1-2), `sync` and `import`, and the `shots-check` CI job (AAR P1-1). The engines are done.
 5. **Align the chapters' User-Agent strings** with `WebDataScience/1.0 (your-email@colorado.edu)`, after the Friday review.
    - Students' #88 and #93 add one to chapter 4's requests.
    - Chapter 7's three top-level requests (Availability, the raw capture, CDX) send none, and week 7's deck copies them. Change the chapter and the deck together, so the slides match the notebook.
@@ -87,7 +88,7 @@ In this order:
     - chapters: `claude/ch01-setup-fixes`, `claude/ch04-figures`, `claude/ch04-refresh-live-data`, `claude/ch04-rss-directory-links`, `claude/ch04-rss-starter-feeds`, `claude/ch04-swap-rss-links`, `claude/ch05-protocols-expansion`, `claude/ch05-protocols-terminal-tools`, `claude/ch07-wayback-background`, `claude/ch08-retakes`, `claude/ch08-selenium-manager-playwright`, `claude/ch08-selenium-preflight`;
     - the toolkit: `claude/pilot-ch05`, `claude/shots-toolkit-m1`, `claude/shots-toolkit-m2`, `claude/shots-toolkit-m3`, `claude/shots-devtools-effect-tests`, `claude/shots-relaxed-limit`, `claude/shots-field-notes`, `claude/notebook-figure-brackets`;
     - docs: `claude/docs-agents-md`, `claude/aar-p0-edits`, `claude/lift-pause-pilot-gate`, `claude/readme-ai-acknowledgement`, `claude/contributing-guide`, `claude/handoff-after-merges`, and `claude/decisions-ua-python`;
-    - the back-fill: `claude/ch01-figures`, `claude/ch02-figures`, `claude/ch03-figures`, `claude/ch05-a-record-note`, `claude/api-client-figures`, `claude/wayback-figures`, `claude/ch07-retakes`, `claude/week07-slide-shots`, and this note's own branch, `claude/week08-slide-shots`, once it merges.
+    - the back-fill: `claude/ch01-figures`, `claude/ch02-figures`, `claude/ch03-figures`, `claude/ch05-a-record-note`, `claude/api-client-figures`, `claude/wayback-figures`, `claude/ch07-retakes`, `claude/week07-slide-shots`, `claude/week08-slide-shots`, and this note's own branch, `claude/m4-tool-engines`, once it merges.
   - **This repository, closed without merging:** `claude/decisions-ua-python-review` (#153). #154 replaced it with the same changes, because the message of #153's first commit quoted a closing keyword with #90's number: merged, it would have closed #90 again.
   - **The course repository, merged into `main`:** `add-slides-ci`, `claude/detrope-week02-images`, `claude/week-01-screenshots-2aiqhh`, `claude/week-02-expansion`, `claude/week-04-rss-feeds-handout`, `claude/wk02-fixes`, `fix-oscars-403-headers-slides`, `overleaf-2026-08-24-0430`, and `overleaf-2026-08-24-0500`.
   - **The course repository, closed without merging:** `claude/swartz-ca-frames` (#23). Delete it only if #23 won't be revived. GitHub can restore it from the closed pull request.

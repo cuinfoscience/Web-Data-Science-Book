@@ -221,7 +221,7 @@ Driver:  154.0.8037.57
 
 `webdriver.Chrome()` runs Selenium Manager once more, finds what step 2 downloaded in its cache, and starts the pair that step 3 checked. The two numbers should match up to the first dot. A browser window opens (@fig-selenium-cft). This is your programmable browser — every command you issue through the `driver` object happens in that window.
 
-![A browser started by `webdriver.Chrome()` on a machine with no Chrome installed, in September 2026. Selenium Manager downloaded Chrome for Testing, which labels itself as meant only for automation.](images/ch-08/selenium-chrome-for-testing.png){#fig-selenium-cft .lightbox fig-alt="Screenshot of a Chrome for Testing window showing the xkcd home page and the comic Stargazing 5. A bar under the address bar reads Chrome for Testing v154.0.8037.57 is only for automated testing. For regular browsing, use a standard version of Chrome that updates automatically. The comic's hover text is showing as a tooltip."}
+![A browser started by `webdriver.Chrome()` on a machine with no Chrome installed, in September 2026. Selenium Manager downloaded Chrome for Testing, which labels itself as meant only for automation.](images/ch-08/selenium-chrome-for-testing.png){#fig-selenium-cft .lightbox fig-alt="Screenshot of a Chrome for Testing window showing the xkcd home page and the comic Voyager Instruments. A bar under the address bar begins Chrome for Testing v154.0.8037.57 is only for automated testing, and offers a Download Chrome link."}
 
 ### What Selenium Manager Does
 
@@ -741,7 +741,7 @@ page.get_by_role("link", name="change").click()
 page.get_by_role("link", name="(about)").click()
 ```
 
-![Playwright's codegen recorder. Every click in the browser on the left became a line in the Inspector on the right. Hovering over the author's name shows the locator codegen would use for it.](images/ch-08/playwright-codegen.png){#fig-codegen .lightbox fig-alt="Screenshot of two windows. On the left, a browser shows the Quotes to Scrape author page for Albert Einstein, with the heading highlighted and a tooltip reading get_by_role heading, name Albert Einstein. On the right, the Playwright Inspector shows a generated Python script that launches Chromium, goes to quotes.toscrape.com, and clicks the link named change and then the link named (about)."}
+![Playwright's codegen recorder. Every click in the browser, above, became a line in the Inspector below it. Hovering over the author's name shows the locator codegen would use for it.](images/ch-08/playwright-codegen.png){#fig-codegen .lightbox fig-alt="Screenshot of two windows, one above the other. Above, a browser shows the Quotes to Scrape author page for Albert Einstein, with codegen's toolbar at the top, the heading highlighted, and a tooltip reading get_by_role heading, name Albert Einstein. Below, the Playwright Inspector shows the Python it generated: it launches Chromium, opens a new page, goes to quotes.toscrape.com, and clicks the link named change and then the link named (about)."}
 
 Codegen writes *role-based* locators: "the link whose visible name is *change*" rather than a CSS path such as `div.tags > a:nth-child(2)`. Role-based locators survive a redesign that renames CSS classes, but they break when the visible text changes, so read what the recorder wrote before you trust it. A recording is a first draft: it reproduces your clicks, but it extracts nothing, so the scraping part is still yours to write.
 

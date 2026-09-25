@@ -11,10 +11,9 @@ Done so far:
 - **M1:** headless captures, guards, retries, provenance, and `check`.
 - **M2:** headed captures of browser UI (DevTools, View Source), with real input on a virtual display.
 - **M3:** numbered markers placed from what the browser measured, a legibility check at each size a figure is shown, side-by-side composites, and contact sheets.
+- **M4, begun:** engines for the two ch-08 figures whose subject is a tool itself: the window Selenium opens, and Playwright's recorder (see Engines).
 
-Still to come:
-
-- **M4:** evidence queries, copying figures into the course repo, CI, and the two ch-08 figures whose subject is a tool itself (the window Selenium opens, Playwright's recorder).
+Still to come, the rest of M4: evidence queries, copying figures into the course repo (`sync`, `import`), and CI.
 
 ## Quick start
 
@@ -598,7 +597,7 @@ One YAML file per chapter in `recipes/`. A figure:
 ```
 
 - **The brief** is for people: what the reader should see, for which paragraph, and what the figure leaves out (step 1 of "Making a figure"). The tool doesn't read it, and it stays out of the recipe's hash, so rewording it needs no new take.
-- **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-08 recipes set 1280×800, the window their images were made in; its two tool windows are over the soft limit until M4 retakes them.)
+- **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-08 recipes set 1280×800, the window their first images were made in; each of its figures now sets its own.)
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top; add `within: '.panel'` for a page that scrolls a panel rather than the window, as Jupyter does.
 - **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`. `{between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 12, 0]}` is a band from the top of one element to the bottom of another; `left` and `width` default to the window.
 - **Pages that lose files:** `expect: {all_files: false}` accepts a page whose own files fail on every load, when the ones lost don't show. Reddit's archived stylesheets for tooltips and crosspost previews came back aborted on most loads, while the post's own styles loaded (chapter 3's `reddit-api-pricing`).
@@ -606,7 +605,7 @@ One YAML file per chapter in `recipes/`. A figure:
 - **Closed shadow roots:** `open_shadow: true` makes a shadow root that the page asks to have closed open instead, before any of the page's scripts run. A closed root is drawn like any other, but no selector reaches it, Playwright's included: no step can wait for its text or hover its buttons, and the text measure can't count it. The page looks the same; only its scripts could tell, since `element.shadowRoot` returns the root rather than `null`. The Wayback Machine's toolbar is one (chapter 7). Headless captures only: DevTools reaches closed roots on its own.
 - **An API's response:** `api_client: true`, on the figure or on a composite's part, marks the request a chapter's own code makes, captured as an API client where robots.txt disallows it (see "Before the recipe" under Field notes). It changes what `doctor` says, not the capture, so it stays out of the recipe's hash.
 - **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls.
-- **Other modes:** `mode: headed` and `mode: composite` are below. An `engine:` other than Playwright (M4) marks a figure that `capture` skips with a note.
+- **Other modes:** `mode: headed` and `mode: composite` are below. `engine: selenium` and `engine: codegen` are for figures whose subject is the tool itself (see Engines).
 - **Patterns** are regular expressions. A leading `(?i)` ignores case; the tool turns it into JavaScript's `i` flag, because Playwright and DevTools evaluate patterns in JavaScript, which has no inline flags.
 - **Quoting:** quote any YAML value that contains ` #`, or everything after it becomes a comment. In single quotes, a backslash is literal: write `'quotes\?page=2'`.
 
@@ -679,6 +678,70 @@ Crops for headed figures are in window coordinates:
 - `{top: 0, height: 680}`: a band of the window;
 - `{between: ['body', 'td.line-number[value="43"]']}`: from the top of one element to the bottom of another, which is how View Source is cut at a line;
 - `{selector: …, pad: 8}`: one element.
+
+## Engines
+
+A figure whose subject is a tool rather than a page is made by that tool:
+`engine: selenium` for the window `webdriver.Chrome()` opens, and `engine:
+codegen` for Playwright's recorder. Both need `mode: headed`, crop the screen
+by `top`, `left`, `width`, and `height`, run only their own steps, and are in
+the selftest.
+
+**`engine: selenium`** (`lib/engine_selenium.py`) drives Chrome through
+Selenium alone, so a caption can say "driven by Selenium". Selenium Manager
+resolves Chrome for Testing at the pinned version and its ChromeDriver, as
+chapter 8 describes. The toolkit adds nothing to the window, so Chrome for
+Testing's "only for automated testing" bar stays: it is the point of the
+figure (`expect: {infobar: true}`). ChromeDriver passes `--test-type`, so
+`--no-sandbox`, which Chrome needs as root, adds no warning of its own.
+
+- **Steps:** `wait` (for `text` or `selector`), `scroll`, `pointer` (the real
+  pointer, for a tooltip), and `settle`.
+- **The record:** the take records Chrome's and ChromeDriver's versions, and
+  the HTTP status from the page's Navigation Timing, which WebDriver doesn't
+  report.
+- **Text:** Chrome's own bars aren't in the page, so the text measure counts
+  the page's text alone. The bar's text is about 14 pixels (a capital is 10
+  tall); a recipe that crops to the bar says so.
+
+**`engine: codegen`** (`lib/engine_codegen.py`) shows codegen's recorder
+and the Playwright Inspector. The `playwright codegen` command can't run
+here: it launches Playwright's own Chromium build, which the toolkit never
+installs. So the engine does what the command does, in Chrome for Testing:
+it launches the browser, turns on the same recorder (the driver's
+`enableRecorder`: Python, recording), and opens the page. Clicks are real
+(xdotool), so the recorder writes a line for each, as it would for a person.
+The first figure taught six things:
+
+- **The Inspector takes no switches.** Playwright opens it in a browser of
+  its own, which `--force-device-scale-factor` can't reach. The engine runs
+  in a child process whose display sets `GDK_SCALE`, which both windows
+  follow.
+- **The recorder writes its script when the browser closes.** `expect:
+  {code: [...]}` checks that file, and the take keeps it as `recorded`.
+- **Open the page after the recorder starts**, as the command does, or the
+  script lacks `page = context.new_page()`.
+- **The Inspector's text is out of every client's reach.** Its sizes come
+  from its own stylesheet (code at 14 pixels, the toolbar at 13), counted
+  with the script's characters.
+- **HTTPS-Upgrades.** Playwright turns off Chrome's upgrade of plain-http
+  links and redirects. quotes.toscrape.com redirects its author pages to
+  http, which the session's proxy doesn't carry. `https_upgrades: true` turns
+  the upgrade back on, as in regular Chrome, by replacing Playwright 1.63's
+  own `--disable-features` switch; a new Playwright version needs the list
+  in `lib/engine_codegen.py` checked. (Playwright's routes can't help: they
+  don't see a request a redirect makes.)
+- **Stack the windows.** `window` is the browser's window, and `inspector:
+  {window: [800, 595], at: below}` puts the Inspector under it (or `right`).
+  Side by side, two windows fill 1,600 pixels and their text shrinks to half
+  in the book; stacked at 800, it reaches 13.6 pixels. A crop can stop after
+  the code the text discusses.
+
+Its steps: `wait` (for `text`, `selector`, or `url`), `click` (a real click,
+by `role` and `name`, by `selector` and `text`, or by `text`; it waits until
+`pause[0]` seconds have passed since the last page load), `scroll` (not
+recorded, as a wheel isn't), `pointer` (the recorder highlights the element
+and shows its locator), and `settle`.
 
 ## Markers
 
@@ -791,7 +854,7 @@ Known cases, measured or computed from the images:
 - Week 08's `infinite_scroll.png`, dropped because it could not be read on its slide: DevTools text at 11 pixels, in a 555-pixel crop, on 35% of the slide's text width. That is 11.7 pixels on a 1920-pixel slide, under 16. The selftest checks this case.
 - Week 08's `xkcd_inspect.png` read well: the same text on half the text width comes to 16.7 pixels.
 - The week-06 handout's DevTools figure measures 6.7 points in print. Its card figure measures 5.2 points, which is readable at the edge; at 3 inches wide it would pass.
-- Before their retakes, every ch-07 and ch-08 figure showed 1100–1858 CSS pixels across, so the book's column showed its text at 42–71% of its size on screen; in the full-window DevTools captures (`network-tab-json`, `xkcd-inspect`), DevTools' text came to about 5 pixels. Retaken within the limit, chapter 7's five measure 11–13.4 pixels in the book (2026-09-25). Chapter 8's two tool windows wait for M4.
+- Before their retakes, every ch-07 and ch-08 figure showed 1100–1858 CSS pixels across, so the book's column showed its text at 42–71% of its size on screen; in the full-window DevTools captures (`network-tab-json`, `xkcd-inspect`), DevTools' text came to about 5 pixels. Retaken within the limit, chapter 7's five measure 11–13.4 pixels in the book (2026-09-25), and chapter 8's two tool windows, taken by the engines, 19.4 (the Selenium window's page) and 13.6 (the Inspector's code).
 
 ## Composites
 
@@ -863,8 +926,10 @@ things about slides:
   recipe says why in `legibility: {skip: …}`: the count and the date the
   frame discusses read at 19.
 
-The three `week08-*` figures remake week 8's JavaScript off/on pair,
-JavaScript off alone, and playwright.dev (2026-09-25). They add a fifth:
+The four `week08-*` figures remake week 8's JavaScript off/on pair,
+JavaScript off alone, playwright.dev, and the window Selenium opens
+(2026-09-25). The last crops to the bar's first sentence, 445 pixels, for a
+35% column. They add a fifth lesson:
 
 - **Or load the page narrow.** A live site reflows for a narrow window, so a
   page loaded 480 pixels wide fills a 35% column without a sideways crop.
@@ -908,7 +973,7 @@ It reports **warnings** for:
 - marks changed in the recipe since the annotated image was drawn (promote again);
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
 
-`selftest` runs 96 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 109 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - a stylesheet whose connection drops, which fails a take whose text is all there and is retried, beside one answered with a 404, which passes, and a recipe that accepts lost files, whose log names them; an aborted stylesheet counts, an aborted image or script doesn't;
@@ -923,7 +988,10 @@ It reports **warnings** for:
 - headed capture: Inspect through the element picker, the tree walked by keyboard, a request found and clicked in the Network panel, View Source cut at a line, and anchors in DevTools and on the page in one take;
 - the User-Agent and its Client Hints, and a first visit's reload, read back from what the local server receives;
 - every DevTools setting read back from what DevTools drew (the table under "Headed figures"), with DevTools' defaults as a control, and a setting DevTools won't honor reported at capture;
-- the infobar guard: no bar above the page, and a recipe that expects one fails without it.
+- the infobar guard: no bar above the page, and a recipe that expects one fails without it;
+- the engines' recipe rules (`mode: headed`, their own steps, window crops, `inspector` for codegen alone);
+- the Selenium engine: the window `webdriver.Chrome()` opens, with Chrome for Testing's bar and the versions recorded;
+- the codegen engine: a real click written as a line of the recorder's script, both windows grabbed, and the Inspector's code counted at its stylesheet's size.
 
 It skips the marker checks if TeX is missing and the headed checks if the virtual display is.
 
@@ -939,6 +1007,8 @@ It skips the marker checks if TeX is missing and the headed checks if the virtua
 | `lib/display.py` | the virtual display, real input, and screen grabs |
 | `lib/devtools.py` | DevTools settings, reading them back from what DevTools drew, and reading the DevTools page to find things on screen |
 | `lib/headed.py` | one headed attempt: window, DevTools, headed steps, and the crop |
+| `lib/engine_selenium.py` | one attempt at the window `webdriver.Chrome()` opens, driven by Selenium |
+| `lib/engine_codegen.py` | one attempt at codegen's recorder and Inspector, in a child process, with real clicks |
 | `lib/measure.py` | at capture: anchors' boxes and the text's sizes, in the take's pixels |
 | `lib/annotate.py`, `styles/shotmarkers.sty` | markers laid out from anchors, drawn with TikZ to PDF and PNG |
 | `lib/legibility.py` | text size at each target, against the thresholds |
