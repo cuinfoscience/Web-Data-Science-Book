@@ -11,9 +11,9 @@ Done so far:
 - **M1:** headless captures, guards, retries, provenance, and `check`.
 - **M2:** headed captures of browser UI (DevTools, View Source), with real input on a virtual display.
 - **M3:** numbered markers placed from what the browser measured, a legibility check at each size a figure is shown, side-by-side composites, and contact sheets.
-- **M4, begun:** engines for the two ch-08 figures whose subject is a tool itself: the window Selenium opens, and Playwright's recorder (see Engines); and evidence queries, the queries behind the numbers and claims in captions (see Evidence).
+- **M4, begun:** engines for the two ch-08 figures whose subject is a tool itself: the window Selenium opens, and Playwright's recorder (see Engines); evidence queries, the queries behind the numbers and claims in captions (see Evidence); and `sync`, which copies figures into the course repo with a record of each (see Sync to the course repo).
 
-Still to come, the rest of M4: copying figures into the course repo (`sync`, `import`), and CI.
+Still to come, the rest of M4: `import`, for hand captures, and CI.
 
 ## Quick start
 
@@ -26,6 +26,9 @@ tools/shots/run compare ch-07 wayback-calendar    # same picture as the approved
 tools/shots/run promote ch-07 wayback-calendar    # copy the take into images/ch-07/, record it
 tools/shots/run evidence ch-07                    # run the queries behind the captions' claims
 tools/shots/run check                             # before a PR
+tools/shots/run sync ch-07 about-this-capture --to slides/week-07/img --as about_capture.png
+                                                  # copy an approved figure into the course repo
+tools/shots/run synced                            # every course copy against its record and source
 ```
 
 - **`bootstrap.sh`** does five things, plus two optional ones:
@@ -894,8 +897,9 @@ will see.
 
 `recipes/course.yml` holds figures made for the course repo rather than a
 chapter. `capture`, `annotate`, and `sheet` work on them. `promote` refuses
-them, because their images live in the course repo (`sync`, in M4, will copy
-them there), and `check` only validates their recipes. The two figures there
+them, because their images live in the course repo, where `sync` copies their
+newest passing take (see Sync to the course repo), and `check` only validates
+their recipes. The two figures there
 rebuild the week-06 Oscars handout's annotated screenshots and are the
 regression test for markers. Every mark lands within 10 image pixels (5 CSS
 pixels) of where it was placed by hand. In the DevTools figure, markers, the
@@ -937,6 +941,48 @@ JavaScript off alone, playwright.dev, and the window Selenium opens
   playwright.dev folds its menu into a button and wraps its headline to four
   lines; its menu bar and hero read at 19.6 pixels. The same pages in 900-
   and 1,280-pixel windows had shown their text at about 7 to 11.
+
+## Sync to the course repo
+
+`sync` copies a figure into a folder of the course repository and records
+where the copy came from; `synced` checks every copy against its record.
+
+```bash
+tools/shots/run sync ch-08 playwright-codegen --to slides/week-08/img --as codegen.png
+tools/shots/run sync course week08-js-off --to slides/week-08/img --as js_off.png
+tools/shots/run sync ch-01 jupyter-cells --to handouts/week-01/img --annotated
+tools/shots/run synced
+```
+
+- **What it copies:** a chapter figure as approved in `images/`, with its
+  marked-up PNG and PDF when it has markers (`--annotated` copies the
+  marked-up PNG alone, for a Markdown handout); a course-only figure from its
+  newest passing take in `out/course/`, or the one `--take` names.
+- **A committed source:** a chapter figure must be committed as it is, so
+  the record can name the commit it came from. A course figure's take isn't
+  committed; its record names the textbook's commit and the take.
+- **The record:** `shots.json` beside the copy holds, per file, the figure,
+  the source file and its commit, both hashes, and the capture's page, date,
+  browser, User-Agent, and engine. `IMAGES.md` gets a table generated from
+  it, between `<!-- shots:begin -->` and `<!-- shots:end -->`, placed before
+  the stubs table; everything else in the file is for people, and
+  `make_stubs.py` keeps to its own markers.
+- **stubs.tsv:** when the file has a row, `sync` sets its size and redraws
+  the stubs table. The row stays: `stubs.tsv` lists every image a deck
+  includes, not only placeholders.
+- **What it says:** each copy is "new", "the same as the file already
+  there", or "replacing a different file", so a sync meant to refresh a
+  record can't silently change a slide.
+- **`synced`** reads every `shots.json` under the course repo's `slides/`
+  and `handouts/`. A copy changed by hand fails; a copy whose source changed
+  since, or whose take was cleaned from `out/`, is a warning.
+- **Where:** the course repository is `--course`, `$SHOTS_COURSE`, or
+  `INFO4617-Fall2026` beside this one.
+
+The first run (2026-09-25) recorded the 25 copies then in the course repo,
+all of them exact: weeks 3, 5, 7, and 8's slides and weeks 1 and 4's
+handouts. It reproduced each file byte for byte, which is the plan's test for
+this step.
 
 ## Provenance
 
@@ -1024,7 +1070,7 @@ It reports **warnings** for:
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility);
 - evidence never run to its end, or whose query or claim changed after it ran (see Evidence).
 
-`selftest` runs 119 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 127 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - a stylesheet whose connection drops, which fails a take whose text is all there and is retried, beside one answered with a 404, which passes, and a recipe that accepts lost files, whose log names them; an aborted stylesheet counts, an aborted image or script doesn't;
@@ -1043,7 +1089,8 @@ It reports **warnings** for:
 - the engines' recipe rules (`mode: headed`, their own steps, window crops, `inspector` for codegen alone);
 - the Selenium engine: the window `webdriver.Chrome()` opens, with Chrome for Testing's bar and the versions recorded;
 - the codegen engine: a real click written as a line of the recorder's script, both windows grabbed, and the Inspector's code counted at its stylesheet's size;
-- evidence, against a stand-in CDX server: a query paged to its end, its summaries and its listing in `IMAGES.md`, a page that returns exactly its limit and one whose resume key is left unfollowed failing, and `check` on evidence never run, a changed query, and a reworded claim.
+- evidence, against a stand-in CDX server: a query paged to its end, its summaries and its listing in `IMAGES.md`, a page that returns exactly its limit and one whose resume key is left unfollowed failing, and `check` on evidence never run, a changed query, and a reworded claim;
+- sync, into a stand-in course repo: an approved figure copied with its record, table, and stubs size, a person's notes kept; `synced` finding it, then a copy changed by hand; `--annotated` without markers and an uncommitted source refused.
 
 It skips the marker checks if TeX is missing and the headed checks if the virtual display is.
 
@@ -1071,6 +1118,7 @@ It skips the marker checks if TeX is missing and the headed checks if the virtua
 | `lib/compare.py` | take against approved image |
 | `lib/provenance.py` | `provenance.json` and the `IMAGES.md` table |
 | `lib/evidence.py` | the queries behind captions' claims: paging, the complete-or-fail rule, summaries, and staleness |
+| `lib/sync.py` | copies into the course repo: `shots.json`, the `IMAGES.md` table, `stubs.tsv` sizes, and `synced` |
 | `selftest.py` | the offline test |
 | `recipes/` | one YAML file per chapter, and `course.yml` for course-only figures |
 | `out/`, `.venv/` | takes, markers, contact sheets, and the virtual environment (git-ignored) |

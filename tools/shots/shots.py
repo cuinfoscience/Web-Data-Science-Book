@@ -10,6 +10,9 @@
     tools/shots/run promote ch-NN ID [--take PATH]
     tools/shots/run adopt ch-NN [--only ID ...]   record provenance for images made before tools/shots
     tools/shots/run evidence ch-NN [--only ID ...]   run the queries behind the captions' claims
+    tools/shots/run sync ch-NN ID --to slides/week-NN/img [--as FILE] [--annotated] [--take PATH]
+                                              copy a figure into the course repo, with its record
+    tools/shots/run synced                    every copy in the course repo against its record and source
     tools/shots/run check [ch-NN ...]         recipes, provenance, legibility, markers, figure blocks, evidence
     tools/shots/run status                    every figure's kind and age
     tools/shots/run clean [ch-NN]             delete old takes
@@ -412,8 +415,8 @@ def cmd_promote(args):
     recipe = load(args.chapter)
     fig = figure(recipe, args.id)
     if recipe["course"]:
-        print(f"{args.chapter} holds course-only figures, which go to the course repo, not images/ "
-              "(`sync`, milestone M4). Use the take and its markers from tools/shots/out/.")
+        print(f"{args.chapter} holds course-only figures, which go to the course repo, not images/: "
+              f"tools/shots/run sync {args.chapter} {args.id} --to slides/week-NN/img --as FILE.png")
         return 1
     take = _take(args)
     if not take:
@@ -645,6 +648,36 @@ def cmd_evidence(args):
     return 1 if bad else 0
 
 
+# ---------------------------------------------------------------- sync
+def cmd_sync(args):
+    from lib import sync as sy
+    recipe = load(args.chapter)
+    fig = figure(recipe, args.id)
+    try:
+        course = sy.course_repo(args.course)
+        for text in sy.sync(recipe, fig, course, args.to, args.name, args.take, args.annotated):
+            print(text)
+    except sy.SyncError as e:
+        line(BAD, str(e))
+        return 1
+    return 0
+
+
+def cmd_synced(args):
+    from lib import sync as sy
+    try:
+        course = sy.course_repo(args.course)
+    except sy.SyncError as e:
+        line(BAD, str(e))
+        return 1
+    found = sy.synced(course)
+    for level, text in found:
+        line({"good": GOOD, "warn": WARN, "bad": BAD}[level], text)
+    if not found:
+        print(f"no copies recorded in {course} (`sync` records them in each img/ folder's shots.json)")
+    return 1 if any(level == "bad" for level, _ in found) else 0
+
+
 # ---------------------------------------------------------------- clean / selftest
 def cmd_clean(args):
     removed = 0
@@ -689,6 +722,11 @@ def main():
     p.add_argument("--force", action="store_true"); p.set_defaults(fn=cmd_adopt)
     p = sub.add_parser("evidence"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
     p.set_defaults(fn=cmd_evidence)
+    p = sub.add_parser("sync"); p.add_argument("chapter"); p.add_argument("id")
+    p.add_argument("--to", required=True); p.add_argument("--as", dest="name"); p.add_argument("--course")
+    p.add_argument("--take"); p.add_argument("--annotated", action="store_true")
+    p.set_defaults(fn=cmd_sync)
+    p = sub.add_parser("synced"); p.add_argument("--course"); p.set_defaults(fn=cmd_synced)
     p = sub.add_parser("check"); p.add_argument("chapters", nargs="*"); p.set_defaults(fn=cmd_check)
     p = sub.add_parser("clean"); p.add_argument("chapters", nargs="*"); p.set_defaults(fn=cmd_clean)
     p = sub.add_parser("selftest"); p.set_defaults(fn=cmd_selftest)
