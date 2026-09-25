@@ -218,6 +218,7 @@ A draft pull request is fine when you want early feedback.
 | **Render** | a `.qmd` file, `_quarto.yml`, or `references.bib` | The book didn't build, or it printed a warning. Click **Details** and find the first `ERROR` or `WARN` line. A broken cross-reference (`@sec-…`) or citation key (`@key`) is a common cause. |
 | **Notebook sync** | a `.qmd` file or a notebook | A notebook doesn't match its chapter. Run `python tools/make_notebooks.py` and commit `notebooks/`. If you edited in the browser, say so in the description. |
 | **Trope lint** | a `.qmd` file | It never fails. It lists phrases to reconsider. |
+| **Screenshot check** | a file in `images/` or `tools/shots/` | An image doesn't match its record: it was replaced by hand, or its `IMAGES.md` table is out of date. Undo the change to `images/`, and report the figure instead (see [Figures and screenshots](#figures-and-screenshots)). |
 
 A first pull request from a fork can wait until a maintainer approves its
 checks. After that, a red check is almost always about your edit. Fix it on the
@@ -253,8 +254,9 @@ same branch, and the checks run again.
 ## Figures and screenshots
 
 Every image in `images/` comes from a recipe in `tools/shots/recipes/`. The
-toolkit records where each image came from, and its `check` command flags an
-image that someone replaced by hand. So:
+toolkit records where each image came from, and its `check` command, which runs
+on every pull request that changes an image, flags an image that someone
+replaced by hand. So:
 
 - **A screenshot is out of date?** File *Something is wrong*, and attach a
   screenshot of what you see now.
