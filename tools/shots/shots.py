@@ -14,6 +14,7 @@
                                               copy a figure into the course repo, with its record
     tools/shots/run synced                    every copy in the course repo against its record and source
     tools/shots/run check [ch-NN ...]         recipes, provenance, legibility, markers, figure blocks, evidence
+                                              (no chapter: all of them and course.yml, as CI runs it)
     tools/shots/run status                    every figure's kind and age
     tools/shots/run clean [ch-NN]             delete old takes
     tools/shots/run selftest                  offline test of the guards, promote, and markers
@@ -38,7 +39,7 @@ from lib import provenance as prov                                      # noqa: 
 from lib import robots                                                  # noqa: E402
 from lib.capture import Pacer, PolicyBlock, capture, sha256, takes      # noqa: E402
 from lib.compare import compare                                         # noqa: E402
-from lib.env import IMAGES, OUT, ROOT, TOOL, chrome_path, chrome_version, proxy, rel  # noqa: E402
+from lib.env import IMAGES, OUT, RECIPES, ROOT, TOOL, chrome_path, chrome_version, proxy, rel  # noqa: E402
 from lib import guards                                                  # noqa: E402
 from lib.recipes import DEFAULTS, RecipeError, chapters, figure, load, loads   # noqa: E402
 
@@ -544,7 +545,9 @@ def cmd_check(args):
         warnings += 1
         line(WARN, text)
 
-    for chapter in args.chapters or chapters():
+    # With no chapter named: every chapter, and the course's recipes, as CI runs it.
+    everything = chapters() + (["course"] if (RECIPES / "course.yml").exists() else [])
+    for chapter in args.chapters or everything:
         print(chapter)
         try:
             recipe = load(chapter)
