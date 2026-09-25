@@ -392,12 +392,13 @@ figures:
   # screenshots of 2026-09-22/23 were taken in 900- and 1,280-pixel windows, one
   # image pixel per CSS pixel, for frames that show them at 35% or 78% of the
   # slide's text width: their text came to 7 to 11 pixels on a 1,920-pixel slide.
-  # The recipes below take the same pages at 480 pixels, where it reaches 18 to 20.
-  # Three others wait: pr_review.png, for a session that can read github.com's
-  # robots.txt (a cloud session reaches github.com only for its own repositories),
-  # and selenium_browser.png and codegen.png, whose subject is the tool itself
-  # (M4). quotes.toscrape.com is a sandbox built for scraping practice and has no
-  # robots.txt.
+  # The first three recipes below take the same pages at 480 pixels, where it
+  # reaches 18 to 20. `week08-selenium-browser` crops the window Selenium opens
+  # (`engine: selenium`); codegen.png is a copy of chapter 8's figure 8.6, whose
+  # recipe names the slide. pr_review.png waits for a session that can read
+  # github.com's robots.txt (a cloud session reaches github.com only for its own
+  # repositories). quotes.toscrape.com is a sandbox built for scraping practice
+  # and has no robots.txt.
   - id: week08-requests-vs-browser
     kind: capture
     section: "week-08 slides, Zero bytes (requests_vs_browser.png)"
@@ -448,3 +449,24 @@ figures:
     crop: {top: 0, height: 528, left: 0, width: 480}      # the menu bar and the hero, to its foot
     targets: {slides: {width: 0.35}}
     drifts: true        # the site's own wording and look
+
+  - id: week08-selenium-browser
+    kind: capture
+    section: "week-08 slides, Selenium: a browser you drive with code (selenium_browser.png)"
+    brief: >-
+      Show the top left of the window webdriver.Chrome() opens: its tab, the
+      address bar, and Chrome for Testing's bar through "is only for automated
+      testing.", above the top of xkcd. Narrow, for a column 35% of the slide wide.
+    url: https://xkcd.com/
+    mode: headed
+    engine: selenium    # webdriver.Chrome(), as chapter 8 runs it (lib/engine_selenium.py)
+    window: [800, 600]
+    steps:
+      - wait: {selector: '#comic img'}
+    expect: {infobar: true, text: ['A webcomic of romance']}
+    # The window's left 445 pixels end just after the bar's first sentence, and its top 288 under
+    # xkcd's TW•FB•IG. Chrome's bars aren't in the page, so the take doesn't measure them: their
+    # text, about 14 pixels (a capital is 10 tall), comes to about 18.5 on the slide.
+    crop: {top: 0, left: 0, width: 445, height: 288}
+    targets: {slides: {width: 0.35}}
+    drifts: true        # xkcd's current comic and the browser version

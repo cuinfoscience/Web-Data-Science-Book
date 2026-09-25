@@ -14,14 +14,20 @@ HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "ty
 STEPS = PAGE_STEPS | HEADED_STEPS
 CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad",
          "devtools"}
-EXPECTS = {"status", "text", "selector", "block", "infobar", "error", "all_files"}
+EXPECTS = {"status", "text", "selector", "block", "infobar", "error", "all_files", "code"}
 DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout", "overview", "columns", "first_visit"}
 DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
 FIGURE_KEYS = {"id", "file", "kind", "section", "brief", "url", "mode", "engine", "steps", "expect", "crop",
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
                "user_agent", "pause", "settle", "timeout", "retries",
-               "annotate", "targets", "legibility", "parts", "layout", "oversize", "api_client", "open_shadow"}
+               "annotate", "targets", "legibility", "parts", "layout", "oversize", "api_client", "open_shadow",
+               "inspector", "https_upgrades"}
 ENGINES = {"playwright", "selenium", "codegen"}
+# The selenium engine (lib/engine_selenium.py) drives its window through Selenium alone.
+SELENIUM_STEPS = {"wait", "scroll", "pointer", "settle"}
+# The codegen engine (lib/engine_codegen.py) clicks for real, so the recorder writes each click.
+CODEGEN_STEPS = {"wait", "click", "scroll", "pointer", "settle"}
+WINDOW_CROP = {"window", "top", "left", "width", "height"}
 # Annotation (lib/annotate.py): marks placed from what the browser measured.
 ANNOTATE = {"width_in", "size", "border", "marks"}
 MARK_KEYS = {"n", "at", "shape", "side", "gap", "x", "y", "lead", "column", "label"}
@@ -91,6 +97,27 @@ def _problems(chapter, raw):
             out.append(f"{where}: `mode` must be one of {sorted(MODES)}")
         if f.get("engine", "playwright") not in ENGINES:
             out.append(f"{where}: `engine` must be one of {sorted(ENGINES)}")
+        if f.get("engine") in ("selenium", "codegen"):
+            if f.get("mode") != "headed":
+                out.append(f"{where}: `engine: {f['engine']}` opens a real window, so it needs `mode: headed`")
+            if f.get("devtools"):
+                out.append(f"{where}: `engine: {f['engine']}` shows the tool's own window, without DevTools")
+            for key in set(f.get("crop") or {}) - WINDOW_CROP:
+                out.append(f"{where}: `engine: {f['engine']}` crops the window by `top`, `left`, `width`, and "
+                           f"`height`, not `{key}`")
+        allowed = {"selenium": SELENIUM_STEPS, "codegen": CODEGEN_STEPS}.get(f.get("engine"))
+        for step in (f.get("steps") or []) if allowed else []:
+            name = next(iter(step), None) if isinstance(step, dict) else step
+            if name not in allowed:
+                out.append(f"{where}: the {f['engine']} engine has no `{name}` step "
+                           f"(it runs {', '.join(sorted(allowed))})")
+        if ("inspector" in f or f.get("https_upgrades") or (f.get("expect") or {}).get("code")) \
+                and f.get("engine") != "codegen":
+            out.append(f"{where}: `inspector`, `https_upgrades`, and `expect: {{code: ...}}` are for `engine: codegen`")
+        spec = f.get("inspector")
+        if spec is not None and not (isinstance(spec, dict) and set(spec) <= {"window", "at"}
+                                     and spec.get("at", "below") in ("below", "right")):
+            out.append(f"{where}: `inspector` is {{window: [width, height], at: below or right}}")
         out += [f"{where}: {p}" for p in _step_problems(f.get("steps"), f.get("mode") == "headed")]
         for key in set(f.get("devtools") or {}) - DEVTOOLS:
             out.append(f"{where}: unknown devtools key `{key}`")

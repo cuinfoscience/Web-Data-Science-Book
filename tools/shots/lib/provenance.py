@@ -14,7 +14,7 @@ BEGIN = ("<!-- shots:begin: generated from provenance.json by tools/shots;"
 END = "<!-- shots:end -->"
 KEEP = ("file", "kind", "url", "final_url", "status", "first_status", "error", "dns", "captured", "by",
         "method", "browser", "user_agent", "window", "scale", "javascript", "crop", "clip", "size",
-        "recipe_sha256", "image_sha256", "note", "text", "parts", "dropped", "open_shadow")
+        "recipe_sha256", "image_sha256", "note", "text", "parts", "dropped", "open_shadow", "engine")
 
 
 def annotated_name(file):
@@ -62,8 +62,21 @@ def _how(entry):
         width, height = entry.get("window", ["?", "?"])
         browser = entry.get("browser", "").split(" (")[0]
         opened = ", closed shadow roots opened" if entry.get("open_shadow") else ""
-        return f"tools/shots: {browser}, {width}×{height} at {entry.get('scale')}×{opened}"
+        return f"tools/shots: {browser}, {width}×{height} at {entry.get('scale')}×{opened}{_engine(entry)}"
     return f"{entry.get('by')}: {entry.get('method', '')}"
+
+
+def _engine(entry):
+    """The tool that drove the window, when the tool is the figure's subject."""
+    engine = entry.get("engine") or {}
+    if engine.get("name") == "selenium":
+        return f", webdriver.Chrome() under Selenium {engine.get('selenium')} (ChromeDriver {engine.get('chromedriver')})"
+    if engine.get("name") == "codegen":
+        inspector = engine.get("inspector") or {}
+        width, height = inspector.get("window") or ["?", "?"]
+        return (f", playwright codegen's recorder (Playwright {engine.get('playwright')}), "
+                f"its Inspector {width}×{height} {inspector.get('at', 'below')}")
+    return ""
 
 
 def _source(entry):

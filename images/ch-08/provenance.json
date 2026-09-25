@@ -102,32 +102,112 @@
       ]
     },
     "playwright-codegen": {
-      "by": "hand-run script, before tools/shots",
-      "captured": "2026-09-22",
+      "browser": "Google Chrome for Testing 154.0.8037.57 (headed on Xvfb, Playwright 1.63.0's recorder)",
+      "by": "tools/shots",
+      "captured": "2026-09-25T04:39:20+00:00",
+      "clip": {
+        "height": 534.0,
+        "width": 800.0,
+        "x": 0.0,
+        "y": 0.0
+      },
+      "crop": {
+        "height": 534,
+        "left": 0,
+        "top": 0,
+        "width": 800
+      },
+      "engine": {
+        "inspector": {
+          "at": "below",
+          "window": [
+            800,
+            595
+          ]
+        },
+        "language": "python",
+        "name": "codegen",
+        "playwright": "1.63.0"
+      },
       "file": "playwright-codegen.png",
-      "image_sha256": "43f07aa404f86fe6ee8391f3e02974b8acf919f9cbbaed5e187f02aaa9d43431",
+      "final_url": "https://quotes.toscrape.com/author/Albert-Einstein/",
+      "image_sha256": "34fb550b01d5a126042994839a11eef354cd39da48873d1c0ca0f38e9ce5f4e3",
+      "javascript": true,
       "kind": "capture",
-      "method": "playwright codegen --target python (Playwright 1.63, its bundled Chrome for Testing 153), headed on Xvfb, grabbed with ImageMagick import",
-      "note": "After two recorded clicks (the tag \"change\", then an \"(about)\" link), hovering the author's name shows the locator codegen would use.",
+      "recipe_sha256": "f78b822200ebb48147d08ce1a593a593cfcc7f078496b3bddfe41137527b11e3",
+      "scale": 2,
       "size": [
-        1630,
-        860
+        1600,
+        1068
       ],
-      "url": "https://quotes.toscrape.com/"
+      "status": 200,
+      "text": {
+        "chars": 519,
+        "median": 28.0,
+        "min": 26.0,
+        "p20": 28.0,
+        "sizes": {
+          "26": 20,
+          "28": 455,
+          "32": 30,
+          "56": 14
+        }
+      },
+      "url": "https://quotes.toscrape.com/",
+      "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
+      "window": [
+        800,
+        230
+      ]
     },
     "selenium-chrome-for-testing": {
-      "by": "hand-run script, before tools/shots",
-      "captured": "2026-09-22",
+      "browser": "Google Chrome for Testing 154.0.8037.57 (headed on Xvfb, driven by Selenium 4.49.0)",
+      "by": "tools/shots",
+      "captured": "2026-09-25T04:38:56+00:00",
+      "clip": {
+        "height": 600.0,
+        "width": 800.0,
+        "x": 0.0,
+        "y": 0.0
+      },
+      "crop": {
+        "window": true
+      },
+      "engine": {
+        "browser": "154.0.8037.57",
+        "chromedriver": "154.0.8037.57",
+        "name": "selenium",
+        "selenium": "4.49.0"
+      },
       "file": "selenium-chrome-for-testing.png",
-      "image_sha256": "7e8cdc35d07ef8c1c0cd6b42b276bce8ec5df0c6fdfc383d831c5014a92409cd",
+      "final_url": "https://xkcd.com/",
+      "image_sha256": "0cfd2c70f2a21053414ac825acc7c3cba11f35e72d16e3394866c7dc3f39027c",
+      "javascript": true,
       "kind": "capture",
-      "method": "webdriver.Chrome() with Selenium 4.49 on a machine with no Chrome; Selenium Manager downloaded Chrome for Testing 154; headed on Xvfb, grabbed with ImageMagick import",
-      "note": "The comic was Stargazing 5; its hover text shows because the pointer rested on it.",
+      "recipe_sha256": "905115cbab1e19b114b1102ee42d66873a9bfc32fea0bae7bb3284aa880ba7d8",
+      "scale": 2,
       "size": [
-        1280,
-        860
+        1600,
+        1200
       ],
-      "url": "https://xkcd.com/"
+      "status": 200,
+      "text": {
+        "chars": 143,
+        "median": 42.0,
+        "min": 32.0,
+        "p20": 40.0,
+        "sizes": {
+          "32": 25,
+          "40": 44,
+          "42": 74
+        }
+      },
+      "url": "https://xkcd.com/",
+      "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
+      "window": [
+        800,
+        600
+      ]
     },
     "view-source-js": {
       "browser": "Google Chrome for Testing 154.0.8037.57 (headed on Xvfb, Playwright 1.63.0)",

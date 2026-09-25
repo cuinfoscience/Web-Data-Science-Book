@@ -81,6 +81,11 @@ PAGES["/picture-502.png"] = (502, "Bad Gateway")
 PAGES["/closed-shadow"] = (200, "<title>Closed</title><h1>Outside the root</h1><div id='host'></div>"
                                 "<script>document.getElementById('host').attachShadow({mode: 'closed'})"
                                 ".innerHTML = '<p style=\"font-size:20px\">Inside a closed root</p>';</script>")
+# Two pages a link joins, for codegen's recorder: a real click on the link becomes a line of Python.
+PAGES["/links"] = (200, "<title>Links</title><h1>The first page</h1>"
+                        "<p style='font-size:20px'><a href='/second'>Go to the second page</a></p>")
+PAGES["/second"] = (200, "<title>Second</title><h1 style='margin-top:40px'>The second page</h1>"
+                         "<p>" + "Something to look at. " * 20 + "</p>")
 # Public DNS over HTTPS, as dns.google answers it: no address for the dead host, one for the refused host.
 DNS = {"dead-host.test": {"Status": 3},
        "refused-host.test": {"Status": 0, "Answer": [{"name": "refused-host.test.", "type": 1, "data": "192.0.2.1"}]}}
@@ -328,6 +333,26 @@ figures:
   - {{id: tunnel-refused, kind: capture, url: "https://refused-host.test/",
       expect: {{error: 'ERR_TUNNEL_CONNECTION_FAILED'}}}}
   - {{id: tunnel-unexpected, kind: capture, url: "https://other-host.test/"}}
+  - id: selenium-window
+    kind: capture
+    url: "{base}/tree"
+    mode: headed
+    engine: selenium
+    window: [700, 500]
+    steps: [{{wait: {{selector: '#target'}}}}]
+    expect: {{infobar: true, text: ['Inspect me']}}
+  - id: codegen-recorded
+    kind: capture
+    url: "{base}/links"
+    mode: headed
+    engine: codegen
+    window: [700, 300]
+    inspector: {{window: [700, 450], at: below}}
+    steps:
+      - click: {{role: link, name: 'Go to the second page'}}
+      - wait: {{url: '**/second'}}
+      - pointer: {{selector: 'h1', at: [0.1, 0.5]}}
+    expect: {{text: ['The second page'], code: ['get_by_role("link", name="Go to the second page").click()']}}
   - id: headed-marks
     kind: capture
     url: "{base}/tree"
@@ -436,6 +461,20 @@ figures:
                              ("page", "https://api.example.org/about", False)])
     expect("a disallowed API response marked api_client is a note; a disallowed page is still a warning",
            [level for level, _, _ in found] == ["note", "warn"] and "API client" in found[0][1], str(found))
+
+    print("engines (recipe rules)")
+    from lib import recipes as recipe_rules
+    bad = recipe_rules._problems("ch-98", {"chapter": "ch-98", "figures": [
+        {"id": "a", "kind": "capture", "url": "https://example.org/", "engine": "selenium",
+         "steps": [{"inspect": {"selector": "img"}}]},
+        {"id": "b", "kind": "capture", "url": "https://example.org/", "mode": "headed", "engine": "codegen",
+         "crop": {"devtools": True}},
+        {"id": "c", "kind": "capture", "url": "https://example.org/", "inspector": {"window": [800, 400]}}]})
+    expect("an engine needs a real window: `mode: headed`", any("(a)" in b and "mode: headed" in b for b in bad), bad)
+    expect("...and runs only its own steps (the selenium engine has no `inspect`)",
+           any("(a)" in b and "no `inspect` step" in b for b in bad), bad)
+    expect("...and crops the window by its edges alone", any("(b)" in b and "not `devtools`" in b for b in bad), bad)
+    expect("`inspector` belongs to the codegen engine", any("(c)" in b and "engine: codegen" in b for b in bad), bad)
 
     print("promote")
     code, out = shots("capture", "ch-99", "--only", "flaky")
@@ -714,6 +753,29 @@ figures:
         expect("the infobar guard reads the browser's bars: a recipe expecting an infobar fails without one",
                wants.get("ok") is False and "expects an infobar" in " ".join(wants.get("problems", [])),
                str(wants.get("problems")))
+
+        print("  engines: the tool is the figure's subject")
+        code, out = shots("capture", "ch-99", "--only", "selenium-window", "codegen-recorded")
+        take = newest("selenium-window")
+        engine = take.get("engine") or {}
+        expect("selenium: webdriver.Chrome() opens Chrome for Testing, which Selenium drives to the page",
+               take.get("ok") is True and engine.get("name") == "selenium" and engine.get("chromedriver"),
+               str(take.get("problems")) + str(engine) + out[-300:])
+        expect("...its window keeps Chrome for Testing's own notice (the engine adds no --disable-infobars)",
+               (take.get("bars") or 0) > BARS + BARS_SLACK, str(take.get("bars")))
+        expect("...the whole window is grabbed at its size, and the page's text measured",
+               take.get("size") == [700, 500] and (take.get("text") or {}).get("chars", 0) > 0,
+               str(take.get("size")) + str(take.get("text")))
+        take = newest("codegen-recorded")
+        recorded = take.get("recorded") or ""
+        expect("codegen: a real click on a link becomes a line in the script the recorder writes",
+               take.get("ok") is True and 'get_by_role("link", name="Go to the second page").click()' in recorded
+               and f'page.goto("{base}/links")' in recorded, str(take.get("problems")) + recorded[-300:] + out[-300:])
+        expect("...both windows are grabbed, the Inspector below the browser",
+               take.get("size") == [700, 750], str(take.get("size")))
+        sizes = (take.get("text") or {}).get("sizes") or {}
+        expect("...and the Inspector's code counts at the size its stylesheet sets (14 pixels)",
+               "14" in sizes, str(take.get("text")))
     else:
         print("  skip  headed tests: Xvfb, xdotool, or ImageMagick missing (bash tools/shots/bootstrap.sh --headed)")
 
