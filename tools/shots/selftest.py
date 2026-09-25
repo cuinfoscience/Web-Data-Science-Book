@@ -26,7 +26,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from lib import devtools as dt                   # noqa: E402  (to read a take's DevTools state)
 from lib.headed import BARS, BARS_SLACK          # noqa: E402
-from lib import robots                            # noqa: E402
+from lib import guards, robots                    # noqa: E402
 
 PAGES = {
     "/ok": (200, "<title>Selftest</title><h1>Hello from the selftest</h1>"
@@ -68,6 +68,12 @@ PAGES["/plain"] = (200, "<!DOCTYPE html><title>Plain</title><body style='margin:
 PAGES["/checked"] = (200, "<title>Checked</title><h1>Checked and reloaded</h1>"
                           + "<p>" + "Something to look at. " * 40 + "</p>")
 CHECK = (202, "<title></title><script>document.cookie = 'checked=1; path=/'; location.reload();</script>")
+# A page whose stylesheet the connection drops (as web.archive.org's did on 2026-09-25), and
+# one whose stylesheet the server answers with a 404 (an archive that never saved it).
+PAGES["/styled"] = (200, "<title>Styled</title><link rel='stylesheet' href='/drop.css'>"
+                         "<h1>A styled page</h1><p>" + "Something to look at. " * 40 + "</p>")
+PAGES["/styled-404"] = (200, "<title>Styled</title><link rel='stylesheet' href='/missing.css'>"
+                             "<h1>A styled page</h1><p>" + "Something to look at. " * 40 + "</p>")
 # Public DNS over HTTPS, as dns.google answers it: no address for the dead host, one for the refused host.
 DNS = {"dead-host.test": {"Status": 3},
        "refused-host.test": {"Status": 0, "Answer": [{"name": "refused-host.test.", "type": 1, "data": "192.0.2.1"}]}}
@@ -94,6 +100,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         SEEN.setdefault(self.path, []).append({k.lower(): v for k, v in self.headers.items()})
         path, _, query = self.path.partition("?")
         kind = "text/html; charset=utf-8"
+        if path == "/drop.css":        # no response at all: Chrome reports ERR_EMPTY_RESPONSE
+            self.close_connection = True
+            return
         if path == "/resolve":
             args = urllib.parse.parse_qs(query)
             answer = DNS.get(args["name"][0], {"Status": 3})
@@ -159,6 +168,9 @@ figures:
   - {{id: missing-text, kind: capture, url: "{base}/ok", expect: {{text: ["Not on the page"]}}}}
   - {{id: flaky, kind: capture, url: "{base}/flaky", retries: 0}}
   - {{id: ua, kind: capture, url: "{base}/ua"}}
+  - {{id: dropped-style, kind: capture, url: "{base}/styled", expect: {{text: ['A styled page']}}}}
+  - {{id: missing-style, kind: capture, url: "{base}/styled-404", expect: {{text: ['A styled page']}}}}
+  - {{id: dropped-allowed, kind: capture, url: "{base}/styled", expect: {{text: ['A styled page'], all_files: false}}}}
   - id: headed-inspect
     kind: capture
     url: "{base}/tree"
@@ -361,6 +373,21 @@ figures:
     expect("requests carry the one User-Agent, and Client Hints that name this machine's system",
            sent.get("user-agent") == "Web Data Science/v1 brian.keegan@colorado.edu"
            and sent.get("sec-ch-ua-platform") == PLATFORM, str(sent))
+    code, out = shots("capture", "ch-99", "--only", "dropped-style", "missing-style", "dropped-allowed")
+    ds = newest("dropped-style")
+    expect("a stylesheet whose connection dropped fails the take, though the text is all there",
+           ds.get("ok") is False and "didn't load" in " ".join(ds.get("problems", [])), str(ds.get("problems")))
+    expect("...and is retried", len(ds.get("attempts", [])) == 2, str(ds.get("attempts")))
+    expect("a stylesheet the server answers with a 404 is the page as it is",
+           newest("missing-style").get("ok") is True, str(newest("missing-style").get("problems")))
+    da = newest("dropped-allowed")
+    expect("a recipe that accepts lost files passes, and its log names them",
+           da.get("ok") is True and "didn't load" in " ".join(da.get("dropped", [])), str(da.get("problems")))
+    lost = guards.dropped([("stylesheet", "https://web.archive.org/x.css", "net::ERR_ABORTED")])
+    expect("an aborted stylesheet is a lost one, worth another try", lost[0] and lost[1] is True, str(lost))
+    kept = guards.dropped([("image", "https://example.org/a.png", "net::ERR_ABORTED"),
+                           ("script", "https://example.org/a.js", "net::ERR_ABORTED")])
+    expect("...but an aborted image or script is the page cancelling it", kept == ([], False), str(kept))
 
     print("robots.txt")
     rules = ("User-agent: *\nDisallow: /private/\n\n"

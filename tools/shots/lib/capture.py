@@ -123,6 +123,14 @@ def _headless(browser, fig, png):
     loaded = []
     page.on("response", lambda r: loaded.append(r.status)
             if r.request.is_navigation_request() and r.frame == page.main_frame else None)
+    # The page's own files that failed before any response came back (guards.dropped).
+    # Chrome also fails a file it refused after an answer, such as a stylesheet that got a
+    # 404, which is the page as it is; so a request that was answered doesn't count.
+    host, failed, answered = urlparse(fig["url"]).hostname, [], set()
+    page.on("response", lambda r: answered.add(r.request))
+    page.on("requestfailed", lambda r: failed.append((r.resource_type, r.url, r.failure))
+            if r.resource_type in guards.DRAWN and urlparse(r.url).hostname == host
+            and r not in answered else None)
     try:
         try:
             response = page.goto(fig["url"], wait_until="domcontentloaded", timeout=fig["timeout"] * 1000)
@@ -152,7 +160,14 @@ def _headless(browser, fig, png):
             result["status"] = status
         text = page.evaluate("() => document.body ? document.body.innerText : ''")
         issues, result["temporary"] = guards.page_problems(status, page.title(), text, expect)
-        problems += issues + _expected(page, fig)
+        lost, lost_temporary = guards.dropped(failed)
+        if expect.get("all_files", True) is False:
+            # The recipe accepts a page that loses a few files (judged by eye on the
+            # contact sheet); the take's log still names them.
+            result["dropped"], lost = lost, []
+        # A dropped file is worth another try, unless the page itself is wrong.
+        result["temporary"] = result["temporary"] or (bool(lost) and lost_temporary and not issues)
+        problems += issues + lost + _expected(page, fig)
         result["final_url"] = page.url
         try:
             rect, full = crop.clip(page, fig)
@@ -162,7 +177,12 @@ def _headless(browser, fig, png):
         if rect or full:
             result["anchors"], result["text"], missed = _measure_headless(page, fig, rect, full)
             problems += missed
-        page.screenshot(path=str(png), clip=rect, full_page=full, animations="disabled")
+        try:
+            page.screenshot(path=str(png), clip=rect, full_page=full, animations="disabled")
+        except Exception as e:
+            # A crop outside the window, for one: a failed take to retry, not a crash of the run.
+            problems.append(f"the screenshot failed: {str(e).splitlines()[0]}")
+            result["temporary"] = True
         result["clip"] = rect
         return result
     finally:
@@ -240,6 +260,8 @@ def capture(browser, fig, pacer, say=print):
                                        ("dns", attempt.get("dns"))) if v})
         # Headed takes: the browser's bars above the page, and what DevTools drew (read back).
         take.update({k: result[k] for k in ("bars", "devtools_seen") if result.get(k) is not None})
+        if result.get("dropped"):
+            take["dropped"] = result["dropped"]      # files lost on a page whose recipe accepts that
         _write(take, png)
         if problems and result["temporary"] and n < fig["retries"]:
             say(f"    attempt {n + 1}: {'; '.join(problems)}; will retry")
@@ -293,7 +315,7 @@ def _composite(browser, fig, pacer, say):
     take = _log(fig, png, problems, parts[0]["status"], parts[0]["final_url"], parts[0]["browser"], None,
                 [a for p in parts for a in p["attempts"]])
     take["parts"] = [{k: p.get(k) for k in ("label", "image", "image_sha256", "url", "javascript", "status",
-                                            "first_status", "error", "dns") if k in p}
+                                            "first_status", "error", "dns", "dropped") if k in p}
                      for p in parts]
     sizes = measure.merge(*[{float(s): c for s, c in ((p.get("text") or {}).get("sizes") or {}).items()}
                             for p in parts])

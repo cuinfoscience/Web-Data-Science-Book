@@ -352,11 +352,38 @@ something the next agent would otherwise find out again, add a note here.
   covers the bottom quarter of the window until `click: {selector:
   '#tocHideBtnStandalone'}` closes it. Its paragraph ids start with a digit,
   so select them as `[id="040.004"]`; `#040.004` is not valid CSS.
-- **Some candidates need another day.** web.archive.org was still resetting
-  connections at 21:45 UTC on 2026-09-24, so CrowdTangle's last capture (3-2)
-  and Reddit's 2023 pricing post (3-3) wait. reddit.com's robots.txt now
-  disallows every path, which leaves 3-3 to the archive's copy.
-  `images/ch-03/IMAGES.md` keeps both draft recipes.
+- **reddit.com is only in the archive.** Its robots.txt disallows every path,
+  so Reddit's 2023 pricing post (3-3) is the Wayback Machine's copy. See
+  "Archived pages".
+
+### Archived pages (chapters 3 and 7)
+
+- **Check the claim in the archive before choosing the figure.** Chapter 3
+  says Reddit announced $0.24 per 1,000 API calls. The archived JSON of the
+  thread (`…/comments/145bram/_/jnk45rr.json`, 10 June 2023) holds u/spez's
+  post: "the rate for apps that require higher usage limits is $0.24 per 1K
+  API calls". That settled which page to show.
+- **New Reddit's archived pages are shells.** The post arrives by a later
+  request that the archive often lacks. old.reddit.com draws the post on the
+  server, so its captures show it; the first came a minute after the post.
+- **The availability API's "closest" is the last capture of the page
+  itself.** CrowdTangle's address was captured until December 2024, but every
+  capture after 14 August 2024 is a 301 redirect. The CDX API
+  (`/cdx/search/cdx?url=…&fl=timestamp,statuscode`) shows which is which.
+- **The toolbar covers a page's own pinned header.** The Wayback toolbar is
+  pinned to the top of the window, and so is CrowdTangle's banner (Bootstrap's
+  `navbar-fixed-top`), which announced the shutdown. The `if_` view
+  (`/web/20240814023608if_/…`) replays the page without the toolbar. 3-2
+  stacks the two views, and the labels say which is which.
+- **A page can come back half drawn.** On 2026-09-25 the archive aborted some
+  of a page's stylesheets, a different few on each load. Every text check
+  passed, and the page showed without its styles. `capture` now fails a take
+  when one of the page's own files fails before any answer, and retries it
+  (see "How a capture works"). Reddit's archived pages lose their stylesheets
+  for tooltips and crosspost previews on nearly every load, while the post
+  looks right; that recipe accepts the loss (`expect: {all_files: false}`).
+- **Scroll before a crop far down the page.** A `between` crop is cut from
+  the window, so an element 1,100 pixels down needs a `scroll` step first.
 
 ### Chrome's JSON viewer (chapters 3 and 4)
 
@@ -387,7 +414,10 @@ something the next agent would otherwise find out again, add a note here.
   archive.org answered, and the proxy's status page (`curl -sS
   "$HTTPS_PROXY/__agentproxy/status"`) listed the relay failures. Work on
   another chapter and retry later. A 403, or a proxy refusal, is a policy:
-  report it, and don't route around it.
+  report it, and don't route around it. On 2026-09-25 it answered again, but
+  not every time. The relay's log showed tunnels opened and closed 11 seconds
+  later with no answer, and the CDX API answered one query with a 504. The
+  30-, 60-, and 120-second retries got through.
 - **A 429 on the first request is the session's address, not your pace.**
   On 2026-09-24, Wikimedia's REST API answered the chapter 1 pageviews URL
   with 429 ("You are making too many requests") before any other request had
@@ -395,7 +425,7 @@ something the next agent would otherwise find out again, add a note here.
   on them. Don't retry in a loop. Try once much later, or have the figure
   captured from another network. It answered 429 again that evening, through
   `capture`'s three retries: a limit counted over a shared address outlasts
-  the backoff.
+  the backoff. One request on 2026-09-25 got the same answer.
 
 ## Making a figure, start to finish
 
@@ -425,7 +455,7 @@ figure's record is kept.
    `drifts: true` if it shows anything that changes. The "Field notes" above
    cover robots.txt, content types, Chrome's XML viewer, View Source, and
    crops; read the ones for your page first.
-4. **Capture, and read what it says.** `tools/shots/run capture ch-NN
+4. **Capture, and read what it says.** `tools/shots/run capture ch-NN --only
    <figure>`. A failed guard names the problem: an error page, missing text,
    an infobar. Read the warnings on a passing take too: a DevTools setting
    that DevTools did not honor, a figure over the soft limit, and the text
@@ -498,9 +528,11 @@ A take fails its guards when:
 - the status is unexpected;
 - the page reads like an error or block page (a Cloudflare challenge, "Access denied," the Wayback Machine's "Fail with status");
 - expected text is missing;
+- one of the page's own files (a stylesheet, image, font, or script from the page's host) failed before any answer came back, which leaves the page half drawn with all its text in place. The take is retried, as for a dropped connection. A file the server answered, even with a 404, is the page as it is; so is an image or script the page aborted itself. A recipe whose page always loses a few files that don't show accepts them with `expect: {all_files: false}`: the take's log names them, and the contact sheet is where the take is judged;
 - the image is nearly blank;
 - in a headed take, an infobar sits above the page (see "No infobars");
-- a page the recipe expects not to load (`expect: {error: ...}`) loads after all.
+- a page the recipe expects not to load (`expect: {error: ...}`) loads after all;
+- the screenshot itself fails, as when a crop falls outside the window. The take is retried rather than ending the run.
 
 The status judged is that of the page the take shows. A site that checks the browser with a script (EUR-Lex answers some first visits with 202, then reloads) is judged at the reloaded page's status, and the take keeps the first as `first_status`.
 
@@ -537,6 +569,7 @@ One YAML file per chapter in `recipes/`. A figure:
 - **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-07 and ch-08 recipes set 1280×800, the window their images were made in; they are over the soft limit until they are retaken.)
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top; add `within: '.panel'` for a page that scrolls a panel rather than the window, as Jupyter does.
 - **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`. `{between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 12, 0]}` is a band from the top of one element to the bottom of another; `left` and `width` default to the window.
+- **Pages that lose files:** `expect: {all_files: false}` accepts a page whose own files fail on every load, when the ones lost don't show. Reddit's archived stylesheets for tooltips and crosspost previews came back aborted on most loads, while the post's own styles loaded (chapter 3's `reddit-api-pricing`).
 - **Refusals as subjects:** `expect: {status: 403}` for a refusal with a body, `expect: {block: true}` for a block page, and `expect: {error: 'ERR_NAME_NOT_RESOLVED|…'}` for a host that doesn't answer, whose take is Chrome's own error page (see "Refusals and dead hosts" under Field notes).
 - **An API's response:** `api_client: true`, on the figure or on a composite's part, marks the request a chapter's own code makes, captured as an API client where robots.txt disallows it (see "Before the recipe" under Field notes). It changes what `doctor` says, not the capture, so it stays out of the recipe's hash.
 - **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls.
@@ -810,9 +843,10 @@ It reports **warnings** for:
 - marks changed in the recipe since the annotated image was drawn (promote again);
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility).
 
-`selftest` runs 87 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 93 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
+- a stylesheet whose connection drops, which fails a take whose text is all there and is retried, beside one answered with a 404, which passes, and a recipe that accepts lost files, whose log names them; an aborted stylesheet counts, an aborted image or script doesn't;
 - robots.txt: groups for Claude's agents, and a disallowed API response marked `api_client` reported as a note while a disallowed page stays a warning;
 - refusals: a host that doesn't answer shown as Chrome's error page, and a failure when that page loads after all; behind a stand-in proxy that opens no tunnels, public DNS (a stand-in too) telling a dead host from a policy block in `capture` and `doctor`, and an unexpected tunnel failure still a policy block; a script check's 202 and reload; robots.txt's `Crawl-delay`;
 - a `scroll` step that scrolls a panel (`within`), not the window;

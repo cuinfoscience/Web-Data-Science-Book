@@ -14,7 +14,7 @@ HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "ty
 STEPS = PAGE_STEPS | HEADED_STEPS
 CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad",
          "devtools"}
-EXPECTS = {"status", "text", "selector", "block", "infobar", "error"}
+EXPECTS = {"status", "text", "selector", "block", "infobar", "error", "all_files"}
 DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout", "overview", "columns", "first_visit"}
 DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
 FIGURE_KEYS = {"id", "file", "kind", "section", "brief", "url", "mode", "engine", "steps", "expect", "crop",
@@ -130,6 +130,10 @@ def _problems(chapter, raw):
 def _expect_problems(expect, mode):
     expect = expect or {}
     out = [f"unknown expect key `{key}`" for key in set(expect) - EXPECTS]
+    if "all_files" in expect and not isinstance(expect["all_files"], bool):
+        out.append("`expect: {all_files: false}` accepts a page that loses some of its files; it is true or false")
+    if expect.get("all_files") is False and mode == "headed":
+        out.append("`expect: {all_files: false}` is for a headless capture, the only kind that counts lost files")
     if expect.get("infobar") and mode != "headed":
         out.append("`expect: {infobar: true}` is for a headed figure, the only kind with browser bars")
     if "error" in expect:
