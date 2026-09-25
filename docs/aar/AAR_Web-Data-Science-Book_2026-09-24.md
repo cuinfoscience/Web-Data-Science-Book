@@ -343,7 +343,7 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 | P1-1 | P1 | `.github/workflows/shots-check.yml` | CI | `check` on PRs that change images | maintainer | Proposed | Image PRs merged without `check` in CI: all → 0 |
 | P1-2 | P1 | `AGENTS.md`, `CLAUDE.md`, `docs/` | layout | One instruction file; records beside the code | auto | Applied | Instruction files found by the collector: 0 → 1; earlier AARs found: 0 → 2 |
 | P1-3 | P1 | skill collector | tool config | Read `queued_command`; wider correction pattern | skill maintainer | Proposed | Steering messages counted: 0 of 8 → 8 of 8 |
-| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 9 of 11 ch-07/08 figures retaken, 3 of 3 captions dated; the slide screenshots are next (see notes) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
+| P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 9 of 11 ch-07/08 figures retaken, 3 of 3 captions dated; week 7's slides remade, weeks 1 and 8's next (see notes) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
 | P2-2 | P2 | `docs/plans/` | plan | Computed outputs | maintainer | Proposed | Plan decided, yes or no |
 
 ### Resolution notes
@@ -364,6 +364,7 @@ stated in the preface. That now conflicts with the aim of showing computed figur
   - The Wayback toolbar keeps its parts in a closed shadow root, which no selector reached, so a recipe couldn't wait for its capture count or open its About panel. `open_shadow: true` opens it.
   - The guard for lost files counted only requests that got no answer. An image answered with a 502 left a hole where AboutFace's banner was, and the take passed. A 5xx answer now counts.
   - A crop whose element was missing ended the whole run instead of failing its take.
+- **Week 7's slides, the same day.** 12 of its 15 Wayback screenshots were remade, and the other 3 already met the slide rule. Eleven come from course recipes cropped for their frames' columns, and one is a copy of figure 7.3. On a 1,920-pixel slide their text went from 6–15 pixels to 16–30. The exceptions are the two toolbar strips, whose 9-pixel date ranges come to 14.4–14.5; their recipes say why. Weeks 1 and 8's slides are what P2-1 has left.
 
 ## Appendix A — Design sketch: why each part exists
 

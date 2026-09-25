@@ -1,6 +1,6 @@
 # Hand-off note
 
-**Updated 2026-09-25**, after textbook #148–#152 and #154–#160 and courses #55–#60 merged, with chapter 7's five retaken figures that this note's pull request adds, and with week 3's copies of chapter 3's archive figures in course #61. This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
+**Updated 2026-09-25**, after textbook #148–#152 and #154–#161 and courses #55–#61 merged, with the recipes for week 7's slide screenshots that this note's pull request adds; the course pull request paired with it holds the images. This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
 
 ## Where things stand
 
@@ -25,7 +25,7 @@
   - ch-03 has all four of the back-fill's figures. #158 added Article 40 of the Digital Services Act on EUR-Lex and the retired endpoints, and #159 added Twitter v1.1's part to the endpoints. #160 added two from the Wayback Machine: u/spez's post of 9 June 2023 announcing Reddit's $0.24 per 1,000 calls (3-3), from old.reddit.com's archived copy, since reddit.com's robots.txt disallows every path; and CrowdTangle's last capture, 14 August 2024, whose banner announced the shutdown (3-2). The archive's later captures of CrowdTangle's address are redirects, and the chapter now says so.
   - ch-04 has all four of the back-fill's figures: three in #149, with fixes for #84, #87, and #132, and the Open-Meteo forecast in Chrome's JSON view (4-2) in #159.
   - ch-05 has four DevTools figures from the pilot (#138).
-  - ch-07: this note's pull request retakes its five Wayback figures within the size limit and dates every caption. Its counts and the calendar's colors follow the new takes, checked against the archive's APIs on 2026-09-25: 20,394,311 captures of google.com, 8,516,745 of facebook.com, and 94,893 of x.com; facebook.com's captures were 200s until April 8, 2005, not through March. Below 1,100 pixels wide the toolbar has no strip chart, so the toolbar paragraph now says what a wider window adds.
+  - ch-07: #161 retook its five Wayback figures within the size limit and dated every caption. Its counts and the calendar's colors follow the new takes, checked against the archive's APIs on 2026-09-25: 20,394,311 captures of google.com, 8,516,745 of facebook.com, and 94,893 of x.com; facebook.com's captures were 200s until April 8, 2005, not through March. Below 1,100 pixels wide the toolbar has no strip chart, so the toolbar paragraph now says what a wider window adds.
   - ch-08: its View Source and JavaScript off/on figures are within the size limit, and the Selenium caption is dated (#142, #148). §8.3 checks Selenium Manager before the first browser (#143).
 - **Decisions on 2026-09-24** ([`decisions.md`](decisions.md)): robots.txt is read for the course's User-Agent, and examples send one; a figure of an API's response is captured as an API client; the book recommends Python 3.14; students' pull requests merge after a code-review standup in class on a Friday.
 - **Contributors.** `CONTRIBUTING.md`, a pull request template, and issue forms that point to it (#146). The README acknowledges the AI tools used to write the book (#145).
@@ -36,8 +36,8 @@
   - Course #58 is merged: copies of chapter 3's figures, offered to week 3's deck, which didn't change, and `make_stubs.py`'s markers in weeks 2 and 3's `IMAGES.md`.
   - Course #59 is merged: figure 4.2 in week 4's `img/`, and the three-part retired endpoints in week 3's.
   - Course #60 is merged: the Friday review table in `docs/plans/2026-09-24-friday-code-review-table.md`, and the Friday plan scheduled for week 7's Friday, October 2, with what that day's frames need from the table.
-  - Course #61 is open: week 3's copies of chapter 3's two archive figures, offered to its frames on Reddit's pricing and CrowdTangle.
-  - Week 7's copies of chapter 7's retaken figures go in the next course pull request, after #61: the course session works from one branch.
+  - Course #61 is merged: week 3's copies of chapter 3's two archive figures, offered to its frames on Reddit's pricing and CrowdTangle.
+  - The course pull request paired with this note's remakes week 7's slide screenshots: 11 from the `week07-*` recipes in `tools/shots/recipes/course.yml`, and a copy of chapter 7's figure 7.3. Their text now reaches 16 pixels on a 1,920-pixel slide; the old crops showed it at 6 to 15. Four frames were resized to fit, and three frames' facts changed with the new takes: the counts, "more than twenty million", and the dots, blue until April 8.
   - Course #56 is merged. It adds the roadmap for the Friday code review (`docs/plans/2026-09-24-friday-code-review.md`) and the merge rule in the revision framework, the pull request walkthrough, and week 4's FAQ. It also puts Python 3.14 in week 1's setup and gensim from conda-forge in week 7's deck.
 
 ## Next
@@ -48,7 +48,7 @@ In this order:
 2. **Finish the back-fill** ([plan](plans/2026-09-24-screenshot-backfill-ch01-05.md), §4). Every chapter has had its pass; what is left waits on a host, the Friday review, or the maintainer.
    - Figure 1-4 (the pageviews JSON) waits for another network: Wikimedia's REST API answered this session's address with 429 twice on 2026-09-24 and once on 2026-09-25 (`images/ch-01/IMAGES.md` has a draft recipe). Figure 2-2 (Reddit's robots.txt) waits for the Friday review.
    - `shots import`, for hand captures such as week 1's issue form, isn't built (M4).
-3. **Week 7's slides** (AAR P2-1). Its 15 Wayback screenshots are crops of the 2026-09-22 captures at 1,280 pixels wide. After course #61 merges, remake them from chapter 7's retaken figures, or from course recipes where a frame needs its own crop, and check each against the slide rule (16 pixels on a 1,920-pixel slide). The frames' counts ("almost 20 million", "8.4 million", "83,190") change with them. Chapter 8's two tool windows wait for M4.
+3. **The rest of AAR P2-1**: weeks 1 and 8's slide screenshots, checked against the slide rule (16 pixels on a 1,920-pixel slide) the way week 7's were: a course recipe per frame, cropped for the frame's column (`tools/shots/README.md`, "Course-only figures"). Week 1's look-alikes wait for the maintainer (see the table below), and chapter 8's two tool windows for M4.
 4. **Toolkit M4** ([plan](plans/2026-09-24-screenshot-toolkit.md), §8): evidence queries for counts in captions (AAR P1-2), `sync` and `import`, the Selenium and codegen engines, and the `shots-check` CI job (AAR P1-1).
 5. **Align the chapters' User-Agent strings** with `WebDataScience/1.0 (your-email@colorado.edu)`, after the Friday review.
    - Students' #88 and #93 add one to chapter 4's requests.
@@ -83,7 +83,7 @@ In this order:
     - chapters: `claude/ch01-setup-fixes`, `claude/ch04-figures`, `claude/ch04-refresh-live-data`, `claude/ch04-rss-directory-links`, `claude/ch04-rss-starter-feeds`, `claude/ch04-swap-rss-links`, `claude/ch05-protocols-expansion`, `claude/ch05-protocols-terminal-tools`, `claude/ch07-wayback-background`, `claude/ch08-retakes`, `claude/ch08-selenium-manager-playwright`, `claude/ch08-selenium-preflight`;
     - the toolkit: `claude/pilot-ch05`, `claude/shots-toolkit-m1`, `claude/shots-toolkit-m2`, `claude/shots-toolkit-m3`, `claude/shots-devtools-effect-tests`, `claude/shots-relaxed-limit`, `claude/shots-field-notes`, `claude/notebook-figure-brackets`;
     - docs: `claude/docs-agents-md`, `claude/aar-p0-edits`, `claude/lift-pause-pilot-gate`, `claude/readme-ai-acknowledgement`, `claude/contributing-guide`, `claude/handoff-after-merges`, and `claude/decisions-ua-python`;
-    - the back-fill: `claude/ch01-figures`, `claude/ch02-figures`, `claude/ch03-figures`, `claude/ch05-a-record-note`, `claude/api-client-figures`, `claude/wayback-figures`, and this note's own branch, `claude/ch07-retakes`, once it merges.
+    - the back-fill: `claude/ch01-figures`, `claude/ch02-figures`, `claude/ch03-figures`, `claude/ch05-a-record-note`, `claude/api-client-figures`, `claude/wayback-figures`, `claude/ch07-retakes`, and this note's own branch, `claude/week07-slide-shots`, once it merges.
   - **This repository, closed without merging:** `claude/decisions-ua-python-review` (#153). #154 replaced it with the same changes, because the message of #153's first commit quoted a closing keyword with #90's number: merged, it would have closed #90 again.
   - **The course repository, merged into `main`:** `add-slides-ci`, `claude/detrope-week02-images`, `claude/week-01-screenshots-2aiqhh`, `claude/week-02-expansion`, `claude/week-04-rss-feeds-handout`, `claude/wk02-fixes`, `fix-oscars-403-headers-slides`, `overleaf-2026-08-24-0430`, and `overleaf-2026-08-24-0500`.
   - **The course repository, closed without merging:** `claude/swartz-ca-frames` (#23). Delete it only if #23 won't be revived. GitHub can restore it from the closed pull request.

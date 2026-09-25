@@ -88,3 +88,302 @@ figures:
     notes: >-
       Seven markers in the left margin, each led to the row of a class name the
       handout's code uses; the four collapsed honorees are one brace.
+
+  # Week 7's slides (the course repo's slides/week-07/img/). The deck's crops of
+  # 2026-09-22, cut from 1,280- and 1,680-pixel windows, showed their text at 6 to
+  # 15 pixels on a 1,920-pixel slide. Each recipe here crops to what its frame
+  # discusses, at the width the frame gives it (`targets: {slides: {width: ...}}`),
+  # so the text can reach 16. `about_capture.png` is a copy of chapter 7's
+  # about-this-capture.png, which already does. The Wayback toolbar keeps its parts
+  # in a closed shadow root; the figures that wait for its capture count open it
+  # (`open_shadow: true`; see recipes/ch-07.yml and the README's field notes).
+
+  - id: week07-wayback-calendar
+    kind: capture
+    section: "week-07 slides, Finding a capture (wayback_calendar.png)"
+    brief: >-
+      Show what the frame describes: the Calendar tab's bars of captures per year
+      for facebook.com, taller where a year holds more captures, with 2005
+      selected, and the first row of 2005's calendar, where dots of different
+      sizes mark the days with captures.
+    url: https://web.archive.org/web/2005*/facebook.com
+    window: [800, 700]
+    steps:
+      # The summary line joins its words with no-break spaces, which \s matches.
+      - wait: {text: 'Saved\s[0-9,]+\stimes'}
+      - wait: {network_idle: true}
+    expect:
+      text: ['Saved\s[0-9,]+\stimes']
+    # From the bars to the bottom of January to March, as wide as the bars.
+    crop: {between: ['.sparkline-container', '.calendar-grid .month:nth-child(3)'], left: 30, width: 740,
+           pad: [4, 0, 2, 0]}
+    targets: {slides: {width: 0.72}}     # 0.78 ran the frame 11.5 points past the slide's foot
+    drifts: true        # the bars and the dots change as captures are added
+
+  - id: week07-toolbar
+    kind: capture
+    section: "week-07 slides, Moving through time (toolbar.png)"
+    brief: >-
+      Show the Wayback toolbar on facebook.com's January 21, 2004 capture, from
+      the address box to the date: the address, the count of captures, the strip
+      of bars across the years, and the big yellow date between its arrows and
+      the neighboring months and years. Leave out the logo and the buttons,
+      which the frame doesn't mention, so the strip can be shown larger.
+    url: https://web.archive.org/web/20040121224607/http://facebook.com/
+    # The strip of bars appears only in a window 1,100 pixels wide or more; at 1,280
+    # it doesn't overlap the count.
+    window: [1280, 300]
+    open_shadow: true
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: '[0-9,]+ captures'}
+      - wait: {network_idle: true}
+    # The crop is the toolbar alone, so the page's own images and stylesheets, which the
+    # archive answered with 502 or aborted on every load on 2026-09-25, don't show.
+    expect:
+      text: ['[0-9,]+ captures']
+      all_files: false
+    crop: {top: 0, height: 68, left: 130, width: 1040}
+    oversize: >-
+      a thin strip shown at the slide's full width (AUTHORING.md): the strip of
+      bars needs the toolbar at 1,280 pixels
+    legibility:
+      skip: >-
+        the date range under the count is 9 pixels in the toolbar at any width, a
+        third of the strip's few words, and it comes to 14.5 pixels on the slide;
+        what the frame discusses, the count and the date, reads at 19 and more
+    targets: {slides: {width: 1.0}}
+    drifts: true        # the count, its date range, and the strip
+
+  - id: week07-calendar-dots
+    kind: capture
+    section: "week-07 slides, Reading the dots (calendar_dots_2005.png)"
+    brief: >-
+      Show where the dots on facebook.com's 2005 calendar change color: April,
+      blue on the 6th and 8th and orange from the 10th, and August, orange to
+      the 4th and blue from the 6th. One month wide, so the dots and their day
+      numbers stay large in the frame's narrow column, and only the weeks where
+      the color changes, so the pair fits the slide's height.
+    url: https://web.archive.org/web/2005*/facebook.com
+    mode: composite
+    window: [800, 1100]       # tall enough to hold August's row, which the crop is cut from
+    parts:
+      - label: April 2005
+        steps: [{wait: {text: 'Saved\s[0-9,]+\stimes'}}, {wait: {network_idle: true}}]
+        expect: {text: ['Saved\s[0-9,]+\stimes']}
+        crop: {selector: '.calendar-grid .month:nth-child(4)', height: 120}     # the title and April 1-16
+      - label: August 2005
+        steps: [{wait: {text: 'Saved\s[0-9,]+\stimes'}}, {wait: {network_idle: true}}]
+        expect: {text: ['Saved\s[0-9,]+\stimes']}
+        crop: {selector: '.calendar-grid .month:nth-child(8)', height: 92}      # the title and August 1-13
+    layout: {direction: column, gap: 10, pad: 8, label_px: 14}
+    targets: {slides: {width: 0.35}}
+
+  - id: week07-x-com-1999
+    kind: capture
+    section: "week-07 slides, Broken captures and x.com before X (x_com_1999.png)"
+    brief: >-
+      Show x.com's November 14, 1999 page with its images broken: the big
+      image's broken icon, the four navigation images (About X.com, Managment
+      Team, Employment Opportunities, Contact Us) as broken icons with their alt
+      text, and the logo's alt text, x.com, below. The page's top 560 by 410
+      pixels, below the toolbar, so the alt text reaches 16 pixels in a column
+      35% of the slide wide.
+    url: https://web.archive.org/web/19991114081850/http://x.com/
+    window: [700, 600]
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'X\.com Corporation'}
+      - wait: {network_idle: true}
+    # The page's images are broken whatever the archive answers: never saved, they get
+    # 404s, and on most loads on 2026-09-25 some got 502s instead.
+    expect:
+      text: ['X\.com Corporation']
+      all_files: false
+    crop: {top: 71, height: 407, left: 0, width: 560}      # below the toolbar's shadow
+    targets: {slides: {width: 0.35}}
+
+  - id: week07-toolbar-counts
+    kind: capture
+    section: "week-07 slides, Why some sites are archived better (toolbar_counts.png)"
+    brief: >-
+      Show three toolbars stacked, google.com, facebook.com, and x.com, each with
+      its count of captures and its strip of captures by year, so the counts
+      (tens of millions against tens of thousands) and the strips' density can
+      be compared. Each strip's label names its site, so the address row, the
+      logo, the date, and the buttons are left out, and the three fit the frame
+      above its text.
+    mode: composite
+    window: [1280, 300]
+    open_shadow: true
+    parts:
+      - label: google.com
+        url: https://web.archive.org/web/19981111184551/http://google.com/
+        steps: [{wait: {selector: '#wm-ipp-base'}}, {wait: {text: '[0-9,]+ captures'}}, {wait: {network_idle: true}}]
+        expect: {text: ['[0-9,]+ captures'], all_files: false}      # the toolbar alone is cropped
+        crop: {top: 28, height: 32, left: 130, width: 930}
+      - label: facebook.com
+        url: https://web.archive.org/web/20040121224607/http://facebook.com/
+        steps: [{wait: {selector: '#wm-ipp-base'}}, {wait: {text: '[0-9,]+ captures'}}, {wait: {network_idle: true}}]
+        expect: {text: ['[0-9,]+ captures'], all_files: false}      # the toolbar alone is cropped
+        crop: {top: 28, height: 32, left: 130, width: 930}
+      - label: x.com
+        url: https://web.archive.org/web/19991114081850/http://x.com/
+        steps: [{wait: {selector: '#wm-ipp-base'}}, {wait: {text: '[0-9,]+ captures'}}, {wait: {network_idle: true}}]
+        expect: {text: ['[0-9,]+ captures'], all_files: false}      # the toolbar alone is cropped
+        crop: {top: 28, height: 32, left: 130, width: 930}
+    layout: {direction: column, gap: 8, pad: 8, label_px: 14}
+    oversize: >-
+      three thin strips, shown at 90% of the slide's width: the strips of bars
+      need the toolbar at 1,280 pixels
+    legibility:
+      skip: >-
+        each toolbar's date range is 9 pixels at any width and comes to 14.4 pixels
+        on the slide; the counts the frame compares read at 19 and more
+    targets: {slides: {width: 0.9}}
+    drifts: true        # the counts and the strips
+
+  - id: week07-devtools-archived
+    kind: capture
+    section: "week-07 slides, The Inspector still works (devtools_archived.png)"
+    brief: >-
+      Show the Elements tree on Thefacebook's February 12, 2004 capture, zoomed
+      to 175% for a column 45% of the slide wide: in the body, the toolbar's
+      div#wm-ipp-base, the second div and the script, the END WAYBACK TOOLBAR
+      INSERT comment, and the page's own <center>, selected. DevTools alone;
+      the frame's text says where the tree comes from.
+    url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
+    mode: headed
+    window: [800, 1000]
+    devtools: {dock: bottom, size: 640, zoom: 1.75, panel: elements, layout: stacked, sidebar: 1}
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'Welcome to Thefacebook'}
+      # As in ch-07's devtools-archived-page: <center>'s empty left margin, a third
+      # of the way down, below the pinned toolbar.
+      - inspect: {selector: 'center', at: [0.02, 0.3], selects: '^<center'}
+    expect:
+      text: ['Welcome to Thefacebook']
+    # DevTools takes the window's lower 639 pixels: from its tab bar to just below </html>,
+    # without the empty rows, the breadcrumb bar, and the Styles pane's tabs.
+    crop: {top: 361, height: 368}
+    targets: {slides: {width: 0.45}}
+
+  - id: week07-wrapped-vs-raw
+    kind: capture
+    section: "week-07 slides, Raw or wrapped? (wrapped_vs_raw.png)"
+    brief: >-
+      Show the top of one capture's source twice, labeled: wrapped
+      (/web/20040212031928/), which starts with the archive's scripts, and raw
+      (/web/20040212031928id_/), which starts with Thefacebook's own <style>.
+      Lines wrap rather than run off the edge, in a window narrow enough for a
+      column 48% of the slide wide.
+    mode: composite
+    # 636 wide puts View Source's scrollbar just past a 620-pixel crop; with the frame's
+    # padding the pair is 636 wide, where its 13-pixel text reaches 16.5 on the slide.
+    window: [636, 560]
+    parts:
+      - label: 'Wrapped: /web/20040212031928/'
+        url: view-source:https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
+        mode: headed
+        steps:
+          - wait: {text: 'wombat'}
+          - click: {selector: 'input[type="checkbox"]'}      # Line wrap
+        crop: {between: ['td.line-number[value="1"]', 'td.line-number[value="7"]'], width: 620}
+      - label: 'Raw: /web/20040212031928id_/'
+        url: view-source:https://web.archive.org/web/20040212031928id_/http://www.thefacebook.com/
+        mode: headed
+        steps:
+          - wait: {text: 'font-size: 18px'}
+          - click: {selector: 'input[type="checkbox"]'}      # Line wrap
+        crop: {between: ['td.line-number[value="1"]', 'td.line-number[value="9"]'], width: 620}
+    layout: {direction: column, gap: 10, pad: 8, label_px: 14}
+    targets: {slides: {width: 0.48}}
+
+  - id: week07-facebook-2004
+    kind: capture
+    section: "week-07 slides, Facebook before Facebook (facebook_2004.png)"
+    brief: >-
+      Show the two things the frame quotes from AboutFace's facebook.com of
+      January 21, 2004, stacked and labeled: its logo and tagline, "The first
+      name in directories", and its pitch to schools and colleges, "Eliminate
+      the need for printed facebooks." Each is a small crop, so the page's
+      11-pixel text reaches 16 pixels in a column 44% of the slide wide.
+    url: https://web.archive.org/web/20040121224607/http://facebook.com/
+    mode: composite
+    window: [778, 600]
+    parts:
+      - label: AboutFace's banner
+        steps: [{wait: {text: 'AboutFace'}}, {wait: {network_idle: true}}]
+        expect: {text: ['AboutFace'], all_files: false}       # judged by eye: the banner must be drawn
+        crop: {top: 67, height: 95, left: 0, width: 240}
+      - label: its pitch to colleges
+        steps: [{wait: {text: 'Eliminate the need for printed facebooks'}}, {wait: {network_idle: true}}]
+        expect: {text: ['Eliminate the need for printed facebooks'], all_files: false}
+        crop: {top: 333, height: 60, left: 455, width: 255}
+    layout: {direction: column, gap: 10, pad: 8, label_px: 13}
+    targets: {slides: {width: 0.4416}}
+
+  - id: week07-thefacebook-2004
+    kind: capture
+    section: "week-07 slides, Facebook before Facebook (thefacebook_2004.png)"
+    brief: >-
+      Show Thefacebook on February 12, 2004, eight days after launch: its
+      "[ thefacebook ]" banner and the welcome box, "Thefacebook is an online
+      directory that connects people through social networks at colleges," open
+      only at Harvard University. The page's right-hand 550 pixels, so its
+      13-pixel text reaches 16 pixels in a column 44% of the slide wide.
+    url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
+    window: [800, 600]
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'Harvard University'}
+      - wait: {network_idle: true}
+    expect:
+      text: ['Welcome to Thefacebook', 'Harvard University']
+    crop: {top: 72, height: 222, left: 209, width: 546}
+    targets: {slides: {width: 0.4416}}
+
+  - id: week07-x-com-1997
+    kind: capture
+    section: "week-07 slides, x.com before X (x_com_1997.png)"
+    brief: >-
+      Show x.com on April 11, 1997: "not nearly the worst place on the web!!!"
+      under a missing image, and "Check out these cool attractions:" with Dave's
+      World and Rob's House of Weather. The page below the toolbar, 730 pixels
+      wide for a column 48% of the slide wide.
+    url: https://web.archive.org/web/19970411224438/http://x.com/
+    window: [800, 600]
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'not nearly the worst place'}
+      - wait: {network_idle: true}
+    # The page's background image resolves to a 2013 capture the archive answered with
+    # 500 on every load on 2026-09-25; the page's own background color shows instead.
+    expect:
+      text: ['not nearly the worst place on the web', "Rob's House of Weather"]
+      all_files: false
+    crop: {top: 70, height: 420, left: 0, width: 730}
+    targets: {slides: {width: 0.48}}
+
+  - id: week07-google-1998
+    kind: capture
+    section: "week-07 slides, google.com, November 1998 (google_1998.png)"
+    brief: >-
+      Show google.com's first capture, November 11, 1998, under the Wayback
+      toolbar with its count of captures today: "Welcome to Google" and its two
+      links, the Google Search Engine Prototype and the "Might-work-some-of-the-
+      time-prototype that is much more up to date."
+    url: https://web.archive.org/web/19981111184551/http://google.com/
+    window: [800, 600]
+    open_shadow: true
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'Welcome to Google'}
+      - wait: {text: '[0-9,]+ captures'}
+      - wait: {network_idle: true}
+    expect:
+      text: ['Welcome to Google', 'Might-work-some-of-the-time', '[0-9,]+ captures']
+    crop: {top: 0, height: 200, left: 0, width: 800}
+    targets: {slides: {width: 0.85}}
+    drifts: true        # the toolbar's count and date range
