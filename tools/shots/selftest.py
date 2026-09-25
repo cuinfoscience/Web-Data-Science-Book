@@ -90,6 +90,11 @@ PAGES["/second"] = (200, "<title>Second</title><h1 style='margin-top:40px'>The s
 DNS = {"dead-host.test": {"Status": 3},
        "refused-host.test": {"Status": 0, "Answer": [{"name": "refused-host.test.", "type": 1, "data": "192.0.2.1"}]}}
 FLAKY = {"count": 0}      # /flaky works once, then answers 502
+# A CDX-style API: five captures, paged by `limit`, with a resume key when more wait (as
+# web.archive.org's CDX server answers with showResumeKey=true).
+CDX_ROWS = [["com,example)/a.gif", "20000801000000", "404"], ["com,example)/a.gif", "20000901000000", "404"],
+            ["com,example)/b.gif", "20000401000000", "200"], ["com,example)/b.gif", "20000801000000", "404"],
+            ["com,example)/c.gif", "20000901000000", "404"]]
 SEEN = {}                 # path: the headers of each request for it, in order
 # What Chrome's User-Agent Client Hints should say on this machine.
 PLATFORM = {"linux": '"Linux"', "darwin": '"macOS"', "win32": '"Windows"'}.get(sys.platform)
@@ -121,6 +126,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if args.get("type", ["A"])[0] != "A":
                 answer = {"Status": answer["Status"]}           # no IPv6 addresses
             status, body, kind = 200, json.dumps(answer), "application/dns-json"
+        elif path == "/cdx":
+            args = urllib.parse.parse_qs(query)
+            limit, start = int(args.get("limit", ["1000"])[0]), int(args.get("resumeKey", ["0"])[0])
+            rows = [["urlkey", "timestamp", "statuscode"]] + CDX_ROWS[start:start + limit]
+            if args.get("showResumeKey", [""])[0] == "true" and start + limit < len(CDX_ROWS):
+                rows += [[], [str(start + limit)]]
+            status, body, kind = 200, json.dumps(rows), "application/json"
         elif path == "/check":
             status, body = PAGES["/checked"] if "checked=1" in (self.headers.get("Cookie") or "") else CHECK
         elif self.path == "/flaky":
@@ -333,6 +345,32 @@ figures:
   - {{id: tunnel-refused, kind: capture, url: "https://refused-host.test/",
       expect: {{error: 'ERR_TUNNEL_CONNECTION_FAILED'}}}}
   - {{id: tunnel-unexpected, kind: capture, url: "https://other-host.test/"}}
+  - id: evidence-paged
+    kind: capture
+    url: "{base}/ok"
+    evidence:
+      - id: paged
+        claim: "a.gif was captured only as 404s"
+        url: "{base}/cdx"
+        params: {{url: 'example.com/', output: json, limit: 2, showResumeKey: 'true'}}
+        page: resume_key
+        summary: {{group_by: urlkey, count: statuscode}}
+      - id: runs
+        claim: "the statuses change three times"
+        url: "{base}/cdx"
+        params: {{url: 'example.com/', output: json, limit: 10}}
+        summary: {{runs: statuscode}}
+  - id: evidence-capped
+    kind: capture
+    url: "{base}/ok"
+    evidence:
+      - {{id: capped, claim: "a query cut short", url: "{base}/cdx", params: {{url: 'example.com/', output: json, limit: 5}}}}
+  - id: evidence-unfollowed
+    kind: capture
+    url: "{base}/ok"
+    evidence:
+      - {{id: unfollowed, claim: "a resume key left unfollowed", url: "{base}/cdx",
+          params: {{url: 'example.com/', output: json, limit: 2, showResumeKey: 'true'}}}}
   - id: selenium-window
     kind: capture
     url: "{base}/tree"
@@ -661,6 +699,48 @@ figures:
     code, out = shots("sheet", "ch-99")
     expect("sheet draws each newest take at the size it will be shown",
            code == 0 and (tmp / "out" / "ch-99" / "sheet-1.png").exists(), out[-300:])
+
+    print("evidence (the queries behind a caption)")
+    code, out = shots("evidence", "ch-99", "--only", "evidence-paged")
+    record = {e["id"]: e for e in json.loads((tmp / "images" / "ch-99" / "provenance.json").read_text())
+              .get("evidence", {}).get("evidence-paged", [])}
+    paged, runs = record.get("paged") or {}, record.get("runs") or {}
+    expect("a paged query follows its resume keys to the end: 5 rows in 3 requests, complete",
+           code == 0 and paged.get("rows") == 5 and len(paged.get("requests") or []) == 3 and paged.get("complete"),
+           str(paged)[:300] + out[-300:])
+    expect("...and its summary counts each capture's status by URL",
+           (paged.get("summary") or {}).get("groups") == {"com,example)/a.gif": {"404": 2},
+                                                          "com,example)/b.gif": {"200": 1, "404": 1},
+                                                          "com,example)/c.gif": {"404": 1}}, str(paged.get("summary")))
+    expect("a summary of runs: each stretch of one status, with its first and last timestamps",
+           (runs.get("summary") or {}).get("runs") == [["404", "20000801000000", "20000901000000", 2],
+                                                       ["200", "20000401000000", "20000401000000", 1],
+                                                       ["404", "20000801000000", "20000901000000", 2]],
+           str(runs.get("summary")))
+    md = (tmp / "images" / "ch-99" / "IMAGES.md").read_text() if (tmp / "images" / "ch-99" / "IMAGES.md").exists() else ""
+    expect("the evidence is listed in IMAGES.md, beside the figures", "Evidence behind the captions" in md
+           and "`paged`" in md, md[-400:])
+    code, out = shots("evidence", "ch-99", "--only", "evidence-capped")
+    expect("a page that returns exactly its limit, with no way to page, fails",
+           code == 1 and "returned exactly its limit" in out, out[-300:])
+    code, out = shots("evidence", "ch-99", "--only", "evidence-unfollowed")
+    expect("...and so does a page whose resume key the query doesn't follow",
+           code == 1 and "resume key" in out and "doesn't follow" in out, out[-300:])
+    code, out = shots("check", "ch-99")
+    expect("check warns about a figure whose evidence was never run to its end",
+           "evidence-capped: evidence `capped` has not been run" in out, out[-600:])
+    expect("...and not about one whose evidence is recorded", "evidence-paged: evidence" not in out, out[-600:])
+    recipe_file = tmp / "recipes" / "ch-99.yml"
+    recipe_file.write_text(recipe_file.read_text().replace("limit: 2, showResumeKey: 'true'}\n        page: resume_key",
+                                                           "limit: 3, showResumeKey: 'true'}\n        page: resume_key"))
+    code, out = shots("check", "ch-99")
+    expect("...and warns again when the query changes after it ran", "evidence `paged`: the query changed" in out,
+           out[-600:])
+    recipe_file.write_text(recipe_file.read_text().replace('claim: "the statuses change three times"',
+                                                           'claim: "the statuses change twice"'))
+    code, out = shots("check", "ch-99")
+    expect("...or when its claim is reworded, so the claim on record is the one checked",
+           "evidence `runs`: the claim changed" in out, out[-600:])
 
     print("headed (virtual display, real input, DevTools)")
     if all(shutil.which(tool) for tool in ("Xvfb", "xdotool", "import")):

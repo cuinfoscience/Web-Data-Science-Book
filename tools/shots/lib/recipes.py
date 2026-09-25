@@ -21,7 +21,7 @@ FIGURE_KEYS = {"id", "file", "kind", "section", "brief", "url", "mode", "engine"
                "javascript", "drifts", "legacy", "notes", "devtools", "window", "scale",
                "user_agent", "pause", "settle", "timeout", "retries",
                "annotate", "targets", "legibility", "parts", "layout", "oversize", "api_client", "open_shadow",
-               "inspector", "https_upgrades"}
+               "inspector", "https_upgrades", "evidence"}
 ENGINES = {"playwright", "selenium", "codegen"}
 # The selenium engine (lib/engine_selenium.py) drives its window through Selenium alone.
 SELENIUM_STEPS = {"wait", "scroll", "pointer", "settle"}
@@ -48,7 +48,8 @@ DIRECTIONS = {"row", "column"}
 # Settings that decide how a take is drawn on or judged, not how it is captured.
 # Changing them needs no new take, so they stay out of the recipe's hash. So does
 # the brief: the request the figure answers, in words.
-NOT_CAPTURE = ("brief", "legacy", "notes", "annotate", "targets", "legibility", "oversize", "api_client")
+NOT_CAPTURE = ("brief", "legacy", "notes", "annotate", "targets", "legibility", "oversize", "api_client",
+               "evidence")
 DEFAULTS = {
     "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu",
     "window": [800, 600],    # CSS pixels; the default limit on what a figure shows, 1024×768 relaxed (lib/legibility.py)
@@ -156,6 +157,9 @@ def _problems(chapter, raw):
                 out.append(f"{where}{f' part {n}' if n else ''}: `open_shadow` is for a headless capture; "
                            "DevTools reaches closed shadow roots on its own")
         out += [f"{where}: {p}" for p in _composite_problems(f)]
+        if "evidence" in f:
+            from .evidence import problems as evidence_problems
+            out += [f"{where}: {p}" for p in evidence_problems(f["evidence"])]
     return out
 
 

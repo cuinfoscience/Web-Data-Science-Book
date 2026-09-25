@@ -371,6 +371,7 @@ stated in the preface. That now conflicts with the aim of showing computed figur
   - the Inspector accepts no switches, so a child process sets `GDK_SCALE`;
   - its text can't be read by any client, so its sizes come from its stylesheet;
   - Playwright turns off HTTPS-Upgrades, and the practice site redirects to plain http.
+- **The first AAR's P1-2 in the toolkit, the same day.** `tools/shots/run evidence` runs the queries a recipe lists behind a caption's claim, pages them to their end, fails one that returns exactly its limit and can't page, and records what it found; `check` warns when evidence is missing or stale. Its first two runs, for chapter 7, confirmed the calendar paragraph's dates and corrected a date in the x.com paragraph (the spacer image was saved in April and May 2000). They also showed that the figure's notes had overstated the x.com finding: the six images' later captures are redirects, not 404s. The rule was already written; what it lacked was a check that runs before a claim ships.
 
 ## Appendix A — Design sketch: why each part exists
 

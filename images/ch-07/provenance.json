@@ -1,5 +1,151 @@
 {
   "chapter": "ch-07",
+  "evidence": {
+    "wayback-calendar": [
+      {
+        "claim": "facebook.com's captures were 200s until April 8, 2005, 403s from April 10, and 200s again from August 6.",
+        "complete": true,
+        "fetched": "2026-09-25T05:07:09+00:00",
+        "fields": [
+          "timestamp",
+          "statuscode"
+        ],
+        "id": "facebook-2005-statuses",
+        "page": "resume_key",
+        "params": {
+          "fl": "timestamp,statuscode",
+          "from": "20050301",
+          "limit": "1000",
+          "output": "json",
+          "showResumeKey": "true",
+          "to": "20050831",
+          "url": "facebook.com"
+        },
+        "query_sha256": "1bc59563d11eb7abbd2c6aeef4ebe11b91d57e58caab40263a1dcc307d35d877",
+        "requests": [
+          {
+            "paced_seconds": 0.0,
+            "rows": 116,
+            "status": 200,
+            "url": "https://web.archive.org/cdx/search/cdx?url=facebook.com&from=20050301&to=20050831&output=json&fl=timestamp%2Cstatuscode&limit=1000&showResumeKey=true"
+          }
+        ],
+        "responses": "tools/shots/out/ch-07/wayback-calendar/evidence/20260925T050705Z-facebook-2005-statuses",
+        "rows": 116,
+        "summary": {
+          "runs": [
+            [
+              "200",
+              "20050302024655",
+              "20050408055255",
+              9
+            ],
+            [
+              "403",
+              "20050410045127",
+              "20050804010813",
+              96
+            ],
+            [
+              "200",
+              "20050806011211",
+              "20050828205250",
+              11
+            ]
+          ]
+        },
+        "url": "https://web.archive.org/cdx/search/cdx",
+        "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu"
+      }
+    ],
+    "x-com-1999": [
+      {
+        "claim": "None of six of the page's seven images was ever captured with a 200: their first captures, in August and September 2000, were 404s, and later ones redirects or 404s. Only the seventh, spacer.gif, was saved successfully, on April 29 and May 5, 2000.",
+        "complete": true,
+        "fetched": "2026-09-25T05:08:48+00:00",
+        "fields": [
+          "urlkey",
+          "timestamp",
+          "statuscode"
+        ],
+        "id": "x-com-images",
+        "page": "resume_key",
+        "params": {
+          "filter": "urlkey:com,x\\)/images/(about_btn|contact_btn|employment_btn|main_x|management_btn|spacer|x_righton)\\.gif",
+          "fl": "urlkey,timestamp,statuscode",
+          "limit": "1000",
+          "matchType": "prefix",
+          "output": "json",
+          "showResumeKey": "true",
+          "url": "x.com/images/"
+        },
+        "query_sha256": "228f447cf06f7ea2ec1a80d965a785b1a71918ae9fba1a7fe3ef413d199c506d",
+        "requests": [
+          {
+            "paced_seconds": 0.0,
+            "rows": 204,
+            "status": 200,
+            "url": "https://web.archive.org/cdx/search/cdx?url=x.com%2Fimages%2F&matchType=prefix&output=json&fl=urlkey%2Ctimestamp%2Cstatuscode&filter=urlkey%3Acom%2Cx%5C%29%2Fimages%2F%28about_btn%7Ccontact_btn%7Cemployment_btn%7Cmain_x%7Cmanagement_btn%7Cspacer%7Cx_righton%29%5C.gif&limit=1000&showResumeKey=true"
+          }
+        ],
+        "responses": "tools/shots/out/ch-07/x-com-1999/evidence/20260925T050841Z-x-com-images",
+        "rows": 204,
+        "summary": {
+          "first": {
+            "com,x)/images/about_btn.gif": "20000907045016",
+            "com,x)/images/contact_btn.gif": "20000826072356",
+            "com,x)/images/employment_btn.gif": "20000825215346",
+            "com,x)/images/main_x.gif": "20000826071957",
+            "com,x)/images/management_btn.gif": "20000907060304",
+            "com,x)/images/spacer.gif": "20000429023807",
+            "com,x)/images/x_righton.gif": "20000825234932"
+          },
+          "groups": {
+            "com,x)/images/about_btn.gif": {
+              "301": 19,
+              "404": 2
+            },
+            "com,x)/images/contact_btn.gif": {
+              "301": 19,
+              "404": 1
+            },
+            "com,x)/images/employment_btn.gif": {
+              "301": 19,
+              "404": 4
+            },
+            "com,x)/images/main_x.gif": {
+              "301": 20,
+              "404": 5
+            },
+            "com,x)/images/management_btn.gif": {
+              "301": 19,
+              "404": 2
+            },
+            "com,x)/images/spacer.gif": {
+              "200": 2,
+              "404": 4
+            },
+            "com,x)/images/x_righton.gif": {
+              "301": 23,
+              "302": 36,
+              "404": 29
+            }
+          },
+          "last": {
+            "com,x)/images/about_btn.gif": "20110826074157",
+            "com,x)/images/contact_btn.gif": "20110826074157",
+            "com,x)/images/employment_btn.gif": "20110826074157",
+            "com,x)/images/main_x.gif": "20130710065428",
+            "com,x)/images/management_btn.gif": "20110826074157",
+            "com,x)/images/spacer.gif": "20000926053926",
+            "com,x)/images/x_righton.gif": "20140304022401"
+          }
+        },
+        "url": "https://web.archive.org/cdx/search/cdx",
+        "user_agent": "Web Data Science/v1 brian.keegan@colorado.edu"
+      }
+    ]
+  },
   "figures": {
     "about-this-capture": {
       "browser": "Google Chrome for Testing 154.0.8037.57 (headless, Playwright 1.63.0)",
