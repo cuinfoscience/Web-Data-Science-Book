@@ -11,9 +11,7 @@ Done so far:
 - **M1:** headless captures, guards, retries, provenance, and `check`.
 - **M2:** headed captures of browser UI (DevTools, View Source), with real input on a virtual display.
 - **M3:** numbered markers placed from what the browser measured, a legibility check at each size a figure is shown, side-by-side composites, and contact sheets.
-- **M4, begun:** engines for the two ch-08 figures whose subject is a tool itself: the window Selenium opens, and Playwright's recorder (see Engines); evidence queries, the queries behind the numbers and claims in captions (see Evidence); and `sync`, which copies figures into the course repo with a record of each (see Sync to the course repo).
-
-Still to come, the rest of M4: `import`, for hand captures, and CI.
+- **M4:** engines for the two ch-08 figures whose subject is a tool itself: the window Selenium opens, and Playwright's recorder (see Engines); evidence queries, the queries behind the numbers and claims in captions (see Evidence); `sync`, which copies figures into the course repo with a record of each (see Sync to the course repo); `import`, which makes a person's screenshot of a page behind a login a take like any other (see Hand captures); and `check` in CI, on pull requests that change images or the toolkit (see Checks).
 
 ## Quick start
 
@@ -29,6 +27,8 @@ tools/shots/run check                             # before a PR
 tools/shots/run sync ch-07 about-this-capture --to slides/week-07/img --as about_capture.png
                                                   # copy an approved figure into the course repo
 tools/shots/run synced                            # every course copy against its record and source
+tools/shots/run import ch-NN ID --file screenshot.png --by NAME --date YYYY-MM-DD
+                                                  # a person's screenshot of a page behind a login
 ```
 
 - **`bootstrap.sh`** does five things, plus two optional ones:
@@ -54,7 +54,7 @@ These come from `slides/common/AUTHORING.md` in the course repo and from the AAR
 - **Real or labeled.** A screenshot is a real capture of a real page. Diagrams and renders are welcome, marked with their `kind`. Never rebuild a real site's interface with invented content.
 - **One honest User-Agent** for every request (`Web Data Science/v1 brian.keegan@colorado.edu`, the one the handouts teach). It goes to Chrome as Chrome's own `--user-agent` flag, so the User-Agent Client Hints (`Sec-CH-UA-Platform` and the rest) name the system the capture runs on. Playwright's `user_agent` option rewrites them too, and for a string that names no system it claims Windows. Page loads on one host are 8–30 seconds apart.
 - **Retries:** a 5xx or a dropped connection is retried three times, 30, 60, then 120 seconds apart. A block page, a 403, or a proxy refusal is not retried.
-- **No logins, no credentials, no student names or work.** A page behind a login is captured by the instructor by hand (M4 adds `import`).
+- **No logins, no credentials, no student names or work.** A page behind a login is captured by the instructor by hand and brought in with `import`, which blacks out what the recipe's `redact:` boxes cover (see Hand captures).
 - **No infobars.** Chrome for Testing puts a notice under the address bar: "Chrome for Testing … is only for automated testing". It is 55 pixels of browser chrome that says nothing about the page. Headed captures pass `--disable-infobars`, which keeps it off. `capture` fails a headed take whose bars above the page are taller than the tab strip and address bar (88 pixels), unless the figure's subject is the bar (`expect: {infobar: true}`, as for ch-08's Selenium window). The figures made before the toolkit ran Chrome without the switch and carried the notice.
 - **Dated captions.** A figure that shows things that change (counts, versions, live pages) says in its caption when it was captured.
 - **800×600 of the screen, or up to 1024×768 when that is clearer.** A figure shows 800×600 CSS pixels of the screen by default (1600×1200 image pixels at scale 2). In the book's 778-pixel column its text then stays about the size it had on screen; a whole 1680-pixel window shrinks it to less than half. To show DevTools, zoom DevTools and crop to what the text discusses, rather than widening the window. A figure may relax to 1024×768 when two things are true:
@@ -475,7 +475,8 @@ figure's record is kept.
 2. **Check the session and the page.** Run `tools/shots/run doctor ch-NN` in
    this session. The page must load signed out, and show no student names or
    work and no one's personal data. A page behind a login is the
-   instructor's to capture by hand.
+   instructor's to capture by hand, and `import` brings the screenshot in
+   (see Hand captures).
 3. **Write the rest of the recipe.** Use the smallest window and crop that
    hold what the brief names: 800×600 CSS pixels by default, or up to
    1024×768 when the extra room removes clutter and the text still passes,
@@ -514,12 +515,13 @@ figure's record is kept.
    run `python tools/trope_lint.py` on the changed chapter, and render it
    with Quarto.
 9. **Make the course copies.** A slide or handout that uses the figure gets
-   a copy in the course repo's `slides/week-NN/img/` (or the handout's
-   `img/`), cropped to what the slide discusses and keeping the file name
-   the deck uses. Update the image's row in `stubs.tsv` (its size and what
-   it shows) and its notes in `IMAGES.md`, then regenerate the table with
-   `cd slides && python3 common/make_stubs.py week-NN`. On a 1920-pixel
-   slide its text must reach 16 pixels.
+   a copy in the course repo through `sync`, under the file name the deck
+   uses: `tools/shots/run sync ch-NN <figure> --to slides/week-NN/img --as
+   <name>.png`. It records the copy in `shots.json` and `IMAGES.md` and sets
+   its size in `stubs.tsv`; say what the image shows in its `stubs.tsv` row,
+   and write any notes outside the markers. A crop for a slide's column is a
+   course recipe of its own (see Course-only figures). On a 1920-pixel slide
+   its text must reach 16 pixels.
 10. **Open the pull requests.** Open one in the textbook and one in the
     course repo, together, each on a new branch. The textbook PR's
     description has the review table: for each figure, its section, what it
@@ -609,7 +611,7 @@ One YAML file per chapter in `recipes/`. A figure:
 - **Closed shadow roots:** `open_shadow: true` makes a shadow root that the page asks to have closed open instead, before any of the page's scripts run. A closed root is drawn like any other, but no selector reaches it, Playwright's included: no step can wait for its text or hover its buttons, and the text measure can't count it. The page looks the same; only its scripts could tell, since `element.shadowRoot` returns the root rather than `null`. The Wayback Machine's toolbar is one (chapter 7). Headless captures only: DevTools reaches closed roots on its own.
 - **An API's response:** `api_client: true`, on the figure or on a composite's part, marks the request a chapter's own code makes, captured as an API client where robots.txt disallows it (see "Before the recipe" under Field notes). It changes what `doctor` says, not the capture, so it stays out of the recipe's hash.
 - **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls.
-- **Other modes:** `mode: headed` and `mode: composite` are below. `engine: selenium` and `engine: codegen` are for figures whose subject is the tool itself (see Engines).
+- **Other modes:** `mode: headed` and `mode: composite` are below. `engine: selenium` and `engine: codegen` are for figures whose subject is the tool itself (see Engines). `mode: hand` is a screenshot a person takes (see Hand captures).
 - **Patterns** are regular expressions. A leading `(?i)` ignores case; the tool turns it into JavaScript's `i` flag, because Playwright and DevTools evaluate patterns in JavaScript, which has no inline flags.
 - **Quoting:** quote any YAML value that contains ` #`, or everything after it becomes a comment. In single quotes, a backslash is literal: write `'quotes\?page=2'`.
 
@@ -746,6 +748,78 @@ by `role` and `name`, by `selector` and `text`, or by `text`; it waits until
 `pause[0]` seconds have passed since the last page load), `scroll` (not
 recorded, as a wheel isn't), `pointer` (the recorder highlights the element
 and shows its locator), and `settle`.
+
+## Hand captures
+
+A page behind a login is the one kind of figure a person takes: the toolkit
+never signs in. The recipe says so with `mode: hand`, and `import` turns the
+person's screenshot into a take, which `sheet`, `promote`, and `sync` treat
+like any other.
+
+```yaml
+- id: issue-form
+  kind: capture
+  mode: hand
+  url: https://github.com/OWNER/REPO/issues/new?template=revision.yml
+  hand:
+    why: the form needs a signed-in GitHub account, and the toolkit never signs in
+    steps: >-
+      Sign in, open the URL in a window whose page is 800 CSS pixels wide, and take
+      a screenshot of the window. Read window.devicePixelRatio in DevTools' console.
+    text_px: 14                  # the form's text, from DevTools' Computed pane
+  scale: 2                       # the screenshot's pixels per CSS pixel: that devicePixelRatio
+  crop: {top: 86, left: 0, width: 800, height: 480}
+  redact:
+    - {box: [700, 90, 100, 40], why: the signed-in account's avatar and menu}
+```
+
+```bash
+tools/shots/run import course issue-form --file issue.png --by "A. Person" --date 2026-09-28 \
+    --browser "Chrome 141 on macOS 15"
+```
+
+- **Coordinates:** `crop` and each `redact` box are in the screenshot's CSS
+  pixels, counted from its top-left corner: the pixels an image viewer shows,
+  divided by `scale`. Both use that one frame, so a box stays on what it hides
+  when the crop changes. A crop past the screenshot's edge is refused, with a
+  question: is `scale` the page's `devicePixelRatio`? A page zoomed to 125% on
+  a 2× display has 2.5.
+- **Finding the numbers:** in a screenshot of the whole window, the page
+  starts below the browser's bars, whose height the console gives as
+  `outerHeight - innerHeight`; that is the crop's `top`. An element's box
+  in the screenshot is its `getBoundingClientRect()` with that height added
+  to `y`. On a real Chrome window at scale 2 (2026-09-25), a box found this way
+  blacked out an avatar and a user name exactly, with the header's own color
+  one pixel outside it. A Mac's window screenshot adds a shadow around the
+  window, which moves every coordinate, unless you hold Option as you click.
+- **Redaction** comes first: each box is filled black, and then the image is
+  cropped. A box outside the crop is reported, since it hides nothing there.
+- **Metadata stays behind.** The take is a new PNG of the pixels alone,
+  converted to sRGB from the screenshot's own color profile (a Mac's is
+  Display P3). The screenshot's PNG text and EXIF, where a computer's name can
+  hide, aren't copied. The screenshot itself isn't kept; the record holds its
+  SHA-256 and size.
+- **Text size:** no page is left to measure, so the recipe declares the size
+  of the text a reader needs, `hand: {text_px: 14}`, read from DevTools'
+  Computed pane. The take records it as declared, and the legibility check
+  judges it as it judges a measured figure's.
+- **Marks** can only be placed by `xy`, in the take's pixels. Moving one needs
+  no new take, for any figure: a spot typed in isn't measured.
+- **The record:** who took the screenshot (`--by`), on what day (`--date`), in
+  what browser (`--browser`), when it was imported, the screenshot's hash, and
+  each box blacked out, with its reason. `IMAGES.md` shows it as "A. Person:
+  screenshot by hand in Chrome 141 on macOS 15; imported by tools/shots, 1
+  area blacked out".
+- **What no check can do:** nothing reads a screenshot's text, so nothing
+  finds a name, an avatar, or an address that the boxes missed. Look at the
+  take on the contact sheet before promoting it.
+- **Elsewhere:** `capture` skips a hand figure and says how to import it.
+  `doctor` doesn't read robots.txt for it, because a person's browser loads the
+  page, as a person.
+
+No recipe uses it yet. Its first candidate is week 1's issue form
+(`issue_form.png`), if the maintainer chooses a hand capture over a public
+issue (see "Waiting on the maintainer" in `docs/handoff.md`).
 
 ## Markers
 
@@ -988,7 +1062,7 @@ this step.
 
 - **`images/<chapter>/provenance.json`** records, for each image:
   - its kind and source URL;
-  - when it was captured, and by whom (the tool, or a hand-run script before it);
+  - when it was captured, and by whom (the tool, a hand-run script before it, or a person, for an import);
   - the browser, User-Agent, window, scale, and crop;
   - a hash of the recipe and of the image;
   - the sizes of its text, which `check` judges;
@@ -1070,7 +1144,16 @@ It reports **warnings** for:
 - a figure showing more than 800×600 CSS pixels whose recipe does not say why (`oversize:`), or, within 1024×768, whose text is too small somewhere it is shown or was never measured (see Legibility);
 - evidence never run to its end, or whose query or claim changed after it ran (see Evidence).
 
-`selftest` runs 127 offline checks against a local web server. It needs the browser but no network. It covers:
+With no chapter named, `check` covers every chapter and `course.yml`. So does
+CI: `.github/workflows/shots-check.yml` runs it on each pull request that
+changes `images/`, `tools/shots/`, or the workflow itself, and on no other
+(AAR P1-1; the maintainer asked for image pull requests only). `check` loads no
+page and starts no browser, so the job installs just PyYAML, Pillow, and
+websockets, at the pins in `requirements.txt`, and `check` itself takes about a
+second. An image replaced by hand, or an `IMAGES.md` table left behind, fails
+it, so the reviewer's look can go to what the figure shows.
+
+`selftest` runs 142 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - a stylesheet whose connection drops, which fails a take whose text is all there and is retried, beside one answered with a 404, which passes, and a recipe that accepts lost files, whose log names them; an aborted stylesheet counts, an aborted image or script doesn't;
@@ -1090,7 +1173,8 @@ It reports **warnings** for:
 - the Selenium engine: the window `webdriver.Chrome()` opens, with Chrome for Testing's bar and the versions recorded;
 - the codegen engine: a real click written as a line of the recorder's script, both windows grabbed, and the Inspector's code counted at its stylesheet's size;
 - evidence, against a stand-in CDX server: a query paged to its end, its summaries and its listing in `IMAGES.md`, a page that returns exactly its limit and one whose resume key is left unfollowed failing, and `check` on evidence never run, a changed query, and a reworded claim;
-- sync, into a stand-in course repo: an approved figure copied with its record, table, and stubs size, a person's notes kept; `synced` finding it, then a copy changed by hand; `--annotated` without markers and an uncommitted source refused.
+- sync, into a stand-in course repo: an approved figure copied with its record, table, and stubs size, a person's notes kept; `synced` finding it, then a copy changed by hand; `--annotated` without markers and an uncommitted source refused;
+- import, of a made-up screenshot: `capture` leaving it to a person; the take cropped at scale 2, its avatar blacked out, its note and color profile left behind, and who, when, the screenshot's hash, and the redaction recorded; a declared text size judged, and one too small warned about; a crop past the edge, a future date, and a figure the toolkit captures refused; the recipe rules for `mode: hand`; `promote` with markers, `check`, and a mark moved by `xy` redrawn without a new take.
 
 It skips the marker checks if TeX is missing and the headed checks if the virtual display is.
 
@@ -1119,6 +1203,7 @@ It skips the marker checks if TeX is missing and the headed checks if the virtua
 | `lib/provenance.py` | `provenance.json` and the `IMAGES.md` table |
 | `lib/evidence.py` | the queries behind captions' claims: paging, the complete-or-fail rule, summaries, and staleness |
 | `lib/sync.py` | copies into the course repo: `shots.json`, the `IMAGES.md` table, `stubs.tsv` sizes, and `synced` |
+| `lib/hand.py` | a person's screenshot made a take: the recipe rules for `mode: hand`, redaction, the crop, and the record |
 | `selftest.py` | the offline test |
 | `recipes/` | one YAML file per chapter, and `course.yml` for course-only figures |
 | `out/`, `.venv/` | takes, markers, contact sheets, and the virtual environment (git-ignored) |

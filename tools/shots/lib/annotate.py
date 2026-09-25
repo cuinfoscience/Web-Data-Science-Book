@@ -103,7 +103,8 @@ def _spread(positions, spacing):
 
 
 def _anchor(anchors, at, i):
-    entry = anchors.get(measure.key(at))
+    # A spot typed in by hand needs no measuring, so a changed `xy` needs no new take.
+    entry = measure.hand_box(at["xy"]) if "xy" in at else anchors.get(measure.key(at))
     if entry is None:
         raise AnnotateError(f"mark {i + 1}: {measure.key(at)} was not measured in this take; "
                             "capture again after changing what a mark points at")

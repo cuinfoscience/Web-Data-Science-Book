@@ -127,8 +127,9 @@ def scales(fig, width, annotated=None):
 
 
 def judge(fig, text, width, annotated=None):
-    """[(target, size there, threshold, unit, ok)] for a take's or an image's text sizes."""
-    if not text or not text.get("chars"):
+    """[(target, size there, threshold, unit, ok)] for a take's or an image's text sizes. A hand
+    capture's size is the one its recipe declares (lib/hand.py), since no page is left to measure."""
+    if not text or not (text.get("chars") or text.get("declared")):
         return []
     size = text["p20"]
     return [(name, round(size * factor, 1), THRESHOLDS[name], UNITS[name], size * factor >= THRESHOLDS[name])

@@ -340,7 +340,7 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 | P0-1 | P0 | `AGENTS.md`, `AUTHORING.md` | definition | Two-sided legibility; scope, then zoom; `check` is the one threshold | maintainer | Applied 2026-09-24 (see note) | Figures failing `check` at any target: 29 → 0 new; figures redone for cramming: 3 → 0 |
 | P0-2 | P0 | `AGENTS.md`, `docs/decisions.md`, `.claude/settings.json`, repo setting | definition + permission | Merge commits, new branch per PR, no force-push | maintainer | Decided; text applied 2026-09-24; permission and repo setting open | Force-pushes: ~6 → 0; squash merges by the agent: 12 → 0; stop-hook unpushed warnings: 2 → 0 |
 | P0-3 | P0 | `selftest.py`, `AGENTS.md` | tool config + definition | Effect test per external setting; a real figure before "done" | auto + maintainer | Applied 2026-09-24: text, then a read-back of every setting (see note) | Toolkit bugs found after merge: 5 → ≤1; settings with an effect test: 3 of 8 → 8 of 8 |
-| P1-1 | P1 | `.github/workflows/shots-check.yml` | CI | `check` on PRs that change images | maintainer | Proposed | Image PRs merged without `check` in CI: all → 0 |
+| P1-1 | P1 | `.github/workflows/shots-check.yml` | CI | `check` on PRs that change images | maintainer | Applied 2026-09-25, when its pull request merges (see note) | Image PRs merged without `check` in CI: all → 0 |
 | P1-2 | P1 | `AGENTS.md`, `CLAUDE.md`, `docs/` | layout | One instruction file; records beside the code | auto | Applied | Instruction files found by the collector: 0 → 1; earlier AARs found: 0 → 2 |
 | P1-3 | P1 | skill collector | tool config | Read `queued_command`; wider correction pattern | skill maintainer | Proposed | Steering messages counted: 0 of 8 → 8 of 8 |
 | P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 11 of 11 ch-07/08 figures retaken, 3 of 3 captions dated; week 7's slides remade, and 5 of week 8's 6 that fell short; the rest wait (see notes) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
@@ -372,6 +372,12 @@ stated in the preface. That now conflicts with the aim of showing computed figur
   - its text can't be read by any client, so its sizes come from its stylesheet;
   - Playwright turns off HTTPS-Upgrades, and the practice site redirects to plain http.
 - **The first AAR's P1-2 in the toolkit, the same day.** `tools/shots/run evidence` runs the queries a recipe lists behind a caption's claim, pages them to their end, fails one that returns exactly its limit and can't page, and records what it found; `check` warns when evidence is missing or stale. Its first two runs, for chapter 7, confirmed the calendar paragraph's dates and corrected a date in the x.com paragraph (the spacer image was saved in April and May 2000). They also showed that the figure's notes had overstated the x.com finding: the six images' later captures are redirects, not 404s. The rule was already written; what it lacked was a check that runs before a claim ships.
+- **P1-1 and the end of M4, the same day.** `.github/workflows/shots-check.yml` runs `tools/shots/run check` on each pull request that changes `images/`, `tools/shots/`, or the workflow, and on no other, as the maintainer asked. The proposal needed three changes to work:
+  - `check` with no chapter named now covers `course.yml` as well as the chapters;
+  - the job installs only what `check` imports (PyYAML, Pillow, websockets, at the toolkit's pins), since Playwright and Selenium are only for capturing;
+  - Python is 3.11, the version the toolkit's pins are tested on.
+
+  Rehearsed in a clean environment, it passed `main` in under a second and failed an image changed by one byte. None of the 39 open student pull requests changes those paths, so it runs on none of them. `AGENTS.md` now says CI repeats the check, in place of the proposal's line asking a pull request to state that `check` passes. The same pull request adds `import`, M4's last piece: a person's screenshot of a page behind a login, made a take with its `redact:` boxes blacked out and its metadata left behind. Its first candidate, week 1's issue form, waits on the maintainer.
 
 ## Appendix A — Design sketch: why each part exists
 

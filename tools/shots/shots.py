@@ -8,6 +8,8 @@
     tools/shots/run annotate ch-NN ID [--take PATH]   redraw a take's markers after editing them
     tools/shots/run sheet ch-NN [--only ID ...]   each newest take at the size it will be shown
     tools/shots/run promote ch-NN ID [--take PATH]
+    tools/shots/run import ch-NN ID --file PNG --by NAME --date YYYY-MM-DD [--browser TEXT]
+                                              a person's screenshot of a `mode: hand` figure, as a take
     tools/shots/run adopt ch-NN [--only ID ...]   record provenance for images made before tools/shots
     tools/shots/run evidence ch-NN [--only ID ...]   run the queries behind the captions' claims
     tools/shots/run sync ch-NN ID --to slides/week-NN/img [--as FILE] [--annotated] [--take PATH]
@@ -292,6 +294,10 @@ def cmd_capture(args):
     try:
         for fig in figs:
             print(f"{args.chapter}/{fig['id']}")
+            if fig["mode"] == "hand":
+                line(NOTE, f"a person takes this screenshot ({fig['hand']['why']}); import it: tools/shots/run "
+                           f"import {args.chapter} {fig['id']} --file PNG --by NAME --date YYYY-MM-DD")
+                continue
             host = host_of(fig.get("url") or "")
             if host in refused:
                 line(BAD, f"skipped: the proxy refused {host} earlier in this run")
@@ -346,10 +352,11 @@ def report_take(fig, take):
     if verdict:
         line("note" if verdict[0] == "note" else WARN, verdict[1])
     skip = (fig.get("legibility") or {}).get("skip")
+    said = "text size" + (" (declared in the recipe)" if (take.get("text") or {}).get("declared") else "")
     if results and skip and not all(r[-1] for r in results):
-        line("note", f"text size: {legibility.describe(results)}; not judged: {skip}")
+        line("note", f"{said}: {legibility.describe(results)}; not judged: {skip}")
     elif results:
-        line(GOOD if all(r[-1] for r in results) else WARN, "text size: " + legibility.describe(results))
+        line(GOOD if all(r[-1] for r in results) else WARN, f"{said}: " + legibility.describe(results))
     return 0
 
 
@@ -459,6 +466,46 @@ def cmd_promote(args):
     return 0
 
 
+def cmd_import(args):
+    from lib import hand
+    recipe = load(args.chapter)
+    fig = figure(recipe, args.id)
+    if fig["mode"] != "hand":
+        print(f"{args.chapter}/{args.id} is captured by the toolkit (`mode: {fig['mode']}`); `import` takes a "
+              "person's screenshot of a figure whose recipe says `mode: hand`")
+        return 1
+    print(f"{args.chapter}/{args.id}")
+    try:
+        take = hand.run(fig, args.file, args.by, args.date, args.browser)
+    except hand.HandError as e:
+        line(BAD, str(e))
+        return 1
+    if not take["ok"]:
+        line(BAD, "; ".join(take["problems"]) + f" ({take['image']})")
+        return 1
+    raw, S = take["raw"], take["scale"]
+    color = f", converted to sRGB from {raw['color']}" if raw.get("color") else ""
+    line(GOOD, f"{take['image']}  ({take['size'][0]}x{take['size'][1]}, cropped from a "
+               f"{raw['size'][0]}x{raw['size'][1]} screenshot{color})")
+    shown = (round(raw["size"][0] / S), round(raw["size"][1] / S))
+    if shown != tuple(fig["window"]):
+        line(NOTE, f"the screenshot shows {shown[0]}×{shown[1]} CSS pixels at scale {S:g}; the recipe's window is "
+                   f"{fig['window'][0]}×{fig['window'][1]} (the crop decides what the figure shows)")
+    for r in take["redacted"]:
+        if r.get("outside_crop"):
+            line(WARN, f"redact {r['box']} ({r['why']}) is outside the crop, so it hides nothing there")
+        else:
+            line(GOOD, f"blacked out {r['box']}: {r['why']}")
+    line(NOTE, "nothing reads a screenshot's text: look at the take for a name, an avatar, or an address the "
+               f"redactions missed (tools/shots/run sheet {args.chapter} --only {args.id})")
+    approved = IMAGES / args.chapter / fig["file"]
+    if not recipe["course"] and approved.exists():
+        c = compare(ROOT / take["image"], approved)
+        line(GOOD if c["similar"] else WARN, f"against the approved image: distance {c['distance']}/64"
+                                             f"{'' if c['similar'] else ' - looks different; check it before promoting'}")
+    return report_take(fig, take)
+
+
 def cmd_adopt(args):
     from PIL import Image
     recipe = load(args.chapter)
@@ -494,7 +541,7 @@ def check_markers(fig, entry, chapter, err, warn):
     """An annotated image must match its record, and its marks the recipe's."""
     annotated = entry.get("annotated")
     if fig.get("annotate") and not annotated:
-        if entry.get("by") == "tools/shots":
+        if entry.get("by") == "tools/shots" or entry.get("imported"):
             warn(f"{fig['id']}: its recipe has marks but no annotated image was recorded (promote again)")
         return
     if not annotated:
@@ -525,11 +572,12 @@ def check_legibility(fig, entry, err):
         return                           # made before the toolkit measured text: nothing to judge
     results = legibility.judge(fig, entry["text"], entry["size"][0], entry.get("annotated"))
     small = [r for r in results if not r[-1]]
+    declared = " (the size its recipe declares)" if entry["text"].get("declared") else ""
     if small and (fig.get("legibility") or {}).get("skip"):
-        line("note", f"{fig['id']}: text is small ({legibility.describe(small)}); "
+        line("note", f"{fig['id']}: text is small ({legibility.describe(small)}){declared}; "
                      f"not judged: {fig['legibility']['skip']}")
     elif small:
-        err(f"{fig['id']}: text too small to read: {legibility.describe(small)}")
+        err(f"{fig['id']}: text too small to read: {legibility.describe(small)}{declared}")
 
 
 def cmd_check(args):
@@ -721,6 +769,12 @@ def main():
         p.set_defaults(fn=fn)
     p = sub.add_parser("sheet"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
     p.set_defaults(fn=cmd_sheet)
+    p = sub.add_parser("import"); p.add_argument("chapter"); p.add_argument("id")
+    p.add_argument("--file", required=True, help="the person's screenshot, a PNG")
+    p.add_argument("--by", required=True, help="who took it")
+    p.add_argument("--date", required=True, help="the day it was taken, YYYY-MM-DD")
+    p.add_argument("--browser", help="the browser and system, as 'Chrome 141 on macOS 15'")
+    p.set_defaults(fn=cmd_import)
     p = sub.add_parser("adopt"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
     p.add_argument("--force", action="store_true"); p.set_defaults(fn=cmd_adopt)
     p = sub.add_parser("evidence"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
