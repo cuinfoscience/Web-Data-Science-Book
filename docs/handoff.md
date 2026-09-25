@@ -1,6 +1,6 @@
 # Hand-off note
 
-**Updated 2026-09-25**, after textbook #148–#152 and #154–#166 and courses #55–#66 merged, with the end of toolkit M4 that this note's pull request adds: `import`, for a person's screenshot of a page behind a login, and the `shots-check` CI job (AAR P1-1). The course pull request paired with it says in `AUTHORING.md` how such a screenshot comes in. This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
+**Updated 2026-09-25**, after textbook #148–#152 and #154–#167 and courses #55–#67 merged. Toolkit M4 is done. This note's pull request adds the screenshot check to `CONTRIBUTING.md`'s table of checks, and the course pull request paired with it brings the course's contributor handouts in line with the textbook (course #68). This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
 
 ## Where things stand
 
@@ -33,7 +33,7 @@
   - ch-07: #161 retook its five Wayback figures within the size limit and dated every caption. Its counts and the calendar's colors follow the new takes, checked against the archive's APIs on 2026-09-25: 20,394,311 captures of google.com, 8,516,745 of facebook.com, and 94,893 of x.com; facebook.com's captures were 200s until April 8, 2005, not through March. Below 1,100 pixels wide the toolbar has no strip chart, so the toolbar paragraph now says what a wider window adds. This note's pull request adds evidence for two of its claims: the calendar's dates (200s until April 8, 2005, 403s from April 10 to August 4, 200s from August 6) and x.com's images (none of six ever a 200). The second corrected the paragraph: the spacer image was saved in April and May 2000, not only April.
   - ch-08: its View Source and JavaScript off/on figures are within the size limit, and the Selenium caption is dated (#142, #148). §8.3 checks Selenium Manager before the first browser (#143). This note's pull request retakes its two tool windows with the engines: the Selenium window, 800×600, and codegen's browser above its Inspector, 800×534, with captions and alt text to match. Every chapter 7 and 8 figure is now within the size limit.
 - **Decisions on 2026-09-24** ([`decisions.md`](decisions.md)): robots.txt is read for the course's User-Agent, and examples send one; a figure of an API's response is captured as an API client; the book recommends Python 3.14; students' pull requests merge after a code-review standup in class on a Friday.
-- **Contributors.** `CONTRIBUTING.md`, a pull request template, and issue forms that point to it (#146). The README acknowledges the AI tools used to write the book (#145).
+- **Contributors.** `CONTRIBUTING.md`, a pull request template, and issue forms that point to it (#146). Its table of checks now lists the screenshot check, and the course's handouts match all three (course #68). The README acknowledges the AI tools used to write the book (#145).
 - **Project records.** `AGENTS.md` and `docs/`: the AARs, the plans, the decision log, and this note.
 - **Course repository.**
   - Course #55 is merged: week 4's figures for the RSS handout and slides, Jupyter in week 1's setup, and `AUTHORING.md`'s notes on copies and the field notes.
@@ -46,7 +46,14 @@
   - Course #63 is merged: three of week 8's slide screenshots, remade from the `week08-*` recipes in 480-pixel windows (#163). Their text went from about 7–11 pixels to 18–19.6 on a 1,920-pixel slide.
   - Course #64 is merged: week 8's two tool windows (#164), `selenium_browser.png`, a crop to the bar's first sentence for its 35% column (18.5 pixels), and `codegen.png`, figure 8.6 (16.2 pixels in its 55% column). Course #65 corrected week 7's x.com note to the evidence's dates.
   - Course #66 is merged: the records of the 25 copies from the textbook, in weeks 3, 5, 7, and 8's slides and weeks 1 and 4's handouts. `sync` reproduced every file byte for byte, so no image changed; each folder gained `shots.json` and a table in `IMAGES.md`, and `AUTHORING.md` names `sync` and `synced`.
-  - The course pull request paired with this note's adds to `AUTHORING.md` that a page behind a login comes in as a person's screenshot, through the textbook's `import`.
+  - Course #67 is merged: `AUTHORING.md` says a page behind a login comes in as a person's screenshot, through the textbook's `import`.
+  - Course #68, paired with this note's pull request, brings the contributor handouts in line with the textbook:
+    - `revision-framework.md` and week 1's deck name `AGENTS.md`;
+    - the handouts show the pull request template (textbook #146) in place of "Pull requests have no form";
+    - a stale or missing figure is reported with a screenshot or a sketch, not replaced by hand, which the screenshot check would now fail;
+    - the walkthrough says Notebook sync fails after every browser edit, as expected.
+
+    Weeks 3 and 4's decks, already taught, still describe the fields by hand.
   - Course #56 is merged. It adds the roadmap for the Friday code review (`docs/plans/2026-09-24-friday-code-review.md`) and the merge rule in the revision framework, the pull request walkthrough, and week 4's FAQ. It also puts Python 3.14 in week 1's setup and gensim from conda-forge in week 7's deck.
 
 ## Next
@@ -65,8 +72,7 @@ In this order:
    - Chapter 7's three top-level requests (Availability, the raw capture, CDX) send none, and week 7's deck copies them. Change the chapter and the deck together, so the slides match the notebook.
    - The course's week 11 deck calls keyed APIs (Census, FRED, FEC) without one. Week 1's setup handout and week 10's deck already send one (course #56 fixed week 1).
 6. **Chapter 4's Step 5**, after the Friday review. It sends students to Open-Meteo after Step 1 taught them to check robots.txt, whose file there disallows every path; a sentence could point back to chapter 2's distinction between crawlers and API clients. Students' #86 revises Step 5, so wait for it.
-7. **The course side of the contributor docs.** `handouts/common/revision-framework.md` and week 1's deck still name `claude.md`, now `AGENTS.md`, and the handouts say pull requests have no form.
-8. **Computed outputs.** If they are adopted, run the [plan](plans/2026-09-24-computed-outputs.md)'s M0 pilot on chapter 5.
+7. **Computed outputs.** If they are adopted, run the [plan](plans/2026-09-24-computed-outputs.md)'s M0 pilot on chapter 5.
 
 ## Waiting on the maintainer
 
@@ -92,14 +98,14 @@ In this order:
     - chapters: `claude/ch01-setup-fixes`, `claude/ch04-figures`, `claude/ch04-refresh-live-data`, `claude/ch04-rss-directory-links`, `claude/ch04-rss-starter-feeds`, `claude/ch04-swap-rss-links`, `claude/ch05-protocols-expansion`, `claude/ch05-protocols-terminal-tools`, `claude/ch07-wayback-background`, `claude/ch08-retakes`, `claude/ch08-selenium-manager-playwright`, `claude/ch08-selenium-preflight`;
     - the toolkit: `claude/pilot-ch05`, `claude/shots-toolkit-m1`, `claude/shots-toolkit-m2`, `claude/shots-toolkit-m3`, `claude/shots-devtools-effect-tests`, `claude/shots-relaxed-limit`, `claude/shots-field-notes`, `claude/notebook-figure-brackets`;
     - docs: `claude/docs-agents-md`, `claude/aar-p0-edits`, `claude/lift-pause-pilot-gate`, `claude/readme-ai-acknowledgement`, `claude/contributing-guide`, `claude/handoff-after-merges`, and `claude/decisions-ua-python`;
-    - the back-fill: `claude/ch01-figures`, `claude/ch02-figures`, `claude/ch03-figures`, `claude/ch05-a-record-note`, `claude/api-client-figures`, `claude/wayback-figures`, `claude/ch07-retakes`, `claude/week07-slide-shots`, `claude/week08-slide-shots`, `claude/m4-tool-engines`, `claude/m4-evidence`, `claude/m4-sync`, and this note's own branch, `claude/m4-import`, once it merges.
+    - the back-fill: `claude/ch01-figures`, `claude/ch02-figures`, `claude/ch03-figures`, `claude/ch05-a-record-note`, `claude/api-client-figures`, `claude/wayback-figures`, `claude/ch07-retakes`, `claude/week07-slide-shots`, `claude/week08-slide-shots`, `claude/m4-tool-engines`, `claude/m4-evidence`, `claude/m4-sync`, `claude/m4-import`, and this note's own branch, `claude/contributor-docs-course`, once it merges.
   - **This repository, closed without merging:** `claude/decisions-ua-python-review` (#153). #154 replaced it with the same changes, because the message of #153's first commit quoted a closing keyword with #90's number: merged, it would have closed #90 again.
   - **The course repository, merged into `main`:** `add-slides-ci`, `claude/detrope-week02-images`, `claude/week-01-screenshots-2aiqhh`, `claude/week-02-expansion`, `claude/week-04-rss-feeds-handout`, `claude/wk02-fixes`, `fix-oscars-403-headers-slides`, `overleaf-2026-08-24-0430`, and `overleaf-2026-08-24-0500`.
   - **The course repository, closed without merging:** `claude/swartz-ca-frames` (#23). Delete it only if #23 won't be revived. GitHub can restore it from the closed pull request.
   - **Keep:** `main`, `gh-pages`, every branch with an open pull request (students' included), and the course session's branch, `claude/info-4617-fall-2026-syllabus-07ahb8`.
 - **Contributor docs that still disagree.** Found by #146's audit and left for later:
   - **User-Agent:** the chapters use six User-Agent strings; `decisions.md` now names the pattern for examples, and aligning them is item 5 of "Next".
-  - **Exercises:** the revision framework invites starter cells, rubrics, and expected output; `AGENTS.md` rules out solutions and scaffolds.
+  - **Exercises:** the course's revision framework invites starter cells, rubrics, and expected output; `AGENTS.md` rules out solutions and scaffolds. An editorial call for the maintainer; course #68 left it as it was.
   - **Common Issues:** ch-15 has no Common Issues section, though the "common issue" revision type assumes one.
   - **Length:** five chapters run past 7,000 words, against a target of about 3,000.
 - **Course CI.** On course #51, the week-7 and week-8 deck builds sat in "Install TeX Live" (apt) for more than 30 minutes. That pull request changed neither deck, and it merged at the maintainer's instruction. The build on `main` after the merge passed. If the stall recurs, cache the TeX install, or build inside a TeX Live container.
