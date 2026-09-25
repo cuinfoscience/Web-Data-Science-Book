@@ -387,3 +387,64 @@ figures:
     crop: {top: 0, height: 200, left: 0, width: 800}
     targets: {slides: {width: 0.85}}
     drifts: true        # the toolbar's count and date range
+
+  # Week 8's slides (the course repo's slides/week-08/img/). Three of the deck's
+  # screenshots of 2026-09-22/23 were taken in 900- and 1,280-pixel windows, one
+  # image pixel per CSS pixel, for frames that show them at 35% or 78% of the
+  # slide's text width: their text came to 7 to 11 pixels on a 1,920-pixel slide.
+  # The recipes below take the same pages at 480 pixels, where it reaches 18 to 20.
+  # Three others wait: pr_review.png, for a session that can read github.com's
+  # robots.txt (a cloud session reaches github.com only for its own repositories),
+  # and selenium_browser.png and codegen.png, whose subject is the tool itself
+  # (M4). quotes.toscrape.com is a sandbox built for scraping practice and has no
+  # robots.txt.
+  - id: week08-requests-vs-browser
+    kind: capture
+    section: "week-08 slides, Zero bytes (requests_vs_browser.png)"
+    brief: >-
+      Show quotes.toscrape.com/js/ with JavaScript off and on, side by side and
+      labeled: off has only the title, Login, Next, and the footer; on has the
+      quotes. Wide and short, for a frame that shows it at 78% of the slide's
+      text width above two paragraphs.
+    url: https://quotes.toscrape.com/js/
+    mode: composite
+    window: [480, 350]
+    parts:
+      - label: JavaScript off
+        javascript: false
+        steps: [{wait: {text: 'Quotes to Scrape'}}]
+      - label: JavaScript on
+        steps: [{wait: {text: 'Albert Einstein'}}]
+    layout: {gap: 20, pad: 15, label_px: 20}
+    oversize: "two 480-pixel pages side by side, 410 tall, for a frame that shows them at 78% of the slide's text width; their 14-pixel text comes to 18 there"
+    targets: {slides: {width: 0.78}}
+
+  - id: week08-js-off
+    kind: capture
+    section: "week-08 slides, Check 2: JavaScript off (js_off.png)"
+    brief: >-
+      Show quotes.toscrape.com/js/ with JavaScript off: the title, Login, Next,
+      and the footer, and no quotes. Narrow, for a column 35% of the slide wide.
+    url: https://quotes.toscrape.com/js/
+    javascript: false
+    window: [480, 400]
+    steps: [{wait: {text: 'Quotes to Scrape'}}]
+    expect: {text: ['Quotes to Scrape', 'Login', 'Next']}
+    targets: {slides: {width: 0.35}}
+
+  - id: week08-playwright-home
+    kind: capture
+    section: "week-08 slides, Playwright (playwright_home.png)"
+    brief: >-
+      Show the top of playwright.dev/python: its headline, "Playwright enables
+      reliable web automation for testing, scripting, and AI agents," and the
+      Get started button. Narrow, for a column 35% of the slide wide.
+    url: https://playwright.dev/python/
+    window: [480, 600]
+    steps:
+      - wait: {text: 'Playwright enables reliable web automation'}
+      - wait: {network_idle: true}
+    expect: {text: ['Playwright enables reliable web automation', 'Get started']}
+    crop: {top: 0, height: 528, left: 0, width: 480}      # the menu bar and the hero, to its foot
+    targets: {slides: {width: 0.35}}
+    drifts: true        # the site's own wording and look

@@ -863,6 +863,15 @@ things about slides:
   recipe says why in `legibility: {skip: …}`: the count and the date the
   frame discusses read at 19.
 
+The three `week08-*` figures remake week 8's JavaScript off/on pair,
+JavaScript off alone, and playwright.dev (2026-09-25). They add a fifth:
+
+- **Or load the page narrow.** A live site reflows for a narrow window, so a
+  page loaded 480 pixels wide fills a 35% column without a sideways crop.
+  playwright.dev folds its menu into a button and wraps its headline to four
+  lines; its menu bar and hero read at 19.6 pixels. The same pages in 900-
+  and 1,280-pixel windows had shown their text at about 7 to 11.
+
 ## Provenance
 
 - **`images/<chapter>/provenance.json`** records, for each image:
