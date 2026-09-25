@@ -564,6 +564,18 @@ You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset
 
 ```{python}
 # Step 3: Run pd.read_html on the cached HTML, count the tables, and pick out yours.
+::: {.callout-tip}
+## Do not rely on table indexes staying fixed
+
+The position of a table on a webpage can change when the site adds or removes other tables. Before writing code that assumes an index such as `tables[3]`, inspect the tables or identify the one you want by its column names.
+
+For example:
+
+```python
+tables = pd.read_html(cached_html)
+
+for i, table in enumerate(tables):
+    print(i, list(table.columns))
 # Your code here
 ```
 
