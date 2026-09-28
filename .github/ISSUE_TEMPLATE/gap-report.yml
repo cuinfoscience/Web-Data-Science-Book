@@ -13,12 +13,18 @@ body:
         whole contribution. You are reading this material for the first time, which
         makes you the best person to notice a hole in it.
 
+        **Finish the title** after `Gap:`: say what was missing or unclear, and where, for example
+        `Gap: Ch. 11 doesn't say where the Census API key goes`. New here?
+        [CONTRIBUTING.md](https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/CONTRIBUTING.md)
+        explains the three forms and what happens after you file.
+
   - type: dropdown
     id: chapter
     attributes:
       label: Where were you?
       description: Pick the chapter you were reading.
       options:
+        - "The preface"
         - "Ch. 1 — Introduction to Web Data Science"
         - "Ch. 2 — Ethics, Law, and Responsible Data Collection"
         - "Ch. 3 — The Post-API Age"
@@ -36,6 +42,7 @@ body:
         - "Ch. 15 — Research Design with Web Data"
         - "An appendix"
         - "A companion notebook"
+        - "The book as a whole"
     validations:
       required: true
 
@@ -93,6 +100,14 @@ body:
         Optional, but useful. You do not have to write the fix — just say what would
         have unstuck you. A sentence, a diagram, an example, a link, a definition.
       placeholder: "One sentence saying robots.txt always lives at the site root, with an example URL."
+    validations:
+      required: false
+
+  - type: textarea
+    id: ai
+    attributes:
+      label: Did an AI tool help you write this?
+      description: Optional. If one did, name it and say what it did, for example "an AI assistant drafted the second paragraph". The course asks for this, and the book discloses its own AI use in Appendix B.
     validations:
       required: false
 

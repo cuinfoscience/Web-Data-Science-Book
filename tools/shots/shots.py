@@ -1,0 +1,799 @@
+#!/usr/bin/env python3
+"""Capture, check, and record the book's screenshots. See tools/shots/README.md.
+
+    tools/shots/run doctor [ch-NN]            can this session capture? (run first, every time)
+    tools/shots/run list [ch-NN]              recipes, approved images, and takes
+    tools/shots/run capture ch-NN [--only ID ...]
+    tools/shots/run compare ch-NN ID          newest take against the approved image
+    tools/shots/run annotate ch-NN ID [--take PATH]   redraw a take's markers after editing them
+    tools/shots/run sheet ch-NN [--only ID ...]   each newest take at the size it will be shown
+    tools/shots/run promote ch-NN ID [--take PATH]
+    tools/shots/run import ch-NN ID --file PNG --by NAME --date YYYY-MM-DD [--browser TEXT]
+                                              a person's screenshot of a `mode: hand` figure, as a take
+    tools/shots/run adopt ch-NN [--only ID ...]   record provenance for images made before tools/shots
+    tools/shots/run evidence ch-NN [--only ID ...]   run the queries behind the captions' claims
+    tools/shots/run sync ch-NN ID --to slides/week-NN/img [--as FILE] [--annotated] [--take PATH]
+                                              copy a figure into the course repo, with its record
+    tools/shots/run synced                    every copy in the course repo against its record and source
+    tools/shots/run check [ch-NN ...]         recipes, provenance, legibility, markers, figure blocks, evidence
+                                              (no chapter: all of them and course.yml, as CI runs it)
+    tools/shots/run status                    every figure's kind and age
+    tools/shots/run clean [ch-NN]             delete old takes
+    tools/shots/run selftest                  offline test of the guards, promote, and markers
+"""
+import argparse
+import datetime
+import json
+import re
+import shutil
+import subprocess
+import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
+from urllib.parse import urlparse
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from lib import annotate, legibility                                   # noqa: E402
+from lib import devtools as dt                                          # noqa: E402
+from lib import provenance as prov                                      # noqa: E402
+from lib import robots                                                  # noqa: E402
+from lib.capture import Pacer, PolicyBlock, capture, sha256, takes      # noqa: E402
+from lib.compare import compare                                         # noqa: E402
+from lib.env import IMAGES, OUT, RECIPES, ROOT, TOOL, chrome_path, chrome_version, proxy, rel  # noqa: E402
+from lib import guards                                                  # noqa: E402
+from lib.recipes import DEFAULTS, RecipeError, chapters, figure, load, loads   # noqa: E402
+
+GOOD, NOTE, WARN, BAD = "ok", "note", "warn", "FAIL"
+
+
+def line(mark, text, fix=None):
+    print(f"  {mark:4}  {text}")
+    if fix:
+        print(f"        -> {fix}")
+
+
+# ---------------------------------------------------------------- doctor
+def cmd_doctor(args):
+    failed = False
+    print("Session")
+    px = proxy()
+    if px:
+        try:
+            # Ask the proxy itself, directly: this request must not be proxied.
+            direct = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+            direct.open(px.rstrip("/") + "/__agentproxy/status", timeout=10).read()
+            line(GOOD, f"proxy {px} answers")
+        except Exception as e:
+            line(WARN, f"proxy {px} is set, but its status endpoint did not answer ({e})")
+    else:
+        line(GOOD, "no HTTPS_PROXY: requests go direct")
+    try:
+        path = chrome_path()
+        line(GOOD, f"browser: {chrome_version(path)}")
+    except Exception as e:
+        line(BAD, f"no browser: {e}", "bash tools/shots/bootstrap.sh")
+        return 1
+    try:
+        from lib.browser import Browser
+        browser = Browser()
+        context = browser.context({**DEFAULTS, "scale": 1})
+        page = context.new_page()
+        response = page.goto("https://example.com/", wait_until="domcontentloaded", timeout=60000)
+        OUT.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(OUT / "doctor.png"))
+        title = page.title()
+        context.close()
+        browser.close()
+        if response and response.status == 200 and "Example Domain" in title:
+            line(GOOD, "headless capture of https://example.com/ works")
+        else:
+            failed = True
+            line(BAD, f"example.com answered {response and response.status} with title {title!r}")
+    except Exception as e:
+        failed = True
+        error = str(e).splitlines()[0]
+        if "ERR_CERT" in error:
+            line(BAD, f"Chrome does not trust the proxy's certificate ({error})", "bash tools/shots/bootstrap.sh")
+        elif "ERR_TUNNEL_CONNECTION_FAILED" in error:
+            line(BAD, f"the proxy refused example.com ({error})",
+                 "check the session's network policy; do not route around it")
+        else:
+            line(BAD, f"headless capture failed: {error}")
+    missing = [t for t in ("Xvfb", "xdotool", "import") if not shutil.which(t)]
+    if missing:
+        line(WARN, f"headed capture needs {', '.join(missing)}, which is not installed",
+             "bash tools/shots/bootstrap.sh --headed")
+    else:
+        failed |= doctor_headed()
+    marked = [f"{f['chapter']}/{f['id']}" for c in (args.chapters or chapters())
+              for f in load(c)["figures"] if f.get("annotate")]
+    missing = annotate.tools_missing()
+    if missing and marked:
+        failed = True
+        line(BAD, f"{len(marked)} figure(s) have markers ({marked[0]}, ...), which need {', '.join(missing)}",
+             "bash tools/shots/bootstrap.sh --tex")
+    elif missing:
+        line(WARN, f"markers need {', '.join(missing)}; no recipe here uses them yet",
+             "bash tools/shots/bootstrap.sh --tex, when one does")
+    else:
+        line(GOOD, "TeX for markers (pdflatex, TikZ, pdftocairo)")
+    for chapter in args.chapters:
+        failed |= doctor_chapter(chapter)
+    print("Ready to capture." if not failed else "Not ready; fix the FAIL lines first.")
+    return 1 if failed else 0
+
+
+def doctor_headed():
+    """A real headed window on the virtual display, with DevTools, grabbed from the screen."""
+    from PIL import Image, ImageStat
+    from lib import headed
+    from lib.browser import Browser
+    browser = None
+    try:
+        browser = Browser()
+        fig = {**DEFAULTS, "id": "doctor", "chapter": "doctor", "mode": "headed", "scale": 1,
+               "window": [900, 600], "devtools": {"dock": "right"}, "timeout": 60}
+        session = headed.Session(browser, fig, browser.display(900, 600))
+        try:
+            response = session.page.goto("https://example.com/", wait_until="domcontentloaded", timeout=60000)
+            session.ready()
+            OUT.mkdir(parents=True, exist_ok=True)
+            session.park()
+            session.grab(OUT / "doctor-headed.png", session.crop_rect())
+        finally:
+            session.close()
+        with Image.open(OUT / "doctor-headed.png") as img:
+            spread = ImageStat.Stat(img.convert("L")).stddev[0]
+        if response and response.status == 200 and spread > 3:
+            line(GOOD, "headed capture works (virtual display, DevTools, screen grab)")
+            return False
+        line(BAD, f"headed capture of example.com came back wrong (status "
+                  f"{response and response.status}, pixel spread {spread:.1f})")
+    except Exception as e:
+        line(BAD, f"headed capture failed: {str(e).splitlines()[0]}", "bash tools/shots/bootstrap.sh --headed")
+    finally:
+        if browser:
+            browser.close()
+    return True
+
+
+def doctor_chapter(chapter):
+    print(f"Hosts in {chapter}")
+    failed = False
+    recipe = load(chapter)
+    by_host = {}
+    for fig in recipe["figures"]:
+        for url, expect, api_client in loads(fig):      # a composite's parts can each load another host
+            if url and host_of(url):
+                by_host.setdefault(host_of(url), []).append((fig, url, expect, api_client))
+        for q in fig.get("evidence") or []:              # an evidence query is an API's, asked as a client
+            if host_of(q["url"]):
+                by_host.setdefault(host_of(q["url"]), []).append((fig, q["url"], {}, True))
+    for host, pages in sorted(by_host.items()):
+        figs = [fig for fig, *_ in pages]
+        agent = figs[0]["user_agent"]
+        if host in ("localhost", "127.0.0.1", "::1"):
+            # A server on this machine, such as chapter 1's Jupyter: robots.txt doesn't apply,
+            # and it listens on its own port, so ask the figure's own address.
+            address = pages[0][1]
+            try:
+                with urllib.request.urlopen(address, timeout=10) as r:
+                    line(GOOD, f"{host}: a server on this machine answers {urlparse(address).netloc} "
+                               f"({r.status}); robots.txt doesn't apply")
+            except Exception as e:
+                line(WARN, f"{host}: nothing answers {urlparse(address).netloc} "
+                           f"({str(getattr(e, 'reason', e))})", "start the server the chapter's recipes describe")
+            continue
+        request = urllib.request.Request(f"https://{host}/robots.txt", headers={"User-Agent": agent})
+        try:
+            with urllib.request.urlopen(request, timeout=30) as r:
+                text = r.read().decode("utf-8", "replace")
+            if r.status != 200 or not text.strip():
+                # EUR-Lex sometimes answers with 202 and an empty page that runs a browser
+                # check: that is not a robots.txt with no rules, so it can't be read as one.
+                line(WARN, f"{host}: robots.txt answered {r.status} with {'nothing' if not text.strip() else 'a page'}, "
+                           "not the file", "run doctor again, or read the file in a browser")
+                continue
+            line(GOOD, f"{host}: reachable (robots.txt {r.status})")
+        except urllib.error.HTTPError as e:
+            line(GOOD if e.code in (404, 410) else WARN, f"{host}: robots.txt answered {e.code}")
+            continue
+        except Exception as e:
+            reason = str(getattr(e, "reason", e))
+            if all(expect.get("error") for _, _, expect, _ in pages):
+                # The subject is a host that no longer answers. Behind the proxy, a refused
+                # host fails the same way, so public DNS decides, as it does in `capture`.
+                try:
+                    dns = guards.lookup(host, agent)
+                except Exception as err:
+                    line(WARN, f"{host}: doesn't answer ({reason}), and public DNS didn't either "
+                               f"({str(getattr(err, 'reason', err))})")
+                    continue
+                if guards.dead_host(dns):
+                    line(NOTE, f"{host}: doesn't answer, and public DNS has no address for it ({dns['rcode']}): "
+                               "the dead host its figure expects")
+                else:
+                    failed = True
+                    line(BAD, f"{host}: doesn't answer, but public DNS resolves it "
+                              f"({', '.join(dns['addresses'])}): the proxy refused it",
+                         "a policy block: report it; do not retry or route around it")
+            elif "Tunnel connection failed" in reason:
+                failed = True
+                line(BAD, f"{host}: the proxy refused it ({reason})",
+                     "a policy block: report it; do not retry or route around it")
+            else:
+                line(WARN, f"{host}: not reachable now ({reason})")
+            continue
+        delay = robots.crawl_delay(text, agent)
+        if delay:
+            slowest = min(fig["pause"][0] for fig in figs)
+            asks = f"{host}: robots.txt asks for {delay:g} second{'' if delay == 1 else 's'} between requests"
+            if slowest < delay:
+                line(WARN, f"{asks}; the recipe's pause starts at {slowest:g}",
+                     f"set `pause: [{delay:g}, 30]` on its figures")
+            else:
+                line(NOTE, f"{asks}; the recipe's pause starts at {slowest:g}")
+        for level, message, fix in robots.findings(host, text, agent, [(fig["id"], url, api_client)
+                                                                        for fig, url, _, api_client in pages]):
+            line(WARN if level == "warn" else NOTE, message, fix)
+    return failed
+
+
+def host_of(url):
+    return urlparse(url.removeprefix("view-source:")).hostname
+
+
+# ---------------------------------------------------------------- list / status
+def cmd_list(args):
+    for chapter in args.chapters or chapters():
+        recipe = load(chapter)
+        data = prov.load(chapter)
+        print(f"{chapter}  ({rel(recipe['path'])}, {len(recipe['figures'])} figures)")
+        for fig in recipe["figures"]:
+            approved = "approved" if (IMAGES / chapter / fig["file"]).exists() else "no image"
+            recorded = "recorded" if fig["id"] in data["figures"] else "no provenance"
+            n = len(takes(chapter, fig["id"], ok_only=False))
+            print(f"  {fig['id']:28} {fig['kind']:8} {fig['mode']:9} {approved}, {recorded}, {n} take(s)")
+    return 0
+
+
+def cmd_status(args):
+    today = datetime.date.today()
+    print(f"{'figure':38} {'kind':8} {'captured':10} {'age':>5}  recipe")
+    for chapter in chapters():
+        recipe = load(chapter)
+        data = prov.load(chapter)
+        for fig in recipe["figures"]:
+            e = data["figures"].get(fig["id"])
+            if not e:
+                print(f"{chapter + '/' + fig['id']:38} {fig['kind']:8} {'-':10} {'-':>5}  no provenance")
+                continue
+            day = str(e.get("captured", ""))[:10]
+            try:
+                age = f"{(today - datetime.date.fromisoformat(day)).days}d"
+            except ValueError:
+                age = "?"
+            same = e.get("recipe_sha256") == fig["recipe_sha256"]
+            note = "same" if same else ("before tools/shots" if not e.get("recipe_sha256") else "changed since")
+            print(f"{chapter + '/' + fig['id']:38} {e['kind']:8} {day:10} {age:>5}  {note}")
+    return 0
+
+
+# ---------------------------------------------------------------- capture / compare / promote
+def cmd_capture(args):
+    from lib.browser import Browser
+    recipe = load(args.chapter)
+    figs = [f for f in recipe["figures"] if not args.only or f["id"] in args.only]
+    if args.only and len(figs) != len(set(args.only)):
+        known = {f["id"] for f in recipe["figures"]}
+        print(f"unknown figure(s): {', '.join(sorted(set(args.only) - known))}")
+        return 2
+    browser, pacer, bad, refused = Browser(), Pacer(), 0, set()
+    try:
+        for fig in figs:
+            print(f"{args.chapter}/{fig['id']}")
+            if fig["mode"] == "hand":
+                line(NOTE, f"a person takes this screenshot ({fig['hand']['why']}); import it: tools/shots/run "
+                           f"import {args.chapter} {fig['id']} --file PNG --by NAME --date YYYY-MM-DD")
+                continue
+            host = host_of(fig.get("url") or "")
+            if host in refused:
+                line(BAD, f"skipped: the proxy refused {host} earlier in this run")
+                bad += 1
+                continue
+            try:
+                take = capture(browser, fig, pacer, say=print)
+            except PolicyBlock as e:
+                refused.add(host)
+                line(BAD, str(e), "a policy block: report it; do not retry or route around it")
+                bad += 1
+                continue
+            if take.get("skipped"):
+                line(WARN, take["skipped"])
+            elif take["ok"]:
+                line(GOOD, f"{take['image']}  ({take['size'][0]}x{take['size'][1]}, status {take['status']})")
+                approved = IMAGES / args.chapter / fig["file"]
+                if approved.exists():
+                    c = compare(ROOT / take["image"], approved)
+                    line(GOOD if c["similar"] else WARN,
+                         f"against the approved image: distance {c['distance']}/64"
+                         f"{'' if c['similar'] else ' - looks different; check it before promoting'}")
+                bad += report_take(fig, take)
+            else:
+                bad += 1
+                where = f" ({take['image']})" if take.get("image") else ""
+                line(BAD, "; ".join(take["problems"]) + where)
+    finally:
+        browser.close()
+    return 1 if bad else 0
+
+
+def report_take(fig, take):
+    """Draw a passing take's markers, if its recipe has any, and say how legible it will be.
+    Returns 1 if the markers could not be drawn."""
+    record = None
+    if fig.get("annotate"):
+        try:
+            record = annotate.build(fig, take)
+            line(GOOD, f"markers: {rel(annotate.stem_for(take))}.png and .pdf")
+            for warning in record["warnings"]:
+                line(WARN, warning)
+        except annotate.AnnotateError as e:
+            line(BAD, f"markers: {e}")
+            return 1
+    if take.get("mode") == "headed" and take.get("devtools"):
+        # A DevTools key DevTools doesn't know fails silently: say what it drew instead.
+        for level, message in dt.compare(take["devtools"], take.get("devtools_seen"), take["scale"]):
+            line(WARN if level == "warn" else "note", f"DevTools: {message}")
+    results = legibility.judge(fig, take.get("text"), take["size"][0], record)
+    verdict = legibility.size_verdict(fig, take, results)
+    if verdict:
+        line("note" if verdict[0] == "note" else WARN, verdict[1])
+    skip = (fig.get("legibility") or {}).get("skip")
+    said = "text size" + (" (declared in the recipe)" if (take.get("text") or {}).get("declared") else "")
+    if results and skip and not all(r[-1] for r in results):
+        line("note", f"{said}: {legibility.describe(results)}; not judged: {skip}")
+    elif results:
+        line(GOOD if all(r[-1] for r in results) else WARN, f"{said}: " + legibility.describe(results))
+    return 0
+
+
+def _take(args):
+    if args.take:
+        return json.loads(Path(args.take).with_suffix(".json").read_text())
+    found = takes(args.chapter, args.id)
+    return found[0] if found else None
+
+
+def cmd_annotate(args):
+    fig = figure(load(args.chapter), args.id)
+    if not fig.get("annotate"):
+        print(f"{args.chapter}/{args.id} has no `annotate:` block")
+        return 1
+    take = _take(args)
+    if not take:
+        print(f"no passing take of {args.chapter}/{args.id}; run capture first")
+        return 1
+    print(f"{args.chapter}/{args.id}  ({take['image']})")
+    return report_take(fig, take)
+
+
+def cmd_sheet(args):
+    from lib import sheet
+    recipe = load(args.chapter)
+    entries = []
+    for fig in recipe["figures"]:
+        if args.only and fig["id"] not in args.only:
+            continue
+        found = takes(args.chapter, fig["id"])
+        if not found:
+            continue
+        take, record, path = found[0], None, ROOT / found[0]["image"]
+        if fig.get("annotate"):
+            stem = annotate.stem_for(take)
+            try:
+                record = json.loads(Path(f"{stem}.json").read_text())
+                path = Path(f"{stem}.png")
+            except FileNotFoundError:
+                line(WARN, f"{fig['id']}: no markers drawn on its newest take (run annotate)")
+        entries.append((fig, take, record, path))
+    if not entries:
+        print(f"no passing takes in {args.chapter}; run capture first")
+        return 1
+    for path in sheet.write(args.chapter, entries):
+        print(f"wrote {path}")
+    return 0
+
+
+def cmd_compare(args):
+    fig = figure(load(args.chapter), args.id)
+    take = _take(args)
+    approved = IMAGES / args.chapter / fig["file"]
+    if not take or not approved.exists():
+        print("need a passing take and an approved image to compare")
+        return 1
+    c = compare(ROOT / take["image"], approved)
+    print(json.dumps(c, indent=2))
+    return 0 if c["similar"] else 1
+
+
+def cmd_promote(args):
+    recipe = load(args.chapter)
+    fig = figure(recipe, args.id)
+    if recipe["course"]:
+        print(f"{args.chapter} holds course-only figures, which go to the course repo, not images/: "
+              f"tools/shots/run sync {args.chapter} {args.id} --to slides/week-NN/img --as FILE.png")
+        return 1
+    take = _take(args)
+    if not take:
+        print(f"no passing take of {args.chapter}/{args.id}; run capture first")
+        return 1
+    if not take.get("ok"):
+        print(f"refusing a take that failed its guards: {'; '.join(take.get('problems', []))}")
+        return 1
+    if take["recipe_sha256"] != fig["recipe_sha256"]:
+        print("the recipe changed after this take; capture again")
+        return 1
+    record = None
+    if fig.get("annotate"):
+        try:                             # drawn fresh, from this take and the recipe's marks as they are now
+            record = annotate.build(fig, take)
+        except annotate.AnnotateError as e:
+            print(f"cannot draw the markers: {e}")
+            return 1
+    source, target = ROOT / take["image"], IMAGES / args.chapter / fig["file"]
+    if target.exists():
+        c = compare(source, target)
+        print(f"replacing {rel(target)} (distance {c['distance']}/64 from the old image)")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(source, target)
+    annotated = None
+    if record:
+        stem = annotate.stem_for(take)
+        png = IMAGES / args.chapter / prov.annotated_name(fig["file"])
+        shutil.copyfile(f"{stem}.png", png)
+        shutil.copyfile(f"{stem}.pdf", png.with_suffix(".pdf"))
+        annotated = {"png_sha256": sha256(png), "pdf_sha256": sha256(png.with_suffix(".pdf")),
+                     **{k: record[k] for k in ("annotate_sha256", "width_in", "unit_in", "warnings")}}
+        print(f"markers -> {rel(png)} and {rel(png.with_suffix('.pdf'))}")
+    data = prov.load(args.chapter)
+    data["figures"][fig["id"]] = prov.from_take(take, annotated)
+    prov.save(args.chapter, data)
+    print(f"promoted {take['image']} -> {rel(target)}")
+    print(prov.write_images_md(args.chapter, recipe["qmd"], data))
+    return 0
+
+
+def cmd_import(args):
+    from lib import hand
+    recipe = load(args.chapter)
+    fig = figure(recipe, args.id)
+    if fig["mode"] != "hand":
+        print(f"{args.chapter}/{args.id} is captured by the toolkit (`mode: {fig['mode']}`); `import` takes a "
+              "person's screenshot of a figure whose recipe says `mode: hand`")
+        return 1
+    print(f"{args.chapter}/{args.id}")
+    try:
+        take = hand.run(fig, args.file, args.by, args.date, args.browser)
+    except hand.HandError as e:
+        line(BAD, str(e))
+        return 1
+    if not take["ok"]:
+        line(BAD, "; ".join(take["problems"]) + f" ({take['image']})")
+        return 1
+    raw, S = take["raw"], take["scale"]
+    color = f", converted to sRGB from {raw['color']}" if raw.get("color") else ""
+    line(GOOD, f"{take['image']}  ({take['size'][0]}x{take['size'][1]}, cropped from a "
+               f"{raw['size'][0]}x{raw['size'][1]} screenshot{color})")
+    shown = (round(raw["size"][0] / S), round(raw["size"][1] / S))
+    if shown != tuple(fig["window"]):
+        line(NOTE, f"the screenshot shows {shown[0]}×{shown[1]} CSS pixels at scale {S:g}; the recipe's window is "
+                   f"{fig['window'][0]}×{fig['window'][1]} (the crop decides what the figure shows)")
+    for r in take["redacted"]:
+        if r.get("outside_crop"):
+            line(WARN, f"redact {r['box']} ({r['why']}) is outside the crop, so it hides nothing there")
+        else:
+            line(GOOD, f"blacked out {r['box']}: {r['why']}")
+    line(NOTE, "nothing reads a screenshot's text: look at the take for a name, an avatar, or an address the "
+               f"redactions missed (tools/shots/run sheet {args.chapter} --only {args.id})")
+    approved = IMAGES / args.chapter / fig["file"]
+    if not recipe["course"] and approved.exists():
+        c = compare(ROOT / take["image"], approved)
+        line(GOOD if c["similar"] else WARN, f"against the approved image: distance {c['distance']}/64"
+                                             f"{'' if c['similar'] else ' - looks different; check it before promoting'}")
+    return report_take(fig, take)
+
+
+def cmd_adopt(args):
+    from PIL import Image
+    recipe = load(args.chapter)
+    data = prov.load(args.chapter)
+    for fig in recipe["figures"]:
+        if args.only and fig["id"] not in args.only:
+            continue
+        image = IMAGES / args.chapter / fig["file"]
+        if not fig.get("legacy"):
+            line(WARN, f"{fig['id']}: no `legacy:` block in the recipe")
+        elif not image.exists():
+            line(WARN, f"{fig['id']}: no image at {rel(image)}")
+        elif fig["id"] in data["figures"] and not args.force:
+            line(GOOD, f"{fig['id']}: already recorded")
+        else:
+            with Image.open(image) as img:
+                size = list(img.size)
+            data["figures"][fig["id"]] = prov.from_legacy(fig, sha256(image), size)
+            line(GOOD, f"{fig['id']}: recorded ({fig['legacy']['captured']})")
+    prov.save(args.chapter, data)
+    print(prov.write_images_md(args.chapter, recipe["qmd"], data))
+    return 0
+
+
+# ---------------------------------------------------------------- check
+def figure_block(qmd_text, chapter, file):
+    pattern = re.compile(r"!\[(?P<caption>.*?)\]\(images/" + re.escape(f"{chapter}/{file}") +
+                         r"\)\{(?P<attrs>[^}]*)\}")
+    return pattern.search(qmd_text)
+
+
+def check_markers(fig, entry, chapter, err, warn):
+    """An annotated image must match its record, and its marks the recipe's."""
+    annotated = entry.get("annotated")
+    if fig.get("annotate") and not annotated:
+        if entry.get("by") == "tools/shots" or entry.get("imported"):
+            warn(f"{fig['id']}: its recipe has marks but no annotated image was recorded (promote again)")
+        return
+    if not annotated:
+        return
+    png = IMAGES / chapter / prov.annotated_name(fig["file"])
+    for path, key in ((png, "png_sha256"), (png.with_suffix(".pdf"), "pdf_sha256")):
+        if not path.exists():
+            err(f"{fig['id']}: {rel(path)} is missing")
+        elif sha256(path) != annotated.get(key):
+            err(f"{fig['id']}: {rel(path)} changed after it was drawn")
+    if fig.get("annotate") and annotated.get("annotate_sha256") != annotate.annotate_sha256(fig):
+        warn(f"{fig['id']}: the recipe's marks changed since the markers were drawn (promote again)")
+
+
+def check_size(fig, entry, warn):
+    """The first and soft limit: a figure shows at most 800x600 CSS pixels; up to 1024x768 when its
+    recipe says what clutter the room removes and its text passes; beyond that, with a reason."""
+    results = legibility.judge(fig, entry.get("text"), entry["size"][0], entry.get("annotated"))
+    verdict = legibility.size_verdict(fig, entry, results)
+    if verdict and verdict[0] == "note":
+        line("note", f"{fig['id']}: {verdict[1]}")
+    elif verdict:
+        warn(f"{fig['id']}: {verdict[1]}")
+
+
+def check_legibility(fig, entry, err):
+    if not entry.get("text"):
+        return                           # made before the toolkit measured text: nothing to judge
+    results = legibility.judge(fig, entry["text"], entry["size"][0], entry.get("annotated"))
+    small = [r for r in results if not r[-1]]
+    declared = " (the size its recipe declares)" if entry["text"].get("declared") else ""
+    if small and (fig.get("legibility") or {}).get("skip"):
+        line("note", f"{fig['id']}: text is small ({legibility.describe(small)}){declared}; "
+                     f"not judged: {fig['legibility']['skip']}")
+    elif small:
+        err(f"{fig['id']}: text too small to read: {legibility.describe(small)}{declared}")
+
+
+def cmd_check(args):
+    errors = warnings = 0
+
+    def err(text):
+        nonlocal errors
+        errors += 1
+        line(BAD, text)
+
+    def warn(text):
+        nonlocal warnings
+        warnings += 1
+        line(WARN, text)
+
+    # With no chapter named: every chapter, and the course's recipes, as CI runs it.
+    everything = chapters() + (["course"] if (RECIPES / "course.yml").exists() else [])
+    for chapter in args.chapters or everything:
+        print(chapter)
+        try:
+            recipe = load(chapter)
+        except RecipeError as e:
+            err(str(e))
+            continue
+        for fig in recipe["figures"]:
+            if not (fig.get("brief") or "").strip():
+                warn(f"{fig['id']}: its recipe has no `brief:`, the request the figure answers "
+                     "(what it shows, for which paragraph, what it leaves out)")
+        if recipe["course"]:
+            line(GOOD, f"{len(recipe['figures'])} course-only recipe(s) valid; their images live in the course repo")
+            continue
+        data = prov.load(chapter)
+        qmd = ROOT / recipe["qmd"] if recipe["qmd"] else None
+        text = qmd.read_text() if qmd and qmd.exists() else ""
+        ids = set()
+        for fig in recipe["figures"]:
+            ids.add(fig["id"])
+            image = IMAGES / chapter / fig["file"]
+            entry = data["figures"].get(fig["id"])
+            if not image.exists():
+                warn(f"{fig['id']}: no approved image yet")
+                continue
+            if not entry:
+                err(f"{fig['id']}: {rel(image)} has no provenance (promote a take, or adopt it)")
+            else:
+                if entry.get("image_sha256") != sha256(image):
+                    err(f"{fig['id']}: {rel(image)} changed after its provenance was recorded")
+                if entry.get("kind") != fig["kind"]:
+                    err(f"{fig['id']}: provenance says {entry.get('kind')}, recipe says {fig['kind']}")
+                check_markers(fig, entry, chapter, err, warn)
+                check_size(fig, entry, warn)
+                check_legibility(fig, entry, err)
+            block = figure_block(text, chapter, fig["file"])
+            if not block and entry and entry.get("annotated"):
+                block = figure_block(text, chapter, prov.annotated_name(fig["file"]))
+            if not block:
+                warn(f"{fig['id']}: not used in {recipe['qmd']}")
+                continue
+            alt = re.search(r'fig-alt="([^"]*)"', block["attrs"])
+            if not alt:
+                err(f"{fig['id']}: the figure in {recipe['qmd']} has no fig-alt")
+            elif len(alt.group(1)) < 80:
+                warn(f"{fig['id']}: fig-alt is short ({len(alt.group(1))} characters)")
+            year = str((entry or {}).get("captured", ""))[:4]
+            if fig.get("drifts") and year and year not in block["caption"]:
+                warn(f"{fig['id']}: shows things that change, but its caption doesn't say when "
+                     f"it was captured (for example, 'in {year}')")
+        for fid in set(data["figures"]) - ids:
+            warn(f"provenance.json has `{fid}`, which no recipe describes")
+        from lib import evidence as ev
+        recorded = data.get("evidence") or {}
+        for fig in recipe["figures"]:
+            for problem in ev.stale(fig, recorded.get(fig["id"])):
+                warn(f"{fig['id']}: {problem}")
+        for fid in set(recorded) - ids:
+            warn(f"provenance.json has evidence for `{fid}`, which no recipe describes")
+        md = IMAGES / chapter / "IMAGES.md"
+        if data["figures"] or data.get("evidence"):
+            current = md.read_text() if md.exists() else ""
+            if prov.table(data) not in current:
+                err(f"{rel(md)}: table out of date (run adopt or promote to rewrite it)")
+    print(f"{errors} error(s), {warnings} warning(s)")
+    return 1 if errors else 0
+
+
+# ---------------------------------------------------------------- evidence
+def cmd_evidence(args):
+    from lib import evidence as ev
+    recipe = load(args.chapter)
+    figs = [f for f in recipe["figures"] if f.get("evidence") and (not args.only or f["id"] in args.only)]
+    if not figs:
+        print(f"no figure in {args.chapter}{' of ' + ', '.join(args.only) if args.only else ''} lists evidence")
+        return 1 if args.only else 0
+    pacer, bad = Pacer(), 0
+    data = prov.load(args.chapter)
+    for fig in figs:
+        print(f"{args.chapter}/{fig['id']}")
+        found = {e["id"]: e for e in (data.get("evidence") or {}).get(fig["id"], [])}
+        for q in fig["evidence"]:
+            print(f"  {q['id']}: {q['claim']}")
+            try:
+                record = ev.run(args.chapter, fig, q, pacer, say=print)
+            except ev.EvidenceError as e:
+                line(BAD, str(e), "the claim can't cite this query until it runs to its end")
+                bad += 1
+                continue
+            found[q["id"]] = record
+            line(GOOD, f"{record['rows']:,} row(s) in {len(record['requests'])} request(s), complete; "
+                       f"responses in {record['responses']}")
+            for key, value in (record.get("summary") or {}).items():
+                print(f"    {key}: {json.dumps(value)[:600]}")
+        data.setdefault("evidence", {})[fig["id"]] = [found[q["id"]] for q in fig["evidence"] if q["id"] in found]
+    if recipe["course"]:
+        print("course-only figures keep no provenance here; the records are in tools/shots/out/")
+    else:
+        prov.save(args.chapter, data)
+        print(f"recorded in {rel(prov.path(args.chapter))}")
+        print(prov.write_images_md(args.chapter, recipe["qmd"], data))
+    return 1 if bad else 0
+
+
+# ---------------------------------------------------------------- sync
+def cmd_sync(args):
+    from lib import sync as sy
+    recipe = load(args.chapter)
+    fig = figure(recipe, args.id)
+    try:
+        course = sy.course_repo(args.course)
+        for text in sy.sync(recipe, fig, course, args.to, args.name, args.take, args.annotated):
+            print(text)
+    except sy.SyncError as e:
+        line(BAD, str(e))
+        return 1
+    return 0
+
+
+def cmd_synced(args):
+    from lib import sync as sy
+    try:
+        course = sy.course_repo(args.course)
+    except sy.SyncError as e:
+        line(BAD, str(e))
+        return 1
+    found = sy.synced(course)
+    for level, text in found:
+        line({"good": GOOD, "warn": WARN, "bad": BAD}[level], text)
+    if not found:
+        print(f"no copies recorded in {course} (`sync` records them in each img/ folder's shots.json)")
+    return 1 if any(level == "bad" for level, _ in found) else 0
+
+
+# ---------------------------------------------------------------- clean / selftest
+def cmd_clean(args):
+    removed = 0
+    for chapter_dir in sorted([*OUT.glob("ch-*"), OUT / "course"]):
+        if not chapter_dir.is_dir() or (args.chapters and chapter_dir.name not in args.chapters):
+            continue
+        for fig_dir in sorted(p for p in chapter_dir.iterdir() if p.is_dir()):
+            logs = sorted((p for p in fig_dir.glob("*.json") if ".annotated." not in p.name), reverse=True)
+            keep = {logs[0]} if logs else set()
+            newest_ok = next((p for p in logs if json.loads(p.read_text()).get("ok")), None)
+            if newest_ok:
+                keep.add(newest_ok)
+            for log in logs:
+                if log not in keep:
+                    stamp = log.name.split(".")[0]           # the take's image, log, and markers
+                    for path in fig_dir.glob(f"{stamp}.*"):
+                        path.unlink()
+                    removed += 1
+    print(f"removed {removed} old take(s)")
+    return 0
+
+
+def cmd_selftest(args):
+    return subprocess.run([sys.executable, str(TOOL / "selftest.py")]).returncode
+
+
+def main():
+    parser = argparse.ArgumentParser(prog="shots", description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = parser.add_subparsers(dest="command", required=True)
+    p = sub.add_parser("doctor"); p.add_argument("chapters", nargs="*"); p.set_defaults(fn=cmd_doctor)
+    p = sub.add_parser("list"); p.add_argument("chapters", nargs="*"); p.set_defaults(fn=cmd_list)
+    p = sub.add_parser("status"); p.set_defaults(fn=cmd_status)
+    p = sub.add_parser("capture"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
+    p.set_defaults(fn=cmd_capture)
+    for name, fn in (("compare", cmd_compare), ("promote", cmd_promote), ("annotate", cmd_annotate)):
+        p = sub.add_parser(name); p.add_argument("chapter"); p.add_argument("id"); p.add_argument("--take")
+        p.set_defaults(fn=fn)
+    p = sub.add_parser("sheet"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
+    p.set_defaults(fn=cmd_sheet)
+    p = sub.add_parser("import"); p.add_argument("chapter"); p.add_argument("id")
+    p.add_argument("--file", required=True, help="the person's screenshot, a PNG")
+    p.add_argument("--by", required=True, help="who took it")
+    p.add_argument("--date", required=True, help="the day it was taken, YYYY-MM-DD")
+    p.add_argument("--browser", help="the browser and system, as 'Chrome 141 on macOS 15'")
+    p.set_defaults(fn=cmd_import)
+    p = sub.add_parser("adopt"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
+    p.add_argument("--force", action="store_true"); p.set_defaults(fn=cmd_adopt)
+    p = sub.add_parser("evidence"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
+    p.set_defaults(fn=cmd_evidence)
+    p = sub.add_parser("sync"); p.add_argument("chapter"); p.add_argument("id")
+    p.add_argument("--to", required=True); p.add_argument("--as", dest="name"); p.add_argument("--course")
+    p.add_argument("--take"); p.add_argument("--annotated", action="store_true")
+    p.set_defaults(fn=cmd_sync)
+    p = sub.add_parser("synced"); p.add_argument("--course"); p.set_defaults(fn=cmd_synced)
+    p = sub.add_parser("check"); p.add_argument("chapters", nargs="*"); p.set_defaults(fn=cmd_check)
+    p = sub.add_parser("clean"); p.add_argument("chapters", nargs="*"); p.set_defaults(fn=cmd_clean)
+    p = sub.add_parser("selftest"); p.set_defaults(fn=cmd_selftest)
+    args = parser.parse_args()
+    try:
+        return args.fn(args)
+    except RecipeError as e:
+        print(e)
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

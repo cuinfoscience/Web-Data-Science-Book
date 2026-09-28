@@ -5,7 +5,7 @@ The significance verdict is a sentence or clause whose entire content is
 that the adjacent evidence means something: "the distinction matters,"
 "the variety is diagnostic," "that is the point," "the tagline is earned."
 It regenerates under endlessly novel strings, so this scanner catches the
-common stems while claude.md's prose-safeguards section states the rule
+common stems while AGENTS.md's prose-safeguards section states the rule
 that actually governs: never assert significance the consequence should
 carry, and delete-test every paragraph-closing sentence.
 
@@ -84,7 +84,7 @@ def main():
         total += len(hits)
     if total:
         print(f"\n{total} flag(s). Each is a candidate for the delete test "
-              "(claude.md, 'Prose safeguards'), not an automatic failure.")
+              "(AGENTS.md, 'Prose safeguards'), not an automatic failure.")
     else:
         print("No significance-verdict flags found.")
 

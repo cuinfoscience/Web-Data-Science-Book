@@ -51,7 +51,7 @@ params = {
 }
 
 # Define this once near the top of your script and reuse it everywhere
-HEADERS = {"User-Agent": "WebDataScience/1.0 (INFO 4617; brian.keegan@colorado.edu)"}
+HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 
 response = requests.get(url, params=params, headers=HEADERS)
 data = response.json()
@@ -59,7 +59,7 @@ data = response.json()
 print(data)
 ```
 
-The `HEADERS` constant deserves a comment before we go further. The [Wikimedia User-Agent policy](https://foundation.wikimedia.org/wiki/Policy:User-Agent_policy) asks every client to identify itself with a descriptive User-Agent string that includes contact information — anonymous or generic user agents may be throttled or blocked outright. Define it once as a module-level constant, and every function you write in this chapter can use it as a default.
+The `HEADERS` constant deserves a comment before we go further. The [Wikimedia User-Agent policy](https://foundation.wikimedia.org/wiki/Policy:User-Agent_policy) asks every client to identify itself with a descriptive User-Agent string that includes contact information — anonymous or generic user agents may be throttled or blocked outright. Put your own email address in place of `your-email@colorado.edu`, keeping the form: a name and version, then your contact information in parentheses. Define it once as a module-level constant, and every function you write in this chapter can use it as a default.
 
 The response is a nested JSON structure. You navigate it one level at a time:
 
@@ -567,7 +567,7 @@ Wikipedia also demonstrates what sustainable, mission-driven data access looks l
 - **Pagination**: The single most common mistake. Always check for `"continue"` in the response. Without it, you get only the first batch (often 500 or fewer results out of thousands).
 - **Nested JSON navigation**: The MediaWiki API nests data several levels deep. Print `data.keys()`, then `data["query"].keys()`, then `data["query"]["pages"].keys()` to navigate step by step.
 - **URL encoding**: Article titles with spaces use underscores in the API. For titles with special characters (parentheses, accented letters), use `urllib.parse.quote()`.
-- **Rate limiting**: The MediaWiki Action API does not publish a fixed requests-per-second quota; instead, its etiquette guidelines ask clients to make requests serially (wait for each response before sending the next) and to use the `maxlag` parameter for bulk work. The REST pageviews endpoints ask clients to stay under roughly 100 requests per second, but course code should stay far below that. The practical rule: serial requests, follow `continue` tokens, and always send an informative User-Agent per the Wikimedia User-Agent policy — without one, you may be throttled or blocked.
+- **Rate limiting**: Wikimedia counts requests per minute across the Action API and the REST APIs, pageviews included: 200 a minute for a client whose User-Agent follows the policy, and 10 a minute for one that doesn't, shared with everyone else on its network address ([Wikimedia APIs/Rate limits](https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits); the limits are new in 2026 and may change). Past the limit, the answer is status 429. The Action API's etiquette guidelines also ask clients to make requests serially (wait for each response before sending the next) and to use the `maxlag` parameter for bulk work. The practical rule: serial requests, follow `continue` tokens, and always send an informative User-Agent per the Wikimedia User-Agent policy — without one, you may be throttled or blocked.
 - **Missing pages**: If you request an article that does not exist, the page ID will be negative (e.g., `-1`). Always check for this before trying to access revision data.
 
 ## Key Takeaways

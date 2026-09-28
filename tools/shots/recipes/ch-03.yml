@@ -1,0 +1,155 @@
+# Recipes for Chapter 3's figures (ch-03-post-api.qmd). See tools/shots/README.md.
+#
+# The last chapter of the back-fill after the chapter 5 pilot
+# (docs/plans/2026-09-24-screenshot-backfill-ch01-05.md, §4): refusals and
+# retired services. The third of 3-1's endpoints, Twitter API v1.1, is an API's
+# response: api.twitter.com's robots.txt disallows every path for all but
+# Googlebot and Bingbot, and it is captured as an API client (docs/decisions.md,
+# 2026-09-24). 3-2, CrowdTangle's last capture, and 3-3, Reddit's June 2023
+# post on API pricing, come from the Wayback Machine (captured 2026-09-25):
+# reddit.com's robots.txt now disallows every path, so 3-3 can only come from
+# the archive's copy. Left out: 3-5, OpenAlex's rate-limit headers, which are
+# optional, and the chapter's take-home exercise asks students to find them.
+chapter: ch-03
+qmd: ch-03-post-api.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: dead-endpoints
+    kind: capture
+    section: "Dead-Endpoint Forensics"
+    brief: >-
+      Show the section's three retired endpoints as a browser meets them, one
+      above another, in the chapter's order. Pushshift answers: a 403 with one
+      line of JSON, {"detail":"Not authenticated"}, so the service still runs
+      and turns you away. CrowdTangle doesn't: no HTTP response comes back, and
+      what shows is Chrome's own error page, which nothing from CrowdTangle is
+      in. Twitter v1.1 answers too: a 400 with error 215, "Bad Authentication
+      data.", so the endpoint still runs for those who pay. Each part is
+      labeled with its host and what its failure means.
+    mode: composite
+    window: [560, 400]
+    parts:
+      - label: "api.pushshift.io answers: a 403, in JSON"
+        url: https://api.pushshift.io/reddit/search/submission/?q=test&size=1
+        expect: {status: 403, text: ['Not authenticated']}
+        crop: {top: 0, height: 56}      # Chrome's Pretty-print bar and the one line of JSON
+      - label: "api.crowdtangle.com doesn't answer: the page is Chrome's own"
+        url: https://api.crowdtangle.com/posts
+        # No HTTP response, so Chrome's error page is the subject. Behind this session's
+        # proxy the error is a failed tunnel, which capture accepts only when public DNS
+        # has no address for the host (a refused host would fail the same way).
+        expect: {error: 'ERR_NAME_NOT_RESOLVED|ERR_TUNNEL_CONNECTION_FAILED', text: ['api\.crowdtangle\.com']}
+        # The icon through the error's name, from Chrome's 24-pixel indent, so it lines up with the JSON.
+        crop: {between: ['.icon', '.error-code'], pad: [4, 0, 14, 0], left: 24}
+      - label: "api.twitter.com answers: a 400, error 215, in JSON"
+        url: https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=nasa
+        api_client: true      # robots.txt disallows every path; see the header
+        expect: {status: 400, text: ['Bad Authentication data']}
+        crop: {top: 0, height: 56}      # Chrome's Pretty-print bar and the one line of JSON
+    layout: {direction: column, gap: 12, pad: 12, label_px: 15}
+    drifts: true        # endpoints are retired, gated, or restored
+
+  - id: crowdtangle-last-capture
+    kind: capture
+    section: "Dead-Endpoint Forensics"
+    brief: >-
+      Show the archive's last capture of CrowdTangle's site, the one the
+      chapter's last_snapshot() finds: www.crowdtangle.com on 14 August 2024.
+      Above, the Wayback Machine's toolbar gives the capture's date and the
+      address's captures, 2012 to December 2024 (every one after this is a
+      redirect), and covers the page's own banner. Below, the same capture
+      without the toolbar, where the banner reads "CrowdTangle will no longer
+      be available after August 14, 2024."
+    mode: composite
+    window: [776, 600]    # 800 wide with the composite's padding
+    parts:
+      - label: "The capture of 14 August 2024, under the Wayback Machine's toolbar"
+        url: https://web.archive.org/web/20240814023608/https://www.crowdtangle.com/
+        steps:
+          - wait: {selector: '#wm-ipp-base'}
+          - wait: {network_idle: true}
+        expect: {text: ['(?i)crowdtangle']}
+        crop: {top: 0, height: 112}     # the toolbar and the page's black navigation bar
+      - label: "The same capture without the toolbar (the archive's if_ view)"
+        # The page's banner is Bootstrap's navbar-fixed-top, pinned where the
+        # toolbar is pinned, so only the view without the toolbar shows it.
+        url: https://web.archive.org/web/20240814023608if_/https://www.crowdtangle.com/
+        steps:
+          - wait: {text: 'no longer be available after August 14, 2024'}
+          - wait: {network_idle: true}
+        expect: {text: ['no longer be available after August 14, 2024']}
+        crop: {top: 0, height: 345}     # the banner through the page's headline
+    layout: {direction: column, gap: 12, pad: 12, label_px: 15}
+    drifts: true        # the toolbar's count of captures
+
+  - id: reddit-api-pricing
+    kind: capture
+    section: "Enclosure"
+    brief: >-
+      Show Reddit's 2023 price in Reddit's own words: u/spez's post in r/reddit
+      on 9 June 2023, "Addressing the community about changes to our API", as
+      the Wayback Machine saved it a minute after it went up. Above, its title
+      and byline; below, the item "Premium Enterprise API / Third-party apps":
+      $0.24 per 1K API calls from 1 July 2023, and Apollo, Reddit is Fun, and
+      Sync closing before then. reddit.com's robots.txt now disallows every
+      path, so the figure comes from the archive's copy on old.reddit.com.
+    mode: composite
+    window: [776, 600]
+    parts:
+      - label: "u/spez in r/reddit, 9 June 2023"
+        url: https://web.archive.org/web/20230609174525/https://old.reddit.com/r/reddit/comments/145bram/addressing_the_community_about_changes_to_our_api/
+        steps:
+          - wait: {selector: '#siteTable .thing p.tagline'}
+          - wait: {network_idle: true}
+        # Reddit's archived stylesheets for tooltips and crosspost previews come back
+        # aborted on most loads; the post's own styles load, so the take is judged by
+        # eye on the contact sheet, and its log names the files it lost.
+        expect: {text: ['Addressing the community about changes to our API'], all_files: false}
+        # The title through the byline, in the post's column; the sidebar and the
+        # sign-up banner above the post are left out.
+        crop: {between: ['#siteTable .thing p.title', '#siteTable .thing p.tagline'],
+               left: 0, width: 470, pad: [6, 0, 6, 0]}
+      - label: "The same post: its item on paid access"
+        url: https://web.archive.org/web/20230609174525/https://old.reddit.com/r/reddit/comments/145bram/addressing_the_community_about_changes_to_our_api/
+        steps:
+          - wait: {text: '\$0\.24 per 1K API calls'}
+          - wait: {network_idle: true}
+          # The item is 1,100 pixels down, and a crop is taken from the window. The
+          # toolbar stays pinned to the window's top as the page scrolls, over its
+          # first 65 pixels, so the item stops 96 pixels down.
+          - scroll: {selector: '#siteTable .expando .md > ul:first-of-type > li:nth-of-type(3)', offset: 96}
+        expect: {text: ['\$0\.24 per 1K API calls', 'Apollo, Reddit is Fun, and Sync'], all_files: false}
+        # The third item of the post's first list, "Premium Enterprise API / Third-party apps".
+        crop: {between: ['#siteTable .expando .md > ul:first-of-type > li:nth-of-type(3)',
+                         '#siteTable .expando .md > ul:first-of-type > li:nth-of-type(3)'],
+               left: 44, width: 426, pad: [6, 0, 6, 0]}
+    layout: {direction: column, gap: 12, pad: 12, label_px: 15}
+
+  - id: dsa-article-40
+    kind: capture
+    section: "Exemption"
+    brief: >-
+      Show the provision the chapter cites, as the EU publishes it: Article 40
+      of the Digital Services Act, "Data access and scrutiny", on EUR-Lex,
+      from its heading through paragraph 4, which obliges very large online
+      platforms and search engines to give vetted researchers access to data
+      for research on systemic risks (boxed, 1). Paragraphs 1 to 3, access for
+      regulators, stay in view above it. EUR-Lex's floating contents box is
+      closed first.
+    url: https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2065
+    window: [800, 700]    # tall enough to hold the band, which is cropped from it
+    pause: [12, 30]       # EUR-Lex's robots.txt asks for 10 seconds between requests
+    steps:
+      # A first visit gets 202 and a script that checks the browser, then reloads the page.
+      - wait: {text: 'Data access and scrutiny'}
+      - click: {selector: '#tocHideBtnStandalone'}     # the contents box floating over the text
+      - scroll: {selector: '#art_40', offset: 12}
+    expect:
+      text: ['vetted researchers']
+    crop: {between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 12, 0]}   # the heading through paragraph 4
+    annotate:
+      marks:
+        - {n: 1, shape: box, at: {selector: '[id="040.004"] p'}}

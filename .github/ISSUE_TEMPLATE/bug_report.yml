@@ -12,12 +12,18 @@ body:
         add parameters, screenshots go stale. Finding one of those is a real
         contribution, and you do not need to know how to fix it.
 
+        **Finish the title** after `Broken:`: say what is wrong and where, for example
+        `Broken: Ch. 6 "Strategy 2" example raises KeyError`. New here?
+        [CONTRIBUTING.md](https://github.com/cuinfoscience/Web-Data-Science-Book/blob/main/CONTRIBUTING.md)
+        explains the three forms and what happens after you file.
+
   - type: dropdown
     id: chapter
     attributes:
       label: Where is it?
       description: Pick the chapter.
       options:
+        - "The preface"
         - "Ch. 1 — Introduction to Web Data Science"
         - "Ch. 2 — Ethics, Law, and Responsible Data Collection"
         - "Ch. 3 — The Post-API Age"
@@ -35,6 +41,7 @@ body:
         - "Ch. 15 — Research Design with Web Data"
         - "An appendix"
         - "A companion notebook"
+        - "The book as a whole"
     validations:
       required: true
 
@@ -102,6 +109,14 @@ body:
       label: Do you know the fix?
       description: Optional. If you worked out what is wrong, say so. If not, leave this blank — the report is still useful.
       placeholder: "The selector changed; the table now uses class 'wikitable sortable jquery-tablesorter'."
+    validations:
+      required: false
+
+  - type: textarea
+    id: ai
+    attributes:
+      label: Did an AI tool help you write this?
+      description: Optional. If one did, name it and say what it did, for example "an AI assistant drafted the second paragraph". The course asks for this, and the book discloses its own AI use in Appendix B.
     validations:
       required: false
 

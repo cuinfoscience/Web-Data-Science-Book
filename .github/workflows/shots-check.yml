@@ -1,0 +1,40 @@
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "images/**"
+      - "tools/shots/**"
+      - ".github/workflows/shots-check.yml"
+
+name: Screenshot check (tools/shots)
+
+# AAR P1-1 (docs/aar/AAR_Web-Data-Science-Book_2026-09-24.md): a pull request
+# that changes an image, a recipe, or the toolkit re-checks every figure's
+# record, so a reviewer's look can go to the content. `check` confirms that
+# each image is the file its provenance.json describes (by SHA-256), with its
+# markers, its text size where the figure is shown, its IMAGES.md table, and
+# the evidence behind its caption. It loads no page and starts no browser, so
+# it needs neither the network nor Chrome. Runs only on pull requests that
+# change images or tools/shots, as the maintainer asked in the AAR.
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"     # the toolkit's pins are tested on 3.11 (bootstrap.sh)
+
+      - name: Install what check needs
+        # The pins in tools/shots/requirements.txt, without Playwright and
+        # Selenium: only capturing uses them.
+        run: |
+          grep -iE '^(pyyaml|pillow|websockets)==' tools/shots/requirements.txt > "$RUNNER_TEMP/check-requirements.txt"
+          python -m pip install --disable-pip-version-check -r "$RUNNER_TEMP/check-requirements.txt"
+
+      - name: tools/shots check (every chapter, and the course's recipes)
+        run: python tools/shots/shots.py check

@@ -1,0 +1,167 @@
+# Recipes for Chapter 8's figures (ch-08-dynamic-pages.qmd). See tools/shots/README.md.
+#
+# Every figure here shows browser UI (View Source, DevTools, the Chrome for
+# Testing window, the Playwright Inspector) or joins two captures. The headed
+# ones run on a virtual display; the composite captures its two parts headless
+# and joins them. The two whose subject is a tool itself (the window Selenium
+# opens, Playwright's recorder) need that tool as the engine and wait for a
+# later milestone (M4). `legacy:` records how each image was made.
+# quotes.toscrape.com is a sandbox built for scraping practice and has no
+# robots.txt.
+chapter: ch-08
+qmd: ch-08-dynamic-pages.qmd
+defaults:
+  window: [1280, 800]
+  scale: 2
+
+figures:
+  - id: view-source-js
+    kind: capture
+    section: "Check 1: View Source"
+    brief: >-
+      Show that the page's source has no quote markup, yet the quotes are there, in
+      a script, as `var data = [...]`. From `<body>` (line 11) through line 43: the
+      header, the script tags, and the first quote object. The `<head>` above adds
+      nothing to the point, and nothing below line 43 is needed.
+    url: view-source:https://quotes.toscrape.com/js/
+    mode: headed
+    # The browser's bars take 88 pixels of the window: 720 leaves room for lines 11-43, wrapped.
+    # 816 wide puts the page's 16-pixel scrollbar just past an 800-pixel crop.
+    window: [816, 720]
+    steps:
+      - wait: {text: 'var data'}
+      # Line 43, the first quote's text, runs about 140 characters: wrap it rather than widen the window.
+      - click: {selector: 'input[type="checkbox"]'}
+      - scroll: {selector: 'td.line-number[value="11"]', offset: 4}
+    crop: {between: ['td.line-number[value="11"]', 'td.line-number[value="43"]'], width: 800}
+
+  - id: javascript-off-on
+    kind: capture
+    section: "Check 2: Turn JavaScript Off"
+    brief: >-
+      Show the same page with JavaScript off and on, side by side and labeled: off
+      has only the title, Login, Next, and the footer; on has the quotes. The
+      lesson is the empty page beside the full one. Each page is 370 pixels wide,
+      so the pair fits 800×600 and its words stay legible.
+    url: https://quotes.toscrape.com/js/
+    mode: composite     # the page with JavaScript off, then on, side by side, labeled
+    # Two 370-pixel pages, the gap, and the frame come to 798 pixels, inside 800×600.
+    window: [370, 520]
+    parts:
+      - label: JavaScript off
+        javascript: false
+        steps: [{wait: {text: 'Quotes to Scrape'}}]
+      - label: JavaScript on
+        steps: [{wait: {text: 'Albert Einstein'}}]
+    layout: {gap: 28, pad: 15, label_px: 28}
+
+  - id: network-tab-json
+    kind: capture
+    section: "Check 3: Watch the Network Tab"
+    brief: >-
+      Show the JSON a scrolling page loads: the Network tab filtered to Fetch/XHR
+      after three scrolls, listing quotes?page=1 through page=4, with page 2's
+      Preview open to its first quote (author, tags, text). DevTools alone; the
+      page adds nothing here.
+    url: https://quotes.toscrape.com/scroll
+    mode: headed
+    # DevTools alone, 800×600, as ch-05's network-headers: a 1000-pixel window lets docked
+    # DevTools be 600 tall, and the crop keeps only DevTools. The page scrolls out of view.
+    window: [800, 1000]
+    devtools: {dock: bottom, size: 600, zoom: 1.25, panel: network, overview: false}
+    steps:
+      - wait: {text: 'Albert Einstein'}
+      - devtools_click: {text: '^Fetch/XHR$'}
+      # Each scroll to the bottom makes the page ask its API for the next page.
+      - scroll: {y: 20000}
+      - devtools_wait: {text: 'quotes\?page=2'}
+      - scroll: {y: 20000}
+      - devtools_wait: {text: 'quotes\?page=3'}
+      - scroll: {y: 20000}
+      - devtools_wait: {text: 'quotes\?page=4'}
+      - devtools_click: {text: '^quotes\?page=2$'}
+      - devtools_click: {text: '^Preview$'}
+      # Open the quotes array and its first quote, as the chapter's figure does.
+      - devtools_click: {text: '^quotes\s*:', at: [0.03, 0.5]}
+      - devtools_click: {text: '^0\s*:', at: [0.05, 0.5]}
+    crop: {devtools: true}
+    drifts: false
+
+  - id: selenium-chrome-for-testing
+    kind: capture
+    section: "Setting Up Selenium"
+    brief: >-
+      Show the window webdriver.Chrome() opens on a machine with no Chrome, after
+      Selenium Manager downloaded Chrome for Testing. Its "only for automated
+      testing" bar is the point, so this is the one figure that keeps it. Any
+      page will do; xkcd is the page the chapter's lab uses.
+    url: https://xkcd.com/
+    mode: headed        # the subject is the window Selenium opens, including its automation bar
+    engine: selenium    # webdriver.Chrome(), as the chapter runs it (lib/engine_selenium.py)
+    # The whole window, 800×600: its tab strip, address bar, and the bar that is the point. At
+    # this width the bar's sentence is cut after "For regular browsing, use a...".
+    window: [800, 600]
+    steps:
+      - wait: {selector: '#comic img'}
+    # The one figure that keeps Chrome for Testing's "only for automated testing" notice: the
+    # caption and alt text point at it, so the take must show it.
+    expect: {infobar: true, text: ['A webcomic of romance']}
+    drifts: true        # xkcd's current comic and the browser version
+
+  - id: xkcd-inspect
+    kind: capture
+    section: "Extracting Data"
+    brief: >-
+      Show where the comic's hover joke and name live: the Elements tree with the
+      comic's <img> selected inside div#comic, its title and alt attributes
+      wrapped in full, down to the breadcrumb bar. Leave out the page and the
+      Styles pane.
+    url: https://xkcd.com/
+    mode: headed
+    # DevTools alone, 800×600, as network-tab-json: the Elements tree gets the whole width,
+    # so the selected <img> row shows its title and alt attributes wrapped in full.
+    window: [800, 1000]
+    devtools: {dock: bottom, size: 600, zoom: 1.25, layout: stacked, sidebar: 1}
+    steps:
+      - wait: {selector: '#comic img'}
+      - inspect: {selector: '#comic img', selects: '^<img'}
+    # DevTools starts 600 pixels up a 1000-pixel window. 530 keeps the breadcrumb bar, the
+    # <img>'s path, and stops above the Styles pane that DevTools won't hide.
+    crop: {top: 400, height: 530}
+    drifts: true
+
+  - id: playwright-codegen
+    kind: capture
+    section: "Recording a Script with Codegen"
+    brief: >-
+      Show codegen turning clicks into code: the recording browser above, after
+      two clicks (the tag "change", then an "(about)" link), with the locator
+      tooltip under the author's name; the Inspector below with the Python it
+      wrote, from the imports through browser.close().
+    url: https://quotes.toscrape.com/
+    mode: headed        # two windows: the browser and the Playwright Inspector
+    engine: codegen     # Playwright's recorder, fed real clicks (lib/engine_codegen.py)
+    # 800 wide and stacked, so both windows' text reaches the book near full size. The browser is
+    # scrolled to the author's name and ends under the locator; the Inspector, 595 tall so its 20
+    # lines need no scrolling, is cropped after line 15, browser.close().
+    window: [800, 230]
+    inspector: {window: [800, 595], at: below}
+    # quotes.toscrape.com redirects its author pages to plain http, which this session's proxy
+    # doesn't carry. With Chrome's HTTPS-Upgrades on, as in regular Chrome, the page loads over https.
+    https_upgrades: true
+    steps:
+      - wait: {text: 'Albert Einstein'}
+      - click: {selector: 'a.tag', text: '^change$'}
+      - wait: {url: '**/tag/change/**'}
+      - click: {role: link, name: '(about)'}
+      - wait: {url: '**/author/Albert-Einstein/**'}
+      - scroll: {selector: 'h3.author-title', offset: 70}
+      - pointer: {selector: 'h3.author-title', at: [0.15, 0.5]}
+    expect:
+      text: ['Born:']
+      code: ['page.goto("https://quotes.toscrape.com/")', 'get_by_role("link", name="change").click()',
+             'get_by_role("link", name="(about)").click()']
+    crop: {top: 0, left: 0, width: 800, height: 534}
+    # Week 8's slides show a copy (codegen.png) in a column 55% of the text width, where the
+    # Inspector's 14-pixel code comes to 16.2.
+    targets: {slides: {width: 0.55}}

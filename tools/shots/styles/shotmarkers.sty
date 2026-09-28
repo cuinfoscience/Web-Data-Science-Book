@@ -1,0 +1,34 @@
+% ==========================================================================
+% shotmarkers.sty -- numbered markers for figures annotated by tools/shots
+%
+% Copied from the course repo's handouts/common/handoutmarkers.sty (INFO 4617),
+% so a marker the toolkit draws on a screenshot looks the same as one drawn
+% by hand in a handout. Change both together.
+%
+%   \node[marker] at (x,y) {3};   in a tikzpicture (small marker: smaller)
+%   marker lead / marker thin lead / marker brace / marker bracket / marker box
+% ==========================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{shotmarkers}[2026/09/24 numbered markers for tools/shots figures]
+\RequirePackage{xcolor}
+\RequirePackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+
+\providecolor{tab-blue}{HTML}{4E79A7}   % the slides' palette
+
+\tikzset{
+  marker/.style={circle,fill=tab-blue,text=white,inner sep=0pt,
+                 minimum size=11pt,font=\sffamily\bfseries\scriptsize},
+  small marker/.style={marker,minimum size=8.5pt,font=\sffamily\bfseries\tiny},
+  marker lead/.style={tab-blue,line width=0.8pt,densely dotted},
+  marker thin lead/.style={tab-blue,line width=0.5pt,densely dotted},
+  marker brace/.style={tab-blue,line width=0.9pt,decorate,
+                       decoration={brace,amplitude=4pt}},
+  % added for tools/shots: an open bracket, a box around a region, a label
+  marker bracket/.style={tab-blue,line width=0.9pt},
+  marker box/.style={tab-blue,line width=1.2pt,rounded corners=3pt},
+  marker label/.style={text=tab-blue,font=\sffamily\bfseries\scriptsize,inner sep=2pt},
+  marker label on/.style={marker label,fill=white,rounded corners=2pt},
+}
+
+\endinput

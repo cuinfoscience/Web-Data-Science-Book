@@ -1,0 +1,185 @@
+# Recipes for Chapter 7's figures (ch-07-archives.qmd). See tools/shots/README.md.
+#
+# The Wayback Machine answers 502 or drops the connection on many first
+# attempts; the toolkit retries politely (30, 60, then 120 seconds apart) and
+# fails a take whose page says "Fail with status" or "upstream request failed".
+#
+# Its toolbar lives in a closed shadow root (the playback script calls
+# attachShadow({mode: "closed"})), which no selector reaches, so the figures that
+# show it set `open_shadow: true`. The toolbar is responsive: below 1,100 pixels
+# wide it drops its logo and its strip chart of captures by year, keeping the
+# address, the capture count, and the date with its arrows. Its capture count
+# arrives from a second request (/__wb/sparkline), which failed on some loads on
+# 2026-09-25, so those figures wait for the count.
+#
+# Every figure keeps within 800×600 except the calendar, which needs three rows
+# of months (its `oversize:` says why).
+chapter: ch-07
+qmd: ch-07-archives.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: wayback-calendar
+    kind: capture
+    section: "Finding a Capture"
+    brief: >-
+      Show the Wayback Machine's Calendar for facebook.com with 2005 selected: the
+      "Saved N times" line, the bar chart of captures per year, and enough months
+      of calendar that circles of different sizes and colors both appear. The
+      caption explains them: size is how many captures a day holds, color is the
+      status code the crawler received.
+    url: https://web.archive.org/web/2005*/facebook.com
+    window: [800, 1100]     # tall enough to hold the crop, which is cut from the window
+    steps:
+      # The summary line joins "Saved", the count, and "between" with no-break spaces
+      # (&nbsp;), which a plain space in a pattern doesn't match; \s does.
+      - wait: {text: 'Saved\s[0-9,]+\stimes'}
+      - wait: {network_idle: true}
+    expect:
+      text: ['Saved\s[0-9,]+\stimes']
+    # At 800 pixels wide the calendar sets three months to a row, each 210 pixels tall,
+    # so January to August takes three rows: from the summary line to the bottom of
+    # July's row, as wide as the histogram.
+    crop: {between: ['.captures-range-info', '.calendar-grid .month:nth-child(7)'], left: 30, width: 740,
+           pad: [8, 0, 4, 0]}
+    oversize: >-
+      three rows of months are needed to reach August, when the circles turn blue again; at
+      740 pixels wide the figure fits the book's column, so the calendar's 10.5-pixel day
+      numbers show at 11 pixels
+    drifts: true        # "Saved N times" and the capture circles change every day
+    # The paragraph under the figure reads the calendar's colors as dates. The CDX API gives
+    # them exactly: every capture of the address from March to August 2005, in time order.
+    evidence:
+      - id: facebook-2005-statuses
+        claim: >-
+          facebook.com's captures were 200s until April 8, 2005, 403s from April 10,
+          and 200s again from August 6.
+        url: https://web.archive.org/cdx/search/cdx
+        params: {url: facebook.com, from: '20050301', to: '20050831', output: json,
+                 fl: 'timestamp,statuscode', limit: 1000, showResumeKey: 'true'}
+        page: resume_key
+        summary: {runs: statuscode}
+
+  - id: facebook-2004
+    kind: capture
+    section: "Finding a Capture"
+    brief: >-
+      Show what a replayed capture looks like: facebook.com on January 21, 2004,
+      two weeks before Thefacebook launched, when the domain belonged to
+      AboutFace ("The first name in directories"), with the Wayback toolbar
+      across the top: the address, the count of captures, and the capture's date
+      with its arrows. AboutFace's pitch to schools and colleges, "Eliminate the
+      need for printed facebooks," is in view.
+    url: https://web.archive.org/web/20040121224607/http://facebook.com/
+    # Most of the page's text is 11 pixels, so the figure is no wider than the book's
+    # column (778 pixels), which shows it at that size. The page is 823 pixels wide,
+    # so the window's edge cuts the last of its four photos.
+    window: [778, 600]
+    open_shadow: true
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'AboutFace'}
+      - wait: {text: '[0-9,]+ captures'}
+      - wait: {network_idle: true}
+    expect:
+      text: ['AboutFace', 'Eliminate the need for printed facebooks', '[0-9,]+ captures']
+    crop: {window: true}
+    drifts: true        # the toolbar's capture count and date range
+
+  - id: about-this-capture
+    kind: capture
+    section: "About This Capture"
+    brief: >-
+      Show the toolbar's About this capture panel on the February 12, 2004 capture
+      of thefacebook.com: who collected the capture (Collected by) and when each
+      embedded image was saved relative to the page (Timestamps). Only the toolbar
+      and the panel. "Collected by" loads after the panel opens; the first take
+      missed it, so wait for it.
+    url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
+    open_shadow: true
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: '[0-9,]+ captures'}
+      # The panel's "Collected by" section loads on hover (from /__wb/provenance),
+      # so hover the control first, then open it and wait for that section.
+      - hover: {selector: '#wm-expand'}
+      - click: {selector: '#wm-expand'}
+      - wait: {text: '(?i)collected by'}
+      - wait: {text: 'alexa_dv'}
+      - wait: {network_idle: true}
+    expect:
+      text: ['(?i)collected by', '(?i)timestamps', 'logo-left\.jpg']
+    # The toolbar and the open panel, and none of the page below.
+    crop: {between: ['#wm-ipp', '#wm-capinfo'], pad: [0, 0, 6, 0]}
+    drifts: true        # the toolbar's capture count and date range
+
+  - id: x-com-1999
+    kind: capture
+    section: "Broken and Missing Captures"
+    brief: >-
+      Show a capture whose HTML was saved but whose images were not: x.com on
+      November 14, 1999, with broken-image icons and their alt text above the
+      signup form and the X.com Corporation footer, under the Wayback toolbar.
+    url: https://web.archive.org/web/19991114081850/http://x.com/
+    # The page is 560 pixels wide, and its fine print ("Register your email address")
+    # is 10 pixels: in a 700-pixel window the book's column shows it at 11.
+    window: [700, 600]
+    open_shadow: true
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'X\.com Corporation'}
+      - wait: {text: '[0-9,]+ captures'}
+      - wait: {network_idle: true}
+    expect:
+      text: ['X\.com Corporation', '[0-9,]+ captures']
+    crop: {window: true}
+    drifts: true        # the toolbar's capture count
+    # The paragraph and caption say the page's images were never saved. The page's seven
+    # <img> files are in images/ (four more, in ../images/, sit in commented-out script).
+    # Every capture of each, ever: a query cut at 25 rows once suggested otherwise (course #44).
+    evidence:
+      - id: x-com-images
+        claim: >-
+          None of six of the page's seven images was ever captured with a 200: their first
+          captures, in August and September 2000, were 404s, and later ones redirects or 404s.
+          Only the seventh, spacer.gif, was saved successfully, on April 29 and May 5, 2000.
+        url: https://web.archive.org/cdx/search/cdx
+        params: {url: 'x.com/images/', matchType: prefix, output: json, fl: 'urlkey,timestamp,statuscode',
+                 filter: 'urlkey:com,x\)/images/(about_btn|contact_btn|employment_btn|main_x|management_btn|spacer|x_righton)\.gif',
+                 limit: 1000, showResumeKey: 'true'}
+        page: resume_key
+        summary: {group_by: urlkey, count: statuscode}
+
+  - id: devtools-archived-page
+    kind: capture
+    section: "Inspecting Archived Pages"
+    brief: >-
+      Show the markup the Wayback Machine adds to a replayed page: on the February
+      12, 2004 capture of thefacebook.com, the Elements tree lists the toolbar's
+      div#wm-ipp-base first in the body, then the END WAYBACK TOOLBAR INSERT
+      comment, then the page's own <center>. The page stays in view beside
+      DevTools, so the reader can match the toolbar to its markup.
+    url: https://web.archive.org/web/20040212031928/http://www.thefacebook.com/
+    mode: headed
+    # DevTools docked at the bottom and zoomed to 125%, the tree given its whole width;
+    # the crop stops above the breadcrumb bar and the Styles pane's tabs.
+    window: [800, 680]
+    devtools: {dock: bottom, size: 380, zoom: 1.25, panel: elements, layout: stacked, sidebar: 1}
+    steps:
+      - wait: {selector: '#wm-ipp-base'}
+      - wait: {text: 'Welcome to Thefacebook'}
+      # Pick the 2004 page's own <center> in its empty left margin (the 700-pixel
+      # table is centered inside it), so DevTools selects <center> itself. The body
+      # then shows the toolbar insert, the comment that ends it, and Thefacebook's
+      # markup. (Climbing from a word of the page takes three nested tables.) The
+      # <center> starts under the pinned toolbar, so pick a third of the way down.
+      - inspect: {selector: 'center', at: [0.02, 0.3], selects: '^<center'}
+      # Picking scrolls <center> into view, 76 pixels up under the toolbar; put the
+      # page back at its top, as it opens.
+      - scroll: {selector: 'html', offset: 0}
+    expect:
+      text: ['Welcome to Thefacebook']
+    crop: {top: 0, height: 572}
+    drifts: true        # the toolbar's capture count, and DevTools' own version

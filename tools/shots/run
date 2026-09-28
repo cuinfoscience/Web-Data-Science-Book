@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Run shots.py with the toolkit's own Python (made by bootstrap.sh).
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ ! -x "$HERE/.venv/bin/python" ]]; then
+  echo "tools/shots is not set up yet: run  bash tools/shots/bootstrap.sh" >&2
+  exit 2
+fi
+exec "$HERE/.venv/bin/python" "$HERE/shots.py" "$@"
