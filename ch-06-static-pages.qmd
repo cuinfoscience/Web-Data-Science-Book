@@ -91,8 +91,8 @@ for i, table in enumerate(tables):
 Once you have identified the correct table, the next step is to navigate its structure tag by tag. Every `<tr>` (table row) contains a sequence of `<td>` (table data) or `<th>` (table header) cells, and BeautifulSoup lets you walk that hierarchy directly:
 
 ```{python}
-# Assuming the data table is tables[1] (verify by inspection)
-data_table = tables[1]
+# tables[0] is the desktop layout with every column; tables[1] is a 5-column mobile layout
+data_table = tables[0]
 rows = data_table.find_all("tr")
 
 # The first row holds the column headers
@@ -100,13 +100,13 @@ header_row = rows[0]
 header_cells = header_row.find_all(["td", "th"])
 header = [cell.get_text(strip=True) for cell in header_cells]
 print(header)
-# ['Rank', '', 'Movie', 'Distributor', 'Gross', 'Change', ...]
+# ['Rank', 'Prev', 'Title', 'Gross', 'WeeklyChange', 'Theaters', 'TheaterAverage', 'Total\xa0Gross', 'Days in Release']
 
 # Inspect a data row the same way
 data_row = rows[1]
 cells = data_row.find_all(["td", "th"])
 print([cell.get_text(strip=True) for cell in cells])
-# ['1', '(1)', 'Aquaman', 'Warner Bros.', '$105,455,062', ...]
+# ['1', '(1)', 'Aquaman', '$92,087,265', '-30%', '4,125', '$22,324', '$229,020,880', '14']
 ```
 
 You might be tempted to shortcut this with `data_row.text.split("\n")` — grab all the text in the row at once and split it apart. Resist the temptation. Notice the empty string in the header list above: the site leaves the previous-rank column's header blank. Splitting on newlines and filtering out empty strings silently drops cells like that one, and every value after it shifts one column to the left — your "Movie" column quietly fills with distributor names. Navigating cell by cell with `find_all(["td", "th"])` preserves empty cells as empty strings, so each value stays aligned with its column. The extra line of code buys you correctness.
