@@ -187,6 +187,22 @@ print(films_df[["Title", "gross", "footnote_count"]].head())
 
 The `errors="coerce"` argument in `pd.to_numeric()` is essential: it converts anything the regex missed into NaN instead of raising an exception, so your cleanup pipeline continues past a handful of unexpected cells rather than crashing on the first one. Counting the footnote markers instead of throwing them away keeps a signal — how heavily annotated a given figure is — that a straight `str.replace()` would have discarded along with the brackets. This table's columns happen not to need it, but the same `.ffill()` you would reach for on a merged-cell "Studio" column elsewhere works the same way here: propagate the last non-null value forward until the next one appears. You should expect to spend as much time cleaning `read_html` output as you spent extracting it — the function handles the hard part of parsing HTML tables; the cleanup is your job.
 
+::: {.callout-tip}
+## Parsing HTML You Already Have
+When you read a cached HTML file into a string, wrap that string in `StringIO` before passing it to `pd.read_html()`. `StringIO` gives pandas a file-like object to read, so it parses the text you already have without fetching the page again. A small example works entirely offline:
+
+```{python}
+from io import StringIO
+
+html = "<table><tr><th>Film</th></tr><tr><td>The Godfather</td></tr></table>"
+cached_tables = pd.read_html(StringIO(html))
+print(cached_tables[0].iloc[0, 0])
+# The Godfather
+```
+
+For your own page, replace `html` with the text you read from disk. A filename such as `"page.html"` can go directly to `pd.read_html()`; the file's contents belong inside `StringIO`. The result is still a list of DataFrames, so inspect the tables before choosing one.
+:::
+
 ## Strategy 4: The Infobox Pattern
 
 Not every `<table>` holds rows of records. Wikipedia's film infoboxes — the shaded box in the upper right of an article like [The Godfather](https://en.wikipedia.org/wiki/The_Godfather) — are a single record laid out as a labeled key/value list: one row per fact, a `<th>` holding the label and a `<td>` holding the value. `pandas.read_html()` will happily parse an infobox into a two-column DataFrame, but that discards the very thing that makes it useful — which label belongs to which value — so this shape calls for BeautifulSoup instead:
