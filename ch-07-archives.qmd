@@ -154,9 +154,17 @@ import requests
 url = "https://www.cnn.com"
 timestamp = "20000815"  # August 15, 2000
 
+# Identify yourself with your own email address, in the form the earlier chapters use
+HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+
 # Pass query arguments as a params dictionary — requests handles the URL encoding, which matters here because one of the values is itself a URL
 api_url = "https://archive.org/wayback/available"
-response = requests.get(api_url, params={"url": url, "timestamp": timestamp})
+response = requests.get(api_url, params={"url": url, "timestamp": timestamp}, headers=HEADERS, timeout=30)
+
+# A refusal has no JSON in its body, so check the status before calling .json()
+if response.status_code == 429:
+    raise RuntimeError("archive.org answered 429 (Too Many Requests): wait a few minutes, then run this cell again")
+response.raise_for_status()
 data = response.json()
 
 # Check if a snapshot is available
@@ -168,6 +176,11 @@ if data["archived_snapshots"]:
 else:
     print("No snapshot available near this date")
 ```
+::: {.callout-warning}
+## If this cell fails with `JSONDecodeError`
+
+archive.org probably answered 429 (Too Many Requests), which has no JSON in its body. Campus networks share addresses, so you can be refused on your first try. Wait a few minutes or switch networks, such as a phone hotspot.
+:::
 
 The API returns the closest snapshot to your requested timestamp. Before you retrieve it, recall what the Inspector showed you: a snapshot URL like `https://web.archive.org/web/20000815052826/http://www.cnn.com/` does *not* return the page exactly as it was captured. It returns the page wrapped, with the archive's scripts injected and its links, scripts, and image references rewritten to point back into the archive; a browser gets the toolbar as well. That is convenient for browsing but poisonous for measurement — counts of links, scripts, and images, and even text length, will include the archive's scaffolding along with the original page. Just as `im_` asked for an image, the `id_` flag after the timestamp (`.../web/20000815052826id_/http://www.cnn.com/`) asks for the original capture, unmodified. The tradeoff is that `id_` returns the rawest form of the capture: relative links are left unresolved and the page may not render nicely in a browser. For measurement, raw is exactly what you want.
 
