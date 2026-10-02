@@ -24,7 +24,7 @@ This chapter treats LLMs as another API to learn: the same patterns of authentic
 ## The OpenAI API
 
 ```{python}
-# Install: pip install openai
+# openai is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge openai
 from openai import OpenAI
 
 # Store your key securely (see Missing Manual Ch. 29)
@@ -398,7 +398,7 @@ This documentation burden connects to the broader norms of scientific reproducib
 Anthropic's Claude provides an alternative LLM API with a similar interface:
 
 ```{python}
-# Install: pip install anthropic
+# anthropic is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge anthropic
 from anthropic import Anthropic
 
 client_anthropic = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))

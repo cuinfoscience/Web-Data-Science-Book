@@ -76,7 +76,7 @@ print(soup.members.member)
 ```
 
 ::: {.callout-important}
-BeautifulSoup's `"xml"` parser is not built in — it is provided by the `lxml` package. Anaconda includes `lxml` by default, but if you see a `bs4.FeatureNotFound` error in another environment, install it with `pip install lxml` and restart your kernel.
+BeautifulSoup's `"xml"` parser is not built in — it is provided by the `lxml` package, which chapter 1's `webdata` includes. If you see a `bs4.FeatureNotFound` error, your environment was made before `lxml` was on chapter 1's list: install it with `conda install -c conda-forge lxml` in a terminal where `webdata` is active, and restart your kernel.
 :::
 
 The power of BeautifulSoup is in its search methods. The `.find()` method returns the first tag matching your criteria — searching all descendants, no matter how deeply nested. The `.find_all()` method returns all matching tags as a list:

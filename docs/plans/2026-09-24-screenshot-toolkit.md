@@ -99,7 +99,7 @@ One YAML file per chapter. This is how ch-05's Network-tab figure would look:
 ```yaml
 chapter: ch-05
 defaults:
-  user_agent: "Web Data Science/v1 brian.keegan@colorado.edu"   # the one the handouts teach
+  user_agent: "WebDataScience/1.0 (brian.keegan@colorado.edu)"   # the form the chapters teach (decisions.md, 2026-09-25)
   window: [800, 600]       # CSS pixels: at most what a figure shows (P1-5, a soft limit)
   scale: 2                 # device pixels per CSS pixel
   pause: [8, 30]           # seconds between page loads on one host

@@ -52,7 +52,7 @@ tools/shots/run import ch-NN ID --file screenshot.png --by NAME --date YYYY-MM-D
 These come from `slides/common/AUTHORING.md` in the course repo and from the AAR:
 
 - **Real or labeled.** A screenshot is a real capture of a real page. Diagrams and renders are welcome, marked with their `kind`. Never rebuild a real site's interface with invented content.
-- **One honest User-Agent** for every request (`Web Data Science/v1 brian.keegan@colorado.edu`, the one the handouts teach). It goes to Chrome as Chrome's own `--user-agent` flag, so the User-Agent Client Hints (`Sec-CH-UA-Platform` and the rest) name the system the capture runs on. Playwright's `user_agent` option rewrites them too, and for a string that names no system it claims Windows. Page loads on one host are 8–30 seconds apart.
+- **One honest User-Agent** for every request: `WebDataScience/1.0 (brian.keegan@colorado.edu)`, in the form chapter 1 and the setup handout teach, a name and version, then contact information in parentheses. Wikimedia's API gateway counts a string in any other form as unidentified (see "When a host is down"). It goes to Chrome as Chrome's own `--user-agent` flag, so the User-Agent Client Hints (`Sec-CH-UA-Platform` and the rest) name the system the capture runs on. Playwright's `user_agent` option rewrites them too, and for a string that names no system it claims Windows. Page loads on one host are 8–30 seconds apart.
 - **Retries:** a 5xx or a dropped connection is retried three times, 30, 60, then 120 seconds apart. A block page, a 403, or a proxy refusal is not retried.
 - **No logins, no credentials, no student names or work.** A page behind a login is captured by the instructor by hand and brought in with `import`, which blacks out what the recipe's `redact:` boxes cover (see Hand captures).
 - **No infobars.** Chrome for Testing puts a notice under the address bar: "Chrome for Testing … is only for automated testing". It is 55 pixels of browser chrome that says nothing about the page. Headed captures pass `--disable-infobars`, which keeps it off. `capture` fails a headed take whose bars above the page are taller than the tab strip and address bar (88 pixels), unless the figure's subject is the bar (`expect: {infobar: true}`, as for ch-08's Selenium window). The figures made before the toolkit ran Chrome without the switch and carried the notice.
@@ -112,7 +112,7 @@ something the next agent would otherwise find out again, add a note here.
 ### Before the recipe
 
 - **Read robots.txt for the course's User-Agent.** Captures send
-  `Web Data Science/v1 brian.keegan@colorado.edu`, and robots.txt is read for
+  `WebDataScience/1.0 (brian.keegan@colorado.edu)`, and robots.txt is read for
   it: the `*` group, unless a group names it. A group addressed only to
   Claude's agents (`Claude-User`, `ClaudeBot`, `Claude-SearchBot`,
   `Claude-Web`, `anthropic-ai`) doesn't govern captures (`docs/decisions.md`,
@@ -161,7 +161,7 @@ something the next agent would otherwise find out again, add a note here.
   URL = "https://clerk.house.gov/xml/lists/MemberData.xml"
   with sync_playwright() as p:
       browser = p.chromium.launch(executable_path=chrome_path(),
-                                  args=["--user-agent=Web Data Science/v1 brian.keegan@colorado.edu"])
+                                  args=["--user-agent=WebDataScience/1.0 (brian.keegan@colorado.edu)"])
       page = browser.new_page(viewport={"width": 800, "height": 700}, device_scale_factor=2)
       page.goto(URL, wait_until="load")
       for line in page.locator(".pretty-print .line").all()[:40]:    # what you might crop or mark
@@ -450,14 +450,19 @@ something the next agent would otherwise find out again, add a note here.
   reset connections again, and answered some page loads with its "Fail with
   status: 502" page and some of a page's images with 502; half an hour of
   retries got chapter 7's five figures through.
-- **A 429 on the first request is the session's address, not your pace.**
-  On 2026-09-24, Wikimedia's REST API answered the chapter 1 pageviews URL
-  with 429 ("You are making too many requests") before any other request had
-  gone to it: cloud sessions share addresses, and the limit counts everyone
-  on them. Don't retry in a loop. Try once much later, or have the figure
-  captured from another network. It answered 429 again that evening, through
-  `capture`'s three retries: a limit counted over a shared address outlasts
-  the backoff. One request on 2026-09-25 got the same answer.
+- **A 429 on the first request can be the User-Agent.** Wikimedia's API
+  gateway gives a request with no identifying User-Agent 10 requests a
+  minute, shared by every such request from its address, and "a compliant
+  User-Agent header" 200 ([Rate limits](https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits)).
+  Compliant means a name and version, then contact information in
+  parentheses. The toolkit's old `Web Data Science/v1
+  brian.keegan@colorado.edu` wasn't, and on 2026-09-24 the chapter 1
+  pageviews URL answered it with 429 ("You are making too many requests")
+  on the first request, four times, through every retry. The same session
+  got 200 on 2026-09-25 with `WebDataScience/1.0 (brian.keegan@colorado.edu)`.
+  The first diagnosis, "the session's shared address", was wrong. Read the
+  429's page before blaming the network: Wikimedia's names its rate-limit
+  policy.
 
 ## Making a figure, start to finish
 
@@ -751,10 +756,11 @@ and shows its locator), and `settle`.
 
 ## Hand captures
 
-A page behind a login is the one kind of figure a person takes: the toolkit
-never signs in. The recipe says so with `mode: hand`, and `import` turns the
-person's screenshot into a take, which `sheet`, `promote`, and `sync` treat
-like any other.
+A person takes two kinds of figure: a page behind a login, since the toolkit
+never signs in, and a page the session can't reach, such as github.com beyond
+the session's own repositories. The recipe says so with `mode: hand`, and
+`import` turns the person's screenshot into a take, which `sheet`, `promote`,
+and `sync` treat like any other.
 
 ```yaml
 - id: issue-form
@@ -817,9 +823,13 @@ tools/shots/run import course issue-form --file issue.png --by "A. Person" --dat
   `doctor` doesn't read robots.txt for it, because a person's browser loads the
   page, as a person.
 
-No recipe uses it yet. Its first candidate is week 1's issue form
-(`issue_form.png`), if the maintainer chooses a hand capture over a public
-issue (see "Waiting on the maintainer" in `docs/handoff.md`).
+Three course recipes wait for their screenshots (2026-09-25): `pr-review`,
+one image for weeks 1, 8, and 13's `pr_review.png`; `week01-issue-form`, a
+filled-in Gap report, not submitted; and `week01-github-repo`, the textbook's
+repository signed out. Each gives the steps in its `hand:` block. Their crop
+and redaction boxes are set from the screenshot before it is imported: in a
+column 35% of the slide wide, a crop wider than about 440 CSS pixels makes
+12-pixel text too small.
 
 ## Markers
 

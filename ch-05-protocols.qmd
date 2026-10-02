@@ -109,55 +109,39 @@ print(response.json())
 # {'ip': '128.138.xxx.xxx'} — your public IP
 ```
 
-**From the terminal.** Before reaching for Python, the fastest reachability check is `ping` — available on every platform, no install required:
+**From the terminal, inside the notebook.** Some of the most useful network tools are programs that come with your operating system rather than Python libraries: `ping`, `traceroute`, and `curl`. A notebook can run them too. When a line in a code cell starts with `!`, Jupyter hands the rest of the line to your computer's terminal, and the program's output appears under the cell. There is nothing to install, and no administrator rights are needed.
 
-```
-ping en.wikipedia.org
+The fastest reachability check is `ping`, which sends a few small packets to a host and reports whether, and how quickly, it replies:
+
+```{python}
+import platform
+
+# ping's flag for "send 4 and stop" is -n on Windows and -c on macOS and Linux
+if platform.system() == "Windows":
+    !ping -n 4 en.wikipedia.org
+else:
+    !ping -c 4 en.wikipedia.org
 ```
 
-It sends a small packet to the host and reports whether, and how quickly, it replies. No reply after several tries usually means the host is unreachable, or that a firewall is silently dropping the probes — the same ambiguity traceroute's `* * *` runs into below. macOS and Linux run `ping` until you press Ctrl+C; Windows stops automatically after four attempts.
+No reply after four tries usually means the host is unreachable, or that a firewall is silently dropping the probes — the same ambiguity traceroute's `* * *` runs into below.
 
 ### Traceroute
 
-When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers, and tracing that path is a good way to make the abstract idea of "the network" concrete. This section uses the `scapy` library to do it in Python — but unlike everything else in this chapter, `scapy` needs real setup before it will work at all, so the install and permissions come first, before any code.
-
-#### Installing and Running `scapy`
-
-`scapy` sends and receives raw network packets directly, bypassing the ordinary socket API that `requests` and every other library in this book uses. Crafting and sniffing raw packets is a privileged operating-system operation on every major platform — that restriction has nothing to do with `scapy` itself, and everything to do with what raw packet access would let *any* program do if it were unrestricted. Because of this, getting `scapy`'s traceroute to run takes three separate steps, in order, and skipping straight to the code below without them is the single most common way to get stuck.
-
-**1. Install the library.**
-
-```
-pip install scapy
-```
-
-or, if you manage packages with conda:
-
-```
-conda install -c conda-forge scapy
-```
-
-**2. On Windows only, install a packet-capture driver.** `scapy` cannot send or receive raw packets on Windows without [Npcap](https://npcap.com/) — a driver, not a Python package, so `pip install scapy` alone will not give you a working `traceroute()` on Windows. Download and run the Npcap installer before continuing, accepting the default options.
-
-**3. Launch your notebook with elevated privileges.** This is the step people skip, and the failure that follows is confusing rather than clear — the call hangs, or every hop comes back unanswered, with no error message pointing at the actual cause.
-
-- **macOS or Linux:** open a terminal and run `sudo jupyter notebook`. One gotcha worth knowing in advance: `sudo` resets your shell's `PATH` by default, so if `scapy` is installed inside a conda environment, a bare `sudo jupyter notebook` can launch a *different* Jupyter than the one in your environment — and fail with `ModuleNotFoundError: No module named 'scapy'` even though you installed it correctly. If that happens, be explicit about which Jupyter you mean: `sudo $(which jupyter) notebook`.
-- **Windows:** open the Start menu, right-click **Anaconda Prompt**, and choose **Run as administrator**. From that elevated prompt, run `jupyter notebook` as usual.
-
-::: {.callout-warning}
-Running an entire Jupyter server with root or Administrator privileges is a bigger step than it sounds. A notebook kernel executes arbitrary code, so once you launch it this way, *anything* that runs in *any* cell has full system access — not just the one `scapy` call that actually needed it. That trade-off is reasonable for a short, deliberate session on your own machine to run the code below, but it is not a habit to build: close the elevated notebook server when you are done, and never leave one running on a machine or network you do not fully trust.
-:::
-
-If your machine will not cooperate — a locked-down lab computer, no administrator rights, or Npcap will not install — skip ahead to the terminal-based backup at the end of this section. You will still see exactly what a traceroute reveals; you just will not be doing it from Python.
+When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers, and tracing that path is a good way to make the abstract idea of "the network" concrete. Every major operating system ships a tool that traces it: `traceroute` on macOS and Linux, and `tracert` on Windows.
 
 ```{python}
-from scapy.all import traceroute
+import platform
 
-# Trace the path to Wikipedia
-result, unans = traceroute("en.wikipedia.org", maxttl=20)
+# Stop after 20 hops: -h on Windows, -m on macOS and Linux
+if platform.system() == "Windows":
+    !tracert -h 20 en.wikipedia.org
+else:
+    !traceroute -m 20 en.wikipedia.org
 ```
 
-Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:
+It can take a minute, because the tool waits a few seconds for each router that doesn't answer. On Linux, if `traceroute` isn't installed, `!tracepath en.wikipedia.org` does the same job.
+
+To work with the output in Python instead of reading it, put a variable in front of the `!`: `hops = !traceroute -m 20 en.wikipedia.org` stores each line of the output as one item of `hops`, which you can loop over like a list. Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:
 
 ```{python}
 import requests
@@ -174,7 +158,7 @@ print(f"{location['city']}, {location['country']}")
 
 #### Interpreting Traceroute Output
 
-Each line `scapy` prints represents one hop — a router along the path — with its IP address (or hostname, if one resolves) and a round-trip time in milliseconds. A few patterns come up often enough to be worth recognizing on sight:
+Each line traceroute prints represents one hop — a router along the path — with its IP address (or hostname, if one resolves) and a round-trip time in milliseconds. A few patterns come up often enough to be worth recognizing on sight:
 
 - **`* * *`, or an unanswered hop.** Not every router replies to traceroute probes — many are configured to rate-limit or silently drop them for their own protection. This does *not* mean that hop or the connection is broken; it usually means the path continues fine past it, just without a visible line for that one router.
 - **A sudden jump in round-trip time.** A hop dramatically slower than the ones just before and after it often marks a long-haul or undersea link — the path crossing from one continent or region to another — rather than anything being wrong.
@@ -182,68 +166,29 @@ Each line `scapy` prints represents one hop — a router along the path — with
 - **Hostnames that encode geography.** Router hostnames on the public internet often contain airport codes or city abbreviations from the network operator that owns them (`iad` for the Washington, D.C. area, `ord` for Chicago, and so on) — a quick, informal way to guess where a hop physically sits, well before you bother calling a geolocation API on it.
 - **Round-trip time stabilizing near the end.** The last few hops usually settle close to the actual latency you would measure with a simple ping to the destination — a sign you have essentially arrived, even if the exact last hop does not respond.
 
-#### A Backup: Traceroute from the Terminal
-
-If the Python setup above is too much friction — or you just want to see the result faster — every major operating system ships a traceroute tool that works from an ordinary, unprivileged terminal: no `scapy`, no elevated permissions, no Npcap.
-
-- **macOS or Linux:** open a terminal and run:
-
-```
-traceroute en.wikipedia.org
-```
-
-- **Windows:** open Command Prompt or Anaconda Prompt — no administrator rights needed for this one — and run:
-
-```
-tracert en.wikipedia.org
-```
-
-Both print the same information `scapy`'s `traceroute()` does, one line per hop with round-trip times, in a slightly different format. This is worth doing even if your Python setup worked: it is the fastest way to sanity-check that what you saw from `scapy` looks like the real path, and it is a reasonable fallback — or a reasonable default — if getting raw-socket access working inside a notebook is not worth the friction for what you are trying to learn here.
-
-### Packets and Packet Sniffing
+### Packets
 
 Every message this chapter has described — a DNS lookup, an HTTP request, a traceroute probe — ultimately travels as a sequence of **packets**: small chunks of data, each wrapped in its own headers that carry routing and delivery information separately from whatever payload it carries. TCP breaks a message into packets on the way out and reassembles them in order on the way in; that reassembly is exactly what lets `requests` hand you back one clean `Response` object instead of a pile of disconnected fragments.
 
 **Packet sniffing** means capturing these packets as they pass across a network interface, rather than only sending and receiving your own application's requests the normal way. This is a meaningfully more invasive capability than anything else in this chapter. A traceroute or a DNS lookup only ever touches traffic you generated. A packet sniffer running on a shared network — campus wifi, a coffee-shop hotspot, an office LAN — can, depending on the network's configuration, see *other people's* traffic too: which sites they are visiting, and on an unencrypted connection, potentially some of what they are sending. Capturing your own traffic on your own machine is unambiguously fine. Capturing other people's traffic without their knowledge or consent is a real privacy question, and sometimes a legal one — @sec-ethics covers consent and authorized access in more depth, and it applies here as much as it does to scraping.
 
-For that reason, the only sniffing this book has you do is on **loopback traffic you generate yourself, to a server running on your own machine**. Nothing here ever touches a shared network or anyone else's packets.
+This book doesn't have you sniff packets. Capturing them takes administrator rights on every major operating system, because of what it would let any program see, and running a notebook with those rights is a habit not worth building.
+
+You can still watch one connection pass through the layers from your own side of it. `curl`, a command-line HTTP client that comes with macOS, Linux, and Windows 10 and later, narrates what it does when you add `-v` (verbose). The section on `curl` and `wget` below covers it in full.
 
 ```{python}
-import time
-import threading
-from http.server import HTTPServer, SimpleHTTPRequestHandler
-from scapy.all import AsyncSniffer
-import requests
-
-PORT = 8899
-
-# A minimal local server -- the only thing this section sends traffic to
-httpd = HTTPServer(("127.0.0.1", PORT), SimpleHTTPRequestHandler)
-threading.Thread(target=httpd.serve_forever, daemon=True).start()
-time.sleep(0.2)  # give the server a moment to start listening
-
-# Start capturing on the loopback interface before generating any traffic.
-# "lo0" on macOS, "lo" on Linux; on Windows, omit iface and let scapy pick the loopback adapter.
-sniffer = AsyncSniffer(filter=f"tcp port {PORT}", iface="lo0")
-sniffer.start()
-time.sleep(0.2)  # give the sniffer a moment to attach
-
-response = requests.get(f"http://127.0.0.1:{PORT}/")
-print("Response status:", response.status_code)
-
-packets = sniffer.stop()
-httpd.shutdown()
-
-print(f"\nCaptured {len(packets)} packets on the loopback interface:")
-for pkt in packets:
-    print(pkt.summary())
+# -v narrates the connection, -I asks for headers only, and -A sets your User-Agent (chapter 2)
+!curl -v -I -A "WebDataScience/1.0 (your-email@colorado.edu)" https://en.wikipedia.org/wiki/Web_scraping
 ```
 
-This needs the same elevated privileges as traceroute, for the same reason — see "Installing and Running `scapy`" above if you have not launched your notebook that way already.
+Read the output from the top:
 
-The captured packets tell the same story as the Network tab's Timing view, just one layer deeper. The first few packets are [TCP's handshake](https://developer.mozilla.org/en-US/docs/Glossary/TCP_handshake) — a `SYN` (your machine proposing a connection), a `SYN-ACK` (the local server accepting it), and an `ACK` (confirming) — before either side has sent a single byte of the actual HTTP request. After that, a `PSH, ACK` packet carries your GET request, and one or more further packets carry the server's response back. Every request this chapter has made with `requests.get()` involved this exact same exchange; `scapy`'s sniffer just makes it visible instead of hidden behind a library call.
+- **Lines starting with `*`** are curl's notes on what it is doing. The first ones show the name resolved to an address, then `Connected to en.wikipedia.org (…) port 443`. By that line, TCP's [handshake](https://developer.mozilla.org/en-US/docs/Glossary/TCP_handshake) is done: a `SYN` from your machine proposing a connection, a `SYN-ACK` from the server accepting it, and an `ACK` confirming, all before a single byte of HTTP. Those three packets happen inside your operating system, below any program you run, which is why curl reports that they finished rather than showing them.
+- **The `*` lines that follow** are the TLS handshake, which encrypts the connection for HTTPS: you will see the TLS version and which HTTP version the server accepted.
+- **Lines starting with `>`** are the request curl sent: the method and path, `Host`, and your `User-Agent`.
+- **Lines starting with `<`** are the response: the status line and headers, the same ones the Network tab showed you.
 
-Scripting a capture like this is useful when you want packets as Python objects you can filter and count in code. If you would rather explore interactively, [Wireshark](https://www.wireshark.org/) is the standard GUI packet analyzer — point it at your loopback interface and you can watch this same handshake appear live, packet by packet, without writing anything.
+Every request this chapter makes with `requests.get()` goes through the same stages. The Network tab's Timing view breaks one request into them too: DNS lookup, initial connection, SSL, and waiting for the first byte. To see the packets themselves, [Wireshark](https://www.wireshark.org/) is the standard packet analyzer. Installing its capture driver needs administrator rights, so use it only on a computer you own, and only on your own traffic.
 
 ## DNS: The Address Book
 
@@ -714,7 +659,7 @@ These are open-ended extensions — no scaffold, no fixed path. Use them for fur
 
 4. **Network tab analysis.** Pick a website you visit frequently. Reload it with the browser's Network tab open and recording. Count and categorize all requests into types: HTML documents, CSS stylesheets, JavaScript files, images, fonts, and tracking/analytics scripts. What fraction of requests serve actual content vs. tracking and advertising? Write a brief analysis of what this reveals about the site's business model.
 
-5. **Graduate extension (INFO 5617).** Choose a website you might plausibly study in your own research and profile its delivery infrastructure. Use the browser's Network tab to record the time to first byte, the full redirect chain, and evidence of CDN involvement (inspect the `Server`, `Via`, and similar response headers), then run `traceroute` (or `scapy`'s traceroute) to the same host and geolocate a few of the hops. Write a 500-word memo connecting these protocol-level observations to research-infrastructure concerns: where does "the" site actually live, how stable are measurements of it likely to be across time and vantage points, and what would an automated collection pipeline need to handle — redirects, rate limits, geographically varying responses — to gather data from it reliably?
+5. **Graduate extension (INFO 5617).** Choose a website you might plausibly study in your own research and profile its delivery infrastructure. Use the browser's Network tab to record the time to first byte, the full redirect chain, and evidence of CDN involvement (inspect the `Server`, `Via`, and similar response headers), then run traceroute to the same host from your notebook (`!traceroute`, or `!tracert` on Windows) and geolocate a few of the hops. Write a 500-word memo connecting these protocol-level observations to research-infrastructure concerns: where does "the" site actually live, how stable are measurements of it likely to be across time and vantage points, and what would an automated collection pipeline need to handle — redirects, rate limits, geographically varying responses — to gather data from it reliably?
 
 ## Social History and Public Interest
 
@@ -731,9 +676,9 @@ The web's protocol stack was designed as public infrastructure — open standard
 
 ## Common Issues to Debug
 
-- **`scapy` import errors**: Requires `pcap` drivers. On Windows, install Npcap. On macOS, the built-in `libpcap` usually works.
-- **`scapy` fails after `sudo jupyter notebook`**: `sudo` often resets `PATH`, launching a different Python than your conda environment. Use `sudo $(which jupyter) notebook` instead.
-- **`AsyncSniffer` captures 0 packets**: Usually a timing race — the sniffer needs a moment to attach before you generate traffic, which is what the `time.sleep()` calls in this chapter's example are for. Also confirm the interface name matches your platform: `lo0` on macOS, `lo` on Linux.
+- **`!ping` or `!traceroute` doesn't stop**: Without `-c`, `ping` on macOS and Linux runs until it is stopped. Press the notebook's ■ (interrupt) button, and add `-c 4`.
+- **`'traceroute' is not recognized`** (Windows) **or `tracert: command not found`** (macOS, Linux): The two systems name the tool differently. The chapter's cells choose with `platform.system()`. On Linux without `traceroute`, use `tracepath`.
+- **Every hop is `* * *`**: Many networks, campus Wi-Fi included, block the probes traceroute sends. Try another network, such as a phone hotspot. The path past the silent hops usually exists; it just isn't shown.
 - **`wget --random-wait` has no visible effect**: It only randomizes a wait time you already set with `--wait`; used alone, with no base wait to randomize, it does nothing.
 - **403 from Wikimedia API**: You forgot the custom `User-Agent` header.
 - **DNS results varying by location**: Normal — content delivery networks return different IPs based on your geographic location.
@@ -741,13 +686,13 @@ The web's protocol stack was designed as public infrastructure — open standard
 
 ## Key Takeaways
 
-The web is built on a layered stack of protocols: TCP/IP transports data, DNS resolves names to addresses, HTTP structures the conversation, and URLs identify the target. Traceroute and packet sniffing make that transport layer directly observable, and the `User-Agent` header — honest or deliberately spoofed — is how a server decides who, or what, it believes is asking. Understanding this stack transforms debugging from guesswork into systematic diagnosis. When a request fails, you can ask: can I reach the server at all? Am I resolving the right address? What status code did I get? Are my headers correct? Is my URL well-formed? This systematic approach carries through every chapter that follows.
+The web is built on a layered stack of protocols: TCP/IP transports data, DNS resolves names to addresses, HTTP structures the conversation, and URLs identify the target. Traceroute and curl's verbose output make that transport layer directly observable, and the `User-Agent` header — honest or deliberately spoofed — is how a server decides who, or what, it believes is asking. Understanding this stack transforms debugging from guesswork into systematic diagnosis. When a request fails, you can ask: can I reach the server at all? Am I resolving the right address? What status code did I get? Are my headers correct? Is my URL well-formed? This systematic approach carries through every chapter that follows.
 
 ## Further Reading
 
 - Mozilla Developer Network — How the Web Works: <https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works>
 - Mozilla Developer Network — HTTP Overview: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview>
-- `scapy` documentation: <https://scapy.readthedocs.io/>
+- IPython's shell commands, `!` and `var = !command`: <https://ipython.readthedocs.io/en/stable/interactive/python-ipython-diff.html#shell-assignment>
 - Wireshark, the standard GUI packet analyzer: <https://www.wireshark.org/>
 - `dnspython` documentation: <https://dnspython.readthedocs.io/>
 - Wikipedia — Internationalized domain name: <https://en.wikipedia.org/wiki/Internationalized_domain_name>

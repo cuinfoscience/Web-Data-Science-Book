@@ -34,7 +34,7 @@ The `pypdf` library provides page-level text extraction and metadata access:
 
 ```{python}
 # Install if needed:
-# pip install pypdf
+# pypdf is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge pypdf
 
 from pypdf import PdfReader
 
@@ -410,7 +410,7 @@ PyPDF handles text-based PDFs well but struggles with two common scenarios:
 **Tables in PDFs**: PyPDF extracts tables as streams of text, losing the column-row structure. For tabular PDF data, use `pdfplumber`, which preserves spatial relationships:
 
 ```{python}
-# pip install pdfplumber
+# pdfplumber is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge pdfplumber
 import pdfplumber
 
 with pdfplumber.open("report.pdf") as pdf:

@@ -2,6 +2,40 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-02 · Chapter 5 drops scapy for the operating system's own tools
+
+**Decision.**
+- Chapter 5 no longer uses scapy. Its traceroute and packet-sniffing code needed `sudo jupyter notebook` (or an Administrator prompt on Windows) and Npcap, which ran the whole notebook with root privileges.
+- `ping`, `traceroute` (`tracert` on Windows), and `curl -v` take their place. They run from notebook cells with Jupyter's `!`, which needs no install and no administrator rights. Each cell picks the right command for the reader's system with `platform.system()`.
+- The book has readers sniff no packets. Chapter 5 explains packets and the TCP handshake with `curl -v`'s account of a connection, and points to Wireshark, on a computer the reader owns, for anyone who wants to see the packets.
+
+**Why.** The maintainer: scapy's install and its `sudo` launch were disruptive and confusing, and running a notebook with `sudo` sets a bad example. Every system ships these tools, and they show the same path and the same handshake without elevated privileges. Students' #106, #111, and #112 edit the scapy text this removes.
+
+**Where.** `ch-05-protocols.qmd` ("TCP/IP: The Transport Layer", "Common Issues to Debug", the graduate extension, "Further Reading"), and week 5's deck in the course repository.
+
+## 2026-10-02 · `webdata` comes from conda-forge with every library the chapters import; the stopword list is a text file
+
+**Decision.**
+- Chapter 1 and the course's setup handout create `webdata` in one command: `conda create -n webdata --override-channels -c conda-forge python=3.14 notebook requests beautifulsoup4 lxml pandas matplotlib seaborn gensim dnspython selenium playwright-python pypdf pdfplumber praw spotipy atproto mastodon.py openai anthropic`. It replaces `conda create -n webdata python=3.14` followed by `pip install notebook requests beautifulsoup4 pandas matplotlib seaborn`.
+- Chapters no longer install their own libraries. Where a chapter used to say `pip install X`, it says that X is in `webdata`, and gives `conda install -c conda-forge X` for an environment made before this change. A chapter that needs a new library adds it to chapter 1's command.
+- Chapter 7 reads its stopwords from `data/stopwords-en.txt` in this repository, fetched with `requests`, in place of NLTK's `stopwords` corpus. The file is NLTK's English list, unchanged. NLTK is no longer a dependency of the book's code.
+- Two steps stay in their chapters because they aren't packages: Playwright's browsers (chapter 8) and API keys (chapters 11 to 13).
+
+**Why.** The maintainer asked for every chapter's libraries to be installed in week 1. An audit of the chapters' imports found three that week 1's environment lacked and no chapter installed: `lxml`, which chapter 6's `pd.read_html()` needs, `dnspython` (chapter 5), and `scipy` (chapter 13). Chapter 7 also needed gensim, which has no Python 3.14 build on PyPI, and NLTK, whose corpus download it left commented out. Everything in the new command solves together on conda-forge for Python 3.14, checked on 2026-10-02. All 22 modules the chapters import load in the environment it builds. The same packages, added to a copy of an environment made the old way, load too. conda-forge's `playwright` package is the Node.js command-line tool; the Python library there is `playwright-python`, a release behind PyPI.
+
+**Where.** `ch-01-introduction.qmd` ("Setting Up Your Environment", "Core Libraries", "Common Issues to Debug"), the install notes in chapters 4, 7, 8, 9, 12, and 13, `data/`, `README.md`, `AGENTS.md`, and, in the course repository, `handouts/week-01/setup.md` and the decks that showed installs.
+
+## 2026-09-25 · The course's User-Agent takes the form the chapters teach
+
+**Decision.**
+- The book's tools and captures send `WebDataScience/1.0 (brian.keegan@colorado.edu)`: a name and version, then contact information in parentheses, the form chapter 1 teaches. It replaces `Web Data Science/v1 brian.keegan@colorado.edu`, and names the same project and contact.
+- Examples keep `WebDataScience/1.0 (your-email@colorado.edu)`, with the reader's own address.
+- An image captured before this keeps its record, which names the old string. A retake sends the new one.
+
+**Why.** Wikimedia's API gateway gives a request with no identifying User-Agent 10 requests a minute, shared by every such request from its address, and "a compliant User-Agent header" 200 (mediawiki.org, "Wikimedia APIs/Rate limits"). The old string wasn't in that form. The pageviews API answered it with 429 on the first request, four times on 2026-09-24, and figure 1-4 was put down to the session's network. On 2026-09-25 the same session got 200 with the new string. The maintainer diagnosed it and approved the change.
+
+**Where.** `tools/shots/lib/recipes.py` (the default), `tools/shots/README.md`, and `AGENTS.md`. *Supersedes* the User-Agent string in "The course's User-Agent is the one robots.txt is read for" and "One honest identity for captures and examples", below; the rest of both stands. Chapter 6 and week 6's Oscars handout, which the maintainer keeps, still show the old string.
+
 ## 2026-09-24 · A figure of an API's response is captured as an API client
 
 **Decision.**
@@ -36,6 +70,8 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 **Where.** `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, the preface (`index.qmd`), chapter 1's setup, chapter 7's gensim note, `.github/workflows/`, and the course's `handouts/week-01/setup.md`.
 
 ## 2026-09-24 · The course's User-Agent is the one robots.txt is read for
+
+*The User-Agent string here is superseded by [2026-09-25 · The course's User-Agent takes the form the chapters teach](#2026-09-25--the-courses-user-agent-takes-the-form-the-chapters-teach); the rest stands.*
 
 **Decision.**
 - Every request the book's tools and scripts make for the maintainer sends the course's User-Agent, `Web Data Science/v1 brian.keegan@colorado.edu` (see the 2026-09-23 entry). None goes out with a library default, such as `python-requests/2.34`, or with a Claude agent's string.
@@ -165,6 +201,8 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 **Where.** The course's `slides/common/AUTHORING.md` ("What counts as a screenshot"), and the toolkit's provenance and `check`. `check` matches each image against its recorded capture.
 
 ## 2026-09-23 · One honest identity for captures and examples
+
+*The User-Agent string here is superseded by [2026-09-25 · The course's User-Agent takes the form the chapters teach](#2026-09-25--the-courses-user-agent-takes-the-form-the-chapters-teach); the rest stands.*
 
 **Decision.**
 - Captures and the book's request examples identify themselves with one User-Agent: `Web Data Science/v1 brian.keegan@colorado.edu`.

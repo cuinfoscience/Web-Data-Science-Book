@@ -399,6 +399,123 @@ figures:
   # github.com's robots.txt (a cloud session reaches github.com only for its own
   # repositories). quotes.toscrape.com is a sandbox built for scraping practice
   # and has no robots.txt.
+  - id: week01-book-website
+    kind: capture
+    section: "week-01 slides, A book built for this course (book_website.png)"
+    brief: >-
+      Show the course's textbook as students first meet it: its website,
+      loaded narrow, with the chapter list open, so the frame's "one chapter
+      per week" has its chapters to point at. The list alone, from Preface
+      through chapter 15, in its four parts (Foundations, Documents, APIs,
+      Practice); leave out the page grayed behind it and the appendices.
+      Narrow, for a column 35% of the slide wide.
+    url: https://cuinfoscience.github.io/Web-Data-Science-Book/
+    window: [480, 760]
+    steps:
+      - wait: {text: 'Retrieving, Parsing, and Analyzing Data'}
+      - click: {selector: 'button.quarto-btn-toggle'}     # the chapter list, folded away at this width
+      - wait: {text: 'Introduction to Web Data Science'}
+      - settle: 1
+    expect: {text: ['Web Data Science', 'Research Design with Web Data']}
+    # The open list is 390 pixels wide. Preface's row starts at 134 and chapter 15's ends
+    # at 627, measured 2026-09-25; the window is 760 tall so all of it is drawn. Title
+    # and list together would be too tall for a 35% column (1.5 times its width).
+    crop: {top: 124, left: 0, width: 388, height: 512}
+    targets: {slides: {width: 0.35}}
+    drifts: true        # the book's chapters and the site's look
+
+  # Hand captures (mode: hand; README, "Hand captures"): screenshots the maintainer takes,
+  # brought in with `tools/shots/run import course <id> --file PNG --by NAME --date D`.
+  # Their crop and redact boxes are set from the screenshot itself, before it is imported:
+  # each column is 35% of the slide, so a crop wider than about 440 CSS pixels makes
+  # 12-pixel text too small (text_px x 0.35 x 1680 / width must reach 16).
+  - id: pr-review
+    kind: capture
+    mode: hand
+    section: "week-01, week-08, and week-13 slides (pr_review.png)"
+    brief: >-
+      Show a pull request as a proposal that people comment on line by line:
+      the Files changed view of a textbook pull request that isn't a student's,
+      a changed line of a chapter's .qmd, and a review comment under it. One
+      image serves weeks 1, 8, and 13, whose frames say the same thing beside
+      it. Week 13's frame also asks students to disclose AI help, which a
+      description written from the pull request template does under "AI
+      assistance"; that is on the Conversation tab, not here, so week 13 could
+      take its own capture of such a description. Narrow, for a column 35% of
+      the slide wide.
+    url: https://github.com/cuinfoscience/Web-Data-Science-Book/pull/50/files
+    hand:
+      why: >-
+        writing the review comment needs a signed-in account, and the session
+        can't reach github.com beyond its own repositories (robots.txt answers
+        403 through its proxy)
+      steps: >-
+        Signed in, open the pull request's Files changed (#50, your own, edits
+        ch-02-ethics.qmd; any pull request that isn't a student's will do) and
+        leave a short review comment on one changed line. Open DevTools' device
+        toolbar (Ctrl+Shift+M; Cmd+Shift+M on a Mac) at 480 x 800, zoom 100%,
+        reload, and scroll so the line and the comment under it are in view.
+        Save the screenshot with the device toolbar's menu, Capture screenshot.
+        window.devicePixelRatio in the console is `scale`.
+      text_px: 12          # GitHub's diff; its comments are 14
+    window: [480, 800]
+    scale: 2
+    targets: {slides: {width: 0.35}}
+    drifts: true           # GitHub's interface
+
+  - id: week01-issue-form
+    kind: capture
+    mode: hand
+    section: "week-01 slides, Your turn (issue_form.png)"
+    brief: >-
+      Show where a student files a problem: the textbook's Gap report form,
+      filled in with the revision framework's worked example (Chapter 2,
+      "Technical Norms: robots.txt": where to find a site's robots.txt), and not
+      submitted. The title and the first fields; no account details. Narrow,
+      for a column 35% of the slide wide.
+    url: https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new?template=gap-report.yml
+    hand:
+      why: GitHub's new-issue forms need a signed-in account, and the toolkit never signs in
+      steps: >-
+        Signed in, open the URL with DevTools' device toolbar at 480 x 800, zoom
+        100%. Fill in the revision framework's gap report
+        (handouts/common/revision-framework.md, "Filling in a form well"): the
+        title "Gap: no explanation of where to find robots.txt", Ch. 2, the
+        heading "Technical Norms: robots.txt", "Something was missing", and its
+        "Where did you get stuck?" answer. Don't submit. Save the screenshot with
+        the device toolbar's Capture screenshot; window.devicePixelRatio is `scale`.
+      text_px: 14
+    window: [480, 800]
+    scale: 2
+    targets: {slides: {width: 0.35}}
+    drifts: true           # the form's fields and GitHub's interface
+
+  - id: week01-github-repo
+    kind: capture
+    mode: hand
+    section: "week-01 slides, The textbook on GitHub (github_repo.png)"
+    brief: >-
+      Show the textbook's repository as a visitor sees it, signed out: its name,
+      the chapter .qmd files in the file list, and the Fork button, for "The
+      book is a living, open repository." Narrow, for a column 35% of the slide
+      wide.
+    url: https://github.com/cuinfoscience/Web-Data-Science-Book
+    hand:
+      why: >-
+        the session can't reach github.com beyond its own repositories
+        (robots.txt answers 403 through its proxy); the page itself needs no
+        account
+      steps: >-
+        In a private window (signed out), open the URL with DevTools' device
+        toolbar at 480 x 800, zoom 100%, and save the screenshot with Capture
+        screenshot; window.devicePixelRatio is `scale`. Signed out, nothing needs
+        blacking out.
+      text_px: 14
+    window: [480, 800]
+    scale: 2
+    targets: {slides: {width: 0.35}}
+    drifts: true           # the repository's files and GitHub's interface
+
   - id: week08-requests-vs-browser
     kind: capture
     section: "week-08 slides, Zero bytes (requests_vs_browser.png)"

@@ -35,7 +35,7 @@ Reddit provides a free API tier for non-commercial use (100 queries per minute).
 Reddit's API uses **OAuth2**, the authorization standard behind most platform APIs. The core idea: instead of sending your password with every request, your application exchanges its credentials for a scoped, revocable token. OAuth2 comes in several *flows* for different situations. The **client credentials** flow used below authenticates your *application* and grants read-only access to public data — sufficient for research collection. The **authorization code** flow additionally asks a *user* to grant your app permission to act on their behalf (post, vote, read private feeds); you will not need it in this chapter, but you will recognize it from every "Sign in with Google" dialog you have ever clicked through.
 
 ```{python}
-# Install: pip install praw
+# praw is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge praw
 import praw
 
 reddit = praw.Reddit(
@@ -182,7 +182,7 @@ Reddit's 2023 API pricing changes — from free to $0.24 per 1,000 calls — and
 Spotify's API provides metadata about artists, albums, tracks, and playlists — a window into the catalog and popularity dynamics of the world's largest music streaming platform:
 
 ```{python}
-# Install: pip install spotipy
+# spotipy is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge spotipy
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -308,7 +308,7 @@ The episode also carries a methodological lesson that outlives the endpoints. Au
 Bluesky, built on the AT Protocol, represents a structural alternative to proprietary platforms. Its open protocol means that API access is an architectural feature, not a business decision:
 
 ```{python}
-# Install: pip install atproto
+# atproto is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge atproto
 from atproto import Client
 
 client = Client()
@@ -426,7 +426,7 @@ print(f"Mutual connections: {len(mutuals)}")
 Mastodon is a decentralized social network built on the ActivityPub protocol. Each server (instance) hosts its own API [@diener2026mastodonpy]:
 
 ```{python}
-# Install: pip install Mastodon.py
+# Mastodon.py is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge mastodon.py
 from mastodon import Mastodon
 
 # One-time setup: register an app on your home instance, then log in.

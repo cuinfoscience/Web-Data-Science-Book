@@ -490,17 +490,23 @@ Swap this wrapper into the collection loop and your pipeline gains two propertie
 
 To measure how much a document changed between versions, you can use a bag-of-words approach. This technique represents each document as a vector of word frequencies, ignoring word order, and then measures the similarity between vectors.
 
-The code below uses gensim and NLTK, which chapter 1's core install doesn't include. In a terminal where `webdata` is active, install both with `conda install -c conda-forge gensim nltk`. For Python 3.14, conda-forge has gensim ready to install, and PyPI, where `pip` looks, doesn't yet (September 2026).
+The code below uses gensim, which chapter 1's `webdata` environment includes. An environment made before October 2026 doesn't have it: add it once, in a terminal where `webdata` is active, with `conda install -c conda-forge gensim`, then restart your Jupyter kernel. `pip install gensim` won't do, because PyPI, where `pip` looks, has no gensim built for Python 3.14 (October 2026); conda-forge does. An `import gensim` that runs without an error means it worked.
+
+Stopwords, such as *the*, *and*, and *of*, are too common to tell two versions of a document apart, so the code drops them before counting. The list comes from the web like any other data: the book keeps it as a plain-text file, one word per line, and `requests` fetches it. It holds the 198 English stopwords of NLTK, a Python library for language processing, which took them from the Snowball project.
 
 ```{python}
+import requests
 from gensim.utils import simple_preprocess
-from nltk.corpus import stopwords
-import nltk
 
-# Download stopwords (first time only)
-# nltk.download('stopwords')
+# The book's stopword list: a plain-text file with one word per line
+STOPWORDS_URL = "https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/stopwords-en.txt"
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 
-stop_words = set(stopwords.words('english'))
+response = requests.get(STOPWORDS_URL, headers=headers, timeout=30)
+response.raise_for_status()
+stop_words = set(response.text.split())  # split() breaks the text at every line break
+print(f"{len(stop_words)} stopwords, such as {sorted(stop_words)[:5]}")
+# 198 stopwords, such as ['a', 'about', 'above', 'after', 'again']
 
 def preprocess_document(text):
     """Tokenize, lowercase, and remove stopwords from a document."""
@@ -540,17 +546,9 @@ The bag-of-words similarity measure tells you how similar two documents are, but
 
 ```{python}
 from gensim import corpora, similarities
-from gensim.utils import simple_preprocess
-from nltk.corpus import stopwords
 
-stop_words = set(stopwords.words("english"))
-
-# Preprocess all versions
-processed_docs = []
-for r in results:
-    if r and r.get("content"):
-        tokens = [t for t in simple_preprocess(r["content"]) if t not in stop_words]
-        processed_docs.append(tokens)
+# Preprocess every version with the same function, so the tokens and stopwords match
+processed_docs = [preprocess_document(r["content"]) for r in results if r and r.get("content")]
 
 # Build dictionary and corpus
 dictionary = corpora.Dictionary(processed_docs)
@@ -670,7 +668,8 @@ The Internet Archive's work also raises fundamental questions about the right to
 - **`502 Bad Gateway`, "Temporarily Offline," or dropped connections**: These usually mean the Archive is overloaded, not that your code is wrong. Wait 30 to 90 seconds, retry, and slow your request rate; the retrying session from @sec-protocols handles this if you give it a longer `backoff_factor`. While this chapter's screenshots were being made in September 2026, roughly half of the first requests to the Archive failed this way and then succeeded on a retry.
 - **Incomplete archived pages**: Many snapshots are missing CSS, images, or JavaScript-rendered content. The text content is usually preserved, but visual rendering may be broken. Open **About this capture** to see when each embedded file was saved, and the Network tab (@sec-protocols) to see which files failed to load.
 - **CDX data inconsistencies**: Some entries may have missing fields or redirect status codes instead of actual content. Filter your data carefully.
-- **NLTK download errors**: Run `nltk.download('stopwords')` once in a fresh Python session to download the stopwords corpus.
+- **`ModuleNotFoundError: No module named 'gensim'`**: Your `webdata` was made before chapter 1's command included gensim. In a terminal where `webdata` is active, run `conda install -c conda-forge gensim`, then restart the kernel. `pip install gensim` finds no Python 3.14 build, tries to compile gensim instead, and usually fails. If the `conda install` fails too, remove the environment with `conda env remove -n webdata` and make it again with chapter 1's command.
+- **The stopword list doesn't load**: `raise_for_status()` names the status code. The list is a plain-text file, so you can also open its address in a browser, save the file next to your notebook, and read it with `open("stopwords-en.txt").read().split()`.
 
 ## Key Takeaways
 

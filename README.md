@@ -55,15 +55,13 @@ This book is written in [Quarto](https://quarto.org/). To build it locally:
 
 ### Python dependencies
 
-The code blocks in the book reference these libraries. Most students will not need all of them at once; install as you work through each chapter:
+The code blocks in the book import these libraries, and chapter 1 installs all of them into the readers' `webdata` environment, from conda-forge, in one command:
 
 ```bash
-pip install requests beautifulsoup4 lxml pandas numpy scipy \
-            matplotlib seaborn selenium pypdf nltk \
-            scapy dnspython praw spotipy atproto Mastodon.py \
-            openai anthropic
-conda install -c conda-forge gensim   # chapter 7; PyPI has no Python 3.14 build of gensim yet
+conda create -n webdata --override-channels -c conda-forge python=3.14 notebook requests beautifulsoup4 lxml pandas matplotlib seaborn gensim dnspython selenium playwright-python pypdf pdfplumber praw spotipy atproto mastodon.py openai anthropic
 ```
+
+conda-forge, unlike PyPI, has gensim (chapter 7) for Python 3.14, and calls the Playwright library `playwright-python`. Two steps are not packages: Playwright's browsers (`playwright install chromium`, chapter 8) and the API keys of chapters 11 to 13.
 
 ### Build commands
 

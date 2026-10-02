@@ -109,8 +109,7 @@ When all three checks come up empty — the data appears only after the page run
 Selenium requires two components: the `selenium` Python library and a browser driver — a small program that lets Python control a specific browser. You only need to install the library: since version 4.6 (late 2022), Selenium has shipped with **Selenium Manager**, which finds or downloads the correct driver for whatever browser you have installed, and downloads the browser as well if you have none.
 
 ```{python}
-# Install from a terminal:
-# pip install selenium
+# selenium is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge selenium
 ```
 
 ### Before the First Browser
@@ -133,7 +132,7 @@ os.environ["SE_AVOID_STATS"] = "true"          # send no usage statistics (optio
 # os.environ["SE_PROXY"] = "http://proxy.example.edu:3128"  # only behind a proxy
 ```
 
-If the version printed is older than 4.20 (April 2024), run `pip install --upgrade selenium` and restart the notebook's kernel. The first setting matters most: it tells Selenium Manager to ignore any driver already on your system `PATH` and use one it has matched to your browser. The end of this section shows what happens without it. The second setting stops the usage statistics that Selenium Manager otherwise sends. The third is for networks that require a proxy; "When Selenium Manager Fails" below says when you need it.
+If the version printed is older than 4.20 (April 2024), run `conda install -c conda-forge "selenium>=4.20"` in a terminal where `webdata` is active, and restart the notebook's kernel. The first setting matters most: it tells Selenium Manager to ignore any driver already on your system `PATH` and use one it has matched to your browser. The end of this section shows what happens without it. The second setting stops the usage statistics that Selenium Manager otherwise sends. The third is for networks that require a proxy; "When Selenium Manager Fails" below says when you need it.
 
 **Step 2: run Selenium Manager.** Ask it for the driver and browser that `webdriver.Chrome()` would use, with its log turned on so that you can read each decision:
 
@@ -240,7 +239,7 @@ It also sends anonymous usage statistics (the browser, operating system, languag
 - **Downloads fail on a campus or corporate network.** A proxy or firewall may block Google's download servers. Set `SE_PROXY` to your proxy's address, or run once on an open network; after that, Selenium Manager works from its cache, and `SE_OFFLINE=true` stops it from trying the network at all.
 - **Chrome is installed somewhere unusual.** Browsers installed through conda or snap can hide from Selenium Manager. Give it the path: in step 2, add `"--browser-path", "/path/to/chrome"` to the list, and when you start the browser, set `options.binary_location = "/path/to/chrome"`.
 - **Something is stuck in the cache.** Delete the cache folder listed above and run your code again; Selenium Manager rebuilds it.
-- **`'SeleniumManager' object has no attribute 'binary_paths'`.** Your `selenium` is older than 4.20. Run `pip install --upgrade selenium` and restart the kernel.
+- **`'SeleniumManager' object has no attribute 'binary_paths'`.** Your `selenium` is older than 4.20. Run `conda install -c conda-forge "selenium>=4.20"` and restart the kernel.
 - **Your computer runs Linux on an ARM processor, such as a Raspberry Pi.** Selenium's documentation says Selenium Manager doesn't run there, but Selenium 4.49 includes a build for 64-bit ARM, and Chrome for Testing and Firefox both publish 64-bit ARM Linux builds for it to download. If it fails anyway, or on 32-bit Linux such as 32-bit Raspberry Pi OS, where there is no Selenium Manager at all, install the browser and its driver with your system's package manager.
 
 Each fix is a setting or a file to delete. Put the setting in step 1's cell, then run steps 1 to 3 again: they show whether the fix worked before you start a browser.
@@ -634,14 +633,13 @@ Notice the use of `WebDriverWait` with `expected_conditions` — this is superio
 
 ### Installing Playwright
 
-Playwright takes two installs: the Python library, and the browsers it drives.
+Playwright takes two installs: the Python library, and the browsers it drives. The library is in `webdata` (chapter 1). On conda-forge it is called `playwright-python`, so an older environment adds it with `conda install -c conda-forge playwright-python`. The browsers are one download, in a terminal where `webdata` is active:
 
 ```
-pip install playwright
 playwright install chromium
 ```
 
-The second command downloads Playwright's own copy of Chrome for Testing plus a smaller headless build. For Playwright 1.63 in September 2026, that came to about 300 MB of downloads and 650 MB on disk, so run it on a fast connection rather than on busy class Wi-Fi. Like Selenium Manager, Playwright fetches browsers for you; unlike Selenium Manager, it pins each Playwright release to one browser version (Chrome 153 for Playwright 1.63), so upgrading Playwright means downloading new browsers too.
+This command downloads Playwright's own copy of Chrome for Testing plus a smaller headless build. For Playwright 1.63 in September 2026, that came to about 300 MB of downloads and 650 MB on disk, so run it on a fast connection rather than on busy class Wi-Fi. Like Selenium Manager, Playwright fetches browsers for you; unlike Selenium Manager, it pins each Playwright release to one browser version (Chrome 153 for Playwright 1.63), so upgrading Playwright means downloading new browsers too.
 
 ### A First Script
 
@@ -818,7 +816,7 @@ When the answer is a browser, the two tools differ in ways that decide which one
 
 | | Selenium | Playwright |
 |---|---|---|
-| Install | `pip install selenium` | `pip install playwright`, then `playwright install` |
+| Install | In `webdata` (chapter 1) | In `webdata`, then `playwright install chromium` |
 | Browsers | Chrome, Firefox, Edge, or Safari, as installed; Selenium Manager downloads Chrome for Testing, Firefox, or Edge if yours is missing | Its own copies of Chromium, Firefox, and WebKit, pinned to each Playwright release |
 | In a notebook | Yes | Only through the async API and `await` |
 | Waiting | Explicit, with `WebDriverWait` | Automatic when you act on or read an element |

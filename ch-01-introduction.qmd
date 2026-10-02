@@ -55,15 +55,16 @@ conda update conda
 conda install anaconda=2026.07-1
 ```
 
-Anaconda's default `base` environment is fine for your first session, but as you accumulate projects, their library requirements will eventually conflict. The `conda` package manager solves this with *environments*: isolated Python installations, each with its own set of packages. Create one for this book, activate it, and install Jupyter and the core libraries into it:
+Anaconda's default `base` environment is fine for your first session, but as you accumulate projects, their library requirements will eventually conflict. The `conda` package manager solves this with *environments*: isolated Python installations, each with its own set of packages. Create one for this book, with Jupyter and every library the book's code uses, then activate it:
 
 ```bash
-conda create -n webdata python=3.14
+conda create -n webdata --override-channels -c conda-forge python=3.14 notebook requests beautifulsoup4 lxml pandas matplotlib seaborn gensim dnspython selenium playwright-python pypdf pdfplumber praw spotipy atproto mastodon.py openai anthropic
 conda activate webdata
-pip install notebook requests beautifulsoup4 pandas matplotlib seaborn
 ```
 
-A new environment holds Python and `pip` and little else, not even Jupyter, which is why `notebook` is on the install line. `conda activate webdata` changes the start of your prompt from `(base)` to `(webdata)`, and from then on `pip` installs into `webdata` and the programs you start run from it. Each new terminal starts in `base`, so run `conda activate webdata` whenever you open one to work on this book.
+The first command is one long line. It makes the environment and installs everything on it at once: Python, Jupyter (`notebook`), and the libraries the chapters import, from `requests` in this chapter to `openai` in chapter 13. `-c conda-forge` takes them from conda-forge, a community channel that builds packages for new versions of Python quickly. gensim, which chapter 7 uses, has a Python 3.14 build there and none yet on PyPI, where `pip` looks. `--override-channels` tells conda to use conda-forge alone, so every package comes from one place. Expect it to take a few minutes. Only two later steps aren't packages: chapter 8 downloads browsers for Playwright, and chapters 11 to 13 ask you for API keys.
+
+`conda activate webdata` changes the start of your prompt from `(base)` to `(webdata)`, and from then on `conda install` and `pip install` put packages into `webdata` and the programs you start run from it. Each new terminal starts in `base`, so run `conda activate webdata` whenever you open one to work on this book.
 
 Giving each project its own environment is a reproducibility practice, not just tidiness: it records exactly which Python and package versions your analysis ran against, so you — or someone replicating your work — can recreate the same setup on another machine months later.
 
@@ -103,7 +104,7 @@ For a thorough introduction to Jupyter Notebooks — cell types, execution order
 
 ### Core Libraries
 
-This book uses several Python libraries extensively. You installed the core ones into `webdata` along with Jupyter; later chapters install more as they need them, with the same `pip install` in a terminal where `webdata` is active. For now, confirm in a notebook that the core libraries import without error:
+This book uses several Python libraries extensively, and you installed all of them into `webdata` along with Jupyter. For now, confirm in a notebook that the ones the first chapters use import without error:
 
 ```{python}
 import requests
@@ -192,7 +193,9 @@ print(type(data))        # <class 'dict'>
 print(data.keys())       # What keys are in the response?
 ```
 
-Notice two things. First, as with the article, you included a custom `User-Agent` header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the `.json()` method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate.
+Notice two things. First, as with the article, you included a custom `User-Agent` header identifying yourself and providing contact information. This is a norm of responsible web data collection that you will learn more about in @sec-ethics. Second, the `.json()` method converts the response body from a JSON string into a Python dictionary — a data structure you already know how to navigate. To see that structure before Python has it, paste the same URL into Chrome and tick **Pretty-print**, as @fig-pageviews-json shows.
+
+![The pageviews API's answer to the chapter's URL in Chrome, with **Pretty-print** ticked, September 2026. The response is a dictionary whose one key, `items` ①, holds a list with one dictionary per day ②. Each day has a `timestamp` ③, written year, month, day, and hour, and its `views` ④: the two fields the plot below is drawn from.](images/ch-01/pageviews-json_annotated.png){#fig-pageviews-json .lightbox fig-alt="Chrome's JSON viewer with the Pretty-print box ticked, showing the response's start. After the opening brace comes the key items, opening a list, and the first day's dictionary: project en.wikipedia, article University_of_Colorado_Boulder, granularity daily, timestamp 2026010100, access all-access, agent all-agents, and views 657. The second day repeats the fields, with timestamp 2026010200 and views 761, and a third begins."}
 
 ### From Response to DataFrame
 
@@ -342,8 +345,8 @@ The tools you learn in this book are not neutral. Web data collection can serve 
 
 ## Common Issues to Debug
 
-- **`jupyter: command not found`** (or "not recognized" on Windows): Jupyter isn't installed in the active environment. Run `conda activate webdata`, then `pip install notebook`, and start `jupyter notebook` again.
-- **`ModuleNotFoundError`**: A library is not installed in the Python your notebook runs. In a terminal where `webdata` is active (the prompt starts with `(webdata)`), run `pip install library-name`, then restart your Jupyter kernel. If the library is installed and the error remains, Jupyter was started from another environment: run `import sys; print(sys.executable)` in the notebook, and check that the path includes `webdata`.
+- **`jupyter: command not found`** (or "not recognized" on Windows): Jupyter isn't installed in the active environment. Run `conda activate webdata`, then `conda install -c conda-forge notebook`, and start `jupyter notebook` again.
+- **`ModuleNotFoundError`**: A library is not installed in the Python your notebook runs. In a terminal where `webdata` is active (the prompt starts with `(webdata)`), run `conda install -c conda-forge library-name`, then restart your Jupyter kernel. If the library is installed and the error remains, Jupyter was started from another environment: run `import sys; print(sys.executable)` in the notebook, and check that the path includes `webdata`.
 - **`ConnectionError`**: Your computer cannot reach the server. Check your internet connection; if you are on a university network, try a different network.
 - **Status code 403 (Forbidden)**: The server rejected your request, often because you did not include a `User-Agent` header; Wikipedia refuses `requests`' default. Send one with your email, as this chapter's requests do, and see @sec-ethics for more on headers.
 - **Cells running out of order**: Jupyter cells can be executed in any order, which leads to stale variables. When in doubt, restart the kernel and run all cells from the top.

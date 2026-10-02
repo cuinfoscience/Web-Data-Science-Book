@@ -468,7 +468,7 @@ figures:
     code, out = shots("capture", "ch-99", "--only", "ua")
     sent = (SEEN.get("/ua") or [{}])[-1]
     expect("requests carry the one User-Agent, and Client Hints that name this machine's system",
-           sent.get("user-agent") == "Web Data Science/v1 brian.keegan@colorado.edu"
+           sent.get("user-agent") == "WebDataScience/1.0 (brian.keegan@colorado.edu)"
            and sent.get("sec-ch-ua-platform") == PLATFORM, str(sent))
     code, out = shots("capture", "ch-99", "--only", "dropped-style", "missing-style", "dropped-allowed")
     ds = newest("dropped-style")
@@ -509,7 +509,7 @@ figures:
     print("robots.txt")
     rules = ("User-agent: *\nDisallow: /private/\n\n"
              "User-agent: ClaudeBot\nUser-agent: Claude-User\nDisallow: /\n")
-    agent = "Web Data Science/v1 brian.keegan@colorado.edu"
+    agent = "WebDataScience/1.0 (brian.keegan@colorado.edu)"
     found = robots.barred(rules, agent, "https://example.org/news/")
     expect("doctor reads a group for Claude's agents, though the capture's User-Agent falls under *",
            found == ["Claude-User", "ClaudeBot"], str(found))

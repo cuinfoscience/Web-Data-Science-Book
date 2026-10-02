@@ -4,8 +4,9 @@
 # (docs/plans/2026-09-24-screenshot-backfill-ch01-05.md, §4): primary sources,
 # each loaded signed out. Left out for now:
 #
-# - 2-2, Reddit's robots.txt: students' pull requests #50, #63, and #79 revise
-#   the paragraphs it would sit beside; it waits for the Friday review.
+# - 2-2, Reddit's robots.txt, is captured and approved (2026-09-25), but its figure
+#   block waits for the Friday review: pull requests #50, #63, and #79 revise the
+#   paragraphs it sits beside.
 # - 2-4, a browser's own request headers: chapter 5's network-headers figure
 #   already shows the Headers pane, and captures send the course's User-Agent
 #   rather than Chrome's, so they can't show "what a real browser sends".
@@ -72,3 +73,21 @@ figures:
         - {n: 2, at: {selector: '.mw-parser-output pre', nth: 0}, side: left, gap: 2}
         - {n: 3, at: {selector: '.mw-parser-output p:has-text("The generic format is")'}, side: left, gap: 2}
     drifts: true        # the policy is edited from time to time
+
+  - id: robots-txt-reddit
+    kind: capture
+    section: "Comparing robots.txt Across Platforms"
+    brief: >-
+      Show the chapter's shortest file, whole, as a browser shows it: Reddit's
+      robots.txt, the eight lines the paragraph counts. The comment block points
+      to the Public Content Policy and to the researchers' program, then
+      User-agent: * and Disallow: / close every path to every crawler. Nothing
+      marked: the file is short enough to read.
+    url: https://www.reddit.com/robots.txt
+    window: [600, 400]
+    steps:
+      - wait: {text: 'Disallow: /'}
+    expect:
+      text: ['User-agent: \*', 'Public Content Policy']
+    crop: {selector: 'pre', pad: 8}     # the whole file, with the page's own margin
+    drifts: true        # Reddit edits the file
