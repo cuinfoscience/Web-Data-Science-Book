@@ -249,13 +249,15 @@ HTTP (Hypertext Transfer Protocol) is the language that clients and servers use 
 The status codes you will encounter most often:
 
 - **200 OK**: The request succeeded and the response body contains the data
-- **301/302 Redirect**: The resource has moved; follow the `Location` header
+- **301/302 Redirect**: The resource has moved; the client is sent to the URL in the `Location` header (`requests` does this automatically)
 - **403 Forbidden**: The server understood your request but refused to fulfill it (often a User-Agent issue)
 - **404 Not Found**: The resource does not exist at this URL
 - **429 Too Many Requests**: You are being rate-limited; slow down
 - **500 Internal Server Error**: Something went wrong on the server side
 
 This list covers what you will see most often in this book, not the full standard — see the [MDN HTTP response status code reference](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status) for the complete set, including the less common ones you will eventually run into (401 Unauthorized, 405 Method Not Allowed, 503 Service Unavailable, and dozens more). You do not need to memorize it; bookmark it instead, and look codes up as you hit them.
+
+**requests** follows redirects automatically, so you never have to read the **Location** header and request the new URL yourself. The response you get back comes from the final URL, which is stored in **response.url**. Each redirect response along the way is kept in **response.history**, oldest first. That's why **diagnose_request()** can report **response.history[0]**.url as the address you started from. To see a redirect itself instead of following it, pass **allow_redirects=False**. The 301 or 302 then comes back as the response, and its destination is in **response.headers["Location"]**.
 
 Before you write a line of Python, the Network tab from earlier in this chapter already shows you every status code a page's requests receive, in the **Status** column of the request list — reloading a page with the Network tab open and watching for anything other than 200 is often the fastest way to spot a problem before you ever open a notebook.
 
@@ -627,7 +629,7 @@ You will build a URL diagnostic tool from the protocol layers this chapter cover
 # Your code here
 ```
 
-**Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check `response.history`, and if it redirected, print where it ended up. Include a docstring.
+**Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected, check **response.history**, and if it redirected, print each hop's status code and URL and where it ended up (**response.url**). Include a docstring.
 
 ```{python}
 # Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring.
