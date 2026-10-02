@@ -141,7 +141,7 @@ conda install -c conda-forge scapy
 
 **3. Launch your notebook with elevated privileges.** This is the step people skip, and the failure that follows is confusing rather than clear — the call hangs, or every hop comes back unanswered, with no error message pointing at the actual cause.
 
-- **macOS or Linux:** open a terminal and run `sudo jupyter notebook`. One gotcha worth knowing in advance: `sudo` resets your shell's `PATH` by default, so if `scapy` is installed inside a conda environment, a bare `sudo jupyter notebook` can launch a *different* Jupyter than the one in your environment — and fail with `ModuleNotFoundError: No module named 'scapy'` even though you installed it correctly. If that happens, be explicit about which Jupyter you mean: `sudo $(which jupyter) notebook`.
+- **macOS or Linux:** open a terminal and run `sudo jupyter notebook --allow-root`. The flag is not optional: without it, Jupyter detects that it is running as root, logs `Running as root is not recommended. Use --allow-root to bypass.`, and exits before the server ever starts. One gotcha worth knowing in advance: `sudo` resets your shell's `PATH` by default, so if `scapy` is installed inside a conda environment, a bare `sudo jupyter notebook` can launch a *different* Jupyter than the one in your environment — and fail with `ModuleNotFoundError: No module named 'scapy'` even though you installed it correctly. If that happens, be explicit about which Jupyter you mean: `sudo $(which jupyter) notebook --allow-root`.
 - **Windows:** open the Start menu, right-click **Anaconda Prompt**, and choose **Run as administrator**. From that elevated prompt, run `jupyter notebook` as usual.
 
 ::: {.callout-warning}
@@ -732,7 +732,8 @@ The web's protocol stack was designed as public infrastructure — open standard
 ## Common Issues to Debug
 
 - **`scapy` import errors**: Requires `pcap` drivers. On Windows, install Npcap. On macOS, the built-in `libpcap` usually works.
-- **`scapy` fails after `sudo jupyter notebook`**: `sudo` often resets `PATH`, launching a different Python than your conda environment. Use `sudo $(which jupyter) notebook` instead.
+- **`sudo jupyter notebook` exits immediately**: Jupyter refuses to run as root unless you ask it to. It logs `Running as root is not recommended. Use --allow-root to bypass.` and stops, so no server starts and no notebook opens. Add the flag: `sudo jupyter notebook --allow-root`.
+- **`scapy` fails after `sudo jupyter notebook --allow-root`**: `sudo` often resets `PATH`, launching a different Python than your conda environment. Use `sudo $(which jupyter) notebook --allow-root` instead.
 - **`AsyncSniffer` captures 0 packets**: Usually a timing race — the sniffer needs a moment to attach before you generate traffic, which is what the `time.sleep()` calls in this chapter's example are for. Also confirm the interface name matches your platform: `lo0` on macOS, `lo` on Linux.
 - **`wget --random-wait` has no visible effect**: It only randomizes a wait time you already set with `--wait`; used alone, with no base wait to randomize, it does nothing.
 - **403 from Wikimedia API**: You forgot the custom `User-Agent` header.
