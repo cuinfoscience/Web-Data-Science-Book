@@ -303,6 +303,23 @@ something the next agent would otherwise find out again, add a note here.
   chapter 1 places both Jupyter figures after the code cell they show.
 - **Some apps scroll a panel, not the window.** `scroll: {…, within:
   '.jp-WindowedPanel-outer'}` positions a cell in Jupyter's notebook panel.
+- **Jupyter moves an output after its cell runs.** Two takes of week 8's
+  traceback put the same line 10 pixels apart, so a crop measured from the
+  window cut a line in one take and not in the other. Crop from the text
+  instead, `crop: {match: …, in: '.jp-RenderedText pre', pad: […]}`: two takes
+  of `week08-handout-no-manager` then came out identical, pixel for pixel.
+- **Park the pointer.** A click leaves the pointer where it was, and after a
+  scroll it can rest over a cell's output, where Jupyter draws a gray button in
+  the output's margin. End with `hover: {selector: '#menu-panel-wrapper'}`, the
+  empty right half of Notebook 7's menu bar.
+- **Run the cells a reader runs, in order.** The prompts show it: week 8's
+  figures run cells 1 to 5 with Shift+Enter, so the browser cell reads `[4]:`,
+  as it will on a student's screen.
+- **A first run needs an empty cache.** Selenium Manager's log shows its
+  downloads only when its cache is empty. Empty the capture user's
+  `~/.cache/selenium` by hand before `week08-handout-manager-log`; its
+  `expect` names the download lines, so a take from a filled cache fails
+  instead of passing without them.
 - **Anchor to what is drawn.** In a rendered Markdown cell, a text pattern
   also matches the cell's hidden source editor, and `.first` picks the hidden
   one: anchor by selector (`.jp-RenderedMarkdown p:has-text(…)`). A text box
@@ -610,12 +627,12 @@ One YAML file per chapter in `recipes/`. A figure:
 - **The brief** is for people: what the reader should see, for which paragraph, and what the figure leaves out (step 1 of "Making a figure"). The tool doesn't read it, and it stays out of the recipe's hash, so rewording it needs no new take.
 - **Defaults:** an 800×600 window at scale 2, 8–30 second pauses, a 60-second limit on each wait, three retries, and JavaScript on. A chapter can change them under `defaults:`, and a figure can override any of them. (The ch-08 recipes set 1280×800, the window their first images were made in; each of its figures now sets its own.)
 - **Steps:** `wait` (for `text`, `selector`, or `network_idle`), `hover`, `click` (by `selector`, `text`, or, as a last resort, `position`), `scroll`, `press`, and `settle` (seconds, for animation with no end signal). `scroll: {selector: …, offset: 175}` puts an element's top 175 pixels below the window's top; add `within: '.panel'` for a page that scrolls a panel rather than the window, as Jupyter does.
-- **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`. `{between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 12, 0]}` is a band from the top of one element to the bottom of another; `left` and `width` default to the window.
+- **Crops around an element** take `pad` as one number or four (top, right, bottom, left, as in CSS), and `width` and `height` to fix the size: `{selector: '.card', pad: [13, 0, 0, 18.5], width: 560, height: 595}`. `{between: ['#art_40', '[id="040.004"]'], pad: [12, 0, 12, 0]}` is a band from the top of one element to the bottom of another; `left` and `width` default to the window. `{match: '^NoSuchDriverException: Message', in: '.jp-RenderedText pre', pad: [118, 0, 0, 12], width: 700, height: 150}` crops around a match inside an element's text, found as `match` anchors and scroll steps find theirs. Jupyter scrolls a cell's output after the cell runs, a few pixels differently from take to take, so a crop of a line of that output measures from the line, not from the window (week 8's handout figure `week08-handout-no-manager`).
 - **Pages that lose files:** `expect: {all_files: false}` accepts a page whose own files fail on every load, when the ones lost don't show. Reddit's archived stylesheets for tooltips and crosspost previews came back aborted on most loads, while the post's own styles loaded (chapter 3's `reddit-api-pricing`).
 - **Refusals as subjects:** `expect: {status: 403}` for a refusal with a body, `expect: {block: true}` for a block page, and `expect: {error: 'ERR_NAME_NOT_RESOLVED|…'}` for a host that doesn't answer, whose take is Chrome's own error page (see "Refusals and dead hosts" under Field notes).
 - **Closed shadow roots:** `open_shadow: true` makes a shadow root that the page asks to have closed open instead, before any of the page's scripts run. A closed root is drawn like any other, but no selector reaches it, Playwright's included: no step can wait for its text or hover its buttons, and the text measure can't count it. The page looks the same; only its scripts could tell, since `element.shadowRoot` returns the root rather than `null`. The Wayback Machine's toolbar is one (chapter 7). Headless captures only: DevTools reaches closed roots on its own.
 - **An API's response:** `api_client: true`, on the figure or on a composite's part, marks the request a chapter's own code makes, captured as an API client where robots.txt disallows it (see "Before the recipe" under Field notes). It changes what `doctor` says, not the capture, so it stays out of the recipe's hash.
-- **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls.
+- **Plain text:** `scroll: {match: '^User-agent: \*$', in: 'pre', offset: 130}` scrolls a line of a plain-text file to 130 pixels below the window's top; `match` anchors mark such lines (see Markers). The step measures again after scrolling and corrects, because a page can move as it scrolls. Add `within: '.panel'` for a line in a panel that scrolls, such as a Jupyter cell's output.
 - **Other modes:** `mode: headed` and `mode: composite` are below. `engine: selenium` and `engine: codegen` are for figures whose subject is the tool itself (see Engines). `mode: hand` is a screenshot a person takes (see Hand captures).
 - **Patterns** are regular expressions. A leading `(?i)` ignores case; the tool turns it into JavaScript's `i` flag, because Playwright and DevTools evaluate patterns in JavaScript, which has no inline flags.
 - **Quoting:** quote any YAML value that contains ` #`, or everything after it becomes a comment. In single quotes, a backslash is literal: write `'quotes\?page=2'`.

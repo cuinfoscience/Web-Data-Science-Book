@@ -63,6 +63,11 @@ PAGES["/cookie"] = (200, "<title>Cookie</title><h1>A page that sets a cookie</h1
 PAGES["/plain"] = (200, "<!DOCTYPE html><title>Plain</title><body style='margin:0'>"
                         "<pre style='margin:0;font:16px monospace;line-height:20px'>"
                         + "\n".join(f"line {n}" for n in range(1, 121)) + "</pre>")
+# The same lines in a panel that scrolls while the window doesn't, as a Jupyter cell's output is.
+PAGES["/panel-lines"] = (200, "<!DOCTYPE html><title>Panel lines</title><body style='margin:0;overflow:hidden'>"
+                              "<div id='panel' style='position:absolute;top:0;left:0;width:800px;height:600px;"
+                              "overflow-y:auto'><pre style='margin:0;font:16px monospace;line-height:20px'>"
+                              + "\n".join(f"line {n}" for n in range(1, 121)) + "</pre></div></body>")
 # A site that checks the browser with a script, as EUR-Lex does: the first visit gets 202 and
 # a script that sets a cookie and reloads; the reload, with the cookie, gets the page.
 PAGES["/checked"] = (200, "<title>Checked</title><h1>Checked and reloaded</h1>"
@@ -319,6 +324,17 @@ figures:
       marks:
         - {{n: 1, at: {{match: '^line 60$', in: 'pre'}}}}
         - {{n: 2, at: {{match: '^line 61\\nline 62$', in: 'pre'}}}}
+  - id: panel-lines
+    kind: capture
+    url: "{base}/panel-lines"
+    steps: [{{scroll: {{match: '^line 90$', in: '#panel pre', offset: 100, within: '#panel'}}}}]
+    annotate: {{marks: [{{n: 1, at: {{match: '^line 90$', in: '#panel pre'}}}}]}}
+  - id: panel-crop
+    kind: capture
+    url: "{base}/panel-lines"
+    steps: [{{scroll: {{match: '^line 90$', in: '#panel pre', offset: 237, within: '#panel'}}}}]
+    crop: {{match: '^line 90$', in: '#panel pre', pad: [40, 0, 20, 0], width: 300}}
+    annotate: {{marks: [{{n: 1, at: {{match: '^line 90$', in: '#panel pre'}}}}]}}
   - {{id: wide, kind: capture, url: "{base}/ok", window: [1000, 500]}}
   - {{id: wide-allowed, kind: capture, url: "{base}/ok", window: [1000, 500], oversize: "a test of the reason"}}
   - {{id: wide-small, kind: capture, url: "{base}/small", window: [1000, 500], oversize: "a test of the reason"}}
@@ -653,6 +669,17 @@ figures:
            abs(one[1] - 100) <= 1, str(one) + out[-300:])
     expect("...and a `match` anchor is the matched lines' box, across line breaks",
            two[1] >= one[3] - 1 and 30 <= two[3] - two[1] <= 45 and two[2] - two[0] < 200, str(two))
+    code, out = shots("capture", "ch-99", "--only", "panel-lines")
+    in_panel = anchor(newest("panel-lines"), {"match": "^line 90$", "in": "#panel pre"}) or [0, 0, 0, 0]
+    expect("a scroll step with `match` and `within` scrolls the panel, putting the line at its offset",
+           abs(in_panel[1] - 100) <= 1, str(in_panel) + out[-300:])
+    code, out = shots("capture", "ch-99", "--only", "panel-crop")
+    cropped = newest("panel-crop")
+    line = anchor(cropped, {"match": "^line 90$", "in": "#panel pre"}) or [0, 0, 0, 0]
+    # The match's box is the font's height (19 pixels here), not the line's 20.
+    expect("a crop on a `match` is measured from the line, wherever the panel left it",
+           cropped.get("size") == [300, round(40 + line[3] - line[1] + 20)] and abs(line[1] - 40) <= 1,
+           str(cropped.get("size")) + str(line) + out[-300:])
     tex_tools = all(shutil.which(t) for t in ("pdflatex", "pdftocairo"))
     if tex_tools:
         stem = tmp / "out" / "ch-99" / "marks" / (Path(marks.get("image", "x.png")).name.removesuffix(".png") + ".annotated")

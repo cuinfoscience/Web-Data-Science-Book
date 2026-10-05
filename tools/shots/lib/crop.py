@@ -12,7 +12,14 @@
                                              a band from the top of one element to the
                                              bottom of another; left/width default to
                                              the window
+    crop: {match: '^NoSuchDriverException: Message', in: '.jp-RenderedText pre',
+           pad: [118, 0, 0, 12], width: 700, height: 150}
+                                             a match inside an element's text, padded
+                                             and sized as for a `selector` (`nth` picks
+                                             a later match): a line of a Jupyter cell's
+                                             output, wherever Jupyter scrolled it
 """
+from .steps import match_boxes
 
 
 class CropError(Exception):
@@ -67,6 +74,19 @@ def clip(page, fig):
         if not box:
             raise CropError(f"crop selector {crop['selector']!r} matched nothing visible")
         x, y, w, h = around((box["x"], box["y"], box["width"], box["height"]), crop)
+        rect = {"x": max(0, x), "y": max(0, y), "width": w, "height": h}
+    elif "match" in crop:
+        # Jupyter scrolls a cell's output after the cell runs, a few pixels differently from
+        # one take to the next; a crop measured from the text moves with it.
+        try:
+            boxes = match_boxes(page, crop, timeout=5000)
+        except Exception:
+            boxes = []
+        n = crop.get("nth", 0)
+        if len(boxes) <= n:
+            raise CropError(f"crop match /{crop['match']}/ matched {len(boxes)} time(s) in {crop.get('in', 'body')}")
+        left, top, right, bottom = boxes[n]
+        x, y, w, h = around((left, top, right - left, bottom - top), crop)
         rect = {"x": max(0, x), "y": max(0, y), "width": w, "height": h}
     else:
         x, y = crop.get("left", 0), crop.get("top", 0)
