@@ -2,6 +2,14 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-05 · Playwright's commands run as `python -m playwright`
+
+**Decision.** Chapter 8 and the README give every Playwright command as `python -m playwright ...` (`install chromium`, `install webkit`, `codegen`), not as the bare `playwright ...`.
+
+**Why.** conda-forge's `playwright-python` (1.62.0) depends on conda-forge's `playwright` (1.63.0), Playwright for Node.js, and both install `bin/playwright`. In a fresh `webdata` made with chapter 1's command on 2026-10-05, `bin/playwright` was a symlink to `lib/node_modules/playwright/cli.js`, and that file held the Python package's entry point, written through the symlink. The file is hard-linked to conda's package cache, so the cache's copy changed too: creating a second environment with `playwright-python` printed `SafetyError` (`cli.js` has an incorrect size) and `ClobberError` (`bin/playwright`), and rewrote the shared file to start the second environment's Python. After that environment was removed, `playwright --version` in `webdata` failed with `exec: .../python3.14: not found` (exit 127). `python -m playwright` worked in every case, since it starts the library with the active environment's Python; the library's driver is `playwright-core` 1.63.0 under `lib/node_modules/playwright/node_modules/`, which the clash doesn't touch. Both forms downloaded the same browsers, Chrome for Testing 153.0.8010.12 (revision 1243), and chapter 8's first script then ran.
+
+**Where.** `ch-08-dynamic-pages.qmd` ("Other Browsers", "Installing Playwright", "Recording a Script with Codegen", the comparison table, "Common Issues to Debug") and `README.md`.
+
 ## 2026-10-05 · Earlier chapters point to the examples that later chapters add
 
 **Decision.** When a later chapter, or an open issue, adds an example that an earlier chapter's discussion would benefit from, the same pull request updates the earlier chapter: a cross-reference, and a sentence that says what the later example adds. The edit keeps to lines that students' open pull requests don't touch, and the description names any overlap.

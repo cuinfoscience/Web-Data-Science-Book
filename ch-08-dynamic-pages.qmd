@@ -323,7 +323,7 @@ Safari's automation differs from the others' in ways you will notice:
 - Only one Safari session can run at a time, so two notebooks can't both drive Safari.
 - Safari has no headless mode: every session opens a window.
 
-Playwright, later in this chapter, offers another route to Safari's engine. It installs its own build of WebKit, the engine inside Safari, with `playwright install webkit`, and that build runs on Windows and Linux as well as macOS. It is not Safari itself, and Playwright's documentation recommends running it on a Mac for the closest match.
+Playwright, later in this chapter, offers another route to Safari's engine. It installs its own build of WebKit, the engine inside Safari, with `python -m playwright install webkit`, and that build runs on Windows and Linux as well as macOS. It is not Safari itself, and Playwright's documentation recommends running it on a Mac for the closest match.
 
 ## Navigating and Finding Elements
 
@@ -789,10 +789,12 @@ For a deeper introduction to environment variables, `.env` files, and keeping se
 Playwright takes two installs: the Python library, and the browsers it drives. The library is in `webdata` (chapter 1). On conda-forge it is called `playwright-python`, so an older environment adds it with `conda install -c conda-forge playwright-python`. The browsers are one download, in a terminal where `webdata` is active:
 
 ```
-playwright install chromium
+python -m playwright install chromium
 ```
 
-This command downloads Playwright's own copy of Chrome for Testing plus a smaller headless build. For Playwright 1.63 in September 2026, that came to about 300 MB of downloads and 650 MB on disk, so run it on a fast connection rather than on busy class Wi-Fi. Like Selenium Manager, Playwright fetches browsers for you; unlike Selenium Manager, it pins each Playwright release to one browser version (Chrome 153 for Playwright 1.63), so upgrading Playwright means downloading new browsers too.
+Type `python -m playwright`, not the shorter `playwright` that Playwright's own documentation shows. On conda-forge, `playwright-python` depends on a second package, `playwright`, which is Playwright for Node.js, and both packages install a command named `playwright`. Only one file can have that name, so the command can end up running the Python of another environment, or of one you have since deleted. `python -m playwright` runs the library with the Python of the environment you activated, whatever the `playwright` command points to. Use it for every Playwright command in this chapter.
+
+This command downloads Playwright's own copy of Chrome for Testing plus a smaller headless build. On Linux in October 2026, that came to about 320 MB of downloads and 660 MB on disk, so run it on a fast connection rather than on busy class Wi-Fi. Like Selenium Manager, Playwright fetches browsers for you; unlike Selenium Manager, it pins each Playwright release to one browser version, so upgrading Playwright means downloading new browsers too. The pin comes from Playwright's *driver*, the Node.js program that the Python library starts, and on conda-forge the driver can be a release ahead of the library. Tested in a fresh `webdata` on 2026-10-05, `playwright-python` 1.62.0 ran the driver from `playwright` 1.63.0, which downloaded Chrome for Testing 153.0.8010.12; `python -m playwright --version` reports the library's 1.62.0.
 
 ### A First Script
 
@@ -881,7 +883,7 @@ Forget one `await` and you get a coroutine object, a placeholder, instead of a r
 You do not have to write a Playwright script from scratch. Run:
 
 ```
-playwright codegen --target python https://quotes.toscrape.com/
+python -m playwright codegen --target python https://quotes.toscrape.com/
 ```
 
 Two windows open: a browser, and the Playwright Inspector (@fig-codegen). Everything you do in the browser becomes a line of Python in the Inspector. Clicking the tag *change* and then an author's *(about)* link recorded these lines:
@@ -969,7 +971,7 @@ When the answer is a browser, the two tools differ in ways that decide which one
 
 | | Selenium | Playwright |
 |---|---|---|
-| Install | In `webdata` (chapter 1) | In `webdata`, then `playwright install chromium` |
+| Install | In `webdata` (chapter 1) | In `webdata`, then `python -m playwright install chromium` |
 | Browsers | Chrome, Firefox, Edge, or Safari, as installed; Selenium Manager downloads Chrome for Testing, Firefox, or Edge if yours is missing | Its own copies of Chromium, Firefox, and WebKit, pinned to each Playwright release |
 | In a notebook | Yes | Only through the async API and `await` |
 | Waiting | Explicit, with `WebDriverWait` | Automatic when you act on or read an element |
@@ -1071,7 +1073,8 @@ When platforms close their APIs and render content exclusively through JavaScrip
 - **A logged-in run suddenly finds nothing**: The session ended, and the site is showing you its logged-out pages. Check for something only logged-in visitors see before you collect, and log in by hand again.
 - **Memory issues**: Each Selenium driver runs a full browser process. Close drivers promptly with `driver.quit()`.
 - **Playwright: `It looks like you are using Playwright Sync API inside the asyncio loop`**: You ran a sync script in a notebook. Run it from the terminal instead, or switch to the async API.
-- **Playwright: `Executable doesn't exist at ...`**: Playwright's browsers are missing, usually right after you install or upgrade the library. Run `playwright install chromium`.
+- **Playwright: `Executable doesn't exist at ...`**: Playwright's browsers are missing, usually right after you install or upgrade the library. Run `python -m playwright install chromium`. The box under the error says to run `playwright install`; in `webdata` that shorter command can run the wrong program (see "Installing Playwright").
+- **Playwright: `exec: .../python3.14: not found`, or conda prints `ClobberError` for `bin/playwright` or `SafetyError` for `lib/node_modules/playwright/cli.js`**: conda-forge's `playwright-python` and `playwright` both install the `playwright` command, and conda wrote one over the other. Because conda hard-links files from its package cache, installing `playwright-python` in a second environment can rewrite the command in `webdata` as well, so that it starts the second environment's Python, which fails once that environment is deleted. The library is not damaged: `python -m playwright` still works (checked on 2026-10-05 with `playwright-python` 1.62.0 and `playwright` 1.63.0).
 
 ## Key Takeaways
 
