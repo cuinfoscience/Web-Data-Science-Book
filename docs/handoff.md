@@ -66,6 +66,12 @@
 
 ## Next
 
+**Paused on 2026-10-05: the course's week 8 handout, "Set up Selenium"**, a PDF with annotated screenshots for adding Selenium to an older `webdata` and starting Chrome for the first time, with a path that needs no `conda activate`. Nothing of it is committed. The maintainer paused it to merge chapter 8 and week 8's deck first, so the deck points to chapter 8's step 1 for now. What the session found, for whoever resumes:
+
+- The catch-up `conda install`, run on a `webdata` made with `pip` (the first setup page), downloads about 120 MB. It prints 2,290 `ClobberError ... path collision` messages, because pip and conda installed the same files, and finishes with `Executing transaction: done`. Afterwards every library imports, and `pip check` is clean. The setup handout now says so.
+- conda-forge's `playwright` (Node.js) and `playwright-python` both claim `bin/playwright`, a symlink into the Node package's `cli.js`. Installing both writes the Python entry point through the symlink, which in this container corrupted the package cache's `cli.js` (a later install reported a `SafetyError`). It is worth a look before students run `playwright install chromium`.
+- The figures would be course recipes in `course.yml`, captured from a real Jupyter Notebook 7 server and synced to `handouts/week-08/img`. Run the server from `webdata`'s own `bin/jupyter`, without activation, as a non-root user, so the kernel lacks `SE_MANAGER_PATH` and Chrome keeps its sandbox. Use an Xvfb display, and add the proxy's CA to that user's `~/.pki/nssdb`, as `bootstrap.sh` does for root. Without the CA, pages load as Chrome's "Privacy error".
+
 In this order:
 
 1. **The first Friday code-review standup**, week 7's Friday, October 2 ([plan](https://github.com/cuinfoscience/INFO4617-Fall2026/blob/main/docs/plans/2026-09-24-friday-code-review.md)). Its review table, built on 2026-09-24, is in the course's `docs/plans/` (course #60). Rebuild it on Thursday, October 1: its "How it was built" lists the steps, and GitHub hasn't run the checks on pull requests from forks. Then build week 7's Friday frames from it (the plan's §4, "Slides").

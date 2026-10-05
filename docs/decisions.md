@@ -21,7 +21,7 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 
 **Why.** The maintainer asked for logging in to be taught as the cheaper alternative to a paid API, with its real ethical costs, and for headless browsing and the worst and best practices with credentials to be covered. Chapter 3's API prices make the logged-in route the one students are most likely to try. The `SE_MANAGER_PATH` change comes from a test on 2026-10-05: conda-forge's `selenium` 4.50 depends on `selenium-manager` 4.50, which installs `bin/selenium-manager` (`Scripts\selenium-manager.exe` on Windows) with activation scripts that set the variable. A Python that hadn't been activated raised `NoSuchDriverException: Unable to obtain driver for chrome`, caused by `Unable to obtain working Selenium Manager binary`; setting the variable in the notebook fixed it. conda's shell wrapper re-activates the environment after `conda install`, but a Jupyter that was already running keeps its old environment, and so does every kernel it restarts.
 
-**Where.** `ch-08-dynamic-pages.qmd` ("Setting Up Selenium", "Headless Mode", "Pages Behind a Login", "Choosing a Tool", "Common Issues to Debug"); `ch-01-introduction.qmd` ("Common Issues to Debug"); in the course repository, week 8's deck and handout, and week 1's setup handout.
+**Where.** `ch-08-dynamic-pages.qmd` ("Setting Up Selenium", "Headless Mode", "Pages Behind a Login", "Choosing a Tool", "Common Issues to Debug"); `ch-01-introduction.qmd` ("Common Issues to Debug"); in the course repository, week 8's deck and week 1's setup handout.
 
 ## 2026-10-02 · Chapter 5 drops scapy for the operating system's own tools
 
