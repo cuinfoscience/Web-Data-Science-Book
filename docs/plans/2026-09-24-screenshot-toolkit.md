@@ -11,6 +11,10 @@ DevTools setting, the no-infobar guard, and a `brief:` for every figure, and #14
 Its redaction boxes are rectangles only; redaction by selector, for the toolkit's own captures,
 isn't built. No scan reads a screenshot for email addresses, since an import has no page text.
 And the CI job runs plain `check`, which never loads a page, so it needs no `--offline`.
+Since M4, on 2026-10-05: markers are drawn reproducibly, so a figure drawn again from the same
+take is the same PDF and PNG, byte for byte, dated by its capture (§7.6;
+[`../decisions.md`](../decisions.md), 2026-10-05). M4's byte-for-byte test now holds for marked-up
+files as well, and a `sync` or `promote` of an unchanged figure changes nothing in git.
 Proposed 2026-09-24. Implements [P0-2] of
 [`../aar/2026-09-24-screenshots.md`](../aar/2026-09-24-screenshots.md), and
 carries the checks behind [P1-2] and [P1-3]. The back-fill of chapters 1–5 that
@@ -226,6 +230,7 @@ A figure whose subject is a refusal says so in its recipe (`expect: {block: true
   - `none`.
 - **Fit.** Markers that would cover text move outward along their leader. A label that would overflow is anchored to its side.
 - **Retakes.** Anchors come from the new take, so markers follow the page.
+- **Reproducible output** (added 2026-10-05). The same take and marks give the same PDF and PNG, byte for byte. pdfTeX would otherwise write each build's time into the PDF's dates and `/ID`. It runs with `SOURCE_DATE_EPOCH` set to the take's capture time, so the PDF is dated when the screenshot was taken, and a redraw of an unchanged figure leaves git with nothing to show.
 
 ### 7.7 Legibility (`lib/legibility.py`)
 The first check is a soft limit on size (P1-5): a figure that shows more than 800×600 CSS pixels gets a warning saying how small the book's column will make its text, unless its recipe says why it needs more.
@@ -290,6 +295,7 @@ The ch-07 and ch-08 figures, at 280–440 characters of alt text, set the bar.
 - **Placeholders:** when `--as` names a placeholder listed in `stubs.tsv`, the file replaces the placeholder under the same name, and the row is removed.
 - **Prerequisite:** P0-1 (`make_stubs.py` keeps notes) must land first, or the next `make` erases what sync wrote.
 - **Handouts:** the same command, with `--to handouts/week-NN/img`.
+- **Re-syncing** (added 2026-10-05). An unchanged figure copies as the same bytes, its marked-up PDF and PNG included (§7.6), so `sync` reports it as "the same as the file already there". "Replacing a different file" always means the figure changed.
 
 ### 7.12 Rules the toolkit enforces or reminds
 - Identify yourself, and pace requests (§7.3). `doctor` warns when a recipe URL is disallowed by the site's `robots.txt`.

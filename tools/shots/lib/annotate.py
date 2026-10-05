@@ -38,10 +38,17 @@ marker style (styles/shotmarkers.sty). pdflatex builds a vector PDF for slides
 and handouts. For the book's PNG, pdftocairo draws the marks alone on a
 transparent page, laid over the screenshot's own pixels, which stay exactly as
 captured.
+
+Both are reproducible: the same take and marks give the same files, byte for
+byte. pdfTeX would write the time of each build into the PDF (its dates, and an
+/ID made from them), so every redraw, and every `sync` of a course figure, would
+put a changed binary into git; it is given the take's capture time instead.
 """
+import datetime
 import hashlib
 import json
 import math
+import os
 import re
 import shutil
 import subprocess
@@ -323,11 +330,25 @@ def render(items, image, size, unit, spec, frame):
     return "\n".join(out)
 
 
-def _pdflatex(tex, folder, unit):
-    """Build the PDF; return it and the drawing's extent (left, top, right, bottom) in image pixels."""
+def source_date(take):
+    """The take's capture time, in seconds since 1970, for SOURCE_DATE_EPOCH. A hand capture
+    records only its date (midnight UTC, then); a take with neither gets 0."""
+    try:
+        when = datetime.datetime.fromisoformat(str(take.get("captured")))
+    except ValueError:
+        return 0
+    if when.tzinfo is None:
+        when = when.replace(tzinfo=datetime.timezone.utc)
+    return max(0, int(when.timestamp()))
+
+
+def _pdflatex(tex, folder, unit, epoch=0):
+    """Build the PDF; return it and the drawing's extent (left, top, right, bottom) in image pixels.
+    pdfTeX dates the PDF, and makes its /ID, from SOURCE_DATE_EPOCH (`epoch`), not the clock."""
     (folder / "figure.tex").write_text(tex)
+    env = dict(os.environ, SOURCE_DATE_EPOCH=str(epoch), FORCE_SOURCE_DATE="1")
     run = subprocess.run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "figure.tex"],
-                         cwd=folder, capture_output=True, text=True, timeout=180)
+                         cwd=folder, capture_output=True, text=True, timeout=180, env=env)
     pdf = folder / "figure.pdf"
     if run.returncode or not pdf.exists():
         errors = [line for line in run.stdout.splitlines() if line.startswith("!")]
@@ -363,6 +384,7 @@ def build(fig, take, stem=None):
     width_in = float(spec.get("width_in", BOOK_WIDTH_IN))
     frame = (0, 0, W, H)
     unit = width_in / W
+    epoch = source_date(take)
     with tempfile.TemporaryDirectory(prefix="shots-annotate-") as tmp:
         folder = Path(tmp)
         shutil.copyfile(ROOT / take["image"], folder / "take.png")
@@ -372,7 +394,7 @@ def build(fig, take, stem=None):
         for _ in range(8):
             items, d, warnings = layout(spec, take.get("anchors") or {}, (W, H), scale, unit)
             tex = render(items, "take.png", (W, H), unit, spec, frame)
-            pdf, extent = _pdflatex(tex, folder, unit)
+            pdf, extent = _pdflatex(tex, folder, unit, epoch)
             need = (min(frame[0], math.floor(extent[0] + 0.01)), min(frame[1], math.floor(extent[1] + 0.01)),
                     max(frame[2], math.ceil(extent[2] - 0.01)), max(frame[3], math.ceil(extent[3] - 0.01)))
             if need == frame:
@@ -387,7 +409,7 @@ def build(fig, take, stem=None):
         # The PNG: the marks alone, drawn on a transparent page of the frame's size, laid over
         # the screenshot's own pixels. (Through TeX, the screenshot would be resampled: pdfTeX
         # writes an image's scale with five decimals, so it lands a fraction of a pixel off.)
-        _pdflatex(render(items, None, (W, H), unit, spec, frame), folder, unit)
+        _pdflatex(render(items, None, (W, H), unit, spec, frame), folder, unit, epoch)
         subprocess.run(["pdftocairo", "-png", "-transp", "-singlefile", "-scale-to-x", str(frame[2] - frame[0]),
                         "-scale-to-y", str(frame[3] - frame[1]), str(folder / "figure.pdf"), str(folder / "marks")],
                        check=True, capture_output=True, timeout=180)

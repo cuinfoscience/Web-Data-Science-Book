@@ -885,6 +885,13 @@ from the recipe as it is then, and copies both files into `images/` as
 (`styles/shotmarkers.sty` copies `handoutmarkers.sty` from the course repo),
 so a marker drawn here looks like one in a handout.
 
+Drawing is reproducible: the same take and marks give the same files, byte for
+byte, so redrawing an unchanged figure changes nothing in git. pdfTeX would
+otherwise write the time of each build into the PDF, both as its dates and in
+the `/ID` it makes from them. The tool runs it with `SOURCE_DATE_EPOCH` set to
+the take's capture time (a hand capture's date, at midnight UTC), so the PDF
+is dated when the screenshot was taken.
+
 ## Legibility
 
 **First, a soft limit on size.** A figure shows 800×600 CSS pixels of the
@@ -1056,7 +1063,9 @@ tools/shots/run synced
   includes, not only placeholders.
 - **What it says:** each copy is "new", "the same as the file already
   there", or "replacing a different file", so a sync meant to refresh a
-  record can't silently change a slide.
+  record can't silently change a slide. A figure that hasn't changed is
+  "the same", its marked-up PDF and PNG included, because markers are drawn
+  reproducibly (see Markers): "replacing" always means the figure changed.
 - **`synced`** reads every `shots.json` under the course repo's `slides/`
   and `handouts/`. A copy changed by hand fails; a copy whose source changed
   since, or whose take was cleaned from `out/`, is a warning.
@@ -1171,7 +1180,7 @@ it, so the reviewer's look can go to what the figure shows.
 - robots.txt: groups for Claude's agents, and a disallowed API response marked `api_client` reported as a note while a disallowed page stays a warning;
 - refusals: a host that doesn't answer shown as Chrome's error page, and a failure when that page loads after all; behind a stand-in proxy that opens no tunnels, public DNS (a stand-in too) telling a dead host from a policy block in `capture` and `doctor`, and an unexpected tunnel failure still a policy block; a script check's 202 and reload; robots.txt's `Crawl-delay`;
 - a `scroll` step that scrolls a panel (`within`), not the window;
-- anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture;
+- anchors measured at capture, at scale 1 and 2; markers, braces, brackets, and hand-placed marks drawn to PDF and PNG, the PNG keeping the screenshot's pixels unchanged; `annotate` without a new capture, drawing the same PDF and PNG a second later, byte for byte, the PDF dated by the take;
 - the size limits: 800×600; the relaxed 1024×768, which needs a reason and text that passes; beyond it; and `check`;
 - `match`: a line of a plain-text file scrolled to its offset, and a match's box across line breaks;
 - legibility, with week 08's `infinite_scroll.png` as the failing case; composites side by side and stacked; a `between` crop in a headless take; `sheet`;
