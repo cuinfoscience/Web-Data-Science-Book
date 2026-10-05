@@ -2,6 +2,16 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-05 · A sync that changes nothing leaves its record alone
+
+**Decision.** A copy's record in the course repository's `shots.json` keeps its `synced` time unless something else in it changes, and `sync` doesn't write `shots.json` when no record would change. `synced` is when the record last changed, not when `sync` last ran.
+
+**Why.**
+- Course #79 re-synced week 8's handout figures. A second sync straight after it found all 14 files "the same", yet changed six lines of `shots.json`, one `synced` time per record, which had to be discarded by hand. A diff with nothing behind it costs a reviewer as much reading as a real one (the entry below).
+- A course figure's record names the textbook's commit at the time of the sync. So after a new commit its record does change, and its time moves with it.
+
+**Where.** `tools/shots/lib/sync.py` (`sync`), checked by `tools/shots/selftest.py` ("leaves shots.json as it was"; "changes no file and no record"), and described in `tools/shots/README.md` ("Sync to the course repo": "The record" and "What it says").
+
 ## 2026-10-05 · A figure drawn again from the same take is the same file
 
 **Decision.** `tools/shots` draws a figure's markers reproducibly: the same take and the same marks give the same PDF and PNG, byte for byte. pdfTeX dates the PDF, and makes its `/ID`, from the take's capture time (a hand capture's date, at midnight UTC), passed as `SOURCE_DATE_EPOCH`, never from the clock. When git shows a toolkit output as changed, the figure changed.

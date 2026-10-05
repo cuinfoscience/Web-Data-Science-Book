@@ -1,13 +1,19 @@
 # Hand-off note
 
-**Updated 2026-10-05.** This note's pull request makes `tools/shots` draw its marked-up figures reproducibly: the same take and marks give the same PDF and PNG, byte for byte, so a redraw, `promote`, or `sync` of an unchanged figure changes nothing in git (see the toolkit below, and [`decisions.md`](decisions.md), 2026-10-05).
+**Updated 2026-10-05.** This note's pull request makes a second `sync` of an unchanged figure leave the course repository's `shots.json` as it was: a record's `synced` time is now when the record last changed, not when `sync` last ran. #220 already draws marked-up figures reproducibly. Together, a redraw, `promote`, or `sync` of an unchanged figure changes nothing in git, neither an image nor a record (see the toolkit below, and [`decisions.md`](decisions.md), 2026-10-05).
 
 Merged earlier the same day:
 - #216, chapter 8's "Headless Mode" and "Pages Behind a Login", with the fix for conda-forge's Selenium Manager and pointers from chapters 1, 2, 3, and 5;
 - #217, Playwright's commands as `python -m playwright`;
 - #218, Chrome's sandbox kept on in chapters 8 and 14.
 
-Merged the same evening: #219, week 8's handout figures and three toolkit features, and course #78, the handout itself (see "Next"). The rest of the note was last rewritten on 2026-09-25 and doesn't cover every merge since; check `git log` before relying on it.
+Merged the same evening:
+- #219, week 8's handout figures and three toolkit features;
+- course #78, the handout itself (see "Next");
+- #220, reproducible marked-up figures;
+- course #79, the handout's figures synced again from #220's `main`.
+
+Course #80 is open: the handouts' `make` rebuilds a PDF when an image in its `img/` folder changes. The rest of the note was last rewritten on 2026-09-25 and doesn't cover every merge since; check `git log` before relying on it.
 
 **Updated 2026-09-25**, after textbook #148–#152 and #154–#168 and courses #55–#68 merged. #169 gives the toolkit a User-Agent in the form Wikimedia's API accepts. That unblocked figure 1-4, and chapter 10 now gives Wikimedia's per-minute limits. The pull request also makes figure 2-2's image ahead of its paragraph and adds course recipes for week 1. The course pull request paired with it retakes week 1's book website, puts figure 1.1 in the setup handout, and deletes unused placeholders. The maintainer's decisions still open, with a recommendation for each, are in "Waiting on the maintainer". This note describes the present state. Rewrite it when a session stops or the state changes, and don't let it grow into a history. History lives in git, in [`decisions.md`](decisions.md), and in the AARs.
 
@@ -32,7 +38,8 @@ Merged the same evening: #219, week 8's handout figures and three toolkit featur
   - `tools/shots/run import` makes a person's screenshot a take, for a figure whose recipe says `mode: hand`: a page behind a login, which the toolkit never signs in to. It blacks out the recipe's `redact:` boxes, crops, and writes a new PNG, leaving the screenshot's metadata behind. It records who took it, when, in what browser, and the screenshot's hash, and takes the text size the recipe declares for the legibility check. Three course recipes use it, each waiting for the maintainer's screenshot: `pr-review`, `week01-issue-form`, and `week01-github-repo` (see "Next").
   - The toolkit sends `WebDataScience/1.0 (brian.keegan@colorado.edu)`, the form the chapters teach (#169; [`decisions.md`](decisions.md), 2026-09-25). Wikimedia's APIs limit a client whose User-Agent isn't in that form to 10 requests a minute, shared by every client on its address, and the old `Web Data Science/v1 brian.keegan@colorado.edu` got 429 on its first request. Images taken before the change stay valid; retakes send the new string.
   - CI runs `check` on every pull request that changes `images/`, `tools/shots/`, or its workflow (`.github/workflows/shots-check.yml`, AAR P1-1), and on no other. With no chapter named, `check` now covers `course.yml` too. None of the 39 open pull requests changes those paths.
-  - Marked-up figures are drawn reproducibly (this note's pull request). pdfTeX had written each build's time into the PDF, so every redraw changed its bytes: re-syncing week 8's four marked-up handout figures, unchanged, rewrote all four PDFs. It now runs with `SOURCE_DATE_EPOCH` set to the take's capture time. A marked-up file that git shows as changed means the take or its marks changed (`AGENTS.md`, "Figures and screenshots").
+  - Marked-up figures are drawn reproducibly (#220). pdfTeX had written each build's time into the PDF, so every redraw changed its bytes: re-syncing week 8's four marked-up handout figures, unchanged, rewrote all four PDFs. It now runs with `SOURCE_DATE_EPOCH` set to the take's capture time. A marked-up file that git shows as changed means the take or its marks changed (`AGENTS.md`, "Figures and screenshots").
+  - A second `sync` of an unchanged figure leaves `shots.json` as it was (this note's pull request). Each sync had written the time it ran into the copy's record, so a repeat sync of week 8's handout figures, with all 14 files "the same", still changed six `synced` times. A course figure's record still changes after a new textbook commit, since it names that commit.
   - #219 added, for week 8's handout:
     - `scroll: {match: …, within: …}` scrolls Jupyter's notebook panel to a line of a cell's output;
     - `crop: {match: …}` crops around a line of text, since Jupyter moves a cell's output a few pixels after it runs;
@@ -40,7 +47,7 @@ Merged the same evening: #219, week 8's handout figures and three toolkit featur
 
     The README's "Jupyter and composites" field notes say what the captures taught.
 
-  The selftest passes 147 of 147. `check` reports 0 errors and 1 warning: figure 2-2's image isn't in its chapter yet (see ch-02). M4 is done.
+  The selftest passes 150 of 150. `check` reports 0 errors and 1 warning: figure 2-2's image isn't in its chapter yet (see ch-02). M4 is done.
 - **Chapters.**
   - ch-01: the setup works as written (#152). Jupyter installs into `webdata`, terminal commands are shell blocks, and the first request sends a User-Agent. #155 adds three figures: Jupyter's **New** menu, the companion notebook's cells, and the article beside View Source. It also corrects the instruction to choose **New** and then **Notebook**: Notebook 7's menu lists **Python 3 (ipykernel)**. #169 adds figure 1-4, the chapter's pageviews URL in Chrome's JSON viewer with **Pretty-print** ticked, in "Calling Your First API". The 429s that had kept it out came from the toolkit's User-Agent, not from the session's address.
   - ch-02: #156 adds Wikipedia's robots.txt at its generic block and Wikimedia's User-Agent policy, and `tools/shots` gains `match:` anchors for lines of plain text. #169 made figure 2-2's image, Reddit's robots.txt (`images/ch-02/robots-txt-reddit.png`), without touching the chapter. Its figure block waits for the Friday review, since #50 (the maintainer's) and students' #63 and #79 revise its paragraphs.
@@ -80,7 +87,7 @@ Merged the same evening: #219, week 8's handout figures and three toolkit featur
     - #75 adds week 8's frames on Selenium behind a login and headless browsing, and the catch-up fix;
     - #76 gives week 8's and week 1's Playwright commands as `python -m playwright`;
     - #77 adds the advice on Chrome's sandbox on Ubuntu and rebuilds week 8's deck.
-  - Course #78 is merged: week 8's handout "Set up Selenium" (`handouts/week-08/selenium-setup.pdf`, four pages), which walks through chapter 8's steps 1 to 3 and the first `webdriver.Chrome()` in Jupyter. Its six figures are real captures, copied by `sync` from #219's recipes, with records in `handouts/week-08/img/shots.json`. Its four marked-up PDFs were drawn before this note's pull request, so the next sync of those figures rewrites them once; after that, a sync of an unchanged figure changes nothing.
+  - Course #78 is merged: week 8's handout "Set up Selenium" (`handouts/week-08/selenium-setup.pdf`, four pages), which walks through chapter 8's steps 1 to 3 and the first `webdriver.Chrome()` in Jupyter. Its six figures are real captures, copied by `sync` from #219's recipes, with records in `handouts/week-08/img/shots.json`. Course #79 synced them again after #220, which rewrote the four marked-up PDFs once, as reproducible ones.
   - Course #56 is merged. It adds the roadmap for the Friday code review (`docs/plans/2026-09-24-friday-code-review.md`) and the merge rule in the revision framework, the pull request walkthrough, and week 4's FAQ. It also puts Python 3.14 in week 1's setup and gensim from conda-forge in week 7's deck.
 
 ## Next
@@ -88,7 +95,7 @@ Merged the same evening: #219, week 8's handout figures and three toolkit featur
 **Week 8's handout, "Set up Selenium", is merged** (#219, course #78). About its figures:
 - **Retaking the figures.** The takes are in the capturing session's `tools/shots/out/`, which isn't committed, so a retake starts from scratch. Set up Jupyter the way the comments above the `week08-handout-*` recipes in `course.yml` describe: Notebook 7 run from `webdata`'s own `bin/jupyter` without `conda activate`, as an ordinary user, on an Xvfb display, with the proxy's CA in that user's `~/.pki/nssdb`. Without the CA, pages load as Chrome's "Privacy error". The README's "Jupyter and composites" lists what else the captures taught.
 - **The Selenium Manager log** (`week08-handout-manager-log`) also needs that user's `~/.cache/selenium` emptied, about 190 MB to download again.
-- **The marked-up PDFs.** The four in #78 were drawn before reproducible drawing, so their next sync rewrites them once.
+- **Syncing them again.** A sync of an unchanged figure changes no file and, after this note's pull request, no record. After a sync that does change a figure, rebuild the handout with `make -B week-08/selenium-setup.pdf` in the course's `handouts/` until course #80 merges; after that, `make` notices the new figure.
 
 In this order:
 
@@ -139,7 +146,7 @@ Each item has a recommendation, made on 2026-09-25; the decision is the maintain
     - the toolkit: `claude/pilot-ch05`, `claude/shots-toolkit-m1`, `claude/shots-toolkit-m2`, `claude/shots-toolkit-m3`, `claude/shots-devtools-effect-tests`, `claude/shots-relaxed-limit`, `claude/shots-field-notes`, `claude/notebook-figure-brackets`;
     - docs: `claude/docs-agents-md`, `claude/aar-p0-edits`, `claude/lift-pause-pilot-gate`, `claude/readme-ai-acknowledgement`, `claude/contributing-guide`, `claude/handoff-after-merges`, and `claude/decisions-ua-python`;
     - the back-fill: `claude/ch01-figures`, `claude/ch02-figures`, `claude/ch03-figures`, `claude/ch05-a-record-note`, `claude/api-client-figures`, `claude/wayback-figures`, `claude/ch07-retakes`, `claude/week07-slide-shots`, `claude/week08-slide-shots`, `claude/m4-tool-engines`, `claude/m4-evidence`, `claude/m4-sync`, `claude/m4-import`, `claude/contributor-docs-course`, and `claude/wikimedia-user-agent`;
-    - since 2026-09-25: `claude/revert-direct-commits` (#193), `claude/ch07-stopwords-conda-forge` (#194), `fix/ch08-python-m-playwright` (#217), and `claude/ch08-chrome-sandbox` (#218); `claude/week08-handout-figures` (#219); and this note's own branch, `claude/shots-reproducible-pdfs`, once it merges.
+    - since 2026-09-25: `claude/revert-direct-commits` (#193), `claude/ch07-stopwords-conda-forge` (#194), `fix/ch08-python-m-playwright` (#217), and `claude/ch08-chrome-sandbox` (#218); `claude/week08-handout-figures` (#219), and `claude/shots-reproducible-pdfs` (#220); and this note's own branch, `claude/shots-sync-keep-time`, once it merges.
     - Automatic deletion is still off in both repositories (`delete_branch_on_merge` is false), so the list grows with each merge ("Waiting on the maintainer", AAR P0-2).
   - **This repository, closed without merging:** `claude/decisions-ua-python-review` (#153). #154 replaced it with the same changes, because the message of #153's first commit quoted a closing keyword with #90's number: merged, it would have closed #90 again.
   - **The course repository, merged into `main`:** `add-slides-ci`, `claude/detrope-week02-images`, `claude/week-01-screenshots-2aiqhh`, `claude/week-02-expansion`, `claude/week-04-rss-feeds-handout`, `claude/wk02-fixes`, `fix-oscars-403-headers-slides`, `overleaf-2026-08-24-0430`, and `overleaf-2026-08-24-0500`.
