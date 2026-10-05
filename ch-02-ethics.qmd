@@ -92,6 +92,9 @@ The key directives are `User-agent` (which crawler the rule applies to), `Disall
 ```{python}
 from urllib.robotparser import RobotFileParser
 
+# Raise and exception if the site sends back a 403/4
+response.raise_for_status()
+
 # Hand the parser text you fetched yourself, rather than calling rp.read(). The callout below explains what rp.read() does instead.
 rp = RobotFileParser()
 rp.parse(response.text.splitlines())
