@@ -1058,7 +1058,10 @@ tools/shots/run synced
 - **What it copies:** a chapter figure as approved in `images/`, with its
   marked-up PNG and PDF when it has markers (`--annotated` copies the
   marked-up PNG alone, for a Markdown handout); a course-only figure from its
-  newest passing take in `out/course/`, or the one `--take` names.
+  newest passing take in `out/course/`, or the one `--take` names. A course
+  figure's markers are drawn again on that take from the recipe as it is,
+  as `promote` draws a chapter figure's, and copied the same way:
+  `NAME_annotated.pdf` is what a LaTeX handout prints (week 8's handout).
 - **A committed source:** a chapter figure must be committed as it is, so
   the record can name the commit it came from. A course figure's take isn't
   committed; its record names the textbook's commit and the take.
@@ -1200,7 +1203,7 @@ it, so the reviewer's look can go to what the figure shows.
 - the Selenium engine: the window `webdriver.Chrome()` opens, with Chrome for Testing's bar and the versions recorded;
 - the codegen engine: a real click written as a line of the recorder's script, both windows grabbed, and the Inspector's code counted at its stylesheet's size;
 - evidence, against a stand-in CDX server: a query paged to its end, its summaries and its listing in `IMAGES.md`, a page that returns exactly its limit and one whose resume key is left unfollowed failing, and `check` on evidence never run, a changed query, and a reworded claim;
-- sync, into a stand-in course repo: an approved figure copied with its record, table, and stubs size, a person's notes kept; `synced` finding it, then a copy changed by hand; `--annotated` without markers and an uncommitted source refused;
+- sync, into a stand-in course repo: an approved figure copied with its record, table, and stubs size, a person's notes kept; `synced` finding it, then a copy changed by hand; `--annotated` without markers and an uncommitted source refused; a course figure copied with its markers drawn from its recipe;
 - import, of a made-up screenshot: `capture` leaving it to a person; the take cropped at scale 2, its avatar blacked out, its note and color profile left behind, and who, when, the screenshot's hash, and the redaction recorded; a declared text size judged, and one too small warned about; a crop past the edge, a future date, and a figure the toolkit captures refused; the recipe rules for `mode: hand`; `promote` with markers, `check`, and a mark moved by `xy` redrawn without a new take.
 
 It skips the marker checks if TeX is missing and the headed checks if the virtual display is.

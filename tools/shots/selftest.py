@@ -833,6 +833,29 @@ figures:
     code, out = shots("sync", "ch-99", "wide", "--to", "slides/week-99/img", "--course", str(course))
     expect("a figure not committed as it is can't be synced: the record names a commit",
            code == 1 and "commit" in out, out[-300:])
+    if tex_tools:
+        # A course figure with markers, for a handout written in LaTeX (week 8's).
+        (tmp / "recipes" / "course.yml").write_text(f"""
+chapter: course
+course: true
+defaults: {{window: [800, 600], scale: 1, pause: [0, 0], settle: 0.2, timeout: 10, retries: 1}}
+figures:
+  - id: handout-marked
+    kind: capture
+    url: "{base}/marks"
+    annotate: {{width_in: 4, marks: [{{n: 1, at: {{selector: '#box'}}}}]}}
+""")
+        shots("capture", "course", "--only", "handout-marked")
+        handout = course / "handouts" / "week-99" / "img"
+        handout.mkdir(parents=True)
+        code, out = shots("sync", "course", "handout-marked", "--to", "handouts/week-99/img", "--as", "marked.png",
+                          "--course", str(course))
+        record = json.loads((handout / "shots.json").read_text()) if (handout / "shots.json").exists() else {"files": {}}
+        entry = record["files"].get("marked.png") or {}
+        expect("sync copies a course figure's take with its markers, drawn from its recipe, for a LaTeX handout",
+               code == 0 and entry.get("also") == ["marked_annotated.png", "marked_annotated.pdf"]
+               and all((handout / f).exists() for f in ("marked.png", "marked_annotated.png", "marked_annotated.pdf")),
+               out[-400:])
 
     print("import (a person's screenshot of a page behind a login)")
     from PIL import ImageCms, ImageDraw, ImageFont, PngImagePlugin

@@ -7,7 +7,10 @@
 A chapter figure is copied as approved, from images/<chapter>/, with its
 marked-up PNG and PDF when it has markers. A course-only figure is copied from
 its newest passing take in out/course/, since `promote` keeps those out of
-images/. The destination folder gets:
+images/; when its recipe has markers, they are drawn again on that take from
+the recipe as it is, as `promote` draws a chapter figure's, and copied too
+(`<name>_annotated.png` and `.pdf`, for a handout written in LaTeX). The
+destination folder gets:
 
 - the file, under `--as` (by default the figure's own name);
 - a record in `shots.json` beside it: the figure, the file it was copied from
@@ -84,9 +87,6 @@ def _head():
 def source(recipe, fig, take_path=None, annotated=False):
     """(files to copy [(source path, suffix)], provenance-like entry, commit) for a figure. With
     `annotated`, the marked-up PNG alone, as a handout that shows only it keeps it."""
-    if annotated and recipe["course"]:
-        raise SyncError("`--annotated` copies a chapter figure's marked-up PNG; a course figure's markers "
-                        "stay with its take in out/")
     if recipe["course"]:
         from .capture import takes
         found = takes(recipe["chapter"], fig["id"])
@@ -99,9 +99,21 @@ def source(recipe, fig, take_path=None, annotated=False):
         if take.get("recipe_sha256") != fig["recipe_sha256"]:
             raise SyncError(f"the recipe of {recipe['chapter']}/{fig['id']} changed after its newest take; "
                             "capture it again")
-        image = ROOT / take["image"]
+        files = [(ROOT / take["image"], ".png")]
+        if fig.get("annotate"):
+            # Drawn now, from the recipe as it is, so marks edited since the take still count.
+            from . import annotate
+            try:
+                annotate.build(fig, take)
+            except annotate.AnnotateError as e:
+                raise SyncError(f"{recipe['chapter']}/{fig['id']}: {e}")
+            stem = annotate.stem_for(take)
+            marked = [(Path(f"{stem}.png"), "_annotated.png"), (Path(f"{stem}.pdf"), "_annotated.pdf")]
+            files = [(Path(f"{stem}.png"), ".png")] if annotated else files + marked
+        elif annotated:
+            raise SyncError(f"{recipe['chapter']}/{fig['id']} has no markers to copy")
         # A take is not committed; the record names the recipe's commit and the take itself.
-        return [(image, ".png")], prov.from_take(take), _head()
+        return files, prov.from_take(take), _head()
     data = prov.load(recipe["chapter"])
     entry = data["figures"].get(fig["id"])
     image = IMAGES / recipe["chapter"] / fig["file"]
