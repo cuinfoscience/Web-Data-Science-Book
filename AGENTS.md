@@ -71,7 +71,7 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
   - Every figure has `fig-alt` that transcribes the text and numbers a reader needs from it. The ch-07 and ch-08 figures, at 280–440 characters, set the bar.
   - A figure showing anything that changes (counts, versions, a live page) says in its caption when it was captured, as in "in September 2026."
   - A count, date, or total printed in a caption comes from a query whose limit and paging are recorded with the figure. If the query hit its limit, page until it doesn't, or don't print the number.
-  - Numbered markers are drawn by `tools/shots` from the recipe's `annotate:` marks, each pointing at a page element or a DevTools row, so they follow the page on a retake. Don't place markers at hand-typed pixel positions or paint them into the image.
+  - Numbered markers are drawn by `tools/shots` from the recipe's `annotate:` marks, each pointing at a page element or a DevTools row, so they follow the page on a retake. Don't place markers at hand-typed pixel positions or paint them into the image. Drawing is reproducible: the same take and marks give the same PDF and PNG, byte for byte. So if a redraw, `promote`, or `sync` shows a marked-up file as changed, the take or its marks changed; find out which before you commit it.
   - **Readable where it is shown, at both ends.** A reader can't use text that is too small, and can't use a figure too crammed to follow.
     - Scope each figure to what its paragraph discusses: crop to it, and hide the panels, columns, and sidebars the text doesn't mention.
     - Enlarge by zooming the application, not by widening the window. Three of the four chapter 5 figures zoom DevTools to 125%.

@@ -2,6 +2,17 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-05 · A figure drawn again from the same take is the same file
+
+**Decision.** `tools/shots` draws a figure's markers reproducibly: the same take and the same marks give the same PDF and PNG, byte for byte. pdfTeX dates the PDF, and makes its `/ID`, from the take's capture time (a hand capture's date, at midnight UTC), passed as `SOURCE_DATE_EPOCH`, never from the clock. When git shows a toolkit output as changed, the figure changed.
+
+**Why.**
+- Each build wrote its own time into the PDF. Two draws of one take, a second apart, came out the same length but different in `/CreationDate`, `/ModDate`, and the `/ID` made from them (tested 2026-10-05 with pdfTeX 1.40.25).
+- Re-syncing week 8's handout figures to the course repository, with nothing changed, rewrote all four marked-up PDFs, because #219's `sync` draws a course figure's markers again at each copy. Each was a binary diff that no reviewer can read. [§5.3 of the toolkit AAR](aar/AAR_Web-Data-Science-Book_2026-09-24.md#53-rewriting-history-costs-the-reviewer) found that this kind of churn costs review time. `promote` redraws a chapter figure's markers the same way, and its provenance records the PDF's hash.
+- The capture time is the date that means something: when the screenshot was taken.
+
+**Where.** `tools/shots/lib/annotate.py` (`source_date`, `_pdflatex`), checked by `tools/shots/selftest.py` ("draws the same PDF and PNG, byte for byte"), and described in `tools/shots/README.md` ("Markers"; "Sync to the course repo", under "What it says").
+
 ## 2026-10-05 · The book's code keeps Chrome's sandbox on
 
 **Decision.**

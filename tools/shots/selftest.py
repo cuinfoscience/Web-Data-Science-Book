@@ -10,6 +10,7 @@ temporary folder; the repository is not touched.
 import http.server
 import json
 import os
+import re
 import shutil
 import socket
 import socketserver
@@ -17,6 +18,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import urllib.parse
 from pathlib import Path
 
@@ -25,6 +27,7 @@ from PIL import Image, ImageChops
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from lib import devtools as dt                   # noqa: E402  (to read a take's DevTools state)
+from lib.annotate import source_date              # noqa: E402
 from lib.headed import BARS, BARS_SLACK          # noqa: E402
 from lib import guards, robots                    # noqa: E402
 
@@ -708,10 +711,21 @@ figures:
                 same = ImageChops.difference(shot.convert("RGB").crop(region),
                                              img.convert("RGB").crop(moved)).getbbox() is None
             expect("...and its screenshot pixels unchanged, not resampled", same, f"frame {record.get('frame')}")
+        drawn_first = {ext: Path(f"{stem}.{ext}").read_bytes() for ext in ("pdf", "png") if Path(f"{stem}.{ext}").exists()}
+        time.sleep(1.1)                             # a second on, so a clock time in the PDF would show
         code, out = shots("annotate", "ch-99", "marks")
         expect("annotate redraws markers from a take without capturing again", code == 0, out[-300:])
+        drawn_again = {ext: Path(f"{stem}.{ext}").read_bytes() for ext in ("pdf", "png") if Path(f"{stem}.{ext}").exists()}
+        dated = ("D:" + re.sub(r"\D", "", str(marks.get("captured")))[:14] + "Z").encode()   # D:YYYYMMDDHHMMSSZ
+        expect("...and draws the same PDF and PNG, byte for byte: the PDF is dated by the take, not the clock",
+               len(drawn_first) == 2 and drawn_again == drawn_first and dated in drawn_again.get("pdf", b""),
+               f"{sorted(drawn_first)} same={drawn_again == drawn_first} date {dated} in PDF="
+               f"{dated in drawn_again.get('pdf', b'')}")
     else:
         print("  skip  marker drawing: pdflatex or pdftocairo missing (bash tools/shots/bootstrap.sh --tex)")
+    dates = [source_date(t) for t in ({"captured": "2026-09-24T14:20:16+00:00"}, {"captured": "2026-09-24"}, {})]
+    expect("a drawing is dated by its take: the capture time, a hand capture's date at midnight UTC, or 1970",
+           dates == [1790259616, 1790208000, 0], str(dates))
     expect("legibility: 11-pixel text in a 555-pixel crop on 35% of a slide is too small (week-08's case)",
            "slides 11.7 px (under 16)" in captured[1] and (small.get("text") or {}).get("p20") == 11.0,
            str(small.get("text")) + captured[1][-300:])
