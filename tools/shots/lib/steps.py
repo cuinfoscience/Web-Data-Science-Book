@@ -18,7 +18,9 @@
     - scroll: {match: '^User-agent: \\*$', in: 'pre', offset: 180}
                                              so a match inside an element's text (lines of
                                              a plain-text file, in one <pre>) is 180 pixels
-                                             below the window's top
+                                             below the window's top; add `within: '.panel'`
+                                             to scroll a panel instead, as for a line of a
+                                             Jupyter cell's output
 
 Playwright's text and CSS locators reach inside open shadow roots, which the
 Wayback Machine's toolbar and calendar use.
@@ -121,6 +123,10 @@ def run(page, fig, log, extra=None):
                 # Measure again after scrolling: a page can move as it scrolls (a header that
                 # turns sticky leaves the flow), so correct until the match is at its offset.
                 n = arg.get("nth", 0)
+                panel = None
+                if "within" in arg:   # a page that scrolls a panel, not the window (Jupyter)
+                    panel = page.locator(arg["within"]).first
+                    panel.wait_for(state="attached", timeout=ms)
                 for _ in range(3):
                     boxes = match_boxes(page, arg, timeout=ms)
                     if len(boxes) <= n:
@@ -128,7 +134,10 @@ def run(page, fig, log, extra=None):
                     dy = boxes[n][1] - arg.get("offset", 0)
                     if abs(dy) < 1:
                         break
-                    page.evaluate("dy => window.scrollBy(0, dy)", dy)
+                    if panel is not None:
+                        panel.evaluate("(el, dy) => { el.scrollTop += dy; }", dy)
+                    else:
+                        page.evaluate("dy => window.scrollBy(0, dy)", dy)
             elif kind == "wait":
                 if "text" in arg:
                     page.get_by_text(pattern(arg["text"])).first.wait_for(state="visible", timeout=ms)
