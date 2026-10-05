@@ -495,6 +495,10 @@ The code below uses gensim, which chapter 1's `webdata` environment includes. An
 Stopwords, such as *the*, *and*, and *of*, are too common to tell two versions of a document apart, so the code drops them before counting. The list comes from the web like any other data: the book keeps it as a plain-text file, one word per line, and `requests` fetches it. It holds the 198 English stopwords of NLTK, a Python library for language processing, which took them from the Snowball project.
 
 ```{python}
+%conda install -y -c conda-forge gensim nltk
+```
+
+```{python}
 import requests
 from gensim.utils import simple_preprocess
 
