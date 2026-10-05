@@ -151,7 +151,9 @@ The simplest way to check whether the Wayback Machine has a snapshot of a URL is
 ```{python}
 import requests
 
-url = "https://www.cnn.com"
+# Give the Availability API a bare address. It matches the address as the crawler
+# recorded it, so "https://www.cnn.com" comes back with no snapshots at all.
+url = "www.cnn.com"
 timestamp = "20000815"  # August 15, 2000
 
 # Pass query arguments as a params dictionary — requests handles the URL encoding, which matters here because one of the values is itself a URL
