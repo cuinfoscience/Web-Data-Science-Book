@@ -10,6 +10,27 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 
 **Where.** `ch-08-dynamic-pages.qmd` ("Other Browsers", "Installing Playwright", "Recording a Script with Codegen", the comparison table, "Common Issues to Debug") and `README.md`.
 
+## 2026-10-05 · Earlier chapters point to the examples that later chapters add
+
+**Decision.** When a later chapter, or an open issue, adds an example that an earlier chapter's discussion would benefit from, the same pull request updates the earlier chapter: a cross-reference, and a sentence that says what the later example adds. The edit keeps to lines that students' open pull requests don't touch, and the description names any overlap.
+
+**Why.** The maintainer: "Always update earlier chapters as examples in late chapters or current issues would benefit from references and discussion." Without the pointer, a reader of chapter 2's court cases or chapter 3's API prices doesn't learn that chapter 8 puts them to work.
+
+**Where.** `AGENTS.md` ("Extending the Book", item 7). First applied with chapter 8's logins and credentials, below: chapters 1, 2, 3, and 5 now point to it.
+
+## 2026-10-05 · Chapter 8 teaches logging in by hand, headless browsing, and keeping credentials out of code
+
+**Decision.**
+- Chapter 8 shows a browser logging in to a practice site, quotes.toscrape.com, which accepts any username and password. The reader logs in by hand while the cell waits on `input()`, so the book's code never holds a password. Where code must log in by itself, the password comes from an environment variable or `getpass()`. The session is kept in a Chrome profile folder outside the project, treated like a password.
+- The chapter says what logging in changes: the Terms of Service bind the reader, what the account sees isn't public, and the account is the reader's to lose. It names the routes that ask first: an API, a researcher program, data donation, and the site's permission.
+- Headless mode is a section of its own. A screenshot shows what the browser drew, and the chapter says what a site still sees: `HeadlessChrome` in the User-Agent, and `navigator.webdriver`. `--no-sandbox` is for containers that run Chrome as root, not for a reader's computer.
+- With conda-forge's `selenium`, Selenium Manager is a package of its own, and activating `webdata` sets `SE_MANAGER_PATH` to it. Step 1 sets the variable from `sys.prefix` when Jupyter started without it, and the chapter tells readers who add `selenium` to restart Jupyter from an activated `webdata`, since restarting the kernel isn't enough.
+- The toolkit still never signs in (2026-09-23).
+
+**Why.** The maintainer asked for logging in to be taught as the cheaper alternative to a paid API, with its real ethical costs, and for headless browsing and the worst and best practices with credentials to be covered. Chapter 3's API prices make the logged-in route the one students are most likely to try. The `SE_MANAGER_PATH` change comes from a test on 2026-10-05: conda-forge's `selenium` 4.50 depends on `selenium-manager` 4.50, which installs `bin/selenium-manager` (`Scripts\selenium-manager.exe` on Windows) with activation scripts that set the variable. A Python that hadn't been activated raised `NoSuchDriverException: Unable to obtain driver for chrome`, caused by `Unable to obtain working Selenium Manager binary`; setting the variable in the notebook fixed it. conda's shell wrapper re-activates the environment after `conda install`, but a Jupyter that was already running keeps its old environment, and so does every kernel it restarts.
+
+**Where.** `ch-08-dynamic-pages.qmd` ("Setting Up Selenium", "Headless Mode", "Pages Behind a Login", "Choosing a Tool", "Common Issues to Debug"); `ch-01-introduction.qmd` ("Common Issues to Debug"); in the course repository, week 8's deck and week 1's setup handout.
+
 ## 2026-10-02 · Chapter 5 drops scapy for the operating system's own tools
 
 **Decision.**

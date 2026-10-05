@@ -8,7 +8,10 @@
 - Start Firefox, Edge, or Safari instead of Chrome, and say what each one needs
 - Locate elements using multiple strategies (ID, name, XPath, CSS selector)
 - Simulate user interactions — clicking, typing, and scrolling — programmatically
+- Run a browser headless, with no window on your screen, and check what it loaded
 - Pass fully-rendered page source from Selenium back to BeautifulSoup for parsing
+- Log in to a site by hand while your code waits, keep the session, and weigh what collecting behind a login costs you and the people in the data
+- Keep passwords, tokens, and session files out of your code, notebooks, and repositories
 - Script the same tasks with Playwright from the terminal, and explain why its simple API does not run in a notebook
 - Compare three ways to hand browser scripting to tools — an AI agent that drives the browser, an agent that writes the scraper, and Playwright's recorder — and weigh their costs and risks
 - Assess the fragility and ethical implications of browser automation
@@ -106,11 +109,13 @@ When all three checks come up empty — the data appears only after the page run
 
 ## Setting Up Selenium
 
-Selenium requires two components: the `selenium` Python library and a browser driver — a small program that lets Python control a specific browser. You only need to install the library: since version 4.6 (late 2022), Selenium has shipped with **Selenium Manager**, which finds or downloads the correct driver for whatever browser you have installed, and downloads the browser as well if you have none.
+Selenium requires two components: the `selenium` Python library and a browser driver — a small program that lets Python control a specific browser. You only need to install the library: since version 4.6 (late 2022), Selenium has come with **Selenium Manager**, which finds or downloads the correct driver for whatever browser you have installed, and downloads the browser as well if you have none. conda-forge, where `webdata`'s packages come from, installs Selenium Manager as a package of its own, `selenium-manager`, whenever it installs `selenium`.
 
 ```{python}
 # selenium is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge selenium
 ```
+
+If you add `selenium` to an older environment, restarting the kernel isn't enough. Close Jupyter, run `conda activate webdata` again, and start `jupyter notebook`. Activating `webdata` sets an environment variable, `SE_MANAGER_PATH`, that tells Selenium where conda put Selenium Manager, and a kernel gets its environment variables from the Jupyter that started it. Step 1 below sets the variable itself if Jupyter started without it.
 
 ### Before the First Browser
 
@@ -122,17 +127,29 @@ The first run downloads files. The driver is about 10 MB. On a machine without C
 
 ```{python}
 import os
+import sys
+from pathlib import Path
 
 import selenium
 
 print("selenium", selenium.__version__)  # the next cell needs 4.20 or later
+
+# Where conda-forge puts Selenium Manager. Activating webdata sets SE_MANAGER_PATH to it; this sets it if Jupyter started without that.
+manager = Path(sys.prefix) / ("Scripts/selenium-manager.exe" if os.name == "nt" else "bin/selenium-manager")
+if "SE_MANAGER_PATH" not in os.environ and manager.is_file():
+    os.environ["SE_MANAGER_PATH"] = str(manager)
+print("Selenium Manager:", os.environ.get("SE_MANAGER_PATH", "inside the selenium package"))
 
 os.environ["SE_SKIP_DRIVER_IN_PATH"] = "true"  # ignore stray drivers on your PATH
 os.environ["SE_AVOID_STATS"] = "true"          # send no usage statistics (optional)
 # os.environ["SE_PROXY"] = "http://proxy.example.edu:3128"  # only behind a proxy
 ```
 
-If the version printed is older than 4.20 (April 2024), run `conda install -c conda-forge "selenium>=4.20"` in a terminal where `webdata` is active, and restart the notebook's kernel. The first setting matters most: it tells Selenium Manager to ignore any driver already on your system `PATH` and use one it has matched to your browser. The end of this section shows what happens without it. The second setting stops the usage statistics that Selenium Manager otherwise sends. The third is for networks that require a proxy; "When Selenium Manager Fails" below says when you need it.
+If the version printed is older than 4.20 (April 2024), run `conda install -c conda-forge "selenium>=4.20"` in a terminal where `webdata` is active, then close Jupyter, run `conda activate webdata`, and start it again.
+
+The `manager` lines look for Selenium Manager in `webdata`'s own folders, where conda-forge's package puts it: `bin` on macOS and Linux, `Scripts` on Windows. They change nothing when `SE_MANAGER_PATH` is already set. With `selenium` from `pip` instead, the program sits inside the package, nothing needs setting, and the line prints `inside the selenium package`.
+
+Of the three settings after them, the first matters most: it tells Selenium Manager to ignore any driver already on your system `PATH` and use one it has matched to your browser. The end of this section shows what happens without it. The second setting stops the usage statistics that Selenium Manager otherwise sends. The third is for networks that require a proxy; "When Selenium Manager Fails" below says when you need it.
 
 **Step 2: run Selenium Manager.** Ask it for the driver and browser that `webdriver.Chrome()` would use, with its log turned on so that you can read each decision:
 
@@ -224,7 +241,7 @@ Driver:  154.0.8037.57
 
 ### What Selenium Manager Does
 
-Selenium Manager is a small program that ships inside the `selenium` package. Step 2 ran it on its own; `webdriver.Chrome()` runs it every time, before the browser starts. It:
+Selenium Manager is a small program that comes with Selenium: `pip` installs it inside the `selenium` package, and conda-forge installs it as a package of its own, in the environment's `bin` folder (`Scripts` on Windows). Step 2 ran it on its own; `webdriver.Chrome()` runs it every time, before the browser starts. It:
 
 1. Looks for a `chromedriver` already on your system `PATH`, and for Chrome itself.
 2. Asks Google's Chrome for Testing service which driver version matches your Chrome. If you have no Chrome at all, it downloads Chrome for Testing as well.
@@ -235,6 +252,7 @@ It also sends anonymous usage statistics (the browser, operating system, languag
 
 ### When Selenium Manager Fails
 
+- **`Unable to obtain driver for chrome`, with `Unable to obtain working Selenium Manager binary` higher up in the traceback.** Selenium couldn't find Selenium Manager, so it never looked for a driver. With conda-forge's `selenium`, this means Jupyter started without `SE_MANAGER_PATH`: from a terminal where `webdata` wasn't active, or before you installed `selenium`. Run step 1, which sets the variable, or close Jupyter, run `conda activate webdata`, and start Jupyter again. Restarting the kernel doesn't help. If the message is `SE_MANAGER_PATH does not point to a file`, the variable names a file that isn't there: remove it with `os.environ.pop("SE_MANAGER_PATH")`, and run step 1 again.
 - **`This version of ChromeDriver only supports Chrome version N`.** An old driver on your `PATH`, left by a manual download, Homebrew, conda, or an npm package, outranks the one Selenium Manager would choose. Set `SE_SKIP_DRIVER_IN_PATH=true`, as step 1 does, or delete the old driver.
 - **Downloads fail on a campus or corporate network.** A proxy or firewall may block Google's download servers. Set `SE_PROXY` to your proxy's address, or run once on an open network; after that, Selenium Manager works from its cache, and `SE_OFFLINE=true` stops it from trying the network at all.
 - **Chrome is installed somewhere unusual.** Browsers installed through conda or snap can hide from Selenium Manager. Give it the path: in step 2, add `"--browser-path", "/path/to/chrome"` to the list, and when you start the browser, set `options.binary_location = "/path/to/chrome"`.
@@ -399,7 +417,7 @@ When your query matches an article title exactly, Wikipedia takes you straight t
 
 ::: {.callout-warning}
 ## Automation Is Not a Loophole
-Everything from @sec-ethics applies with full force to browser automation. A robots.txt disallow rule does not stop mattering because a real browser is doing the requesting, and a site's Terms of Service does not stop applying because a script is doing the clicking. Legal risk concentrates precisely where Selenium is most tempting: automating logged-in accounts and ToS-restricted content. Check the policies of any site before you automate interactions with it.
+Everything from @sec-ethics applies with full force to browser automation. A robots.txt disallow rule does not stop mattering because a real browser is doing the requesting, and a site's Terms of Service does not stop applying because a script is doing the clicking. Legal risk concentrates precisely where Selenium is most tempting: automating logged-in accounts and ToS-restricted content. Check the policies of any site before you automate interactions with it. "Pages Behind a Login", later in this chapter, takes up logged-in accounts.
 :::
 
 ### Scrolling
@@ -530,27 +548,45 @@ This fragility reinforces a principle from @sec-post-api: when an API is availab
 
 Selenium is also not the only browser automation tool. **Playwright**, which the second half of this chapter covers, waits for elements automatically and can record a script while you click, but it runs best outside the notebook. Selenium is long established, with a deep reservoir of documentation and community answers, and it runs in the notebook, which is why this chapter teaches it first.
 
-### Headless Mode
+## Headless Mode
 
-For production scraping, you do not need a visible browser window. Headless mode runs the browser without a graphical interface, which is faster and can run on servers without a display:
+Selenium doesn't need a window on your screen. In **headless mode**, the browser does everything it does in a window: it requests the page, runs the page's JavaScript, builds the DOM, and lays the page out at a set size. It just draws none of it on your screen. Your code works the same either way: `driver.get()`, `find_element()`, the waits, clicks, and scrolling from earlier in this chapter, and `driver.page_source`.
 
 ```{python}
+from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
 options = Options()
-options.add_argument("--headless=new")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--headless=new")          # run Chrome with no window
+options.add_argument("--window-size=1280,800")  # lay pages out as a 1280-by-800 window would
 
 driver = webdriver.Chrome(options=options)
-driver.get("https://example.com")
-print(f"Title: {driver.title}")
+driver.get("https://quotes.toscrape.com/js/")
+print(driver.title)
+# Quotes to Scrape
+print(len(driver.find_elements(By.CLASS_NAME, "quote")))
+# 10
+
+driver.save_screenshot("quotes-headless.png")  # what the browser drew, saved next to the notebook
 driver.quit()
 ```
 
-The `=new` suffix selects Chrome's new headless implementation (Chrome 109 and later), which behaves much more like the regular browser than the legacy `--headless` mode did. The `--no-sandbox` and `--disable-dev-shm-usage` flags resolve common issues when running Chrome in containerized or server environments (like GitHub Actions, which you will use in @sec-automation). Headless mode is essential for automated data collection pipelines where no one is watching the browser window.
+Headless Chrome is the same browser as Chrome in a window. It used to be a separate, simpler browser built into Chrome. `--headless=new` asked for the new kind from Chrome 109 on, and since Chrome 132, plain `--headless` means the same; the old one is now a download of its own, `chrome-headless-shell`. Headless mode suits three situations:
 
-One important caveat: some websites detect headless browsers and serve different content or block access entirely. They do this by checking for browser properties that headless mode handles differently (like the `navigator.webdriver` flag). If you get different results in headless mode than in a visible browser, this is likely the cause. For educational purposes, switching back to headed mode usually resolves the issue. In production settings, there are legitimate workarounds, but circumventing bot detection raises the ethical questions discussed in @sec-ethics — the fact that you *can* evade detection does not mean you *should*.
+- **Long or repeated collection.** The browser works in the background, and no window takes over your screen or catches a stray click while you do something else.
+- **A computer with no screen.** A server, a container, or the GitHub Actions runners of @sec-automation have no display for a window to open on.
+- **More than one browser at a time.** Each headless browser still runs a full browser, with a full browser's memory, but no windows pile up on your screen.
+
+Write and debug with a window, then switch to headless once the code works: watching the browser is how you catch a click that landed on the wrong button. The switch is one line, so keep it in one place, such as a `HEADLESS = True` at the top of your notebook. Playwright, later in this chapter, starts its browsers headless unless you ask for a window.
+
+**Seeing what a headless browser saw.** With no window, a screenshot is how you look. `driver.save_screenshot()` saves what the browser drew, and it is the first thing to check when a headless run finds fewer elements than a run with a window. Set the window size too: without `--window-size`, headless Chrome 154 used a window 780 pixels wide, narrower than most laptop screens, and a site that lays out its pages for the window's width can give a narrow window a different layout, with different elements.
+
+**What the site sees.** Headless mode hides the browser from you, not from the site. Headless Chrome names itself in its User-Agent, `HeadlessChrome/154.0.0.0` where a window would send `Chrome/154.0.0.0`, and any browser that Selenium drives, with a window or without, tells the page's JavaScript that `navigator.webdriver` is `true`. Some sites check one or both, and serve different content or none. If a page works with a window and not headless, that is the likely cause, and the first thing to try is the window. Rewriting the User-Agent or hiding `navigator.webdriver` so that your scraper passes for a person is the User-Agent spoofing of @sec-protocols, and raises the questions of @sec-ethics: that you *can* evade a site's detection does not mean you *should*.
+
+**On a server or in a container.** Chrome there may need two more flags. `--no-sandbox` turns off Chrome's sandbox, which walls each page's code off from the rest of the computer; Chrome won't start as the `root` user without it, and many containers run as `root`. On your own computer, leave the sandbox on. `--disable-dev-shm-usage` makes Chrome keep its working files on disk instead of in a shared-memory area that containers often keep small.
+
+**What headless mode can't do: wait for you.** You can't type into a window that isn't there, so logging in by hand ("Pages Behind a Login", below) needs a window. Log in with a window once, keep the session, and run headless after that.
 
 ## A Practical Selenium Workflow
 
@@ -626,6 +662,123 @@ print(quotes_df.shape)
 ```
 
 Notice the use of `WebDriverWait` with `expected_conditions` — this is superior to `time.sleep()` because it waits only as long as needed for the element to appear, rather than waiting a fixed amount of time that might be too short (element not loaded) or too long (wasted time). The `try/finally` block ensures the browser is closed even if an error occurs. The pagination uses `find_elements` (plural), which returns an empty list instead of raising an error when the last page has no **Next** link, so the loop ends cleanly. And notice the `None` checks before calling `.text`: dynamic pages serve malformed or incomplete items just as often as static ones do, and the defensive parsing habits from @sec-static-pages carry over unchanged.
+
+## Pages Behind a Login
+
+Some pages show their data only after you log in: a forum's member pages, a course site, a social feed. A browser that your code drives can log in the way you do, and that makes Selenium tempting when an API is out of reach. @sec-post-api priced the alternatives: X's enterprise API at $42,000 a month and up, and Reddit's at $0.24 per 1,000 calls. Logging in with your own account costs no money. This section shows how to do it without putting your password in your code, and then what it does cost.
+
+### Logging In by Hand
+
+Quotes to Scrape has a practice login page that accepts any username and password. Once you're logged in, each quote shows a link to its author's Goodreads page, which visitors who aren't logged in don't see. Start a browser with a window, and let the notebook wait while you log in:
+
+```{python}
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+driver = webdriver.Chrome()
+driver.get("https://quotes.toscrape.com/login")
+input("Log in in the Chrome window, then press Enter here")  # the cell waits until you press Enter
+
+driver.get("https://quotes.toscrape.com/")
+links = driver.find_elements(By.LINK_TEXT, "(Goodreads page)")
+print(len(links))
+# 10 when you are logged in; 0 when you are not
+```
+
+`input()` puts a text box under the cell and waits. Meanwhile you log in in the browser window, as you would on any day. Your password goes from your keyboard to the site, and never into your code, your notebook, or its outputs. So does a two-factor code, if the site asks for one.
+
+### Keeping the Session
+
+When you log in, the site sets a **session cookie**: a token your browser sends with every request after that, so the site knows it's you without asking for your password again. Selenium starts each browser with a new, empty profile, the folder where a browser keeps its cookies and settings, so the cookie is gone after `driver.quit()`. To keep it, give Chrome a profile folder of its own:
+
+```{python}
+from pathlib import Path
+
+from selenium.webdriver.chrome.options import Options
+
+# A profile folder outside your project folder, so it never ends up in git
+profile = Path.home() / "selenium-profiles" / "quotes"
+
+options = Options()
+options.add_argument(f"--user-data-dir={profile}")
+
+driver = webdriver.Chrome(options=options)
+driver.get("https://quotes.toscrape.com/login")
+input("Log in in the Chrome window, then press Enter here")
+driver.quit()
+```
+
+The next run can start from that profile, headless, and skip the login:
+
+```{python}
+options = Options()
+options.add_argument(f"--user-data-dir={profile}")
+options.add_argument("--headless=new")
+
+driver = webdriver.Chrome(options=options)
+driver.get("https://quotes.toscrape.com/")
+print(len(driver.find_elements(By.LINK_TEXT, "(Goodreads page)")))
+# 10: the session survived
+driver.quit()
+```
+
+On the practice site, in October 2026, the session survived the restart. A real site decides how long its sessions last and can end one whenever it likes, so check at the start of every run, by counting something that only a logged-in visitor sees, before you collect anything. Only one browser at a time can use a profile folder, so quit one driver before you start the next.
+
+The profile folder now holds what the cookie holds: a way into your account that needs no password and no two-factor code. Treat it like your password. "Passwords and Other Credentials", below, says how.
+
+### What Changes When You Log In
+
+The technical difference between this scraper and a logged-out one is a cookie. The other differences are larger:
+
+- **The Terms of Service bind you.** You agreed to them when you made the account, and most platforms' terms forbid automated collection. @sec-ethics traced where the legal risk falls: Meta's 2024 contract claims against Bright Data failed because Bright Data collected only what anyone could see without logging in, while hiQ lost to LinkedIn on breach of contract after it had agreed to LinkedIn's terms. Logging in moves you from the first situation toward the second.
+- **What you see isn't public.** A logged-in page shows what the site shows *you*: members-only posts, friends' content, a feed shaped by your account. The people in it shared it with an audience, not with a dataset, and an IRB treats it differently from public data (@sec-ethics, "IRBs and Web Data").
+- **Your account is you.** Every request your code makes, it makes as you, and the site can tell a script from a person: Selenium's browser reports `navigator.webdriver` as `true` to every page. If the site objects, the account is what you lose: in 2021, Meta disabled the personal accounts of the NYU researchers behind Ad Observatory over how they collected data (@sec-post-api). Don't open accounts under made-up identities to collect data, either. Audits that need them, such as the discrimination studies behind *Sandvig v. Barr*, break a site's terms on purpose, and they need an IRB's review and legal advice before they start.
+- **Cheaper isn't free.** A logged-in browser trades an API's price for risks that you carry: to your account, under a contract, and to the people whose posts you collect. Before you log in to collect, try the routes that ask first: the platform's API or researcher program, data donated by consenting users (@sec-post-api), or a message asking the site for the data.
+
+### Passwords and Other Credentials
+
+A **credential** is anything that proves to a site that you are you: a password; an API key or token, like those in @sec-government and @sec-social; and a session cookie, which a profile folder keeps. Whoever has one can act as you until it expires or you change it. Scraping projects leak credentials in a few predictable ways:
+
+| Don't | Because |
+|---|---|
+| Type a password into a code cell: `password = "..."` | The notebook file saves it. Push or submit the notebook, and the password goes too. Deleting the line later leaves it in git's history. |
+| Print a password, token, or cookie | Outputs are saved in the notebook file, and they go where the notebook goes. |
+| Keep a `.env` file, a saved cookie file, or a profile folder inside the project | `git add .` commits it. A saved cookie or profile logs in without the password, and without the two-factor code. |
+| Paste a password or cookie into an AI assistant | It goes to the AI provider with the rest of the conversation. |
+| Share one account among a team, or use someone else's | Nobody can tell who did what, and the account's owner answers for all of it. |
+
+: Common ways that scraping projects leak credentials. {#tbl-credential-leaks}
+
+And the habits that prevent each one:
+
+- **Log in by hand when you can.** The `input()` pause keeps the password out of your code entirely.
+- **When code must log in by itself**, as a job that runs on a schedule must, read the password from an environment variable, the way @sec-government reads API keys, or ask for it with `getpass()`, which hides what you type and keeps it out of the notebook:
+
+```{python}
+import os
+from getpass import getpass
+
+from selenium.webdriver.common.keys import Keys
+
+# From the environment if it's set there, otherwise typed in; either way it isn't in the notebook
+password = os.environ.get("QUOTES_PASSWORD") or getpass("Password: ")
+
+driver = webdriver.Chrome()
+driver.get("https://quotes.toscrape.com/login")
+driver.find_element(By.ID, "username").send_keys("your-username")
+driver.find_element(By.ID, "password").send_keys(password, Keys.RETURN)
+```
+
+- **Keep secret files and profile folders out of the repository.** Put them outside the project folder, as the profile above is, or list them in `.gitignore` before your first commit.
+- **Prefer a credential made for programs.** An API token or an app password, like Bluesky's in @sec-social, can be limited to what your code needs and revoked without changing your password.
+- **Use your own account**, with two-factor authentication on, or one that the platform's researcher program issues you.
+- **Clear outputs before you share a notebook**, and look through it for anything secret before you push.
+- **If a credential leaks, change it at once.** Change the password, or revoke the token, and log out the account's other sessions if the site lets you. Deleting the file from GitHub doesn't undo the leak, because earlier commits still hold it.
+
+::: {.callout-tip}
+## Missing Manual Reference
+For a deeper introduction to environment variables, `.env` files, and keeping secrets out of version control, see *Missing Manual* Chapter 34: Environment Variables and Secrets.
+:::
 
 ## Playwright: Scripting a Browser
 
@@ -812,7 +965,7 @@ With the full toolkit in hand, here is the decision tree for choosing your data 
 2. **Is the content in the page source?** Use `requests` + BeautifulSoup (see @sec-static-pages). If the data sits inside a `<script>`, cut it out and parse it with `json.loads()`.
 3. **Does the Network tab show the data arriving as JSON?** Request that JSON directly with `requests`, politely.
 4. **Is the content rendered by JavaScript you cannot get around?** Drive a browser: Selenium in a notebook, or Playwright in a script. Either way, expect it to be slower, more fragile, and more resource-intensive than the options above.
-5. **Is the content behind a login?** This is where ethical judgment matters most. Automating access to login-gated content may violate Terms of Service. See @sec-ethics.
+5. **Is the content behind a login?** This is where ethical judgment matters most. Look first for a route that asks: an API, a researcher program, data donation, or the site's permission. A browser you log in yourself works, but it stakes your account, a contract you agreed to, and the privacy of people who shared with an audience, not with you. See "Pages Behind a Login" above, and @sec-ethics.
 
 When the answer is a browser, the two tools differ in ways that decide which one fits your project:
 
@@ -887,7 +1040,9 @@ These are open-ended extensions — no scaffold, no fixed path. Use them for fur
 
 5. **Playwright script.** Rewrite Steps 2–4 of the Recommended Exercise as a Playwright script that you run from the terminal. Replace `WebDriverWait` with a locator that waits, and hand `page.content()` to BeautifulSoup. Compare the two versions: how many lines each took, how long each ran, and what each needed from you before the content was ready to read.
 
-6. **Graduate extension (INFO 5617).** Choose a JavaScript-heavy site relevant to your own research interests and instrument it with both approaches from this part of the book: static `requests` + BeautifulSoup and Selenium. Quantify what each approach sees — count of elements retrieved, payload size in bytes, and wall-clock time — across at least five pages. Then write a roughly 500-word memo on when the added cost of browser automation is justified, engaging with the treatment of JavaScript scraping in @mitchell2018web. Your memo should articulate a defensible general rule for other researchers, not just describe your particular site.
+6. **Behind a login, on paper.** Choose a site where you have an account, and data there that you'd like to study. Without collecting anything, list every route to that data: an API and its price, a researcher program, data donation, asking the site, and a logged-in browser. For each, write what it costs in money and in risk, and who carries the risk: you, the platform, or the people in the data. Which route would you take, and what would you tell an IRB about it?
+
+7. **Graduate extension (INFO 5617).** Choose a JavaScript-heavy site relevant to your own research interests and instrument it with both approaches from this part of the book: static `requests` + BeautifulSoup and Selenium. Quantify what each approach sees — count of elements retrieved, payload size in bytes, and wall-clock time — across at least five pages. Then write a roughly 500-word memo on when the added cost of browser automation is justified, engaging with the treatment of JavaScript scraping in @mitchell2018web. Your memo should articulate a defensible general rule for other researchers, not just describe your particular site.
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -912,6 +1067,10 @@ When platforms close their APIs and render content exclusively through JavaScrip
 - **`NoSuchElementException`**: The element does not exist yet because the page has not finished loading. Add `time.sleep()` or use explicit waits with `WebDriverWait`.
 - **`StaleElementReferenceException`**: The DOM changed between when you found the element and when you tried to interact with it. Re-find the element.
 - **`SessionNotCreatedException: This version of ChromeDriver only supports Chrome version N`**: An older `chromedriver` on your `PATH` is overriding Selenium Manager; step 3 of "Before the First Browser" prints `False` when this happens. Delete it, or set `SE_SKIP_DRIVER_IN_PATH=true` (see "When Selenium Manager Fails" above). If there is no stray driver, a brand-new browser release may have outrun Selenium for a few days; updating the `selenium` package typically fixes it.
+- **`NoSuchDriverException: Unable to obtain driver for chrome`**, with `Unable to obtain working Selenium Manager binary` above it in the traceback: Selenium can't find Selenium Manager, usually because Jupyter started before you installed `selenium`, or without `webdata` active. Run step 1 of "Before the First Browser", or close Jupyter, run `conda activate webdata`, and start it again; restarting the kernel isn't enough.
+- **`SessionNotCreatedException: session not created: Chrome instance exited`** when you start Chrome with a profile folder (`--user-data-dir`): often, another Chrome is still using that folder, such as one that an earlier cell started and never quit. Call `driver.quit()` on it, then start the new one.
+- **A headless run finds fewer elements than a run with a window**: Save a screenshot with `driver.save_screenshot("check.png")` and look at it. Set `--window-size`; if the page itself is different, the site may be treating headless browsers differently ("Headless Mode").
+- **A logged-in run suddenly finds nothing**: The session ended, and the site is showing you its logged-out pages. Check for something only logged-in visitors see before you collect, and log in by hand again.
 - **Memory issues**: Each Selenium driver runs a full browser process. Close drivers promptly with `driver.quit()`.
 - **Playwright: `It looks like you are using Playwright Sync API inside the asyncio loop`**: You ran a sync script in a notebook. Run it from the terminal instead, or switch to the async API.
 - **Playwright: `Executable doesn't exist at ...`**: Playwright's browsers are missing, usually right after you install or upgrade the library. Run `python -m playwright install chromium`. The box under the error says to run `playwright install`; in `webdata` that shorter command can run the wrong program (see "Installing Playwright").
@@ -919,7 +1078,7 @@ When platforms close their APIs and render content exclusively through JavaScrip
 
 ## Key Takeaways
 
-The modern web is dynamic: JavaScript renders content after the initial HTML loads, making it invisible to static scraping tools. Before you reach for a browser, check by hand: the data may be in the page source, inside a script, or arriving as JSON you can request directly. When you do need a browser, Selenium controls a real one from your notebook, with Selenium Manager fetching the driver, and the browser if you need one, letting you access fully-rendered pages, simulate user interactions, and extract content that `requests` cannot see. Playwright does the same from scripts, waits on its own, and can record a script while you click; AI agents can drive it too, but for research, have them write a script you can read and rerun rather than browse on your behalf. Every one of these tools is slow, fragile, and resource-intensive next to an API — a last resort when APIs and static scraping are unavailable. The hybrid approach of a browser for rendering plus BeautifulSoup for parsing gives you full access to the modern web while keeping your parsing code familiar.
+The modern web is dynamic: JavaScript renders content after the initial HTML loads, making it invisible to static scraping tools. Before you reach for a browser, check by hand: the data may be in the page source, inside a script, or arriving as JSON you can request directly. When you do need a browser, Selenium controls a real one from your notebook, with Selenium Manager fetching the driver, and the browser if you need one, letting you access fully-rendered pages, simulate user interactions, and extract content that `requests` cannot see. The browser needs no window: headless, it does the same work out of sight, and a screenshot shows you what it saw. It can also log in as you, which is where a scraper's costs shift from money to your account, a contract, and the people in the data; log in by hand, and treat the session it leaves behind like your password. Playwright does the same from scripts, waits on its own, and can record a script while you click; AI agents can drive it too, but for research, have them write a script you can read and rerun rather than browse on your behalf. Every one of these tools is slow, fragile, and resource-intensive next to an API — a last resort when APIs and static scraping are unavailable. The hybrid approach of a browser for rendering plus BeautifulSoup for parsing gives you full access to the modern web while keeping your parsing code familiar.
 
 ## Further Reading
 
@@ -928,6 +1087,9 @@ The modern web is dynamic: JavaScript renders content after the initial HTML loa
 - Selenium's pages on each browser (Chrome, Edge, Firefox, Safari): <https://www.selenium.dev/documentation/webdriver/browsers/>
 - Apple, "About WebDriver for Safari": <https://developer.apple.com/documentation/webkit/about-webdriver-for-safari>
 - Mozilla, geckodriver usage, including Firefox snaps: <https://firefox-source-docs.mozilla.org/testing/geckodriver/Usage.html>
+- Chrome for Developers, "Chrome Headless mode": <https://developer.chrome.com/docs/automation-and-testing/headless>
+- Python's `getpass` module: <https://docs.python.org/3/library/getpass.html>
+- OWASP, "Secrets Management Cheat Sheet": <https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html>
 - Selenium Python bindings: <https://selenium-python.readthedocs.io/>
 - Playwright for Python: <https://playwright.dev/python/>
 - Playwright MCP: <https://playwright.dev/mcp/introduction>

@@ -25,7 +25,7 @@ This chapter walks through each layer of the stack: the **client-server model** 
 
 The web follows a client-server architecture. A **client** (your browser, your Python script) sends a **request** to a **server** (a computer hosting a website or API). The server processes the request and sends back a **response**. This request-response cycle is the fundamental unit of web communication, and every scraping and API operation you perform in this book is an instance of it.
 
-Your browser is a sophisticated client that handles many things automatically — resolving domain names, managing cookies, rendering HTML and CSS, executing JavaScript. When you use `requests.get()` in Python, you are acting as a much simpler client that only handles the HTTP layer. Understanding what your browser does behind the scenes will help you diagnose problems when your Python client gets different results than your browser.
+Your browser is a sophisticated client that handles many things automatically — resolving domain names, managing cookies (including the one that keeps you logged in to a site, which @sec-dynamic-pages treats like a password), rendering HTML and CSS, executing JavaScript. When you use `requests.get()` in Python, you are acting as a much simpler client that only handles the HTTP layer. Understanding what your browser does behind the scenes will help you diagnose problems when your Python client gets different results than your browser.
 
 ## Browser Developer Tools
 

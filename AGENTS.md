@@ -149,3 +149,4 @@ When adding new chapters or updating existing ones:
 4. Include at least one cross-reference to another chapter and one to the Missing Manual
 5. Add any new references to `references.bib`
 6. Test the build with `quarto preview` before committing
+7. Update earlier chapters too. When a later chapter, or an open issue, adds an example that an earlier chapter's discussion would benefit from, the same pull request adds a cross-reference there, with a sentence that says what the later example adds. Chapter 2's court cases, for instance, point to chapter 8's logged-in scraper, which puts them to work. Keep to lines that students' open pull requests don't touch, and name any overlap in the description (`docs/decisions.md`, 2026-10-05).
