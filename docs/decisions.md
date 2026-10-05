@@ -2,6 +2,22 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-05 · The book's code keeps Chrome's sandbox on
+
+**Decision.**
+- No example in the book passes `--no-sandbox` to Chrome. Chapter 8 says what the flag does, that Chrome needs it to start as `root` (as in many containers), and that a reader's own computer keeps the sandbox on.
+- Chapter 14's scheduled scraper no longer passes it. GitHub's Ubuntu runners run jobs as an ordinary user, and their image includes Google Chrome.
+- On Ubuntu 24.04 and later, where Chrome for Testing can't start its sandbox, chapter 8's fix is to install Google Chrome, not to turn the sandbox off.
+
+**Why.**
+- Chromium's documentation says a browser run with `--no-sandbox` "should never be used when browsing the open web", and a scraper browses it. Its design document describes the sandbox as what keeps code from making "persistent changes to the computer" or reading "information that is confidential".
+- Tested on 2026-10-05 with Chrome for Testing 154 from Selenium Manager. As root, Chrome refused to start without the flag ("Running as root without --no-sandbox is not supported"). As an ordinary user, `chrome://sandbox` reported the namespace sandbox and seccomp-BPF, "adequately sandboxed". With `--no-sandbox`, it reported neither, "NOT adequately sandboxed".
+- Ubuntu 24.04's release notes turn on the AppArmor restriction on unprivileged user namespaces, with profiles for programs such as Google Chrome at `/opt/google/chrome/chrome`. Chromium's and Puppeteer's documentation say that the restriction stops downloaded builds such as Chrome for Testing with `No usable sandbox!`.
+- Selenium reports only `session not created: Chrome instance exited`; ChromeDriver's verbose log carries Chrome's own message. GitHub's runner image list for Ubuntu 24.04 includes Google Chrome 154.0.8037.57.
+- The book's earlier code passed `--no-sandbox` in chapter 8's headless example (removed on 2026-10-05, in #216) and in chapter 14, which called it "required" for GitHub Actions.
+
+**Where.** `ch-08-dynamic-pages.qmd` ("When Selenium Manager Fails", "Headless Mode", "Common Issues to Debug", "Further Reading") and `ch-14-automation.qmd`. The toolkit in `tools/shots` still passes the flag, because it runs as root in a container and visits only the pages its recipes name.
+
 ## 2026-10-05 · Playwright's commands run as `python -m playwright`
 
 **Decision.** Chapter 8 and the README give every Playwright command as `python -m playwright ...` (`install chromium`, `install webkit`, `codegen`), not as the bare `playwright ...`.
