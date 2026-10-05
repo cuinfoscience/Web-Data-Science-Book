@@ -456,7 +456,7 @@ div.csl-indent {
 <section id="step-1-notebook-to-script" class="level2" data-number="14.3">
 <h2 data-number="14.3" class="anchored" data-anchor-id="step-1-notebook-to-script"><span class="header-section-number">14.3</span> Step 1: Notebook to Script</h2>
 <p>Let us convert a Rotten Tomatoes score scraper from notebook format to a standalone script. The key changes: remove interactive exploration, add a <code>main()</code> function, handle imports and configuration at the top, and write output to a file.</p>
-<div id="286d72db" class="cell" data-execution_count="1">
+<div id="a3e2a846" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="co"># scraper.py — Rotten Tomatoes Score Scraper</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="co">"""Scrape Rotten Tomatoes audience and critic scores for a film."""</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
@@ -490,62 +490,61 @@ div.csl-indent {
 <span id="cb1-31"><a href="#cb1-31" aria-label="31"></a>    <span class="co"># Configure headless Chrome</span></span>
 <span id="cb1-32"><a href="#cb1-32" aria-label="32"></a>    options <span class="op">=</span> Options()</span>
 <span id="cb1-33"><a href="#cb1-33" aria-label="33"></a>    options.add_argument(<span class="st">"--headless"</span>)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-label="34"></a>    options.add_argument(<span class="st">"--no-sandbox"</span>)</span>
-<span id="cb1-35"><a href="#cb1-35" aria-label="35"></a>    options.add_argument(<span class="st">"--disable-dev-shm-usage"</span>)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-label="36"></a>    </span>
-<span id="cb1-37"><a href="#cb1-37" aria-label="37"></a>    driver <span class="op">=</span> webdriver.Chrome(options<span class="op">=</span>options)</span>
-<span id="cb1-38"><a href="#cb1-38" aria-label="38"></a>    </span>
-<span id="cb1-39"><a href="#cb1-39" aria-label="39"></a>    <span class="cf">try</span>:</span>
-<span id="cb1-40"><a href="#cb1-40" aria-label="40"></a>        driver.get(url)</span>
-<span id="cb1-41"><a href="#cb1-41" aria-label="41"></a>        <span class="co"># Wait for the score elements to render -- reading page_source immediately on a JS-heavy page yields intermittent empty scores</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-label="42"></a>        WebDriverWait(driver, <span class="dv">10</span>).until(</span>
-<span id="cb1-43"><a href="#cb1-43" aria-label="43"></a>            EC.presence_of_element_located(</span>
-<span id="cb1-44"><a href="#cb1-44" aria-label="44"></a>                (By.TAG_NAME, <span class="st">"score-icon-critic-deprecated"</span>)</span>
-<span id="cb1-45"><a href="#cb1-45" aria-label="45"></a>            )</span>
-<span id="cb1-46"><a href="#cb1-46" aria-label="46"></a>        )</span>
-<span id="cb1-47"><a href="#cb1-47" aria-label="47"></a>        soup <span class="op">=</span> BeautifulSoup(driver.page_source, <span class="st">"html.parser"</span>)</span>
-<span id="cb1-48"><a href="#cb1-48" aria-label="48"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-label="49"></a>        <span class="co"># Extract scores from the page's custom score elements</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-label="50"></a>        scores <span class="op">=</span> {}</span>
-<span id="cb1-51"><a href="#cb1-51" aria-label="51"></a>        <span class="cf">for</span> tag <span class="kw">in</span> soup.find_all(<span class="st">"score-icon-critic-deprecated"</span>):</span>
-<span id="cb1-52"><a href="#cb1-52" aria-label="52"></a>            scores[<span class="st">"critic_score"</span>] <span class="op">=</span> tag.get(<span class="st">"percentage"</span>, <span class="st">""</span>)</span>
-<span id="cb1-53"><a href="#cb1-53" aria-label="53"></a>        <span class="cf">for</span> tag <span class="kw">in</span> soup.find_all(<span class="st">"score-icon-audience-deprecated"</span>):</span>
-<span id="cb1-54"><a href="#cb1-54" aria-label="54"></a>            scores[<span class="st">"audience_score"</span>] <span class="op">=</span> tag.get(<span class="st">"percentage"</span>, <span class="st">""</span>)</span>
-<span id="cb1-55"><a href="#cb1-55" aria-label="55"></a></span>
-<span id="cb1-56"><a href="#cb1-56" aria-label="56"></a>        scores[<span class="st">"timestamp"</span>] <span class="op">=</span> datetime.now(timezone.utc).isoformat()</span>
-<span id="cb1-57"><a href="#cb1-57" aria-label="57"></a>        scores[<span class="st">"url"</span>] <span class="op">=</span> url</span>
-<span id="cb1-58"><a href="#cb1-58" aria-label="58"></a>        <span class="cf">return</span> scores</span>
-<span id="cb1-59"><a href="#cb1-59" aria-label="59"></a>    <span class="cf">finally</span>:</span>
-<span id="cb1-60"><a href="#cb1-60" aria-label="60"></a>        driver.quit()</span>
+<span id="cb1-34"><a href="#cb1-34" aria-label="34"></a>    options.add_argument(<span class="st">"--disable-dev-shm-usage"</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-label="35"></a>    </span>
+<span id="cb1-36"><a href="#cb1-36" aria-label="36"></a>    driver <span class="op">=</span> webdriver.Chrome(options<span class="op">=</span>options)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-label="37"></a>    </span>
+<span id="cb1-38"><a href="#cb1-38" aria-label="38"></a>    <span class="cf">try</span>:</span>
+<span id="cb1-39"><a href="#cb1-39" aria-label="39"></a>        driver.get(url)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-label="40"></a>        <span class="co"># Wait for the score elements to render -- reading page_source immediately on a JS-heavy page yields intermittent empty scores</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-label="41"></a>        WebDriverWait(driver, <span class="dv">10</span>).until(</span>
+<span id="cb1-42"><a href="#cb1-42" aria-label="42"></a>            EC.presence_of_element_located(</span>
+<span id="cb1-43"><a href="#cb1-43" aria-label="43"></a>                (By.TAG_NAME, <span class="st">"score-icon-critic-deprecated"</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-label="44"></a>            )</span>
+<span id="cb1-45"><a href="#cb1-45" aria-label="45"></a>        )</span>
+<span id="cb1-46"><a href="#cb1-46" aria-label="46"></a>        soup <span class="op">=</span> BeautifulSoup(driver.page_source, <span class="st">"html.parser"</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-label="47"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-label="48"></a>        <span class="co"># Extract scores from the page's custom score elements</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-label="49"></a>        scores <span class="op">=</span> {}</span>
+<span id="cb1-50"><a href="#cb1-50" aria-label="50"></a>        <span class="cf">for</span> tag <span class="kw">in</span> soup.find_all(<span class="st">"score-icon-critic-deprecated"</span>):</span>
+<span id="cb1-51"><a href="#cb1-51" aria-label="51"></a>            scores[<span class="st">"critic_score"</span>] <span class="op">=</span> tag.get(<span class="st">"percentage"</span>, <span class="st">""</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-label="52"></a>        <span class="cf">for</span> tag <span class="kw">in</span> soup.find_all(<span class="st">"score-icon-audience-deprecated"</span>):</span>
+<span id="cb1-53"><a href="#cb1-53" aria-label="53"></a>            scores[<span class="st">"audience_score"</span>] <span class="op">=</span> tag.get(<span class="st">"percentage"</span>, <span class="st">""</span>)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-label="54"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-label="55"></a>        scores[<span class="st">"timestamp"</span>] <span class="op">=</span> datetime.now(timezone.utc).isoformat()</span>
+<span id="cb1-56"><a href="#cb1-56" aria-label="56"></a>        scores[<span class="st">"url"</span>] <span class="op">=</span> url</span>
+<span id="cb1-57"><a href="#cb1-57" aria-label="57"></a>        <span class="cf">return</span> scores</span>
+<span id="cb1-58"><a href="#cb1-58" aria-label="58"></a>    <span class="cf">finally</span>:</span>
+<span id="cb1-59"><a href="#cb1-59" aria-label="59"></a>        driver.quit()</span>
+<span id="cb1-60"><a href="#cb1-60" aria-label="60"></a></span>
 <span id="cb1-61"><a href="#cb1-61" aria-label="61"></a></span>
-<span id="cb1-62"><a href="#cb1-62" aria-label="62"></a></span>
-<span id="cb1-63"><a href="#cb1-63" aria-label="63"></a><span class="kw">def</span> save_scores(scores, filepath<span class="op">=</span><span class="st">"scores.csv"</span>):</span>
-<span id="cb1-64"><a href="#cb1-64" aria-label="64"></a>    <span class="co">"""Append scores to a CSV file, creating it if needed."""</span></span>
-<span id="cb1-65"><a href="#cb1-65" aria-label="65"></a>    file_exists <span class="op">=</span> os.path.exists(filepath)</span>
-<span id="cb1-66"><a href="#cb1-66" aria-label="66"></a></span>
-<span id="cb1-67"><a href="#cb1-67" aria-label="67"></a>    <span class="cf">with</span> <span class="bu">open</span>(filepath, <span class="st">"a"</span>, newline<span class="op">=</span><span class="st">""</span>) <span class="im">as</span> f:</span>
-<span id="cb1-68"><a href="#cb1-68" aria-label="68"></a>        writer <span class="op">=</span> csv.DictWriter(f, fieldnames<span class="op">=</span>FIELDNAMES)</span>
-<span id="cb1-69"><a href="#cb1-69" aria-label="69"></a>        <span class="cf">if</span> <span class="kw">not</span> file_exists:</span>
-<span id="cb1-70"><a href="#cb1-70" aria-label="70"></a>            writer.writeheader()</span>
-<span id="cb1-71"><a href="#cb1-71" aria-label="71"></a>        writer.writerow(scores)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-label="62"></a><span class="kw">def</span> save_scores(scores, filepath<span class="op">=</span><span class="st">"scores.csv"</span>):</span>
+<span id="cb1-63"><a href="#cb1-63" aria-label="63"></a>    <span class="co">"""Append scores to a CSV file, creating it if needed."""</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-label="64"></a>    file_exists <span class="op">=</span> os.path.exists(filepath)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-label="65"></a></span>
+<span id="cb1-66"><a href="#cb1-66" aria-label="66"></a>    <span class="cf">with</span> <span class="bu">open</span>(filepath, <span class="st">"a"</span>, newline<span class="op">=</span><span class="st">""</span>) <span class="im">as</span> f:</span>
+<span id="cb1-67"><a href="#cb1-67" aria-label="67"></a>        writer <span class="op">=</span> csv.DictWriter(f, fieldnames<span class="op">=</span>FIELDNAMES)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-label="68"></a>        <span class="cf">if</span> <span class="kw">not</span> file_exists:</span>
+<span id="cb1-69"><a href="#cb1-69" aria-label="69"></a>            writer.writeheader()</span>
+<span id="cb1-70"><a href="#cb1-70" aria-label="70"></a>        writer.writerow(scores)</span>
+<span id="cb1-71"><a href="#cb1-71" aria-label="71"></a></span>
 <span id="cb1-72"><a href="#cb1-72" aria-label="72"></a></span>
-<span id="cb1-73"><a href="#cb1-73" aria-label="73"></a></span>
-<span id="cb1-74"><a href="#cb1-74" aria-label="74"></a><span class="kw">def</span> main():</span>
-<span id="cb1-75"><a href="#cb1-75" aria-label="75"></a>    url <span class="op">=</span> <span class="st">"https://www.rottentomatoes.com/m/the_wild_robot"</span></span>
-<span id="cb1-76"><a href="#cb1-76" aria-label="76"></a>    scores <span class="op">=</span> get_scores(url)</span>
-<span id="cb1-77"><a href="#cb1-77" aria-label="77"></a>    save_scores(scores)</span>
-<span id="cb1-78"><a href="#cb1-78" aria-label="78"></a>    <span class="bu">print</span>(<span class="ss">f"Saved scores at </span><span class="sc">{</span>scores[<span class="st">'timestamp'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-label="73"></a><span class="kw">def</span> main():</span>
+<span id="cb1-74"><a href="#cb1-74" aria-label="74"></a>    url <span class="op">=</span> <span class="st">"https://www.rottentomatoes.com/m/the_wild_robot"</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-label="75"></a>    scores <span class="op">=</span> get_scores(url)</span>
+<span id="cb1-76"><a href="#cb1-76" aria-label="76"></a>    save_scores(scores)</span>
+<span id="cb1-77"><a href="#cb1-77" aria-label="77"></a>    <span class="bu">print</span>(<span class="ss">f"Saved scores at </span><span class="sc">{</span>scores[<span class="st">'timestamp'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-78"><a href="#cb1-78" aria-label="78"></a></span>
 <span id="cb1-79"><a href="#cb1-79" aria-label="79"></a></span>
-<span id="cb1-80"><a href="#cb1-80" aria-label="80"></a></span>
-<span id="cb1-81"><a href="#cb1-81" aria-label="81"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
-<span id="cb1-82"><a href="#cb1-82" aria-label="82"></a>    main()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-80"><a href="#cb1-80" aria-label="80"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb1-81"><a href="#cb1-81" aria-label="81"></a>    main()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Notice the headless Chrome configuration: <code>--headless</code> runs the browser without a visible window, <code>--no-sandbox</code> and <code>--disable-dev-shm-usage</code> are required for running in CI/CD environments like GitHub Actions.</p>
+<p>Notice the headless Chrome configuration: <code>--headless</code> runs the browser without a visible window (<a href="ch-08-dynamic-pages.html" class="quarto-xref"><span>Chapter 8</span></a>, “Headless Mode”), and <code>--disable-dev-shm-usage</code> keeps Chrome from running out of shared memory in a container. The script leaves out <code>--no-sandbox</code>, which many tutorials add. That flag turns off the sandbox that keeps a page’s code from changing the machine or reading its files. On GitHub’s Ubuntu runners, Chrome should start without it: they run your job as an ordinary user, not <code>root</code>, and their image includes Google Chrome (version 154 in October 2026), which Ubuntu lets use its sandbox. Add <code>--no-sandbox</code> only where Chrome refuses to start without it, such as a container that runs as <code>root</code>.</p>
 <p>Two other design choices deserve a comment. First, the CSV schema is pinned in the <code>FIELDNAMES</code> constant rather than derived from <code>scores.keys()</code>: a fixed schema keeps the column order stable across every run, whereas a keys-derived header locks in whatever the first run happened to produce — and a later scrape with a missing or extra key would then corrupt or crash the append. Second, the elements this scraper targets — <code>score-icon-critic-deprecated</code> and its audience twin — are not metadata tags but custom web-component elements defined by Rotten Tomatoes’ front-end code. The <code>-deprecated</code> suffix is a broad hint that these element names change frequently, and when they do, the scraper will start returning empty results. That fragility is exactly why <a href="ch-08-dynamic-pages.html" class="quarto-xref"><span>Chapter 8</span></a> emphasized inspecting the live page in your browser’s developer tools: when the site changes, the fix starts there, not in this book.</p>
 <section id="testing-your-script-locally" class="level3" data-number="14.3.1">
 <h3 data-number="14.3.1" class="anchored" data-anchor-id="testing-your-script-locally"><span class="header-section-number">14.3.1</span> Testing Your Script Locally</h3>
 <p>Before deploying your script to GitHub Actions, always test it locally from the command line. Running a script in the terminal is different from running cells in a notebook — import errors, missing dependencies, and file path issues that were invisible in Jupyter will surface immediately.</p>
-<div id="85107601" class="cell" data-execution_count="2">
+<div id="a39fbdb0" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co"># From your terminal, run the script directly:</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="co"># $ python scraper.py</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="co"># Saved scores at 2024-11-15T14:23:07.482361+00:00</span></span>
@@ -723,7 +722,7 @@ div.csl-indent {
 <h3 data-number="14.4.5" class="anchored" data-anchor-id="handling-failures-gracefully"><span class="header-section-number">14.4.5</span> Handling Failures Gracefully</h3>
 <p>Even with validation in place, your scraper will occasionally fail due to circumstances beyond your control: the target website goes down for maintenance, a rate limit is temporarily enforced, or a network timeout occurs. A well-designed scraping pipeline handles these failures without losing previously collected data or crashing the workflow.</p>
 <p>The simplest approach is to wrap your scraping logic in a try/except block that logs the error and exits gracefully rather than raising an unhandled exception:</p>
-<div id="5d59e8dc" class="cell" data-execution_count="3">
+<div id="3dfa0e72" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> sys</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="im">import</span> traceback</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a></span>
@@ -766,7 +765,7 @@ div.csl-indent {
 <section id="step-3-analyze-collected-data" class="level2" data-number="14.5">
 <h2 data-number="14.5" class="anchored" data-anchor-id="step-3-analyze-collected-data"><span class="header-section-number">14.5</span> Step 3: Analyze Collected Data</h2>
 <p>After running your scraper for a period, you will have accumulated data to analyze:</p>
-<div id="1a5abfb3" class="cell" data-execution_count="4">
+<div id="96fa99f0" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"scores.csv"</span>)</span>
@@ -789,32 +788,32 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will take a collector you already trust and make it deployable: notebook to script, script to scheduled workflow, workflow to monitored pipeline. The deliverable stays inside the notebook — actually running it on GitHub Actions for days is the Additional Exercises’ territory — but every piece you write here is the real thing.</p>
 <p><strong>Step 1 — Choose and rehearse your collector.</strong> Pick a keyless data source from an earlier chapter — Open-Meteo (<a href="ch-04-data-formats.html" class="quarto-xref"><span>Chapter 4</span></a>) or Wikipedia pageviews (<a href="ch-01-introduction.html" class="quarto-xref"><span>Chapter 1</span></a>) are ideal. Write a <code>collect()</code> function with a docstring that fetches the current data with your <code>HEADERS</code> and returns a dictionary of the fields you want to keep, including a UTC timestamp. Run it once to prove it works.</p>
-<div id="72058e2a" class="cell" data-execution_count="5">
+<div id="1e8cf7be" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># Step 1: Write collect() -- fetch one observation from your source and return a dict of fields including a UTC timestamp. Run it once.</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Append safely to CSV.</strong> Write <code>save_row(row, filepath)</code> following the chapter’s pattern: a pinned <code>FIELDNAMES</code> constant, append mode, header written only when the file does not yet exist. Run collect-and-save twice and show the CSV has two rows and one header.</p>
-<div id="456710e1" class="cell" data-execution_count="6">
+<div id="35da9cdb" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Step 2: Write save_row() with a pinned schema, run the pipeline twice, and prove the CSV grew correctly.</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Convert to a script.</strong> Assemble the whole thing into a standalone <code>collector.py</code>: imports at top, your two functions, a <code>main()</code> that calls them, and the <code>if __name__ == "__main__":</code> guard. Write it to disk from the notebook, then verify it runs from the command line with <code>!python collector.py</code>.</p>
-<div id="41daa46b" class="cell" data-execution_count="7">
+<div id="72eaca7b" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Step 3: Write collector.py to disk (imports, collect, save_row, main, __main__ guard) and run it with !python collector.py.</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Add a freshness check.</strong> Write <code>check_freshness(filepath, max_age_hours=24)</code>: read the CSV, parse the newest timestamp, and print a clear OK or a warning if the data is stale. Test both paths — once against your fresh file, once with the threshold set low enough to trigger the warning.</p>
-<div id="8172f647" class="cell" data-execution_count="8">
+<div id="572f88ff" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 4: Write check_freshness() and demonstrate both the passing and the failing case.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Draft the workflow.</strong> Write the GitHub Actions workflow YAML for this collector as a string and save it to <code>collect.yml</code>: a cron schedule (explain your chosen expression in a comment — remember Actions cron is UTC), checkout, Python setup, dependency install, running <code>collector.py</code>, running the freshness check, and committing the CSV back — following the chapter’s template.</p>
-<div id="f7338a8c" class="cell" data-execution_count="9">
+<div id="69f94c97" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 5: Draft the full workflow YAML, with the cron expression explained, and save it to collect.yml.</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: What failure modes does this pipeline have — what breaks it silently, and what breaks it loudly? Which failure would your freshness check catch, and which would it miss? What one addition from the chapter’s hardening section would you make before trusting this pipeline for a semester?</p>
-<div id="93717e42" class="cell" data-execution_count="10">
+<div id="64724e58" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1417,386 +1416,385 @@ Wilson, Greg, Jennifer Bryan, Karen Cranston, Justin Kitzes, Lex Nederbragt, and
 <span id="cb16-75"><a href="#cb16-75" aria-label="73"></a>    <span class="co"># Configure headless Chrome</span></span>
 <span id="cb16-76"><a href="#cb16-76" aria-label="74"></a>    options <span class="op">=</span> Options()</span>
 <span id="cb16-77"><a href="#cb16-77" aria-label="75"></a>    options.add_argument(<span class="st">"--headless"</span>)</span>
-<span id="cb16-78"><a href="#cb16-78" aria-label="76"></a>    options.add_argument(<span class="st">"--no-sandbox"</span>)</span>
-<span id="cb16-79"><a href="#cb16-79" aria-label="77"></a>    options.add_argument(<span class="st">"--disable-dev-shm-usage"</span>)</span>
-<span id="cb16-80"><a href="#cb16-80" aria-label="78"></a>    </span>
-<span id="cb16-81"><a href="#cb16-81" aria-label="79"></a>    driver <span class="op">=</span> webdriver.Chrome(options<span class="op">=</span>options)</span>
-<span id="cb16-82"><a href="#cb16-82" aria-label="80"></a>    </span>
-<span id="cb16-83"><a href="#cb16-83" aria-label="81"></a>    <span class="cf">try</span>:</span>
-<span id="cb16-84"><a href="#cb16-84" aria-label="82"></a>        driver.get(url)</span>
-<span id="cb16-85"><a href="#cb16-85" aria-label="83"></a>        <span class="co"># Wait for the score elements to render -- reading page_source immediately on a JS-heavy page yields intermittent empty scores</span></span>
-<span id="cb16-86"><a href="#cb16-86" aria-label="84"></a>        WebDriverWait(driver, <span class="dv">10</span>).until(</span>
-<span id="cb16-87"><a href="#cb16-87" aria-label="85"></a>            EC.presence_of_element_located(</span>
-<span id="cb16-88"><a href="#cb16-88" aria-label="86"></a>                (By.TAG_NAME, <span class="st">"score-icon-critic-deprecated"</span>)</span>
-<span id="cb16-89"><a href="#cb16-89" aria-label="87"></a>            )</span>
-<span id="cb16-90"><a href="#cb16-90" aria-label="88"></a>        )</span>
-<span id="cb16-91"><a href="#cb16-91" aria-label="89"></a>        soup <span class="op">=</span> BeautifulSoup(driver.page_source, <span class="st">"html.parser"</span>)</span>
-<span id="cb16-92"><a href="#cb16-92" aria-label="90"></a></span>
-<span id="cb16-93"><a href="#cb16-93" aria-label="91"></a>        <span class="co"># Extract scores from the page's custom score elements</span></span>
-<span id="cb16-94"><a href="#cb16-94" aria-label="92"></a>        scores <span class="op">=</span> {}</span>
-<span id="cb16-95"><a href="#cb16-95" aria-label="93"></a>        <span class="cf">for</span> tag <span class="kw">in</span> soup.find_all(<span class="st">"score-icon-critic-deprecated"</span>):</span>
-<span id="cb16-96"><a href="#cb16-96" aria-label="94"></a>            scores[<span class="st">"critic_score"</span>] <span class="op">=</span> tag.get(<span class="st">"percentage"</span>, <span class="st">""</span>)</span>
-<span id="cb16-97"><a href="#cb16-97" aria-label="95"></a>        <span class="cf">for</span> tag <span class="kw">in</span> soup.find_all(<span class="st">"score-icon-audience-deprecated"</span>):</span>
-<span id="cb16-98"><a href="#cb16-98" aria-label="96"></a>            scores[<span class="st">"audience_score"</span>] <span class="op">=</span> tag.get(<span class="st">"percentage"</span>, <span class="st">""</span>)</span>
-<span id="cb16-99"><a href="#cb16-99" aria-label="97"></a></span>
-<span id="cb16-100"><a href="#cb16-100" aria-label="98"></a>        scores[<span class="st">"timestamp"</span>] <span class="op">=</span> datetime.now(timezone.utc).isoformat()</span>
-<span id="cb16-101"><a href="#cb16-101" aria-label="99"></a>        scores[<span class="st">"url"</span>] <span class="op">=</span> url</span>
-<span id="cb16-102"><a href="#cb16-102" aria-label="100"></a>        <span class="cf">return</span> scores</span>
-<span id="cb16-103"><a href="#cb16-103" aria-label="101"></a>    <span class="cf">finally</span>:</span>
-<span id="cb16-104"><a href="#cb16-104" aria-label="102"></a>        driver.quit()</span>
+<span id="cb16-78"><a href="#cb16-78" aria-label="76"></a>    options.add_argument(<span class="st">"--disable-dev-shm-usage"</span>)</span>
+<span id="cb16-79"><a href="#cb16-79" aria-label="77"></a>    </span>
+<span id="cb16-80"><a href="#cb16-80" aria-label="78"></a>    driver <span class="op">=</span> webdriver.Chrome(options<span class="op">=</span>options)</span>
+<span id="cb16-81"><a href="#cb16-81" aria-label="79"></a>    </span>
+<span id="cb16-82"><a href="#cb16-82" aria-label="80"></a>    <span class="cf">try</span>:</span>
+<span id="cb16-83"><a href="#cb16-83" aria-label="81"></a>        driver.get(url)</span>
+<span id="cb16-84"><a href="#cb16-84" aria-label="82"></a>        <span class="co"># Wait for the score elements to render -- reading page_source immediately on a JS-heavy page yields intermittent empty scores</span></span>
+<span id="cb16-85"><a href="#cb16-85" aria-label="83"></a>        WebDriverWait(driver, <span class="dv">10</span>).until(</span>
+<span id="cb16-86"><a href="#cb16-86" aria-label="84"></a>            EC.presence_of_element_located(</span>
+<span id="cb16-87"><a href="#cb16-87" aria-label="85"></a>                (By.TAG_NAME, <span class="st">"score-icon-critic-deprecated"</span>)</span>
+<span id="cb16-88"><a href="#cb16-88" aria-label="86"></a>            )</span>
+<span id="cb16-89"><a href="#cb16-89" aria-label="87"></a>        )</span>
+<span id="cb16-90"><a href="#cb16-90" aria-label="88"></a>        soup <span class="op">=</span> BeautifulSoup(driver.page_source, <span class="st">"html.parser"</span>)</span>
+<span id="cb16-91"><a href="#cb16-91" aria-label="89"></a></span>
+<span id="cb16-92"><a href="#cb16-92" aria-label="90"></a>        <span class="co"># Extract scores from the page's custom score elements</span></span>
+<span id="cb16-93"><a href="#cb16-93" aria-label="91"></a>        scores <span class="op">=</span> {}</span>
+<span id="cb16-94"><a href="#cb16-94" aria-label="92"></a>        <span class="cf">for</span> tag <span class="kw">in</span> soup.find_all(<span class="st">"score-icon-critic-deprecated"</span>):</span>
+<span id="cb16-95"><a href="#cb16-95" aria-label="93"></a>            scores[<span class="st">"critic_score"</span>] <span class="op">=</span> tag.get(<span class="st">"percentage"</span>, <span class="st">""</span>)</span>
+<span id="cb16-96"><a href="#cb16-96" aria-label="94"></a>        <span class="cf">for</span> tag <span class="kw">in</span> soup.find_all(<span class="st">"score-icon-audience-deprecated"</span>):</span>
+<span id="cb16-97"><a href="#cb16-97" aria-label="95"></a>            scores[<span class="st">"audience_score"</span>] <span class="op">=</span> tag.get(<span class="st">"percentage"</span>, <span class="st">""</span>)</span>
+<span id="cb16-98"><a href="#cb16-98" aria-label="96"></a></span>
+<span id="cb16-99"><a href="#cb16-99" aria-label="97"></a>        scores[<span class="st">"timestamp"</span>] <span class="op">=</span> datetime.now(timezone.utc).isoformat()</span>
+<span id="cb16-100"><a href="#cb16-100" aria-label="98"></a>        scores[<span class="st">"url"</span>] <span class="op">=</span> url</span>
+<span id="cb16-101"><a href="#cb16-101" aria-label="99"></a>        <span class="cf">return</span> scores</span>
+<span id="cb16-102"><a href="#cb16-102" aria-label="100"></a>    <span class="cf">finally</span>:</span>
+<span id="cb16-103"><a href="#cb16-103" aria-label="101"></a>        driver.quit()</span>
+<span id="cb16-104"><a href="#cb16-104" aria-label="102"></a></span>
 <span id="cb16-105"><a href="#cb16-105" aria-label="103"></a></span>
-<span id="cb16-106"><a href="#cb16-106" aria-label="104"></a></span>
-<span id="cb16-107"><a href="#cb16-107" aria-label="105"></a><span class="kw">def</span> save_scores(scores, filepath<span class="op">=</span><span class="st">"scores.csv"</span>):</span>
-<span id="cb16-108"><a href="#cb16-108" aria-label="106"></a>    <span class="co">"""Append scores to a CSV file, creating it if needed."""</span></span>
-<span id="cb16-109"><a href="#cb16-109" aria-label="107"></a>    file_exists <span class="op">=</span> os.path.exists(filepath)</span>
-<span id="cb16-110"><a href="#cb16-110" aria-label="108"></a></span>
-<span id="cb16-111"><a href="#cb16-111" aria-label="109"></a>    <span class="cf">with</span> <span class="bu">open</span>(filepath, <span class="st">"a"</span>, newline<span class="op">=</span><span class="st">""</span>) <span class="im">as</span> f:</span>
-<span id="cb16-112"><a href="#cb16-112" aria-label="110"></a>        writer <span class="op">=</span> csv.DictWriter(f, fieldnames<span class="op">=</span>FIELDNAMES)</span>
-<span id="cb16-113"><a href="#cb16-113" aria-label="111"></a>        <span class="cf">if</span> <span class="kw">not</span> file_exists:</span>
-<span id="cb16-114"><a href="#cb16-114" aria-label="112"></a>            writer.writeheader()</span>
-<span id="cb16-115"><a href="#cb16-115" aria-label="113"></a>        writer.writerow(scores)</span>
+<span id="cb16-106"><a href="#cb16-106" aria-label="104"></a><span class="kw">def</span> save_scores(scores, filepath<span class="op">=</span><span class="st">"scores.csv"</span>):</span>
+<span id="cb16-107"><a href="#cb16-107" aria-label="105"></a>    <span class="co">"""Append scores to a CSV file, creating it if needed."""</span></span>
+<span id="cb16-108"><a href="#cb16-108" aria-label="106"></a>    file_exists <span class="op">=</span> os.path.exists(filepath)</span>
+<span id="cb16-109"><a href="#cb16-109" aria-label="107"></a></span>
+<span id="cb16-110"><a href="#cb16-110" aria-label="108"></a>    <span class="cf">with</span> <span class="bu">open</span>(filepath, <span class="st">"a"</span>, newline<span class="op">=</span><span class="st">""</span>) <span class="im">as</span> f:</span>
+<span id="cb16-111"><a href="#cb16-111" aria-label="109"></a>        writer <span class="op">=</span> csv.DictWriter(f, fieldnames<span class="op">=</span>FIELDNAMES)</span>
+<span id="cb16-112"><a href="#cb16-112" aria-label="110"></a>        <span class="cf">if</span> <span class="kw">not</span> file_exists:</span>
+<span id="cb16-113"><a href="#cb16-113" aria-label="111"></a>            writer.writeheader()</span>
+<span id="cb16-114"><a href="#cb16-114" aria-label="112"></a>        writer.writerow(scores)</span>
+<span id="cb16-115"><a href="#cb16-115" aria-label="113"></a></span>
 <span id="cb16-116"><a href="#cb16-116" aria-label="114"></a></span>
-<span id="cb16-117"><a href="#cb16-117" aria-label="115"></a></span>
-<span id="cb16-118"><a href="#cb16-118" aria-label="116"></a><span class="kw">def</span> main():</span>
-<span id="cb16-119"><a href="#cb16-119" aria-label="117"></a>    url <span class="op">=</span> <span class="st">"https://www.rottentomatoes.com/m/the_wild_robot"</span></span>
-<span id="cb16-120"><a href="#cb16-120" aria-label="118"></a>    scores <span class="op">=</span> get_scores(url)</span>
-<span id="cb16-121"><a href="#cb16-121" aria-label="119"></a>    save_scores(scores)</span>
-<span id="cb16-122"><a href="#cb16-122" aria-label="120"></a>    <span class="bu">print</span>(<span class="ss">f"Saved scores at </span><span class="sc">{</span>scores[<span class="st">'timestamp'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-117"><a href="#cb16-117" aria-label="115"></a><span class="kw">def</span> main():</span>
+<span id="cb16-118"><a href="#cb16-118" aria-label="116"></a>    url <span class="op">=</span> <span class="st">"https://www.rottentomatoes.com/m/the_wild_robot"</span></span>
+<span id="cb16-119"><a href="#cb16-119" aria-label="117"></a>    scores <span class="op">=</span> get_scores(url)</span>
+<span id="cb16-120"><a href="#cb16-120" aria-label="118"></a>    save_scores(scores)</span>
+<span id="cb16-121"><a href="#cb16-121" aria-label="119"></a>    <span class="bu">print</span>(<span class="ss">f"Saved scores at </span><span class="sc">{</span>scores[<span class="st">'timestamp'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-122"><a href="#cb16-122" aria-label="120"></a></span>
 <span id="cb16-123"><a href="#cb16-123" aria-label="121"></a></span>
-<span id="cb16-124"><a href="#cb16-124" aria-label="122"></a></span>
-<span id="cb16-125"><a href="#cb16-125" aria-label="123"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
-<span id="cb16-126"><a href="#cb16-126" aria-label="124"></a>    main()</span>
-<span id="cb16-127"><a href="#cb16-127" aria-label="125"></a><span class="in">```</span></span>
-<span id="cb16-128"><a href="#cb16-128" aria-label="126"></a></span>
-<span id="cb16-129"><a href="#cb16-129" aria-label="127"></a>Notice the headless Chrome configuration: <span class="in">`--headless`</span> runs the browser without a visible window, <span class="in">`--no-sandbox`</span> and <span class="in">`--disable-dev-shm-usage`</span> are required for running in CI/CD environments like GitHub Actions.</span>
-<span id="cb16-130"><a href="#cb16-130" aria-label="128"></a></span>
-<span id="cb16-131"><a href="#cb16-131" aria-label="129"></a>Two other design choices deserve a comment. First, the CSV schema is pinned in the <span class="in">`FIELDNAMES`</span> constant rather than derived from <span class="in">`scores.keys()`</span>: a fixed schema keeps the column order stable across every run, whereas a keys-derived header locks in whatever the first run happened to produce — and a later scrape with a missing or extra key would then corrupt or crash the append. Second, the elements this scraper targets — <span class="in">`score-icon-critic-deprecated`</span> and its audience twin — are not metadata tags but custom web-component elements defined by Rotten Tomatoes' front-end code. The <span class="in">`-deprecated`</span> suffix is a broad hint that these element names change frequently, and when they do, the scraper will start returning empty results. That fragility is exactly why @sec-dynamic-pages emphasized inspecting the live page in your browser's developer tools: when the site changes, the fix starts there, not in this book.</span>
-<span id="cb16-132"><a href="#cb16-132" aria-label="130"></a></span>
-<span id="cb16-133"><a href="#cb16-133" aria-label="131"></a><span class="fu">### Testing Your Script Locally</span></span>
-<span id="cb16-134"><a href="#cb16-134" aria-label="132"></a></span>
-<span id="cb16-135"><a href="#cb16-135" aria-label="133"></a>Before deploying your script to GitHub Actions, always test it locally from the command line. Running a script in the terminal is different from running cells in a notebook — import errors, missing dependencies, and file path issues that were invisible in Jupyter will surface immediately.</span>
-<span id="cb16-136"><a href="#cb16-136" aria-label="134"></a></span>
-<span id="cb16-139"><a href="#cb16-139" aria-label="135"></a><span class="in">```{python}</span></span>
-<span id="cb16-140"><a href="#cb16-140" aria-label="136"></a><span class="co"># From your terminal, run the script directly:</span></span>
-<span id="cb16-141"><a href="#cb16-141" aria-label="137"></a><span class="co"># $ python scraper.py</span></span>
-<span id="cb16-142"><a href="#cb16-142" aria-label="138"></a><span class="co"># Saved scores at 2024-11-15T14:23:07.482361+00:00</span></span>
-<span id="cb16-143"><a href="#cb16-143" aria-label="139"></a></span>
-<span id="cb16-144"><a href="#cb16-144" aria-label="140"></a><span class="co"># Verify the output file was created and contains data:</span></span>
-<span id="cb16-145"><a href="#cb16-145" aria-label="141"></a><span class="co"># $ head scores.csv</span></span>
-<span id="cb16-146"><a href="#cb16-146" aria-label="142"></a><span class="co"># timestamp,url,critic_score,audience_score</span></span>
-<span id="cb16-147"><a href="#cb16-147" aria-label="143"></a><span class="co"># 2024-11-15T14:23:07.482361+00:00,https://www.rottentomatoes.com/m/the_wild_robot,97,95</span></span>
-<span id="cb16-148"><a href="#cb16-148" aria-label="144"></a></span>
-<span id="cb16-149"><a href="#cb16-149" aria-label="145"></a><span class="co"># Check the file size to confirm it is not empty:</span></span>
-<span id="cb16-150"><a href="#cb16-150" aria-label="146"></a><span class="co"># $ ls -la scores.csv</span></span>
-<span id="cb16-151"><a href="#cb16-151" aria-label="147"></a><span class="co"># -rw-r--r--  1 user  staff  148 Nov 15 14:23 scores.csv</span></span>
-<span id="cb16-152"><a href="#cb16-152" aria-label="148"></a><span class="in">```</span></span>
-<span id="cb16-153"><a href="#cb16-153" aria-label="149"></a></span>
-<span id="cb16-154"><a href="#cb16-154" aria-label="150"></a>Debugging a Python script on your own machine is straightforward: you can add <span class="in">`print()`</span> statements, inspect variables, and re-run instantly. Debugging the same script inside a GitHub Actions YAML workflow is far more painful — each attempt requires a commit, a push, and waiting for the runner to spin up, install dependencies, and execute. The few minutes you spend testing locally will save you hours of frustrating CI debugging later. If the script runs cleanly on your machine and produces the expected output file, you can be reasonably confident it will work in the Actions environment, provided the dependencies match.</span>
-<span id="cb16-155"><a href="#cb16-155" aria-label="151"></a></span>
-<span id="cb16-156"><a href="#cb16-156" aria-label="152"></a><span class="fu">## Step 2: GitHub Actions</span></span>
-<span id="cb16-157"><a href="#cb16-157" aria-label="153"></a></span>
-<span id="cb16-158"><a href="#cb16-158" aria-label="154"></a>GitHub Actions lets you run scripts on a schedule using GitHub's cloud infrastructure. You define a workflow in a YAML file placed in <span class="in">`.github/workflows/`</span>:</span>
-<span id="cb16-159"><a href="#cb16-159" aria-label="155"></a></span>
-<span id="cb16-160"><a href="#cb16-160" aria-label="156"></a><span class="in">```yaml</span></span>
-<span id="cb16-161"><a href="#cb16-161" aria-label="157"></a><span class="co"># .github/workflows/scraper-action.yml</span></span>
-<span id="cb16-162"><a href="#cb16-162" aria-label="158"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Scrape Rotten Tomatoes Scores</span></span>
-<span id="cb16-163"><a href="#cb16-163" aria-label="159"></a></span>
-<span id="cb16-164"><a href="#cb16-164" aria-label="160"></a><span class="fu">on</span><span class="kw">:</span></span>
-<span id="cb16-165"><a href="#cb16-165" aria-label="161"></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span></span>
-<span id="cb16-166"><a href="#cb16-166" aria-label="162"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">cron</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 */6 * * *"</span><span class="co">  # Every 6 hours</span></span>
-<span id="cb16-167"><a href="#cb16-167" aria-label="163"></a><span class="at">  </span><span class="fu">workflow_dispatch</span><span class="kw">:</span><span class="co">  # Allow manual triggering</span></span>
-<span id="cb16-168"><a href="#cb16-168" aria-label="164"></a></span>
-<span id="cb16-169"><a href="#cb16-169" aria-label="165"></a><span class="fu">permissions</span><span class="kw">:</span></span>
-<span id="cb16-170"><a href="#cb16-170" aria-label="166"></a><span class="at">  </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> write</span><span class="co">  # The commit-and-push step below needs write access</span></span>
-<span id="cb16-171"><a href="#cb16-171" aria-label="167"></a></span>
-<span id="cb16-172"><a href="#cb16-172" aria-label="168"></a><span class="fu">jobs</span><span class="kw">:</span></span>
-<span id="cb16-173"><a href="#cb16-173" aria-label="169"></a><span class="at">  </span><span class="fu">scrape</span><span class="kw">:</span></span>
-<span id="cb16-174"><a href="#cb16-174" aria-label="170"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
-<span id="cb16-175"><a href="#cb16-175" aria-label="171"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb16-176"><a href="#cb16-176" aria-label="172"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Checkout repository</span></span>
-<span id="cb16-177"><a href="#cb16-177" aria-label="173"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
-<span id="cb16-178"><a href="#cb16-178" aria-label="174"></a><span class="at">      </span></span>
-<span id="cb16-179"><a href="#cb16-179" aria-label="175"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Python</span></span>
-<span id="cb16-180"><a href="#cb16-180" aria-label="176"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/setup-python@v5</span></span>
-<span id="cb16-181"><a href="#cb16-181" aria-label="177"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb16-182"><a href="#cb16-182" aria-label="178"></a><span class="at">          </span><span class="fu">python-version</span><span class="kw">:</span><span class="at"> </span><span class="st">"3.11"</span></span>
-<span id="cb16-183"><a href="#cb16-183" aria-label="179"></a><span class="at">      </span></span>
-<span id="cb16-184"><a href="#cb16-184" aria-label="180"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install dependencies</span></span>
-<span id="cb16-185"><a href="#cb16-185" aria-label="181"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> pip install -r requirements.txt</span></span>
-<span id="cb16-186"><a href="#cb16-186" aria-label="182"></a><span class="at">      </span></span>
-<span id="cb16-187"><a href="#cb16-187" aria-label="183"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install Chrome</span></span>
-<span id="cb16-188"><a href="#cb16-188" aria-label="184"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> browser-actions/setup-chrome@v1</span></span>
-<span id="cb16-189"><a href="#cb16-189" aria-label="185"></a><span class="at">      </span></span>
-<span id="cb16-190"><a href="#cb16-190" aria-label="186"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run scraper</span></span>
-<span id="cb16-191"><a href="#cb16-191" aria-label="187"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> python scraper.py</span></span>
-<span id="cb16-192"><a href="#cb16-192" aria-label="188"></a><span class="at">      </span></span>
-<span id="cb16-193"><a href="#cb16-193" aria-label="189"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Commit and push results</span></span>
-<span id="cb16-194"><a href="#cb16-194" aria-label="190"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb16-195"><a href="#cb16-195" aria-label="191"></a>          git config user.name "GitHub Actions Bot"</span>
-<span id="cb16-196"><a href="#cb16-196" aria-label="192"></a>          git config user.email "actions@github.com"</span>
-<span id="cb16-197"><a href="#cb16-197" aria-label="193"></a>          git add scores.csv</span>
-<span id="cb16-198"><a href="#cb16-198" aria-label="194"></a>          git diff --staged --quiet || git commit -m "Update scores $(date -u)"</span>
-<span id="cb16-199"><a href="#cb16-199" aria-label="195"></a>          git pull --rebase origin main  # Integrate any commits pushed since checkout</span>
-<span id="cb16-200"><a href="#cb16-200" aria-label="196"></a>          git push</span>
-<span id="cb16-201"><a href="#cb16-201" aria-label="197"></a><span class="in">```</span></span>
-<span id="cb16-202"><a href="#cb16-202" aria-label="198"></a></span>
-<span id="cb16-203"><a href="#cb16-203" aria-label="199"></a>Do not skip the <span class="in">`permissions`</span> block: the automatic <span class="in">`GITHUB_TOKEN`</span> that workflows use to authenticate is often read-only by default, and without <span class="in">`contents: write`</span> the final <span class="in">`git push`</span> step fails with a 403 error.</span>
-<span id="cb16-204"><a href="#cb16-204" aria-label="200"></a></span>
-<span id="cb16-205"><a href="#cb16-205" aria-label="201"></a><span class="fu">### Python-Free Scraping</span></span>
-<span id="cb16-206"><a href="#cb16-206" aria-label="202"></a></span>
-<span id="cb16-207"><a href="#cb16-207" aria-label="203"></a>Not every automated scraper needs Python. The Wikimedia REST API returns JSON, so you can retrieve data with <span class="in">`curl`</span> directly in the YAML workflow:</span>
-<span id="cb16-208"><a href="#cb16-208" aria-label="204"></a></span>
-<span id="cb16-209"><a href="#cb16-209" aria-label="205"></a><span class="in">```yaml</span></span>
-<span id="cb16-210"><a href="#cb16-210" aria-label="206"></a><span class="co"># .github/workflows/wiki-top-pages.yml</span></span>
-<span id="cb16-211"><a href="#cb16-211" aria-label="207"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Top Wikipedia Pages</span></span>
-<span id="cb16-212"><a href="#cb16-212" aria-label="208"></a></span>
-<span id="cb16-213"><a href="#cb16-213" aria-label="209"></a><span class="fu">on</span><span class="kw">:</span></span>
-<span id="cb16-214"><a href="#cb16-214" aria-label="210"></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span></span>
-<span id="cb16-215"><a href="#cb16-215" aria-label="211"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">cron</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 12 * * *"</span><span class="co">  # Daily at noon UTC</span></span>
-<span id="cb16-216"><a href="#cb16-216" aria-label="212"></a></span>
-<span id="cb16-217"><a href="#cb16-217" aria-label="213"></a><span class="fu">permissions</span><span class="kw">:</span></span>
-<span id="cb16-218"><a href="#cb16-218" aria-label="214"></a><span class="at">  </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> write</span><span class="co">  # Required for the push step below</span></span>
-<span id="cb16-219"><a href="#cb16-219" aria-label="215"></a></span>
-<span id="cb16-220"><a href="#cb16-220" aria-label="216"></a><span class="fu">jobs</span><span class="kw">:</span></span>
-<span id="cb16-221"><a href="#cb16-221" aria-label="217"></a><span class="at">  </span><span class="fu">fetch</span><span class="kw">:</span></span>
-<span id="cb16-222"><a href="#cb16-222" aria-label="218"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
-<span id="cb16-223"><a href="#cb16-223" aria-label="219"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb16-224"><a href="#cb16-224" aria-label="220"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
-<span id="cb16-225"><a href="#cb16-225" aria-label="221"></a></span>
-<span id="cb16-226"><a href="#cb16-226" aria-label="222"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Fetch top pages</span></span>
-<span id="cb16-227"><a href="#cb16-227" aria-label="223"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb16-228"><a href="#cb16-228" aria-label="224"></a>          mkdir -p data  # curl writes the file but will not create the directory</span>
-<span id="cb16-229"><a href="#cb16-229" aria-label="225"></a>          DATE=$(date -u -d "yesterday" +%Y/%m/%d)</span>
-<span id="cb16-230"><a href="#cb16-230" aria-label="226"></a>          curl -s "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/$DATE" \</span>
-<span id="cb16-231"><a href="#cb16-231" aria-label="227"></a>            -H "User-Agent: WebDataScience/1.0" \</span>
-<span id="cb16-232"><a href="#cb16-232" aria-label="228"></a>            -o "data/top_pages_$(date -u -d yesterday +%Y%m%d).json"</span>
-<span id="cb16-233"><a href="#cb16-233" aria-label="229"></a></span>
-<span id="cb16-234"><a href="#cb16-234" aria-label="230"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Commit results</span></span>
-<span id="cb16-235"><a href="#cb16-235" aria-label="231"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb16-236"><a href="#cb16-236" aria-label="232"></a>          git config user.name "GitHub Actions Bot"</span>
-<span id="cb16-237"><a href="#cb16-237" aria-label="233"></a>          git config user.email "actions@github.com"</span>
-<span id="cb16-238"><a href="#cb16-238" aria-label="234"></a>          git add data/</span>
-<span id="cb16-239"><a href="#cb16-239" aria-label="235"></a>          git diff --staged --quiet || git commit -m "Top pages $(date -u -d yesterday +%Y-%m-%d)"</span>
-<span id="cb16-240"><a href="#cb16-240" aria-label="236"></a>          git pull --rebase origin main  # Integrate any commits pushed since checkout</span>
-<span id="cb16-241"><a href="#cb16-241" aria-label="237"></a>          git push</span>
-<span id="cb16-242"><a href="#cb16-242" aria-label="238"></a><span class="in">```</span></span>
-<span id="cb16-243"><a href="#cb16-243" aria-label="239"></a></span>
-<span id="cb16-244"><a href="#cb16-244" aria-label="240"></a><span class="fu">### Understanding Cron Syntax</span></span>
-<span id="cb16-245"><a href="#cb16-245" aria-label="241"></a></span>
-<span id="cb16-246"><a href="#cb16-246" aria-label="242"></a>The <span class="in">`cron`</span> field in your workflow file controls when the scraper runs. Cron expressions use five fields separated by spaces: <span class="in">`minute hour day-of-month month day-of-week`</span>. Each field can be a specific number, a range, a list, or a wildcard (<span class="in">`*`</span> for "every"). The <span class="in">`*/N`</span> syntax means "every N units." All times are in UTC, not your local timezone.</span>
-<span id="cb16-247"><a href="#cb16-247" aria-label="243"></a></span>
-<span id="cb16-248"><a href="#cb16-248" aria-label="244"></a><span class="pp">|</span> Expression <span class="pp">|</span> Meaning <span class="pp">|</span></span>
-<span id="cb16-249"><a href="#cb16-249" aria-label="245"></a><span class="pp">|---|---|</span></span>
-<span id="cb16-250"><a href="#cb16-250" aria-label="246"></a><span class="pp">|</span> <span class="in">`0 */6 * * *`</span> <span class="pp">|</span> Every 6 hours (at minute 0) <span class="pp">|</span></span>
-<span id="cb16-251"><a href="#cb16-251" aria-label="247"></a><span class="pp">|</span> <span class="in">`0 12 * * 1-5`</span> <span class="pp">|</span> Weekdays at noon UTC <span class="pp">|</span></span>
-<span id="cb16-252"><a href="#cb16-252" aria-label="248"></a><span class="pp">|</span> <span class="in">`30 8 * * *`</span> <span class="pp">|</span> Daily at 8:30 AM UTC <span class="pp">|</span></span>
-<span id="cb16-253"><a href="#cb16-253" aria-label="249"></a><span class="pp">|</span> <span class="in">`0 0 1 * *`</span> <span class="pp">|</span> First day of each month at midnight <span class="pp">|</span></span>
-<span id="cb16-254"><a href="#cb16-254" aria-label="250"></a><span class="pp">|</span> <span class="in">`0 0 * * 0`</span> <span class="pp">|</span> Weekly on Sunday at midnight <span class="pp">|</span></span>
-<span id="cb16-255"><a href="#cb16-255" aria-label="251"></a></span>
-<span id="cb16-256"><a href="#cb16-256" aria-label="252"></a>The interactive tool at <span class="co">[</span><span class="ot">crontab.guru</span><span class="co">](https://crontab.guru/)</span> lets you build and verify cron expressions visually — type in an expression and it will show you in plain English when the job will run. Bookmark it; you will use it more often than you expect. Note that GitHub Actions does not guarantee exact execution times for scheduled workflows. Your job may run several minutes after the scheduled time, especially during periods of high demand on GitHub's infrastructure. For most data collection tasks, this jitter is inconsequential.</span>
-<span id="cb16-257"><a href="#cb16-257" aria-label="253"></a></span>
-<span id="cb16-258"><a href="#cb16-258" aria-label="254"></a><span class="fu">### Secrets Management</span></span>
-<span id="cb16-259"><a href="#cb16-259" aria-label="255"></a></span>
-<span id="cb16-260"><a href="#cb16-260" aria-label="256"></a>For authenticated APIs (like Spotify from @sec-social), store credentials as GitHub repository secrets:</span>
-<span id="cb16-261"><a href="#cb16-261" aria-label="257"></a></span>
-<span id="cb16-262"><a href="#cb16-262" aria-label="258"></a><span class="in">```yaml</span></span>
-<span id="cb16-263"><a href="#cb16-263" aria-label="259"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run Spotify scraper</span></span>
-<span id="cb16-264"><a href="#cb16-264" aria-label="260"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
-<span id="cb16-265"><a href="#cb16-265" aria-label="261"></a><span class="at">          </span><span class="fu">SPOTIPY_CLIENT_ID</span><span class="kw">:</span><span class="at"> ${{ secrets.SPOTIPY_CLIENT_ID }}</span></span>
-<span id="cb16-266"><a href="#cb16-266" aria-label="262"></a><span class="at">          </span><span class="fu">SPOTIPY_CLIENT_SECRET</span><span class="kw">:</span><span class="at"> ${{ secrets.SPOTIPY_CLIENT_SECRET }}</span></span>
-<span id="cb16-267"><a href="#cb16-267" aria-label="263"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> python spotify_scraper.py</span></span>
-<span id="cb16-268"><a href="#cb16-268" aria-label="264"></a><span class="in">```</span></span>
-<span id="cb16-269"><a href="#cb16-269" aria-label="265"></a></span>
-<span id="cb16-270"><a href="#cb16-270" aria-label="266"></a>::: {.callout-tip}</span>
-<span id="cb16-271"><a href="#cb16-271" aria-label="267"></a><span class="fu">## Missing Manual Reference</span></span>
-<span id="cb16-272"><a href="#cb16-272" aria-label="268"></a>For a full treatment of automation with GitHub Actions, cron syntax, and CI/CD concepts, see *Missing Manual* Chapter 33: Automation. For secrets management, see *Missing Manual* Chapter 34: Environment Variables and Secrets.</span>
-<span id="cb16-273"><a href="#cb16-273" aria-label="269"></a>:::</span>
-<span id="cb16-274"><a href="#cb16-274" aria-label="270"></a></span>
-<span id="cb16-275"><a href="#cb16-275" aria-label="271"></a><span class="fu">### Monitoring and Debugging Actions</span></span>
-<span id="cb16-276"><a href="#cb16-276" aria-label="272"></a></span>
-<span id="cb16-277"><a href="#cb16-277" aria-label="273"></a>Once your workflow is running on a schedule, you need to monitor it. GitHub's Actions tab shows the status of every workflow run — green check for success, red X for failure. Click into a failed run to read the step-by-step log output, which will show you exactly where the error occurred. Common failure modes include expired API keys (the scraper worked for weeks, then the token expired), package version conflicts (a dependency updated and broke your import), and Chrome driver version mismatches (Selenium's ChromeDriver must match the installed Chrome version, and both update frequently).</span>
-<span id="cb16-278"><a href="#cb16-278" aria-label="274"></a></span>
-<span id="cb16-279"><a href="#cb16-279" aria-label="275"></a>A particularly insidious failure mode is the "silent success": the workflow runs to completion without errors, but the scraper did not actually collect any data — perhaps the target website changed its HTML structure, or an API endpoint started returning empty results. Your workflow reports success because no Python exception was raised, but your CSV file has a new row full of empty values. To catch this, add a validation step to your workflow that checks whether the data actually grew.</span>
-<span id="cb16-280"><a href="#cb16-280" aria-label="276"></a></span>
-<span id="cb16-281"><a href="#cb16-281" aria-label="277"></a><span class="in">```yaml</span></span>
-<span id="cb16-282"><a href="#cb16-282" aria-label="278"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Validate scrape results</span></span>
-<span id="cb16-283"><a href="#cb16-283" aria-label="279"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb16-284"><a href="#cb16-284" aria-label="280"></a>          # Count rows in the CSV (excluding the header)</span>
-<span id="cb16-285"><a href="#cb16-285" aria-label="281"></a>          ROW_COUNT=$(tail -n +2 scores.csv | wc -l)</span>
-<span id="cb16-286"><a href="#cb16-286" aria-label="282"></a>          echo "Current row count: $ROW_COUNT"</span>
-<span id="cb16-287"><a href="#cb16-287" aria-label="283"></a></span>
-<span id="cb16-288"><a href="#cb16-288" aria-label="284"></a>          # Check if the latest row has non-empty score fields</span>
-<span id="cb16-289"><a href="#cb16-289" aria-label="285"></a>          LAST_LINE=$(tail -1 scores.csv)</span>
-<span id="cb16-290"><a href="#cb16-290" aria-label="286"></a>          if echo "$LAST_LINE" | grep -q ",,"; then</span>
-<span id="cb16-291"><a href="#cb16-291" aria-label="287"></a>            echo "ERROR: Latest row contains empty fields"</span>
-<span id="cb16-292"><a href="#cb16-292" aria-label="288"></a>            exit 1</span>
-<span id="cb16-293"><a href="#cb16-293" aria-label="289"></a>          fi</span>
-<span id="cb16-294"><a href="#cb16-294" aria-label="290"></a></span>
-<span id="cb16-295"><a href="#cb16-295" aria-label="291"></a>          echo "Validation passed"</span>
-<span id="cb16-296"><a href="#cb16-296" aria-label="292"></a><span class="in">```</span></span>
-<span id="cb16-297"><a href="#cb16-297" aria-label="293"></a></span>
-<span id="cb16-298"><a href="#cb16-298" aria-label="294"></a>Adding this step after your scraping step means the workflow will fail with a clear error message when the data is incomplete, rather than silently committing garbage to your repository. You can also configure GitHub to send email notifications on workflow failures, so you learn about problems promptly rather than discovering weeks of missing data when you finally sit down to analyze your dataset.</span>
-<span id="cb16-299"><a href="#cb16-299" aria-label="295"></a></span>
-<span id="cb16-300"><a href="#cb16-300" aria-label="296"></a><span class="fu">### Handling Failures Gracefully</span></span>
-<span id="cb16-301"><a href="#cb16-301" aria-label="297"></a></span>
-<span id="cb16-302"><a href="#cb16-302" aria-label="298"></a>Even with validation in place, your scraper will occasionally fail due to circumstances beyond your control: the target website goes down for maintenance, a rate limit is temporarily enforced, or a network timeout occurs. A well-designed scraping pipeline handles these failures without losing previously collected data or crashing the workflow.</span>
-<span id="cb16-303"><a href="#cb16-303" aria-label="299"></a></span>
-<span id="cb16-304"><a href="#cb16-304" aria-label="300"></a>The simplest approach is to wrap your scraping logic in a try/except block that logs the error and exits gracefully rather than raising an unhandled exception:</span>
-<span id="cb16-305"><a href="#cb16-305" aria-label="301"></a></span>
-<span id="cb16-308"><a href="#cb16-308" aria-label="302"></a><span class="in">```{python}</span></span>
-<span id="cb16-309"><a href="#cb16-309" aria-label="303"></a><span class="im">import</span> sys</span>
-<span id="cb16-310"><a href="#cb16-310" aria-label="304"></a><span class="im">import</span> traceback</span>
-<span id="cb16-311"><a href="#cb16-311" aria-label="305"></a></span>
-<span id="cb16-312"><a href="#cb16-312" aria-label="306"></a><span class="kw">def</span> main():</span>
-<span id="cb16-313"><a href="#cb16-313" aria-label="307"></a>    url <span class="op">=</span> <span class="st">"https://www.rottentomatoes.com/m/the_wild_robot"</span></span>
-<span id="cb16-314"><a href="#cb16-314" aria-label="308"></a>    <span class="cf">try</span>:</span>
-<span id="cb16-315"><a href="#cb16-315" aria-label="309"></a>        scores <span class="op">=</span> get_scores(url)</span>
-<span id="cb16-316"><a href="#cb16-316" aria-label="310"></a>        save_scores(scores)</span>
-<span id="cb16-317"><a href="#cb16-317" aria-label="311"></a>        <span class="bu">print</span>(<span class="ss">f"Saved scores at </span><span class="sc">{</span>scores[<span class="st">'timestamp'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-318"><a href="#cb16-318" aria-label="312"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb16-319"><a href="#cb16-319" aria-label="313"></a>        <span class="bu">print</span>(<span class="ss">f"Scraper failed: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>, <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
-<span id="cb16-320"><a href="#cb16-320" aria-label="314"></a>        traceback.print_exc()</span>
-<span id="cb16-321"><a href="#cb16-321" aria-label="315"></a>        <span class="co"># Exit with code 1 so the GitHub Actions step reports failure</span></span>
-<span id="cb16-322"><a href="#cb16-322" aria-label="316"></a>        sys.exit(<span class="dv">1</span>)</span>
-<span id="cb16-323"><a href="#cb16-323" aria-label="317"></a><span class="in">```</span></span>
-<span id="cb16-324"><a href="#cb16-324" aria-label="318"></a></span>
-<span id="cb16-325"><a href="#cb16-325" aria-label="319"></a>This pattern ensures that a single failed scrape does not corrupt your data file. The error is logged, the workflow step is marked as failed, and the next scheduled run will try again. Over a multi-week collection period, you should expect a small number of failures — the important thing is that they are visible, documented, and do not cascade into data loss.</span>
-<span id="cb16-326"><a href="#cb16-326" aria-label="320"></a></span>
-<span id="cb16-327"><a href="#cb16-327" aria-label="321"></a><span class="fu">### Hardening the Workflow</span></span>
-<span id="cb16-328"><a href="#cb16-328" aria-label="322"></a></span>
-<span id="cb16-329"><a href="#cb16-329" aria-label="323"></a>A few more lines of YAML make a scheduled workflow noticeably more robust. A <span class="in">`timeout-minutes`</span> limit kills a hung job (a stalled Selenium session would otherwise occupy the runner for the six-hour default), a <span class="in">`concurrency`</span> group prevents a delayed run from overlapping with the next scheduled one, and caching pip's downloads speeds up every run:</span>
-<span id="cb16-330"><a href="#cb16-330" aria-label="324"></a></span>
-<span id="cb16-331"><a href="#cb16-331" aria-label="325"></a><span class="in">```yaml</span></span>
-<span id="cb16-332"><a href="#cb16-332" aria-label="326"></a><span class="co"># Additions to .github/workflows/scraper-action.yml</span></span>
-<span id="cb16-333"><a href="#cb16-333" aria-label="327"></a><span class="fu">concurrency</span><span class="kw">:</span></span>
-<span id="cb16-334"><a href="#cb16-334" aria-label="328"></a><span class="at">  </span><span class="fu">group</span><span class="kw">:</span><span class="at"> rt-scraper</span></span>
-<span id="cb16-335"><a href="#cb16-335" aria-label="329"></a><span class="at">  </span><span class="fu">cancel-in-progress</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">  # Let the current run finish; queue the next one</span></span>
-<span id="cb16-336"><a href="#cb16-336" aria-label="330"></a></span>
-<span id="cb16-337"><a href="#cb16-337" aria-label="331"></a><span class="fu">jobs</span><span class="kw">:</span></span>
-<span id="cb16-338"><a href="#cb16-338" aria-label="332"></a><span class="at">  </span><span class="fu">scrape</span><span class="kw">:</span></span>
-<span id="cb16-339"><a href="#cb16-339" aria-label="333"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
-<span id="cb16-340"><a href="#cb16-340" aria-label="334"></a><span class="at">    </span><span class="fu">timeout-minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">15</span><span class="co">  # Fail fast instead of hanging for the 6-hour default</span></span>
-<span id="cb16-341"><a href="#cb16-341" aria-label="335"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb16-342"><a href="#cb16-342" aria-label="336"></a><span class="co">      # ... after the setup-python step ...</span></span>
-<span id="cb16-343"><a href="#cb16-343" aria-label="337"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Cache pip dependencies</span></span>
-<span id="cb16-344"><a href="#cb16-344" aria-label="338"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/cache@v4</span></span>
-<span id="cb16-345"><a href="#cb16-345" aria-label="339"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb16-346"><a href="#cb16-346" aria-label="340"></a><span class="at">          </span><span class="fu">path</span><span class="kw">:</span><span class="at"> ~/.cache/pip</span></span>
-<span id="cb16-347"><a href="#cb16-347" aria-label="341"></a><span class="at">          </span><span class="fu">key</span><span class="kw">:</span><span class="at"> pip-${{ hashFiles('requirements.txt') }}</span></span>
-<span id="cb16-348"><a href="#cb16-348" aria-label="342"></a><span class="in">```</span></span>
-<span id="cb16-349"><a href="#cb16-349" aria-label="343"></a></span>
-<span id="cb16-350"><a href="#cb16-350" aria-label="344"></a>Inside the scraper itself, the single biggest reliability improvement is retrying failed requests with exponential backoff. You already know this pattern — @sec-protocols introduced retries and backoff for exactly this situation — so apply it in your scraping functions rather than letting one transient 503 waste an entire scheduled run. A scraper that retries a couple of times with increasing delays will ride out the vast majority of momentary network and server hiccups that would otherwise appear as gaps in your time series.</span>
-<span id="cb16-351"><a href="#cb16-351" aria-label="345"></a></span>
-<span id="cb16-352"><a href="#cb16-352" aria-label="346"></a><span class="fu">## Step 3: Analyze Collected Data</span></span>
-<span id="cb16-353"><a href="#cb16-353" aria-label="347"></a></span>
-<span id="cb16-354"><a href="#cb16-354" aria-label="348"></a>After running your scraper for a period, you will have accumulated data to analyze:</span>
-<span id="cb16-355"><a href="#cb16-355" aria-label="349"></a></span>
-<span id="cb16-358"><a href="#cb16-358" aria-label="350"></a><span class="in">```{python}</span></span>
-<span id="cb16-359"><a href="#cb16-359" aria-label="351"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb16-360"><a href="#cb16-360" aria-label="352"></a></span>
-<span id="cb16-361"><a href="#cb16-361" aria-label="353"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"scores.csv"</span>)</span>
-<span id="cb16-362"><a href="#cb16-362" aria-label="354"></a>df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>])</span>
-<span id="cb16-363"><a href="#cb16-363" aria-label="355"></a></span>
-<span id="cb16-364"><a href="#cb16-364" aria-label="356"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb16-365"><a href="#cb16-365" aria-label="357"></a></span>
-<span id="cb16-366"><a href="#cb16-366" aria-label="358"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
-<span id="cb16-367"><a href="#cb16-367" aria-label="359"></a>plt.plot(df[<span class="st">"timestamp"</span>], df[<span class="st">"critic_score"</span>], label<span class="op">=</span><span class="st">"Critics"</span>, marker<span class="op">=</span><span class="st">"o"</span>)</span>
-<span id="cb16-368"><a href="#cb16-368" aria-label="360"></a>plt.plot(df[<span class="st">"timestamp"</span>], df[<span class="st">"audience_score"</span>], label<span class="op">=</span><span class="st">"Audience"</span>, marker<span class="op">=</span><span class="st">"s"</span>)</span>
-<span id="cb16-369"><a href="#cb16-369" aria-label="361"></a>plt.title(<span class="st">"Rotten Tomatoes Score Tracking"</span>)</span>
-<span id="cb16-370"><a href="#cb16-370" aria-label="362"></a>plt.ylabel(<span class="st">"Score (%)"</span>)</span>
-<span id="cb16-371"><a href="#cb16-371" aria-label="363"></a>plt.legend()</span>
-<span id="cb16-372"><a href="#cb16-372" aria-label="364"></a>plt.tight_layout()</span>
-<span id="cb16-373"><a href="#cb16-373" aria-label="365"></a>plt.show()</span>
-<span id="cb16-374"><a href="#cb16-374" aria-label="366"></a><span class="in">```</span></span>
-<span id="cb16-375"><a href="#cb16-375" aria-label="367"></a></span>
-<span id="cb16-376"><a href="#cb16-376" aria-label="368"></a><span class="fu">## Recommended Exercises</span></span>
-<span id="cb16-377"><a href="#cb16-377" aria-label="369"></a></span>
-<span id="cb16-378"><a href="#cb16-378" aria-label="370"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
-<span id="cb16-379"><a href="#cb16-379" aria-label="371"></a></span>
-<span id="cb16-380"><a href="#cb16-380" aria-label="372"></a>You will take a collector you already trust and make it deployable: notebook to script, script to scheduled workflow, workflow to monitored pipeline. The deliverable stays inside the notebook — actually running it on GitHub Actions for days is the Additional Exercises' territory — but every piece you write here is the real thing.</span>
-<span id="cb16-381"><a href="#cb16-381" aria-label="373"></a></span>
-<span id="cb16-382"><a href="#cb16-382" aria-label="374"></a>**Step 1 — Choose and rehearse your collector.** Pick a keyless data source from an earlier chapter — Open-Meteo (@sec-data-formats) or Wikipedia pageviews (@sec-introduction) are ideal. Write a <span class="in">`collect()`</span> function with a docstring that fetches the current data with your <span class="in">`HEADERS`</span> and returns a dictionary of the fields you want to keep, including a UTC timestamp. Run it once to prove it works.</span>
-<span id="cb16-383"><a href="#cb16-383" aria-label="375"></a></span>
-<span id="cb16-386"><a href="#cb16-386" aria-label="376"></a><span class="in">```{python}</span></span>
-<span id="cb16-387"><a href="#cb16-387" aria-label="377"></a><span class="co"># Step 1: Write collect() -- fetch one observation from your source and return a dict of fields including a UTC timestamp. Run it once.</span></span>
-<span id="cb16-388"><a href="#cb16-388" aria-label="378"></a><span class="co"># Your code here</span></span>
-<span id="cb16-389"><a href="#cb16-389" aria-label="379"></a><span class="in">```</span></span>
-<span id="cb16-390"><a href="#cb16-390" aria-label="380"></a></span>
-<span id="cb16-391"><a href="#cb16-391" aria-label="381"></a>**Step 2 — Append safely to CSV.** Write <span class="in">`save_row(row, filepath)`</span> following the chapter's pattern: a pinned <span class="in">`FIELDNAMES`</span> constant, append mode, header written only when the file does not yet exist. Run collect-and-save twice and show the CSV has two rows and one header.</span>
-<span id="cb16-392"><a href="#cb16-392" aria-label="382"></a></span>
-<span id="cb16-395"><a href="#cb16-395" aria-label="383"></a><span class="in">```{python}</span></span>
-<span id="cb16-396"><a href="#cb16-396" aria-label="384"></a><span class="co"># Step 2: Write save_row() with a pinned schema, run the pipeline twice, and prove the CSV grew correctly.</span></span>
-<span id="cb16-397"><a href="#cb16-397" aria-label="385"></a><span class="co"># Your code here</span></span>
-<span id="cb16-398"><a href="#cb16-398" aria-label="386"></a><span class="in">```</span></span>
-<span id="cb16-399"><a href="#cb16-399" aria-label="387"></a></span>
-<span id="cb16-400"><a href="#cb16-400" aria-label="388"></a>**Step 3 — Convert to a script.** Assemble the whole thing into a standalone <span class="in">`collector.py`</span>: imports at top, your two functions, a <span class="in">`main()`</span> that calls them, and the <span class="in">`if __name__ == "__main__":`</span> guard. Write it to disk from the notebook, then verify it runs from the command line with <span class="in">`!python collector.py`</span>.</span>
-<span id="cb16-401"><a href="#cb16-401" aria-label="389"></a></span>
-<span id="cb16-404"><a href="#cb16-404" aria-label="390"></a><span class="in">```{python}</span></span>
-<span id="cb16-405"><a href="#cb16-405" aria-label="391"></a><span class="co"># Step 3: Write collector.py to disk (imports, collect, save_row, main, __main__ guard) and run it with !python collector.py.</span></span>
-<span id="cb16-406"><a href="#cb16-406" aria-label="392"></a><span class="co"># Your code here</span></span>
-<span id="cb16-407"><a href="#cb16-407" aria-label="393"></a><span class="in">```</span></span>
-<span id="cb16-408"><a href="#cb16-408" aria-label="394"></a></span>
-<span id="cb16-409"><a href="#cb16-409" aria-label="395"></a>**Step 4 — Add a freshness check.** Write <span class="in">`check_freshness(filepath, max_age_hours=24)`</span>: read the CSV, parse the newest timestamp, and print a clear OK or a warning if the data is stale. Test both paths — once against your fresh file, once with the threshold set low enough to trigger the warning.</span>
-<span id="cb16-410"><a href="#cb16-410" aria-label="396"></a></span>
-<span id="cb16-413"><a href="#cb16-413" aria-label="397"></a><span class="in">```{python}</span></span>
-<span id="cb16-414"><a href="#cb16-414" aria-label="398"></a><span class="co"># Step 4: Write check_freshness() and demonstrate both the passing and the failing case.</span></span>
-<span id="cb16-415"><a href="#cb16-415" aria-label="399"></a><span class="co"># Your code here</span></span>
-<span id="cb16-416"><a href="#cb16-416" aria-label="400"></a><span class="in">```</span></span>
-<span id="cb16-417"><a href="#cb16-417" aria-label="401"></a></span>
-<span id="cb16-418"><a href="#cb16-418" aria-label="402"></a>**Step 5 — Draft the workflow.** Write the GitHub Actions workflow YAML for this collector as a string and save it to <span class="in">`collect.yml`</span>: a cron schedule (explain your chosen expression in a comment — remember Actions cron is UTC), checkout, Python setup, dependency install, running <span class="in">`collector.py`</span>, running the freshness check, and committing the CSV back — following the chapter's template.</span>
-<span id="cb16-419"><a href="#cb16-419" aria-label="403"></a></span>
-<span id="cb16-422"><a href="#cb16-422" aria-label="404"></a><span class="in">```{python}</span></span>
-<span id="cb16-423"><a href="#cb16-423" aria-label="405"></a><span class="co"># Step 5: Draft the full workflow YAML, with the cron expression explained, and save it to collect.yml.</span></span>
-<span id="cb16-424"><a href="#cb16-424" aria-label="406"></a><span class="co"># Your code here</span></span>
-<span id="cb16-425"><a href="#cb16-425" aria-label="407"></a><span class="in">```</span></span>
-<span id="cb16-426"><a href="#cb16-426" aria-label="408"></a></span>
-<span id="cb16-427"><a href="#cb16-427" aria-label="409"></a>**Step 6 — Interpret.** In four to six sentences: What failure modes does this pipeline have — what breaks it silently, and what breaks it loudly? Which failure would your freshness check catch, and which would it miss? What one addition from the chapter's hardening section would you make before trusting this pipeline for a semester?</span>
-<span id="cb16-428"><a href="#cb16-428" aria-label="410"></a></span>
-<span id="cb16-431"><a href="#cb16-431" aria-label="411"></a><span class="in">```{python}</span></span>
-<span id="cb16-432"><a href="#cb16-432" aria-label="412"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
-<span id="cb16-433"><a href="#cb16-433" aria-label="413"></a><span class="in">```</span></span>
-<span id="cb16-434"><a href="#cb16-434" aria-label="414"></a></span>
-<span id="cb16-435"><a href="#cb16-435" aria-label="415"></a><span class="fu">## Additional Exercises</span></span>
-<span id="cb16-436"><a href="#cb16-436" aria-label="416"></a></span>
-<span id="cb16-437"><a href="#cb16-437" aria-label="417"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration. The first two are where the recommended exercise's pieces get deployed for real.</span>
-<span id="cb16-438"><a href="#cb16-438" aria-label="418"></a></span>
-<span id="cb16-439"><a href="#cb16-439" aria-label="419"></a><span class="ss">1. </span>**Build a scraper.** Set up a GitHub Actions scraper for a data source of your choice — the script and workflow you drafted above are your starting point. Run it for at least three days and analyze the results. Good candidates include weather APIs, news site headlines, government dashboards, or e-commerce prices.</span>
-<span id="cb16-440"><a href="#cb16-440" aria-label="420"></a></span>
-<span id="cb16-441"><a href="#cb16-441" aria-label="421"></a><span class="ss">2. </span>**Government data collector.** Set up a daily GitHub Actions workflow that retrieves data from a free API (Open-Meteo weather, OpenAQ air quality, or USGS earthquake data). Run it for at least one week. Download the collected data and create a visualization showing how the measurements changed over the collection period.</span>
+<span id="cb16-124"><a href="#cb16-124" aria-label="122"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb16-125"><a href="#cb16-125" aria-label="123"></a>    main()</span>
+<span id="cb16-126"><a href="#cb16-126" aria-label="124"></a><span class="in">```</span></span>
+<span id="cb16-127"><a href="#cb16-127" aria-label="125"></a></span>
+<span id="cb16-128"><a href="#cb16-128" aria-label="126"></a>Notice the headless Chrome configuration: <span class="in">`--headless`</span> runs the browser without a visible window (@sec-dynamic-pages, "Headless Mode"), and <span class="in">`--disable-dev-shm-usage`</span> keeps Chrome from running out of shared memory in a container. The script leaves out <span class="in">`--no-sandbox`</span>, which many tutorials add. That flag turns off the sandbox that keeps a page's code from changing the machine or reading its files. On GitHub's Ubuntu runners, Chrome should start without it: they run your job as an ordinary user, not <span class="in">`root`</span>, and their image includes Google Chrome (version 154 in October 2026), which Ubuntu lets use its sandbox. Add <span class="in">`--no-sandbox`</span> only where Chrome refuses to start without it, such as a container that runs as <span class="in">`root`</span>.</span>
+<span id="cb16-129"><a href="#cb16-129" aria-label="127"></a></span>
+<span id="cb16-130"><a href="#cb16-130" aria-label="128"></a>Two other design choices deserve a comment. First, the CSV schema is pinned in the <span class="in">`FIELDNAMES`</span> constant rather than derived from <span class="in">`scores.keys()`</span>: a fixed schema keeps the column order stable across every run, whereas a keys-derived header locks in whatever the first run happened to produce — and a later scrape with a missing or extra key would then corrupt or crash the append. Second, the elements this scraper targets — <span class="in">`score-icon-critic-deprecated`</span> and its audience twin — are not metadata tags but custom web-component elements defined by Rotten Tomatoes' front-end code. The <span class="in">`-deprecated`</span> suffix is a broad hint that these element names change frequently, and when they do, the scraper will start returning empty results. That fragility is exactly why @sec-dynamic-pages emphasized inspecting the live page in your browser's developer tools: when the site changes, the fix starts there, not in this book.</span>
+<span id="cb16-131"><a href="#cb16-131" aria-label="129"></a></span>
+<span id="cb16-132"><a href="#cb16-132" aria-label="130"></a><span class="fu">### Testing Your Script Locally</span></span>
+<span id="cb16-133"><a href="#cb16-133" aria-label="131"></a></span>
+<span id="cb16-134"><a href="#cb16-134" aria-label="132"></a>Before deploying your script to GitHub Actions, always test it locally from the command line. Running a script in the terminal is different from running cells in a notebook — import errors, missing dependencies, and file path issues that were invisible in Jupyter will surface immediately.</span>
+<span id="cb16-135"><a href="#cb16-135" aria-label="133"></a></span>
+<span id="cb16-138"><a href="#cb16-138" aria-label="134"></a><span class="in">```{python}</span></span>
+<span id="cb16-139"><a href="#cb16-139" aria-label="135"></a><span class="co"># From your terminal, run the script directly:</span></span>
+<span id="cb16-140"><a href="#cb16-140" aria-label="136"></a><span class="co"># $ python scraper.py</span></span>
+<span id="cb16-141"><a href="#cb16-141" aria-label="137"></a><span class="co"># Saved scores at 2024-11-15T14:23:07.482361+00:00</span></span>
+<span id="cb16-142"><a href="#cb16-142" aria-label="138"></a></span>
+<span id="cb16-143"><a href="#cb16-143" aria-label="139"></a><span class="co"># Verify the output file was created and contains data:</span></span>
+<span id="cb16-144"><a href="#cb16-144" aria-label="140"></a><span class="co"># $ head scores.csv</span></span>
+<span id="cb16-145"><a href="#cb16-145" aria-label="141"></a><span class="co"># timestamp,url,critic_score,audience_score</span></span>
+<span id="cb16-146"><a href="#cb16-146" aria-label="142"></a><span class="co"># 2024-11-15T14:23:07.482361+00:00,https://www.rottentomatoes.com/m/the_wild_robot,97,95</span></span>
+<span id="cb16-147"><a href="#cb16-147" aria-label="143"></a></span>
+<span id="cb16-148"><a href="#cb16-148" aria-label="144"></a><span class="co"># Check the file size to confirm it is not empty:</span></span>
+<span id="cb16-149"><a href="#cb16-149" aria-label="145"></a><span class="co"># $ ls -la scores.csv</span></span>
+<span id="cb16-150"><a href="#cb16-150" aria-label="146"></a><span class="co"># -rw-r--r--  1 user  staff  148 Nov 15 14:23 scores.csv</span></span>
+<span id="cb16-151"><a href="#cb16-151" aria-label="147"></a><span class="in">```</span></span>
+<span id="cb16-152"><a href="#cb16-152" aria-label="148"></a></span>
+<span id="cb16-153"><a href="#cb16-153" aria-label="149"></a>Debugging a Python script on your own machine is straightforward: you can add <span class="in">`print()`</span> statements, inspect variables, and re-run instantly. Debugging the same script inside a GitHub Actions YAML workflow is far more painful — each attempt requires a commit, a push, and waiting for the runner to spin up, install dependencies, and execute. The few minutes you spend testing locally will save you hours of frustrating CI debugging later. If the script runs cleanly on your machine and produces the expected output file, you can be reasonably confident it will work in the Actions environment, provided the dependencies match.</span>
+<span id="cb16-154"><a href="#cb16-154" aria-label="150"></a></span>
+<span id="cb16-155"><a href="#cb16-155" aria-label="151"></a><span class="fu">## Step 2: GitHub Actions</span></span>
+<span id="cb16-156"><a href="#cb16-156" aria-label="152"></a></span>
+<span id="cb16-157"><a href="#cb16-157" aria-label="153"></a>GitHub Actions lets you run scripts on a schedule using GitHub's cloud infrastructure. You define a workflow in a YAML file placed in <span class="in">`.github/workflows/`</span>:</span>
+<span id="cb16-158"><a href="#cb16-158" aria-label="154"></a></span>
+<span id="cb16-159"><a href="#cb16-159" aria-label="155"></a><span class="in">```yaml</span></span>
+<span id="cb16-160"><a href="#cb16-160" aria-label="156"></a><span class="co"># .github/workflows/scraper-action.yml</span></span>
+<span id="cb16-161"><a href="#cb16-161" aria-label="157"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Scrape Rotten Tomatoes Scores</span></span>
+<span id="cb16-162"><a href="#cb16-162" aria-label="158"></a></span>
+<span id="cb16-163"><a href="#cb16-163" aria-label="159"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb16-164"><a href="#cb16-164" aria-label="160"></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span></span>
+<span id="cb16-165"><a href="#cb16-165" aria-label="161"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">cron</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 */6 * * *"</span><span class="co">  # Every 6 hours</span></span>
+<span id="cb16-166"><a href="#cb16-166" aria-label="162"></a><span class="at">  </span><span class="fu">workflow_dispatch</span><span class="kw">:</span><span class="co">  # Allow manual triggering</span></span>
+<span id="cb16-167"><a href="#cb16-167" aria-label="163"></a></span>
+<span id="cb16-168"><a href="#cb16-168" aria-label="164"></a><span class="fu">permissions</span><span class="kw">:</span></span>
+<span id="cb16-169"><a href="#cb16-169" aria-label="165"></a><span class="at">  </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> write</span><span class="co">  # The commit-and-push step below needs write access</span></span>
+<span id="cb16-170"><a href="#cb16-170" aria-label="166"></a></span>
+<span id="cb16-171"><a href="#cb16-171" aria-label="167"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb16-172"><a href="#cb16-172" aria-label="168"></a><span class="at">  </span><span class="fu">scrape</span><span class="kw">:</span></span>
+<span id="cb16-173"><a href="#cb16-173" aria-label="169"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb16-174"><a href="#cb16-174" aria-label="170"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb16-175"><a href="#cb16-175" aria-label="171"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Checkout repository</span></span>
+<span id="cb16-176"><a href="#cb16-176" aria-label="172"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
+<span id="cb16-177"><a href="#cb16-177" aria-label="173"></a><span class="at">      </span></span>
+<span id="cb16-178"><a href="#cb16-178" aria-label="174"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Python</span></span>
+<span id="cb16-179"><a href="#cb16-179" aria-label="175"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/setup-python@v5</span></span>
+<span id="cb16-180"><a href="#cb16-180" aria-label="176"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb16-181"><a href="#cb16-181" aria-label="177"></a><span class="at">          </span><span class="fu">python-version</span><span class="kw">:</span><span class="at"> </span><span class="st">"3.11"</span></span>
+<span id="cb16-182"><a href="#cb16-182" aria-label="178"></a><span class="at">      </span></span>
+<span id="cb16-183"><a href="#cb16-183" aria-label="179"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install dependencies</span></span>
+<span id="cb16-184"><a href="#cb16-184" aria-label="180"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> pip install -r requirements.txt</span></span>
+<span id="cb16-185"><a href="#cb16-185" aria-label="181"></a><span class="at">      </span></span>
+<span id="cb16-186"><a href="#cb16-186" aria-label="182"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install Chrome</span></span>
+<span id="cb16-187"><a href="#cb16-187" aria-label="183"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> browser-actions/setup-chrome@v1</span></span>
+<span id="cb16-188"><a href="#cb16-188" aria-label="184"></a><span class="at">      </span></span>
+<span id="cb16-189"><a href="#cb16-189" aria-label="185"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run scraper</span></span>
+<span id="cb16-190"><a href="#cb16-190" aria-label="186"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> python scraper.py</span></span>
+<span id="cb16-191"><a href="#cb16-191" aria-label="187"></a><span class="at">      </span></span>
+<span id="cb16-192"><a href="#cb16-192" aria-label="188"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Commit and push results</span></span>
+<span id="cb16-193"><a href="#cb16-193" aria-label="189"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb16-194"><a href="#cb16-194" aria-label="190"></a>          git config user.name "GitHub Actions Bot"</span>
+<span id="cb16-195"><a href="#cb16-195" aria-label="191"></a>          git config user.email "actions@github.com"</span>
+<span id="cb16-196"><a href="#cb16-196" aria-label="192"></a>          git add scores.csv</span>
+<span id="cb16-197"><a href="#cb16-197" aria-label="193"></a>          git diff --staged --quiet || git commit -m "Update scores $(date -u)"</span>
+<span id="cb16-198"><a href="#cb16-198" aria-label="194"></a>          git pull --rebase origin main  # Integrate any commits pushed since checkout</span>
+<span id="cb16-199"><a href="#cb16-199" aria-label="195"></a>          git push</span>
+<span id="cb16-200"><a href="#cb16-200" aria-label="196"></a><span class="in">```</span></span>
+<span id="cb16-201"><a href="#cb16-201" aria-label="197"></a></span>
+<span id="cb16-202"><a href="#cb16-202" aria-label="198"></a>Do not skip the <span class="in">`permissions`</span> block: the automatic <span class="in">`GITHUB_TOKEN`</span> that workflows use to authenticate is often read-only by default, and without <span class="in">`contents: write`</span> the final <span class="in">`git push`</span> step fails with a 403 error.</span>
+<span id="cb16-203"><a href="#cb16-203" aria-label="199"></a></span>
+<span id="cb16-204"><a href="#cb16-204" aria-label="200"></a><span class="fu">### Python-Free Scraping</span></span>
+<span id="cb16-205"><a href="#cb16-205" aria-label="201"></a></span>
+<span id="cb16-206"><a href="#cb16-206" aria-label="202"></a>Not every automated scraper needs Python. The Wikimedia REST API returns JSON, so you can retrieve data with <span class="in">`curl`</span> directly in the YAML workflow:</span>
+<span id="cb16-207"><a href="#cb16-207" aria-label="203"></a></span>
+<span id="cb16-208"><a href="#cb16-208" aria-label="204"></a><span class="in">```yaml</span></span>
+<span id="cb16-209"><a href="#cb16-209" aria-label="205"></a><span class="co"># .github/workflows/wiki-top-pages.yml</span></span>
+<span id="cb16-210"><a href="#cb16-210" aria-label="206"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Top Wikipedia Pages</span></span>
+<span id="cb16-211"><a href="#cb16-211" aria-label="207"></a></span>
+<span id="cb16-212"><a href="#cb16-212" aria-label="208"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb16-213"><a href="#cb16-213" aria-label="209"></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span></span>
+<span id="cb16-214"><a href="#cb16-214" aria-label="210"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">cron</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 12 * * *"</span><span class="co">  # Daily at noon UTC</span></span>
+<span id="cb16-215"><a href="#cb16-215" aria-label="211"></a></span>
+<span id="cb16-216"><a href="#cb16-216" aria-label="212"></a><span class="fu">permissions</span><span class="kw">:</span></span>
+<span id="cb16-217"><a href="#cb16-217" aria-label="213"></a><span class="at">  </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> write</span><span class="co">  # Required for the push step below</span></span>
+<span id="cb16-218"><a href="#cb16-218" aria-label="214"></a></span>
+<span id="cb16-219"><a href="#cb16-219" aria-label="215"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb16-220"><a href="#cb16-220" aria-label="216"></a><span class="at">  </span><span class="fu">fetch</span><span class="kw">:</span></span>
+<span id="cb16-221"><a href="#cb16-221" aria-label="217"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb16-222"><a href="#cb16-222" aria-label="218"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb16-223"><a href="#cb16-223" aria-label="219"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
+<span id="cb16-224"><a href="#cb16-224" aria-label="220"></a></span>
+<span id="cb16-225"><a href="#cb16-225" aria-label="221"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Fetch top pages</span></span>
+<span id="cb16-226"><a href="#cb16-226" aria-label="222"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb16-227"><a href="#cb16-227" aria-label="223"></a>          mkdir -p data  # curl writes the file but will not create the directory</span>
+<span id="cb16-228"><a href="#cb16-228" aria-label="224"></a>          DATE=$(date -u -d "yesterday" +%Y/%m/%d)</span>
+<span id="cb16-229"><a href="#cb16-229" aria-label="225"></a>          curl -s "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/$DATE" \</span>
+<span id="cb16-230"><a href="#cb16-230" aria-label="226"></a>            -H "User-Agent: WebDataScience/1.0" \</span>
+<span id="cb16-231"><a href="#cb16-231" aria-label="227"></a>            -o "data/top_pages_$(date -u -d yesterday +%Y%m%d).json"</span>
+<span id="cb16-232"><a href="#cb16-232" aria-label="228"></a></span>
+<span id="cb16-233"><a href="#cb16-233" aria-label="229"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Commit results</span></span>
+<span id="cb16-234"><a href="#cb16-234" aria-label="230"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb16-235"><a href="#cb16-235" aria-label="231"></a>          git config user.name "GitHub Actions Bot"</span>
+<span id="cb16-236"><a href="#cb16-236" aria-label="232"></a>          git config user.email "actions@github.com"</span>
+<span id="cb16-237"><a href="#cb16-237" aria-label="233"></a>          git add data/</span>
+<span id="cb16-238"><a href="#cb16-238" aria-label="234"></a>          git diff --staged --quiet || git commit -m "Top pages $(date -u -d yesterday +%Y-%m-%d)"</span>
+<span id="cb16-239"><a href="#cb16-239" aria-label="235"></a>          git pull --rebase origin main  # Integrate any commits pushed since checkout</span>
+<span id="cb16-240"><a href="#cb16-240" aria-label="236"></a>          git push</span>
+<span id="cb16-241"><a href="#cb16-241" aria-label="237"></a><span class="in">```</span></span>
+<span id="cb16-242"><a href="#cb16-242" aria-label="238"></a></span>
+<span id="cb16-243"><a href="#cb16-243" aria-label="239"></a><span class="fu">### Understanding Cron Syntax</span></span>
+<span id="cb16-244"><a href="#cb16-244" aria-label="240"></a></span>
+<span id="cb16-245"><a href="#cb16-245" aria-label="241"></a>The <span class="in">`cron`</span> field in your workflow file controls when the scraper runs. Cron expressions use five fields separated by spaces: <span class="in">`minute hour day-of-month month day-of-week`</span>. Each field can be a specific number, a range, a list, or a wildcard (<span class="in">`*`</span> for "every"). The <span class="in">`*/N`</span> syntax means "every N units." All times are in UTC, not your local timezone.</span>
+<span id="cb16-246"><a href="#cb16-246" aria-label="242"></a></span>
+<span id="cb16-247"><a href="#cb16-247" aria-label="243"></a><span class="pp">|</span> Expression <span class="pp">|</span> Meaning <span class="pp">|</span></span>
+<span id="cb16-248"><a href="#cb16-248" aria-label="244"></a><span class="pp">|---|---|</span></span>
+<span id="cb16-249"><a href="#cb16-249" aria-label="245"></a><span class="pp">|</span> <span class="in">`0 */6 * * *`</span> <span class="pp">|</span> Every 6 hours (at minute 0) <span class="pp">|</span></span>
+<span id="cb16-250"><a href="#cb16-250" aria-label="246"></a><span class="pp">|</span> <span class="in">`0 12 * * 1-5`</span> <span class="pp">|</span> Weekdays at noon UTC <span class="pp">|</span></span>
+<span id="cb16-251"><a href="#cb16-251" aria-label="247"></a><span class="pp">|</span> <span class="in">`30 8 * * *`</span> <span class="pp">|</span> Daily at 8:30 AM UTC <span class="pp">|</span></span>
+<span id="cb16-252"><a href="#cb16-252" aria-label="248"></a><span class="pp">|</span> <span class="in">`0 0 1 * *`</span> <span class="pp">|</span> First day of each month at midnight <span class="pp">|</span></span>
+<span id="cb16-253"><a href="#cb16-253" aria-label="249"></a><span class="pp">|</span> <span class="in">`0 0 * * 0`</span> <span class="pp">|</span> Weekly on Sunday at midnight <span class="pp">|</span></span>
+<span id="cb16-254"><a href="#cb16-254" aria-label="250"></a></span>
+<span id="cb16-255"><a href="#cb16-255" aria-label="251"></a>The interactive tool at <span class="co">[</span><span class="ot">crontab.guru</span><span class="co">](https://crontab.guru/)</span> lets you build and verify cron expressions visually — type in an expression and it will show you in plain English when the job will run. Bookmark it; you will use it more often than you expect. Note that GitHub Actions does not guarantee exact execution times for scheduled workflows. Your job may run several minutes after the scheduled time, especially during periods of high demand on GitHub's infrastructure. For most data collection tasks, this jitter is inconsequential.</span>
+<span id="cb16-256"><a href="#cb16-256" aria-label="252"></a></span>
+<span id="cb16-257"><a href="#cb16-257" aria-label="253"></a><span class="fu">### Secrets Management</span></span>
+<span id="cb16-258"><a href="#cb16-258" aria-label="254"></a></span>
+<span id="cb16-259"><a href="#cb16-259" aria-label="255"></a>For authenticated APIs (like Spotify from @sec-social), store credentials as GitHub repository secrets:</span>
+<span id="cb16-260"><a href="#cb16-260" aria-label="256"></a></span>
+<span id="cb16-261"><a href="#cb16-261" aria-label="257"></a><span class="in">```yaml</span></span>
+<span id="cb16-262"><a href="#cb16-262" aria-label="258"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run Spotify scraper</span></span>
+<span id="cb16-263"><a href="#cb16-263" aria-label="259"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb16-264"><a href="#cb16-264" aria-label="260"></a><span class="at">          </span><span class="fu">SPOTIPY_CLIENT_ID</span><span class="kw">:</span><span class="at"> ${{ secrets.SPOTIPY_CLIENT_ID }}</span></span>
+<span id="cb16-265"><a href="#cb16-265" aria-label="261"></a><span class="at">          </span><span class="fu">SPOTIPY_CLIENT_SECRET</span><span class="kw">:</span><span class="at"> ${{ secrets.SPOTIPY_CLIENT_SECRET }}</span></span>
+<span id="cb16-266"><a href="#cb16-266" aria-label="262"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> python spotify_scraper.py</span></span>
+<span id="cb16-267"><a href="#cb16-267" aria-label="263"></a><span class="in">```</span></span>
+<span id="cb16-268"><a href="#cb16-268" aria-label="264"></a></span>
+<span id="cb16-269"><a href="#cb16-269" aria-label="265"></a>::: {.callout-tip}</span>
+<span id="cb16-270"><a href="#cb16-270" aria-label="266"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb16-271"><a href="#cb16-271" aria-label="267"></a>For a full treatment of automation with GitHub Actions, cron syntax, and CI/CD concepts, see *Missing Manual* Chapter 33: Automation. For secrets management, see *Missing Manual* Chapter 34: Environment Variables and Secrets.</span>
+<span id="cb16-272"><a href="#cb16-272" aria-label="268"></a>:::</span>
+<span id="cb16-273"><a href="#cb16-273" aria-label="269"></a></span>
+<span id="cb16-274"><a href="#cb16-274" aria-label="270"></a><span class="fu">### Monitoring and Debugging Actions</span></span>
+<span id="cb16-275"><a href="#cb16-275" aria-label="271"></a></span>
+<span id="cb16-276"><a href="#cb16-276" aria-label="272"></a>Once your workflow is running on a schedule, you need to monitor it. GitHub's Actions tab shows the status of every workflow run — green check for success, red X for failure. Click into a failed run to read the step-by-step log output, which will show you exactly where the error occurred. Common failure modes include expired API keys (the scraper worked for weeks, then the token expired), package version conflicts (a dependency updated and broke your import), and Chrome driver version mismatches (Selenium's ChromeDriver must match the installed Chrome version, and both update frequently).</span>
+<span id="cb16-277"><a href="#cb16-277" aria-label="273"></a></span>
+<span id="cb16-278"><a href="#cb16-278" aria-label="274"></a>A particularly insidious failure mode is the "silent success": the workflow runs to completion without errors, but the scraper did not actually collect any data — perhaps the target website changed its HTML structure, or an API endpoint started returning empty results. Your workflow reports success because no Python exception was raised, but your CSV file has a new row full of empty values. To catch this, add a validation step to your workflow that checks whether the data actually grew.</span>
+<span id="cb16-279"><a href="#cb16-279" aria-label="275"></a></span>
+<span id="cb16-280"><a href="#cb16-280" aria-label="276"></a><span class="in">```yaml</span></span>
+<span id="cb16-281"><a href="#cb16-281" aria-label="277"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Validate scrape results</span></span>
+<span id="cb16-282"><a href="#cb16-282" aria-label="278"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb16-283"><a href="#cb16-283" aria-label="279"></a>          # Count rows in the CSV (excluding the header)</span>
+<span id="cb16-284"><a href="#cb16-284" aria-label="280"></a>          ROW_COUNT=$(tail -n +2 scores.csv | wc -l)</span>
+<span id="cb16-285"><a href="#cb16-285" aria-label="281"></a>          echo "Current row count: $ROW_COUNT"</span>
+<span id="cb16-286"><a href="#cb16-286" aria-label="282"></a></span>
+<span id="cb16-287"><a href="#cb16-287" aria-label="283"></a>          # Check if the latest row has non-empty score fields</span>
+<span id="cb16-288"><a href="#cb16-288" aria-label="284"></a>          LAST_LINE=$(tail -1 scores.csv)</span>
+<span id="cb16-289"><a href="#cb16-289" aria-label="285"></a>          if echo "$LAST_LINE" | grep -q ",,"; then</span>
+<span id="cb16-290"><a href="#cb16-290" aria-label="286"></a>            echo "ERROR: Latest row contains empty fields"</span>
+<span id="cb16-291"><a href="#cb16-291" aria-label="287"></a>            exit 1</span>
+<span id="cb16-292"><a href="#cb16-292" aria-label="288"></a>          fi</span>
+<span id="cb16-293"><a href="#cb16-293" aria-label="289"></a></span>
+<span id="cb16-294"><a href="#cb16-294" aria-label="290"></a>          echo "Validation passed"</span>
+<span id="cb16-295"><a href="#cb16-295" aria-label="291"></a><span class="in">```</span></span>
+<span id="cb16-296"><a href="#cb16-296" aria-label="292"></a></span>
+<span id="cb16-297"><a href="#cb16-297" aria-label="293"></a>Adding this step after your scraping step means the workflow will fail with a clear error message when the data is incomplete, rather than silently committing garbage to your repository. You can also configure GitHub to send email notifications on workflow failures, so you learn about problems promptly rather than discovering weeks of missing data when you finally sit down to analyze your dataset.</span>
+<span id="cb16-298"><a href="#cb16-298" aria-label="294"></a></span>
+<span id="cb16-299"><a href="#cb16-299" aria-label="295"></a><span class="fu">### Handling Failures Gracefully</span></span>
+<span id="cb16-300"><a href="#cb16-300" aria-label="296"></a></span>
+<span id="cb16-301"><a href="#cb16-301" aria-label="297"></a>Even with validation in place, your scraper will occasionally fail due to circumstances beyond your control: the target website goes down for maintenance, a rate limit is temporarily enforced, or a network timeout occurs. A well-designed scraping pipeline handles these failures without losing previously collected data or crashing the workflow.</span>
+<span id="cb16-302"><a href="#cb16-302" aria-label="298"></a></span>
+<span id="cb16-303"><a href="#cb16-303" aria-label="299"></a>The simplest approach is to wrap your scraping logic in a try/except block that logs the error and exits gracefully rather than raising an unhandled exception:</span>
+<span id="cb16-304"><a href="#cb16-304" aria-label="300"></a></span>
+<span id="cb16-307"><a href="#cb16-307" aria-label="301"></a><span class="in">```{python}</span></span>
+<span id="cb16-308"><a href="#cb16-308" aria-label="302"></a><span class="im">import</span> sys</span>
+<span id="cb16-309"><a href="#cb16-309" aria-label="303"></a><span class="im">import</span> traceback</span>
+<span id="cb16-310"><a href="#cb16-310" aria-label="304"></a></span>
+<span id="cb16-311"><a href="#cb16-311" aria-label="305"></a><span class="kw">def</span> main():</span>
+<span id="cb16-312"><a href="#cb16-312" aria-label="306"></a>    url <span class="op">=</span> <span class="st">"https://www.rottentomatoes.com/m/the_wild_robot"</span></span>
+<span id="cb16-313"><a href="#cb16-313" aria-label="307"></a>    <span class="cf">try</span>:</span>
+<span id="cb16-314"><a href="#cb16-314" aria-label="308"></a>        scores <span class="op">=</span> get_scores(url)</span>
+<span id="cb16-315"><a href="#cb16-315" aria-label="309"></a>        save_scores(scores)</span>
+<span id="cb16-316"><a href="#cb16-316" aria-label="310"></a>        <span class="bu">print</span>(<span class="ss">f"Saved scores at </span><span class="sc">{</span>scores[<span class="st">'timestamp'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-317"><a href="#cb16-317" aria-label="311"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb16-318"><a href="#cb16-318" aria-label="312"></a>        <span class="bu">print</span>(<span class="ss">f"Scraper failed: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>, <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
+<span id="cb16-319"><a href="#cb16-319" aria-label="313"></a>        traceback.print_exc()</span>
+<span id="cb16-320"><a href="#cb16-320" aria-label="314"></a>        <span class="co"># Exit with code 1 so the GitHub Actions step reports failure</span></span>
+<span id="cb16-321"><a href="#cb16-321" aria-label="315"></a>        sys.exit(<span class="dv">1</span>)</span>
+<span id="cb16-322"><a href="#cb16-322" aria-label="316"></a><span class="in">```</span></span>
+<span id="cb16-323"><a href="#cb16-323" aria-label="317"></a></span>
+<span id="cb16-324"><a href="#cb16-324" aria-label="318"></a>This pattern ensures that a single failed scrape does not corrupt your data file. The error is logged, the workflow step is marked as failed, and the next scheduled run will try again. Over a multi-week collection period, you should expect a small number of failures — the important thing is that they are visible, documented, and do not cascade into data loss.</span>
+<span id="cb16-325"><a href="#cb16-325" aria-label="319"></a></span>
+<span id="cb16-326"><a href="#cb16-326" aria-label="320"></a><span class="fu">### Hardening the Workflow</span></span>
+<span id="cb16-327"><a href="#cb16-327" aria-label="321"></a></span>
+<span id="cb16-328"><a href="#cb16-328" aria-label="322"></a>A few more lines of YAML make a scheduled workflow noticeably more robust. A <span class="in">`timeout-minutes`</span> limit kills a hung job (a stalled Selenium session would otherwise occupy the runner for the six-hour default), a <span class="in">`concurrency`</span> group prevents a delayed run from overlapping with the next scheduled one, and caching pip's downloads speeds up every run:</span>
+<span id="cb16-329"><a href="#cb16-329" aria-label="323"></a></span>
+<span id="cb16-330"><a href="#cb16-330" aria-label="324"></a><span class="in">```yaml</span></span>
+<span id="cb16-331"><a href="#cb16-331" aria-label="325"></a><span class="co"># Additions to .github/workflows/scraper-action.yml</span></span>
+<span id="cb16-332"><a href="#cb16-332" aria-label="326"></a><span class="fu">concurrency</span><span class="kw">:</span></span>
+<span id="cb16-333"><a href="#cb16-333" aria-label="327"></a><span class="at">  </span><span class="fu">group</span><span class="kw">:</span><span class="at"> rt-scraper</span></span>
+<span id="cb16-334"><a href="#cb16-334" aria-label="328"></a><span class="at">  </span><span class="fu">cancel-in-progress</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">  # Let the current run finish; queue the next one</span></span>
+<span id="cb16-335"><a href="#cb16-335" aria-label="329"></a></span>
+<span id="cb16-336"><a href="#cb16-336" aria-label="330"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb16-337"><a href="#cb16-337" aria-label="331"></a><span class="at">  </span><span class="fu">scrape</span><span class="kw">:</span></span>
+<span id="cb16-338"><a href="#cb16-338" aria-label="332"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb16-339"><a href="#cb16-339" aria-label="333"></a><span class="at">    </span><span class="fu">timeout-minutes</span><span class="kw">:</span><span class="at"> </span><span class="dv">15</span><span class="co">  # Fail fast instead of hanging for the 6-hour default</span></span>
+<span id="cb16-340"><a href="#cb16-340" aria-label="334"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb16-341"><a href="#cb16-341" aria-label="335"></a><span class="co">      # ... after the setup-python step ...</span></span>
+<span id="cb16-342"><a href="#cb16-342" aria-label="336"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Cache pip dependencies</span></span>
+<span id="cb16-343"><a href="#cb16-343" aria-label="337"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/cache@v4</span></span>
+<span id="cb16-344"><a href="#cb16-344" aria-label="338"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb16-345"><a href="#cb16-345" aria-label="339"></a><span class="at">          </span><span class="fu">path</span><span class="kw">:</span><span class="at"> ~/.cache/pip</span></span>
+<span id="cb16-346"><a href="#cb16-346" aria-label="340"></a><span class="at">          </span><span class="fu">key</span><span class="kw">:</span><span class="at"> pip-${{ hashFiles('requirements.txt') }}</span></span>
+<span id="cb16-347"><a href="#cb16-347" aria-label="341"></a><span class="in">```</span></span>
+<span id="cb16-348"><a href="#cb16-348" aria-label="342"></a></span>
+<span id="cb16-349"><a href="#cb16-349" aria-label="343"></a>Inside the scraper itself, the single biggest reliability improvement is retrying failed requests with exponential backoff. You already know this pattern — @sec-protocols introduced retries and backoff for exactly this situation — so apply it in your scraping functions rather than letting one transient 503 waste an entire scheduled run. A scraper that retries a couple of times with increasing delays will ride out the vast majority of momentary network and server hiccups that would otherwise appear as gaps in your time series.</span>
+<span id="cb16-350"><a href="#cb16-350" aria-label="344"></a></span>
+<span id="cb16-351"><a href="#cb16-351" aria-label="345"></a><span class="fu">## Step 3: Analyze Collected Data</span></span>
+<span id="cb16-352"><a href="#cb16-352" aria-label="346"></a></span>
+<span id="cb16-353"><a href="#cb16-353" aria-label="347"></a>After running your scraper for a period, you will have accumulated data to analyze:</span>
+<span id="cb16-354"><a href="#cb16-354" aria-label="348"></a></span>
+<span id="cb16-357"><a href="#cb16-357" aria-label="349"></a><span class="in">```{python}</span></span>
+<span id="cb16-358"><a href="#cb16-358" aria-label="350"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb16-359"><a href="#cb16-359" aria-label="351"></a></span>
+<span id="cb16-360"><a href="#cb16-360" aria-label="352"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"scores.csv"</span>)</span>
+<span id="cb16-361"><a href="#cb16-361" aria-label="353"></a>df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>])</span>
+<span id="cb16-362"><a href="#cb16-362" aria-label="354"></a></span>
+<span id="cb16-363"><a href="#cb16-363" aria-label="355"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb16-364"><a href="#cb16-364" aria-label="356"></a></span>
+<span id="cb16-365"><a href="#cb16-365" aria-label="357"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
+<span id="cb16-366"><a href="#cb16-366" aria-label="358"></a>plt.plot(df[<span class="st">"timestamp"</span>], df[<span class="st">"critic_score"</span>], label<span class="op">=</span><span class="st">"Critics"</span>, marker<span class="op">=</span><span class="st">"o"</span>)</span>
+<span id="cb16-367"><a href="#cb16-367" aria-label="359"></a>plt.plot(df[<span class="st">"timestamp"</span>], df[<span class="st">"audience_score"</span>], label<span class="op">=</span><span class="st">"Audience"</span>, marker<span class="op">=</span><span class="st">"s"</span>)</span>
+<span id="cb16-368"><a href="#cb16-368" aria-label="360"></a>plt.title(<span class="st">"Rotten Tomatoes Score Tracking"</span>)</span>
+<span id="cb16-369"><a href="#cb16-369" aria-label="361"></a>plt.ylabel(<span class="st">"Score (%)"</span>)</span>
+<span id="cb16-370"><a href="#cb16-370" aria-label="362"></a>plt.legend()</span>
+<span id="cb16-371"><a href="#cb16-371" aria-label="363"></a>plt.tight_layout()</span>
+<span id="cb16-372"><a href="#cb16-372" aria-label="364"></a>plt.show()</span>
+<span id="cb16-373"><a href="#cb16-373" aria-label="365"></a><span class="in">```</span></span>
+<span id="cb16-374"><a href="#cb16-374" aria-label="366"></a></span>
+<span id="cb16-375"><a href="#cb16-375" aria-label="367"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb16-376"><a href="#cb16-376" aria-label="368"></a></span>
+<span id="cb16-377"><a href="#cb16-377" aria-label="369"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
+<span id="cb16-378"><a href="#cb16-378" aria-label="370"></a></span>
+<span id="cb16-379"><a href="#cb16-379" aria-label="371"></a>You will take a collector you already trust and make it deployable: notebook to script, script to scheduled workflow, workflow to monitored pipeline. The deliverable stays inside the notebook — actually running it on GitHub Actions for days is the Additional Exercises' territory — but every piece you write here is the real thing.</span>
+<span id="cb16-380"><a href="#cb16-380" aria-label="372"></a></span>
+<span id="cb16-381"><a href="#cb16-381" aria-label="373"></a>**Step 1 — Choose and rehearse your collector.** Pick a keyless data source from an earlier chapter — Open-Meteo (@sec-data-formats) or Wikipedia pageviews (@sec-introduction) are ideal. Write a <span class="in">`collect()`</span> function with a docstring that fetches the current data with your <span class="in">`HEADERS`</span> and returns a dictionary of the fields you want to keep, including a UTC timestamp. Run it once to prove it works.</span>
+<span id="cb16-382"><a href="#cb16-382" aria-label="374"></a></span>
+<span id="cb16-385"><a href="#cb16-385" aria-label="375"></a><span class="in">```{python}</span></span>
+<span id="cb16-386"><a href="#cb16-386" aria-label="376"></a><span class="co"># Step 1: Write collect() -- fetch one observation from your source and return a dict of fields including a UTC timestamp. Run it once.</span></span>
+<span id="cb16-387"><a href="#cb16-387" aria-label="377"></a><span class="co"># Your code here</span></span>
+<span id="cb16-388"><a href="#cb16-388" aria-label="378"></a><span class="in">```</span></span>
+<span id="cb16-389"><a href="#cb16-389" aria-label="379"></a></span>
+<span id="cb16-390"><a href="#cb16-390" aria-label="380"></a>**Step 2 — Append safely to CSV.** Write <span class="in">`save_row(row, filepath)`</span> following the chapter's pattern: a pinned <span class="in">`FIELDNAMES`</span> constant, append mode, header written only when the file does not yet exist. Run collect-and-save twice and show the CSV has two rows and one header.</span>
+<span id="cb16-391"><a href="#cb16-391" aria-label="381"></a></span>
+<span id="cb16-394"><a href="#cb16-394" aria-label="382"></a><span class="in">```{python}</span></span>
+<span id="cb16-395"><a href="#cb16-395" aria-label="383"></a><span class="co"># Step 2: Write save_row() with a pinned schema, run the pipeline twice, and prove the CSV grew correctly.</span></span>
+<span id="cb16-396"><a href="#cb16-396" aria-label="384"></a><span class="co"># Your code here</span></span>
+<span id="cb16-397"><a href="#cb16-397" aria-label="385"></a><span class="in">```</span></span>
+<span id="cb16-398"><a href="#cb16-398" aria-label="386"></a></span>
+<span id="cb16-399"><a href="#cb16-399" aria-label="387"></a>**Step 3 — Convert to a script.** Assemble the whole thing into a standalone <span class="in">`collector.py`</span>: imports at top, your two functions, a <span class="in">`main()`</span> that calls them, and the <span class="in">`if __name__ == "__main__":`</span> guard. Write it to disk from the notebook, then verify it runs from the command line with <span class="in">`!python collector.py`</span>.</span>
+<span id="cb16-400"><a href="#cb16-400" aria-label="388"></a></span>
+<span id="cb16-403"><a href="#cb16-403" aria-label="389"></a><span class="in">```{python}</span></span>
+<span id="cb16-404"><a href="#cb16-404" aria-label="390"></a><span class="co"># Step 3: Write collector.py to disk (imports, collect, save_row, main, __main__ guard) and run it with !python collector.py.</span></span>
+<span id="cb16-405"><a href="#cb16-405" aria-label="391"></a><span class="co"># Your code here</span></span>
+<span id="cb16-406"><a href="#cb16-406" aria-label="392"></a><span class="in">```</span></span>
+<span id="cb16-407"><a href="#cb16-407" aria-label="393"></a></span>
+<span id="cb16-408"><a href="#cb16-408" aria-label="394"></a>**Step 4 — Add a freshness check.** Write <span class="in">`check_freshness(filepath, max_age_hours=24)`</span>: read the CSV, parse the newest timestamp, and print a clear OK or a warning if the data is stale. Test both paths — once against your fresh file, once with the threshold set low enough to trigger the warning.</span>
+<span id="cb16-409"><a href="#cb16-409" aria-label="395"></a></span>
+<span id="cb16-412"><a href="#cb16-412" aria-label="396"></a><span class="in">```{python}</span></span>
+<span id="cb16-413"><a href="#cb16-413" aria-label="397"></a><span class="co"># Step 4: Write check_freshness() and demonstrate both the passing and the failing case.</span></span>
+<span id="cb16-414"><a href="#cb16-414" aria-label="398"></a><span class="co"># Your code here</span></span>
+<span id="cb16-415"><a href="#cb16-415" aria-label="399"></a><span class="in">```</span></span>
+<span id="cb16-416"><a href="#cb16-416" aria-label="400"></a></span>
+<span id="cb16-417"><a href="#cb16-417" aria-label="401"></a>**Step 5 — Draft the workflow.** Write the GitHub Actions workflow YAML for this collector as a string and save it to <span class="in">`collect.yml`</span>: a cron schedule (explain your chosen expression in a comment — remember Actions cron is UTC), checkout, Python setup, dependency install, running <span class="in">`collector.py`</span>, running the freshness check, and committing the CSV back — following the chapter's template.</span>
+<span id="cb16-418"><a href="#cb16-418" aria-label="402"></a></span>
+<span id="cb16-421"><a href="#cb16-421" aria-label="403"></a><span class="in">```{python}</span></span>
+<span id="cb16-422"><a href="#cb16-422" aria-label="404"></a><span class="co"># Step 5: Draft the full workflow YAML, with the cron expression explained, and save it to collect.yml.</span></span>
+<span id="cb16-423"><a href="#cb16-423" aria-label="405"></a><span class="co"># Your code here</span></span>
+<span id="cb16-424"><a href="#cb16-424" aria-label="406"></a><span class="in">```</span></span>
+<span id="cb16-425"><a href="#cb16-425" aria-label="407"></a></span>
+<span id="cb16-426"><a href="#cb16-426" aria-label="408"></a>**Step 6 — Interpret.** In four to six sentences: What failure modes does this pipeline have — what breaks it silently, and what breaks it loudly? Which failure would your freshness check catch, and which would it miss? What one addition from the chapter's hardening section would you make before trusting this pipeline for a semester?</span>
+<span id="cb16-427"><a href="#cb16-427" aria-label="409"></a></span>
+<span id="cb16-430"><a href="#cb16-430" aria-label="410"></a><span class="in">```{python}</span></span>
+<span id="cb16-431"><a href="#cb16-431" aria-label="411"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb16-432"><a href="#cb16-432" aria-label="412"></a><span class="in">```</span></span>
+<span id="cb16-433"><a href="#cb16-433" aria-label="413"></a></span>
+<span id="cb16-434"><a href="#cb16-434" aria-label="414"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb16-435"><a href="#cb16-435" aria-label="415"></a></span>
+<span id="cb16-436"><a href="#cb16-436" aria-label="416"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration. The first two are where the recommended exercise's pieces get deployed for real.</span>
+<span id="cb16-437"><a href="#cb16-437" aria-label="417"></a></span>
+<span id="cb16-438"><a href="#cb16-438" aria-label="418"></a><span class="ss">1. </span>**Build a scraper.** Set up a GitHub Actions scraper for a data source of your choice — the script and workflow you drafted above are your starting point. Run it for at least three days and analyze the results. Good candidates include weather APIs, news site headlines, government dashboards, or e-commerce prices.</span>
+<span id="cb16-439"><a href="#cb16-439" aria-label="419"></a></span>
+<span id="cb16-440"><a href="#cb16-440" aria-label="420"></a><span class="ss">2. </span>**Government data collector.** Set up a daily GitHub Actions workflow that retrieves data from a free API (Open-Meteo weather, OpenAQ air quality, or USGS earthquake data). Run it for at least one week. Download the collected data and create a visualization showing how the measurements changed over the collection period.</span>
+<span id="cb16-441"><a href="#cb16-441" aria-label="421"></a></span>
 <span id="cb16-442"><a href="#cb16-442" aria-label="422"></a></span>
-<span id="cb16-443"><a href="#cb16-443" aria-label="423"></a></span>
-<span id="cb16-444"><a href="#cb16-444" aria-label="424"></a><span class="ss">3. </span>**Graduate extension (INFO 5617).** Deploy a scheduled collector of your own design and keep it running for at least two weeks. Then write an infrastructure post-mortem in the spirit of the "good enough practices" described by @wilson2017good: quantify how many scheduled runs were missed or delayed, categorize every failure (selector drift, rate limiting, runner environment changes, silent successes), and measure any drift in the collected data itself over the window. Conclude with the two or three changes that would most improve reliability if the pipeline had to run for six months. The deliverable is the post-mortem, not the scraper.</span>
-<span id="cb16-445"><a href="#cb16-445" aria-label="425"></a></span>
-<span id="cb16-446"><a href="#cb16-446" aria-label="426"></a>::: {.callout-note}</span>
-<span id="cb16-447"><a href="#cb16-447" aria-label="427"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb16-448"><a href="#cb16-448" aria-label="428"></a>Automated data collection is how you build the independent infrastructure that @sec-post-api describes as **ownership**. A GitHub Actions scraper does not depend on platform goodwill — it runs on your terms, on your schedule, collecting data you control. But ownership comes with responsibility: the ongoing labor of monitoring, maintaining, and updating your scrapers is itself a form of stewardship.</span>
-<span id="cb16-449"><a href="#cb16-449" aria-label="429"></a>:::</span>
-<span id="cb16-450"><a href="#cb16-450" aria-label="430"></a></span>
-<span id="cb16-451"><a href="#cb16-451" aria-label="431"></a><span class="fu">## Social History and Public Interest</span></span>
-<span id="cb16-452"><a href="#cb16-452" aria-label="432"></a></span>
-<span id="cb16-453"><a href="#cb16-453" aria-label="433"></a>Automated data collection powers some of the most important public interest projects in data science. Air quality monitoring networks, transit performance trackers, and legislative activity dashboards all depend on regular, automated data retrieval. Community data projects — where citizens build their own monitoring infrastructure rather than depending on platforms or government agencies — embody the ownership value described in @sec-post-api.</span>
-<span id="cb16-454"><a href="#cb16-454" aria-label="434"></a></span>
-<span id="cb16-455"><a href="#cb16-455" aria-label="435"></a>But automation also raises the ethical stakes from @sec-ethics. A manual scraper that you run once makes a few requests. An automated scraper running every hour, indefinitely, accumulates a much larger footprint. The commitment to maintaining an automated scraper responsibly — monitoring for errors, respecting rate limits, adjusting to site changes — is a form of ongoing stewardship.</span>
-<span id="cb16-456"><a href="#cb16-456" aria-label="436"></a></span>
-<span id="cb16-457"><a href="#cb16-457" aria-label="437"></a>The Internet Archive's Wayback Machine is perhaps the most ambitious automated data collection project in history — it has been systematically crawling and archiving the web since 1996, preserving billions of pages that would otherwise be lost as websites change and disappear. On a smaller scale, projects like the GDELT Project monitor global news media in real time, and the Pushshift archive (before its shutdown) collected every public Reddit post and comment for over a decade. These projects demonstrate both the power and the responsibility of automated collection: the data they preserved has enabled thousands of research studies, but maintaining the infrastructure required sustained funding, technical labor, and institutional commitment. When you build your own automated scraper, you are participating in this same tradition of data stewardship — on a smaller scale, but with the same obligations.</span>
-<span id="cb16-458"><a href="#cb16-458" aria-label="438"></a></span>
-<span id="cb16-459"><a href="#cb16-459" aria-label="439"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb16-460"><a href="#cb16-460" aria-label="440"></a></span>
-<span id="cb16-461"><a href="#cb16-461" aria-label="441"></a><span class="ss">- </span>**YAML indentation errors**: YAML is whitespace-sensitive. Use a YAML validator before committing.</span>
-<span id="cb16-462"><a href="#cb16-462" aria-label="442"></a><span class="ss">- </span>**GitHub Actions runner environment**: The Ubuntu runner may differ from your local setup. Pin Python and Chrome versions explicitly.</span>
-<span id="cb16-463"><a href="#cb16-463" aria-label="443"></a><span class="ss">- </span>**Git conflicts**: If the Action runs while you are also pushing changes, you will get merge conflicts. This is why the workflow examples in this chapter run <span class="in">`git pull --rebase`</span> before <span class="in">`git push`</span>.</span>
-<span id="cb16-464"><a href="#cb16-464" aria-label="444"></a><span class="ss">- </span>**Cron syntax**: The five fields are <span class="in">`minute hour day-of-month month day-of-week`</span>. Use <span class="co">[</span><span class="ot">crontab.guru</span><span class="co">](https://crontab.guru/)</span> to verify your schedule.</span>
-<span id="cb16-465"><a href="#cb16-465" aria-label="445"></a><span class="ss">- </span>**Stale ChromeDriver**: Selenium requires a ChromeDriver version that matches your Chrome version. The <span class="in">`browser-actions/setup-chrome@v1`</span> action in GitHub Actions handles this automatically, but local setups may drift. Use <span class="in">`webdriver-manager`</span> for automatic local driver management.</span>
-<span id="cb16-466"><a href="#cb16-466" aria-label="446"></a></span>
-<span id="cb16-467"><a href="#cb16-467" aria-label="447"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb16-468"><a href="#cb16-468" aria-label="448"></a></span>
-<span id="cb16-469"><a href="#cb16-469" aria-label="449"></a>Interactive notebooks are for exploration; production data collection requires automation. The progression is notebook → script → scheduled pipeline. GitHub Actions provides free cloud-based scheduling for public repositories. But automation is not "set and forget" — scrapers break, APIs change, and data quality drifts. Building your own data infrastructure means accepting responsibility for its upkeep. That ongoing commitment is a form of the stewardship and ownership that defines public interest data science.</span>
-<span id="cb16-470"><a href="#cb16-470" aria-label="450"></a></span>
-<span id="cb16-471"><a href="#cb16-471" aria-label="451"></a><span class="fu">## Further Reading</span></span>
-<span id="cb16-472"><a href="#cb16-472" aria-label="452"></a></span>
-<span id="cb16-473"><a href="#cb16-473" aria-label="453"></a><span class="ss">- </span>GitHub Actions documentation: <span class="ot">&lt;https://docs.github.com/en/actions&gt;</span></span>
-<span id="cb16-474"><a href="#cb16-474" aria-label="454"></a><span class="ss">- </span>Cron syntax reference: <span class="ot">&lt;https://crontab.guru/&gt;</span></span>
-<span id="cb16-475"><a href="#cb16-475" aria-label="455"></a><span class="ss">- </span>Selenium headless mode: <span class="ot">&lt;https://www.selenium.dev/documentation/webdriver/drivers/options/&gt;</span></span>
+<span id="cb16-443"><a href="#cb16-443" aria-label="423"></a><span class="ss">3. </span>**Graduate extension (INFO 5617).** Deploy a scheduled collector of your own design and keep it running for at least two weeks. Then write an infrastructure post-mortem in the spirit of the "good enough practices" described by @wilson2017good: quantify how many scheduled runs were missed or delayed, categorize every failure (selector drift, rate limiting, runner environment changes, silent successes), and measure any drift in the collected data itself over the window. Conclude with the two or three changes that would most improve reliability if the pipeline had to run for six months. The deliverable is the post-mortem, not the scraper.</span>
+<span id="cb16-444"><a href="#cb16-444" aria-label="424"></a></span>
+<span id="cb16-445"><a href="#cb16-445" aria-label="425"></a>::: {.callout-note}</span>
+<span id="cb16-446"><a href="#cb16-446" aria-label="426"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb16-447"><a href="#cb16-447" aria-label="427"></a>Automated data collection is how you build the independent infrastructure that @sec-post-api describes as **ownership**. A GitHub Actions scraper does not depend on platform goodwill — it runs on your terms, on your schedule, collecting data you control. But ownership comes with responsibility: the ongoing labor of monitoring, maintaining, and updating your scrapers is itself a form of stewardship.</span>
+<span id="cb16-448"><a href="#cb16-448" aria-label="428"></a>:::</span>
+<span id="cb16-449"><a href="#cb16-449" aria-label="429"></a></span>
+<span id="cb16-450"><a href="#cb16-450" aria-label="430"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb16-451"><a href="#cb16-451" aria-label="431"></a></span>
+<span id="cb16-452"><a href="#cb16-452" aria-label="432"></a>Automated data collection powers some of the most important public interest projects in data science. Air quality monitoring networks, transit performance trackers, and legislative activity dashboards all depend on regular, automated data retrieval. Community data projects — where citizens build their own monitoring infrastructure rather than depending on platforms or government agencies — embody the ownership value described in @sec-post-api.</span>
+<span id="cb16-453"><a href="#cb16-453" aria-label="433"></a></span>
+<span id="cb16-454"><a href="#cb16-454" aria-label="434"></a>But automation also raises the ethical stakes from @sec-ethics. A manual scraper that you run once makes a few requests. An automated scraper running every hour, indefinitely, accumulates a much larger footprint. The commitment to maintaining an automated scraper responsibly — monitoring for errors, respecting rate limits, adjusting to site changes — is a form of ongoing stewardship.</span>
+<span id="cb16-455"><a href="#cb16-455" aria-label="435"></a></span>
+<span id="cb16-456"><a href="#cb16-456" aria-label="436"></a>The Internet Archive's Wayback Machine is perhaps the most ambitious automated data collection project in history — it has been systematically crawling and archiving the web since 1996, preserving billions of pages that would otherwise be lost as websites change and disappear. On a smaller scale, projects like the GDELT Project monitor global news media in real time, and the Pushshift archive (before its shutdown) collected every public Reddit post and comment for over a decade. These projects demonstrate both the power and the responsibility of automated collection: the data they preserved has enabled thousands of research studies, but maintaining the infrastructure required sustained funding, technical labor, and institutional commitment. When you build your own automated scraper, you are participating in this same tradition of data stewardship — on a smaller scale, but with the same obligations.</span>
+<span id="cb16-457"><a href="#cb16-457" aria-label="437"></a></span>
+<span id="cb16-458"><a href="#cb16-458" aria-label="438"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb16-459"><a href="#cb16-459" aria-label="439"></a></span>
+<span id="cb16-460"><a href="#cb16-460" aria-label="440"></a><span class="ss">- </span>**YAML indentation errors**: YAML is whitespace-sensitive. Use a YAML validator before committing.</span>
+<span id="cb16-461"><a href="#cb16-461" aria-label="441"></a><span class="ss">- </span>**GitHub Actions runner environment**: The Ubuntu runner may differ from your local setup. Pin Python and Chrome versions explicitly.</span>
+<span id="cb16-462"><a href="#cb16-462" aria-label="442"></a><span class="ss">- </span>**Git conflicts**: If the Action runs while you are also pushing changes, you will get merge conflicts. This is why the workflow examples in this chapter run <span class="in">`git pull --rebase`</span> before <span class="in">`git push`</span>.</span>
+<span id="cb16-463"><a href="#cb16-463" aria-label="443"></a><span class="ss">- </span>**Cron syntax**: The five fields are <span class="in">`minute hour day-of-month month day-of-week`</span>. Use <span class="co">[</span><span class="ot">crontab.guru</span><span class="co">](https://crontab.guru/)</span> to verify your schedule.</span>
+<span id="cb16-464"><a href="#cb16-464" aria-label="444"></a><span class="ss">- </span>**Stale ChromeDriver**: Selenium requires a ChromeDriver version that matches your Chrome version. The <span class="in">`browser-actions/setup-chrome@v1`</span> action in GitHub Actions handles this automatically, but local setups may drift. Use <span class="in">`webdriver-manager`</span> for automatic local driver management.</span>
+<span id="cb16-465"><a href="#cb16-465" aria-label="445"></a></span>
+<span id="cb16-466"><a href="#cb16-466" aria-label="446"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb16-467"><a href="#cb16-467" aria-label="447"></a></span>
+<span id="cb16-468"><a href="#cb16-468" aria-label="448"></a>Interactive notebooks are for exploration; production data collection requires automation. The progression is notebook → script → scheduled pipeline. GitHub Actions provides free cloud-based scheduling for public repositories. But automation is not "set and forget" — scrapers break, APIs change, and data quality drifts. Building your own data infrastructure means accepting responsibility for its upkeep. That ongoing commitment is a form of the stewardship and ownership that defines public interest data science.</span>
+<span id="cb16-469"><a href="#cb16-469" aria-label="449"></a></span>
+<span id="cb16-470"><a href="#cb16-470" aria-label="450"></a><span class="fu">## Further Reading</span></span>
+<span id="cb16-471"><a href="#cb16-471" aria-label="451"></a></span>
+<span id="cb16-472"><a href="#cb16-472" aria-label="452"></a><span class="ss">- </span>GitHub Actions documentation: <span class="ot">&lt;https://docs.github.com/en/actions&gt;</span></span>
+<span id="cb16-473"><a href="#cb16-473" aria-label="453"></a><span class="ss">- </span>Cron syntax reference: <span class="ot">&lt;https://crontab.guru/&gt;</span></span>
+<span id="cb16-474"><a href="#cb16-474" aria-label="454"></a><span class="ss">- </span>Selenium headless mode: <span class="ot">&lt;https://www.selenium.dev/documentation/webdriver/drivers/options/&gt;</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
