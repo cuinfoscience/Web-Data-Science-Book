@@ -587,3 +587,211 @@ figures:
     crop: {top: 0, left: 0, width: 445, height: 288}
     targets: {slides: {width: 0.35}}
     drifts: true        # xkcd's current comic and the browser version
+
+  # Week 8's handout "Set up Selenium" (course repo, handouts/week-08/selenium-setup.tex). The
+  # notebook figures come from a real Jupyter Notebook 7.6.3 on this machine, set up the way a
+  # student's is after adding selenium to an older webdata while Jupyter was running:
+  #
+  #   - webdata made with chapter 1's first command (python=3.14, then pip), then the setup
+  #     handout's catch-up `conda install`, which brings selenium 4.50.0 and selenium-manager;
+  #   - Jupyter started from webdata's own bin/jupyter without `conda activate`, so its kernels
+  #     have no SE_MANAGER_PATH, as a Jupyter started before the install has none;
+  #   - run as an ordinary user, not root, so Chrome keeps its sandbox; with HOME set, so
+  #     Selenium Manager's cache is that user's ~/.cache/selenium; with an Xvfb display, for
+  #     the window webdriver.Chrome() opens; and with the session proxy's CA in that user's
+  #     ~/.pki/nssdb, as bootstrap.sh does for root;
+  #   - no token, on 127.0.0.1, with --ServerApp.disable_check_xsrf=True, so a script can delete
+  #     a notebook's kernel session before each take and its prompts start at [1].
+  #
+  # The folder holds selenium-setup.ipynb and no-setup-cell.ipynb, built from chapter 8's own
+  # cells so the screenshots show the code the chapter prints: steps 1 to 3 of "Before the First
+  # Browser" (settings, Selenium Manager with its log, the check), the cell under "Starting the
+  # Browser", and a cell that visits Quotes to Scrape, prints its title, and quits; and that
+  # browser cell alone. Jupyter's news and update prompts are pre-answered by
+  # $PREFIX/share/jupyter/lab/settings/overrides.json, as for chapter 1.
+  #
+  # Take week08-handout-manager-log first, with that user's ~/.cache/selenium emptied: its log
+  # shows Selenium Manager downloading Chrome for Testing and its driver, and a take from a
+  # filled cache fails its `expect`. The figures after it run the same cells from the cache.
+  - id: week08-handout-no-manager
+    kind: capture
+    section: "week-08 handout, If something goes wrong: Unable to obtain driver for chrome"
+    brief: >-
+      Show what a student sees when Jupyter started without SE_MANAGER_PATH and
+      a cell runs webdriver.Chrome(): two strips of the long red traceback. The
+      first is the line partway down that names the cause, Unable to obtain
+      working Selenium Manager binary, with the path Selenium looked in. The
+      second is the last line, NoSuchDriverException ... Unable to obtain driver
+      for chrome. The handout's fix is the setup cell.
+    url: http://localhost:8888/notebooks/no-setup-cell.ipynb
+    mode: composite
+    parts:
+      - label: Partway down the traceback
+        steps:
+          - wait: {selector: '.jp-CodeCell'}
+          - click: {selector: '.jp-CodeCell .jp-InputPrompt'}
+          - press: 'Control+Enter'
+          - wait: {text: 'Unable to obtain driver for chrome'}
+          # Jupyter's menu and toolbar stay at the top of the window, over the panel's first
+          # 125 pixels, so the line goes 170 pixels down.
+          - scroll: {match: '^WebDriverException: Message: Unable to obtain working', in: '.jp-RenderedText pre', offset: 170, within: '.jp-WindowedPanel-outer'}
+        expect:
+          text: ['Unable to obtain working Selenium Manager binary']
+        # The red output alone, from the message to "The above exception ...", measured from the
+        # message: Jupyter scrolls the output a few pixels differently from take to take. Its
+        # text starts 3 pixels into the output; 696 wide ends before the cell's blue border.
+        crop: {match: '^WebDriverException: Message: Unable to obtain working', in: '.jp-RenderedText pre',
+               pad: [10, 0, 0, 3], width: 696, height: 118}
+      - label: At the bottom
+        steps:
+          - wait: {selector: '.jp-CodeCell'}
+          - click: {selector: '.jp-CodeCell .jp-InputPrompt'}
+          - press: 'Control+Enter'
+          - wait: {text: 'Unable to obtain driver for chrome'}
+          # The colon: the second traceback's header line also starts with the exception's name.
+          # The message is the output's last line, so the panel can't scroll it up past the
+          # window's lower part; 470 pixels down is a place it can always reach.
+          - scroll: {match: '^NoSuchDriverException: Message', in: '.jp-RenderedText pre', offset: 470, within: '.jp-WindowedPanel-outer'}
+        expect:
+          text: ['NoSuchDriverException: Message: Unable to obtain driver for chrome']
+        # The last frame's lines, and the message under them, to the end of the output. Lines
+        # are 17 pixels apart: the frame's `except` line starts 86 above the message, and the
+        # output ends 50 below it.
+        crop: {match: '^NoSuchDriverException: Message', in: '.jp-RenderedText pre',
+               pad: [86, 0, 0, 3], width: 696, height: 140}
+    layout: {direction: column, gap: 16, pad: 10, label_px: 15}
+    targets: {handout: {width_in: 5.5}}
+    drifts: true        # Selenium's traceback and Jupyter's look from version to version
+
+  - id: week08-handout-setup-cell
+    kind: capture
+    section: "week-08 handout, step 1: settings first"
+    brief: >-
+      Show chapter 8's step 1 cell after it ran in that Jupyter: its code, and
+      its output, the selenium version (1) and where Selenium Manager is (2), a
+      path in webdata's own bin folder that the cell found and set. Long lines
+      run past the cell's right edge, as they do in Jupyter by default.
+    url: http://localhost:8888/notebooks/selenium-setup.ipynb
+    steps:
+      - wait: {selector: '.jp-CodeCell'}
+      - click: {selector: '.jp-CodeCell:has-text("SE_MANAGER_PATH") .jp-InputPrompt'}
+      - press: 'Control+Enter'
+      - wait: {text: 'Selenium Manager: /'}
+    expect:
+      text: ['selenium 4\.50\.0', 'Selenium Manager: /\S+/bin/selenium-manager']
+    crop: {selector: '.jp-CodeCell:has-text("SE_MANAGER_PATH")', pad: 6}
+    targets: {handout: {width_in: 5.5}}
+    annotate:
+      width_in: 5.5
+      size: small
+      marks:
+        - {n: 1, at: {match: '^selenium 4\.50\.0$', in: '.jp-CodeCell:has-text("SE_MANAGER_PATH") .jp-OutputArea-output pre'}}
+        - {n: 2, at: {match: '^Selenium Manager: .*$', in: '.jp-CodeCell:has-text("SE_MANAGER_PATH") .jp-OutputArea-output pre'}}
+    drifts: true        # the versions, and Jupyter's look
+
+  - id: week08-handout-manager-log
+    kind: capture
+    section: "week-08 handout, step 2: run Selenium Manager"
+    brief: >-
+      Show chapter 8's step 2 cell after it ran on a computer with no Chrome and
+      an empty ~/.cache/selenium: its code, and Selenium Manager's log under it,
+      on the pink Jupyter gives anything written to the error stream. It found
+      no Chrome (1), downloaded Chrome for Testing (2) and the chromedriver made
+      for it (3), and kept both in ~/.cache/selenium (4). The markers sit in the
+      output's empty left margin, because the log's lines run the cell's width.
+    url: http://localhost:8888/notebooks/selenium-setup.ipynb
+    # Tall enough for the whole cell under Jupyter's menu and toolbar.
+    window: [800, 900]
+    timeout: 300        # the first run downloads Chrome for Testing, about 190 MB
+    steps:
+      - wait: {selector: '.jp-CodeCell'}
+      - click: {selector: '.jp-CodeCell:has-text("SE_MANAGER_PATH") .jp-InputPrompt'}
+      - press: 'Shift+Enter'
+      - wait: {text: 'Selenium Manager: /'}
+      - press: 'Control+Enter'
+      - wait: {text: 'Browser path: '}
+      - scroll: {selector: '.jp-CodeCell:has-text("binary_paths")', offset: 130, within: '.jp-WindowedPanel-outer'}
+    expect:
+      text: ['DEBUG chrome not found in the system', 'DEBUG Downloading chrome \d', 'DEBUG Downloading chromedriver \d']
+    crop: {selector: '.jp-CodeCell:has-text("binary_paths")', pad: 6}
+    oversize: >-
+      The cell and the whole log under it: a shorter crop cuts either the code the
+      student just ran or one of the four lines the markers point to.
+    targets: {handout: {width_in: 5.5}}
+    annotate:
+      width_in: 5.5
+      size: small
+      marks:
+        - {n: 1, side: left, at: {match: '^DEBUG chrome not found in the system$', in: '.jp-CodeCell:has-text("binary_paths") .jp-OutputArea-output pre'}}
+        - {n: 2, side: left, at: {match: '^DEBUG Downloading chrome \d', in: '.jp-CodeCell:has-text("binary_paths") .jp-OutputArea-output pre'}}
+        - {n: 3, side: left, at: {match: '^DEBUG Downloading chromedriver \d', in: '.jp-CodeCell:has-text("binary_paths") .jp-OutputArea-output pre'}}
+        - {n: 4, shape: brace, side: left, at: {match: '^DEBUG Driver path: .*\nDEBUG Browser path: .*$', in: '.jp-CodeCell:has-text("binary_paths") .jp-OutputArea-output pre'}}
+    drifts: true        # the versions, Selenium Manager's wording, and Jupyter's look
+
+  - id: week08-handout-check-paths
+    kind: capture
+    section: "week-08 handout, step 3: check before you start the browser"
+    brief: >-
+      Show chapter 8's step 3 cell after steps 1 and 2 ran from the filled cache:
+      the driver's and the browser's paths, each ending in (found) (1), and
+      Driver chosen by Selenium Manager: True (2).
+    url: http://localhost:8888/notebooks/selenium-setup.ipynb
+    steps:
+      - wait: {selector: '.jp-CodeCell'}
+      - click: {selector: '.jp-CodeCell:has-text("SE_MANAGER_PATH") .jp-InputPrompt'}
+      - press: 'Shift+Enter'
+      - wait: {text: 'Selenium Manager: /'}
+      - press: 'Shift+Enter'
+      - wait: {text: 'Browser path: '}
+      - press: 'Control+Enter'
+      - wait: {text: 'Driver chosen by Selenium Manager: '}
+      - scroll: {selector: '.jp-CodeCell:has-text("Driver chosen by Selenium Manager")', offset: 130, within: '.jp-WindowedPanel-outer'}
+      # The scroll leaves the pointer wherever the first click put it. Over a cell's output,
+      # Jupyter draws a gray button in the margin; the menu bar's empty right half has none.
+      - hover: {selector: '#menu-panel-wrapper'}
+    expect:
+      text: ['Driver: +/\S+/chromedriver \(found\)', 'Browser: /\S+/chrome \(found\)', 'Driver chosen by Selenium Manager: True']
+    crop: {selector: '.jp-CodeCell:has-text("Driver chosen by Selenium Manager")', pad: 6}
+    targets: {handout: {width_in: 5.5}}
+    annotate:
+      width_in: 5.5
+      size: small
+      marks:
+        - {n: 1, shape: brace, side: left, at: {match: '^Driver: .*\nBrowser: .*$', in: '.jp-CodeCell:has-text("Driver chosen by Selenium Manager") .jp-OutputArea-output pre'}}
+        - {n: 2, side: left, at: {match: '^Driver chosen by Selenium Manager: True$', in: '.jp-CodeCell:has-text("Driver chosen by Selenium Manager") .jp-OutputArea-output pre'}}
+    drifts: true        # the versions, and Jupyter's look
+
+  - id: week08-handout-first-chrome
+    kind: capture
+    section: "week-08 handout, step 4: start the browser"
+    brief: >-
+      Show the browser cell and the visit cell after steps 1 to 3 ran: Browser
+      and Driver versions that match (1), and the page's title, Quotes to
+      Scrape (2), printed before driver.quit() closed the window.
+    url: http://localhost:8888/notebooks/selenium-setup.ipynb
+    steps:
+      - wait: {selector: '.jp-CodeCell'}
+      - click: {selector: '.jp-CodeCell:has-text("SE_MANAGER_PATH") .jp-InputPrompt'}
+      - press: 'Shift+Enter'
+      - wait: {text: 'Selenium Manager: /'}
+      - press: 'Shift+Enter'
+      - wait: {text: 'Browser path: '}
+      - press: 'Shift+Enter'
+      - wait: {text: 'Driver chosen by Selenium Manager: '}
+      - press: 'Shift+Enter'
+      - wait: {text: 'Driver: +1\d\d\.'}
+      - press: 'Control+Enter'
+      - wait: {text: 'Quotes to Scrape'}
+      - scroll: {selector: '.jp-CodeCell:has-text("webdriver.Chrome()")', offset: 130, within: '.jp-WindowedPanel-outer'}
+      - hover: {selector: '#menu-panel-wrapper'}      # off the outputs, as for check-paths
+    expect:
+      text: ['Browser: 1\d\d\.', 'Driver: +1\d\d\.', 'Quotes to Scrape']
+    crop: {between: ['.jp-CodeCell:has-text("webdriver.Chrome()")', '.jp-CodeCell:has-text("driver.quit()")'], pad: [6, 0, 6, 0]}
+    targets: {handout: {width_in: 5.5}}
+    annotate:
+      width_in: 5.5
+      size: small
+      marks:
+        - {n: 1, shape: brace, at: {match: '^Browser: .*\nDriver: .*$', in: '.jp-CodeCell:has-text("webdriver.Chrome()") .jp-OutputArea-output pre'}}
+        - {n: 2, at: {match: '^Quotes to Scrape$', in: '.jp-CodeCell:has-text("driver.quit()") .jp-OutputArea-output pre'}}
+    drifts: true        # the versions, and Jupyter's look

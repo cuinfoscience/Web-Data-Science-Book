@@ -14,7 +14,7 @@ PAGE_STEPS = {"wait", "hover", "click", "scroll", "press", "settle"}
 HEADED_STEPS = {"inspect", "tree", "devtools_click", "devtools_wait", "key", "type", "pointer"}
 STEPS = PAGE_STEPS | HEADED_STEPS
 CROPS = {"window", "full_page", "content", "between", "top", "left", "width", "height", "selector", "pad",
-         "devtools"}
+         "devtools", "match", "in", "nth"}
 EXPECTS = {"status", "text", "selector", "block", "infobar", "error", "all_files", "code"}
 DEVTOOLS = {"dock", "panel", "zoom", "size", "sidebar", "layout", "overview", "columns", "first_visit"}
 DEVTOOLS_LAYOUTS = {"side-by-side", "stacked", "auto"}
