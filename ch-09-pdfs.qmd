@@ -134,6 +134,43 @@ print("tagged:", "/StructTreeRoot" in reader.trailer["/Root"])
 # tagged: True
 ```
 
+::: {.callout-note}
+## Aside: Where PDF Came From, and What's in the File
+
+PDF grew out of a printer language. In 1984 Adobe released PostScript, a programming language for describing pages: a laser printer ran a PostScript program, and the program drew the page. In 1990 John Warnock, one of Adobe's founders, set out what he called the Camelot Project ([Adobe's timeline](https://www.adobe.com/acrobat/resources/pdf-timeline.html)). If every computer could display and print the same page description, people could send each other documents that looked the same everywhere. Adobe released Acrobat and version 1.0 of the Portable Document Format on June 15, 1993. PDF kept PostScript's way of drawing a page, with fonts, coordinates, lines, and images, and dropped the programming: a PDF page is a fixed list of instructions rather than a program to run. From 1994 Adobe gave Acrobat Reader away, and it published the specification, so anyone could write software that reads or writes PDFs. That is why this chapter's files come from so many makers: Word's PDFMaker, Acrobat Distiller, a Canon scanner, and, for the minutes of 2000, the records portal itself.
+
+The file is a set of numbered *objects*: dictionaries, arrays, numbers, and strings, plus *streams* of compressed bytes, such as fonts, images, and each page's drawing instructions. A *cross-reference table* records where each object starts, so a viewer can jump to page 15 without reading pages 1 to 14. A viewer starts at the end of the file, whose last lines say where that table is ([pypdf's guide to the format](https://pypdf.readthedocs.io/en/latest/dev/pdf-format.html) walks through the parts). Each page object points to the fonts, images, and content stream it uses. Here are the December 2024 report's first bytes, and the instructions that draw its running title on page 2:
+
+```{python}
+raw = report_2024.read_bytes()
+print(raw[:8])                                   # the header: the format and its version
+print(raw[raw.find(b"<<"):raw.find(b">>") + 2])  # the first object: how the file is arranged
+
+stream = reader.pages[1].get_contents().get_data().decode("latin-1")
+print(len(stream), "characters of drawing instructions on page 2")
+start = stream.find("/TT0 1 Tf")                 # the report's running title, "City of Boulder"
+print(stream[start:stream.find("]TJ", start) + 3])
+
+fonts = reader.pages[1]["/Resources"]["/Font"]
+print("/TT0 is", fonts["/TT0"]["/BaseFont"])
+# b'%PDF-1.6'
+# b'<</Linearized 1/L 723920/O 3296/E 219046/N 15/T 723260/H [ 526 432]>>'
+# 62267 characters of drawing instructions on page 2
+# /TT0 1 Tf
+# 11.04 0 0 11.04 54 767.28 Tm
+# ( )Tj
+# -0.002 Tc 0.007 Tw 0 -1.141 TD
+# [(C)2.6 (i)-6.6 (t)-6 (y o)11.2 (f)-6 ( B)2.6 (ou)11.2 (l)-6.6 (der)]TJ
+# /TT0 is /CALYKT+Arial-BoldMT
+```
+
+The header names the format and its version. The first object says the file is *linearized*, which Acrobat calls "Fast Web View": 723,920 bytes long, with 15 pages, arranged so that the first page's objects come first and a browser can show page 1 while the rest downloads. In the content stream, `Tf` picks the font `/TT0`, Arial Bold. The six letters before the plus sign in its name mark a *subset*: the file holds only the characters the report uses. `Tm` sets the size, 11.04 points, and a position 54 points from the left edge and 767.28 up from the bottom, since PDF counts up from the bottom where pdfplumber's `top` counts down. After a space, `TD` moves down a line, and `TJ` draws the strings in its brackets. "City of Boulder" is stored as nine pieces, `C`, `i`, `t`, `y o`, and so on, with the numbers between them nudging each piece into place. Nothing marks the three words as words, or the line as a title.
+
+Later versions added what the first lacked. Linearization came with PDF 1.2 in 1996, and tagged PDF with PDF 1.4 in 2001: the structure tree of headings, reading order, and alternative text described above. Tags are optional, so software that makes PDFs could leave them out, and much of it did. PDF became an ISO standard in 2008, as ISO 32000-1, and PDF 2.0 followed as ISO 32000-2 in 2017. Two narrower standards build on it: PDF/A for archives (ISO 19005, from 2005), which requires every font to be embedded and forbids encryption, so a file still opens decades later; and PDF/UA for accessibility (ISO 14289, from 2012), which requires tags.
+
+The same design explains why institutions publish PDFs and why analysts struggle with them. A PDF looks the same on every screen and printer, carries its own fonts, can be signed, and can be kept for decades, which suits a record that must not change. But it describes a printed page, not a document: it doesn't reflow on a phone, it keeps its structure only when someone tags it, and it hands a script positions instead of words. Adobe added a reading mode for phones, Liquid Mode, in 2020. The UK's Government Digital Service drew a different conclusion in 2018: GOV.UK's content should be [HTML by default, not PDF](https://gds.blog.gov.uk/2018/07/16/why-gov-uk-content-should-be-published-in-html-and-not-pdf/), because a PDF doesn't fit the browser's window and is harder to find, use, keep up to date, and make accessible. The chapter's last section returns to what the trade costs the public.
+:::
+
 ## What Kind of PDF Is It?
 
 Chapter 8 began with three checks for whether a page needs a browser (@sec-dynamic-pages). A PDF needs the same kind of triage before you extract anything, because the right tool depends on how each page was made. There are three kinds:
