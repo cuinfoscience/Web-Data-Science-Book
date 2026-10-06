@@ -370,7 +370,7 @@ from datetime import datetime
 
 fb_tos_url = "facebook.com/terms"
 
-def get_wayback_content(url, date, headers=None):
+def get_wayback_content(url, date, headers=None, retries=3):
     """Retrieve a page from the Wayback Machine closest to a given date.
     
     Parameters
@@ -381,6 +381,8 @@ def get_wayback_content(url, date, headers=None):
         The target date for the snapshot
     headers : dict, optional
         HTTP headers for the request
+    retries : int, optional
+        How many times to wait and try again after a 429 or 5xx before giving up
     
     Returns
     -------
@@ -390,28 +392,36 @@ def get_wayback_content(url, date, headers=None):
     """
     timestamp = date.strftime("%Y%m%d")
 
-    try:
-        api_response = requests.get(
-            "https://archive.org/wayback/available",
-            params={"url": url, "timestamp": timestamp},
-            headers=headers,
-        )
-        api_response.raise_for_status()
-        api_data = api_response.json()
+    for attempt in range(retries + 1):
+        try:
+            api_response = requests.get(
+                "https://archive.org/wayback/available",
+                params={"url": url, "timestamp": timestamp},
+                headers=headers,
+            )
+            api_response.raise_for_status()
+            api_data = api_response.json()
 
-        if not api_data.get("archived_snapshots"):
-            return None
+            if not api_data.get("archived_snapshots"):
+                return None
 
-        # Fetch the original capture (id_) so the extracted text doesn't include the Wayback toolbar and banner
-        closest = api_data["archived_snapshots"]["closest"]
-        snapshot_url = closest["url"].replace(
-            closest["timestamp"], closest["timestamp"] + "id_"
-        )
-        page_response = requests.get(snapshot_url, headers=headers)
-        page_response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(f"Request failed for {url} near {timestamp}: {e}")
-        return None
+            # Fetch the original capture (id_) so the extracted text doesn't include the Wayback toolbar and banner
+            closest = api_data["archived_snapshots"]["closest"]
+            snapshot_url = closest["url"].replace(
+                closest["timestamp"], closest["timestamp"] + "id_"
+            )
+            page_response = requests.get(snapshot_url, headers=headers)
+            page_response.raise_for_status()
+            break  # Both requests succeeded
+        except requests.exceptions.RequestException as e:
+            # A 429 or 502 from the Archive is an outcome, not a bug: wait, then try again
+            if attempt < retries:
+                wait = 30 * (attempt + 1)
+                print(f"Request failed for {url} near {timestamp} ({e}); waiting {wait}s before retry {attempt + 1}")
+                time.sleep(wait)
+            else:
+                print(f"Request failed for {url} near {timestamp} after {retries} retries: {e}")
+                return None
 
     soup = BeautifulSoup(page_response.text, "html.parser")
 
@@ -422,13 +432,15 @@ def get_wayback_content(url, date, headers=None):
         "timestamp": closest["timestamp"],
         "url": snapshot_url,
         "word_count": len(text.split()),
-        "content": text[:5000]  # First 5000 characters to avoid memory issues
+        "content": text,
     }
 ```
 
+The retry loop is not optional politeness. As "Common Issues to Debug" notes below, roughly half of first requests to the Archive fail with a 429 or a `502 Bad Gateway` and then succeed on a second try. Without the loop, each of those failures becomes a `None`, the collection loop skips it, and your history quietly loses a quarter here and a quarter there. A gap in the change timeline would then be a gap in your luck with the server, not a gap in the archival record, and nothing downstream could tell the difference. Waiting and retrying turns a coin flip into a reliable fetch, and the growing wait between attempts keeps the retries from adding to the load that caused the failure.
+
 ### Collecting the History
 
-The function retrieves one snapshot; a loop over the quarterly dates assembles the history. Note where the `time.sleep()` lives — in the loop, between requests, just as in @sec-static-pages — and that failed retrievals (returned as `None`) are simply skipped rather than crashing the run:
+The function retrieves one snapshot; a loop over the quarterly dates assembles the history. Note where the `time.sleep()` lives — in the loop, between requests, just as in @sec-static-pages — and that retrievals that still fail after their retries (returned as `None`) are skipped rather than crashing the run. Compare the two counts the loop prints at the end: a large gap between snapshots retrieved and time points queried means captures that do not exist, or a server having a bad day, and you should know which before you plot anything:
 
 ```{python}
 results = []
@@ -669,7 +681,7 @@ The Internet Archive's work also raises fundamental questions about the right to
 ## Common Issues to Debug
 
 - **Wayback Machine rate limiting**: Space your requests with `time.sleep()`. The service is free and community-maintained; do not abuse it.
-- **`502 Bad Gateway`, "Temporarily Offline," or dropped connections**: These usually mean the Archive is overloaded, not that your code is wrong. Wait 30 to 90 seconds, retry, and slow your request rate; the retrying session from @sec-protocols handles this if you give it a longer `backoff_factor`. While this chapter's screenshots were being made in September 2026, roughly half of the first requests to the Archive failed this way and then succeeded on a retry.
+- **`502 Bad Gateway`, "Temporarily Offline," or dropped connections**: These usually mean the Archive is overloaded, not that your code is wrong. Wait 30 to 90 seconds, retry, and slow your request rate; `get_wayback_content()` above does this with a plain wait-and-retry loop, and the retrying session from @sec-protocols handles it too if you give it a longer `backoff_factor`. While this chapter's screenshots were being made in September 2026, roughly half of the first requests to the Archive failed this way and then succeeded on a retry.
 - **Incomplete archived pages**: Many snapshots are missing CSS, images, or JavaScript-rendered content. The text content is usually preserved, but visual rendering may be broken. Open **About this capture** to see when each embedded file was saved, and the Network tab (@sec-protocols) to see which files failed to load.
 - **CDX data inconsistencies**: Some entries may have missing fields or redirect status codes instead of actual content. Filter your data carefully.
 - **`ModuleNotFoundError: No module named 'gensim'`**: Your `webdata` was made before chapter 1's command included gensim. In a terminal where `webdata` is active, run `conda install -c conda-forge gensim`, then restart the kernel. `pip install gensim` finds no Python 3.14 build, tries to compile gensim instead, and usually fails. If the `conda install` fails too, remove the environment with `conda env remove -n webdata` and make it again with chapter 1's command.
