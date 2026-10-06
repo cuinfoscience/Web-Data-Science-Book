@@ -644,3 +644,7 @@ HTML scraping follows a consistent pattern: retrieve the page, inspect it with d
 - pandas `read_html` documentation: <https://pandas.pydata.org/docs/reference/api/pandas.read_html.html>
 - @mitchell2018web — Chapters 2–5 on HTML scraping patterns
 - @vandenbroucke2018practical — best practices for production web scraping
+- Chris Moffitt, "Reading HTML tables with Pandas" (Practical Business 
+  Python): <https://pbpython.com/pandas-html-table.html>, a worked Wikipedia 
+  example that picks a table with `read_html(match=...)` and cleans stray `%`, 
+  minus-sign, and `\xa0` characters before converting columns to numbers
