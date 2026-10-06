@@ -111,11 +111,24 @@ When all three checks come up empty — the data appears only after the page run
 
 Selenium requires two components: the `selenium` Python library and a browser driver — a small program that lets Python control a specific browser. You only need to install the library: since version 4.6 (late 2022), Selenium has come with **Selenium Manager**, which finds or downloads the correct driver for whatever browser you have installed, and downloads the browser as well if you have none. conda-forge, where `webdata`'s packages come from, installs Selenium Manager as a package of its own, `selenium-manager`, whenever it installs `selenium`.
 
+### Installing Selenium and Selenium Manager
+
+Chapter 1's `webdata` environment has both packages. Anaconda as it comes has neither, and neither does an older `webdata`. In either case, `import selenium` stops with `ModuleNotFoundError`, and none of this chapter's browser code runs until you install them. Run this cell once:
+
 ```{python}
-# selenium is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge selenium
+%conda install -y -c conda-forge selenium selenium-manager
 ```
 
-If you add `selenium` to an older environment, restarting the kernel isn't enough. Close Jupyter, run `conda activate webdata` again, and start `jupyter notebook`. Activating `webdata` sets an environment variable, `SE_MANAGER_PATH`, that tells Selenium where conda put Selenium Manager, and a kernel gets its environment variables from the Jupyter that started it. Step 1 below sets the variable itself if Jupyter started without it.
+It installs two packages from conda-forge into the Python that runs this notebook, whichever environment that is:
+
+- `selenium`, the Python library that you import;
+- `selenium-manager`, the program that finds your browser and downloads its driver. conda-forge packages it separately. Installing `selenium` would bring it anyway, but naming it shows that there are two.
+
+The cell takes a minute or two. It worked if one of its last lines is `Executing transaction: done`, or, if both packages were there already, `All requested packages already installed`. conda may also print notices about other things, some starting with `WARNING`; they don't matter here. Then restart the kernel (**Kernel → Restart Kernel…**) and go on to step 1 below.
+
+From a terminal, the same install is `conda install -c conda-forge selenium selenium-manager`. Type it where the environment you use is active: after `conda activate webdata`, or where the prompt shows `(base)` for Anaconda's own environment. There, `conda list selenium` lists both packages, and `selenium-manager --version` prints Selenium Manager's version.
+
+Selenium finds Selenium Manager through an environment variable, `SE_MANAGER_PATH`, which `conda activate` sets. A kernel gets its environment variables from the Jupyter that started it. So in a Jupyter started without `conda activate`, or started before the install, Selenium can't find Selenium Manager by itself. You don't need to restart Jupyter to fix that: step 1 below sets the variable.
 
 ### Before the First Browser
 
@@ -145,7 +158,7 @@ os.environ["SE_AVOID_STATS"] = "true"          # send no usage statistics (optio
 # os.environ["SE_PROXY"] = "http://proxy.example.edu:3128"  # only behind a proxy
 ```
 
-If the version printed is older than 4.20 (April 2024), run `conda install -c conda-forge "selenium>=4.20"` in a terminal where `webdata` is active, then close Jupyter, run `conda activate webdata`, and start it again.
+If the version printed is older than 4.20 (April 2024), update both packages in a new cell with `%conda update -y -c conda-forge selenium selenium-manager`. Then restart the kernel and run this step again.
 
 The `manager` lines look for Selenium Manager in `webdata`'s own folders, where conda-forge's package puts it: `bin` on macOS and Linux, `Scripts` on Windows. They change nothing when `SE_MANAGER_PATH` is already set. With `selenium` from `pip` instead, the program sits inside the package, nothing needs setting, and the line prints `inside the selenium package`.
 
