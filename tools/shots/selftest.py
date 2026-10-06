@@ -834,6 +834,24 @@ figures:
            and md.index("shots:begin") < md.index("## Listed in `stubs.tsv`"), md[-500:])
     expect("...and sets its size in stubs.tsv", "copy.png\t1000x500\t" in (week / "stubs.tsv").read_text(),
            (week / "stubs.tsv").read_text())
+    before = (week / "shots.json").read_bytes() if (week / "shots.json").exists() else b""
+    time.sleep(1.1)                                   # `synced` counts seconds, so a new time would show
+    code, out = shots("sync", "ch-99", "wide-allowed", "--to", "slides/week-99/img", "--as", "copy.png",
+                      "--course", str(course))
+    expect("a second sync of an unchanged figure leaves shots.json as it was, its `synced` time too",
+           code == 0 and "record in slides/week-99/img/shots.json unchanged" in out
+           and (week / "shots.json").read_bytes() == before, out[-300:])
+    record = json.loads(before or b'{"files": {}}')
+    if "copy.png" in record["files"]:
+        # As if copied from an older commit: the record changes, so its time does.
+        record["files"]["copy.png"].update(textbook_commit="0" * 40, synced="2026-01-01T00:00:00+00:00")
+        (week / "shots.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
+    code, out = shots("sync", "ch-99", "wide-allowed", "--to", "slides/week-99/img", "--as", "copy.png",
+                      "--course", str(course))
+    entry = (json.loads((week / "shots.json").read_text())["files"].get("copy.png") or {}) if code == 0 else {}
+    expect("...but a record that does change gets a new `synced` time",
+           "recorded in slides/week-99/img/shots.json" in out and entry.get("textbook_commit") not in (None, "0" * 40)
+           and entry.get("synced") not in (None, "2026-01-01T00:00:00+00:00"), out[-300:])
     code, out = shots("synced", "--course", str(course))
     expect("synced finds the copy as it was copied", code == 0 and "as copied from ch-99/wide-allowed" in out, out[-300:])
     if (week / "copy.png").exists():
@@ -870,6 +888,13 @@ figures:
                code == 0 and entry.get("also") == ["marked_annotated.png", "marked_annotated.pdf"]
                and all((handout / f).exists() for f in ("marked.png", "marked_annotated.png", "marked_annotated.pdf")),
                out[-400:])
+        before = (handout / "shots.json").read_bytes() if (handout / "shots.json").exists() else b""
+        time.sleep(1.1)
+        code, out = shots("sync", "course", "handout-marked", "--to", "handouts/week-99/img", "--as", "marked.png",
+                          "--course", str(course))
+        expect("...and syncing it again, its markers drawn again, changes no file and no record",
+               code == 0 and out.count("(the same as the file already there)") == 3
+               and (handout / "shots.json").read_bytes() == before, out[-400:])
 
     print("import (a person's screenshot of a page behind a login)")
     from PIL import ImageCms, ImageDraw, ImageFont, PngImagePlugin
