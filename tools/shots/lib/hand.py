@@ -42,6 +42,11 @@ redaction stays on what it hides when the crop changes.
 
 Nothing reads a screenshot's text, so nothing finds a name or an address that
 the redactions missed. Look at the take on the contact sheet before promoting it.
+
+A render comes in the same way: a picture a script draws from a file, such as a
+page of a PDF drawn by pdfplumber. Its recipe says `kind: render`, its `hand:
+{steps: ...}` names the script, and `--tool` names the program that drew it, so
+the record says "rendered with pdfplumber 0.11.10" rather than "screenshot by hand".
 """
 import datetime
 import io
@@ -79,8 +84,9 @@ def problems(f):
             out.append("`redact` boxes are for `mode: hand`; crop a capture to what the text discusses instead")
         return out
     out = []
-    if f.get("kind") != "capture":
-        out.append("a screenshot a person takes is `kind: capture`")
+    if f.get("kind") not in ("capture", "render"):
+        out.append("a screenshot a person takes is `kind: capture`, and a picture a script draws from a file is "
+                   "`kind: render`")
     spec = f.get("hand")
     if not isinstance(spec, dict):
         out.append("`mode: hand` needs a `hand:` block: `why` a person takes it, and the text's size, `text_px`")
@@ -162,11 +168,16 @@ def _crop_box(fig, width, height):
     return [left, top, crop.get("width", width / S - left), crop.get("height", height / S - top)]
 
 
-def run(fig, file, by, date, browser=None):
-    """Import a person's screenshot as a take of `fig`; returns the take's log. Raises HandError when
-    the screenshot can't be read or used as the recipe says."""
+def run(fig, file, by, date, browser=None, tool=None):
+    """Import a person's screenshot, or a script's render, as a take of `fig`; returns the take's log.
+    Raises HandError when the image can't be read or used as the recipe says."""
     if not (by or "").strip():
         raise HandError("--by names the person who took the screenshot")
+    render = fig["kind"] == "render"
+    if render and browser:
+        raise HandError("a render has no browser: name the program that drew it with --tool")
+    if tool and not render:
+        raise HandError("--tool names the program that drew a render (`kind: render`); a screenshot's is --browser")
     captured = _date(date)
     file = Path(file)
     try:
@@ -204,7 +215,10 @@ def run(fig, file, by, date, browser=None):
         failed = png.with_name(png.stem + ".FAILED.png")
         png.rename(failed)
         png = failed
-    how = "screenshot by hand" + (f" in {browser}" if browser else "") + "; imported by tools/shots"
+    if render:
+        how = "rendered" + (f" with {tool}" if tool else "") + "; imported by tools/shots"
+    else:
+        how = "screenshot by hand" + (f" in {browser}" if browser else "") + "; imported by tools/shots"
     if redacted:
         how += f", {len(redacted)} area{'' if len(redacted) == 1 else 's'} blacked out"
     text_px = fig["hand"]["text_px"]
@@ -215,6 +229,7 @@ def run(fig, file, by, date, browser=None):
         "captured": captured,
         "imported": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
         "by": by.strip(), "method": how, **({"browser": browser} if browser else {}),
+        **({"tool": tool} if tool else {}),
         "window": fig["window"], "scale": S, "mode": "hand", "crop": fig.get("crop") or {"window": True},
         "clip": {"x": rect[0] / S, "y": rect[1] / S, "width": (rect[2] - rect[0]) / S,
                  "height": (rect[3] - rect[1]) / S},
