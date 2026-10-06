@@ -6,7 +6,7 @@
 - Decide by hand — with View Source, JavaScript switched off, and the Network tab — whether a page needs a browser at all
 - Install Selenium, check what Selenium Manager finds and downloads before starting the first browser, and fix it when it fails
 - Start Firefox, Edge, or Safari instead of Chrome, and say what each one needs
-- Locate elements using multiple strategies (ID, name, XPath, CSS selector)
+- Locate elements with each of Selenium's eight strategies, and explain how `find_element()` differs from BeautifulSoup's `find_all()`
 - Simulate user interactions — clicking, typing, and scrolling — programmatically
 - Run a browser headless, with no window on your screen, and check what it loaded
 - Pass fully-rendered page source from Selenium back to BeautifulSoup for parsing
@@ -388,25 +388,156 @@ Playwright, later in this chapter, offers another route to Safari's engine. It i
 
 ## Navigating and Finding Elements
 
-```{python}
-# Navigate to a website
-driver.get("https://xkcd.com")
+`driver.get()` loads a page, as typing its address into the browser does. To read part of the page or act on it, you first find its element, with `find_element()`:
 
-# Find elements by various strategies
+```{python}
 from selenium.webdriver.common.by import By
 
-# By ID
-comic_div = driver.find_element(By.ID, "comic")
+driver.get("https://xkcd.com")
 
-# By CSS selector
-nav_links = driver.find_elements(By.CSS_SELECTOR, "ul.comicNav li a")
-
-# By XPath
-title = driver.find_element(By.XPATH, "//div[@id='ctitle']")
-print(title.text)  # The title of the current comic
+comic = driver.find_element(By.ID, "comic")
+print(comic.tag_name)
+# div
 ```
 
-The `find_element` method (singular) returns the first matching element. The `find_elements` method (plural) returns a list of all matches.
+`find_element()` takes two arguments, which together make a **locator**. The first is a **strategy**, which says what kind of description follows. The second is the **value**, the description itself. `By.ID, "comic"` means "the element whose `id` attribute is `comic`": on xkcd, the `<div>` that holds the comic.
+
+### What `By` Does
+
+In your code, `By` is a class whose attributes are plain strings, the names of the strategies:
+
+```{python}
+print(By.ID, By.CSS_SELECTOR, By.XPATH, sep=" | ")
+# id | css selector | xpath
+```
+
+So `driver.find_element("id", "comic")` finds the same element. Writing `By.ID` instead lets your editor complete the name as you type, and it stops a typo at once: `By.IDD` raises `AttributeError: type object 'By' has no attribute 'IDD'` on the line you mistyped. A mistyped string, `"idd"`, travels to the browser first and comes back as `InvalidArgumentException: invalid argument: invalid locator`.
+
+Older code calls a method for each strategy instead, such as `driver.find_element_by_id("comic")`. Selenium 4.3 removed those methods in June 2022, so code copied from an older tutorial stops with `AttributeError: 'WebDriver' object has no attribute 'find_element_by_id'`. Rewrite each such call with `By`: `driver.find_element(By.ID, "comic")`.
+
+In the browser, a locator is an instruction. Selenium doesn't search the page itself. It sends the strategy and the value to chromedriver, which has Chrome search the page as it stands, after its JavaScript has run, and send back a reference to each element it found. The [W3C WebDriver standard](https://www.w3.org/TR/webdriver2/#locator-strategies), which every browser's driver follows, defines five strategies: CSS selector, link text, partial link text, tag name, and XPath. Selenium's other three, `By.ID`, `By.NAME`, and `By.CLASS_NAME`, are shortcuts that it rewrites as CSS selectors before it sends them. The rewrite shows in the error when nothing matches:
+
+```python
+driver.find_element(By.ID, "nope")
+```
+
+```
+NoSuchElementException: Message: no such element: Unable to locate element: {"method":"css selector","selector":"[id="nope"]"}
+```
+
+### The Eight Strategies
+
+| Strategy | Finds | Example | Sent to the browser as |
+|---|---|---|---|
+| `By.ID` | the element whose `id` is the value | `By.ID, "comic"`: xkcd's comic | the CSS selector `[id="comic"]` |
+| `By.NAME` | elements whose `name` attribute is the value, usually form fields | `By.NAME, "search"`: Wikipedia's search box ("Typing and Searching", below) | the CSS selector `[name="search"]` |
+| `By.CLASS_NAME` | elements that have the value among their classes | `By.CLASS_NAME, "comicNav"`: xkcd's two rows of navigation links | the CSS selector `.comicNav` |
+| `By.TAG_NAME` | elements with that tag | `By.TAG_NAME, "img"`: every image | a tag name |
+| `By.CSS_SELECTOR` | whatever a CSS selector describes | `By.CSS_SELECTOR, "#comic img"`: the comic's image | a CSS selector |
+| `By.XPATH` | whatever an XPath expression describes, including an element's text and its parent | `By.XPATH, "//a[text()='Random']"`: the link that reads **Random** | an XPath expression |
+| `By.LINK_TEXT` | links whose text is exactly the value | `By.LINK_TEXT, "Random"`: the same link | link text |
+| `By.PARTIAL_LINK_TEXT` | links whose text contains the value | `By.PARTIAL_LINK_TEXT, "Prev"`: the link that reads **< Prev** | partial link text |
+
+Here are five of them on xkcd's front page, in October 2026:
+
+```{python}
+# By class name: two rows of navigation links, above and below the comic
+print(len(driver.find_elements(By.CLASS_NAME, "comicNav")))
+# 2
+
+# By CSS selector: the links in those rows, five in each
+links = driver.find_elements(By.CSS_SELECTOR, "ul.comicNav a")
+print(len(links), [a.text for a in links[:5]])
+# 10 ['|<', '< Prev', 'Random', 'Next >', '>|']
+
+# By link text, exact and partial
+print(driver.find_element(By.LINK_TEXT, "Random").get_attribute("href"))
+# https://c.xkcd.com/random/comic/
+print(driver.find_element(By.PARTIAL_LINK_TEXT, "Prev").text)
+# < Prev
+
+# By XPath: up from the comic to the element that holds it
+print(driver.find_element(By.XPATH, "//div[@id='comic']/..").get_attribute("id"))
+# middleContainer
+```
+
+Which strategy to use depends on what the element offers:
+
+- **`By.ID`**, when the element has an id. An id is meant to be unique on its page, and ids are among the most stable attributes (@sec-protocols).
+- **`By.CSS_SELECTOR`**, for most of the rest. It is the language of BeautifulSoup's `select()` (@sec-static-pages) and of the Inspector's **Copy selector**, and it does all that `By.CLASS_NAME` and `By.TAG_NAME` do. `By.CLASS_NAME` takes a single class: `"comicNav box"` raises `InvalidSelectorException: Compound class names are not allowed.` To require two classes, join them in a CSS selector with no space between, as in `".first.second"`.
+- **`By.XPATH`**, for what a CSS selector can't express: an element by its text, such as `//a[text()='Random']`, or a step up to an element's parent, with `/..`. "Clicking", below, matches part of a link's text with `contains()`. The Inspector's **Copy full XPath** counts its way down from the top of the page: for xkcd's comic, `/html/body/div[2]/div[2]/img`. That path stops working when anything above the comic moves. Write a shorter one that starts from an id instead, such as `//div[@id='comic']/img`.
+- **`By.LINK_TEXT`** and **`By.PARTIAL_LINK_TEXT`**, for links whose words you can read on the screen. The exact version must match every character: `By.LINK_TEXT, "Prev"` raises `NoSuchElementException`, because the link reads `< Prev`.
+- **`By.NAME`**, for form fields. A field's `name` is what the form sends its value under, so fields have one, and "Typing and Searching", below, finds Wikipedia's search box this way. Other elements rarely do: on xkcd's front page, only a `<meta>` tag and the image map of the "Selected Comics" banner have a `name`.
+
+### One Element or Many
+
+`find_element()` returns the first match, in the order the elements appear in the page, and raises `NoSuchElementException` when nothing matches. `find_elements()`, plural, returns a list of every match, and an empty list when nothing matches. That makes it the way to ask whether something exists without risking an error: "A Practical Selenium Workflow" uses it to find out whether a page has a **Next** link.
+
+To search inside an element, call the same methods on the element instead of on the driver. With XPath, start the expression with a dot. Without the dot, `//` searches the whole page, whichever element you call it on:
+
+```{python}
+nav = driver.find_element(By.CLASS_NAME, "comicNav")  # the first row
+
+print(len(nav.find_elements(By.XPATH, ".//a")))  # the links inside this row
+# 5
+print(len(nav.find_elements(By.XPATH, "//a")))   # every link on the page
+# 47
+```
+
+What `find_element()` returns is a `WebElement`: a reference to an element in the browser, not a copy of it. Each `.text` or `.get_attribute()` asks the browser again. When the page changes, as when a click loads the next page, the reference goes **stale**, and using it raises `StaleElementReferenceException`. Find the element again on the new page.
+
+### How This Differs from BeautifulSoup's `find_all()`
+
+Selenium's `find_elements()` and BeautifulSoup's `find_all()` (@sec-static-pages) look alike: each takes a description and returns a list of matches. On the quotes page whose JavaScript writes the quotes, they find the same ten:
+
+```{python}
+from bs4 import BeautifulSoup
+
+driver.get("https://quotes.toscrape.com/js/")
+
+# Selenium: the page in the browser, after its JavaScript ran
+print(len(driver.find_elements(By.CSS_SELECTOR, "div.quote")))
+# 10
+
+# BeautifulSoup: the HTML you give it, here a copy of the same page
+soup = BeautifulSoup(driver.page_source, "html.parser")
+print(len(soup.find_all("div", class_="quote")))
+# 10
+```
+
+Check 1 parsed the HTML that `requests` received from the same address, before any JavaScript ran, and found none.
+
+The two also describe what they want in different ways. BeautifulSoup's filters are Python arguments, and one call can combine them: `find_all("div", class_="quote")` means a `<div>` with the class `quote`. The underscore in `class_` keeps it apart from `class`, a word that Python reserves. A Selenium locator holds one strategy and one string, so to combine conditions, you write them into a single CSS selector or XPath expression: `By.CSS_SELECTOR, "div.quote"`.
+
+| | Selenium's `find_elements()` | BeautifulSoup's `find_all()` |
+|---|---|---|
+| What it searches | The page in the browser, as it is now, after its JavaScript ran | The HTML you parsed: from `requests`, the page before any JavaScript ran; from `driver.page_source`, a copy of the page at that moment |
+| Where the search runs | In the browser. Each call is a request to chromedriver | In your own Python, with no requests |
+| How you describe what you want | A strategy and a string, such as `By.CSS_SELECTOR, "div.quote"` | Arguments: a tag name, `id=`, `class_=`, `attrs=`, `string=`. CSS selectors go to `select()`, and there is no XPath |
+| What it returns | `WebElement` objects: references to elements in the browser | `Tag` objects, which hold a copy of the markup in Python |
+| When nothing matches | `find_elements()` returns `[]`; `find_element()` raises `NoSuchElementException` | `find_all()` returns `[]`; `find()` returns `None` |
+| Text | `.text`: only what the browser displays | `.get_text()`: the text in the markup, displayed or not |
+| A link's `href` | `get_attribute("href")`: the full address, `https://quotes.toscrape.com/js/page/2/`. `get_dom_attribute("href")` gives it as written | `tag["href"]`: as written, `/js/page/2/` |
+| After the page changes | Stale: using it raises `StaleElementReferenceException` | Unchanged, because it is a copy |
+
+Two of those rows are easy to trip over. The first is **text**. xkcd keeps a transcript of many comics in a `<div id="transcript">` that its style hides (`display: none`). Selenium's `.text` returns only what the browser displays, so for the transcript it returns an empty string. BeautifulSoup returns the text in the markup, hidden or not:
+
+```{python}
+driver.get("https://xkcd.com/353/")  # The comic "Python"
+transcript = driver.find_element(By.ID, "transcript")
+print(repr(transcript.text))
+# ''
+print(transcript.get_attribute("textContent")[:59])  # Hidden text, read through Selenium
+# [[ Guy 1 is talking to Guy 2, who is floating in the sky ]]
+
+soup = BeautifulSoup(driver.page_source, "html.parser")
+print(soup.find("div", id="transcript").get_text()[:59])
+# [[ Guy 1 is talking to Guy 2, who is floating in the sky ]]
+```
+
+The second is **speed**. Each Selenium call is a request to chromedriver and an answer from the browser. Reading the ten quotes' text one element at a time, `[q.find_element(By.CLASS_NAME, "text").text for q in driver.find_elements(By.CLASS_NAME, "quote")]`, took 21 such calls, about 0.18 seconds in a test in October 2026. Parsing `driver.page_source` with BeautifulSoup and reading the same ten took less than 0.01 seconds.
+
+Use Selenium's locators for what you must click, type into, scroll, or wait for. Once the page holds what you need, hand its HTML to BeautifulSoup and read it all at once, as "Passing to BeautifulSoup", below, does.
 
 ## Extracting Data
 
@@ -417,6 +548,8 @@ xkcd is famous for its hidden alt-text messages. Right-click the comic and choos
 You can extract both attributes:
 
 ```{python}
+driver.get("https://xkcd.com")  # Back to the latest comic
+
 # Find the comic image
 img = driver.find_element(By.XPATH, "//div[@id='comic']//img")
 
