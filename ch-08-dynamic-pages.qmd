@@ -80,19 +80,56 @@ Now open <https://quotes.toscrape.com/scroll>. View Source shows no quotes and n
 
 ![The Network tab on `quotes.toscrape.com/scroll`, filtered to Fetch/XHR. Scrolling triggered requests for pages 1 through 4 of the site's quote API, and Preview shows page 2's JSON.](images/ch-08/network-tab-json.png){#fig-network-json .lightbox fig-alt="Screenshot of Chrome's developer tools with the Network tab filtered to Fetch/XHR. The request list shows four requests, quotes?page=1 through quotes?page=4, with page 2 selected. Its Preview pane shows JSON with has_next true, page 2, and a quotes array open to its first item, whose fields are author, tags, and text, followed by tag null and top_ten_tags."}
 
-That request is an interface the page built for itself, and your own code can call it too. Check the site's terms first (@sec-ethics), then request it directly, with a pause between pages:
+What you have found is a **hidden API**, also called an undocumented or internal API. The page's JavaScript asks the server for quotes, the server answers with JSON (@sec-data-formats), and the script builds the boxes you see from the reply. The API is hidden only in that nobody publishes it: no documentation lists its address or its parameters, it needs no key, and the site has made no promise to keep it working. Everything you need to use it is in the Network tab. Three steps take you from that request to a scraper: find the endpoint, test one request, and write the loop.
+
+**Find the endpoint.** Click the request and open **Headers**. Under **General**, the **Request URL** is the address the page asked for, `https://quotes.toscrape.com/api/quotes?page=2`. The **Request Method** is `GET` and the **Status Code** is `200`, and under **Response Headers**, `Content-Type` is `application/json`. The address has two parts that do different jobs. Everything before the `?` is the **endpoint**, `https://quotes.toscrape.com/api/quotes`, which stays the same from request to request. After the `?` comes the **query string**, `page=2`, which the **Payload** tab lists as a parameter on its own line. Click `quotes?page=3` and only the parameter changes: that is what your loop will change. To copy an address exactly, right-click the request and choose **Copy** → **Copy URL**.
+
+**Test one request.** Before you write a loop, make one request from Python and look at what comes back:
+
+```{python}
+response = requests.get(
+    "https://quotes.toscrape.com/api/quotes",
+    params={"page": 1},
+    headers=HEADERS,
+)
+print(response.url)  # requests built the query string from params
+# https://quotes.toscrape.com/api/quotes?page=1
+print(response.status_code, response.headers["Content-Type"])
+# 200 application/json
+
+data = response.json()
+print(list(data))
+# ['has_next', 'page', 'quotes', 'tag', 'top_ten_tags']
+print(data["page"], data["has_next"], len(data["quotes"]))
+# 1 True 10
+print(data["quotes"][0]["author"]["name"])
+# Albert Einstein
+```
+
+The request worked with nothing from the browser: no cookies and no token, only your `User-Agent`. Each page holds ten quotes, and `has_next` says whether another page follows. Two more single requests show how the API behaves before you scale up:
+
+- **One page past the end.** With `page=11`, the server still answers `200`, with an empty `quotes` list and `has_next` set to `false`. A loop that stopped only on an error would keep requesting empty pages, so stop on `has_next`.
+- **A parameter the page didn't use.** `tag` is `null` in these replies, a hint that the endpoint takes one. With `params={"tag": "love", "page": 1}`, it returned only quotes tagged *love*: ten on page 1, then four on page 2, where `has_next` turned `false`.
+
+With no documentation to read, tests like these are how you learn what an undocumented API accepts. Keep each one small, and pause between them.
+
+**Write the scraper.** The loop asks for one page at a time until `has_next` says to stop. Check the site's terms first (@sec-ethics), then request the pages directly, with a pause between them:
 
 ```{python}
 import time
 
+import pandas as pd
+
 all_quotes = []
 page = 1
 while True:
-    data = requests.get(
+    response = requests.get(
         "https://quotes.toscrape.com/api/quotes",
         params={"page": page},
         headers=HEADERS,
-    ).json()
+    )
+    response.raise_for_status()  # Stop on an error status rather than parse an error page
+    data = response.json()
     all_quotes.extend(data["quotes"])
     if not data["has_next"]:  # The API says when to stop
         break
@@ -101,13 +138,23 @@ while True:
 
 print(len(all_quotes))
 # 100
+
+# One row per quote; each quote's author is a dictionary of its own
+api_quotes = pd.DataFrame([
+    {"author": q["author"]["name"], "text": q["text"], "tags": ", ".join(q["tags"])}
+    for q in all_quotes
+])
+print(api_quotes.shape)
+# (100, 3)
 ```
 
 The JSON arrives already structured, with no HTML to parse. Nobody promised to keep an undocumented endpoint like this one stable, though, so save what you collect as you go, as @sec-archives recommends.
 
-When all three checks come up empty — the data appears only after the page runs code you cannot reproduce, or only after clicks, typing, or scrolling you must perform — you need a browser. The rest of this chapter drives one in two ways: with Selenium in the notebook, and then with Playwright as a script. The Selenium examples start on simple pages like xkcd that do not strictly need a browser, because simple pages make the tool's basics easy to see.
+A hidden API isn't always this easy to call. Its Request URL may carry a value that changes on every visit, such as a token or signature that the page's JavaScript computes, so an address you copy stops working. It may answer your `requests` call with `401` or `403` while the page gets `200`, because the page sends cookies or headers that you don't: compare the two with **Copy** → **Copy as cURL** (@sec-protocols). And some pages request no data at all, or request it only after clicks, typing, or scrolling that you would have to perform.
 
 ## Setting Up Selenium
+
+When all three checks come up empty, as on those pages, you need a browser that runs the page's code for you. The rest of this chapter drives one in two ways: with Selenium in the notebook, and then with Playwright as a script, which can also catch a hidden API's replies as the page receives them ("Catching the JSON Behind a Page"). The Selenium examples start on simple pages like xkcd that do not strictly need a browser, because simple pages make the tool's basics easy to see.
 
 Selenium requires two components: the `selenium` Python library and a browser driver — a small program that lets Python control a specific browser. You only need to install the library: since version 4.6 (late 2022), Selenium has come with **Selenium Manager**, which finds or downloads the correct driver for whatever browser you have installed, and downloads the browser as well if you have none. conda-forge, where `webdata`'s packages come from, installs Selenium Manager as a package of its own, `selenium-manager`, whenever it installs `selenium`.
 
