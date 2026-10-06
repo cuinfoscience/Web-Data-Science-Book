@@ -2,11 +2,12 @@
 
 ::: {.callout-tip}
 ## Learning Objectives
-- Explain why PDF text extraction is difficult and how PDFs differ from structured formats
-- Use PyPDF to open PDF files, access metadata, and extract page-level text
-- Apply string methods and regular expressions to clean and structure extracted text
-- Build a data pipeline that processes multiple PDF files to extract structured information
-- Visualize trends across a corpus of PDF documents
+- Explain what a PDF stores (characters, rectangles, and images placed on a page) and why its text and tables must be reconstructed
+- Tell born-digital, scanned, and mixed pages apart before you extract anything
+- Download PDFs from a records portal politely, keeping a record of where each came from
+- Extract text with pypdf, and words, lines, and tables with pdfplumber, and say what each one reconstructs
+- Recover text from a page image with OCR
+- Check an extraction with counts, sums, cross-checks, and a sample coded by hand, and use those checks to judge an AI document parser
 :::
 
 ::: {.callout-tip}
@@ -17,16 +18,253 @@ Run this chapter's code as you read: open the [companion notebook](https://githu
 
 ## The Web's Filing Cabinets
 
-PDFs are everywhere in institutional record-keeping: city council meeting minutes, legislative bill texts, financial reports, court filings, academic papers, and environmental impact assessments. They are the format of choice for "official" documents precisely because they preserve visual layout across different devices and printers. But that design priority — visual fidelity over semantic structure — makes them hostile to programmatic data extraction. The records locked inside them are what @salganik2018bit calls *readymade* data: created by institutions for administrative purposes rather than for research, but repurposable — with effort — to answer questions their creators never anticipated.
+PDFs are everywhere in institutional record-keeping: city council minutes, legislative bill texts, financial reports, court filings, academic papers, and environmental impact assessments. They are the format of choice for "official" documents because they look the same on every screen and every printer. The records inside them are what @salganik2018bit calls *readymade* data: made by institutions for their own purposes, and reusable, with effort, to answer questions their makers never asked.
 
-When you read a PDF, you see paragraphs, tables, headers, and page numbers. When a computer reads a PDF, it sees a sequence of drawing instructions: place this character at coordinates (x, y), draw a line from here to there, embed this image at this location. Text extraction from PDFs is *reconstruction*, not reading — the computer must infer the logical structure from the spatial layout.
+The City of Boulder keeps thousands of them in its online records portal: signed City Council minutes back to 2000, budgets, ordinances, and the Finance Department's revenue reports. The revenue report for December 2024 shows both the promise and the problem. Its first pages hold tables of tax revenue whose numbers you can select and copy. Its last page holds a table of sales tax by month for six years that you can't select at all, because it is a picture of a table. Beside it, the city printed a note: "Please contact sales tax staff … for a screen readable version."
 
-This chapter teaches you to work within these constraints. The results will not be perfect, but they can be good enough to turn inaccessible institutional records into analyzable datasets.
+When you read a PDF, you see paragraphs, tables, headers, and page numbers. A computer reading the same file sees instructions for drawing the page: put these characters at these coordinates, fill this rectangle, paint this image. Getting data out of a PDF is *reconstruction*, not reading. Software has to infer the words, lines, and tables you see from where things sit on the page, and for a picture of a table, it has to recognize the characters themselves.
+
+So treat the PDF as your last resort, in the same spirit as chapter 8's order of preference for web pages (@sec-dynamic-pages):
+
+1. **Look for the data in a form made for machines**: an open-data portal, an API, or a spreadsheet.
+2. **Ask for it.** Colorado's open-records law says that a record kept in a sortable format, such as a spreadsheet, must be provided in that format (C.R.S. 24-72-203(3.5)).
+3. **Parse the PDF.**
+
+This chapter is about the third step, which for older records is often the only one available. It starts with the concepts and tools: what a PDF stores, how to tell which kind of PDF you have, how to get the files, what pypdf, pdfplumber, and OCR each reconstruct, and how to check that an extraction is right. Two case studies from Boulder then use all of them: council minutes for text, and revenue reports for tables. The chapter ends with AI document parsers, and with how to judge one.
 
 ::: {.callout-note}
 ## Public Interest Connection
-When governments publish meeting minutes, budgets, and regulatory filings only as PDFs, they create what @sec-post-api describes as "soft enclosure" — records that are nominally public but practically inaccessible for analysis. Building the skills to extract data from PDFs is itself a form of the **oversight** value: it enables independent analysis of institutional records.
+When governments publish minutes, budgets, and filings only as PDFs, they create what @sec-post-api calls "soft enclosure": records that are public in name and hard to analyze in practice. A picture of a table is the extreme case, because neither a screen reader nor a script can read its numbers. Building the skills to extract data from PDFs serves the **oversight** value: it lets people outside an institution analyze its records for themselves.
 :::
+
+### This Chapter's Files
+
+The chapter's code reads copies of the city's PDFs that the book keeps on GitHub, so that a class of readers doesn't send hundreds of requests to the city's server at once. "Getting the Files," below, shows where the copies came from and how to download from the portal yourself. Each file downloads once, the first time you ask for it:
+
+```{python}
+import requests
+from pathlib import Path
+
+# The book's copies of this chapter's files; data/ch-09/manifest.csv says where each one came from
+BOOK_DATA = "https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-09/"
+HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+PDF_DIR = Path("pdfs")
+
+def get_saved_copy(name):
+    """Return the path of one of the book's saved files, downloading it the first time.
+
+    Parameters
+    ----------
+    name : str
+        A file name in the book's data/ch-09 folder, such as "revenue-report-2024-12.pdf"
+
+    Returns
+    -------
+    pathlib.Path
+        Where the file is on your computer
+    """
+    path = PDF_DIR / name
+    if not path.exists():
+        PDF_DIR.mkdir(exist_ok=True)
+        response = requests.get(BOOK_DATA + name, headers=HEADERS, timeout=60)
+        response.raise_for_status()
+        path.write_bytes(response.content)
+    return path
+
+report_2024 = get_saved_copy("revenue-report-2024-12.pdf")
+print(report_2024, f"{report_2024.stat().st_size:,} bytes")
+# pdfs/revenue-report-2024-12.pdf 723,920 bytes
+```
+
+The files land in a `pdfs` folder next to your notebook. On Windows, the path prints with a backslash.
+
+## What's Inside a PDF
+
+A PDF page is a list of drawing instructions, which the format calls a *content stream*. Three kinds of things get drawn:
+
+- **Characters.** Each instruction picks a font and a size and places characters at a position. The font maps each character's shape to the Unicode character it stands for. When that map is missing or wrong, extraction returns gibberish from a page that looks fine.
+- **Lines and rectangles**: rules, borders, shading, and the grid of a table.
+- **Images**: logos, photographs, charts, and, in a scanned document, the whole page.
+
+What most PDFs don't store is any of the structure you see: words, lines of text, paragraphs, columns, tables, or the order in which to read them. The gap between two words may be a space character, or just a wider gap between two characters. Everything else is inferred from position.
+
+You can see this with pdfplumber, which lists every object on a page with its coordinates. Positions are in *points*, 1/72 of an inch, measured from the page's left edge (`x0`) and its top (`top`):
+
+```{python}
+import pdfplumber
+
+with pdfplumber.open(report_2024) as pdf:
+    page = pdf.pages[1]  # the second page, where the report's tables start
+    print(len(pdf.pages), "pages; this one is", page.width, "by", page.height, "points")
+    for char in page.chars[1:8]:
+        print(repr(char["text"]), round(char["x0"], 1), round(char["top"], 1), char["fontname"], round(char["size"], 1))
+    print(len(page.chars), "characters,", len(page.lines), "lines,", len(page.rects), "rectangles,", len(page.images), "images")
+# 15 pages; this one is 612.0 by 792.0 points
+# 'C' 54.0 30.4 CALYKT+Arial-BoldMT 11.0
+# 'i' 61.9 30.4 CALYKT+Arial-BoldMT 11.0
+# 't' 65.0 30.4 CALYKT+Arial-BoldMT 11.0
+# 'y' 68.8 30.4 CALYKT+Arial-BoldMT 11.0
+# ' ' 74.9 30.4 CALYKT+Arial-BoldMT 11.0
+# 'o' 78.0 30.4 CALYKT+Arial-BoldMT 11.0
+# 'f' 84.6 30.4 CALYKT+Arial-BoldMT 11.0
+# 2222 characters, 0 lines, 549 rectangles, 0 images
+```
+
+The first seven characters spell "City of", one character at a time. Each carries its own position, font, and size, and "City" is a word only because its four characters sit close together. The table's rules aren't lines at all: they are hundreds of thin, filled rectangles (@fig-pdf-objects). Any tool that finds a table on this page has to rebuild its grid from those rectangles, and its cells from the characters.
+
+![The summary table on page 2 of the December 2024 report, drawn by pdfplumber. Each of the 290 rectangles the page draws here is outlined in red, and each character of the title and of the Sales Tax row has its own blue box.](images/ch-09/pdf-objects.png){#fig-pdf-objects .lightbox fig-alt="A table titled Sales and Use Tax Summary, comparing December year-to-date tax revenue in 2023 and 2024. Red outlines mark every rectangle the page draws: the table's borders, its shaded header cells, and the thin rules between rows. Each character of the title and of the first row, Sales Tax, $137,732,945 in 2023 and $139,069,840 in 2024, sits in its own blue box. The rows below it, such as Construction Use Tax, are not boxed."}
+
+**Metadata.** A PDF also stores facts about itself: a title, an author, the program that made it, and dates. pypdf reads them:
+
+```{python}
+from pypdf import PdfReader
+
+reader = PdfReader(report_2024)
+meta = reader.metadata
+print(meta.title, "|", meta.subject, "|", meta.creator, "|", meta.creation_date)
+# REVENUE REPORT | March 2018 | Acrobat PDFMaker 25 for Word | 2025-05-01 13:20:25-06:00
+```
+
+The title and the creator look right. The subject, March 2018, in a report on December 2024, came from the Word template the report started from: five of the city's seven year-end reports carry it. Metadata says what the software wrote, not what is true, so don't date a document by it. The creator is worth reading, though, because it tells you how the file was made, which is what the next section is about.
+
+**Tagged PDFs.** Some PDFs carry a second layer for assistive technology: a *structure tree* that marks headings, paragraphs, tables, and figures, sets the reading order, and holds *alternative text*, which a screen reader speaks in place of an image. PDF/UA (ISO 14289-1) is the standard for doing this well. Six of the seven year-end reports are tagged. In the December 2024 report, the picture of the monthly table has alternative text, and it reads the note again: "This table presents historical taxes by type. Please contact sales tax staff … for a screen readable version." In December 2021, the three pictures of tables say what Word writes when nobody writes anything: "Table. Description automatically generated." Tagging can make a PDF accessible, but only when someone fills it in.
+
+```{python}
+print("tagged:", "/StructTreeRoot" in reader.trailer["/Root"])
+# tagged: True
+```
+
+## What Kind of PDF Is It?
+
+Chapter 8 began with three checks for whether a page needs a browser (@sec-dynamic-pages). A PDF needs the same kind of triage before you extract anything, because the right tool depends on how each page was made. There are three kinds:
+
+- **Born-digital** pages come from software, such as Word or a print-to-PDF driver, which writes the characters into the file. The text is there to extract, though its structure must still be rebuilt.
+- **Scanned** pages are pictures of paper. The file holds an image and no characters, so text extraction returns nothing. You need *optical character recognition* (OCR), which reads characters from the image.
+- **Scanned with a text layer**: someone, often the scanner itself, already ran OCR and hid the text it recognized behind the image. The page looks like a scan, and extraction returns text, but that text is only as good as the OCR that made it.
+
+Files mix them. Boulder's revenue reports are born-digital, but their charts, and in some years their tables, are pictures.
+
+**Check 1: try to select the text.** Open the PDF in a viewer and drag across a line. If the text highlights word by word, the page has characters. If nothing highlights, or the whole page highlights as one block, it's an image.
+
+**Check 2: count characters and images on every page.** This is check 1 done in code, for every page at once:
+
+```{python}
+def page_profile(path):
+    """Characters of extracted text, and number of images, on each page of a PDF."""
+    reader = PdfReader(path)
+    return [(len(page.extract_text()), len(page.images)) for page in reader.pages]
+
+for name in ["revenue-report-2024-12.pdf", "revenue-report-2018.pdf", "council-minutes-2018-12-04.pdf"]:
+    profile = page_profile(get_saved_copy(name))
+    print(name)
+    print("  characters:", [chars for chars, images in profile])
+    print("  images:    ", [images for chars, images in profile])
+# revenue-report-2024-12.pdf
+#   characters: [1332, 2279, 2782, 648, 738, 393, 491, 1356, 1390, 676, 3429, 1519, 3797, 4624, 265]
+#   images:     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+# revenue-report-2018.pdf
+#   characters: [1491, 1919, 143, 474, 42, 191, 374, 269, 907, 1273, 3048, 1334, 3031, 3964, 5569]
+#   images:     [1, 0, 2, 1, 1, 1, 3, 3, 2, 1, 0, 0, 0, 0, 0]
+# council-minutes-2018-12-04.pdf
+#   characters: [1718, 1869, 1729, 2381, 2776, 1706, 1665, 1673, 320]
+#   images:     [1, 1, 1, 1, 1, 1, 1, 1, 1]
+```
+
+Read each file's two lists together:
+
+- **The December 2024 report** has text on every page. Its first page has one image (the city's logo), and its last page has one image and only 265 characters: the picture of the monthly table, and the note beside it.
+- **The 2018 annual report** has pages with one to three images and little text: those are its charts. Its last page has 5,569 characters, because in 2018 the same monthly table was text.
+- **The minutes from December 4, 2018** have one image and about 1,700 characters on every page. One image filling the page, with plenty of text, is the third kind: a scan with a text layer.
+
+@fig-two-exhibit-3s shows the two reports' last pages. They look alike on screen. Try to select the numbers, though, and only the 2018 table's highlight; the counts above say why.
+
+![Exhibit 3, sales and use tax by month, in the 2018 report (top), where the table is text, and in the December 2024 report (bottom), where it is a picture under a note. Drawn by pdfplumber. The note's phone number and email address are blacked out.](images/ch-09/two-exhibit-3s.png){#fig-two-exhibit-3s .lightbox fig-alt="Two crops of report pages, one above the other, each titled Exhibit 3: Sales Tax and Use Tax Separately by Month. The top one, from 2018, is a table of retail sales tax by month for 2012 to 2017. The bottom one, from December 2024, is the same kind of table for 2019 to 2024, under a note: This table presents historical taxes by type. Please contact sales tax staff at a blacked-out phone number and email for a screen readable version."}
+
+**Check 3: find out where the text came from.** The minutes' metadata names the machine that made them, and their text shows how well its OCR worked:
+
+```{python}
+minutes = PdfReader(get_saved_copy("council-minutes-2018-12-04.pdf"))
+print(minutes.metadata.creator, "|", minutes.metadata.creation_date)
+for line in minutes.pages[0].extract_text().splitlines()[:3]:
+    print(line.strip())
+# Canon  | 2019-01-22 10:08:22-07:00
+# CITY OF BOULDER
+# CITY COTJNCIL MEETING
+# Municipal Building, 1777 Broadway
+```
+
+The minutes were scanned on a Canon scanner seven weeks after the meeting, and the scanner's OCR read "COUNCIL" as "COTJNCIL". Most of the page fared better. The motions, though, are printed in small capital letters, and on December 18, 2018 the scanner turned "Council Member Weaver moved to amend Ordinance 8296" into "CouNcrl MrnrnBn Wrlvrn lrovno ro xvrBNo OnorNaNcn 8296". The text layer exists, and the parts that record the votes are unusable. Later in the chapter, OCR reads these pages again.
+
+The checks route each page to a tool:
+
+| What the checks show | What the page is | What to do |
+|---|---|---|
+| Text you can select; characters on the page | Born-digital | Extract the text with pypdf, and the layout and tables with pdfplumber |
+| One image on the page, and no characters | Scanned | Run OCR |
+| One image, and characters too | Scanned with a text layer | Test the text; if it's poor, run OCR again |
+| Text pages, with some image pages | Mixed | Route each page by itself |
+
+## Getting the Files
+
+The saved copies came from the city's records portal, [documents.bouldercolorado.gov](https://documents.bouldercolorado.gov/WebLink/Browse.aspx?id=194345&dbid=0&repo=LF8PROD2), which runs Laserfiche WebLink, software that many local governments use for their records. Open the Revenue Reports folder in a browser and you'll see four year folders and three annual reports. View Source shows almost none of it: the page is a shell that says "Loading...", and JavaScript fills in the list. Chapter 8's way of finding a hidden API (@sec-dynamic-pages, "Check 3: Watch the Network Tab") shows where the list comes from: a request named `GetFolderListing2`, which sends the folder's number and gets back JSON.
+
+::: {.callout-important}
+## The city's server leaves out a certificate
+Your first request to the portal from Python will probably fail with `SSLError: … CERTIFICATE_VERIFY_FAILED … unable to get local issuer certificate`. The server sends its own certificate, but not the *intermediate* certificate that links it to a root certificate your computer trusts. Browsers find the missing certificate by themselves; Python doesn't.
+
+Don't fix this with `verify=False`, which turns off the check that you're talking to the real server. Pass the book's ready-made bundle instead, `verify=bundle`: it holds the standard root certificates plus that one intermediate. If the city repairs its server, the bundle still works. `data/ch-09/make_ca_bundle.py` in the book's repository shows how the bundle was made.
+:::
+
+These two cells are the chapter's only requests to the city's server. Run them at home, not all at once in class: on October 6, 2026, the server stopped answering after 13 to 17 requests in a row, whether they came 30 or 60 seconds apart, and answered again after a five-minute pause. The first cell asks for the Revenue Reports folder's list, as the folder page does:
+
+```{python}
+import time
+
+bundle = get_saved_copy("boulder-ca-bundle.pem")
+PORTAL = "https://documents.bouldercolorado.gov/WebLink/"
+
+# The JSON the folder page itself sends: 194345 is the Revenue Reports folder
+body = {"repoName": "LF8PROD2", "folderId": 194345, "getNewListing": True,
+        "start": 0, "end": 100, "sortColumn": "", "sortAscending": True}
+response = requests.post(PORTAL + "FolderListingService.aspx/GetFolderListing2",
+                         json=body, headers=HEADERS, timeout=60, verify=bundle)
+response.raise_for_status()
+folder = response.json()["data"]
+print(folder["path"], "|", folder["totalEntries"], "entries")
+for entry in folder["results"]:
+    kind = "folder" if entry["type"] == 0 else f"{entry['data'][1]} pages"
+    print(entry["entryId"], entry["name"], f"({kind})")
+# \Central Records\Finance\Reports\Revenue Reports | 7 entries
+# 194346 2021 (folder)
+# 194359 2022 (folder)
+# 194372 2023 (folder)
+# 194385 2024 (folder)
+# 194398 Revenue Report 2018 (15 pages)
+# 194399 Revenue Report 2019 (14 pages)
+# 194400 Revenue Report 2020 (16 pages)
+```
+
+Each document's `entryId` is the number the portal's download address needs. The second cell downloads the December 2024 report, which sits in the 2024 folder:
+
+```{python}
+import hashlib
+
+time.sleep(30)  # wait between requests to the city's server
+docid = 194397  # Revenue Report 2024.12
+url = PORTAL + f"ElectronicFile.aspx?docid={docid}&dbid=0&repo=LF8PROD2"
+response = requests.get(url, headers=HEADERS, timeout=120, verify=bundle)
+response.raise_for_status()
+print(response.headers["Content-Type"], len(response.content), response.content[:5])
+
+# Is the book's saved copy the same file, byte for byte?
+print(hashlib.sha256(response.content).hexdigest() == hashlib.sha256(report_2024.read_bytes()).hexdigest())
+# application/pdf 723920 b'%PDF-'
+# True
+```
+
+Check what came back before you parse it. A status of 200 isn't enough: for a record that holds scanned pages rather than a PDF file, the same address answers 200 with an empty body. A PDF starts with the five bytes `%PDF-`, so test them along with the content type. The last line compares a *hash*, a fingerprint of the file's bytes, with the book's copy. `data/ch-09/manifest.csv` records each saved copy's hash, address, and download time, so you can check any of them the same way.
+
+This code fits Laserfiche WebLink portals, and this one in particular: the folder number, the repository name `LF8PROD2`, and the request body all come from Boulder's site. What carries over to other portals is the method: watch what the page requests, test one request, check what comes back, and keep a record of every file you take.
 
 ## PyPDF Basics
 
@@ -38,8 +276,8 @@ The `pypdf` library provides page-level text extraction and metadata access:
 
 from pypdf import PdfReader
 
-# Open a PDF file (download Boulder City Council minutes first)
-reader = PdfReader("council_minutes_2024_01.pdf")
+# Open one of the chapter's saved copies (see "This Chapter's Files")
+reader = PdfReader(get_saved_copy("council-minutes-2018-12-04.pdf"))
 
 # Document-level metadata
 print(f"Number of pages: {len(reader.pages)}")

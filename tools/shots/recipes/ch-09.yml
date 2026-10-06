@@ -1,0 +1,69 @@
+# Recipes for Chapter 9's figures (ch-09-pdfs.qmd). See tools/shots/README.md.
+#
+# The figures here are renders, not screenshots: pdfplumber draws pages of the
+# City of Boulder's revenue reports from the copies saved in data/ch-09/, and
+# tools/shots/renders/ch-09.py is the script. Each is imported as a take with
+# `--tool`, so its record says "rendered with pdfplumber", and promoted like
+# any other figure (README, "Hand captures"). The reports come from the city's
+# records portal, documents.bouldercolorado.gov (Laserfiche WebLink); the
+# chapter's text says how, and data/README.md lists each file's docid and hash.
+chapter: ch-09
+qmd: ch-09-pdfs.qmd
+defaults:
+  scale: 2
+
+figures:
+  - id: pdf-objects
+    kind: render
+    mode: hand
+    section: "What's Inside a PDF"
+    brief: >-
+      Show that a PDF stores marks on a page, not a table: the December 2024
+      report's summary table (page 2), with every rectangle the page draws
+      outlined in red and the characters of the title and the first row
+      (Sales Tax) each in its own blue box. The reader should see that the
+      table's lines are thin filled rectangles, 290 in this crop, and that
+      each digit of a number is placed on its own. The other rows are left
+      unboxed so they stay readable.
+    url: https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2
+    hand:
+      why: >-
+        a script draws it from the city's PDF; no browser is involved
+      steps: >-
+        In the webdata environment, run `python tools/shots/renders/ch-09.py
+        OUTDIR`, which reads data/ch-09/revenue-report-2024-12.pdf (sha256
+        8d32866d…c80fc68d) and writes OUTDIR/pdf-objects.png, 1600 pixels
+        wide. Import it with --tool naming pdfplumber's version.
+      text_px: 16          # the table's body text, in an 800-pixel frame
+    window: [800, 360]
+
+  - id: two-exhibit-3s
+    kind: render
+    mode: hand
+    section: "What Kind of PDF Is It?"
+    brief: >-
+      Show the same exhibit published two ways: Exhibit 3 (sales and use tax
+      by month) in the 2018 report, where the table is text, above Exhibit 3
+      in the December 2024 report, where the table is a picture under a
+      note offering a "screen readable version". The numbers are not meant
+      to be read here; the titles and the note are. Two crops of page 15,
+      each 720 points wide, joined with a gray rule.
+    url: https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2
+    hand:
+      why: >-
+        a script draws it from the city's PDFs; no browser is involved
+      steps: >-
+        In the webdata environment, run `python tools/shots/renders/ch-09.py
+        OUTDIR`, which reads data/ch-09/revenue-report-2018.pdf (docid
+        194398, sha256 25a01ccd…a5c1632c) and revenue-report-2024-12.pdf
+        (docid 194397, sha256 8d32866d…c80fc68d) and writes
+        OUTDIR/two-exhibit-3s.png, 1600 pixels wide. Import it with --tool
+        naming pdfplumber's version.
+      text_px: 12          # the note above the 2024 table; the tables' numbers are smaller
+    window: [800, 346]
+    redact:
+      - box: [382, 233, 241, 17]
+        why: >-
+          the sales tax office's phone number and email address in the note,
+          which the chapter leaves out rather than send a class of readers to
+          the city's staff
