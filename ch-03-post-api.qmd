@@ -151,6 +151,9 @@ TARGETS = {
     "Meta Graph":  "https://graph.facebook.com/v20.0/me",
 }
 
+# What each status code means for an anonymous request; any other code is "other".
+VERDICTS = {200: "open", 401: "gated", 403: "gated", 429: "rate-limited"}
+
 
 def probe(name, url):
     """Ask one endpoint for data without credentials and describe the answer.
@@ -164,15 +167,8 @@ def probe(name, url):
     except requests.RequestException as error:
         return {"api": name, "status": None, "verdict": "unreachable",
                 "content_type": type(error).__name__, "rate_limit": None}
-    
-    verdict_dict = {
-        200: "open",
-        401: "gated",
-        403: "gated",
-        429: "too-many-requests"
-    }
 
-    verdict = verdict_dict.get(response.status_code, "other")
+    verdict = VERDICTS.get(response.status_code, "other")
 
     return {
         "api": name,
