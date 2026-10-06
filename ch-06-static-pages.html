@@ -482,7 +482,7 @@ div.csl-indent {
 <section id="strategy-1-the-clean-single-table" class="level2" data-number="6.3">
 <h2 data-number="6.3" class="anchored" data-anchor-id="strategy-1-the-clean-single-table"><span class="header-section-number">6.3</span> Strategy 1: The Clean Single Table</h2>
 <p>Start with the easiest case on the spectrum: a single site, a consistent template, and a page whose data lives in exactly one <code>&lt;table&gt;</code> with nothing else on the page competing for it. <a href="https://www.boxofficemojo.com">Box Office Mojo</a>’s weekly box office charts are built this way, and the chart for the week ending December 28, 2018 — the lucrative corridor between Christmas and New Year’s — sits at a URL that follows the same pattern every week:</p>
-<div id="67f94dc1" class="cell" data-execution_count="1">
+<div id="9758bde7" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://www.boxofficemojo.com/weekend/2018W52/"</span></span>
@@ -502,7 +502,7 @@ div.csl-indent {
 <p>The Numbers publishes the same kind of weekly box office chart as Box Office Mojo, for the same weeks — but the page ships two <code>&lt;table&gt;</code> elements, not one: a full desktop layout and a separate mobile layout stacked beneath it. Pick <code>tables[0]</code> on faith and you have a fifty-fifty chance of parsing the wrong one; you have to inspect the page and confirm which table is the one you want before you write a line of extraction code. Let us extract box office revenue data from <a href="https://www.the-numbers.com">The Numbers</a> for the same late-December 2018 chart. One hedge before we begin: sites reorganize their URLs and page structures over time, so the code below targets the page as it existed in mid-2026 (this chapter’s closing “A Note on Fragility” has more to say about living with that reality).</p>
 <section id="retrieving-and-inspecting" class="level3" data-number="6.4.1">
 <h3 data-number="6.4.1" class="anchored" data-anchor-id="retrieving-and-inspecting"><span class="header-section-number">6.4.1</span> Retrieving and Inspecting</h3>
-<div id="c779e091" class="cell" data-execution_count="2">
+<div id="797a74d1" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
@@ -512,7 +512,7 @@ div.csl-indent {
 <span id="cb2-7"><a href="#cb2-7" aria-label="7"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Before writing parsing code, inspect the page in your browser’s developer tools. Right-click on the table and select “Inspect” to see the HTML structure. You are looking for the <code>&lt;table&gt;</code> tag and, within it, <code>&lt;tr&gt;</code> (table row) and <code>&lt;td&gt;</code> (table data) tags.</p>
-<div id="103cfb88" class="cell" data-execution_count="3">
+<div id="b55935d7" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co"># Find all tables on the page</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>tables <span class="op">=</span> soup.find_all(<span class="st">"table"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"Number of tables found: </span><span class="sc">{</span><span class="bu">len</span>(tables)<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -528,7 +528,7 @@ div.csl-indent {
 <section id="extracting-row-data" class="level3" data-number="6.4.2">
 <h3 data-number="6.4.2" class="anchored" data-anchor-id="extracting-row-data"><span class="header-section-number">6.4.2</span> Extracting Row Data</h3>
 <p>Once you have identified the correct table, the next step is to navigate its structure tag by tag. Every <code>&lt;tr&gt;</code> (table row) contains a sequence of <code>&lt;td&gt;</code> (table data) or <code>&lt;th&gt;</code> (table header) cells, and BeautifulSoup lets you walk that hierarchy directly:</p>
-<div id="bc3bef18" class="cell" data-execution_count="4">
+<div id="e74e9cbc" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Assuming the data table is tables[1] (verify by inspection)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>data_table <span class="op">=</span> tables[<span class="dv">1</span>]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>rows <span class="op">=</span> data_table.find_all(<span class="st">"tr"</span>)</span>
@@ -550,7 +550,7 @@ div.csl-indent {
 </section>
 <section id="building-the-dataframe" class="level3" data-number="6.4.3">
 <h3 data-number="6.4.3" class="anchored" data-anchor-id="building-the-dataframe"><span class="header-section-number">6.4.3</span> Building the DataFrame</h3>
-<div id="c34dfd91" class="cell" data-execution_count="5">
+<div id="bd85e341" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Loop through the data rows, extracting each cell's text</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>all_rows <span class="op">=</span> []</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="cf">for</span> row <span class="kw">in</span> rows[<span class="dv">1</span>:]:  <span class="co"># Skip the header row</span></span>
@@ -575,7 +575,7 @@ div.csl-indent {
 <section id="strategy-3-the-table-that-needs-cleanup" class="level2" data-number="6.5">
 <h2 data-number="6.5" class="anchored" data-anchor-id="strategy-3-the-table-that-needs-cleanup"><span class="header-section-number">6.5</span> Strategy 3: The Table That Needs Cleanup</h2>
 <p>For well-structured HTML tables, pandas provides a powerful shortcut. The <code>read_html()</code> function finds all tables on a page and converts each one to a DataFrame:</p>
-<div id="c66ad7ac" class="cell" data-execution_count="6">
+<div id="53ad0e89" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co"># Point read_html directly at a URL — no requests or BeautifulSoup needed</span></span>
@@ -587,7 +587,7 @@ div.csl-indent {
 <span id="cb6-9"><a href="#cb6-9" aria-label="9"></a><span class="co"># Wikipedia pages often have many tables</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Notice <code>storage_options</code>: without it, <code>read_html</code> requests the page anonymously, and Wikipedia answers an anonymous request with HTTP 403. It is the same courtesy <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> asked of every request you send, identifying yourself by name, passed through the one parameter <code>read_html</code> offers for it. Since that single call already fetched every table on the page, select the one you want by index instead of requesting the page again:</p>
-<div id="3c73a0c7" class="cell" data-execution_count="7">
+<div id="fdb2f05c" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># The highest-grossing films table is at index 0</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a>films_df <span class="op">=</span> tables[<span class="dv">0</span>]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="bu">print</span>(films_df.head())</span>
@@ -598,11 +598,11 @@ div.csl-indent {
 <section id="cleaning-up-read_html-results" class="level3" data-number="6.5.1">
 <h3 data-number="6.5.1" class="anchored" data-anchor-id="cleaning-up-read_html-results"><span class="header-section-number">6.5.1</span> Cleaning Up read_html Results</h3>
 <p>Look at the raw <code>Worldwide gross</code> column before you clean anything, so you know exactly what you are stripping out:</p>
-<div id="eca347cc" class="cell" data-execution_count="8">
+<div id="f446548c" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="bu">print</span>(films_df[<span class="st">"Worldwide gross"</span>].unique()[:<span class="dv">10</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Most entries look like <code>$2,923,710,708</code> — a dollar sign, digits, and commas. A handful carry a stray letter glued onto the front, left over from a footnote marker that never got separated from the number when the table was rendered: Titanic’s gross reads <code>T$2,257,906,828</code>, and Ne Zha 2’s reads <code>NZ$2,217,758,382</code>. The <code>Ref</code> column has its own quirk — footnote markers like <code>[# 1][# 2]</code> that <code>read_html</code> leaves as literal bracketed text rather than resolving into anything numeric. Here is a cleanup pass that handles both:</p>
-<div id="6c30754c" class="cell" data-execution_count="9">
+<div id="2063fc0c" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co"># Strip everything except digits -- removes the $ and the stray footnote letters in one pass</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>films_df[<span class="st">"gross"</span>] <span class="op">=</span> pd.to_numeric(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>    films_df[<span class="st">"Worldwide gross"</span>].<span class="bu">str</span>.replace(<span class="vs">r"</span><span class="pp">[^0-9]</span><span class="vs">"</span>, <span class="st">""</span>, regex<span class="op">=</span><span class="va">True</span>),</span>
@@ -620,7 +620,7 @@ div.csl-indent {
 <section id="strategy-4-the-infobox-pattern" class="level2" data-number="6.6">
 <h2 data-number="6.6" class="anchored" data-anchor-id="strategy-4-the-infobox-pattern"><span class="header-section-number">6.6</span> Strategy 4: The Infobox Pattern</h2>
 <p>Not every <code>&lt;table&gt;</code> holds rows of records. Wikipedia’s film infoboxes — the shaded box in the upper right of an article like <a href="https://en.wikipedia.org/wiki/The_Godfather">The Godfather</a> — are a single record laid out as a labeled key/value list: one row per fact, a <code>&lt;th&gt;</code> holding the label and a <code>&lt;td&gt;</code> holding the value. <code>pandas.read_html()</code> will happily parse an infobox into a two-column DataFrame, but that discards the very thing that makes it useful — which label belongs to which value — so this shape calls for BeautifulSoup instead:</p>
-<div id="dd2ce301" class="cell" data-execution_count="10">
+<div id="e8145c6b" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a></span>
@@ -645,7 +645,7 @@ div.csl-indent {
 <h2 data-number="6.7" class="anchored" data-anchor-id="strategy-5-porting-the-pattern-to-a-new-site"><span class="header-section-number">6.7</span> Strategy 5: Porting the Pattern to a New Site</h2>
 <p>The loop above is barely ten lines, and the next step reuses it almost verbatim — the site changes, the labels change, but the shape does not. Point it at the French Wikipedia article for the same film and choose your URL carefully: <code>https://fr.wikipedia.org/wiki/Le_Parrain</code> (without <code>(film)</code>) is a disambiguation page, a “page d’homonymie” with no infobox and no tables at all. The article with the infobox lives at <code>https://fr.wikipedia.org/wiki/Le_Parrain_(film)</code>.</p>
 <p>Reach for the same class name you used in Strategy 4 there and it fails you in an unexpected way. The page does carry <code>class="infobox_v3"</code> — inspect it in a live browser and you can see it right there on the infobox — but <code>soup.select("table.infobox_v3")</code> still comes back empty. The class is real; it is just not on the <code>&lt;table&gt;</code>. French Wikipedia’s infobox template wraps the actual <code>&lt;table&gt;</code> in a <code>&lt;div class="infobox_v3 infobox infobox--frwiki ..."&gt;</code>, and the table itself carries no class at all. Selecting by a class you saw in the Inspector only works if you also confirm <em>which element</em> that class sits on — the visual “infobox” you are looking at and the <code>&lt;table&gt;</code> holding its rows are not always the same node. What holds up here is the table’s own <code>&lt;caption&gt;</code>, one level down from the div you might have selected instead, which BeautifulSoup’s CSS-selector support can target directly:</p>
-<div id="5d8cf97d" class="cell" data-execution_count="11">
+<div id="afcfdd41" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>url <span class="op">=</span> <span class="st">"https://fr.wikipedia.org/wiki/Le_Parrain_(film)"</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
@@ -669,7 +669,7 @@ div.csl-indent {
 <section id="the-oscars-example" class="level3" data-number="6.8.1">
 <h3 data-number="6.8.1" class="anchored" data-anchor-id="the-oscars-example"><span class="header-section-number">6.8.1</span> The Oscars Example</h3>
 <p>The <a href="https://www.oscars.org">Academy Awards</a> website lists nominees and winners organized by category, structured with nested <code>&lt;div&gt;</code> tags rather than <code>&lt;table&gt;</code> elements — a good candidate for this strategy, with one complication before you can even start. As of this writing, oscars.org’s bot protection rejects a plain <code>requests.get()</code> with HTTP 403 — it also rejects a <code>User-Agent</code> spoofed to look like Chrome or Firefox, the same 403 either way. What it does <em>not</em> reject is a <code>User-Agent</code> that identifies you honestly, the way <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> asked you to identify yourself in the first place:</p>
-<div id="86fa0d9d" class="cell" data-execution_count="12">
+<div id="7871507c" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a></span>
@@ -685,7 +685,7 @@ div.csl-indent {
 <section id="finding-reliable-anchors" class="level3" data-number="6.8.2">
 <h3 data-number="6.8.2" class="anchored" data-anchor-id="finding-reliable-anchors"><span class="header-section-number">6.8.2</span> Finding Reliable Anchors</h3>
 <p>The key challenge with non-tabular scraping is finding HTML elements that reliably contain your target data. Oscars.org runs on Drupal, a content-management system whose class names describe Drupal’s own data model rather than anything about awards — <code>field--name-field-award-categories</code> names a <em>field</em>, not a category — which is worth knowing before you go hunting the Inspector for something friendlier:</p>
-<div id="1a383545" class="cell" data-execution_count="13">
+<div id="89edf492" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># The outer container that holds every award category on the page</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>area <span class="op">=</span> soup.find(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"field--name-field-award-categories"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a></span>
@@ -698,7 +698,7 @@ div.csl-indent {
 <section id="navigating-the-tree-for-specificity" class="level3" data-number="6.8.3">
 <h3 data-number="6.8.3" class="anchored" data-anchor-id="navigating-the-tree-for-specificity"><span class="header-section-number">6.8.3</span> Navigating the Tree for Specificity</h3>
 <p>Each category nests a further level down: a name, and one “honoree” entry per person or film listed under it. Winners and nominees share the same container structure, distinguished only by a type field inside each honoree:</p>
-<div id="b1c4922e" class="cell" data-execution_count="14">
+<div id="09e733b7" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="cf">for</span> cat <span class="kw">in</span> categories[:<span class="dv">1</span>]:</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a>    name <span class="op">=</span> cat.find(class_<span class="op">=</span><span class="st">"field--name-field-award-category-oscars"</span>).get_text(strip<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a>    honorees <span class="op">=</span> cat.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"paragraph--type--award-honoree"</span>)</span>
@@ -709,7 +709,7 @@ div.csl-indent {
 <section id="extracting-category-data" class="level3" data-number="6.8.4">
 <h3 data-number="6.8.4" class="anchored" data-anchor-id="extracting-category-data"><span class="header-section-number">6.8.4</span> Extracting Category Data</h3>
 <p>For each category, extract the award name and every honoree’s type, entity, and film:</p>
-<div id="965037e9" class="cell" data-execution_count="15">
+<div id="41c0477b" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a>results <span class="op">=</span> []</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="cf">for</span> cat <span class="kw">in</span> categories:</span>
@@ -741,7 +741,7 @@ div.csl-indent {
 <section id="css-selectors-with-select" class="level3" data-number="6.8.5">
 <h3 data-number="6.8.5" class="anchored" data-anchor-id="css-selectors-with-select"><span class="header-section-number">6.8.5</span> CSS Selectors with <code>select()</code></h3>
 <p>So far you have navigated the tree with <code>find()</code> and <code>find_all()</code>. BeautifulSoup offers a second navigation language you already half-know from browsing the web: CSS selectors, via the <code>select()</code> method. If you have ever written a stylesheet — or copied a selector out of your browser’s Inspector — the syntax will feel familiar. A bare name matches a tag, a leading <code>.</code> matches a class, a leading <code>#</code> matches an id, and whitespace between selectors matches descendants:</p>
-<div id="15c93f72" class="cell" data-execution_count="16">
+<div id="9223993c" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># A tag name selects all matching elements — like find_all("div")</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>divs <span class="op">=</span> soup.select(<span class="st">"div"</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a></span>
@@ -762,35 +762,50 @@ div.csl-indent {
 <section id="abstracting-into-functions" class="level3" data-number="6.8.6">
 <h3 data-number="6.8.6" class="anchored" data-anchor-id="abstracting-into-functions"><span class="header-section-number">6.8.6</span> Abstracting into Functions</h3>
 <p>Once your parser works for one ceremony, abstract it into a function you can reuse across every year you want. This is exactly the situation <code>responsible_get()</code> from <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> was built for: a named, identified requester, one page at a time, with a pause built in between calls. Here it is again so this chapter’s code runs on its own:</p>
-<div id="00d2ed11" class="cell" data-execution_count="17">
+<div id="9bea58c2" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="im">import</span> time</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a><span class="im">import</span> logging</span>
 <span id="cb17-4"><a href="#cb17-4" aria-label="4"></a></span>
 <span id="cb17-5"><a href="#cb17-5" aria-label="5"></a><span class="kw">def</span> responsible_get(url, headers<span class="op">=</span><span class="va">None</span>, delay<span class="op">=</span><span class="fl">1.0</span>):</span>
-<span id="cb17-6"><a href="#cb17-6" aria-label="6"></a>    <span class="co">"""Make an HTTP GET request with responsible defaults (from @sec-ethics)."""</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-label="7"></a>    default_headers <span class="op">=</span> {</span>
-<span id="cb17-8"><a href="#cb17-8" aria-label="8"></a>        <span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (student-project; your-email@colorado.edu)"</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-label="9"></a>    }</span>
-<span id="cb17-10"><a href="#cb17-10" aria-label="10"></a>    <span class="cf">if</span> headers:</span>
-<span id="cb17-11"><a href="#cb17-11" aria-label="11"></a>        default_headers.update(headers)</span>
-<span id="cb17-12"><a href="#cb17-12" aria-label="12"></a></span>
-<span id="cb17-13"><a href="#cb17-13" aria-label="13"></a>    <span class="cf">try</span>:</span>
-<span id="cb17-14"><a href="#cb17-14" aria-label="14"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>default_headers, timeout<span class="op">=</span><span class="dv">30</span>)</span>
-<span id="cb17-15"><a href="#cb17-15" aria-label="15"></a>        response.raise_for_status()</span>
-<span id="cb17-16"><a href="#cb17-16" aria-label="16"></a>        logging.info(<span class="ss">f"</span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb17-17"><a href="#cb17-17" aria-label="17"></a>        time.sleep(delay)</span>
-<span id="cb17-18"><a href="#cb17-18" aria-label="18"></a>        <span class="cf">return</span> response</span>
-<span id="cb17-19"><a href="#cb17-19" aria-label="19"></a>    <span class="cf">except</span> requests.exceptions.HTTPError <span class="im">as</span> e:</span>
-<span id="cb17-20"><a href="#cb17-20" aria-label="20"></a>        logging.error(<span class="ss">f"HTTP error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb17-21"><a href="#cb17-21" aria-label="21"></a>        time.sleep(delay)</span>
-<span id="cb17-22"><a href="#cb17-22" aria-label="22"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb17-23"><a href="#cb17-23" aria-label="23"></a>    <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
-<span id="cb17-24"><a href="#cb17-24" aria-label="24"></a>        logging.error(<span class="ss">f"Request failed (</span><span class="sc">{</span><span class="bu">type</span>(e)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">): </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb17-25"><a href="#cb17-25" aria-label="25"></a>        <span class="cf">return</span> <span class="va">None</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb17-6"><a href="#cb17-6" aria-label="6"></a>    <span class="co">"""Make an HTTP GET request with responsible defaults.</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-label="7"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-label="8"></a><span class="co">    Parameters</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-label="9"></a><span class="co">    ----------</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-label="10"></a><span class="co">    url : str</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-label="11"></a><span class="co">        The URL to request</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-label="12"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-label="13"></a><span class="co">        Custom headers; a default User-Agent is added if none provided</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-label="14"></a><span class="co">    delay : float</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-label="15"></a><span class="co">        Seconds to wait after the request (default: 1.0)</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-label="16"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-label="17"></a><span class="co">    Returns</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-label="18"></a><span class="co">    -------</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-label="19"></a><span class="co">    requests.Response or None</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-label="20"></a><span class="co">        The response object, or None if the request failed</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-label="21"></a><span class="co">    """</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-label="22"></a>    default_headers <span class="op">=</span> {</span>
+<span id="cb17-23"><a href="#cb17-23" aria-label="23"></a>        <span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (student-project; your-email@colorado.edu)"</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-label="24"></a>    }</span>
+<span id="cb17-25"><a href="#cb17-25" aria-label="25"></a>    <span class="cf">if</span> headers:</span>
+<span id="cb17-26"><a href="#cb17-26" aria-label="26"></a>        default_headers.update(headers)</span>
+<span id="cb17-27"><a href="#cb17-27" aria-label="27"></a></span>
+<span id="cb17-28"><a href="#cb17-28" aria-label="28"></a>    <span class="cf">try</span>:</span>
+<span id="cb17-29"><a href="#cb17-29" aria-label="29"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>default_headers, timeout<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb17-30"><a href="#cb17-30" aria-label="30"></a>        response.raise_for_status()  <span class="co"># Treat 4xx/5xx statuses as failures</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-label="31"></a>        logging.info(<span class="ss">f"</span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-32"><a href="#cb17-32" aria-label="32"></a>        time.sleep(delay)</span>
+<span id="cb17-33"><a href="#cb17-33" aria-label="33"></a>        <span class="cf">return</span> response</span>
+<span id="cb17-34"><a href="#cb17-34" aria-label="34"></a>    <span class="cf">except</span> requests.exceptions.HTTPError <span class="im">as</span> e:</span>
+<span id="cb17-35"><a href="#cb17-35" aria-label="35"></a>        logging.error(<span class="ss">f"HTTP error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-36"><a href="#cb17-36" aria-label="36"></a>        time.sleep(delay)  <span class="co"># A failed request still counts against the server</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-label="37"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-label="38"></a>    <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
+<span id="cb17-39"><a href="#cb17-39" aria-label="39"></a>        logging.error(<span class="ss">f"Request failed (</span><span class="sc">{</span><span class="bu">type</span>(e)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">): </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-40"><a href="#cb17-40" aria-label="40"></a>        <span class="cf">return</span> <span class="va">None</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>With that defined, wrap the parser around it:</p>
-<div id="1e6ec011" class="cell" data-execution_count="18">
+<div id="e4b702f5" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="kw">def</span> parse_oscar_ceremony(year):</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a>    <span class="co">"""Fetch and parse one Oscars ceremony page into one row per honoree.</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a></span>
@@ -840,7 +855,7 @@ div.csl-indent {
 <span id="cb18-47"><a href="#cb18-47" aria-label="47"></a>    <span class="cf">return</span> pd.DataFrame(rows)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Collecting several ceremonies together is an ordinary loop over years, one request per iteration, with <code>responsible_get()</code>’s own <code>delay</code> doing the rate-limiting rather than a manual <code>time.sleep()</code> scattered through the loop:</p>
-<div id="26287cdd" class="cell" data-execution_count="19">
+<div id="bd4b5de1" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a>all_years <span class="op">=</span> [parse_oscar_ceremony(year) <span class="cf">for</span> year <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2024</span>, <span class="dv">2027</span>)]</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a>oscars <span class="op">=</span> pd.concat(all_years, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a><span class="bu">print</span>(<span class="ss">f"Collected </span><span class="sc">{</span><span class="bu">len</span>(oscars)<span class="sc">}</span><span class="ss"> honorees across </span><span class="sc">{</span>oscars[<span class="st">'year'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> ceremonies"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -850,7 +865,7 @@ div.csl-indent {
 <section id="a-second-parser-colorado-legislators" class="level3" data-number="6.8.7">
 <h3 data-number="6.8.7" class="anchored" data-anchor-id="a-second-parser-colorado-legislators"><span class="header-section-number">6.8.7</span> A Second Parser: Colorado Legislators</h3>
 <p>The Oscars example is one instance of this strategy — cards standing in for rows — on one site. Let us apply the same strategy to a very different page, still on a single site, to see how much of it is the pattern and how much was specific to Drupal’s field names. The Colorado General Assembly website at <a href="https://leg.colorado.gov/legislators">leg.colorado.gov/legislators</a> lists all current state legislators with their names, party affiliations, districts, and chambers, and — unlike oscars.org — does not run a WAF that cares who is asking; a bare <code>requests.get()</code> with no headers at all works here just as well as an identified one:</p>
-<div id="ef5f44f1" class="cell" data-execution_count="20">
+<div id="d0cb7f6c" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb20-3"><a href="#cb20-3" aria-label="3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -866,7 +881,7 @@ div.csl-indent {
 <span id="cb20-13"><a href="#cb20-13" aria-label="13"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(containers)<span class="sc">}</span><span class="ss"> legislator entries"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For each container, extract the relevant fields. The exact tag structure will vary, so the key skill here is using the Inspector to trace from the visible text on the page back to the HTML elements that contain it:</p>
-<div id="3987425d" class="cell" data-execution_count="21">
+<div id="244fb3b9" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a>records <span class="op">=</span> []</span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="cf">for</span> container <span class="kw">in</span> containers:</span>
 <span id="cb21-3"><a href="#cb21-3" aria-label="3"></a>    name_tag <span class="op">=</span> container.find(<span class="st">"a"</span>)</span>
@@ -891,7 +906,7 @@ div.csl-indent {
 <section id="strategy-7-inconsistent-cards-multiple-sites" class="level2" data-number="6.9">
 <h2 data-number="6.9" class="anchored" data-anchor-id="strategy-7-inconsistent-cards-multiple-sites"><span class="header-section-number">6.9</span> Strategy 7: Inconsistent Cards, Multiple Sites</h2>
 <p>Oscars’ award cards and the Colorado legislators’ cards are both single-site problems: write the parser once, and it covers the whole site. Move to a second site entirely and the same underlying idea — repeating containers standing in for table rows — reappears in a structurally unrelated shape. <a href="https://www.rottentomatoes.com">Rotten Tomatoes</a>’ “Movies in Theaters” grid at <code>https://www.rottentomatoes.com/browse/movies_in_theaters/</code> looks, at a glance, like the same kind of card layout as an Oscars category. It is not built the same way at all: Rotten Tomatoes’ grid uses custom HTML elements — tags the site defines itself, not <code>&lt;div&gt;</code> — so <code>find_all("div", ...)</code> returns nothing useful there:</p>
-<div id="cbfdb036" class="cell" data-execution_count="22">
+<div id="f2c1a94d" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb22-3"><a href="#cb22-3" aria-label="3"></a></span>
@@ -917,7 +932,7 @@ div.csl-indent {
 <section id="strategy-8-when-static-isnt" class="level2" data-number="6.10">
 <h2 data-number="6.10" class="anchored" data-anchor-id="strategy-8-when-static-isnt"><span class="header-section-number">6.10</span> Strategy 8: When “Static” Isn’t</h2>
 <p>Every strategy so far assumes the HTML your code receives is the HTML a human sees — that the page is <em>static</em> in the sense this chapter needs, meaning fully formed before your request finishes. That assumption fails, and it fails without raising any error at all:</p>
-<div id="bff5c59e" class="cell" data-execution_count="23">
+<div id="cff7ac57" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://www.imdb.com/title/tt0068646/"</span>  <span class="co"># The Godfather</span></span>
@@ -933,7 +948,7 @@ div.csl-indent {
 <section id="error-handling-patterns" class="level2" data-number="6.11">
 <h2 data-number="6.11" class="anchored" data-anchor-id="error-handling-patterns"><span class="header-section-number">6.11</span> Error Handling Patterns</h2>
 <p>As you scrape more pages, you will encounter failures: pages that do not load, elements that are missing, or structures that do not match your expectations. A robust scraper handles these gracefully:</p>
-<div id="75cc9051" class="cell" data-execution_count="24">
+<div id="9eb7d9c8" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="kw">def</span> safe_scrape(url, headers, parse_func):</span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a>    <span class="co">"""Scrape a URL with comprehensive error handling.</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-label="3"></a></span>
@@ -991,38 +1006,38 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset, then look under the hood at the same page with BeautifulSoup.</p>
 <p><strong>Step 1 — Choose and check.</strong> Pick a Wikipedia article containing a data table you find interesting — countries by population, U.S. states by area, highest-grossing films. Confirm the article path is allowed by Wikipedia’s <code>robots.txt</code> (you parsed it in <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), and fetch the page with your named <code>HEADERS</code>.</p>
-<div id="3e0be82b" class="cell" data-execution_count="25">
+<div id="7bc267fa" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a><span class="co"># Step 1: Choose a Wikipedia article with a table, confirm robots.txt allows it, and fetch the page with your HEADERS.</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Cache the raw HTML.</strong> Save <code>response.text</code> to a local file before parsing anything, and re-read it from disk. Every later step should parse the cached file, not re-request the page — while you debug, Wikipedia’s servers should be hit exactly once.</p>
-<div id="208a3127" class="cell" data-execution_count="26">
+<div id="6e476890" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a><span class="co"># Step 2: Save response.text to a local file, then read it back from disk.</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Extract with <code>read_html()</code>.</strong> Run <code>pd.read_html()</code> on the cached HTML. Print how many tables it found, look at the <code>head()</code> of a few, and identify the index of the table you want.</p>
-<div id="948d2b19" class="cell" data-execution_count="27">
+<div id="00886497" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-label="1"></a><span class="co"># Step 3: Run pd.read_html on the cached HTML, count the tables, and pick out yours.</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Clean it.</strong> Apply the chapter’s cleanup patterns as needed: select and rename columns, strip footnote markers from values, and convert numeric columns with <code>pd.to_numeric()</code> after removing commas. Show <code>dtypes</code> before and after to prove the conversion happened.</p>
-<div id="b3eb507f" class="cell" data-execution_count="28">
+<div id="bb3efb5d" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-label="1"></a><span class="co"># Step 4: Clean the DataFrame -- columns, footnote markers, numeric types.</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-label="2"></a><span class="co"># Show dtypes before and after.</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-label="3"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Visualize.</strong> Plot a horizontal bar chart of the top ten rows by your main numeric column, with labeled axes and a title saying what the data is and where it came from.</p>
-<div id="59cd40ce" class="cell" data-execution_count="29">
+<div id="c817a227" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-label="1"></a><span class="co"># Step 5: Bar chart of the top ten rows, labeled and titled.</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Look under the hood.</strong> Parse the same cached HTML with BeautifulSoup and find your table by its class (Wikipedia data tables usually carry <code>class="wikitable"</code>). Extract the header row’s text yourself with <code>find_all()</code>. Compare what you got to <code>read_html()</code>’s column names.</p>
-<div id="abee6865" class="cell" data-execution_count="30">
+<div id="3c11a489" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-label="1"></a><span class="co"># Step 6: Parse the cached HTML with BeautifulSoup, find your table by class, and extract the header row by hand.</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In four to six sentences: What did <code>read_html()</code> do for you that the manual approach made visible? What cleanup did the table need and why (footnotes, merged headers, number formatting)? If Wikipedia renamed the table’s CSS class tomorrow, which of your two extraction paths would break?</p>
-<div id="09d71893" class="cell" data-execution_count="31">
+<div id="1386ed07" class="cell" data-execution_count="31">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1928,341 +1943,356 @@ Vanden Broucke, Seppe, and Bart Baesens. 2018. <em>Practical Web Scraping for Da
 <span id="cb32-389"><a href="#cb32-389" aria-label="355"></a><span class="im">import</span> logging</span>
 <span id="cb32-390"><a href="#cb32-390" aria-label="356"></a></span>
 <span id="cb32-391"><a href="#cb32-391" aria-label="357"></a><span class="kw">def</span> responsible_get(url, headers<span class="op">=</span><span class="va">None</span>, delay<span class="op">=</span><span class="fl">1.0</span>):</span>
-<span id="cb32-392"><a href="#cb32-392" aria-label="358"></a>    <span class="co">"""Make an HTTP GET request with responsible defaults (from @sec-ethics)."""</span></span>
-<span id="cb32-393"><a href="#cb32-393" aria-label="359"></a>    default_headers <span class="op">=</span> {</span>
-<span id="cb32-394"><a href="#cb32-394" aria-label="360"></a>        <span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (student-project; your-email@colorado.edu)"</span></span>
-<span id="cb32-395"><a href="#cb32-395" aria-label="361"></a>    }</span>
-<span id="cb32-396"><a href="#cb32-396" aria-label="362"></a>    <span class="cf">if</span> headers:</span>
-<span id="cb32-397"><a href="#cb32-397" aria-label="363"></a>        default_headers.update(headers)</span>
-<span id="cb32-398"><a href="#cb32-398" aria-label="364"></a></span>
-<span id="cb32-399"><a href="#cb32-399" aria-label="365"></a>    <span class="cf">try</span>:</span>
-<span id="cb32-400"><a href="#cb32-400" aria-label="366"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>default_headers, timeout<span class="op">=</span><span class="dv">30</span>)</span>
-<span id="cb32-401"><a href="#cb32-401" aria-label="367"></a>        response.raise_for_status()</span>
-<span id="cb32-402"><a href="#cb32-402" aria-label="368"></a>        logging.info(<span class="ss">f"</span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb32-403"><a href="#cb32-403" aria-label="369"></a>        time.sleep(delay)</span>
-<span id="cb32-404"><a href="#cb32-404" aria-label="370"></a>        <span class="cf">return</span> response</span>
-<span id="cb32-405"><a href="#cb32-405" aria-label="371"></a>    <span class="cf">except</span> requests.exceptions.HTTPError <span class="im">as</span> e:</span>
-<span id="cb32-406"><a href="#cb32-406" aria-label="372"></a>        logging.error(<span class="ss">f"HTTP error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb32-407"><a href="#cb32-407" aria-label="373"></a>        time.sleep(delay)</span>
-<span id="cb32-408"><a href="#cb32-408" aria-label="374"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb32-409"><a href="#cb32-409" aria-label="375"></a>    <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
-<span id="cb32-410"><a href="#cb32-410" aria-label="376"></a>        logging.error(<span class="ss">f"Request failed (</span><span class="sc">{</span><span class="bu">type</span>(e)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">): </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb32-411"><a href="#cb32-411" aria-label="377"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb32-412"><a href="#cb32-412" aria-label="378"></a><span class="in">```</span></span>
+<span id="cb32-392"><a href="#cb32-392" aria-label="358"></a>    <span class="co">"""Make an HTTP GET request with responsible defaults.</span></span>
+<span id="cb32-393"><a href="#cb32-393" aria-label="359"></a></span>
+<span id="cb32-394"><a href="#cb32-394" aria-label="360"></a><span class="co">    Parameters</span></span>
+<span id="cb32-395"><a href="#cb32-395" aria-label="361"></a><span class="co">    ----------</span></span>
+<span id="cb32-396"><a href="#cb32-396" aria-label="362"></a><span class="co">    url : str</span></span>
+<span id="cb32-397"><a href="#cb32-397" aria-label="363"></a><span class="co">        The URL to request</span></span>
+<span id="cb32-398"><a href="#cb32-398" aria-label="364"></a><span class="co">    headers : dict, optional</span></span>
+<span id="cb32-399"><a href="#cb32-399" aria-label="365"></a><span class="co">        Custom headers; a default User-Agent is added if none provided</span></span>
+<span id="cb32-400"><a href="#cb32-400" aria-label="366"></a><span class="co">    delay : float</span></span>
+<span id="cb32-401"><a href="#cb32-401" aria-label="367"></a><span class="co">        Seconds to wait after the request (default: 1.0)</span></span>
+<span id="cb32-402"><a href="#cb32-402" aria-label="368"></a></span>
+<span id="cb32-403"><a href="#cb32-403" aria-label="369"></a><span class="co">    Returns</span></span>
+<span id="cb32-404"><a href="#cb32-404" aria-label="370"></a><span class="co">    -------</span></span>
+<span id="cb32-405"><a href="#cb32-405" aria-label="371"></a><span class="co">    requests.Response or None</span></span>
+<span id="cb32-406"><a href="#cb32-406" aria-label="372"></a><span class="co">        The response object, or None if the request failed</span></span>
+<span id="cb32-407"><a href="#cb32-407" aria-label="373"></a><span class="co">    """</span></span>
+<span id="cb32-408"><a href="#cb32-408" aria-label="374"></a>    default_headers <span class="op">=</span> {</span>
+<span id="cb32-409"><a href="#cb32-409" aria-label="375"></a>        <span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (student-project; your-email@colorado.edu)"</span></span>
+<span id="cb32-410"><a href="#cb32-410" aria-label="376"></a>    }</span>
+<span id="cb32-411"><a href="#cb32-411" aria-label="377"></a>    <span class="cf">if</span> headers:</span>
+<span id="cb32-412"><a href="#cb32-412" aria-label="378"></a>        default_headers.update(headers)</span>
 <span id="cb32-413"><a href="#cb32-413" aria-label="379"></a></span>
-<span id="cb32-414"><a href="#cb32-414" aria-label="380"></a>With that defined, wrap the parser around it:</span>
-<span id="cb32-415"><a href="#cb32-415" aria-label="381"></a></span>
-<span id="cb32-418"><a href="#cb32-418" aria-label="382"></a><span class="in">```{python}</span></span>
-<span id="cb32-419"><a href="#cb32-419" aria-label="383"></a><span class="kw">def</span> parse_oscar_ceremony(year):</span>
-<span id="cb32-420"><a href="#cb32-420" aria-label="384"></a>    <span class="co">"""Fetch and parse one Oscars ceremony page into one row per honoree.</span></span>
-<span id="cb32-421"><a href="#cb32-421" aria-label="385"></a></span>
-<span id="cb32-422"><a href="#cb32-422" aria-label="386"></a><span class="co">    Parameters</span></span>
-<span id="cb32-423"><a href="#cb32-423" aria-label="387"></a><span class="co">    ----------</span></span>
-<span id="cb32-424"><a href="#cb32-424" aria-label="388"></a><span class="co">    year : int</span></span>
-<span id="cb32-425"><a href="#cb32-425" aria-label="389"></a><span class="co">        The ceremony year to fetch and parse</span></span>
-<span id="cb32-426"><a href="#cb32-426" aria-label="390"></a></span>
-<span id="cb32-427"><a href="#cb32-427" aria-label="391"></a><span class="co">    Returns</span></span>
-<span id="cb32-428"><a href="#cb32-428" aria-label="392"></a><span class="co">    -------</span></span>
-<span id="cb32-429"><a href="#cb32-429" aria-label="393"></a><span class="co">    pd.DataFrame</span></span>
-<span id="cb32-430"><a href="#cb32-430" aria-label="394"></a><span class="co">        DataFrame with columns: category, honoree_type, entity, film, year</span></span>
-<span id="cb32-431"><a href="#cb32-431" aria-label="395"></a><span class="co">    """</span></span>
-<span id="cb32-432"><a href="#cb32-432" aria-label="396"></a>    url <span class="op">=</span> <span class="ss">f"https://www.oscars.org/oscars/ceremonies/</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb32-433"><a href="#cb32-433" aria-label="397"></a>    response <span class="op">=</span> responsible_get(url)</span>
-<span id="cb32-434"><a href="#cb32-434" aria-label="398"></a>    <span class="cf">if</span> response <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb32-435"><a href="#cb32-435" aria-label="399"></a>        <span class="bu">print</span>(<span class="ss">f"Request failed for </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb32-436"><a href="#cb32-436" aria-label="400"></a>        <span class="cf">return</span> pd.DataFrame()</span>
-<span id="cb32-437"><a href="#cb32-437" aria-label="401"></a></span>
-<span id="cb32-438"><a href="#cb32-438" aria-label="402"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
-<span id="cb32-439"><a href="#cb32-439" aria-label="403"></a></span>
-<span id="cb32-440"><a href="#cb32-440" aria-label="404"></a>    area <span class="op">=</span> soup.find(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"field--name-field-award-categories"</span>)</span>
-<span id="cb32-441"><a href="#cb32-441" aria-label="405"></a>    <span class="cf">if</span> <span class="kw">not</span> area:</span>
-<span id="cb32-442"><a href="#cb32-442" aria-label="406"></a>        <span class="bu">print</span>(<span class="ss">f"No categories found for </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> — page structure may differ"</span>)</span>
-<span id="cb32-443"><a href="#cb32-443" aria-label="407"></a>        <span class="cf">return</span> pd.DataFrame()</span>
-<span id="cb32-444"><a href="#cb32-444" aria-label="408"></a></span>
-<span id="cb32-445"><a href="#cb32-445" aria-label="409"></a>    rows <span class="op">=</span> []</span>
-<span id="cb32-446"><a href="#cb32-446" aria-label="410"></a>    <span class="cf">for</span> cat <span class="kw">in</span> area.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"paragraph--type--award-category"</span>):</span>
-<span id="cb32-447"><a href="#cb32-447" aria-label="411"></a>        name_tag <span class="op">=</span> cat.find(class_<span class="op">=</span><span class="st">"field--name-field-award-category-oscars"</span>)</span>
-<span id="cb32-448"><a href="#cb32-448" aria-label="412"></a>        <span class="cf">if</span> <span class="kw">not</span> name_tag:</span>
-<span id="cb32-449"><a href="#cb32-449" aria-label="413"></a>            <span class="cf">continue</span></span>
-<span id="cb32-450"><a href="#cb32-450" aria-label="414"></a>        category_name <span class="op">=</span> name_tag.get_text(strip<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb32-451"><a href="#cb32-451" aria-label="415"></a></span>
-<span id="cb32-452"><a href="#cb32-452" aria-label="416"></a>        <span class="cf">for</span> h <span class="kw">in</span> cat.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"paragraph--type--award-honoree"</span>):</span>
-<span id="cb32-453"><a href="#cb32-453" aria-label="417"></a>            type_tag <span class="op">=</span> h.find(class_<span class="op">=</span><span class="st">"field--name-field-honoree-type"</span>)</span>
-<span id="cb32-454"><a href="#cb32-454" aria-label="418"></a>            entity_tag <span class="op">=</span> h.find(class_<span class="op">=</span><span class="st">"field--name-field-award-entities"</span>)</span>
-<span id="cb32-455"><a href="#cb32-455" aria-label="419"></a>            film_tag <span class="op">=</span> h.find(class_<span class="op">=</span><span class="st">"field--name-field-award-film"</span>)</span>
-<span id="cb32-456"><a href="#cb32-456" aria-label="420"></a></span>
-<span id="cb32-457"><a href="#cb32-457" aria-label="421"></a>            rows.append({</span>
-<span id="cb32-458"><a href="#cb32-458" aria-label="422"></a>                <span class="st">"category"</span>: category_name,</span>
-<span id="cb32-459"><a href="#cb32-459" aria-label="423"></a>                <span class="st">"honoree_type"</span>: type_tag.get_text(strip<span class="op">=</span><span class="va">True</span>) <span class="cf">if</span> type_tag <span class="cf">else</span> <span class="va">None</span>,</span>
-<span id="cb32-460"><a href="#cb32-460" aria-label="424"></a>                <span class="st">"entity"</span>: entity_tag.get_text(strip<span class="op">=</span><span class="va">True</span>) <span class="cf">if</span> entity_tag <span class="cf">else</span> <span class="va">None</span>,</span>
-<span id="cb32-461"><a href="#cb32-461" aria-label="425"></a>                <span class="st">"film"</span>: film_tag.get_text(strip<span class="op">=</span><span class="va">True</span>) <span class="cf">if</span> film_tag <span class="cf">else</span> <span class="va">None</span>,</span>
-<span id="cb32-462"><a href="#cb32-462" aria-label="426"></a>                <span class="st">"year"</span>: year,</span>
-<span id="cb32-463"><a href="#cb32-463" aria-label="427"></a>            })</span>
-<span id="cb32-464"><a href="#cb32-464" aria-label="428"></a></span>
-<span id="cb32-465"><a href="#cb32-465" aria-label="429"></a>    <span class="cf">return</span> pd.DataFrame(rows)</span>
-<span id="cb32-466"><a href="#cb32-466" aria-label="430"></a><span class="in">```</span></span>
-<span id="cb32-467"><a href="#cb32-467" aria-label="431"></a></span>
-<span id="cb32-468"><a href="#cb32-468" aria-label="432"></a>Collecting several ceremonies together is an ordinary loop over years, one request per iteration, with <span class="in">`responsible_get()`</span>'s own <span class="in">`delay`</span> doing the rate-limiting rather than a manual <span class="in">`time.sleep()`</span> scattered through the loop:</span>
-<span id="cb32-469"><a href="#cb32-469" aria-label="433"></a></span>
-<span id="cb32-472"><a href="#cb32-472" aria-label="434"></a><span class="in">```{python}</span></span>
-<span id="cb32-473"><a href="#cb32-473" aria-label="435"></a>all_years <span class="op">=</span> [parse_oscar_ceremony(year) <span class="cf">for</span> year <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2024</span>, <span class="dv">2027</span>)]</span>
-<span id="cb32-474"><a href="#cb32-474" aria-label="436"></a>oscars <span class="op">=</span> pd.concat(all_years, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb32-475"><a href="#cb32-475" aria-label="437"></a><span class="bu">print</span>(<span class="ss">f"Collected </span><span class="sc">{</span><span class="bu">len</span>(oscars)<span class="sc">}</span><span class="ss"> honorees across </span><span class="sc">{</span>oscars[<span class="st">'year'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> ceremonies"</span>)</span>
-<span id="cb32-476"><a href="#cb32-476" aria-label="438"></a><span class="in">```</span></span>
-<span id="cb32-477"><a href="#cb32-477" aria-label="439"></a></span>
-<span id="cb32-478"><a href="#cb32-478" aria-label="440"></a>Nothing about this loop is special to oscars.org — it is the same shape as the Colorado Legislators parser below, and the same shape @sec-ethics used for its own examples. The only thing this site asked of you that a fully open site would not is honesty: identify yourself, and it lets you in.</span>
-<span id="cb32-479"><a href="#cb32-479" aria-label="441"></a></span>
-<span id="cb32-480"><a href="#cb32-480" aria-label="442"></a><span class="fu">### A Second Parser: Colorado Legislators</span></span>
-<span id="cb32-481"><a href="#cb32-481" aria-label="443"></a></span>
-<span id="cb32-482"><a href="#cb32-482" aria-label="444"></a>The Oscars example is one instance of this strategy — cards standing in for rows — on one site. Let us apply the same strategy to a very different page, still on a single site, to see how much of it is the pattern and how much was specific to Drupal's field names. The Colorado General Assembly website at <span class="co">[</span><span class="ot">leg.colorado.gov/legislators</span><span class="co">](https://leg.colorado.gov/legislators)</span> lists all current state legislators with their names, party affiliations, districts, and chambers, and — unlike oscars.org — does not run a WAF that cares who is asking; a bare <span class="in">`requests.get()`</span> with no headers at all works here just as well as an identified one:</span>
-<span id="cb32-483"><a href="#cb32-483" aria-label="445"></a></span>
-<span id="cb32-486"><a href="#cb32-486" aria-label="446"></a><span class="in">```{python}</span></span>
-<span id="cb32-487"><a href="#cb32-487" aria-label="447"></a><span class="im">import</span> requests</span>
-<span id="cb32-488"><a href="#cb32-488" aria-label="448"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
-<span id="cb32-489"><a href="#cb32-489" aria-label="449"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb32-490"><a href="#cb32-490" aria-label="450"></a></span>
-<span id="cb32-491"><a href="#cb32-491" aria-label="451"></a>url <span class="op">=</span> <span class="st">"https://leg.colorado.gov/legislators"</span></span>
-<span id="cb32-492"><a href="#cb32-492" aria-label="452"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
-<span id="cb32-493"><a href="#cb32-493" aria-label="453"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
-<span id="cb32-494"><a href="#cb32-494" aria-label="454"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
-<span id="cb32-495"><a href="#cb32-495" aria-label="455"></a></span>
-<span id="cb32-496"><a href="#cb32-496" aria-label="456"></a><span class="co"># Inspect the page structure — legislators are typically in repeating containers</span></span>
-<span id="cb32-497"><a href="#cb32-497" aria-label="457"></a><span class="co"># The exact class names may change; always verify with the Inspector</span></span>
-<span id="cb32-498"><a href="#cb32-498" aria-label="458"></a>containers <span class="op">=</span> soup.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"views-row"</span>)</span>
-<span id="cb32-499"><a href="#cb32-499" aria-label="459"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(containers)<span class="sc">}</span><span class="ss"> legislator entries"</span>)</span>
-<span id="cb32-500"><a href="#cb32-500" aria-label="460"></a><span class="in">```</span></span>
-<span id="cb32-501"><a href="#cb32-501" aria-label="461"></a></span>
-<span id="cb32-502"><a href="#cb32-502" aria-label="462"></a>For each container, extract the relevant fields. The exact tag structure will vary, so the key skill here is using the Inspector to trace from the visible text on the page back to the HTML elements that contain it:</span>
-<span id="cb32-503"><a href="#cb32-503" aria-label="463"></a></span>
-<span id="cb32-506"><a href="#cb32-506" aria-label="464"></a><span class="in">```{python}</span></span>
-<span id="cb32-507"><a href="#cb32-507" aria-label="465"></a>records <span class="op">=</span> []</span>
-<span id="cb32-508"><a href="#cb32-508" aria-label="466"></a><span class="cf">for</span> container <span class="kw">in</span> containers:</span>
-<span id="cb32-509"><a href="#cb32-509" aria-label="467"></a>    name_tag <span class="op">=</span> container.find(<span class="st">"a"</span>)</span>
-<span id="cb32-510"><a href="#cb32-510" aria-label="468"></a>    party_tag <span class="op">=</span> container.find(<span class="st">"span"</span>, class_<span class="op">=</span><span class="st">"party-initial"</span>)</span>
-<span id="cb32-511"><a href="#cb32-511" aria-label="469"></a>    district_tag <span class="op">=</span> container.find(<span class="st">"span"</span>, class_<span class="op">=</span><span class="st">"district-number"</span>)</span>
-<span id="cb32-512"><a href="#cb32-512" aria-label="470"></a></span>
-<span id="cb32-513"><a href="#cb32-513" aria-label="471"></a>    <span class="cf">if</span> name_tag:</span>
-<span id="cb32-514"><a href="#cb32-514" aria-label="472"></a>        records.append({</span>
-<span id="cb32-515"><a href="#cb32-515" aria-label="473"></a>            <span class="st">"name"</span>: name_tag.text.strip(),</span>
-<span id="cb32-516"><a href="#cb32-516" aria-label="474"></a>            <span class="st">"party"</span>: party_tag.text.strip() <span class="cf">if</span> party_tag <span class="cf">else</span> <span class="va">None</span>,</span>
-<span id="cb32-517"><a href="#cb32-517" aria-label="475"></a>            <span class="st">"district"</span>: district_tag.text.strip() <span class="cf">if</span> district_tag <span class="cf">else</span> <span class="va">None</span>,</span>
-<span id="cb32-518"><a href="#cb32-518" aria-label="476"></a>        })</span>
-<span id="cb32-519"><a href="#cb32-519" aria-label="477"></a></span>
-<span id="cb32-520"><a href="#cb32-520" aria-label="478"></a>df <span class="op">=</span> pd.DataFrame(records)</span>
-<span id="cb32-521"><a href="#cb32-521" aria-label="479"></a><span class="bu">print</span>(<span class="ss">f"Extracted </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> legislators"</span>)</span>
-<span id="cb32-522"><a href="#cb32-522" aria-label="480"></a><span class="bu">print</span>(df.groupby(<span class="st">"party"</span>).size())</span>
-<span id="cb32-523"><a href="#cb32-523" aria-label="481"></a><span class="in">```</span></span>
-<span id="cb32-524"><a href="#cb32-524" aria-label="482"></a></span>
-<span id="cb32-525"><a href="#cb32-525" aria-label="483"></a>This parser illustrates an important principle: start simple and iterate. Your first attempt at identifying the right containers may return too many or too few results. Compare your count against what you see on the page. If you find 100 containers but the page shows 65 legislators, you are matching extra elements — narrow your search with a more specific class or a parent container. If you find 0, the page may use different class names than you expected, or the content may be loaded dynamically with JavaScript (in which case, see @sec-dynamic-pages).</span>
-<span id="cb32-526"><a href="#cb32-526" aria-label="484"></a></span>
-<span id="cb32-527"><a href="#cb32-527" aria-label="485"></a>Note that the page may have changed since this was written — that is the fundamental challenge of web scraping. If the class names above do not match what you see in the Inspector, that is not a bug in this code; it is a feature of how the web works. The skill you are building is not memorizing specific class names but learning the *process* of inspection, hypothesis, and verification that lets you adapt to any page structure. Think of each parser as a hypothesis about the page's structure — you test it, compare the output to what you expect, and refine until they match.</span>
-<span id="cb32-528"><a href="#cb32-528" aria-label="486"></a></span>
-<span id="cb32-529"><a href="#cb32-529" aria-label="487"></a><span class="fu">## Strategy 7: Inconsistent Cards, Multiple Sites</span></span>
-<span id="cb32-530"><a href="#cb32-530" aria-label="488"></a></span>
-<span id="cb32-531"><a href="#cb32-531" aria-label="489"></a>Oscars' award cards and the Colorado legislators' cards are both single-site problems: write the parser once, and it covers the whole site. Move to a second site entirely and the same underlying idea — repeating containers standing in for table rows — reappears in a structurally unrelated shape. <span class="co">[</span><span class="ot">Rotten Tomatoes</span><span class="co">](https://www.rottentomatoes.com)</span>' "Movies in Theaters" grid at <span class="in">`https://www.rottentomatoes.com/browse/movies_in_theaters/`</span> looks, at a glance, like the same kind of card layout as an Oscars category. It is not built the same way at all: Rotten Tomatoes' grid uses custom HTML elements — tags the site defines itself, not <span class="in">`&lt;div&gt;`</span> — so <span class="in">`find_all("div", ...)`</span> returns nothing useful there:</span>
-<span id="cb32-532"><a href="#cb32-532" aria-label="490"></a></span>
-<span id="cb32-535"><a href="#cb32-535" aria-label="491"></a><span class="in">```{python}</span></span>
-<span id="cb32-536"><a href="#cb32-536" aria-label="492"></a><span class="im">import</span> requests</span>
-<span id="cb32-537"><a href="#cb32-537" aria-label="493"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
-<span id="cb32-538"><a href="#cb32-538" aria-label="494"></a></span>
-<span id="cb32-539"><a href="#cb32-539" aria-label="495"></a>url <span class="op">=</span> <span class="st">"https://www.rottentomatoes.com/browse/movies_in_theaters/"</span></span>
-<span id="cb32-540"><a href="#cb32-540" aria-label="496"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
-<span id="cb32-541"><a href="#cb32-541" aria-label="497"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
-<span id="cb32-542"><a href="#cb32-542" aria-label="498"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
-<span id="cb32-543"><a href="#cb32-543" aria-label="499"></a></span>
-<span id="cb32-544"><a href="#cb32-544" aria-label="500"></a>tiles <span class="op">=</span> soup.find_all(<span class="st">"media-info-tile"</span>)</span>
-<span id="cb32-545"><a href="#cb32-545" aria-label="501"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(tiles)<span class="sc">}</span><span class="ss"> tiles"</span>)</span>
-<span id="cb32-546"><a href="#cb32-546" aria-label="502"></a><span class="co"># Found 28 tiles (October 2026)</span></span>
-<span id="cb32-547"><a href="#cb32-547" aria-label="503"></a></span>
-<span id="cb32-548"><a href="#cb32-548" aria-label="504"></a><span class="cf">for</span> tile <span class="kw">in</span> tiles:</span>
-<span id="cb32-549"><a href="#cb32-549" aria-label="505"></a>    title <span class="op">=</span> tile.find(<span class="st">"rt-text"</span>, attrs<span class="op">=</span>{<span class="st">"data-qa"</span>: <span class="st">"discovery-media-list-item-title"</span>})</span>
-<span id="cb32-550"><a href="#cb32-550" aria-label="506"></a>    score <span class="op">=</span> tile.find(<span class="st">"rt-text"</span>, attrs<span class="op">=</span>{<span class="st">"slot"</span>: <span class="st">"criticsScore"</span>})</span>
-<span id="cb32-551"><a href="#cb32-551" aria-label="507"></a>    critics <span class="op">=</span> score.get_text(strip<span class="op">=</span><span class="va">True</span>) <span class="cf">if</span> score <span class="cf">else</span> <span class="st">""</span></span>
-<span id="cb32-552"><a href="#cb32-552" aria-label="508"></a>    <span class="bu">print</span>(title.get_text(strip<span class="op">=</span><span class="va">True</span>), critics <span class="kw">or</span> <span class="st">"no Tomatometer yet"</span>)</span>
-<span id="cb32-553"><a href="#cb32-553" aria-label="509"></a><span class="co"># Casino Royale 94%</span></span>
-<span id="cb32-554"><a href="#cb32-554" aria-label="510"></a><span class="in">```</span></span>
-<span id="cb32-555"><a href="#cb32-555" aria-label="511"></a></span>
-<span id="cb32-556"><a href="#cb32-556" aria-label="512"></a>Each <span class="in">`&lt;media-info-tile&gt;`</span> carries a poster, an <span class="in">`&lt;rt-text data-qa="discovery-media-list-item-title"&gt;`</span> holding the title, and two more <span class="in">`&lt;rt-text&gt;`</span> elements told apart by their <span class="in">`slot`</span> attribute: <span class="in">`criticsScore`</span> holds the Tomatometer as a percentage string, and <span class="in">`audienceScore`</span> the audience's. A film too new to have enough reviews has an empty <span class="in">`criticsScore`</span>; on the October 2026 page, 16 of the 28 did. The page has other custom tiles too: <span class="in">`find_all("tile-dynamic")`</span> matches a "Certified Fresh" list and news links, not the grid. Name the grid's own element, and confirm in your browser's Inspector that what you matched is what you meant. None of this resembles <span class="in">`paragraph--type--award-honoree`</span> or the Colorado legislators' <span class="in">`views-row`</span>, and BeautifulSoup does not care: it navigates <span class="in">`tile-dynamic`</span> and <span class="in">`rt-text`</span> exactly as it would <span class="in">`&lt;div&gt;`</span> and <span class="in">`&lt;span&gt;`</span>, because it works on tag structure, not on a fixed vocabulary of "real" HTML tags.</span>
-<span id="cb32-557"><a href="#cb32-557" aria-label="513"></a></span>
-<span id="cb32-558"><a href="#cb32-558" aria-label="514"></a>This is where the 2×2 spectrum from the start of the chapter stops being an abstraction. A research question that needs both box-office performance and critical reception — whether a film's opening-weekend take tracks its Tomatometer score, say — cannot be answered from one site: The Numbers and Box Office Mojo have the money figures, and Rotten Tomatoes has the reviews. This is the multiple-sites, inconsistent-design quadrant from the start of the chapter, and it is where most real scraping projects end up living. The fix is not a cleverer, more general parser. It is one parser per site, each translating that site's own shape into a shared handful of columns — title, plus whatever that site alone provides — joined afterward on the one field every source shares: the movie's title.</span>
-<span id="cb32-559"><a href="#cb32-559" aria-label="515"></a></span>
-<span id="cb32-560"><a href="#cb32-560" aria-label="516"></a><span class="fu">## Strategy 8: When "Static" Isn't</span></span>
-<span id="cb32-561"><a href="#cb32-561" aria-label="517"></a></span>
-<span id="cb32-562"><a href="#cb32-562" aria-label="518"></a>Every strategy so far assumes the HTML your code receives is the HTML a human sees — that the page is *static* in the sense this chapter needs, meaning fully formed before your request finishes. That assumption fails, and it fails without raising any error at all:</span>
-<span id="cb32-563"><a href="#cb32-563" aria-label="519"></a></span>
-<span id="cb32-566"><a href="#cb32-566" aria-label="520"></a><span class="in">```{python}</span></span>
-<span id="cb32-567"><a href="#cb32-567" aria-label="521"></a><span class="im">import</span> requests</span>
-<span id="cb32-568"><a href="#cb32-568" aria-label="522"></a></span>
-<span id="cb32-569"><a href="#cb32-569" aria-label="523"></a>url <span class="op">=</span> <span class="st">"https://www.imdb.com/title/tt0068646/"</span>  <span class="co"># The Godfather</span></span>
-<span id="cb32-570"><a href="#cb32-570" aria-label="524"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
-<span id="cb32-571"><a href="#cb32-571" aria-label="525"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
-<span id="cb32-572"><a href="#cb32-572" aria-label="526"></a></span>
-<span id="cb32-573"><a href="#cb32-573" aria-label="527"></a><span class="bu">print</span>(response.status_code, <span class="bu">len</span>(response.text))</span>
-<span id="cb32-574"><a href="#cb32-574" aria-label="528"></a><span class="co"># 202 0</span></span>
-<span id="cb32-575"><a href="#cb32-575" aria-label="529"></a><span class="in">```</span></span>
-<span id="cb32-576"><a href="#cb32-576" aria-label="530"></a></span>
-<span id="cb32-577"><a href="#cb32-577" aria-label="531"></a>Status code 202 means the request was accepted, and the body that came back is zero characters long — not a truncated cast list, not a missing infobox, nothing at all for BeautifulSoup to parse. Open the same URL in an actual browser and the page is there in full: title, cast, ratings, everything. The difference is what runs between the request and the pixels on your screen. IMDb builds this page with JavaScript that executes after the initial HTML arrives, and <span class="in">`requests`</span> never runs JavaScript — it only ever sees whatever the server sent in that first response, which here is next to nothing.</span>
-<span id="cb32-578"><a href="#cb32-578" aria-label="532"></a></span>
-<span id="cb32-579"><a href="#cb32-579" aria-label="533"></a>None of the eight strategies in this chapter close this gap, because none of them touch JavaScript execution; every one of them only ever operates on HTML that already exists in the response body. The tell is a response that comes back too fast, too short, or too empty relative to what the browser shows, and the fix is not a different BeautifulSoup pattern but a different tool: @sec-dynamic-pages covers Selenium and other approaches that drive an actual browser, wait for JavaScript to run, and hand you the HTML the human sees instead of the HTML the server first sent.</span>
-<span id="cb32-580"><a href="#cb32-580" aria-label="534"></a></span>
-<span id="cb32-581"><a href="#cb32-581" aria-label="535"></a><span class="fu">## Error Handling Patterns</span></span>
-<span id="cb32-582"><a href="#cb32-582" aria-label="536"></a></span>
-<span id="cb32-583"><a href="#cb32-583" aria-label="537"></a>As you scrape more pages, you will encounter failures: pages that do not load, elements that are missing, or structures that do not match your expectations. A robust scraper handles these gracefully:</span>
-<span id="cb32-584"><a href="#cb32-584" aria-label="538"></a></span>
-<span id="cb32-587"><a href="#cb32-587" aria-label="539"></a><span class="in">```{python}</span></span>
-<span id="cb32-588"><a href="#cb32-588" aria-label="540"></a><span class="kw">def</span> safe_scrape(url, headers, parse_func):</span>
-<span id="cb32-589"><a href="#cb32-589" aria-label="541"></a>    <span class="co">"""Scrape a URL with comprehensive error handling.</span></span>
-<span id="cb32-590"><a href="#cb32-590" aria-label="542"></a></span>
-<span id="cb32-591"><a href="#cb32-591" aria-label="543"></a><span class="co">    Parameters</span></span>
-<span id="cb32-592"><a href="#cb32-592" aria-label="544"></a><span class="co">    ----------</span></span>
-<span id="cb32-593"><a href="#cb32-593" aria-label="545"></a><span class="co">    url : str</span></span>
-<span id="cb32-594"><a href="#cb32-594" aria-label="546"></a><span class="co">        The URL to scrape</span></span>
-<span id="cb32-595"><a href="#cb32-595" aria-label="547"></a><span class="co">    headers : dict</span></span>
-<span id="cb32-596"><a href="#cb32-596" aria-label="548"></a><span class="co">        HTTP headers</span></span>
-<span id="cb32-597"><a href="#cb32-597" aria-label="549"></a><span class="co">    parse_func : callable</span></span>
-<span id="cb32-598"><a href="#cb32-598" aria-label="550"></a><span class="co">        A function that takes a BeautifulSoup object and returns data</span></span>
-<span id="cb32-599"><a href="#cb32-599" aria-label="551"></a></span>
-<span id="cb32-600"><a href="#cb32-600" aria-label="552"></a><span class="co">    Returns</span></span>
-<span id="cb32-601"><a href="#cb32-601" aria-label="553"></a><span class="co">    -------</span></span>
-<span id="cb32-602"><a href="#cb32-602" aria-label="554"></a><span class="co">    list or None</span></span>
-<span id="cb32-603"><a href="#cb32-603" aria-label="555"></a><span class="co">        Parsed data, or None if the scrape failed</span></span>
-<span id="cb32-604"><a href="#cb32-604" aria-label="556"></a><span class="co">    """</span></span>
-<span id="cb32-605"><a href="#cb32-605" aria-label="557"></a>    <span class="cf">try</span>:</span>
-<span id="cb32-606"><a href="#cb32-606" aria-label="558"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers, timeout<span class="op">=</span><span class="dv">30</span>)</span>
-<span id="cb32-607"><a href="#cb32-607" aria-label="559"></a>        response.raise_for_status()</span>
-<span id="cb32-608"><a href="#cb32-608" aria-label="560"></a>    <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
-<span id="cb32-609"><a href="#cb32-609" aria-label="561"></a>        <span class="bu">print</span>(<span class="ss">f"Request failed for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb32-610"><a href="#cb32-610" aria-label="562"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb32-611"><a href="#cb32-611" aria-label="563"></a></span>
-<span id="cb32-612"><a href="#cb32-612" aria-label="564"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
-<span id="cb32-613"><a href="#cb32-613" aria-label="565"></a></span>
-<span id="cb32-614"><a href="#cb32-614" aria-label="566"></a>    <span class="cf">try</span>:</span>
-<span id="cb32-615"><a href="#cb32-615" aria-label="567"></a>        <span class="cf">return</span> parse_func(soup)</span>
-<span id="cb32-616"><a href="#cb32-616" aria-label="568"></a>    <span class="cf">except</span> <span class="pp">AttributeError</span> <span class="im">as</span> e:</span>
-<span id="cb32-617"><a href="#cb32-617" aria-label="569"></a>        <span class="bu">print</span>(<span class="ss">f"Parsing failed for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb32-618"><a href="#cb32-618" aria-label="570"></a>        <span class="bu">print</span>(<span class="st">"The page structure may have changed — re-inspect with dev tools."</span>)</span>
-<span id="cb32-619"><a href="#cb32-619" aria-label="571"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb32-620"><a href="#cb32-620" aria-label="572"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb32-621"><a href="#cb32-621" aria-label="573"></a>        <span class="bu">print</span>(<span class="ss">f"Unexpected error for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb32-622"><a href="#cb32-622" aria-label="574"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb32-623"><a href="#cb32-623" aria-label="575"></a><span class="in">```</span></span>
-<span id="cb32-624"><a href="#cb32-624" aria-label="576"></a></span>
-<span id="cb32-625"><a href="#cb32-625" aria-label="577"></a>The <span class="in">`AttributeError`</span> catch is especially important: it fires when <span class="in">`.find()`</span> returns <span class="in">`None`</span> and you try to call <span class="in">`.text`</span> on it — the single most common scraping error. By catching it explicitly, you get an informative message ("the page structure may have changed") instead of a cryptic traceback. The broader <span class="in">`Exception`</span> catch ensures your scraping loop continues even if an individual page has an unexpected problem.</span>
+<span id="cb32-414"><a href="#cb32-414" aria-label="380"></a>    <span class="cf">try</span>:</span>
+<span id="cb32-415"><a href="#cb32-415" aria-label="381"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>default_headers, timeout<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb32-416"><a href="#cb32-416" aria-label="382"></a>        response.raise_for_status()  <span class="co"># Treat 4xx/5xx statuses as failures</span></span>
+<span id="cb32-417"><a href="#cb32-417" aria-label="383"></a>        logging.info(<span class="ss">f"</span><span class="sc">{</span>response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-418"><a href="#cb32-418" aria-label="384"></a>        time.sleep(delay)</span>
+<span id="cb32-419"><a href="#cb32-419" aria-label="385"></a>        <span class="cf">return</span> response</span>
+<span id="cb32-420"><a href="#cb32-420" aria-label="386"></a>    <span class="cf">except</span> requests.exceptions.HTTPError <span class="im">as</span> e:</span>
+<span id="cb32-421"><a href="#cb32-421" aria-label="387"></a>        logging.error(<span class="ss">f"HTTP error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-422"><a href="#cb32-422" aria-label="388"></a>        time.sleep(delay)  <span class="co"># A failed request still counts against the server</span></span>
+<span id="cb32-423"><a href="#cb32-423" aria-label="389"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb32-424"><a href="#cb32-424" aria-label="390"></a>    <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
+<span id="cb32-425"><a href="#cb32-425" aria-label="391"></a>        logging.error(<span class="ss">f"Request failed (</span><span class="sc">{</span><span class="bu">type</span>(e)<span class="sc">.</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">): </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-426"><a href="#cb32-426" aria-label="392"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb32-427"><a href="#cb32-427" aria-label="393"></a><span class="in">```</span></span>
+<span id="cb32-428"><a href="#cb32-428" aria-label="394"></a></span>
+<span id="cb32-429"><a href="#cb32-429" aria-label="395"></a>With that defined, wrap the parser around it:</span>
+<span id="cb32-430"><a href="#cb32-430" aria-label="396"></a></span>
+<span id="cb32-433"><a href="#cb32-433" aria-label="397"></a><span class="in">```{python}</span></span>
+<span id="cb32-434"><a href="#cb32-434" aria-label="398"></a><span class="kw">def</span> parse_oscar_ceremony(year):</span>
+<span id="cb32-435"><a href="#cb32-435" aria-label="399"></a>    <span class="co">"""Fetch and parse one Oscars ceremony page into one row per honoree.</span></span>
+<span id="cb32-436"><a href="#cb32-436" aria-label="400"></a></span>
+<span id="cb32-437"><a href="#cb32-437" aria-label="401"></a><span class="co">    Parameters</span></span>
+<span id="cb32-438"><a href="#cb32-438" aria-label="402"></a><span class="co">    ----------</span></span>
+<span id="cb32-439"><a href="#cb32-439" aria-label="403"></a><span class="co">    year : int</span></span>
+<span id="cb32-440"><a href="#cb32-440" aria-label="404"></a><span class="co">        The ceremony year to fetch and parse</span></span>
+<span id="cb32-441"><a href="#cb32-441" aria-label="405"></a></span>
+<span id="cb32-442"><a href="#cb32-442" aria-label="406"></a><span class="co">    Returns</span></span>
+<span id="cb32-443"><a href="#cb32-443" aria-label="407"></a><span class="co">    -------</span></span>
+<span id="cb32-444"><a href="#cb32-444" aria-label="408"></a><span class="co">    pd.DataFrame</span></span>
+<span id="cb32-445"><a href="#cb32-445" aria-label="409"></a><span class="co">        DataFrame with columns: category, honoree_type, entity, film, year</span></span>
+<span id="cb32-446"><a href="#cb32-446" aria-label="410"></a><span class="co">    """</span></span>
+<span id="cb32-447"><a href="#cb32-447" aria-label="411"></a>    url <span class="op">=</span> <span class="ss">f"https://www.oscars.org/oscars/ceremonies/</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb32-448"><a href="#cb32-448" aria-label="412"></a>    response <span class="op">=</span> responsible_get(url)</span>
+<span id="cb32-449"><a href="#cb32-449" aria-label="413"></a>    <span class="cf">if</span> response <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb32-450"><a href="#cb32-450" aria-label="414"></a>        <span class="bu">print</span>(<span class="ss">f"Request failed for </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-451"><a href="#cb32-451" aria-label="415"></a>        <span class="cf">return</span> pd.DataFrame()</span>
+<span id="cb32-452"><a href="#cb32-452" aria-label="416"></a></span>
+<span id="cb32-453"><a href="#cb32-453" aria-label="417"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb32-454"><a href="#cb32-454" aria-label="418"></a></span>
+<span id="cb32-455"><a href="#cb32-455" aria-label="419"></a>    area <span class="op">=</span> soup.find(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"field--name-field-award-categories"</span>)</span>
+<span id="cb32-456"><a href="#cb32-456" aria-label="420"></a>    <span class="cf">if</span> <span class="kw">not</span> area:</span>
+<span id="cb32-457"><a href="#cb32-457" aria-label="421"></a>        <span class="bu">print</span>(<span class="ss">f"No categories found for </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> — page structure may differ"</span>)</span>
+<span id="cb32-458"><a href="#cb32-458" aria-label="422"></a>        <span class="cf">return</span> pd.DataFrame()</span>
+<span id="cb32-459"><a href="#cb32-459" aria-label="423"></a></span>
+<span id="cb32-460"><a href="#cb32-460" aria-label="424"></a>    rows <span class="op">=</span> []</span>
+<span id="cb32-461"><a href="#cb32-461" aria-label="425"></a>    <span class="cf">for</span> cat <span class="kw">in</span> area.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"paragraph--type--award-category"</span>):</span>
+<span id="cb32-462"><a href="#cb32-462" aria-label="426"></a>        name_tag <span class="op">=</span> cat.find(class_<span class="op">=</span><span class="st">"field--name-field-award-category-oscars"</span>)</span>
+<span id="cb32-463"><a href="#cb32-463" aria-label="427"></a>        <span class="cf">if</span> <span class="kw">not</span> name_tag:</span>
+<span id="cb32-464"><a href="#cb32-464" aria-label="428"></a>            <span class="cf">continue</span></span>
+<span id="cb32-465"><a href="#cb32-465" aria-label="429"></a>        category_name <span class="op">=</span> name_tag.get_text(strip<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb32-466"><a href="#cb32-466" aria-label="430"></a></span>
+<span id="cb32-467"><a href="#cb32-467" aria-label="431"></a>        <span class="cf">for</span> h <span class="kw">in</span> cat.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"paragraph--type--award-honoree"</span>):</span>
+<span id="cb32-468"><a href="#cb32-468" aria-label="432"></a>            type_tag <span class="op">=</span> h.find(class_<span class="op">=</span><span class="st">"field--name-field-honoree-type"</span>)</span>
+<span id="cb32-469"><a href="#cb32-469" aria-label="433"></a>            entity_tag <span class="op">=</span> h.find(class_<span class="op">=</span><span class="st">"field--name-field-award-entities"</span>)</span>
+<span id="cb32-470"><a href="#cb32-470" aria-label="434"></a>            film_tag <span class="op">=</span> h.find(class_<span class="op">=</span><span class="st">"field--name-field-award-film"</span>)</span>
+<span id="cb32-471"><a href="#cb32-471" aria-label="435"></a></span>
+<span id="cb32-472"><a href="#cb32-472" aria-label="436"></a>            rows.append({</span>
+<span id="cb32-473"><a href="#cb32-473" aria-label="437"></a>                <span class="st">"category"</span>: category_name,</span>
+<span id="cb32-474"><a href="#cb32-474" aria-label="438"></a>                <span class="st">"honoree_type"</span>: type_tag.get_text(strip<span class="op">=</span><span class="va">True</span>) <span class="cf">if</span> type_tag <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb32-475"><a href="#cb32-475" aria-label="439"></a>                <span class="st">"entity"</span>: entity_tag.get_text(strip<span class="op">=</span><span class="va">True</span>) <span class="cf">if</span> entity_tag <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb32-476"><a href="#cb32-476" aria-label="440"></a>                <span class="st">"film"</span>: film_tag.get_text(strip<span class="op">=</span><span class="va">True</span>) <span class="cf">if</span> film_tag <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb32-477"><a href="#cb32-477" aria-label="441"></a>                <span class="st">"year"</span>: year,</span>
+<span id="cb32-478"><a href="#cb32-478" aria-label="442"></a>            })</span>
+<span id="cb32-479"><a href="#cb32-479" aria-label="443"></a></span>
+<span id="cb32-480"><a href="#cb32-480" aria-label="444"></a>    <span class="cf">return</span> pd.DataFrame(rows)</span>
+<span id="cb32-481"><a href="#cb32-481" aria-label="445"></a><span class="in">```</span></span>
+<span id="cb32-482"><a href="#cb32-482" aria-label="446"></a></span>
+<span id="cb32-483"><a href="#cb32-483" aria-label="447"></a>Collecting several ceremonies together is an ordinary loop over years, one request per iteration, with <span class="in">`responsible_get()`</span>'s own <span class="in">`delay`</span> doing the rate-limiting rather than a manual <span class="in">`time.sleep()`</span> scattered through the loop:</span>
+<span id="cb32-484"><a href="#cb32-484" aria-label="448"></a></span>
+<span id="cb32-487"><a href="#cb32-487" aria-label="449"></a><span class="in">```{python}</span></span>
+<span id="cb32-488"><a href="#cb32-488" aria-label="450"></a>all_years <span class="op">=</span> [parse_oscar_ceremony(year) <span class="cf">for</span> year <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2024</span>, <span class="dv">2027</span>)]</span>
+<span id="cb32-489"><a href="#cb32-489" aria-label="451"></a>oscars <span class="op">=</span> pd.concat(all_years, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb32-490"><a href="#cb32-490" aria-label="452"></a><span class="bu">print</span>(<span class="ss">f"Collected </span><span class="sc">{</span><span class="bu">len</span>(oscars)<span class="sc">}</span><span class="ss"> honorees across </span><span class="sc">{</span>oscars[<span class="st">'year'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> ceremonies"</span>)</span>
+<span id="cb32-491"><a href="#cb32-491" aria-label="453"></a><span class="in">```</span></span>
+<span id="cb32-492"><a href="#cb32-492" aria-label="454"></a></span>
+<span id="cb32-493"><a href="#cb32-493" aria-label="455"></a>Nothing about this loop is special to oscars.org — it is the same shape as the Colorado Legislators parser below, and the same shape @sec-ethics used for its own examples. The only thing this site asked of you that a fully open site would not is honesty: identify yourself, and it lets you in.</span>
+<span id="cb32-494"><a href="#cb32-494" aria-label="456"></a></span>
+<span id="cb32-495"><a href="#cb32-495" aria-label="457"></a><span class="fu">### A Second Parser: Colorado Legislators</span></span>
+<span id="cb32-496"><a href="#cb32-496" aria-label="458"></a></span>
+<span id="cb32-497"><a href="#cb32-497" aria-label="459"></a>The Oscars example is one instance of this strategy — cards standing in for rows — on one site. Let us apply the same strategy to a very different page, still on a single site, to see how much of it is the pattern and how much was specific to Drupal's field names. The Colorado General Assembly website at <span class="co">[</span><span class="ot">leg.colorado.gov/legislators</span><span class="co">](https://leg.colorado.gov/legislators)</span> lists all current state legislators with their names, party affiliations, districts, and chambers, and — unlike oscars.org — does not run a WAF that cares who is asking; a bare <span class="in">`requests.get()`</span> with no headers at all works here just as well as an identified one:</span>
+<span id="cb32-498"><a href="#cb32-498" aria-label="460"></a></span>
+<span id="cb32-501"><a href="#cb32-501" aria-label="461"></a><span class="in">```{python}</span></span>
+<span id="cb32-502"><a href="#cb32-502" aria-label="462"></a><span class="im">import</span> requests</span>
+<span id="cb32-503"><a href="#cb32-503" aria-label="463"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb32-504"><a href="#cb32-504" aria-label="464"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb32-505"><a href="#cb32-505" aria-label="465"></a></span>
+<span id="cb32-506"><a href="#cb32-506" aria-label="466"></a>url <span class="op">=</span> <span class="st">"https://leg.colorado.gov/legislators"</span></span>
+<span id="cb32-507"><a href="#cb32-507" aria-label="467"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb32-508"><a href="#cb32-508" aria-label="468"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb32-509"><a href="#cb32-509" aria-label="469"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb32-510"><a href="#cb32-510" aria-label="470"></a></span>
+<span id="cb32-511"><a href="#cb32-511" aria-label="471"></a><span class="co"># Inspect the page structure — legislators are typically in repeating containers</span></span>
+<span id="cb32-512"><a href="#cb32-512" aria-label="472"></a><span class="co"># The exact class names may change; always verify with the Inspector</span></span>
+<span id="cb32-513"><a href="#cb32-513" aria-label="473"></a>containers <span class="op">=</span> soup.find_all(<span class="st">"div"</span>, class_<span class="op">=</span><span class="st">"views-row"</span>)</span>
+<span id="cb32-514"><a href="#cb32-514" aria-label="474"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(containers)<span class="sc">}</span><span class="ss"> legislator entries"</span>)</span>
+<span id="cb32-515"><a href="#cb32-515" aria-label="475"></a><span class="in">```</span></span>
+<span id="cb32-516"><a href="#cb32-516" aria-label="476"></a></span>
+<span id="cb32-517"><a href="#cb32-517" aria-label="477"></a>For each container, extract the relevant fields. The exact tag structure will vary, so the key skill here is using the Inspector to trace from the visible text on the page back to the HTML elements that contain it:</span>
+<span id="cb32-518"><a href="#cb32-518" aria-label="478"></a></span>
+<span id="cb32-521"><a href="#cb32-521" aria-label="479"></a><span class="in">```{python}</span></span>
+<span id="cb32-522"><a href="#cb32-522" aria-label="480"></a>records <span class="op">=</span> []</span>
+<span id="cb32-523"><a href="#cb32-523" aria-label="481"></a><span class="cf">for</span> container <span class="kw">in</span> containers:</span>
+<span id="cb32-524"><a href="#cb32-524" aria-label="482"></a>    name_tag <span class="op">=</span> container.find(<span class="st">"a"</span>)</span>
+<span id="cb32-525"><a href="#cb32-525" aria-label="483"></a>    party_tag <span class="op">=</span> container.find(<span class="st">"span"</span>, class_<span class="op">=</span><span class="st">"party-initial"</span>)</span>
+<span id="cb32-526"><a href="#cb32-526" aria-label="484"></a>    district_tag <span class="op">=</span> container.find(<span class="st">"span"</span>, class_<span class="op">=</span><span class="st">"district-number"</span>)</span>
+<span id="cb32-527"><a href="#cb32-527" aria-label="485"></a></span>
+<span id="cb32-528"><a href="#cb32-528" aria-label="486"></a>    <span class="cf">if</span> name_tag:</span>
+<span id="cb32-529"><a href="#cb32-529" aria-label="487"></a>        records.append({</span>
+<span id="cb32-530"><a href="#cb32-530" aria-label="488"></a>            <span class="st">"name"</span>: name_tag.text.strip(),</span>
+<span id="cb32-531"><a href="#cb32-531" aria-label="489"></a>            <span class="st">"party"</span>: party_tag.text.strip() <span class="cf">if</span> party_tag <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb32-532"><a href="#cb32-532" aria-label="490"></a>            <span class="st">"district"</span>: district_tag.text.strip() <span class="cf">if</span> district_tag <span class="cf">else</span> <span class="va">None</span>,</span>
+<span id="cb32-533"><a href="#cb32-533" aria-label="491"></a>        })</span>
+<span id="cb32-534"><a href="#cb32-534" aria-label="492"></a></span>
+<span id="cb32-535"><a href="#cb32-535" aria-label="493"></a>df <span class="op">=</span> pd.DataFrame(records)</span>
+<span id="cb32-536"><a href="#cb32-536" aria-label="494"></a><span class="bu">print</span>(<span class="ss">f"Extracted </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> legislators"</span>)</span>
+<span id="cb32-537"><a href="#cb32-537" aria-label="495"></a><span class="bu">print</span>(df.groupby(<span class="st">"party"</span>).size())</span>
+<span id="cb32-538"><a href="#cb32-538" aria-label="496"></a><span class="in">```</span></span>
+<span id="cb32-539"><a href="#cb32-539" aria-label="497"></a></span>
+<span id="cb32-540"><a href="#cb32-540" aria-label="498"></a>This parser illustrates an important principle: start simple and iterate. Your first attempt at identifying the right containers may return too many or too few results. Compare your count against what you see on the page. If you find 100 containers but the page shows 65 legislators, you are matching extra elements — narrow your search with a more specific class or a parent container. If you find 0, the page may use different class names than you expected, or the content may be loaded dynamically with JavaScript (in which case, see @sec-dynamic-pages).</span>
+<span id="cb32-541"><a href="#cb32-541" aria-label="499"></a></span>
+<span id="cb32-542"><a href="#cb32-542" aria-label="500"></a>Note that the page may have changed since this was written — that is the fundamental challenge of web scraping. If the class names above do not match what you see in the Inspector, that is not a bug in this code; it is a feature of how the web works. The skill you are building is not memorizing specific class names but learning the *process* of inspection, hypothesis, and verification that lets you adapt to any page structure. Think of each parser as a hypothesis about the page's structure — you test it, compare the output to what you expect, and refine until they match.</span>
+<span id="cb32-543"><a href="#cb32-543" aria-label="501"></a></span>
+<span id="cb32-544"><a href="#cb32-544" aria-label="502"></a><span class="fu">## Strategy 7: Inconsistent Cards, Multiple Sites</span></span>
+<span id="cb32-545"><a href="#cb32-545" aria-label="503"></a></span>
+<span id="cb32-546"><a href="#cb32-546" aria-label="504"></a>Oscars' award cards and the Colorado legislators' cards are both single-site problems: write the parser once, and it covers the whole site. Move to a second site entirely and the same underlying idea — repeating containers standing in for table rows — reappears in a structurally unrelated shape. <span class="co">[</span><span class="ot">Rotten Tomatoes</span><span class="co">](https://www.rottentomatoes.com)</span>' "Movies in Theaters" grid at <span class="in">`https://www.rottentomatoes.com/browse/movies_in_theaters/`</span> looks, at a glance, like the same kind of card layout as an Oscars category. It is not built the same way at all: Rotten Tomatoes' grid uses custom HTML elements — tags the site defines itself, not <span class="in">`&lt;div&gt;`</span> — so <span class="in">`find_all("div", ...)`</span> returns nothing useful there:</span>
+<span id="cb32-547"><a href="#cb32-547" aria-label="505"></a></span>
+<span id="cb32-550"><a href="#cb32-550" aria-label="506"></a><span class="in">```{python}</span></span>
+<span id="cb32-551"><a href="#cb32-551" aria-label="507"></a><span class="im">import</span> requests</span>
+<span id="cb32-552"><a href="#cb32-552" aria-label="508"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb32-553"><a href="#cb32-553" aria-label="509"></a></span>
+<span id="cb32-554"><a href="#cb32-554" aria-label="510"></a>url <span class="op">=</span> <span class="st">"https://www.rottentomatoes.com/browse/movies_in_theaters/"</span></span>
+<span id="cb32-555"><a href="#cb32-555" aria-label="511"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb32-556"><a href="#cb32-556" aria-label="512"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb32-557"><a href="#cb32-557" aria-label="513"></a>soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb32-558"><a href="#cb32-558" aria-label="514"></a></span>
+<span id="cb32-559"><a href="#cb32-559" aria-label="515"></a>tiles <span class="op">=</span> soup.find_all(<span class="st">"media-info-tile"</span>)</span>
+<span id="cb32-560"><a href="#cb32-560" aria-label="516"></a><span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(tiles)<span class="sc">}</span><span class="ss"> tiles"</span>)</span>
+<span id="cb32-561"><a href="#cb32-561" aria-label="517"></a><span class="co"># Found 28 tiles (October 2026)</span></span>
+<span id="cb32-562"><a href="#cb32-562" aria-label="518"></a></span>
+<span id="cb32-563"><a href="#cb32-563" aria-label="519"></a><span class="cf">for</span> tile <span class="kw">in</span> tiles:</span>
+<span id="cb32-564"><a href="#cb32-564" aria-label="520"></a>    title <span class="op">=</span> tile.find(<span class="st">"rt-text"</span>, attrs<span class="op">=</span>{<span class="st">"data-qa"</span>: <span class="st">"discovery-media-list-item-title"</span>})</span>
+<span id="cb32-565"><a href="#cb32-565" aria-label="521"></a>    score <span class="op">=</span> tile.find(<span class="st">"rt-text"</span>, attrs<span class="op">=</span>{<span class="st">"slot"</span>: <span class="st">"criticsScore"</span>})</span>
+<span id="cb32-566"><a href="#cb32-566" aria-label="522"></a>    critics <span class="op">=</span> score.get_text(strip<span class="op">=</span><span class="va">True</span>) <span class="cf">if</span> score <span class="cf">else</span> <span class="st">""</span></span>
+<span id="cb32-567"><a href="#cb32-567" aria-label="523"></a>    <span class="bu">print</span>(title.get_text(strip<span class="op">=</span><span class="va">True</span>), critics <span class="kw">or</span> <span class="st">"no Tomatometer yet"</span>)</span>
+<span id="cb32-568"><a href="#cb32-568" aria-label="524"></a><span class="co"># Casino Royale 94%</span></span>
+<span id="cb32-569"><a href="#cb32-569" aria-label="525"></a><span class="in">```</span></span>
+<span id="cb32-570"><a href="#cb32-570" aria-label="526"></a></span>
+<span id="cb32-571"><a href="#cb32-571" aria-label="527"></a>Each <span class="in">`&lt;media-info-tile&gt;`</span> carries a poster, an <span class="in">`&lt;rt-text data-qa="discovery-media-list-item-title"&gt;`</span> holding the title, and two more <span class="in">`&lt;rt-text&gt;`</span> elements told apart by their <span class="in">`slot`</span> attribute: <span class="in">`criticsScore`</span> holds the Tomatometer as a percentage string, and <span class="in">`audienceScore`</span> the audience's. A film too new to have enough reviews has an empty <span class="in">`criticsScore`</span>; on the October 2026 page, 16 of the 28 did. The page has other custom tiles too: <span class="in">`find_all("tile-dynamic")`</span> matches a "Certified Fresh" list and news links, not the grid. Name the grid's own element, and confirm in your browser's Inspector that what you matched is what you meant. None of this resembles <span class="in">`paragraph--type--award-honoree`</span> or the Colorado legislators' <span class="in">`views-row`</span>, and BeautifulSoup does not care: it navigates <span class="in">`tile-dynamic`</span> and <span class="in">`rt-text`</span> exactly as it would <span class="in">`&lt;div&gt;`</span> and <span class="in">`&lt;span&gt;`</span>, because it works on tag structure, not on a fixed vocabulary of "real" HTML tags.</span>
+<span id="cb32-572"><a href="#cb32-572" aria-label="528"></a></span>
+<span id="cb32-573"><a href="#cb32-573" aria-label="529"></a>This is where the 2×2 spectrum from the start of the chapter stops being an abstraction. A research question that needs both box-office performance and critical reception — whether a film's opening-weekend take tracks its Tomatometer score, say — cannot be answered from one site: The Numbers and Box Office Mojo have the money figures, and Rotten Tomatoes has the reviews. This is the multiple-sites, inconsistent-design quadrant from the start of the chapter, and it is where most real scraping projects end up living. The fix is not a cleverer, more general parser. It is one parser per site, each translating that site's own shape into a shared handful of columns — title, plus whatever that site alone provides — joined afterward on the one field every source shares: the movie's title.</span>
+<span id="cb32-574"><a href="#cb32-574" aria-label="530"></a></span>
+<span id="cb32-575"><a href="#cb32-575" aria-label="531"></a><span class="fu">## Strategy 8: When "Static" Isn't</span></span>
+<span id="cb32-576"><a href="#cb32-576" aria-label="532"></a></span>
+<span id="cb32-577"><a href="#cb32-577" aria-label="533"></a>Every strategy so far assumes the HTML your code receives is the HTML a human sees — that the page is *static* in the sense this chapter needs, meaning fully formed before your request finishes. That assumption fails, and it fails without raising any error at all:</span>
+<span id="cb32-578"><a href="#cb32-578" aria-label="534"></a></span>
+<span id="cb32-581"><a href="#cb32-581" aria-label="535"></a><span class="in">```{python}</span></span>
+<span id="cb32-582"><a href="#cb32-582" aria-label="536"></a><span class="im">import</span> requests</span>
+<span id="cb32-583"><a href="#cb32-583" aria-label="537"></a></span>
+<span id="cb32-584"><a href="#cb32-584" aria-label="538"></a>url <span class="op">=</span> <span class="st">"https://www.imdb.com/title/tt0068646/"</span>  <span class="co"># The Godfather</span></span>
+<span id="cb32-585"><a href="#cb32-585" aria-label="539"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb32-586"><a href="#cb32-586" aria-label="540"></a>response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb32-587"><a href="#cb32-587" aria-label="541"></a></span>
+<span id="cb32-588"><a href="#cb32-588" aria-label="542"></a><span class="bu">print</span>(response.status_code, <span class="bu">len</span>(response.text))</span>
+<span id="cb32-589"><a href="#cb32-589" aria-label="543"></a><span class="co"># 202 0</span></span>
+<span id="cb32-590"><a href="#cb32-590" aria-label="544"></a><span class="in">```</span></span>
+<span id="cb32-591"><a href="#cb32-591" aria-label="545"></a></span>
+<span id="cb32-592"><a href="#cb32-592" aria-label="546"></a>Status code 202 means the request was accepted, and the body that came back is zero characters long — not a truncated cast list, not a missing infobox, nothing at all for BeautifulSoup to parse. Open the same URL in an actual browser and the page is there in full: title, cast, ratings, everything. The difference is what runs between the request and the pixels on your screen. IMDb builds this page with JavaScript that executes after the initial HTML arrives, and <span class="in">`requests`</span> never runs JavaScript — it only ever sees whatever the server sent in that first response, which here is next to nothing.</span>
+<span id="cb32-593"><a href="#cb32-593" aria-label="547"></a></span>
+<span id="cb32-594"><a href="#cb32-594" aria-label="548"></a>None of the eight strategies in this chapter close this gap, because none of them touch JavaScript execution; every one of them only ever operates on HTML that already exists in the response body. The tell is a response that comes back too fast, too short, or too empty relative to what the browser shows, and the fix is not a different BeautifulSoup pattern but a different tool: @sec-dynamic-pages covers Selenium and other approaches that drive an actual browser, wait for JavaScript to run, and hand you the HTML the human sees instead of the HTML the server first sent.</span>
+<span id="cb32-595"><a href="#cb32-595" aria-label="549"></a></span>
+<span id="cb32-596"><a href="#cb32-596" aria-label="550"></a><span class="fu">## Error Handling Patterns</span></span>
+<span id="cb32-597"><a href="#cb32-597" aria-label="551"></a></span>
+<span id="cb32-598"><a href="#cb32-598" aria-label="552"></a>As you scrape more pages, you will encounter failures: pages that do not load, elements that are missing, or structures that do not match your expectations. A robust scraper handles these gracefully:</span>
+<span id="cb32-599"><a href="#cb32-599" aria-label="553"></a></span>
+<span id="cb32-602"><a href="#cb32-602" aria-label="554"></a><span class="in">```{python}</span></span>
+<span id="cb32-603"><a href="#cb32-603" aria-label="555"></a><span class="kw">def</span> safe_scrape(url, headers, parse_func):</span>
+<span id="cb32-604"><a href="#cb32-604" aria-label="556"></a>    <span class="co">"""Scrape a URL with comprehensive error handling.</span></span>
+<span id="cb32-605"><a href="#cb32-605" aria-label="557"></a></span>
+<span id="cb32-606"><a href="#cb32-606" aria-label="558"></a><span class="co">    Parameters</span></span>
+<span id="cb32-607"><a href="#cb32-607" aria-label="559"></a><span class="co">    ----------</span></span>
+<span id="cb32-608"><a href="#cb32-608" aria-label="560"></a><span class="co">    url : str</span></span>
+<span id="cb32-609"><a href="#cb32-609" aria-label="561"></a><span class="co">        The URL to scrape</span></span>
+<span id="cb32-610"><a href="#cb32-610" aria-label="562"></a><span class="co">    headers : dict</span></span>
+<span id="cb32-611"><a href="#cb32-611" aria-label="563"></a><span class="co">        HTTP headers</span></span>
+<span id="cb32-612"><a href="#cb32-612" aria-label="564"></a><span class="co">    parse_func : callable</span></span>
+<span id="cb32-613"><a href="#cb32-613" aria-label="565"></a><span class="co">        A function that takes a BeautifulSoup object and returns data</span></span>
+<span id="cb32-614"><a href="#cb32-614" aria-label="566"></a></span>
+<span id="cb32-615"><a href="#cb32-615" aria-label="567"></a><span class="co">    Returns</span></span>
+<span id="cb32-616"><a href="#cb32-616" aria-label="568"></a><span class="co">    -------</span></span>
+<span id="cb32-617"><a href="#cb32-617" aria-label="569"></a><span class="co">    list or None</span></span>
+<span id="cb32-618"><a href="#cb32-618" aria-label="570"></a><span class="co">        Parsed data, or None if the scrape failed</span></span>
+<span id="cb32-619"><a href="#cb32-619" aria-label="571"></a><span class="co">    """</span></span>
+<span id="cb32-620"><a href="#cb32-620" aria-label="572"></a>    <span class="cf">try</span>:</span>
+<span id="cb32-621"><a href="#cb32-621" aria-label="573"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers, timeout<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb32-622"><a href="#cb32-622" aria-label="574"></a>        response.raise_for_status()</span>
+<span id="cb32-623"><a href="#cb32-623" aria-label="575"></a>    <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
+<span id="cb32-624"><a href="#cb32-624" aria-label="576"></a>        <span class="bu">print</span>(<span class="ss">f"Request failed for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-625"><a href="#cb32-625" aria-label="577"></a>        <span class="cf">return</span> <span class="va">None</span></span>
 <span id="cb32-626"><a href="#cb32-626" aria-label="578"></a></span>
-<span id="cb32-627"><a href="#cb32-627" aria-label="579"></a>This pattern separates the *what* (your parsing logic in `parse_func`) from the *how* (request handling, error recovery). You can write a clean parsing function that assumes everything works, then wrap it in <span class="in">`safe_scrape`</span> for production use. This is the same separation-of-concerns principle you saw with the <span class="in">`responsible_get()`</span> function in @sec-ethics, and you will use it again in @sec-archives when building pipelines that retrieve dozens or hundreds of pages.</span>
+<span id="cb32-627"><a href="#cb32-627" aria-label="579"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">"html.parser"</span>)</span>
 <span id="cb32-628"><a href="#cb32-628" aria-label="580"></a></span>
-<span id="cb32-629"><a href="#cb32-629" aria-label="581"></a>::: {.callout-warning}</span>
-<span id="cb32-630"><a href="#cb32-630" aria-label="582"></a><span class="fu">## A Note on Fragility</span></span>
-<span id="cb32-631"><a href="#cb32-631" aria-label="583"></a>Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. The Oscars class names in this chapter were re-verified directly against the live 2026 ceremony page — a reminder that fragility is not only markup shifting under you, but sometimes a site's own bot protection changing what "asking nicely" requires: oscars.org rejects a bare <span class="in">`requests.get()`</span> and rejects a browser-spoofed one, but accepts a request that identifies itself honestly. If a site you are scraping starts returning 403 where it once returned 200, check whether the fix is a more honest <span class="in">`User-Agent`</span> before assuming the door is closed for good. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).</span>
-<span id="cb32-632"><a href="#cb32-632" aria-label="584"></a>:::</span>
-<span id="cb32-633"><a href="#cb32-633" aria-label="585"></a></span>
-<span id="cb32-634"><a href="#cb32-634" aria-label="586"></a><span class="fu">## Recommended Exercises</span></span>
-<span id="cb32-635"><a href="#cb32-635" aria-label="587"></a></span>
-<span id="cb32-636"><a href="#cb32-636" aria-label="588"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
-<span id="cb32-637"><a href="#cb32-637" aria-label="589"></a></span>
-<span id="cb32-638"><a href="#cb32-638" aria-label="590"></a>You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset, then look under the hood at the same page with BeautifulSoup.</span>
+<span id="cb32-629"><a href="#cb32-629" aria-label="581"></a>    <span class="cf">try</span>:</span>
+<span id="cb32-630"><a href="#cb32-630" aria-label="582"></a>        <span class="cf">return</span> parse_func(soup)</span>
+<span id="cb32-631"><a href="#cb32-631" aria-label="583"></a>    <span class="cf">except</span> <span class="pp">AttributeError</span> <span class="im">as</span> e:</span>
+<span id="cb32-632"><a href="#cb32-632" aria-label="584"></a>        <span class="bu">print</span>(<span class="ss">f"Parsing failed for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-633"><a href="#cb32-633" aria-label="585"></a>        <span class="bu">print</span>(<span class="st">"The page structure may have changed — re-inspect with dev tools."</span>)</span>
+<span id="cb32-634"><a href="#cb32-634" aria-label="586"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb32-635"><a href="#cb32-635" aria-label="587"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb32-636"><a href="#cb32-636" aria-label="588"></a>        <span class="bu">print</span>(<span class="ss">f"Unexpected error for </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-637"><a href="#cb32-637" aria-label="589"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb32-638"><a href="#cb32-638" aria-label="590"></a><span class="in">```</span></span>
 <span id="cb32-639"><a href="#cb32-639" aria-label="591"></a></span>
-<span id="cb32-640"><a href="#cb32-640" aria-label="592"></a>**Step 1 — Choose and check.** Pick a Wikipedia article containing a data table you find interesting — countries by population, U.S. states by area, highest-grossing films. Confirm the article path is allowed by Wikipedia's <span class="in">`robots.txt`</span> (you parsed it in @sec-ethics), and fetch the page with your named <span class="in">`HEADERS`</span>.</span>
+<span id="cb32-640"><a href="#cb32-640" aria-label="592"></a>The <span class="in">`AttributeError`</span> catch is especially important: it fires when <span class="in">`.find()`</span> returns <span class="in">`None`</span> and you try to call <span class="in">`.text`</span> on it — the single most common scraping error. By catching it explicitly, you get an informative message ("the page structure may have changed") instead of a cryptic traceback. The broader <span class="in">`Exception`</span> catch ensures your scraping loop continues even if an individual page has an unexpected problem.</span>
 <span id="cb32-641"><a href="#cb32-641" aria-label="593"></a></span>
-<span id="cb32-644"><a href="#cb32-644" aria-label="594"></a><span class="in">```{python}</span></span>
-<span id="cb32-645"><a href="#cb32-645" aria-label="595"></a><span class="co"># Step 1: Choose a Wikipedia article with a table, confirm robots.txt allows it, and fetch the page with your HEADERS.</span></span>
-<span id="cb32-646"><a href="#cb32-646" aria-label="596"></a><span class="co"># Your code here</span></span>
-<span id="cb32-647"><a href="#cb32-647" aria-label="597"></a><span class="in">```</span></span>
-<span id="cb32-648"><a href="#cb32-648" aria-label="598"></a></span>
-<span id="cb32-649"><a href="#cb32-649" aria-label="599"></a>**Step 2 — Cache the raw HTML.** Save <span class="in">`response.text`</span> to a local file before parsing anything, and re-read it from disk. Every later step should parse the cached file, not re-request the page — while you debug, Wikipedia's servers should be hit exactly once.</span>
-<span id="cb32-650"><a href="#cb32-650" aria-label="600"></a></span>
-<span id="cb32-653"><a href="#cb32-653" aria-label="601"></a><span class="in">```{python}</span></span>
-<span id="cb32-654"><a href="#cb32-654" aria-label="602"></a><span class="co"># Step 2: Save response.text to a local file, then read it back from disk.</span></span>
-<span id="cb32-655"><a href="#cb32-655" aria-label="603"></a><span class="co"># Your code here</span></span>
-<span id="cb32-656"><a href="#cb32-656" aria-label="604"></a><span class="in">```</span></span>
-<span id="cb32-657"><a href="#cb32-657" aria-label="605"></a></span>
-<span id="cb32-658"><a href="#cb32-658" aria-label="606"></a>**Step 3 — Extract with `read_html()`.** Run <span class="in">`pd.read_html()`</span> on the cached HTML. Print how many tables it found, look at the <span class="in">`head()`</span> of a few, and identify the index of the table you want.</span>
-<span id="cb32-659"><a href="#cb32-659" aria-label="607"></a></span>
-<span id="cb32-662"><a href="#cb32-662" aria-label="608"></a><span class="in">```{python}</span></span>
-<span id="cb32-663"><a href="#cb32-663" aria-label="609"></a><span class="co"># Step 3: Run pd.read_html on the cached HTML, count the tables, and pick out yours.</span></span>
-<span id="cb32-664"><a href="#cb32-664" aria-label="610"></a><span class="co"># Your code here</span></span>
-<span id="cb32-665"><a href="#cb32-665" aria-label="611"></a><span class="in">```</span></span>
-<span id="cb32-666"><a href="#cb32-666" aria-label="612"></a></span>
-<span id="cb32-667"><a href="#cb32-667" aria-label="613"></a>**Step 4 — Clean it.** Apply the chapter's cleanup patterns as needed: select and rename columns, strip footnote markers from values, and convert numeric columns with <span class="in">`pd.to_numeric()`</span> after removing commas. Show <span class="in">`dtypes`</span> before and after to prove the conversion happened.</span>
-<span id="cb32-668"><a href="#cb32-668" aria-label="614"></a></span>
-<span id="cb32-671"><a href="#cb32-671" aria-label="615"></a><span class="in">```{python}</span></span>
-<span id="cb32-672"><a href="#cb32-672" aria-label="616"></a><span class="co"># Step 4: Clean the DataFrame -- columns, footnote markers, numeric types.</span></span>
-<span id="cb32-673"><a href="#cb32-673" aria-label="617"></a><span class="co"># Show dtypes before and after.</span></span>
-<span id="cb32-674"><a href="#cb32-674" aria-label="618"></a><span class="co"># Your code here</span></span>
-<span id="cb32-675"><a href="#cb32-675" aria-label="619"></a><span class="in">```</span></span>
-<span id="cb32-676"><a href="#cb32-676" aria-label="620"></a></span>
-<span id="cb32-677"><a href="#cb32-677" aria-label="621"></a>**Step 5 — Visualize.** Plot a horizontal bar chart of the top ten rows by your main numeric column, with labeled axes and a title saying what the data is and where it came from.</span>
-<span id="cb32-678"><a href="#cb32-678" aria-label="622"></a></span>
-<span id="cb32-681"><a href="#cb32-681" aria-label="623"></a><span class="in">```{python}</span></span>
-<span id="cb32-682"><a href="#cb32-682" aria-label="624"></a><span class="co"># Step 5: Bar chart of the top ten rows, labeled and titled.</span></span>
-<span id="cb32-683"><a href="#cb32-683" aria-label="625"></a><span class="co"># Your code here</span></span>
-<span id="cb32-684"><a href="#cb32-684" aria-label="626"></a><span class="in">```</span></span>
-<span id="cb32-685"><a href="#cb32-685" aria-label="627"></a></span>
-<span id="cb32-686"><a href="#cb32-686" aria-label="628"></a>**Step 6 — Look under the hood.** Parse the same cached HTML with BeautifulSoup and find your table by its class (Wikipedia data tables usually carry <span class="in">`class="wikitable"`</span>). Extract the header row's text yourself with <span class="in">`find_all()`</span>. Compare what you got to <span class="in">`read_html()`</span>'s column names.</span>
-<span id="cb32-687"><a href="#cb32-687" aria-label="629"></a></span>
-<span id="cb32-690"><a href="#cb32-690" aria-label="630"></a><span class="in">```{python}</span></span>
-<span id="cb32-691"><a href="#cb32-691" aria-label="631"></a><span class="co"># Step 6: Parse the cached HTML with BeautifulSoup, find your table by class, and extract the header row by hand.</span></span>
-<span id="cb32-692"><a href="#cb32-692" aria-label="632"></a><span class="co"># Your code here</span></span>
-<span id="cb32-693"><a href="#cb32-693" aria-label="633"></a><span class="in">```</span></span>
-<span id="cb32-694"><a href="#cb32-694" aria-label="634"></a></span>
-<span id="cb32-695"><a href="#cb32-695" aria-label="635"></a>**Step 7 — Interpret.** In four to six sentences: What did <span class="in">`read_html()`</span> do for you that the manual approach made visible? What cleanup did the table need and why (footnotes, merged headers, number formatting)? If Wikipedia renamed the table's CSS class tomorrow, which of your two extraction paths would break?</span>
-<span id="cb32-696"><a href="#cb32-696" aria-label="636"></a></span>
-<span id="cb32-699"><a href="#cb32-699" aria-label="637"></a><span class="in">```{python}</span></span>
-<span id="cb32-700"><a href="#cb32-700" aria-label="638"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span>
-<span id="cb32-701"><a href="#cb32-701" aria-label="639"></a><span class="in">```</span></span>
-<span id="cb32-702"><a href="#cb32-702" aria-label="640"></a></span>
-<span id="cb32-703"><a href="#cb32-703" aria-label="641"></a><span class="fu">## Additional Exercises</span></span>
-<span id="cb32-704"><a href="#cb32-704" aria-label="642"></a></span>
-<span id="cb32-705"><a href="#cb32-705" aria-label="643"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
-<span id="cb32-706"><a href="#cb32-706" aria-label="644"></a></span>
-<span id="cb32-707"><a href="#cb32-707" aria-label="645"></a><span class="ss">1. </span>**Custom parser.** Write a custom BeautifulSoup parser for a non-tabular web page. Good candidates include a course catalog, a restaurant menu, or a list of elected officials. Document your element selection strategy: why did you choose these specific tags and classes?</span>
-<span id="cb32-708"><a href="#cb32-708" aria-label="646"></a></span>
-<span id="cb32-709"><a href="#cb32-709" aria-label="647"></a><span class="ss">2. </span>**Multi-page scraping.** Extend your parser from Exercise 1 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use <span class="in">`time.sleep()`</span> between requests, <span class="in">`try/except`</span> for error handling, and a function to abstract the repeated logic.</span>
-<span id="cb32-710"><a href="#cb32-710" aria-label="648"></a></span>
-<span id="cb32-711"><a href="#cb32-711" aria-label="649"></a><span class="ss">3. </span>**Non-English Wikipedia.** Use <span class="in">`pd.read_html()`</span> to scrape a data table from a non-English Wikipedia edition (e.g., the French, Spanish, or Japanese Wikipedia). Does <span class="in">`read_html`</span> handle non-ASCII characters correctly? What cleanup is needed compared to the English version? Write a brief analysis of any encoding issues you encounter.</span>
-<span id="cb32-712"><a href="#cb32-712" aria-label="650"></a></span>
-<span id="cb32-713"><a href="#cb32-713" aria-label="651"></a><span class="ss">4. </span>**Cache first, parse offline.** Build a two-stage scraper. Stage one downloads the raw HTML for several pages (e.g., five weekly box office charts, or five Oscars ceremony years) exactly once, saving each response to a local <span class="in">`cache/`</span> directory with a filename derived from the URL slug (e.g., <span class="in">`cache/weekend-2018w52.html`</span>) and sleeping between downloads. Stage two is your parser, which reads only from the cached files and never touches the network. In a short paragraph, explain how this save-then-parse pattern serves politeness (how many times does each server get hit while you debug?), reproducibility (what is your analysis anchored to after the site changes?), and iteration speed.</span>
-<span id="cb32-714"><a href="#cb32-714" aria-label="652"></a></span>
-<span id="cb32-715"><a href="#cb32-715" aria-label="653"></a><span class="ss">5. </span>**Reconcile two sites.** Pick two sites that describe the same underlying things through unrelated HTML — box office figures from The Numbers or Box Office Mojo, paired with critical reception from Rotten Tomatoes, or a pairing of your own choosing. Write one parser per site, extract a field both can produce (a title, a name, a date), and join the two results into a single DataFrame. Report where the join fails to match rows cleanly, and explain why — mismatched capitalization, alternate titles, or one site covering entries the other does not.</span>
-<span id="cb32-716"><a href="#cb32-716" aria-label="654"></a></span>
-<span id="cb32-717"><a href="#cb32-717" aria-label="655"></a><span class="ss">6. </span>**Graduate extension (INFO 5617).** Read @fiesler2020no, a study of how social media platforms' Terms of Service regulate automated data collection. Then audit two websites you might realistically scrape for a research project: locate and read each site's Terms of Service and <span class="in">`robots.txt`</span>, and classify what each document says about scraping using the paper's categories. Write a ~500-word memo comparing what the two sites permit, where the ToS and <span class="in">`robots.txt`</span> agree or conflict, and how you would proceed as a researcher — including what the paper's findings suggest about the gap between written policy and ethical practice.</span>
-<span id="cb32-718"><a href="#cb32-718" aria-label="656"></a></span>
-<span id="cb32-719"><a href="#cb32-719" aria-label="657"></a>::: {.callout-tip}</span>
-<span id="cb32-720"><a href="#cb32-720" aria-label="658"></a><span class="fu">## Missing Manual Reference</span></span>
-<span id="cb32-721"><a href="#cb32-721" aria-label="659"></a>For a refresher on writing functions, handling exceptions with <span class="in">`try/except`</span>, and structuring reusable code, see *Missing Manual* Chapter 17: Scripting.</span>
-<span id="cb32-722"><a href="#cb32-722" aria-label="660"></a>:::</span>
+<span id="cb32-642"><a href="#cb32-642" aria-label="594"></a>This pattern separates the *what* (your parsing logic in `parse_func`) from the *how* (request handling, error recovery). You can write a clean parsing function that assumes everything works, then wrap it in <span class="in">`safe_scrape`</span> for production use. This is the same separation-of-concerns principle you saw with the <span class="in">`responsible_get()`</span> function in @sec-ethics, and you will use it again in @sec-archives when building pipelines that retrieve dozens or hundreds of pages.</span>
+<span id="cb32-643"><a href="#cb32-643" aria-label="595"></a></span>
+<span id="cb32-644"><a href="#cb32-644" aria-label="596"></a>::: {.callout-warning}</span>
+<span id="cb32-645"><a href="#cb32-645" aria-label="597"></a><span class="fu">## A Note on Fragility</span></span>
+<span id="cb32-646"><a href="#cb32-646" aria-label="598"></a>Websites redesign their HTML regularly. The specific CSS classes and tag structures described here were accurate at the time of writing but may have changed since. If your parser stops working, the first step is always to re-inspect the page in your browser's developer tools and identify what changed. The Oscars class names in this chapter were re-verified directly against the live 2026 ceremony page — a reminder that fragility is not only markup shifting under you, but sometimes a site's own bot protection changing what "asking nicely" requires: oscars.org rejects a bare <span class="in">`requests.get()`</span> and rejects a browser-spoofed one, but accepts a request that identifies itself honestly. If a site you are scraping starts returning 403 where it once returned 200, check whether the fix is a more honest <span class="in">`User-Agent`</span> before assuming the door is closed for good. This fragility is a fundamental characteristic of web scraping and a motivation for preferring APIs when they are available (see @sec-post-api).</span>
+<span id="cb32-647"><a href="#cb32-647" aria-label="599"></a>:::</span>
+<span id="cb32-648"><a href="#cb32-648" aria-label="600"></a></span>
+<span id="cb32-649"><a href="#cb32-649" aria-label="601"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb32-650"><a href="#cb32-650" aria-label="602"></a></span>
+<span id="cb32-651"><a href="#cb32-651" aria-label="603"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
+<span id="cb32-652"><a href="#cb32-652" aria-label="604"></a></span>
+<span id="cb32-653"><a href="#cb32-653" aria-label="605"></a>You will take one Wikipedia table from raw HTML to a cleaned, visualized dataset, then look under the hood at the same page with BeautifulSoup.</span>
+<span id="cb32-654"><a href="#cb32-654" aria-label="606"></a></span>
+<span id="cb32-655"><a href="#cb32-655" aria-label="607"></a>**Step 1 — Choose and check.** Pick a Wikipedia article containing a data table you find interesting — countries by population, U.S. states by area, highest-grossing films. Confirm the article path is allowed by Wikipedia's <span class="in">`robots.txt`</span> (you parsed it in @sec-ethics), and fetch the page with your named <span class="in">`HEADERS`</span>.</span>
+<span id="cb32-656"><a href="#cb32-656" aria-label="608"></a></span>
+<span id="cb32-659"><a href="#cb32-659" aria-label="609"></a><span class="in">```{python}</span></span>
+<span id="cb32-660"><a href="#cb32-660" aria-label="610"></a><span class="co"># Step 1: Choose a Wikipedia article with a table, confirm robots.txt allows it, and fetch the page with your HEADERS.</span></span>
+<span id="cb32-661"><a href="#cb32-661" aria-label="611"></a><span class="co"># Your code here</span></span>
+<span id="cb32-662"><a href="#cb32-662" aria-label="612"></a><span class="in">```</span></span>
+<span id="cb32-663"><a href="#cb32-663" aria-label="613"></a></span>
+<span id="cb32-664"><a href="#cb32-664" aria-label="614"></a>**Step 2 — Cache the raw HTML.** Save <span class="in">`response.text`</span> to a local file before parsing anything, and re-read it from disk. Every later step should parse the cached file, not re-request the page — while you debug, Wikipedia's servers should be hit exactly once.</span>
+<span id="cb32-665"><a href="#cb32-665" aria-label="615"></a></span>
+<span id="cb32-668"><a href="#cb32-668" aria-label="616"></a><span class="in">```{python}</span></span>
+<span id="cb32-669"><a href="#cb32-669" aria-label="617"></a><span class="co"># Step 2: Save response.text to a local file, then read it back from disk.</span></span>
+<span id="cb32-670"><a href="#cb32-670" aria-label="618"></a><span class="co"># Your code here</span></span>
+<span id="cb32-671"><a href="#cb32-671" aria-label="619"></a><span class="in">```</span></span>
+<span id="cb32-672"><a href="#cb32-672" aria-label="620"></a></span>
+<span id="cb32-673"><a href="#cb32-673" aria-label="621"></a>**Step 3 — Extract with `read_html()`.** Run <span class="in">`pd.read_html()`</span> on the cached HTML. Print how many tables it found, look at the <span class="in">`head()`</span> of a few, and identify the index of the table you want.</span>
+<span id="cb32-674"><a href="#cb32-674" aria-label="622"></a></span>
+<span id="cb32-677"><a href="#cb32-677" aria-label="623"></a><span class="in">```{python}</span></span>
+<span id="cb32-678"><a href="#cb32-678" aria-label="624"></a><span class="co"># Step 3: Run pd.read_html on the cached HTML, count the tables, and pick out yours.</span></span>
+<span id="cb32-679"><a href="#cb32-679" aria-label="625"></a><span class="co"># Your code here</span></span>
+<span id="cb32-680"><a href="#cb32-680" aria-label="626"></a><span class="in">```</span></span>
+<span id="cb32-681"><a href="#cb32-681" aria-label="627"></a></span>
+<span id="cb32-682"><a href="#cb32-682" aria-label="628"></a>**Step 4 — Clean it.** Apply the chapter's cleanup patterns as needed: select and rename columns, strip footnote markers from values, and convert numeric columns with <span class="in">`pd.to_numeric()`</span> after removing commas. Show <span class="in">`dtypes`</span> before and after to prove the conversion happened.</span>
+<span id="cb32-683"><a href="#cb32-683" aria-label="629"></a></span>
+<span id="cb32-686"><a href="#cb32-686" aria-label="630"></a><span class="in">```{python}</span></span>
+<span id="cb32-687"><a href="#cb32-687" aria-label="631"></a><span class="co"># Step 4: Clean the DataFrame -- columns, footnote markers, numeric types.</span></span>
+<span id="cb32-688"><a href="#cb32-688" aria-label="632"></a><span class="co"># Show dtypes before and after.</span></span>
+<span id="cb32-689"><a href="#cb32-689" aria-label="633"></a><span class="co"># Your code here</span></span>
+<span id="cb32-690"><a href="#cb32-690" aria-label="634"></a><span class="in">```</span></span>
+<span id="cb32-691"><a href="#cb32-691" aria-label="635"></a></span>
+<span id="cb32-692"><a href="#cb32-692" aria-label="636"></a>**Step 5 — Visualize.** Plot a horizontal bar chart of the top ten rows by your main numeric column, with labeled axes and a title saying what the data is and where it came from.</span>
+<span id="cb32-693"><a href="#cb32-693" aria-label="637"></a></span>
+<span id="cb32-696"><a href="#cb32-696" aria-label="638"></a><span class="in">```{python}</span></span>
+<span id="cb32-697"><a href="#cb32-697" aria-label="639"></a><span class="co"># Step 5: Bar chart of the top ten rows, labeled and titled.</span></span>
+<span id="cb32-698"><a href="#cb32-698" aria-label="640"></a><span class="co"># Your code here</span></span>
+<span id="cb32-699"><a href="#cb32-699" aria-label="641"></a><span class="in">```</span></span>
+<span id="cb32-700"><a href="#cb32-700" aria-label="642"></a></span>
+<span id="cb32-701"><a href="#cb32-701" aria-label="643"></a>**Step 6 — Look under the hood.** Parse the same cached HTML with BeautifulSoup and find your table by its class (Wikipedia data tables usually carry <span class="in">`class="wikitable"`</span>). Extract the header row's text yourself with <span class="in">`find_all()`</span>. Compare what you got to <span class="in">`read_html()`</span>'s column names.</span>
+<span id="cb32-702"><a href="#cb32-702" aria-label="644"></a></span>
+<span id="cb32-705"><a href="#cb32-705" aria-label="645"></a><span class="in">```{python}</span></span>
+<span id="cb32-706"><a href="#cb32-706" aria-label="646"></a><span class="co"># Step 6: Parse the cached HTML with BeautifulSoup, find your table by class, and extract the header row by hand.</span></span>
+<span id="cb32-707"><a href="#cb32-707" aria-label="647"></a><span class="co"># Your code here</span></span>
+<span id="cb32-708"><a href="#cb32-708" aria-label="648"></a><span class="in">```</span></span>
+<span id="cb32-709"><a href="#cb32-709" aria-label="649"></a></span>
+<span id="cb32-710"><a href="#cb32-710" aria-label="650"></a>**Step 7 — Interpret.** In four to six sentences: What did <span class="in">`read_html()`</span> do for you that the manual approach made visible? What cleanup did the table need and why (footnotes, merged headers, number formatting)? If Wikipedia renamed the table's CSS class tomorrow, which of your two extraction paths would break?</span>
+<span id="cb32-711"><a href="#cb32-711" aria-label="651"></a></span>
+<span id="cb32-714"><a href="#cb32-714" aria-label="652"></a><span class="in">```{python}</span></span>
+<span id="cb32-715"><a href="#cb32-715" aria-label="653"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb32-716"><a href="#cb32-716" aria-label="654"></a><span class="in">```</span></span>
+<span id="cb32-717"><a href="#cb32-717" aria-label="655"></a></span>
+<span id="cb32-718"><a href="#cb32-718" aria-label="656"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb32-719"><a href="#cb32-719" aria-label="657"></a></span>
+<span id="cb32-720"><a href="#cb32-720" aria-label="658"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
+<span id="cb32-721"><a href="#cb32-721" aria-label="659"></a></span>
+<span id="cb32-722"><a href="#cb32-722" aria-label="660"></a><span class="ss">1. </span>**Custom parser.** Write a custom BeautifulSoup parser for a non-tabular web page. Good candidates include a course catalog, a restaurant menu, or a list of elected officials. Document your element selection strategy: why did you choose these specific tags and classes?</span>
 <span id="cb32-723"><a href="#cb32-723" aria-label="661"></a></span>
-<span id="cb32-724"><a href="#cb32-724" aria-label="662"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb32-724"><a href="#cb32-724" aria-label="662"></a><span class="ss">2. </span>**Multi-page scraping.** Extend your parser from Exercise 1 to handle multiple pages (e.g., multiple years, multiple categories, or paginated results). Use <span class="in">`time.sleep()`</span> between requests, <span class="in">`try/except`</span> for error handling, and a function to abstract the repeated logic.</span>
 <span id="cb32-725"><a href="#cb32-725" aria-label="663"></a></span>
-<span id="cb32-726"><a href="#cb32-726" aria-label="664"></a>Web scraping has deep roots in data journalism. Organizations like ProPublica, The Markup, and the Investigative Reporters and Editors (IRE) have built some of their most important investigations on data scraped from public websites — court records, school inspection reports, environmental compliance databases, campaign finance disclosures. The skill of turning a web page into a dataset is, in this tradition, a form of civic empowerment: it enables citizens and journalists to analyze information that is nominally public but practically inaccessible in its raw HTML form.</span>
+<span id="cb32-726"><a href="#cb32-726" aria-label="664"></a><span class="ss">3. </span>**Non-English Wikipedia.** Use <span class="in">`pd.read_html()`</span> to scrape a data table from a non-English Wikipedia edition (e.g., the French, Spanish, or Japanese Wikipedia). Does <span class="in">`read_html`</span> handle non-ASCII characters correctly? What cleanup is needed compared to the English version? Write a brief analysis of any encoding issues you encounter.</span>
 <span id="cb32-727"><a href="#cb32-727" aria-label="665"></a></span>
-<span id="cb32-728"><a href="#cb32-728" aria-label="666"></a>::: {.callout-note}</span>
-<span id="cb32-729"><a href="#cb32-729" aria-label="667"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb32-730"><a href="#cb32-730" aria-label="668"></a>Turning a web page into a dataset is a form of **oversight** (@sec-post-api). When government agencies publish information as web pages but not as downloadable data, scraping bridges the gap between nominal transparency and practical accountability. The ability to parse a legislative directory into a DataFrame enables analysis of representation, diversity, and political geography that the agency itself may not provide.</span>
-<span id="cb32-731"><a href="#cb32-731" aria-label="669"></a>:::</span>
-<span id="cb32-732"><a href="#cb32-732" aria-label="670"></a></span>
-<span id="cb32-733"><a href="#cb32-733" aria-label="671"></a>The Colorado General Assembly website (<span class="co">[</span><span class="ot">leg.colorado.gov</span><span class="co">](https://leg.colorado.gov)</span>) provides a concrete example. Biographical information about legislators — their districts, party affiliations, committee assignments, and contact information — is published on the web, but not in a structured format you can download and analyze. Scraping this data into a DataFrame enables research on representation, diversity, and legislative behavior that would be impossible otherwise.</span>
-<span id="cb32-734"><a href="#cb32-734" aria-label="672"></a></span>
-<span id="cb32-735"><a href="#cb32-735" aria-label="673"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb32-736"><a href="#cb32-736" aria-label="674"></a></span>
-<span id="cb32-737"><a href="#cb32-737" aria-label="675"></a><span class="ss">- </span>**Multiple tables on a page**: <span class="in">`read_html`</span> and <span class="in">`find_all("table")`</span> return all tables, including navigation elements. Inspect each to find the one with your data.</span>
-<span id="cb32-738"><a href="#cb32-738" aria-label="676"></a><span class="ss">- </span>**Character encoding**: Watch for <span class="in">`\xa0`</span> (non-breaking spaces) and other Unicode characters in names and text. Use <span class="in">`.strip()`</span> and <span class="in">`.replace('\xa0', ' ')`</span>.</span>
-<span id="cb32-739"><a href="#cb32-739" aria-label="677"></a><span class="ss">- </span>**Elements that look unique but are not**: Always verify your <span class="in">`find_all`</span> count against the expected number of results before building your parser.</span>
-<span id="cb32-740"><a href="#cb32-740" aria-label="678"></a><span class="ss">- </span>**Dynamic content**: If <span class="in">`requests`</span> + BeautifulSoup returns a nearly-empty page — or, as in Strategy 8, no page at all — the content is loaded by JavaScript after the initial response. See "Strategy 8: When 'Static' Isn't" above and @sec-dynamic-pages for Selenium-based solutions.</span>
-<span id="cb32-741"><a href="#cb32-741" aria-label="679"></a></span>
-<span id="cb32-742"><a href="#cb32-742" aria-label="680"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb32-743"><a href="#cb32-743" aria-label="681"></a></span>
-<span id="cb32-744"><a href="#cb32-744" aria-label="682"></a>HTML scraping follows a consistent pattern: retrieve the page, inspect it with developer tools, identify your target elements, extract the data, and convert it to a DataFrame. Where you start within that pattern depends on where your page sits on the chapter's 2×2 spectrum. A single, consistent table calls for <span class="in">`pd.read_html()`</span> and little else; a table hiding among decoys, or one whose values need cleanup after extraction, calls for the same tools plus more inspection and cleanup code. A labeled infobox calls for a key/value loop that ports from one language edition to another once you re-verify the anchor and labels. Repeating card-style containers — consistent on a single site, or inconsistent across several — call for a custom parser, one per site when the sites disagree, joined afterward into a shared schema. Always abstract your parsing logic into functions, handle errors gracefully, and rate-limit your requests. And when a page comes back nearly or entirely empty, these eight strategies have reached their edge — @sec-dynamic-pages picks up from there.</span>
-<span id="cb32-745"><a href="#cb32-745" aria-label="683"></a></span>
-<span id="cb32-746"><a href="#cb32-746" aria-label="684"></a><span class="fu">## Further Reading</span></span>
+<span id="cb32-728"><a href="#cb32-728" aria-label="666"></a><span class="ss">4. </span>**Cache first, parse offline.** Build a two-stage scraper. Stage one downloads the raw HTML for several pages (e.g., five weekly box office charts, or five Oscars ceremony years) exactly once, saving each response to a local <span class="in">`cache/`</span> directory with a filename derived from the URL slug (e.g., <span class="in">`cache/weekend-2018w52.html`</span>) and sleeping between downloads. Stage two is your parser, which reads only from the cached files and never touches the network. In a short paragraph, explain how this save-then-parse pattern serves politeness (how many times does each server get hit while you debug?), reproducibility (what is your analysis anchored to after the site changes?), and iteration speed.</span>
+<span id="cb32-729"><a href="#cb32-729" aria-label="667"></a></span>
+<span id="cb32-730"><a href="#cb32-730" aria-label="668"></a><span class="ss">5. </span>**Reconcile two sites.** Pick two sites that describe the same underlying things through unrelated HTML — box office figures from The Numbers or Box Office Mojo, paired with critical reception from Rotten Tomatoes, or a pairing of your own choosing. Write one parser per site, extract a field both can produce (a title, a name, a date), and join the two results into a single DataFrame. Report where the join fails to match rows cleanly, and explain why — mismatched capitalization, alternate titles, or one site covering entries the other does not.</span>
+<span id="cb32-731"><a href="#cb32-731" aria-label="669"></a></span>
+<span id="cb32-732"><a href="#cb32-732" aria-label="670"></a><span class="ss">6. </span>**Graduate extension (INFO 5617).** Read @fiesler2020no, a study of how social media platforms' Terms of Service regulate automated data collection. Then audit two websites you might realistically scrape for a research project: locate and read each site's Terms of Service and <span class="in">`robots.txt`</span>, and classify what each document says about scraping using the paper's categories. Write a ~500-word memo comparing what the two sites permit, where the ToS and <span class="in">`robots.txt`</span> agree or conflict, and how you would proceed as a researcher — including what the paper's findings suggest about the gap between written policy and ethical practice.</span>
+<span id="cb32-733"><a href="#cb32-733" aria-label="671"></a></span>
+<span id="cb32-734"><a href="#cb32-734" aria-label="672"></a>::: {.callout-tip}</span>
+<span id="cb32-735"><a href="#cb32-735" aria-label="673"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb32-736"><a href="#cb32-736" aria-label="674"></a>For a refresher on writing functions, handling exceptions with <span class="in">`try/except`</span>, and structuring reusable code, see *Missing Manual* Chapter 17: Scripting.</span>
+<span id="cb32-737"><a href="#cb32-737" aria-label="675"></a>:::</span>
+<span id="cb32-738"><a href="#cb32-738" aria-label="676"></a></span>
+<span id="cb32-739"><a href="#cb32-739" aria-label="677"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb32-740"><a href="#cb32-740" aria-label="678"></a></span>
+<span id="cb32-741"><a href="#cb32-741" aria-label="679"></a>Web scraping has deep roots in data journalism. Organizations like ProPublica, The Markup, and the Investigative Reporters and Editors (IRE) have built some of their most important investigations on data scraped from public websites — court records, school inspection reports, environmental compliance databases, campaign finance disclosures. The skill of turning a web page into a dataset is, in this tradition, a form of civic empowerment: it enables citizens and journalists to analyze information that is nominally public but practically inaccessible in its raw HTML form.</span>
+<span id="cb32-742"><a href="#cb32-742" aria-label="680"></a></span>
+<span id="cb32-743"><a href="#cb32-743" aria-label="681"></a>::: {.callout-note}</span>
+<span id="cb32-744"><a href="#cb32-744" aria-label="682"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb32-745"><a href="#cb32-745" aria-label="683"></a>Turning a web page into a dataset is a form of **oversight** (@sec-post-api). When government agencies publish information as web pages but not as downloadable data, scraping bridges the gap between nominal transparency and practical accountability. The ability to parse a legislative directory into a DataFrame enables analysis of representation, diversity, and political geography that the agency itself may not provide.</span>
+<span id="cb32-746"><a href="#cb32-746" aria-label="684"></a>:::</span>
 <span id="cb32-747"><a href="#cb32-747" aria-label="685"></a></span>
-<span id="cb32-748"><a href="#cb32-748" aria-label="686"></a><span class="ss">- </span>pandas <span class="in">`read_html`</span> documentation: <span class="ot">&lt;https://pandas.pydata.org/docs/reference/api/pandas.read_html.html&gt;</span></span>
-<span id="cb32-749"><a href="#cb32-749" aria-label="687"></a><span class="ss">- </span>@mitchell2018web — Chapters 2–5 on HTML scraping patterns</span>
-<span id="cb32-750"><a href="#cb32-750" aria-label="688"></a><span class="ss">- </span>@vandenbroucke2018practical — best practices for production web scraping</span>
-<span id="cb32-751"><a href="#cb32-751" aria-label="689"></a><span class="ss">- </span>Chris Moffitt, "Reading HTML tables with Pandas" (Practical Business </span>
-<span id="cb32-752"><a href="#cb32-752" aria-label="690"></a>  Python): <span class="ot">&lt;https://pbpython.com/pandas-html-table.html&gt;</span>, a worked Wikipedia </span>
-<span id="cb32-753"><a href="#cb32-753" aria-label="691"></a>  example that picks a table with <span class="in">`read_html(match=...)`</span> and cleans stray <span class="in">`%`</span>, </span>
-<span id="cb32-754"><a href="#cb32-754" aria-label="692"></a>  minus-sign, and <span class="in">`\xa0`</span> characters before converting columns to numbers</span>
+<span id="cb32-748"><a href="#cb32-748" aria-label="686"></a>The Colorado General Assembly website (<span class="co">[</span><span class="ot">leg.colorado.gov</span><span class="co">](https://leg.colorado.gov)</span>) provides a concrete example. Biographical information about legislators — their districts, party affiliations, committee assignments, and contact information — is published on the web, but not in a structured format you can download and analyze. Scraping this data into a DataFrame enables research on representation, diversity, and legislative behavior that would be impossible otherwise.</span>
+<span id="cb32-749"><a href="#cb32-749" aria-label="687"></a></span>
+<span id="cb32-750"><a href="#cb32-750" aria-label="688"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb32-751"><a href="#cb32-751" aria-label="689"></a></span>
+<span id="cb32-752"><a href="#cb32-752" aria-label="690"></a><span class="ss">- </span>**Multiple tables on a page**: <span class="in">`read_html`</span> and <span class="in">`find_all("table")`</span> return all tables, including navigation elements. Inspect each to find the one with your data.</span>
+<span id="cb32-753"><a href="#cb32-753" aria-label="691"></a><span class="ss">- </span>**Character encoding**: Watch for <span class="in">`\xa0`</span> (non-breaking spaces) and other Unicode characters in names and text. Use <span class="in">`.strip()`</span> and <span class="in">`.replace('\xa0', ' ')`</span>.</span>
+<span id="cb32-754"><a href="#cb32-754" aria-label="692"></a><span class="ss">- </span>**Elements that look unique but are not**: Always verify your <span class="in">`find_all`</span> count against the expected number of results before building your parser.</span>
+<span id="cb32-755"><a href="#cb32-755" aria-label="693"></a><span class="ss">- </span>**Dynamic content**: If <span class="in">`requests`</span> + BeautifulSoup returns a nearly-empty page — or, as in Strategy 8, no page at all — the content is loaded by JavaScript after the initial response. See "Strategy 8: When 'Static' Isn't" above and @sec-dynamic-pages for Selenium-based solutions.</span>
+<span id="cb32-756"><a href="#cb32-756" aria-label="694"></a></span>
+<span id="cb32-757"><a href="#cb32-757" aria-label="695"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb32-758"><a href="#cb32-758" aria-label="696"></a></span>
+<span id="cb32-759"><a href="#cb32-759" aria-label="697"></a>HTML scraping follows a consistent pattern: retrieve the page, inspect it with developer tools, identify your target elements, extract the data, and convert it to a DataFrame. Where you start within that pattern depends on where your page sits on the chapter's 2×2 spectrum. A single, consistent table calls for <span class="in">`pd.read_html()`</span> and little else; a table hiding among decoys, or one whose values need cleanup after extraction, calls for the same tools plus more inspection and cleanup code. A labeled infobox calls for a key/value loop that ports from one language edition to another once you re-verify the anchor and labels. Repeating card-style containers — consistent on a single site, or inconsistent across several — call for a custom parser, one per site when the sites disagree, joined afterward into a shared schema. Always abstract your parsing logic into functions, handle errors gracefully, and rate-limit your requests. And when a page comes back nearly or entirely empty, these eight strategies have reached their edge — @sec-dynamic-pages picks up from there.</span>
+<span id="cb32-760"><a href="#cb32-760" aria-label="698"></a></span>
+<span id="cb32-761"><a href="#cb32-761" aria-label="699"></a><span class="fu">## Further Reading</span></span>
+<span id="cb32-762"><a href="#cb32-762" aria-label="700"></a></span>
+<span id="cb32-763"><a href="#cb32-763" aria-label="701"></a><span class="ss">- </span>pandas <span class="in">`read_html`</span> documentation: <span class="ot">&lt;https://pandas.pydata.org/docs/reference/api/pandas.read_html.html&gt;</span></span>
+<span id="cb32-764"><a href="#cb32-764" aria-label="702"></a><span class="ss">- </span>@mitchell2018web — Chapters 2–5 on HTML scraping patterns</span>
+<span id="cb32-765"><a href="#cb32-765" aria-label="703"></a><span class="ss">- </span>@vandenbroucke2018practical — best practices for production web scraping</span>
+<span id="cb32-766"><a href="#cb32-766" aria-label="704"></a><span class="ss">- </span>Chris Moffitt, "Reading HTML tables with Pandas" (Practical Business </span>
+<span id="cb32-767"><a href="#cb32-767" aria-label="705"></a>  Python): <span class="ot">&lt;https://pbpython.com/pandas-html-table.html&gt;</span>, a worked Wikipedia </span>
+<span id="cb32-768"><a href="#cb32-768" aria-label="706"></a>  example that picks a table with <span class="in">`read_html(match=...)`</span> and cleans stray <span class="in">`%`</span>, </span>
+<span id="cb32-769"><a href="#cb32-769" aria-label="707"></a>  minus-sign, and <span class="in">`\xa0`</span> characters before converting columns to numbers</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
