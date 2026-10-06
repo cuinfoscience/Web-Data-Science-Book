@@ -770,7 +770,7 @@ Screen-scraping with Selenium is inherently fragile. The Twitter scraping exampl
 
 This fragility reinforces a principle from @sec-post-api: when an API is available, use it. Selenium is a powerful last resort for cases where you ethically need data that no API provides, but it is slow, resource-intensive, and brittle compared to API access. Try an API first, static scraping second, and a browser last, the order that "Choosing a Tool", at the end of this chapter, lays out in full.
 
-When a browser is the only way in, fragility is an argument for writing Selenium code defensively, not for avoiding Selenium. Here is a complete workflow that pulls together everything this chapter has covered. We will automate a multi-page interaction on the JavaScript version of Quotes to Scrape: navigating to the site, waiting for JavaScript to render the quotes, extracting the data, and repeating across multiple pages. As the View Source check showed, this particular page does not strictly need a browser; it stands in for sites that do, and it will not change under you.
+When a browser is the only way in, fragility is an argument for writing Selenium code defensively, not for avoiding Selenium. Here is a complete workflow that pulls together everything this chapter has covered. We will automate a multi-page interaction on the JavaScript version of Quotes to Scrape: navigating to the site, waiting for JavaScript to render the quotes, extracting the data, and repeating across multiple pages. As the View Source check showed, this particular page does not strictly need a browser; it stands in for sites that do, and it will not change under you. The code itself works on Quotes to Scrape and nowhere else, as the Oscars parser of Strategy 6 in @sec-static-pages works only on oscars.org.
 
 ```{python}
 import time
@@ -783,15 +783,16 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 def scrape_quotes(max_pages=3):
-    """Scrape quotes from a JavaScript-rendered, paginated site.
+    """Scrape quotes from Quotes to Scrape's JavaScript pages, and only there.
 
-    This demonstrates the full Selenium workflow:
+    The steps of the workflow carry over to other sites:
     1. Launch a headless browser
     2. Navigate to the page
     3. Wait for JavaScript to render the content
     4. Extract data via BeautifulSoup
     5. Handle pagination
     6. Clean up
+    The address, tags, and class names in quotation marks belong to this site.
     """
     options = Options()
     options.add_argument("--headless=new")
@@ -800,18 +801,18 @@ def scrape_quotes(max_pages=3):
     all_results = []
 
     try:
-        driver.get("https://quotes.toscrape.com/js/")
+        driver.get("https://quotes.toscrape.com/js/")  # This site's address
 
         for page in range(max_pages):
             # Wait for the quotes to render (up to 10 seconds)
             WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "quote"))
+                EC.presence_of_element_located((By.CLASS_NAME, "quote"))  # This site's class
             )
 
             # Pass rendered HTML to BeautifulSoup
             soup = BeautifulSoup(driver.page_source, "html.parser")
 
-            # Extract data from this page
+            # Extract data from this page, with this site's tags and classes
             for item in soup.find_all("div", class_="quote"):
                 # Check that both elements exist before calling .text — the same defensive pattern you learned for static scraping
                 text_tag = item.find("span", class_="text")
@@ -824,7 +825,8 @@ def scrape_quotes(max_pages=3):
                     "page": page + 1
                 })
 
-            # Click "Next" if there is one; the last page has none
+            # Click "Next" if there is one; the last page has none.
+            # li.next a is this site's selector for its Next link
             next_links = driver.find_elements(By.CSS_SELECTOR, "li.next a")
             if not next_links:
                 break  # No more pages
@@ -842,6 +844,8 @@ print(quotes_df.shape)
 ```
 
 Notice the use of `WebDriverWait` with `expected_conditions` — this is superior to `time.sleep()` because it waits only as long as needed for the element to appear, rather than waiting a fixed amount of time that might be too short (element not loaded) or too long (wasted time). The `try/finally` block quits the browser even when an error stops the function partway, such as a `TimeoutException` from a page whose quotes never appear. Without it, the error would skip `driver.quit()`, and the headless browser would keep running, out of sight, until you restart the kernel. The pagination uses `find_elements` (plural), which returns an empty list instead of raising an error when the last page has no **Next** link, so the loop ends cleanly. And notice the `None` checks before calling `.text`: dynamic pages serve malformed or incomplete items just as often as static ones do, and the defensive parsing habits from @sec-static-pages carry over unchanged.
+
+Those habits carry over; the strings don't. Every string in quotation marks that names part of a page belongs to Quotes to Scrape: the address, the `quote`, `text`, and `author` classes with the `div`, `span`, and `small` tags that carry them, and `li.next a`, the selector for its **Next** link. Point `scrape_quotes()` at another site and it fails at the first wait: on xkcd's front page, waiting for an element with the class `quote` raised `TimeoutException` after 10 seconds. Strategy 6 in @sec-static-pages drew the same line: its Oscars parser rested on class names from Drupal, the system that runs oscars.org, and the Colorado legislators needed a parser of their own, built the same way. The shape is what carries over: start a browser, wait for a condition, hand `page_source` to BeautifulSoup, go to the next page, pause, and quit in `finally`. For a new site, find its own selectors in the developer tools, as "Navigating and Finding Elements" did for xkcd, and check how its pages continue: a **Next** link, an infinite scroll ("Scraping Infinite Scroll Pages"), or a **Load More** button.
 
 ## Pages Behind a Login
 
