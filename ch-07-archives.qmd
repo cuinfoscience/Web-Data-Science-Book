@@ -669,6 +669,7 @@ The Internet Archive's work also raises fundamental questions about the right to
 ## Common Issues to Debug
 
 - **Wayback Machine rate limiting**: Space your requests with `time.sleep()`. The service is free and community-maintained; do not abuse it.
+- **`NameError: name 'snapshot' is not defined`**: The Availability API cell printed "No snapshot available near this date," so `snapshot` was never created and the next cell has nothing to use. The Archive sometimes sends back an empty answer when it is busy, even for pages it has. Wait a minute, rerun the Availability API cell until it prints a URL, then run the next cell.
 - **`502 Bad Gateway`, "Temporarily Offline," or dropped connections**: These usually mean the Archive is overloaded, not that your code is wrong. Wait 30 to 90 seconds, retry, and slow your request rate; the retrying session from @sec-protocols handles this if you give it a longer `backoff_factor`. While this chapter's screenshots were being made in September 2026, roughly half of the first requests to the Archive failed this way and then succeeded on a retry.
 - **Incomplete archived pages**: Many snapshots are missing CSS, images, or JavaScript-rendered content. The text content is usually preserved, but visual rendering may be broken. Open **About this capture** to see when each embedded file was saved, and the Network tab (@sec-protocols) to see which files failed to load.
 - **CDX data inconsistencies**: Some entries may have missing fields or redirect status codes instead of actual content. Filter your data carefully.
