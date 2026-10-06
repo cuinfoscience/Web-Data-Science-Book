@@ -338,13 +338,13 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 | ID | Pri | Target | Medium | Change | Owner | Status | Check next time |
 |---|---|---|---|---|---|---|---|
 | P0-1 | P0 | `AGENTS.md`, `AUTHORING.md` | definition | Two-sided legibility; scope, then zoom; `check` is the one threshold | maintainer | Applied 2026-09-24 (see note) | Figures failing `check` at any target: 29 → 0 new; figures redone for cramming: 3 → 0 |
-| P0-2 | P0 | `AGENTS.md`, `docs/decisions.md`, `.claude/settings.json`, repo setting | definition + permission | Merge commits, new branch per PR, no force-push | maintainer | Decided; text applied 2026-09-24; permission and repo setting open | Force-pushes: ~6 → 0; squash merges by the agent: 12 → 0; stop-hook unpushed warnings: 2 → 0 |
+| P0-2 | P0 | `AGENTS.md`, `docs/decisions.md`, `.claude/settings.json`, repo setting | definition + permission | Merge commits, new branch per PR, no force-push | maintainer | Decided; text applied 2026-09-24. On 2026-10-06: automatic branch deletion is on in the textbook and off in the course, and the permission rule isn't added; carried into the 2026-10-06 AAR's P1-1 and P1-2 | Force-pushes: ~6 → 0; squash merges by the agent: 12 → 0; stop-hook unpushed warnings: 2 → 0 |
 | P0-3 | P0 | `selftest.py`, `AGENTS.md` | tool config + definition | Effect test per external setting; a real figure before "done" | auto + maintainer | Applied 2026-09-24: text, then a read-back of every setting (see note) | Toolkit bugs found after merge: 5 → ≤1; settings with an effect test: 3 of 8 → 8 of 8 |
 | P1-1 | P1 | `.github/workflows/shots-check.yml` | CI | `check` on PRs that change images | maintainer | Applied 2026-09-25, when its pull request merges (see note) | Image PRs merged without `check` in CI: all → 0 |
 | P1-2 | P1 | `AGENTS.md`, `CLAUDE.md`, `docs/` | layout | One instruction file; records beside the code | auto | Applied | Instruction files found by the collector: 0 → 1; earlier AARs found: 0 → 2 |
-| P1-3 | P1 | skill collector | tool config | Read `queued_command`; wider correction pattern | skill maintainer | Proposed | Steering messages counted: 0 of 8 → 8 of 8 |
+| P1-3 | P1 | skill collector | tool config | Read `queued_command`; wider correction pattern | skill maintainer | Not applied; carried forward as the 2026-10-06 AAR's P1-3 (it counted 2 of 55 messages) | Steering messages counted: 0 of 8 → 8 of 8 |
 | P2-1 | P2 | chapters 7–8, weeks 01/07/08 | content | Dated captions; retakes | maintainer | In progress: 11 of 11 ch-07/08 figures retaken, 3 of 3 captions dated; week 7's slides remade, 5 of week 8's 6 that fell short, and week 1's book website; three hand captures wait for the maintainer (see notes) | Captions flagged: 3 → 0; figures over the limit: 29 → 0 |
-| P2-2 | P2 | `docs/plans/` | plan | Computed outputs | maintainer | Proposed | Plan decided, yes or no |
+| P2-2 | P2 | `docs/plans/` | plan | Computed outputs | maintainer | Not decided. Its urgent part, running code before it ships, is the 2026-10-06 AAR's P0-2 | Plan decided, yes or no |
 
 ### Resolution notes
 
@@ -386,7 +386,13 @@ stated in the preface. That now conflicts with the aim of showing computed figur
 **2026-10-05: §5.3's cost, from binary files.**
 - **The finding.** §5.3 traced the reviewer's churn to rewritten history. Week 8's handout found another source: files whose bytes change when nothing in them has. pdfTeX wrote each build's time into every marked-up PDF, as its dates and in the `/ID` made from them. Once #219's `sync` drew a course figure's markers again at each copy, re-syncing the handout's four marked-up figures, unchanged, rewrote all four PDFs in the course repository. That is four binary diffs that no reviewer can read and that say nothing.
 - **The fix.** Markers are drawn with `SOURCE_DATE_EPOCH` set to the take's capture time, so the same take and marks give the same PDF and PNG, byte for byte, and the PDF is dated when the screenshot was taken. The selftest draws one figure twice, a second apart, and compares the bytes ([`../decisions.md`](../decisions.md), 2026-10-05). For porting: any build step that writes the time, or a random ID, into its output shows changes in git that aren't there. Pin it to the source's own date.
-- **Check next time.** Redraws of an unchanged figure that change its bytes: 4 of 4 → 0.
+- **Then the records.** With the PDFs fixed, a repeat sync of the same six figures still changed six lines of `shots.json`: each record's `synced` time, written at every run. `synced` is now the time the record last changed, and a sync that would change no record leaves the file alone ([`../decisions.md`](../decisions.md), 2026-10-05, "A sync that changes nothing leaves its record alone"). For porting: a timestamp in a record is output too. Write it when the record changes, not when the tool runs.
+- **Check next time.** Redraws of an unchanged figure that change its bytes: 4 of 4 → 0. Records a repeat sync rewrites: 6 of 6 → 0.
+
+**2026-10-06: followed up.** [`AAR_Web-Data-Science-Book_2026-10-06.md`](AAR_Web-Data-Science-Book_2026-10-06.md) (§2a) checked each action against weeks 7 and 8 and the review pass.
+- **Worked:** P0-1 (no message about text size in the window), P0-3, P1-1, and P1-2. P0-2 worked for agents: every merge in the window used a merge commit, and no agent squashed or force-pushed.
+- **Carried forward:** P0-2's settings (P1-1 and P1-2 there), P1-3 (P1-3), and P2-1's three screenshots (P2-3).
+- **Superseded in part:** P2-2. The pattern behind it, code that never ran, recurred at high cost: 17 errors found after merge. The new P0-2 runs changed cells before a pull request, which needs none of the computed-outputs plan's decisions.
 
 ## Appendix A — Design sketch: why each part exists
 

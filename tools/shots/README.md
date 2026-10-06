@@ -1081,11 +1081,12 @@ tools/shots/run synced
   the record can name the commit it came from. A course figure's take isn't
   committed; its record names the textbook's commit and the take.
 - **The record:** `shots.json` beside the copy holds, per file, the figure,
-  the source file and its commit, both hashes, and the capture's page, date,
-  browser, User-Agent, and engine. `IMAGES.md` gets a table generated from
-  it, between `<!-- shots:begin -->` and `<!-- shots:end -->`, placed before
-  the stubs table; everything else in the file is for people, and
-  `make_stubs.py` keeps to its own markers.
+  the source file and its commit, both hashes, the capture's page, date,
+  browser, User-Agent, and engine, and `synced`, the time the record last
+  changed. `IMAGES.md` gets a table generated from it, between
+  `<!-- shots:begin -->` and `<!-- shots:end -->`, placed before the stubs
+  table; everything else in the file is for people, and `make_stubs.py`
+  keeps to its own markers.
 - **stubs.tsv:** when the file has a row, `sync` sets its size and redraws
   the stubs table. The row stays: `stubs.tsv` lists every image a deck
   includes, not only placeholders.
@@ -1094,6 +1095,10 @@ tools/shots/run synced
   record can't silently change a slide. A figure that hasn't changed is
   "the same", its marked-up PDF and PNG included, because markers are drawn
   reproducibly (see Markers): "replacing" always means the figure changed.
+  The record is "unchanged" when nothing in it would change; `synced` then
+  keeps its time and `shots.json` isn't written, so syncing a figure again
+  leaves no diff. A course figure's record names the textbook's commit it
+  was synced at, so a sync after a new commit changes it, `synced` too.
 - **`synced`** reads every `shots.json` under the course repo's `slides/`
   and `handouts/`. A copy changed by hand fails; a copy whose source changed
   since, or whose take was cleaned from `out/`, is a warning.
@@ -1200,7 +1205,7 @@ websockets, at the pins in `requirements.txt`, and `check` itself takes about a
 second. An image replaced by hand, or an `IMAGES.md` table left behind, fails
 it, so the reviewer's look can go to what the figure shows.
 
-`selftest` runs 142 offline checks against a local web server. It needs the browser but no network. It covers:
+`selftest` runs 154 offline checks against a local web server. It needs the browser but no network. It covers:
 
 - the guards, retries, `promote`, and `check`;
 - a stylesheet whose connection drops, which fails a take whose text is all there and is retried, beside one answered with a 404, which passes, and a recipe that accepts lost files, whose log names them; an aborted stylesheet counts, an aborted image or script doesn't;
@@ -1220,8 +1225,8 @@ it, so the reviewer's look can go to what the figure shows.
 - the Selenium engine: the window `webdriver.Chrome()` opens, with Chrome for Testing's bar and the versions recorded;
 - the codegen engine: a real click written as a line of the recorder's script, both windows grabbed, and the Inspector's code counted at its stylesheet's size;
 - evidence, against a stand-in CDX server: a query paged to its end, its summaries and its listing in `IMAGES.md`, a page that returns exactly its limit and one whose resume key is left unfollowed failing, and `check` on evidence never run, a changed query, and a reworded claim;
-- sync, into a stand-in course repo: an approved figure copied with its record, table, and stubs size, a person's notes kept; `synced` finding it, then a copy changed by hand; `--annotated` without markers and an uncommitted source refused; a course figure copied with its markers drawn from its recipe;
-- import, of a made-up screenshot: `capture` leaving it to a person; the take cropped at scale 2, its avatar blacked out, its note and color profile left behind, and who, when, the screenshot's hash, and the redaction recorded; a declared text size judged, and one too small warned about; a crop past the edge, a future date, and a figure the toolkit captures refused; the recipe rules for `mode: hand`; `promote` with markers, `check`, and a mark moved by `xy` redrawn without a new take.
+- sync, into a stand-in course repo: an approved figure copied with its record, table, and stubs size, a person's notes kept; a second sync leaving `shots.json` byte for byte, and a record that changes getting a new `synced` time; `synced` finding the copy, then a copy changed by hand; `--annotated` without markers and an uncommitted source refused; a course figure copied with its markers drawn from its recipe, and synced again with no file or record changed;
+- import, of a made-up screenshot: `capture` leaving it to a person; the take cropped at scale 2, its avatar blacked out, its note and color profile left behind, and who, when, the screenshot's hash, and the redaction recorded; a declared text size judged, and one too small warned about; a crop past the edge, a future date, and a figure the toolkit captures refused; the recipe rules for `mode: hand`; `promote` with markers, `check`, and a mark moved by `xy` redrawn without a new take; and a render (`kind: render`) imported with `--tool`, recorded as rendered with that program, with a render's `--browser` and a screenshot's `--tool` refused, and `promote` keeping its kind and program.
 
 It skips the marker checks if TeX is missing and the headed checks if the virtual display is.
 
