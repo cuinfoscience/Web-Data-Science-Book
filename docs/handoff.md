@@ -1,5 +1,16 @@
 # Hand-off note
 
+**Updated 2026-10-06.** A review pass over students' open pull requests on chapters 1 to 7, which the maintainer asked for ([`decisions.md`](decisions.md), 2026-10-06). Every one of them has a review. Twelve low-risk ones are merged: #56, #95 (chapters 2 and 3); #92, #98, #212 (chapter 4); #107, #113, #126 (chapter 5); #174, #188 (chapter 6); #202, #210 (chapter 7). This note's pull request regenerates the notebooks after them, and adds the period that #56's callout lost. #50 had also left chapter 2's notebook stale, so Notebook sync had failed on `main` and on every pull request.
+
+- **Held for the maintainer**, correct or nearly so but more than a few lines of code: #80 (chapter 3's `probe()` verdicts), #116 (chapter 5's `Retry-After`), #131 (`responsible_get()` copied into chapter 6), #179 (chapter 6's Strategy 7 fetch; the loop under it still fails on today's page), and #191 (chapter 7's retry loop, once its fixes are in).
+- **Commented, nothing to merge:** #62, #88, #101, #106, #111, #112, #127, #130, #171, #203. Each is superseded, empty, or edits lines `main` removed; the comment says so and what the student can do next.
+- **Everything else** has "Request changes" with the fix spelled out. When a student pushes, the same rules apply.
+- **Found on `main` by the reviews, not fixed by any pull request:**
+  - Chapter 5's two `diagnose_request()` test calls and `get_with_backoff()` send no User-Agent, so Wikipedia answers 403 (#122's review gives the fixed calls).
+  - Chapter 6, line 321, says Best Picture has no film field; on the 2024–2026 ceremony pages its entity is the producers and its film field the movie (#173's review gives text).
+  - Chapter 6's Strategy 7 selector matches a "Certified Fresh" list, not the "Movies in Theaters" grid, and the loop raises `AttributeError` on the fifth tile; the grid is 28 `media-info-tile` elements. Strategy 3's expected output is stale (Avatar is now row 1), and Strategy 1 calls `pd.read_html(url)` with no User-Agent.
+  - If #181 merges, chapter 8's opening (line 28) uses its IMDb example as a JavaScript page; #181 shows it is an AWS WAF challenge. Chapter 8 would need a sentence (`AGENTS.md`, "Extending the Book", item 7).
+
 **Updated 2026-10-05.** This note's pull request makes `tools/shots` draw its marked-up figures reproducibly: the same take and marks give the same PDF and PNG, byte for byte, so a redraw, `promote`, or `sync` of an unchanged figure changes nothing in git (see the toolkit below, and [`decisions.md`](decisions.md), 2026-10-05).
 
 Merged earlier the same day:
@@ -127,7 +138,7 @@ Each item has a recommendation, made on 2026-09-25; the decision is the maintain
 
 ## Known issues
 
-- **Students' pull requests.** 38 are open, beside the maintainer's #50; they merge after the Friday code review. The course's review table (#60) lists each one's checks, conflicts, and overlaps.
+- **Students' pull requests.** After the review pass of 2026-10-06, 49 are open on chapters 1 to 7, and one on chapter 11 (#78), which the pass didn't cover. They merge after the Friday code review, or in a review pass the maintainer asks for ([`decisions.md`](decisions.md), 2026-10-06). The course's review table (#60) predates the pass.
   - Four conflict with `main` since #149 and #152 merged: #52 (chapter 1), and #88, #89, and #93 (chapter 4). #88 and #93 make the same change. Resolving a conflict is a good demonstration for the review.
   - Most were made in the browser, so they fail Notebook sync (see the table above).
   - Six come from a fork's `main` branch. There, every later commit joins the open pull request, and two of them share one set of changes. `CONTRIBUTING.md` now asks for one branch per pull request.
@@ -154,8 +165,8 @@ Each item has a recommendation, made on 2026-09-25; the decision is the maintain
 
 ## Hands off
 
-- Chapter 6 and course week 6: leave them untouched (maintainer's instruction).
-- Students' branches and pull requests: never merge, edit, or rebase them. The maintainer merges them after the Friday code review.
+- Chapter 6 and course week 6: leave them untouched (maintainer's instruction). In the review pass of 2026-10-06 the maintainer had students' chapter 6 pull requests reviewed and merged like the others; agents' own edits to chapter 6 stay off.
+- Students' branches and pull requests: never edit or rebase them. Merge one only in a review pass the maintainer asks for, under the rules in [`decisions.md`](decisions.md) (2026-10-06); otherwise the maintainer merges them after the Friday code review.
 - Issues a student's open pull request already fixes: leave the fix to it. On 2026-09-24 a chapter 4 fix for #90 had to be withdrawn because #92, the reporter's own pull request, already fixed it. Check the issue's linked pull requests and the open ones on that chapter first.
 - Closing keywords: write "fixes #N", "closes #N", or "resolves #N" only where the change fixes #N. GitHub reads them anywhere in a commit message that reaches `main`; "already fixes #90", in a sentence about #92, closed #90. A quotation counts too, so search a branch's commit messages before merging it.
 
