@@ -2,6 +2,25 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-06 · In a review pass the maintainer asks for, an agent merges students' low-risk pull requests
+
+**Decision.**
+- When the maintainer asks for a review pass, an agent reviews students' open pull requests and merges the low-risk ones itself, with merge commits. A pull request is low-risk when all of these hold:
+  - it changes text, links, or callouts, or makes a code change of about one to three lines whose correctness a reader can check;
+  - review finds nothing to fix in it, against the chapter, `AGENTS.md`, and, for a claim about a site or an API, the live site;
+  - it merges into `main` without a conflict;
+  - it doesn't edit a file in `notebooks/` by hand;
+  - every closing keyword in its description and commits names an issue it fixes.
+- A red Notebook sync check alone doesn't stop a merge, since `CONTRIBUTING.md` tells students that a browser edit fails it. The agent regenerates the notebooks in its own pull request after the merges. Where GitHub hasn't run a fork's checks, the agent runs them locally.
+- Where two pull requests make the same change, the agent merges the better one and comments on the other. Larger code changes (a new function, a retry loop, a rewritten block) get a review and wait for the maintainer, even when they look correct.
+- Anything else gets a "Request changes" review with the fix spelled out, or a comment when no change would make it mergeable (the lines are gone from `main`, the change is superseded, or the diff is empty).
+- Students' pull requests are still presented and reviewed at the Friday standup. Outside a review pass the maintainer asks for, agents still don't merge them.
+- In the pass of 2026-10-06, the maintainer had chapter 6's pull requests treated like the others. Chapter 6 stays hands off for agents' own changes.
+
+**Why.** On 2026-10-06 about 57 students' pull requests on chapters 1 to 7 were open, many a link or a sentence. The maintainer asked for reviews, comments, and merges of the low-risk ones through chapter 7. Most were made in the browser, so their Notebook sync failed, as `CONTRIBUTING.md` says it will; holding them for that would have left all but six unmerged, and "Request changes" would have contradicted the guide.
+
+**Where.** `AGENTS.md` ("Git and Pull Requests"), `CONTRIBUTING.md` ("Review and merge"), and [`handoff.md`](handoff.md). *Amends* "Students' pull requests merge after a Friday code-review standup" (2026-09-24), below.
+
 ## 2026-10-05 · A sync that changes nothing leaves its record alone
 
 **Decision.** A copy's record in the course repository's `shots.json` keeps its `synced` time unless something else in it changes, and `sync` doesn't write `shots.json` when no record would change. `synced` is when the record last changed, not when `sync` last ran.
