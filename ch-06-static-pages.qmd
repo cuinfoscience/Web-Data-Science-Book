@@ -144,17 +144,18 @@ import pandas as pd
 
 # Point read_html directly at a URL — no requests or BeautifulSoup needed
 url = "https://en.wikipedia.org/wiki/List_of_highest-grossing_films"
-tables = pd.read_html(url)
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+tables = pd.read_html(url, header=0, storage_options=headers)
 
 print(f"Number of tables found: {len(tables)}")
 # Wikipedia pages often have many tables
 ```
 
-You can specify which row contains the column headers and select the table you want by index:
+Notice `storage_options`: without it, `read_html` requests the page anonymously, and Wikipedia answers an anonymous request with HTTP 403. It is the same courtesy @sec-ethics asked of every request you send, identifying yourself by name, passed through the one parameter `read_html` offers for it. Since that single call already fetched every table on the page, select the one you want by index instead of requesting the page again:
 
 ```{python}
 # The highest-grossing films table is at index 0
-films_df = pd.read_html(url, header=0)[0]
+films_df = tables[0]
 print(films_df.head())
 # Columns: Rank, Peak, Title, Worldwide gross, Year, Ref
 # Row 0: 1, 1, Avatar, $2,923,710,708, 2009, [# 1][# 2]
