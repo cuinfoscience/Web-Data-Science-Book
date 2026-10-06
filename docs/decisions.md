@@ -2,6 +2,23 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-06 · `webdata` adds OCR: `ocrmypdf` and `pytesseract`
+
+**Decision.**
+- Chapter 1's command adds `ocrmypdf pytesseract`, and so do its copies: the README, and the course's setup handout and its catch-up line.
+- conda-forge's `ocrmypdf` brings Tesseract with it. Tesseract is the OCR program chapter 9 uses, and it comes with its language files.
+- Chapter 9's notebook keeps an install cell, `conda install -c conda-forge ocrmypdf pytesseract`, for environments made before this change.
+
+**Why.**
+- The maintainer chose OCR for chapter 9, installed both in chapter 9 and in chapter 1's environment (2026-10-06, [`plans/2026-10-06-ch09-pdfs.md`](plans/2026-10-06-ch09-pdfs.md), decision 5).
+- `pip` can't install Tesseract, because it is a program rather than a Python library. conda-forge's `tesseract` package can.
+- `ocrmypdf` depends on Tesseract, and adds a command that gives a scanned PDF a text layer. Chapter 9 uses it on scanned minutes from 2000.
+- The cost is size. Tesseract's package is 181 MB because it carries 125 languages.
+- The command still solves on conda-forge for Python 3.14 on linux-64, win-64, osx-arm64, and osx-64. This was checked with micromamba dry runs on 2026-10-06. The macOS runs need `CONDA_OVERRIDE_OSX=13.0`, because a dry run from Linux can't see a Mac's version; without it, even the old command fails to solve.
+- Downloads with the two packages: 679 MB on Linux and 736 MB on Windows. On Apple Silicon the download grows from 244 MB to 445 MB.
+
+**Where.** `ch-01-introduction.qmd`, `README.md`, `AGENTS.md` ("Key Python libraries"), the course's `handouts/week-01/setup.md`, and chapter 9's install cell. This *applies* "`webdata` comes from conda-forge with every library the chapters import" (2026-10-02, below), which says a chapter that needs a new library adds it to chapter 1's command.
+
 ## 2026-10-06 · In a review pass the maintainer asks for, an agent merges students' low-risk pull requests
 
 **Decision.**

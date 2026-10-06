@@ -34,7 +34,7 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
 - Quarto 1.4+
 - Python 3.14 via Anaconda (3.13 also works). Chapter 1 creates the readers' `webdata` environment from conda-forge in one command, with every library the chapters import; PyPI has no 3.14 build of gensim. A chapter that needs a new library adds it to that command, not a `pip install` of its own
 - Jupyter (for rendering .qmd files with Python code)
-- Key Python libraries (all in chapter 1's `webdata`): requests, beautifulsoup4, lxml, pandas, numpy, scipy, matplotlib, seaborn, gensim, dnspython, selenium, playwright, pypdf, pdfplumber, praw, spotipy, atproto, Mastodon.py, openai, anthropic
+- Key Python libraries (all in chapter 1's `webdata`): requests, beautifulsoup4, lxml, pandas, numpy, scipy, matplotlib, seaborn, gensim, dnspython, selenium, playwright, pypdf, pdfplumber, ocrmypdf and pytesseract (with the Tesseract program), praw, spotipy, atproto, Mastodon.py, openai, anthropic
 
 ## Editorial Voice and Style
 
