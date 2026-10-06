@@ -233,8 +233,10 @@ same branch, and the checks run again.
 - Students' pull requests are merged in class, after a code-review standup on a
   Friday: you present your change, a classmate reviews it, and the maintainer
   merges the approved ones with a merge commit. Other pull requests are merged
-  by the maintainer the same way. Don't merge your own pull request or a
-  classmate's, even if GitHub shows you the button.
+  by the maintainer the same way. Between standups, the maintainer may have a
+  small, checked change merged early, such as a fixed link or a corrected
+  sentence. Don't merge your own pull request or a classmate's, even if GitHub
+  shows you the button.
 - Not every pull request is merged. A closed one can still be a useful report,
   and in the course you are graded on the proposal and the review, not on the
   merge.

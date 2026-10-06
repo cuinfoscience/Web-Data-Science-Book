@@ -1,5 +1,13 @@
 # Hand-off note
 
+**Updated 2026-10-06.** A review pass over students' open pull requests on chapters 1 to 7, which the maintainer asked for ([`decisions.md`](decisions.md), 2026-10-06). Every one of them has a review. Twelve low-risk ones are merged, and #179, #80, #116, and #131 later at the maintainer's request: #56, #95 (chapters 2 and 3); #92, #98, #212 (chapter 4); #107, #113, #126 (chapter 5); #174, #188 (chapter 6); #202, #210 (chapter 7). This note's pull request regenerates the notebooks after them, and adds the period that #56's callout lost. #50 had also left chapter 2's notebook stale, so Notebook sync had failed on `main` and on every pull request.
+
+- **Held, then merged at the maintainer's request:** #80 (chapter 3's `probe()` verdicts), #116 (chapter 5's `Retry-After`), and #131 (`responsible_get()` copied into chapter 6). A follow-up pull request made their reviews' notes: a module-level `VERDICTS` with a `"rate-limited"` label, and chapter 2's `responsible_get()` copied exactly. #191 (chapter 7's retry loop) needs the maintainer's review once its fixes are in.
+- **Closed by the maintainer, nothing to merge:** #62, #88, #101, #106, #111, #112, #127, #130, #171, #203. Each is superseded, empty, or edits lines `main` removed; its comment says so and what the student can do next.
+- **Everything else** has "Request changes" with the fix spelled out. When a student pushes, the same rules apply.
+- **Found on `main` by the reviews.** A second pull request the same day, at the maintainer's request, fixed the problems in chapters 5 and 6: chapter 5's `diagnose_request()` test calls now send a User-Agent; in chapter 6, Strategy 1 sends one, Strategy 3's expected output is dated, the Oscars paragraph says what each field holds (every card has a film field; Best Picture's entity is its producers), and Strategy 7 parses the grid's `media-info-tile` elements, after #179's fetch merged. Box Office Mojo's `robots.txt`, which Strategy 1 reads from, is `User-agent: *` and `Disallow: /`, below a notice that scraping needs IMDb's written permission (checked 2026-10-06); the maintainer decided the same day to keep the site. Still open:
+  - If #181 merges, chapter 8's opening (line 28) uses its IMDb example as a JavaScript page; #181 shows it is an AWS WAF challenge. Chapter 8 would need a sentence (`AGENTS.md`, "Extending the Book", item 7).
+
 **Updated 2026-10-05.** This note's pull request makes `tools/shots` draw its marked-up figures reproducibly: the same take and marks give the same PDF and PNG, byte for byte, so a redraw, `promote`, or `sync` of an unchanged figure changes nothing in git (see the toolkit below, and [`decisions.md`](decisions.md), 2026-10-05).
 
 Merged earlier the same day:
@@ -107,7 +115,7 @@ In this order:
    - The course's week 11 deck calls keyed APIs (Census, FRED, FEC) without one. Week 1's setup handout and week 10's deck already send one (course #56 fixed week 1), and course #69 puts the reader's address in week 10's, as chapter 10 now has.
    - Chapter 2's rate-limiting example (`ch-02-ethics.qmd`, line 196) sends `brian.keegan@colorado.edu`, so a student who runs it identifies as the maintainer. It should take the reader's address, as chapter 10's now does. Six open pull requests touch chapter 2 (#50, #54, #56, #59, #63, #79), so it waits for the review.
    - Figure 5.4 (`network-headers`, chapter 5's request headers) shows the old string; its caption calls it the identification the book's screenshots are taken with. A retake shows the new one. Fourteen open pull requests touch chapter 5, so the retake, caption, and alt text wait for the review.
-   - Chapter 6 (line 253) and week 6's Oscars handout still send the toolkit's old string, `Web Data Science v1 brian.keegan@colorado.edu` (the handout writes `v1` as `/v1`), to oscars.org, which has no per-minute limit like Wikimedia's. Both are hands off (below); changing them is the maintainer's call.
+   - Chapter 6's Oscars example now sends `WebDataScience/1.0 (your-email@colorado.edu)`, at the maintainer's request on 2026-10-06; oscars.org answered it with 200, and the `requests` default and a Chrome-like string with 403. Week 6's Oscars handout, in the course repository, still sends the old `Web Data Science /v1 brian.keegan@colorado.edu`.
 6. **Chapter 4's Step 5**, at the Friday review. It sends students to Open-Meteo after Step 1 taught them to check robots.txt, whose file there disallows every path; a sentence could point back to chapter 2's distinction between crawlers and API clients. Students' #86 revises Step 5, so raise it in #86's review: if #86 adds the sentence, no later pull request is needed.
 7. **Computed outputs.** If they are adopted, run the [plan](plans/2026-09-24-computed-outputs.md)'s M0 pilot on chapter 5.
 
@@ -127,7 +135,7 @@ Each item has a recommendation, made on 2026-09-25; the decision is the maintain
 
 ## Known issues
 
-- **Students' pull requests.** 38 are open, beside the maintainer's #50; they merge after the Friday code review. The course's review table (#60) lists each one's checks, conflicts, and overlaps.
+- **Students' pull requests.** After the review pass of 2026-10-06, 35 are open on chapters 1 to 7, each waiting on its author's changes, and one on chapter 11 (#78), which the pass didn't cover. They merge after the Friday code review, or in a review pass the maintainer asks for ([`decisions.md`](decisions.md), 2026-10-06). The course's review table (#60) predates the pass.
   - Four conflict with `main` since #149 and #152 merged: #52 (chapter 1), and #88, #89, and #93 (chapter 4). #88 and #93 make the same change. Resolving a conflict is a good demonstration for the review.
   - Most were made in the browser, so they fail Notebook sync (see the table above).
   - Six come from a fork's `main` branch. There, every later commit joins the open pull request, and two of them share one set of changes. `CONTRIBUTING.md` now asks for one branch per pull request.
@@ -154,8 +162,8 @@ Each item has a recommendation, made on 2026-09-25; the decision is the maintain
 
 ## Hands off
 
-- Chapter 6 and course week 6: leave them untouched (maintainer's instruction).
-- Students' branches and pull requests: never merge, edit, or rebase them. The maintainer merges them after the Friday code review.
+- Chapter 6 and course week 6: leave them untouched (maintainer's instruction). In the review pass of 2026-10-06 the maintainer had students' chapter 6 pull requests reviewed and merged like the others, and then asked for the fixes to chapter 6 that the reviews found. Other agent edits to chapter 6 still wait for the maintainer's request.
+- Students' branches and pull requests: never edit or rebase them. Merge one only in a review pass the maintainer asks for, under the rules in [`decisions.md`](decisions.md) (2026-10-06); otherwise the maintainer merges them after the Friday code review.
 - Issues a student's open pull request already fixes: leave the fix to it. On 2026-09-24 a chapter 4 fix for #90 had to be withdrawn because #92, the reporter's own pull request, already fixed it. Check the issue's linked pull requests and the open ones on that chapter first.
 - Closing keywords: write "fixes #N", "closes #N", or "resolves #N" only where the change fixes #N. GitHub reads them anywhere in a commit message that reaches `main`; "already fixes #90", in a sentence about #92, closed #90. A quotation counts too, so search a branch's commit messages before merging it.
 
