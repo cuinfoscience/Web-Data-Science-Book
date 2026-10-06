@@ -630,18 +630,20 @@ You will build a URL diagnostic tool from the protocol layers this chapter cover
 **Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check `response.history`, and if it redirected, print where it ended up. Include a docstring.
 
 ```{python}
-# Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring.
+# Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring. Use a timeout like `timeout=10` so an unresponsive URL does not stall the entire notebook.
 # Your code here
 ```
 
-**Step 5 — Profile five URLs.** Run `diagnose_url()` on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an `http://` address of a site that upgrades you to `https://`), an API endpoint, and a site that blocks automated access (@sec-post-api showed you one).
+**Step 5 — Profile five URLs.** Run `diagnose_url()` on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an `http://` address of a site that upgrades you to `https://`), an API endpoint, and a site known to restrict automated access (@sec-post-api showed you one).
+
+Record what you actually receive from the fifth site: its behavior can vary with your network, request headers, and the time of the request. Inspect a short excerpt of `response.text` as well as the status and headers. A `200` response or a small HTML body alone does not tell you whether you received the requested content, a page that needs JavaScript, or an access challenge. If the response does not clearly show a refusal, report that you could not confirm a block; you do not need to keep trying sites until one refuses you.
 
 ```{python}
-# Step 5: Diagnose five URLs -- working, 404, redirect, API, and blocked.
+# Step 5: Diagnose five URLs -- working, 404, redirect, API, and potentially blocked.
 # Your code here
 ```
 
-**Step 6 — Interpret.** In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the blocked site, what layer refused you — and how do you know it was the site rather than your network (@sec-post-api)?
+**Step 6 — Interpret.** In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the fifth site, what evidence supports a refusal, successful access, or an uncertain result? If you observed a refusal, explain what you can infer about the layer involved (@sec-post-api). An HTTP response shows that you reached an HTTP-speaking server, but its status alone does not identify whether the response came from the site's application, a CDN, or a proxy; a connection error or timeout provides no HTTP status to interpret.
 
 ```{python}
 # Step 6: Write your answer here as comments, or convert this cell to Markdown.
@@ -682,6 +684,7 @@ The web's protocol stack was designed as public infrastructure — open standard
 - **`wget --random-wait` has no visible effect**: It only randomizes a wait time you already set with `--wait`; used alone, with no base wait to randomize, it does nothing.
 - **403 from Wikimedia API**: You forgot the custom `User-Agent` header.
 - **DNS results varying by location**: Normal — content delivery networks return different IPs based on your geographic location.
+- **`dns.resolver` raises `NoNameservers ... answered REFUSED`**: The kernel is querying campus resolvers (CU's are in the `128.138.x.x` range), which only answer recursive queries from on-campus addresses. `dnspython` reads DNS settings once per process, so a kernel started on campus or on VPN keeps them after you get home, even though `scutil --dns` shows your current ones. `requests` and your browser keep working, which makes it look specific to this exercise. Restart the kernel; if that doesn't fix it, build your own resolver with `r = dns.resolver.Resolver()`, set `r.nameservers = ["8.8.8.8", "1.1.1.1"]`, and call `r.resolve(...)` instead of `dns.resolver.resolve(...)`.
 - **URL encoding issues**: Use `urllib.parse.quote()` for article titles with spaces or special characters.
 
 ## Key Takeaways
