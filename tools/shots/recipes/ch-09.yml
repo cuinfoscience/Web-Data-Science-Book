@@ -67,3 +67,57 @@ figures:
           the sales tax office's phone number and email address in the note,
           which the chapter leaves out rather than send a class of readers to
           the city's staff
+
+  - id: missing-totals-row
+    kind: render
+    mode: hand
+    section: "Words, Lines, and Tables with pdfplumber"
+    brief: >-
+      Show why pdfplumber's default table finder drops the summary table's
+      totals row: its debug image of the December 2024 report's page 2, with
+      the cells it found shaded, their edges in red, and the rules' crossings
+      circled. The reader should see the shading stop above "Total Sales and
+      Use Tax", which has a double rule under it and no vertical rules beside
+      its figures. Cropped to the table, from its title to just below the
+      double rule, so the footnote stays out.
+    url: https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2
+    hand:
+      why: >-
+        a script draws it from the city's PDF; no browser is involved
+      steps: >-
+        In the webdata environment, run `python tools/shots/renders/ch-09.py
+        OUTDIR`, which reads data/ch-09/revenue-report-2024-12.pdf (sha256
+        8d32866d…c80fc68d) and writes OUTDIR/missing-totals-row.png, 1600
+        pixels wide: pdfplumber's debug_tablefinder() on page 2, cropped to
+        PDF points 48–594 across and 148–396 down. Import it with --tool
+        naming pdfplumber's version.
+      text_px: 16          # the table's body text, in an 800-pixel frame
+    window: [800, 363]
+
+  - id: ocr-confidence
+    kind: render
+    mode: hand
+    section: "When There Is No Text Layer: OCR"
+    brief: >-
+      Show that Tesseract's confidence scores don't track its errors: the
+      retail sales tax rows (2019–2024, January to May) of Exhibit 3 in the
+      December 2024 report, a picture of a table, with a box around each
+      word Tesseract read, blue for a confidence of 80 or more and red
+      below. Of the 13 red words, 11 were read correctly; the two misreads
+      among them, and one blue misread, are named in the caption, since the
+      image shows the page rather than what Tesseract read.
+    url: https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2
+    hand:
+      why: >-
+        a script draws it from the city's PDF and Tesseract's output; no
+        browser is involved
+      steps: >-
+        In the webdata environment, run `python tools/shots/renders/ch-09.py
+        OUTDIR`, which reads the image on page 15 of
+        data/ch-09/revenue-report-2024-12.pdf (sha256 8d32866d…c80fc68d),
+        runs pytesseract.image_to_data on it in grayscale with --psm 6, as
+        the chapter does, and writes OUTDIR/ocr-confidence.png: image pixels
+        340–1130 across and 36–266 down, 1600 pixels wide. Import it with
+        --tool naming pytesseract's and Tesseract's versions.
+      text_px: 20          # the table's figures, in an 800-pixel frame
+    window: [800, 233]

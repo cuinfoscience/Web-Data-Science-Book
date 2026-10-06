@@ -499,7 +499,7 @@ def cmd_import(args):
             line(WARN, f"redact {r['box']} ({r['why']}) is outside the crop, so it hides nothing there")
         else:
             line(GOOD, f"blacked out {r['box']}: {r['why']}")
-    line(NOTE, "nothing reads a screenshot's text: look at the take for a name, an avatar, or an address the "
+    line(NOTE, f"nothing reads a {source}'s text: look at the take for a name, an avatar, or an address the "
                f"redactions missed (tools/shots/run sheet {args.chapter} --only {args.id})")
     approved = IMAGES / args.chapter / fig["file"]
     if not recipe["course"] and approved.exists():
