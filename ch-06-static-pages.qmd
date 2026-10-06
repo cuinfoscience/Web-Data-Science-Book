@@ -252,7 +252,7 @@ The [Academy Awards](https://www.oscars.org) website lists nominees and winners 
 import requests
 from bs4 import BeautifulSoup
 
-headers = {"User-Agent": "Web Data Science v1 brian.keegan@colorado.edu"}
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 response = requests.get("https://www.oscars.org/oscars/ceremonies/2026", headers=headers)
 print(response.status_code)
 # 200
