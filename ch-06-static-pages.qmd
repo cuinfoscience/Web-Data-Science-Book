@@ -355,7 +355,22 @@ import time
 import logging
 
 def responsible_get(url, headers=None, delay=1.0):
-    """Make an HTTP GET request with responsible defaults (from @sec-ethics)."""
+    """Make an HTTP GET request with responsible defaults.
+
+    Parameters
+    ----------
+    url : str
+        The URL to request
+    headers : dict, optional
+        Custom headers; a default User-Agent is added if none provided
+    delay : float
+        Seconds to wait after the request (default: 1.0)
+
+    Returns
+    -------
+    requests.Response or None
+        The response object, or None if the request failed
+    """
     default_headers = {
         "User-Agent": "WebDataScience/1.0 (student-project; your-email@colorado.edu)"
     }
@@ -364,13 +379,13 @@ def responsible_get(url, headers=None, delay=1.0):
 
     try:
         response = requests.get(url, headers=default_headers, timeout=30)
-        response.raise_for_status()
+        response.raise_for_status()  # Treat 4xx/5xx statuses as failures
         logging.info(f"{response.status_code} {url}")
         time.sleep(delay)
         return response
     except requests.exceptions.HTTPError as e:
         logging.error(f"HTTP error: {e}")
-        time.sleep(delay)
+        time.sleep(delay)  # A failed request still counts against the server
         return None
     except requests.exceptions.RequestException as e:
         logging.error(f"Request failed ({type(e).__name__}): {url}")
