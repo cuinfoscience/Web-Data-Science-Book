@@ -14,8 +14,9 @@ destination folder gets:
 
 - the file, under `--as` (by default the figure's own name);
 - a record in `shots.json` beside it: the figure, the file it was copied from
-  and that file's textbook commit, both hashes, and the capture's page, date,
-  browser, and User-Agent;
+  and that file's textbook commit, both hashes, the capture's page, date,
+  browser, and User-Agent, and `synced`, when the record last changed. A sync
+  that would change nothing else keeps `synced` and leaves the file alone;
 - a table in its `IMAGES.md`, generated from `shots.json`, between
   `<!-- shots:begin -->` and `<!-- shots:end -->`. Everything outside the
   markers is for people, and `make_stubs.py` keeps to its own markers;
@@ -230,18 +231,29 @@ def sync(recipe, fig, course, to, name=None, take=None, annotated=False):
         size = f"{img.width}x{img.height}"
     keep = ("url", "final_url", "captured", "browser", "user_agent", "window", "scale", "size", "kind",
             "open_shadow", "engine", "by", "method", "imported", "redacted")
-    record["files"][name] = {
+    new = json.loads(json.dumps({
         "figure": f"{recipe['chapter']}/{fig['id']}",
         "copied_from": rel(files[0][0]),
         "textbook_commit": commit,
         "source_sha256": _sha256(files[0][0]),
         "sha256": _sha256(copied),
-        "synced": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
         **{k: entry[k] for k in keep if k in entry},
         **({"also": also} if also else {}),
-    }
-    (folder / RECORD).write_text(json.dumps(record, indent=2, sort_keys=True, ensure_ascii=False) + "\n")
-    said.append(f"recorded in {(folder / RECORD).relative_to(course)}")
+    }))
+    # `synced` is when the record last changed, so a second sync of an unchanged figure leaves
+    # shots.json as it was.
+    old = record["files"].get(name) or {}
+    unchanged = "synced" in old and {k: v for k, v in old.items() if k != "synced"} == new
+    new["synced"] = (old["synced"] if unchanged
+                     else datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"))
+    record["files"][name] = new
+    text = json.dumps(record, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    where = (folder / RECORD).relative_to(course)
+    if (folder / RECORD).exists() and (folder / RECORD).read_text() == text:
+        said.append(f"record in {where} unchanged")
+    else:
+        (folder / RECORD).write_text(text)
+        said.append(f"recorded in {where}")
     said.append(write_images_md(folder, record))
     stub = update_stubs(folder, name, size)
     if stub:
