@@ -295,7 +295,7 @@ The ch-07 and ch-08 figures, at 280–440 characters of alt text, set the bar.
 - **Placeholders:** when `--as` names a placeholder listed in `stubs.tsv`, the file replaces the placeholder under the same name, and the row is removed.
 - **Prerequisite:** P0-1 (`make_stubs.py` keeps notes) must land first, or the next `make` erases what sync wrote.
 - **Handouts:** the same command, with `--to handouts/week-NN/img`.
-- **Re-syncing** (added 2026-10-05). An unchanged figure copies as the same bytes, its marked-up PDF and PNG included (§7.6), so `sync` reports it as "the same as the file already there". "Replacing a different file" always means the figure changed.
+- **Re-syncing** (added 2026-10-05). An unchanged figure copies as the same bytes, its marked-up PDF and PNG included (§7.6), so `sync` reports it as "the same as the file already there". "Replacing a different file" always means the figure changed. Its record is "unchanged" too: `synced` keeps its time unless something else in the record changes, so a repeat sync leaves no diff.
 
 ### 7.12 Rules the toolkit enforces or reminds
 - Identify yourself, and pace requests (§7.3). `doctor` warns when a recipe URL is disallowed by the site's `robots.txt`.
