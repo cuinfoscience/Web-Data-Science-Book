@@ -44,7 +44,8 @@ Start with the easiest case on the spectrum: a single site, a consistent templat
 import pandas as pd
 
 url = "https://www.boxofficemojo.com/weekend/2018W52/"
-tables = pd.read_html(url)
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+tables = pd.read_html(url, storage_options=headers)
 
 print(f"Number of tables found: {len(tables)}")
 # Number of tables found: 1
@@ -158,7 +159,7 @@ Notice `storage_options`: without it, `read_html` requests the page anonymously,
 films_df = tables[0]
 print(films_df.head())
 # Columns: Rank, Peak, Title, Worldwide gross, Year, Ref
-# Row 0: 1, 1, Avatar, $2,923,710,708, 2009, [# 1][# 2]
+# Row 0 in October 2026: 1, 1, Avengers: Endgame †, $2,925,713,609, 2019, [# 1][# 2]
 ```
 
 `read_html` is remarkably powerful for its simplicity, but it is not magic: it still struggles with `colspan` and `rowspan` — cells merged across rows or columns to avoid repeating a value, which `read_html` cannot always split back apart — and it never guesses at what a cell's text is supposed to mean. This table shows a more common version of the second problem: every value it returned is technically present but not yet usable for arithmetic or plotting.
@@ -289,7 +290,7 @@ for cat in categories[:1]:
 
 ### Extracting Category Data
 
-For each category, extract the award name and every honoree's type, entity, and — where the category distinguishes one — film:
+For each category, extract the award name and every honoree's type, entity, and film:
 
 ```{python}
 results = []
@@ -303,7 +304,7 @@ for cat in categories:
     for h in cat.find_all("div", class_="paragraph--type--award-honoree"):
         type_tag = h.find(class_="field--name-field-honoree-type")
         entity_tag = h.find(class_="field--name-field-award-entities")
-        film_tag = h.find(class_="field--name-field-award-film")  # None for some categories
+        film_tag = h.find(class_="field--name-field-award-film")  # None if a card has no film field
 
         results.append({
             "category": category_name,
@@ -319,7 +320,7 @@ print(df[df["category"] == "Actor in a Leading Role"].iloc[0])
 # film                     Sinners
 ```
 
-The `field--name-field-award-film` lookup is what separates an award to a *person* from an award to a *film*: Michael B. Jordan's win names both an entity and the film he won it for. Best Picture works the other way around — its nominees, the winner "One Battle after Another" alongside Bugonia, F1, Frankenstein, Hamnet, Marty Supreme, and Sinners, are entities in their own right, so that category has no separate film to distinguish an entity from. That is exactly why `film_tag` is allowed to come back `None`, and why the guard checks for it rather than assuming every honoree has one.
+The `field--name-field-award-film` lookup pairs each honoree with a film: Michael B. Jordan's win names both the actor and the film he won it for, and Best Picture names the producers as the entity and the film, "One Battle after Another," in the film field. The field names stay the same from category to category, but what they hold does not. International Feature Film puts the film, "Sentimental Value," in the entity field and its country, Norway, in the film field, so a column called `film` can hold a country; Original Song puts the song's title in the film field and its film and songwriters in the entity field. Every card on the 2026 page has all three fields, but nothing on the page promises that, so the guard lets `film_tag` come back `None` instead of crashing on a card without one.
 
 ### CSS Selectors with `select()`
 
@@ -466,16 +467,19 @@ headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 response = requests.get(url, headers=headers)
 soup = BeautifulSoup(response.text, "html.parser")
 
-tiles = soup.find_all("tile-dynamic", attrs={"data-qa": "tile"})
+tiles = soup.find_all("media-info-tile")
+print(f"Found {len(tiles)} tiles")
+# Found 28 tiles (October 2026)
 
 for tile in tiles:
-    title = tile.find("span", class_="p--small")
-    score = tile.find("rt-text", class_="critics-score")
-    print(title.get_text(strip=True), score.get_text(strip=True) if score else None)
-# Resident Evil 96%
+    title = tile.find("rt-text", attrs={"data-qa": "discovery-media-list-item-title"})
+    score = tile.find("rt-text", attrs={"slot": "criticsScore"})
+    critics = score.get_text(strip=True) if score else ""
+    print(title.get_text(strip=True), critics or "no Tomatometer yet")
+# Casino Royale 94%
 ```
 
-Each tile carries a poster image, a `<span class="p--small">` holding the title, and — wrapped inside a `<score-icon-critics>` element — an `<rt-text class="critics-score">` holding the Tomatometer score as a percentage string. None of this resembles `paragraph--type--award-honoree` or the Colorado legislators' `views-row`, and BeautifulSoup does not care: it navigates `tile-dynamic` and `rt-text` exactly as it would `<div>` and `<span>`, because it works on tag structure, not on a fixed vocabulary of "real" HTML tags.
+Each `<media-info-tile>` carries a poster, an `<rt-text data-qa="discovery-media-list-item-title">` holding the title, and two more `<rt-text>` elements told apart by their `slot` attribute: `criticsScore` holds the Tomatometer as a percentage string, and `audienceScore` the audience's. A film too new to have enough reviews has an empty `criticsScore`; on the October 2026 page, 16 of the 28 did. The page has other custom tiles too: `find_all("tile-dynamic")` matches a "Certified Fresh" list and news links, not the grid. Name the grid's own element, and confirm in your browser's Inspector that what you matched is what you meant. None of this resembles `paragraph--type--award-honoree` or the Colorado legislators' `views-row`, and BeautifulSoup does not care: it navigates `tile-dynamic` and `rt-text` exactly as it would `<div>` and `<span>`, because it works on tag structure, not on a fixed vocabulary of "real" HTML tags.
 
 This is where the 2×2 spectrum from the start of the chapter stops being an abstraction. A research question that needs both box-office performance and critical reception — whether a film's opening-weekend take tracks its Tomatometer score, say — cannot be answered from one site: The Numbers and Box Office Mojo have the money figures, and Rotten Tomatoes has the reviews. This is the multiple-sites, inconsistent-design quadrant from the start of the chapter, and it is where most real scraping projects end up living. The fix is not a cleverer, more general parser. It is one parser per site, each translating that site's own shape into a shared handful of columns — title, plus whatever that site alone provides — joined afterward on the one field every source shares: the movie's title.
 

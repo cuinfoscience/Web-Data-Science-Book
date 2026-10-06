@@ -283,9 +283,10 @@ def diagnose_request(url, headers=None):
     except requests.exceptions.Timeout:
         print(f"Request timed out: {url}")
 
-# Test on a few URLs
-diagnose_request("https://en.wikipedia.org/wiki/Python_(programming_language)")
-diagnose_request("https://en.wikipedia.org/wiki/Nonexistent_Page_12345")
+# Test on a few URLs; without a User-Agent that names you, Wikipedia answers both with 403
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+diagnose_request("https://en.wikipedia.org/wiki/Python_(programming_language)", headers=headers)
+diagnose_request("https://en.wikipedia.org/wiki/Nonexistent_Page_12345", headers=headers)
 ```
 
 The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a `User-Agent` header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:
