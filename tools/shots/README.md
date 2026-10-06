@@ -839,6 +839,14 @@ tools/shots/run import course issue-form --file issue.png --by "A. Person" --dat
 - **Elsewhere:** `capture` skips a hand figure and says how to import it.
   `doctor` doesn't read robots.txt for it, because a person's browser loads the
   page, as a person.
+- **Renders** come in the same way: a picture a script draws from a file, such
+  as a page of a PDF that pdfplumber draws with its boxes (chapter 9). The
+  recipe says `kind: render` and `mode: hand`, its `hand: {steps: ...}` names
+  the script and the file, and `--tool` names the program in place of
+  `--browser`. The record then reads "rendered with pdfplumber 0.11.10;
+  imported by tools/shots", never "screenshot by hand". The rule that a
+  screenshot is a real capture still holds, because the kind says what the
+  picture is.
 
 Three course recipes wait for their screenshots (2026-09-25): `pr-review`,
 one image for weeks 1, 8, and 13's `pr_review.png`; `week01-issue-form`, a

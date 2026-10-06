@@ -8,8 +8,9 @@
     tools/shots/run annotate ch-NN ID [--take PATH]   redraw a take's markers after editing them
     tools/shots/run sheet ch-NN [--only ID ...]   each newest take at the size it will be shown
     tools/shots/run promote ch-NN ID [--take PATH]
-    tools/shots/run import ch-NN ID --file PNG --by NAME --date YYYY-MM-DD [--browser TEXT]
-                                              a person's screenshot of a `mode: hand` figure, as a take
+    tools/shots/run import ch-NN ID --file PNG --by NAME --date YYYY-MM-DD [--browser TEXT | --tool TEXT]
+                                              a person's screenshot of a `mode: hand` figure, or a
+                                              script's render (`kind: render`), as a take
     tools/shots/run adopt ch-NN [--only ID ...]   record provenance for images made before tools/shots
     tools/shots/run evidence ch-NN [--only ID ...]   run the queries behind the captions' claims
     tools/shots/run sync ch-NN ID --to slides/week-NN/img [--as FILE] [--annotated] [--take PATH]
@@ -295,7 +296,8 @@ def cmd_capture(args):
         for fig in figs:
             print(f"{args.chapter}/{fig['id']}")
             if fig["mode"] == "hand":
-                line(NOTE, f"a person takes this screenshot ({fig['hand']['why']}); import it: tools/shots/run "
+                made = "a script draws this render" if fig["kind"] == "render" else "a person takes this screenshot"
+                line(NOTE, f"{made} ({fig['hand']['why']}); import it: tools/shots/run "
                            f"import {args.chapter} {fig['id']} --file PNG --by NAME --date YYYY-MM-DD")
                 continue
             host = host_of(fig.get("url") or "")
@@ -476,7 +478,7 @@ def cmd_import(args):
         return 1
     print(f"{args.chapter}/{args.id}")
     try:
-        take = hand.run(fig, args.file, args.by, args.date, args.browser)
+        take = hand.run(fig, args.file, args.by, args.date, args.browser, args.tool)
     except hand.HandError as e:
         line(BAD, str(e))
         return 1
@@ -484,12 +486,13 @@ def cmd_import(args):
         line(BAD, "; ".join(take["problems"]) + f" ({take['image']})")
         return 1
     raw, S = take["raw"], take["scale"]
+    source = "render" if fig["kind"] == "render" else "screenshot"
     color = f", converted to sRGB from {raw['color']}" if raw.get("color") else ""
     line(GOOD, f"{take['image']}  ({take['size'][0]}x{take['size'][1]}, cropped from a "
-               f"{raw['size'][0]}x{raw['size'][1]} screenshot{color})")
+               f"{raw['size'][0]}x{raw['size'][1]} {source}{color})")
     shown = (round(raw["size"][0] / S), round(raw["size"][1] / S))
     if shown != tuple(fig["window"]):
-        line(NOTE, f"the screenshot shows {shown[0]}×{shown[1]} CSS pixels at scale {S:g}; the recipe's window is "
+        line(NOTE, f"the {source} shows {shown[0]}×{shown[1]} CSS pixels at scale {S:g}; the recipe's window is "
                    f"{fig['window'][0]}×{fig['window'][1]} (the crop decides what the figure shows)")
     for r in take["redacted"]:
         if r.get("outside_crop"):
@@ -774,6 +777,7 @@ def main():
     p.add_argument("--by", required=True, help="who took it")
     p.add_argument("--date", required=True, help="the day it was taken, YYYY-MM-DD")
     p.add_argument("--browser", help="the browser and system, as 'Chrome 141 on macOS 15'")
+    p.add_argument("--tool", help="for a render (`kind: render`), the program that drew it, as 'pdfplumber 0.11.10'")
     p.set_defaults(fn=cmd_import)
     p = sub.add_parser("adopt"); p.add_argument("chapter"); p.add_argument("--only", nargs="+")
     p.add_argument("--force", action="store_true"); p.set_defaults(fn=cmd_adopt)

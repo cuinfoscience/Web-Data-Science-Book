@@ -15,7 +15,7 @@ END = "<!-- shots:end -->"
 KEEP = ("file", "kind", "url", "final_url", "status", "first_status", "error", "dns", "captured", "by",
         "method", "browser", "user_agent", "window", "scale", "javascript", "crop", "clip", "size",
         "recipe_sha256", "image_sha256", "note", "text", "parts", "dropped", "open_shadow", "engine",
-        "imported", "raw", "redacted")
+        "imported", "raw", "redacted", "tool")
 
 
 def annotated_name(file):

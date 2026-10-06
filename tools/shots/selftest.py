@@ -412,6 +412,14 @@ figures:
     window: [450, 350]
     scale: 2
     crop: {{top: 20, left: 0, width: 400, height: 300}}
+  # A page of a PDF drawn by a script: a render, imported the same way.
+  - id: hand-render
+    kind: render
+    mode: hand
+    url: "https://example.org/report.pdf"
+    hand: {{why: "a script draws it from the PDF", steps: "python draw.py report.pdf", text_px: 16}}
+    window: [450, 350]
+    scale: 2
   - id: selenium-window
     kind: capture
     url: "{base}/tree"
@@ -926,6 +934,25 @@ figures:
     code, out = shots("import", "ch-99", "ok", "--file", str(tmp / "screenshot.png"), "--by", "A. Person",
                       "--date", "2026-09-20")
     expect("...and a figure the toolkit captures itself", code == 1 and "mode: hand" in out, out[-300:])
+    code, out = shots("import", "ch-99", "hand-render", "--file", str(tmp / "screenshot.png"), "--by", "A. Person",
+                      "--date", "2026-09-20", "--tool", "draw.py 1.0")
+    take = newest("hand-render")
+    expect("a render comes in the same way, recorded as rendered with its program, not as a screenshot",
+           code == 0 and take.get("kind") == "render" and take.get("tool") == "draw.py 1.0"
+           and take.get("method") == "rendered with draw.py 1.0; imported by tools/shots" and "browser" not in take
+           and "cropped from a 900x700 render" in out, str(take)[:300] + out[-300:])
+    code, out = shots("import", "ch-99", "hand-render", "--file", str(tmp / "screenshot.png"), "--by", "A. Person",
+                      "--date", "2026-09-20", "--browser", "Chrome 141 on macOS 15")
+    expect("...a render has no browser", code == 1 and "--tool" in out, out[-300:])
+    code, out = shots("import", "ch-99", "hand-small", "--file", str(tmp / "screenshot.png"), "--by", "A. Person",
+                      "--date", "2026-09-20", "--tool", "draw.py 1.0")
+    expect("...and a screenshot has no --tool", code == 1 and "--browser" in out, out[-300:])
+    code, out = shots("promote", "ch-99", "hand-render")
+    entry = json.loads((images / "ch-99" / "provenance.json").read_text())["figures"].get("hand-render") or {}
+    expect("promote keeps a render's kind and program, and IMAGES.md says it was rendered",
+           code == 0 and entry.get("kind") == "render" and entry.get("tool") == "draw.py 1.0"
+           and "A. Person: rendered with draw.py 1.0; imported by tools/shots" in (images / "ch-99" / "IMAGES.md").read_text(),
+           out[-300:])
     bad = recipe_rules._problems("ch-98", {"chapter": "ch-98", "figures": [
         {"id": "a", "kind": "capture", "url": "https://example.org/", "mode": "hand", "hand": {"why": "a login"},
          "steps": [{"wait": {"text": "Form"}}], "annotate": {"marks": [{"n": 1, "at": {"selector": "h1"}}]}},
