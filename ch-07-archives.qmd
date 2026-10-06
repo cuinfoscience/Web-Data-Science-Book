@@ -422,7 +422,7 @@ def get_wayback_content(url, date, headers=None):
         "timestamp": closest["timestamp"],
         "url": snapshot_url,
         "word_count": len(text.split()),
-        "content": text[:5000]  # First 5000 characters to avoid memory issues
+        "content": text  # Keep the full text; the similarity analysis compares whole documents
     }
 ```
 
