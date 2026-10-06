@@ -458,6 +458,14 @@ Note that the page may have changed since this was written — that is the funda
 Oscars' award cards and the Colorado legislators' cards are both single-site problems: write the parser once, and it covers the whole site. Move to a second site entirely and the same underlying idea — repeating containers standing in for table rows — reappears in a structurally unrelated shape. [Rotten Tomatoes](https://www.rottentomatoes.com)' "Movies in Theaters" grid at `https://www.rottentomatoes.com/browse/movies_in_theaters/` looks, at a glance, like the same kind of card layout as an Oscars category. It is not built the same way at all: Rotten Tomatoes' grid uses custom HTML elements — tags the site defines itself, not `<div>` — so `find_all("div", ...)` returns nothing useful there:
 
 ```{python}
+import requests
+from bs4 import BeautifulSoup
+
+url = "https://www.rottentomatoes.com/browse/movies_in_theaters/"
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+response = requests.get(url, headers=headers)
+soup = BeautifulSoup(response.text, "html.parser")
+
 tiles = soup.find_all("tile-dynamic", attrs={"data-qa": "tile"})
 
 for tile in tiles:
