@@ -519,7 +519,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <h2 data-number="5.4" class="anchored" data-anchor-id="tcpip-the-transport-layer"><span class="header-section-number">5.4</span> TCP/IP: The Transport Layer</h2>
 <p>Every computer on a public network has an IP address — a numerical identifier that functions like a postal address. IPv4 addresses are formatted as four numbers separated by dots (e.g., <code>151.101.130.133</code>), allowing for about 4.3 billion unique addresses. IPv6 uses a longer hexadecimal format to support a vastly larger address space.</p>
 <p>You can find your own computer’s IP address programmatically:</p>
-<div id="fd797f33" class="cell" data-execution_count="1">
+<div id="2ff1865e" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> socket</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co"># Your computer's hostname on the local network</span></span>
@@ -532,7 +532,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 </div>
 <p>Be aware that on many Linux and macOS systems this lookup returns a loopback address like <code>127.0.0.1</code> or <code>127.0.1.1</code> — an address that simply means “this machine” — rather than your network-assigned IP, so the public-IP query below is the more reliable way to see how the internet identifies you.</p>
 <p>To see your <em>public</em> IP address (as seen by servers on the internet), you can query an external service:</p>
-<div id="ee9e0b44" class="cell" data-execution_count="2">
+<div id="774307fd" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>response <span class="op">=</span> requests.get(<span class="st">"https://api.ipify.org?format=json"</span>)</span>
@@ -541,7 +541,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 </div>
 <p><strong>From the terminal, inside the notebook.</strong> Some of the most useful network tools are programs that come with your operating system rather than Python libraries: <code>ping</code>, <code>traceroute</code>, and <code>curl</code>. A notebook can run them too. When a line in a code cell starts with <code>!</code>, Jupyter hands the rest of the line to your computer’s terminal, and the program’s output appears under the cell. There is nothing to install, and no administrator rights are needed.</p>
 <p>The fastest reachability check is <code>ping</code>, which sends a few small packets to a host and reports whether, and how quickly, it replies:</p>
-<div id="b8437894" class="cell" data-execution_count="3">
+<div id="1267faa9" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">import</span> platform</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="co"># ping's flag for "send 4 and stop" is -n on Windows and -c on macOS and Linux</span></span>
@@ -554,7 +554,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <section id="traceroute" class="level3" data-number="5.4.1">
 <h3 data-number="5.4.1" class="anchored" data-anchor-id="traceroute"><span class="header-section-number">5.4.1</span> Traceroute</h3>
 <p>When you send a request to a remote server, the data does not travel in a straight line. It hops through a series of intermediate routers, and tracing that path is a good way to make the abstract idea of “the network” concrete. Every major operating system ships a tool that traces it: <code>traceroute</code> on macOS and Linux, and <code>tracert</code> on Windows.</p>
-<div id="13b913ea" class="cell" data-execution_count="4">
+<div id="63167fe9" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="im">import</span> platform</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="co"># Stop after 20 hops: -h on Windows, -m on macOS and Linux</span></span>
@@ -565,7 +565,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 </div>
 <p>It can take a minute, because the tool waits a few seconds for each router that doesn’t answer. On Linux, if <code>traceroute</code> isn’t installed, <code>!tracepath en.wikipedia.org</code> does the same job.</p>
 <p>To work with the output in Python instead of reading it, put a variable in front of the <code>!</code>: <code>hops = !traceroute -m 20 en.wikipedia.org</code> stores each line of the output as one item of <code>hops</code>, which you can loop over like a list. Each hop represents a router or server along the path. You can use an IP geolocation service to map these hops geographically:</p>
-<div id="34aa0198" class="cell" data-execution_count="5">
+<div id="b24157a5" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="kw">def</span> geolocate_ip(ip):</span>
@@ -595,7 +595,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <p><strong>Packet sniffing</strong> means capturing these packets as they pass across a network interface, rather than only sending and receiving your own application’s requests the normal way. This is a meaningfully more invasive capability than anything else in this chapter. A traceroute or a DNS lookup only ever touches traffic you generated. A packet sniffer running on a shared network — campus wifi, a coffee-shop hotspot, an office LAN — can, depending on the network’s configuration, see <em>other people’s</em> traffic too: which sites they are visiting, and on an unencrypted connection, potentially some of what they are sending. Capturing your own traffic on your own machine is unambiguously fine. Capturing other people’s traffic without their knowledge or consent is a real privacy question, and sometimes a legal one — <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> covers consent and authorized access in more depth, and it applies here as much as it does to scraping.</p>
 <p>This book doesn’t have you sniff packets. Capturing them takes administrator rights on every major operating system, because of what it would let any program see, and running a notebook with those rights is a habit not worth building.</p>
 <p>You can still watch one connection pass through the layers from your own side of it. <code>curl</code>, a command-line HTTP client that comes with macOS, Linux, and Windows 10 and later, narrates what it does when you add <code>-v</code> (verbose). The section on <code>curl</code> and <code>wget</code> below covers it in full.</p>
-<div id="2eecf971" class="cell" data-execution_count="6">
+<div id="d9d0d94b" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="co"># -v narrates the connection, -I asks for headers only, and -A sets your User-Agent (chapter 2)</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="op">!</span>curl <span class="op">-</span>v <span class="op">-</span>I <span class="op">-</span>A <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span> https:<span class="op">//</span>en.wikipedia.org<span class="op">/</span>wiki<span class="op">/</span>Web_scraping</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -612,7 +612,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <section id="dns-the-address-book" class="level2" data-number="5.5">
 <h2 data-number="5.5" class="anchored" data-anchor-id="dns-the-address-book"><span class="header-section-number">5.5</span> DNS: The Address Book</h2>
 <p>The Domain Name System translates human-readable domain names (like <code>en.wikipedia.org</code>) into IP addresses that computers can route to. You can perform DNS lookups programmatically with the <code>dnspython</code> library:</p>
-<div id="d06d1381" class="cell" data-execution_count="7">
+<div id="3e579949" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> dns.resolver</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="co"># Look up the IP address for Wikipedia</span></span>
@@ -662,7 +662,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <section id="diagnosing-http-errors" class="level3" data-number="5.6.1">
 <h3 data-number="5.6.1" class="anchored" data-anchor-id="diagnosing-http-errors"><span class="header-section-number">5.6.1</span> Diagnosing HTTP Errors</h3>
 <p>When a request fails, the status code tells you <em>what</em> went wrong, but diagnosing <em>why</em> requires looking at the full response. A diagnostic function can help:</p>
-<div id="b9c7280d" class="cell" data-execution_count="8">
+<div id="92022b59" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="kw">def</span> diagnose_request(url, headers<span class="op">=</span><span class="va">None</span>):</span>
@@ -682,12 +682,13 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <span id="cb10-17"><a href="#cb10-17" aria-label="17"></a>    <span class="cf">except</span> requests.exceptions.Timeout:</span>
 <span id="cb10-18"><a href="#cb10-18" aria-label="18"></a>        <span class="bu">print</span>(<span class="ss">f"Request timed out: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb10-19"><a href="#cb10-19" aria-label="19"></a></span>
-<span id="cb10-20"><a href="#cb10-20" aria-label="20"></a><span class="co"># Test on a few URLs</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-label="21"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Python_(programming_language)"</span>)</span>
-<span id="cb10-22"><a href="#cb10-22" aria-label="22"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Nonexistent_Page_12345"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-20"><a href="#cb10-20" aria-label="20"></a><span class="co"># Test on a few URLs; without a User-Agent that names you, Wikipedia answers both with 403</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-label="21"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb10-22"><a href="#cb10-22" aria-label="22"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Python_(programming_language)"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb10-23"><a href="#cb10-23" aria-label="23"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Nonexistent_Page_12345"</span>, headers<span class="op">=</span>headers)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a <code>User-Agent</code> header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:</p>
-<div id="86fb1c5d" class="cell" data-execution_count="9">
+<div id="30aa9e7e" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a><span class="kw">def</span> get_with_backoff(url, headers<span class="op">=</span><span class="va">None</span>, max_retries<span class="op">=</span><span class="dv">3</span>):</span>
@@ -708,7 +709,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <section id="making-api-requests-with-custom-headers" class="level3" data-number="5.6.2">
 <h3 data-number="5.6.2" class="anchored" data-anchor-id="making-api-requests-with-custom-headers"><span class="header-section-number">5.6.2</span> Making API Requests with Custom Headers</h3>
 <p>Let us retrieve data from the Wikimedia pageviews API. This API requires a meaningful <code>User-Agent</code> header — if you send the default <code>requests</code> User-Agent, you will get a 403 error:</p>
-<div id="71d117d4" class="cell" data-execution_count="10">
+<div id="972631d7" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>article <span class="op">=</span> <span class="st">"University_of_Colorado_Boulder"</span></span>
@@ -731,7 +732,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 </div>
 <p><strong>From the terminal.</strong> The same check, inspectable without Python: <code>curl -I</code> fetches only the response headers — a fast way to confirm a status code without downloading the body — and <code>curl -v</code> shows the entire request and response, close to what the Network tab’s Headers pane showed you earlier in this chapter. Both work alongside <code>-A</code> to set a User-Agent the same way the <code>headers</code> dictionary above does. See “<code>curl</code> and <code>wget</code>” later in this chapter for these tools as full alternatives to <code>requests</code>.</p>
 <p>Now convert the response to a DataFrame and plot it:</p>
-<div id="918f2f3f" class="cell" data-execution_count="11">
+<div id="bfdfe7d4" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a></span>
@@ -753,7 +754,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <p>Every request this chapter has made has honestly identified itself — <code>WebDataScience/1.0 (your-email@colorado.edu)</code>, a real contact address a server operator could actually use to reach you. <strong>User-Agent spoofing</strong> means sending a <code>User-Agent</code> header that claims to be something you are not: a specific browser, operating system, or device you are not actually running. It is worth understanding both because you will encounter it — some sites behave differently depending on what you claim to be — and because doing it yourself raises questions this book has otherwise been able to sidestep by simply identifying itself truthfully.</p>
 <p>There are legitimate, unremarkable reasons to change a <code>User-Agent</code>: testing how your own site renders on a phone without owning one, checking whether a page serves a simplified version to older browsers, or working around a service that blocks a legitimate research tool’s honest identification for no defensible reason. There are also reasons that are not legitimate, covered below.</p>
 <p>Mechanically, spoofing is nothing more than the <code>headers</code> dictionary you already know how to build — just with a value that describes a browser and device you are not actually using:</p>
-<div id="44b5d4b7" class="cell" data-execution_count="12">
+<div id="93decd15" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a><span class="co"># An honest identification, like every other request in this book</span></span>
@@ -794,7 +795,7 @@ Figure&nbsp;5.4: The request headers Chrome sent for the article, in the Headers
 <h3 data-number="5.6.4" class="anchored" data-anchor-id="connections-sessions-and-retries"><span class="header-section-number">5.6.4</span> Connections, Sessions, and Retries</h3>
 <p>Every bare <code>requests.get()</code> call does more work than it appears to: it opens a fresh TCP connection to the server, performs the TLS handshake, sends the request, and tears the connection back down. For a single request, that overhead is negligible. But the chapters ahead will have you making dozens or hundreds of requests to the same host — one per Wikipedia article, one per bill, one per archived page — and paying the connection setup cost every time is wasteful for both you and the server.</p>
 <p>A <code>requests.Session</code> object fixes this. A Session keeps the underlying connection open and reuses it for subsequent requests to the same host, and it remembers headers, so you set your <code>User-Agent</code> once instead of passing it to every call. A Session can also carry a retry policy: rather than hand-rolling backoff logic like the <code>get_with_backoff()</code> function you wrote earlier, you can mount a <code>Retry</code> configuration that automatically retries rate limits and transient server errors with exponentially increasing delays — and it honors any <code>Retry-After</code> header the server sends:</p>
-<div id="303e7b2b" class="cell" data-execution_count="13">
+<div id="a1b2d203" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="im">from</span> requests.adapters <span class="im">import</span> HTTPAdapter</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="im">from</span> urllib3.util.retry <span class="im">import</span> Retry</span>
@@ -872,7 +873,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 <p>URLs (Uniform Resource Locators) have a well-defined structure:</p>
 <pre><code>scheme://userinfo@host:port/path?query#fragment</code></pre>
 <p>Never write regular expressions to parse URLs. Use the <a href="https://docs.python.org/3/library/urllib.parse.html"><code>urllib.parse</code></a> module instead:</p>
-<div id="190a8db4" class="cell" data-execution_count="14">
+<div id="647b6e88" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlparse, parse_qs</span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://api.census.gov/data/2022/acs/acs5?get=NAME,B01001_001E&amp;for=place:07850&amp;in=state:08"</span></span>
@@ -893,7 +894,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 <h3 data-number="5.7.1" class="anchored" data-anchor-id="building-urls-programmatically"><span class="header-section-number">5.7.1</span> Building URLs Programmatically</h3>
 <p>Web APIs expect the values you supply in one of two places, and you need to recognize which pattern you are dealing with before you can build the URL correctly.</p>
 <p>Both patterns below build URLs with Python’s <strong>f-strings</strong> — a compact way to embed variables and expressions directly inside a string, written <code>f"...{expression}..."</code>. This is an intermediate Python feature: an f-string evaluates whatever sits inside the curly braces and inserts the result directly into the string at that position.</p>
-<div id="8d7e1d07" class="cell" data-execution_count="15">
+<div id="42bdc1db" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a>name <span class="op">=</span> <span class="st">"Boulder"</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a>count <span class="op">=</span> <span class="dv">3</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-label="3"></a></span>
@@ -907,7 +908,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 </div>
 <p>An f-string can also span multiple lines by placing several adjacent string literals next to each other — Python concatenates them automatically, which is how the URL-building code below builds one long string across several lines without a single <code>+</code>. The <a href="https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals">Python tutorial’s section on formatted string literals</a> covers the full syntax, including format specifiers (<code>{value:.2f}</code> for two decimal places, and similar) that come up less often in this book but are worth knowing exist.</p>
 <p><strong>Path-segment APIs</strong> embed each value at a fixed position in the URL’s path. The Wikimedia pageviews endpoint you used earlier works this way: project, access method, agent, article, granularity, and date range are all path segments in a required order. Build these URLs with an f-string over the components — but URL-encode any component that might contain special characters using <code>urllib.parse.quote</code>, because a stray slash or space inside a path segment produces a URL the server cannot route:</p>
-<div id="c63248d9" class="cell" data-execution_count="16">
+<div id="72cad5c9" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="im">from</span> urllib.parse <span class="im">import</span> quote</span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a></span>
 <span id="cb24-3"><a href="#cb24-3" aria-label="3"></a><span class="co"># Each value occupies a fixed position in the path</span></span>
@@ -930,7 +931,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 </div>
 <p>The encoding matters more than this example suggests: a band like “AC/DC” has a slash in its article title, and <code>quote("AC/DC", safe="")</code> correctly produces <code>AC%2FDC</code>. Paste the raw title into your f-string instead, and the API would interpret the slash as a path separator and return a 404.</p>
 <p><strong>Query-parameter APIs</strong> instead accept <code>key=value</code> pairs after a <code>?</code>, where order does not matter and many parameters are optional. The MediaWiki Action API — Wikipedia’s general-purpose API, which you will explore in <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a> — works this way. The <code>urlencode</code> function converts a dictionary into a properly escaped query string:</p>
-<div id="5e6557d3" class="cell" data-execution_count="17">
+<div id="d2f30c64" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlencode</span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-label="3"></a>base_url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
@@ -946,7 +947,7 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 <span id="cb25-13"><a href="#cb25-13" aria-label="13"></a><span class="co"># action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For query-parameter APIs, the <code>requests</code> library can do this encoding for you: pass the dictionary as the <code>params</code> argument. This is the preferred approach for API calls:</p>
-<div id="fe38df49" class="cell" data-execution_count="18">
+<div id="5d1edb08" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a>response <span class="op">=</span> requests.get(base_url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
 <span id="cb26-2"><a href="#cb26-2" aria-label="2"></a><span class="bu">print</span>(response.url)  <span class="co"># The full URL that requests actually built</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-label="3"></a><span class="co"># https://en.wikipedia.org/w/api.php?action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span>
@@ -960,33 +961,33 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will build a URL diagnostic tool from the protocol layers this chapter covered — DNS, HTTP status codes, headers, and redirects — and use it to profile five real URLs.</p>
 <p><strong>Step 1 — Take a URL apart.</strong> Use <code>urlparse()</code> on three URLs of different shapes — a plain page, a URL with a query string, and one of the API URLs from earlier chapters. For each, print the scheme, netloc, path, and query.</p>
-<div id="ce77d4d3" class="cell" data-execution_count="19">
+<div id="4cb27735" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-label="1"></a><span class="co"># Step 1: urlparse three different URLs and print their components.</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Resolve a name.</strong> Use <code>dns.resolver</code> to look up the A records for <code>en.wikipedia.org</code> and two other domains you choose. Print the IP addresses. Do any share an address?</p>
-<div id="fcbecd82" class="cell" data-execution_count="20">
+<div id="6ce13b26" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-label="1"></a><span class="co"># Step 2: Resolve A records for three domains and print the IPs.</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Request with named headers.</strong> Define your <code>HEADERS</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>) and request one of the three URLs from Step 1. Print the status code and three response headers: <code>Content-Type</code>, <code>Server</code>, and <code>Content-Length</code> (or the length of <code>response.content</code> if the header is absent).</p>
-<div id="1032b52b" class="cell" data-execution_count="21">
+<div id="a0821142" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-label="1"></a><span class="co"># Step 3: Make a request with your HEADERS and print the status code and three response headers.</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Write <code>diagnose_url()</code>.</strong> Wrap Step 3 in a function <code>diagnose_url(url)</code> that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check <code>response.history</code>, and if it redirected, print where it ended up. Include a docstring.</p>
-<div id="e7666bcd" class="cell" data-execution_count="22">
+<div id="ced87822" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-label="1"></a><span class="co"># Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring. Use a timeout like `timeout=10` so an unresponsive URL does not stall the entire notebook.</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Profile five URLs.</strong> Run <code>diagnose_url()</code> on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an <code>http://</code> address of a site that upgrades you to <code>https://</code>), an API endpoint, and a site known to restrict automated access (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> showed you one).</p>
 <p>Record what you actually receive from the fifth site: its behavior can vary with your network, request headers, and the time of the request. Inspect a short excerpt of <code>response.text</code> as well as the status and headers. A <code>200</code> response or a small HTML body alone does not tell you whether you received the requested content, a page that needs JavaScript, or an access challenge. If the response does not clearly show a refusal, report that you could not confirm a block; you do not need to keep trying sites until one refuses you.</p>
-<div id="15a43879" class="cell" data-execution_count="23">
+<div id="c13b41fb" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-label="1"></a><span class="co"># Step 5: Diagnose five URLs -- working, 404, redirect, API, and potentially blocked.</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the fifth site, what evidence supports a refusal, successful access, or an uncertain result? If you observed a refusal, explain what you can infer about the layer involved (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>). An HTTP response shows that you reached an HTTP-speaking server, but its status alone does not identify whether the response came from the site’s application, a CDN, or a proxy; a connection error or timeout provides no HTTP status to interpret.</p>
-<div id="402279ff" class="cell" data-execution_count="24">
+<div id="9a289caf" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1805,425 +1806,426 @@ wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (yo
 <span id="cb33-299"><a href="#cb33-299" aria-label="283"></a>    <span class="cf">except</span> requests.exceptions.Timeout:</span>
 <span id="cb33-300"><a href="#cb33-300" aria-label="284"></a>        <span class="bu">print</span>(<span class="ss">f"Request timed out: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb33-301"><a href="#cb33-301" aria-label="285"></a></span>
-<span id="cb33-302"><a href="#cb33-302" aria-label="286"></a><span class="co"># Test on a few URLs</span></span>
-<span id="cb33-303"><a href="#cb33-303" aria-label="287"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Python_(programming_language)"</span>)</span>
-<span id="cb33-304"><a href="#cb33-304" aria-label="288"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Nonexistent_Page_12345"</span>)</span>
-<span id="cb33-305"><a href="#cb33-305" aria-label="289"></a><span class="in">```</span></span>
-<span id="cb33-306"><a href="#cb33-306" aria-label="290"></a></span>
-<span id="cb33-307"><a href="#cb33-307" aria-label="291"></a>The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a <span class="in">`User-Agent`</span> header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:</span>
-<span id="cb33-308"><a href="#cb33-308" aria-label="292"></a></span>
-<span id="cb33-311"><a href="#cb33-311" aria-label="293"></a><span class="in">```{python}</span></span>
-<span id="cb33-312"><a href="#cb33-312" aria-label="294"></a><span class="im">import</span> time</span>
-<span id="cb33-313"><a href="#cb33-313" aria-label="295"></a></span>
-<span id="cb33-314"><a href="#cb33-314" aria-label="296"></a><span class="kw">def</span> get_with_backoff(url, headers<span class="op">=</span><span class="va">None</span>, max_retries<span class="op">=</span><span class="dv">3</span>):</span>
-<span id="cb33-315"><a href="#cb33-315" aria-label="297"></a>    <span class="co">"""Retry a request with exponential backoff on 429 errors."""</span></span>
-<span id="cb33-316"><a href="#cb33-316" aria-label="298"></a>    <span class="cf">for</span> attempt <span class="kw">in</span> <span class="bu">range</span>(max_retries):</span>
-<span id="cb33-317"><a href="#cb33-317" aria-label="299"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
-<span id="cb33-318"><a href="#cb33-318" aria-label="300"></a>        <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">429</span>:</span>
-<span id="cb33-319"><a href="#cb33-319" aria-label="301"></a>            wait_time <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> attempt  <span class="co"># 1s, 2s, 4s</span></span>
-<span id="cb33-320"><a href="#cb33-320" aria-label="302"></a>            <span class="bu">print</span>(<span class="ss">f"Rate limited. Waiting </span><span class="sc">{</span>wait_time<span class="sc">}</span><span class="ss">s before retry..."</span>)</span>
-<span id="cb33-321"><a href="#cb33-321" aria-label="303"></a>            time.sleep(wait_time)</span>
-<span id="cb33-322"><a href="#cb33-322" aria-label="304"></a>        <span class="cf">else</span>:</span>
-<span id="cb33-323"><a href="#cb33-323" aria-label="305"></a>            <span class="cf">return</span> response</span>
-<span id="cb33-324"><a href="#cb33-324" aria-label="306"></a>    <span class="cf">return</span> response  <span class="co"># Return the last response even if still 429</span></span>
-<span id="cb33-325"><a href="#cb33-325" aria-label="307"></a><span class="in">```</span></span>
-<span id="cb33-326"><a href="#cb33-326" aria-label="308"></a></span>
-<span id="cb33-327"><a href="#cb33-327" aria-label="309"></a>Exponential backoff doubles the wait time with each retry, giving the server progressively more breathing room. Many APIs include a <span class="in">`Retry-After`</span> header in their 429 responses that tells you exactly how long to wait — check for it with <span class="in">`response.headers.get("Retry-After")`</span> before falling back to your own backoff schedule.</span>
-<span id="cb33-328"><a href="#cb33-328" aria-label="310"></a></span>
-<span id="cb33-329"><a href="#cb33-329" aria-label="311"></a>Understanding status codes in context makes debugging much faster. A 403 from the Wikimedia API almost always means you forgot the <span class="in">`User-Agent`</span> header — the fix is a single line of code. A 403 from a news site might mean the site blocks all automated access, and no header change will help. A 404 could mean the page was deleted, the URL has a typo, or the site restructured its paths. A 500 is the server's problem, not yours — retry after a delay. Building this diagnostic intuition takes practice, but the pattern is always the same: check the status code, inspect the response headers, read the response body for error messages, and adjust your request accordingly. This systematic approach to debugging carries through every chapter that follows.</span>
-<span id="cb33-330"><a href="#cb33-330" aria-label="312"></a></span>
-<span id="cb33-331"><a href="#cb33-331" aria-label="313"></a><span class="fu">### Making API Requests with Custom Headers</span></span>
-<span id="cb33-332"><a href="#cb33-332" aria-label="314"></a></span>
-<span id="cb33-333"><a href="#cb33-333" aria-label="315"></a>Let us retrieve data from the Wikimedia pageviews API. This API requires a meaningful <span class="in">`User-Agent`</span> header — if you send the default <span class="in">`requests`</span> User-Agent, you will get a 403 error:</span>
-<span id="cb33-334"><a href="#cb33-334" aria-label="316"></a></span>
-<span id="cb33-337"><a href="#cb33-337" aria-label="317"></a><span class="in">```{python}</span></span>
-<span id="cb33-338"><a href="#cb33-338" aria-label="318"></a><span class="im">import</span> requests</span>
-<span id="cb33-339"><a href="#cb33-339" aria-label="319"></a></span>
-<span id="cb33-340"><a href="#cb33-340" aria-label="320"></a>article <span class="op">=</span> <span class="st">"University_of_Colorado_Boulder"</span></span>
-<span id="cb33-341"><a href="#cb33-341" aria-label="321"></a>api_url <span class="op">=</span> (</span>
-<span id="cb33-342"><a href="#cb33-342" aria-label="322"></a>    <span class="ss">f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
-<span id="cb33-343"><a href="#cb33-343" aria-label="323"></a>    <span class="ss">f"/en.wikipedia/all-access/all-agents/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
-<span id="cb33-344"><a href="#cb33-344" aria-label="324"></a>)</span>
-<span id="cb33-345"><a href="#cb33-345" aria-label="325"></a></span>
-<span id="cb33-346"><a href="#cb33-346" aria-label="326"></a><span class="co"># This will likely fail with a 403</span></span>
-<span id="cb33-347"><a href="#cb33-347" aria-label="327"></a>response <span class="op">=</span> requests.get(api_url)</span>
-<span id="cb33-348"><a href="#cb33-348" aria-label="328"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 403</span></span>
-<span id="cb33-349"><a href="#cb33-349" aria-label="329"></a></span>
-<span id="cb33-350"><a href="#cb33-350" aria-label="330"></a><span class="co"># Add a custom User-Agent header</span></span>
-<span id="cb33-351"><a href="#cb33-351" aria-label="331"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
-<span id="cb33-352"><a href="#cb33-352" aria-label="332"></a>response <span class="op">=</span> requests.get(api_url, headers<span class="op">=</span>headers)</span>
-<span id="cb33-353"><a href="#cb33-353" aria-label="333"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200</span></span>
-<span id="cb33-354"><a href="#cb33-354" aria-label="334"></a></span>
-<span id="cb33-355"><a href="#cb33-355" aria-label="335"></a><span class="co"># Parse the JSON response</span></span>
-<span id="cb33-356"><a href="#cb33-356" aria-label="336"></a>data <span class="op">=</span> response.json()</span>
-<span id="cb33-357"><a href="#cb33-357" aria-label="337"></a><span class="in">```</span></span>
-<span id="cb33-358"><a href="#cb33-358" aria-label="338"></a></span>
-<span id="cb33-359"><a href="#cb33-359" aria-label="339"></a>**From the terminal.** The same check, inspectable without Python: <span class="in">`curl -I`</span> fetches only the response headers — a fast way to confirm a status code without downloading the body — and <span class="in">`curl -v`</span> shows the entire request and response, close to what the Network tab's Headers pane showed you earlier in this chapter. Both work alongside <span class="in">`-A`</span> to set a User-Agent the same way the <span class="in">`headers`</span> dictionary above does. See "<span class="in">`curl`</span> and <span class="in">`wget`</span>" later in this chapter for these tools as full alternatives to <span class="in">`requests`</span>.</span>
-<span id="cb33-360"><a href="#cb33-360" aria-label="340"></a></span>
-<span id="cb33-361"><a href="#cb33-361" aria-label="341"></a>Now convert the response to a DataFrame and plot it:</span>
-<span id="cb33-362"><a href="#cb33-362" aria-label="342"></a></span>
-<span id="cb33-365"><a href="#cb33-365" aria-label="343"></a><span class="in">```{python}</span></span>
-<span id="cb33-366"><a href="#cb33-366" aria-label="344"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb33-367"><a href="#cb33-367" aria-label="345"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb33-368"><a href="#cb33-368" aria-label="346"></a></span>
-<span id="cb33-369"><a href="#cb33-369" aria-label="347"></a><span class="co"># The pageview data is nested inside data['items']</span></span>
-<span id="cb33-370"><a href="#cb33-370" aria-label="348"></a>df <span class="op">=</span> pd.DataFrame(data[<span class="st">"items"</span>])</span>
-<span id="cb33-371"><a href="#cb33-371" aria-label="349"></a>df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">00"</span>)</span>
-<span id="cb33-372"><a href="#cb33-372" aria-label="350"></a></span>
-<span id="cb33-373"><a href="#cb33-373" aria-label="351"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
-<span id="cb33-374"><a href="#cb33-374" aria-label="352"></a>plt.plot(df[<span class="st">"timestamp"</span>], df[<span class="st">"views"</span>])</span>
-<span id="cb33-375"><a href="#cb33-375" aria-label="353"></a>plt.title(<span class="ss">f"Daily Pageviews: </span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb33-376"><a href="#cb33-376" aria-label="354"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
-<span id="cb33-377"><a href="#cb33-377" aria-label="355"></a>plt.ylabel(<span class="st">"Views"</span>)</span>
-<span id="cb33-378"><a href="#cb33-378" aria-label="356"></a>plt.tight_layout()</span>
-<span id="cb33-379"><a href="#cb33-379" aria-label="357"></a>plt.show()</span>
-<span id="cb33-380"><a href="#cb33-380" aria-label="358"></a><span class="in">```</span></span>
-<span id="cb33-381"><a href="#cb33-381" aria-label="359"></a></span>
-<span id="cb33-382"><a href="#cb33-382" aria-label="360"></a><span class="fu">### User-Agent Spoofing</span></span>
-<span id="cb33-383"><a href="#cb33-383" aria-label="361"></a></span>
-<span id="cb33-384"><a href="#cb33-384" aria-label="362"></a>Every request this chapter has made has honestly identified itself — <span class="in">`WebDataScience/1.0 (your-email@colorado.edu)`</span>, a real contact address a server operator could actually use to reach you. **User-Agent spoofing** means sending a <span class="in">`User-Agent`</span> header that claims to be something you are not: a specific browser, operating system, or device you are not actually running. It is worth understanding both because you will encounter it — some sites behave differently depending on what you claim to be — and because doing it yourself raises questions this book has otherwise been able to sidestep by simply identifying itself truthfully.</span>
-<span id="cb33-385"><a href="#cb33-385" aria-label="363"></a></span>
-<span id="cb33-386"><a href="#cb33-386" aria-label="364"></a>There are legitimate, unremarkable reasons to change a <span class="in">`User-Agent`</span>: testing how your own site renders on a phone without owning one, checking whether a page serves a simplified version to older browsers, or working around a service that blocks a legitimate research tool's honest identification for no defensible reason. There are also reasons that are not legitimate, covered below.</span>
-<span id="cb33-387"><a href="#cb33-387" aria-label="365"></a></span>
-<span id="cb33-388"><a href="#cb33-388" aria-label="366"></a>Mechanically, spoofing is nothing more than the <span class="in">`headers`</span> dictionary you already know how to build — just with a value that describes a browser and device you are not actually using:</span>
-<span id="cb33-389"><a href="#cb33-389" aria-label="367"></a></span>
-<span id="cb33-392"><a href="#cb33-392" aria-label="368"></a><span class="in">```{python}</span></span>
-<span id="cb33-393"><a href="#cb33-393" aria-label="369"></a><span class="im">import</span> requests</span>
-<span id="cb33-394"><a href="#cb33-394" aria-label="370"></a></span>
-<span id="cb33-395"><a href="#cb33-395" aria-label="371"></a><span class="co"># An honest identification, like every other request in this book</span></span>
-<span id="cb33-396"><a href="#cb33-396" aria-label="372"></a>honest_headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
-<span id="cb33-397"><a href="#cb33-397" aria-label="373"></a></span>
-<span id="cb33-398"><a href="#cb33-398" aria-label="374"></a><span class="co"># A spoofed identification, claiming to be a specific desktop Chrome browser</span></span>
-<span id="cb33-399"><a href="#cb33-399" aria-label="375"></a>spoofed_headers <span class="op">=</span> {</span>
-<span id="cb33-400"><a href="#cb33-400" aria-label="376"></a>    <span class="st">"User-Agent"</span>: (</span>
-<span id="cb33-401"><a href="#cb33-401" aria-label="377"></a>        <span class="st">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "</span></span>
-<span id="cb33-402"><a href="#cb33-402" aria-label="378"></a>        <span class="st">"(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"</span></span>
-<span id="cb33-403"><a href="#cb33-403" aria-label="379"></a>    )</span>
-<span id="cb33-404"><a href="#cb33-404" aria-label="380"></a>}</span>
-<span id="cb33-405"><a href="#cb33-405" aria-label="381"></a></span>
-<span id="cb33-406"><a href="#cb33-406" aria-label="382"></a><span class="co"># httpbin.org's /user-agent endpoint just echoes back whatever header you sent --</span></span>
-<span id="cb33-407"><a href="#cb33-407" aria-label="383"></a><span class="co"># a safe, verifiable way to see exactly what a server receives, with no guessing</span></span>
-<span id="cb33-408"><a href="#cb33-408" aria-label="384"></a><span class="co"># about how any particular real site might currently react to it</span></span>
-<span id="cb33-409"><a href="#cb33-409" aria-label="385"></a><span class="bu">print</span>(requests.get(<span class="st">"https://httpbin.org/user-agent"</span>, headers<span class="op">=</span>honest_headers).json())</span>
-<span id="cb33-410"><a href="#cb33-410" aria-label="386"></a><span class="bu">print</span>(requests.get(<span class="st">"https://httpbin.org/user-agent"</span>, headers<span class="op">=</span>spoofed_headers).json())</span>
-<span id="cb33-411"><a href="#cb33-411" aria-label="387"></a><span class="in">```</span></span>
-<span id="cb33-412"><a href="#cb33-412" aria-label="388"></a></span>
-<span id="cb33-413"><a href="#cb33-413" aria-label="389"></a>The two responses differ only in the string you supplied — the server has no way to tell the second one apart from a real Chrome browser unless it looks at more than the <span class="in">`User-Agent`</span> header alone (more on that below). You already saw a real, working case of a site's behavior actually changing based on this exact header earlier in this chapter: the Wikimedia pageviews API's default <span class="in">`requests`</span> User-Agent got a 403, and a properly identified one got a 200. That is UA-based gatekeeping in its lightest, most common form — refusing an *unidentified* client — and it is already something you have done deliberately, just not by pretending to be a different, specific piece of software.</span>
-<span id="cb33-414"><a href="#cb33-414" aria-label="390"></a></span>
-<span id="cb33-415"><a href="#cb33-415" aria-label="391"></a>**What a User-Agent string actually contains.** The long, oddly-formatted string above packs in a browser's rendering engine, version, and operating system, largely for historical compatibility reasons rather than any coherent modern design — that is why even a current Chrome browser's User-Agent still contains the word "Mozilla." Because parsing these strings reliably is genuinely difficult, modern browsers increasingly expose the same information in a cleaner, structured way through [**User-Agent Client Hints**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Client_hints) — a newer set of headers (<span class="in">`Sec-CH-UA`</span> and related) that a server can request explicitly instead of parsing a free-text string. A server that checks the traditional <span class="in">`User-Agent`</span> header while ignoring Client Hints, or the reverse, can end up seeing a mismatch between what the two report — one of several signals, beyond the User-Agent header alone, that modern bot-detection systems use. The practical takeaway for this book is narrower than "how to avoid detection": simply changing a <span class="in">`User-Agent`</span> string is a weak, easily-noticed technique on its own, not a reliable way to make automated traffic indistinguishable from a real browser, and treating it as one will give you false confidence.</span>
-<span id="cb33-416"><a href="#cb33-416" aria-label="392"></a></span>
-<span id="cb33-417"><a href="#cb33-417" aria-label="393"></a>::: {.callout-important}</span>
-<span id="cb33-418"><a href="#cb33-418" aria-label="394"></a><span class="fu">## Ethical and Legal Considerations</span></span>
-<span id="cb33-419"><a href="#cb33-419" aria-label="395"></a></span>
-<span id="cb33-420"><a href="#cb33-420" aria-label="396"></a>Spoofing a <span class="in">`User-Agent`</span> is not illegal simply as a technical act — what matters is *what you do it for*. Checking how your own site renders on different devices is unremarkable; defeating a site's stated attempt to block automated access is a different act with real legal stakes, even though the code is identical either way. @sec-ethics covers those stakes in depth — the same analysis that applies to <span class="in">`robots.txt`</span> and Terms of Service applies here.</span>
-<span id="cb33-421"><a href="#cb33-421" aria-label="397"></a></span>
-<span id="cb33-422"><a href="#cb33-422" aria-label="398"></a>For coursework in this class, the rule is the one @sec-ethics already establishes for everything else: identify yourself honestly by default, and treat a site's explicit attempt to block automated access as a signal to stop and reconsider, not an obstacle to route around. If a legitimate research need ever leads you to consider doing otherwise, that is a conversation to have with your instructor first.</span>
-<span id="cb33-423"><a href="#cb33-423" aria-label="399"></a>:::</span>
-<span id="cb33-424"><a href="#cb33-424" aria-label="400"></a></span>
-<span id="cb33-425"><a href="#cb33-425" aria-label="401"></a><span class="fu">### Connections, Sessions, and Retries</span></span>
-<span id="cb33-426"><a href="#cb33-426" aria-label="402"></a></span>
-<span id="cb33-427"><a href="#cb33-427" aria-label="403"></a>Every bare <span class="in">`requests.get()`</span> call does more work than it appears to: it opens a fresh TCP connection to the server, performs the TLS handshake, sends the request, and tears the connection back down. For a single request, that overhead is negligible. But the chapters ahead will have you making dozens or hundreds of requests to the same host — one per Wikipedia article, one per bill, one per archived page — and paying the connection setup cost every time is wasteful for both you and the server.</span>
-<span id="cb33-428"><a href="#cb33-428" aria-label="404"></a></span>
-<span id="cb33-429"><a href="#cb33-429" aria-label="405"></a>A <span class="in">`requests.Session`</span> object fixes this. A Session keeps the underlying connection open and reuses it for subsequent requests to the same host, and it remembers headers, so you set your <span class="in">`User-Agent`</span> once instead of passing it to every call. A Session can also carry a retry policy: rather than hand-rolling backoff logic like the <span class="in">`get_with_backoff()`</span> function you wrote earlier, you can mount a <span class="in">`Retry`</span> configuration that automatically retries rate limits and transient server errors with exponentially increasing delays — and it honors any <span class="in">`Retry-After`</span> header the server sends:</span>
-<span id="cb33-430"><a href="#cb33-430" aria-label="406"></a></span>
-<span id="cb33-433"><a href="#cb33-433" aria-label="407"></a><span class="in">```{python}</span></span>
-<span id="cb33-434"><a href="#cb33-434" aria-label="408"></a><span class="im">import</span> requests</span>
-<span id="cb33-435"><a href="#cb33-435" aria-label="409"></a><span class="im">from</span> requests.adapters <span class="im">import</span> HTTPAdapter</span>
-<span id="cb33-436"><a href="#cb33-436" aria-label="410"></a><span class="im">from</span> urllib3.util.retry <span class="im">import</span> Retry</span>
-<span id="cb33-437"><a href="#cb33-437" aria-label="411"></a></span>
-<span id="cb33-438"><a href="#cb33-438" aria-label="412"></a><span class="co"># Create a session with persistent headers</span></span>
-<span id="cb33-439"><a href="#cb33-439" aria-label="413"></a>session <span class="op">=</span> requests.Session()</span>
-<span id="cb33-440"><a href="#cb33-440" aria-label="414"></a>session.headers.update(</span>
-<span id="cb33-441"><a href="#cb33-441" aria-label="415"></a>    {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
-<span id="cb33-442"><a href="#cb33-442" aria-label="416"></a>)</span>
-<span id="cb33-443"><a href="#cb33-443" aria-label="417"></a></span>
-<span id="cb33-444"><a href="#cb33-444" aria-label="418"></a><span class="co"># Retry up to 3 times on rate limits and server errors, waiting 1s, 2s, then 4s between attempts</span></span>
-<span id="cb33-445"><a href="#cb33-445" aria-label="419"></a>retries <span class="op">=</span> Retry(</span>
-<span id="cb33-446"><a href="#cb33-446" aria-label="420"></a>    total<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb33-447"><a href="#cb33-447" aria-label="421"></a>    backoff_factor<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb33-448"><a href="#cb33-448" aria-label="422"></a>    status_forcelist<span class="op">=</span>[<span class="dv">429</span>, <span class="dv">500</span>, <span class="dv">502</span>, <span class="dv">503</span>, <span class="dv">504</span>],</span>
-<span id="cb33-449"><a href="#cb33-449" aria-label="423"></a>)</span>
-<span id="cb33-450"><a href="#cb33-450" aria-label="424"></a>session.mount(<span class="st">"https://"</span>, HTTPAdapter(max_retries<span class="op">=</span>retries))</span>
-<span id="cb33-451"><a href="#cb33-451" aria-label="425"></a></span>
-<span id="cb33-452"><a href="#cb33-452" aria-label="426"></a><span class="co"># Use the session exactly like the requests module itself</span></span>
-<span id="cb33-453"><a href="#cb33-453" aria-label="427"></a>articles <span class="op">=</span> [<span class="st">"Python_(programming_language)"</span>, <span class="st">"Web_scraping"</span>, <span class="st">"Data_science"</span>]</span>
-<span id="cb33-454"><a href="#cb33-454" aria-label="428"></a><span class="cf">for</span> article <span class="kw">in</span> articles:</span>
-<span id="cb33-455"><a href="#cb33-455" aria-label="429"></a>    url <span class="op">=</span> <span class="ss">f"https://en.wikipedia.org/wiki/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb33-456"><a href="#cb33-456" aria-label="430"></a>    response <span class="op">=</span> session.get(url)  <span class="co"># Connection reused; headers already set</span></span>
-<span id="cb33-457"><a href="#cb33-457" aria-label="431"></a>    <span class="bu">print</span>(article, response.status_code, <span class="bu">len</span>(response.text))</span>
-<span id="cb33-458"><a href="#cb33-458" aria-label="432"></a><span class="co"># Python_(programming_language) 200 812394</span></span>
-<span id="cb33-459"><a href="#cb33-459" aria-label="433"></a><span class="co"># Web_scraping 200 145207</span></span>
-<span id="cb33-460"><a href="#cb33-460" aria-label="434"></a><span class="co"># Data_science 200 291846</span></span>
-<span id="cb33-461"><a href="#cb33-461" aria-label="435"></a><span class="in">```</span></span>
-<span id="cb33-462"><a href="#cb33-462" aria-label="436"></a></span>
-<span id="cb33-463"><a href="#cb33-463" aria-label="437"></a>The setup costs six lines, and everything after that behaves exactly like the <span class="in">`requests.get()`</span> calls you already know — <span class="in">`session.get()`</span> returns the same <span class="in">`Response`</span> object with the same <span class="in">`.json()`</span>, <span class="in">`.text`</span>, and <span class="in">`.status_code`</span>.</span>
-<span id="cb33-464"><a href="#cb33-464" aria-label="438"></a></span>
-<span id="cb33-465"><a href="#cb33-465" aria-label="439"></a>::: {.callout-tip}</span>
-<span id="cb33-466"><a href="#cb33-466" aria-label="440"></a>A <span class="in">`for`</span> loop around <span class="in">`requests.get()`</span> is your cue to create a <span class="in">`Session`</span> first. The scraping and API chapters ahead (@sec-static-pages, @sec-wikipedia, @sec-government) all involve exactly this kind of loop over many URLs at the same host, and this pattern carries over unchanged.</span>
-<span id="cb33-467"><a href="#cb33-467" aria-label="441"></a>:::</span>
-<span id="cb33-468"><a href="#cb33-468" aria-label="442"></a></span>
-<span id="cb33-469"><a href="#cb33-469" aria-label="443"></a><span class="fu">### `curl` and `wget`: Command-Line Alternatives to `requests`</span></span>
-<span id="cb33-470"><a href="#cb33-470" aria-label="444"></a></span>
-<span id="cb33-471"><a href="#cb33-471" aria-label="445"></a>Everything this chapter has done with <span class="in">`requests`</span> has a command-line equivalent. <span class="in">`curl`</span> and <span class="in">`wget`</span> are HTTP clients too — just ones you drive from the terminal instead of Python, and they are worth knowing for exactly the situations where opening a notebook is more overhead than the task deserves: a one-off check, a shell script, a scheduled job on a server that may not even have Python installed, or simply downloading a file straight to disk without writing code to do it.</span>
-<span id="cb33-472"><a href="#cb33-472" aria-label="446"></a></span>
-<span id="cb33-473"><a href="#cb33-473" aria-label="447"></a>The two tools split the same job differently. <span class="in">`curl`</span> is a general-purpose HTTP client built for fine control — headers, methods, authentication — and prints the response to your terminal by default. <span class="in">`wget`</span> is built specifically for downloading: it saves to disk automatically, resumes interrupted downloads, and, as you will see below, has built-in support for exactly the kind of polite, rate-limited fetching this book has been teaching you to write by hand in Python. <span class="in">`curl`</span> ships by default on macOS, Linux, and modern Windows; <span class="in">`wget`</span> is standard on most Linux distributions but often needs a separate install on macOS (<span class="in">`brew install wget`</span>).</span>
-<span id="cb33-474"><a href="#cb33-474" aria-label="448"></a></span>
-<span id="cb33-475"><a href="#cb33-475" aria-label="449"></a>Neither tool replaces Python for this book's actual work. They fetch; they do not parse. The moment you need to pull a value out of JSON, select an element out of HTML, or turn a response into a DataFrame, you are back to <span class="in">`requests`</span> and the rest of this book. <span class="in">`curl`</span> and <span class="in">`wget`</span> are for everything *before* that: getting the bytes.</span>
-<span id="cb33-476"><a href="#cb33-476" aria-label="450"></a></span>
-<span id="cb33-477"><a href="#cb33-477" aria-label="451"></a>**Setting a User-Agent.** The same header, the same reasons, from the command line instead of a <span class="in">`headers`</span> dictionary:</span>
-<span id="cb33-478"><a href="#cb33-478" aria-label="452"></a></span>
-<span id="cb33-479"><a href="#cb33-479" aria-label="453"></a><span class="in">```</span></span>
-<span id="cb33-480"><a href="#cb33-480" aria-label="454"></a><span class="in">curl -A "WebDataScience/1.0 (your-email@colorado.edu)" https://en.wikipedia.org/wiki/Web_scraping</span></span>
-<span id="cb33-481"><a href="#cb33-481" aria-label="455"></a><span class="in">wget --user-agent="WebDataScience/1.0 (your-email@colorado.edu)" https://en.wikipedia.org/wiki/Web_scraping</span></span>
-<span id="cb33-482"><a href="#cb33-482" aria-label="456"></a><span class="in">```</span></span>
-<span id="cb33-483"><a href="#cb33-483" aria-label="457"></a></span>
-<span id="cb33-484"><a href="#cb33-484" aria-label="458"></a><span class="in">`curl`</span> prints the response body to your terminal by default — add <span class="in">`-O`</span> to save it to a file named after the URL's last path segment, or <span class="in">`-o filename.html`</span> to choose the name yourself. <span class="in">`wget`</span> saves to disk automatically, without being asked.</span>
-<span id="cb33-485"><a href="#cb33-485" aria-label="459"></a></span>
-<span id="cb33-486"><a href="#cb33-486" aria-label="460"></a>**Replicating `time.sleep()` between requests.** This is where the two tools genuinely differ, not just in syntax. <span class="in">`wget`</span> has rate-limiting built in: <span class="in">`--wait=SECONDS`</span> pauses between each request when you give it more than one URL, and <span class="in">`--random-wait`</span> varies that pause between roughly half and one-and-a-half times the value you gave, so your request timing does not look as suspiciously uniform as a fixed delay does:</span>
-<span id="cb33-487"><a href="#cb33-487" aria-label="461"></a></span>
-<span id="cb33-488"><a href="#cb33-488" aria-label="462"></a><span class="in">```</span></span>
-<span id="cb33-489"><a href="#cb33-489" aria-label="463"></a><span class="in">wget --wait=2 --random-wait https://en.wikipedia.org/wiki/Python_(programming_language) https://en.wikipedia.org/wiki/Web_scraping</span></span>
-<span id="cb33-490"><a href="#cb33-490" aria-label="464"></a><span class="in">```</span></span>
-<span id="cb33-491"><a href="#cb33-491" aria-label="465"></a></span>
-<span id="cb33-492"><a href="#cb33-492" aria-label="466"></a><span class="in">`curl`</span> has no equivalent flag — you get the same behavior only by wrapping it in a shell loop and calling <span class="in">`sleep`</span> yourself, the command-line version of the <span class="in">`time.sleep()`</span> calls you have already written in Python:</span>
-<span id="cb33-493"><a href="#cb33-493" aria-label="467"></a></span>
-<span id="cb33-494"><a href="#cb33-494" aria-label="468"></a><span class="in">```</span></span>
-<span id="cb33-495"><a href="#cb33-495" aria-label="469"></a><span class="in">for url in "https://en.wikipedia.org/wiki/Python_(programming_language)" "https://en.wikipedia.org/wiki/Web_scraping"; do</span></span>
-<span id="cb33-496"><a href="#cb33-496" aria-label="470"></a><span class="in">  curl -O "$url"</span></span>
-<span id="cb33-497"><a href="#cb33-497" aria-label="471"></a><span class="in">  sleep 2</span></span>
-<span id="cb33-498"><a href="#cb33-498" aria-label="472"></a><span class="in">done</span></span>
-<span id="cb33-499"><a href="#cb33-499" aria-label="473"></a><span class="in">```</span></span>
-<span id="cb33-500"><a href="#cb33-500" aria-label="474"></a></span>
-<span id="cb33-501"><a href="#cb33-501" aria-label="475"></a>**Fetching several files from a server.** The <span class="in">`Session`</span> loop just above fetched three Wikipedia articles from Python:</span>
-<span id="cb33-502"><a href="#cb33-502" aria-label="476"></a></span>
-<span id="cb33-503"><a href="#cb33-503" aria-label="477"></a><span class="in">```python</span></span>
-<span id="cb33-504"><a href="#cb33-504" aria-label="478"></a>articles <span class="op">=</span> [<span class="st">"Python_(programming_language)"</span>, <span class="st">"Web_scraping"</span>, <span class="st">"Data_science"</span>]</span>
-<span id="cb33-505"><a href="#cb33-505" aria-label="479"></a><span class="cf">for</span> article <span class="kw">in</span> articles:</span>
-<span id="cb33-506"><a href="#cb33-506" aria-label="480"></a>    url <span class="op">=</span> <span class="ss">f"https://en.wikipedia.org/wiki/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb33-507"><a href="#cb33-507" aria-label="481"></a>    response <span class="op">=</span> session.get(url)</span>
-<span id="cb33-508"><a href="#cb33-508" aria-label="482"></a><span class="in">```</span></span>
-<span id="cb33-509"><a href="#cb33-509" aria-label="483"></a></span>
-<span id="cb33-510"><a href="#cb33-510" aria-label="484"></a>The same task from the command line reads a list of URLs from a file, one per line, instead of looping over a Python list — with <span class="in">`wget`</span>'s rate-limiting doing the polite pause for you:</span>
-<span id="cb33-511"><a href="#cb33-511" aria-label="485"></a></span>
-<span id="cb33-512"><a href="#cb33-512" aria-label="486"></a><span class="in">```</span></span>
-<span id="cb33-513"><a href="#cb33-513" aria-label="487"></a><span class="in">cat &gt; articles.txt &lt;&lt; 'EOF'</span></span>
-<span id="cb33-514"><a href="#cb33-514" aria-label="488"></a><span class="in">https://en.wikipedia.org/wiki/Python_(programming_language)</span></span>
-<span id="cb33-515"><a href="#cb33-515" aria-label="489"></a><span class="in">https://en.wikipedia.org/wiki/Web_scraping</span></span>
-<span id="cb33-516"><a href="#cb33-516" aria-label="490"></a><span class="in">https://en.wikipedia.org/wiki/Data_science</span></span>
-<span id="cb33-517"><a href="#cb33-517" aria-label="491"></a><span class="in">EOF</span></span>
-<span id="cb33-518"><a href="#cb33-518" aria-label="492"></a></span>
-<span id="cb33-519"><a href="#cb33-519" aria-label="493"></a><span class="in">wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (your-email@colorado.edu)"</span></span>
-<span id="cb33-520"><a href="#cb33-520" aria-label="494"></a><span class="in">```</span></span>
-<span id="cb33-521"><a href="#cb33-521" aria-label="495"></a></span>
-<span id="cb33-522"><a href="#cb33-522" aria-label="496"></a>Every file lands in your current directory, named after its own URL. This pattern — a text file of URLs, one <span class="in">`wget`</span> call, a <span class="in">`--wait`</span> you set once — is often the fastest way to grab a known, fixed set of files (an agency's list of CSV exports, a set of PDF filings) without writing a line of Python at all. If you later need to *do* something with what you downloaded beyond saving it to disk, that is your cue to switch back to <span class="in">`requests`</span> and the rest of this book.</span>
-<span id="cb33-523"><a href="#cb33-523" aria-label="497"></a></span>
-<span id="cb33-524"><a href="#cb33-524" aria-label="498"></a><span class="fu">## URLs: Anatomy and Parsing</span></span>
-<span id="cb33-525"><a href="#cb33-525" aria-label="499"></a></span>
-<span id="cb33-526"><a href="#cb33-526" aria-label="500"></a>URLs (Uniform Resource Locators) have a well-defined structure:</span>
-<span id="cb33-527"><a href="#cb33-527" aria-label="501"></a></span>
-<span id="cb33-528"><a href="#cb33-528" aria-label="502"></a><span class="in">```</span></span>
-<span id="cb33-529"><a href="#cb33-529" aria-label="503"></a><span class="in">scheme://userinfo@host:port/path?query#fragment</span></span>
-<span id="cb33-530"><a href="#cb33-530" aria-label="504"></a><span class="in">```</span></span>
-<span id="cb33-531"><a href="#cb33-531" aria-label="505"></a></span>
-<span id="cb33-532"><a href="#cb33-532" aria-label="506"></a>Never write regular expressions to parse URLs. Use the <span class="co">[</span><span class="ot">`urllib.parse`</span><span class="co">](https://docs.python.org/3/library/urllib.parse.html)</span> module instead:</span>
-<span id="cb33-533"><a href="#cb33-533" aria-label="507"></a></span>
-<span id="cb33-536"><a href="#cb33-536" aria-label="508"></a><span class="in">```{python}</span></span>
-<span id="cb33-537"><a href="#cb33-537" aria-label="509"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlparse, parse_qs</span>
-<span id="cb33-538"><a href="#cb33-538" aria-label="510"></a></span>
-<span id="cb33-539"><a href="#cb33-539" aria-label="511"></a>url <span class="op">=</span> <span class="st">"https://api.census.gov/data/2022/acs/acs5?get=NAME,B01001_001E&amp;for=place:07850&amp;in=state:08"</span></span>
-<span id="cb33-540"><a href="#cb33-540" aria-label="512"></a></span>
-<span id="cb33-541"><a href="#cb33-541" aria-label="513"></a>parsed <span class="op">=</span> urlparse(url)</span>
-<span id="cb33-542"><a href="#cb33-542" aria-label="514"></a><span class="bu">print</span>(<span class="ss">f"Scheme: </span><span class="sc">{</span>parsed<span class="sc">.</span>scheme<span class="sc">}</span><span class="ss">"</span>)      <span class="co"># https</span></span>
-<span id="cb33-543"><a href="#cb33-543" aria-label="515"></a><span class="bu">print</span>(<span class="ss">f"Host: </span><span class="sc">{</span>parsed<span class="sc">.</span>netloc<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># api.census.gov</span></span>
-<span id="cb33-544"><a href="#cb33-544" aria-label="516"></a><span class="bu">print</span>(<span class="ss">f"Path: </span><span class="sc">{</span>parsed<span class="sc">.</span>path<span class="sc">}</span><span class="ss">"</span>)          <span class="co"># /data/2022/acs/acs5</span></span>
-<span id="cb33-545"><a href="#cb33-545" aria-label="517"></a><span class="bu">print</span>(<span class="ss">f"Query: </span><span class="sc">{</span>parsed<span class="sc">.</span>query<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># get=NAME,...</span></span>
-<span id="cb33-546"><a href="#cb33-546" aria-label="518"></a></span>
-<span id="cb33-547"><a href="#cb33-547" aria-label="519"></a><span class="co"># Parse query parameters into a dictionary</span></span>
-<span id="cb33-548"><a href="#cb33-548" aria-label="520"></a>params <span class="op">=</span> parse_qs(parsed.query)</span>
-<span id="cb33-549"><a href="#cb33-549" aria-label="521"></a><span class="bu">print</span>(params)</span>
-<span id="cb33-550"><a href="#cb33-550" aria-label="522"></a><span class="co"># {'get': ['NAME,B01001_001E'], 'for': ['place:07850'], 'in': ['state:08']}</span></span>
-<span id="cb33-551"><a href="#cb33-551" aria-label="523"></a><span class="in">```</span></span>
-<span id="cb33-552"><a href="#cb33-552" aria-label="524"></a></span>
-<span id="cb33-553"><a href="#cb33-553" aria-label="525"></a>Understanding URL structure is essential for constructing API requests. In @sec-wikipedia through @sec-ai-apis, you will build URLs programmatically by assembling scheme, host, path, and query parameters.</span>
-<span id="cb33-554"><a href="#cb33-554" aria-label="526"></a></span>
-<span id="cb33-555"><a href="#cb33-555" aria-label="527"></a><span class="fu">### Building URLs Programmatically</span></span>
-<span id="cb33-556"><a href="#cb33-556" aria-label="528"></a></span>
-<span id="cb33-557"><a href="#cb33-557" aria-label="529"></a>Web APIs expect the values you supply in one of two places, and you need to recognize which pattern you are dealing with before you can build the URL correctly.</span>
-<span id="cb33-558"><a href="#cb33-558" aria-label="530"></a></span>
-<span id="cb33-559"><a href="#cb33-559" aria-label="531"></a>Both patterns below build URLs with Python's **f-strings** — a compact way to embed variables and expressions directly inside a string, written <span class="in">`f"...{expression}..."`</span>. This is an intermediate Python feature: an f-string evaluates whatever sits inside the curly braces and inserts the result directly into the string at that position.</span>
-<span id="cb33-560"><a href="#cb33-560" aria-label="532"></a></span>
-<span id="cb33-563"><a href="#cb33-563" aria-label="533"></a><span class="in">```{python}</span></span>
-<span id="cb33-564"><a href="#cb33-564" aria-label="534"></a>name <span class="op">=</span> <span class="st">"Boulder"</span></span>
-<span id="cb33-565"><a href="#cb33-565" aria-label="535"></a>count <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb33-566"><a href="#cb33-566" aria-label="536"></a></span>
-<span id="cb33-567"><a href="#cb33-567" aria-label="537"></a><span class="co"># An f-string: the "f" before the opening quote enables {expression} substitution</span></span>
-<span id="cb33-568"><a href="#cb33-568" aria-label="538"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> has </span><span class="sc">{</span>count<span class="sc">}</span><span class="ss"> things"</span>)          <span class="co"># Boulder has 3 things</span></span>
-<span id="cb33-569"><a href="#cb33-569" aria-label="539"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> has </span><span class="sc">{</span>count <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss"> things"</span>)      <span class="co"># expressions work too, not just variables</span></span>
-<span id="cb33-570"><a href="#cb33-570" aria-label="540"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">.</span>upper()<span class="sc">}</span><span class="ss"> has </span><span class="sc">{</span>count<span class="sc">}</span><span class="ss"> things"</span>)  <span class="co"># so do method calls</span></span>
-<span id="cb33-571"><a href="#cb33-571" aria-label="541"></a></span>
-<span id="cb33-572"><a href="#cb33-572" aria-label="542"></a><span class="co"># An ordinary string does none of this -- braces stay literal text</span></span>
-<span id="cb33-573"><a href="#cb33-573" aria-label="543"></a><span class="bu">print</span>(<span class="st">"</span><span class="sc">{name}</span><span class="st"> has </span><span class="sc">{count}</span><span class="st"> things"</span>)           <span class="co"># {name} has {count} things</span></span>
-<span id="cb33-574"><a href="#cb33-574" aria-label="544"></a><span class="in">```</span></span>
-<span id="cb33-575"><a href="#cb33-575" aria-label="545"></a></span>
-<span id="cb33-576"><a href="#cb33-576" aria-label="546"></a>An f-string can also span multiple lines by placing several adjacent string literals next to each other — Python concatenates them automatically, which is how the URL-building code below builds one long string across several lines without a single <span class="in">`+`</span>. The <span class="co">[</span><span class="ot">Python tutorial's section on formatted string literals</span><span class="co">](https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals)</span> covers the full syntax, including format specifiers (<span class="in">`{value:.2f}`</span> for two decimal places, and similar) that come up less often in this book but are worth knowing exist.</span>
-<span id="cb33-577"><a href="#cb33-577" aria-label="547"></a></span>
-<span id="cb33-578"><a href="#cb33-578" aria-label="548"></a>**Path-segment APIs** embed each value at a fixed position in the URL's path. The Wikimedia pageviews endpoint you used earlier works this way: project, access method, agent, article, granularity, and date range are all path segments in a required order. Build these URLs with an f-string over the components — but URL-encode any component that might contain special characters using <span class="in">`urllib.parse.quote`</span>, because a stray slash or space inside a path segment produces a URL the server cannot route:</span>
-<span id="cb33-579"><a href="#cb33-579" aria-label="549"></a></span>
-<span id="cb33-582"><a href="#cb33-582" aria-label="550"></a><span class="in">```{python}</span></span>
-<span id="cb33-583"><a href="#cb33-583" aria-label="551"></a><span class="im">from</span> urllib.parse <span class="im">import</span> quote</span>
-<span id="cb33-584"><a href="#cb33-584" aria-label="552"></a></span>
-<span id="cb33-585"><a href="#cb33-585" aria-label="553"></a><span class="co"># Each value occupies a fixed position in the path</span></span>
-<span id="cb33-586"><a href="#cb33-586" aria-label="554"></a>project <span class="op">=</span> <span class="st">"en.wikipedia"</span></span>
-<span id="cb33-587"><a href="#cb33-587" aria-label="555"></a>access <span class="op">=</span> <span class="st">"all-access"</span></span>
-<span id="cb33-588"><a href="#cb33-588" aria-label="556"></a>agent <span class="op">=</span> <span class="st">"all-agents"</span></span>
-<span id="cb33-589"><a href="#cb33-589" aria-label="557"></a>article <span class="op">=</span> <span class="st">"University of Colorado Boulder"</span>  <span class="co"># Note the spaces</span></span>
-<span id="cb33-590"><a href="#cb33-590" aria-label="558"></a></span>
-<span id="cb33-591"><a href="#cb33-591" aria-label="559"></a><span class="co"># Wikipedia titles replace spaces with underscores; quote() percent-encodes anything else that would break a path segment (slashes, question marks)</span></span>
-<span id="cb33-592"><a href="#cb33-592" aria-label="560"></a>encoded_article <span class="op">=</span> quote(article.replace(<span class="st">" "</span>, <span class="st">"_"</span>), safe<span class="op">=</span><span class="st">""</span>)</span>
-<span id="cb33-593"><a href="#cb33-593" aria-label="561"></a><span class="bu">print</span>(encoded_article)</span>
-<span id="cb33-594"><a href="#cb33-594" aria-label="562"></a><span class="co"># University_of_Colorado_Boulder</span></span>
-<span id="cb33-595"><a href="#cb33-595" aria-label="563"></a></span>
-<span id="cb33-596"><a href="#cb33-596" aria-label="564"></a>url <span class="op">=</span> (</span>
-<span id="cb33-597"><a href="#cb33-597" aria-label="565"></a>    <span class="st">"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
-<span id="cb33-598"><a href="#cb33-598" aria-label="566"></a>    <span class="ss">f"/</span><span class="sc">{</span>project<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>access<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>agent<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>encoded_article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
-<span id="cb33-599"><a href="#cb33-599" aria-label="567"></a>)</span>
-<span id="cb33-600"><a href="#cb33-600" aria-label="568"></a><span class="bu">print</span>(url)</span>
-<span id="cb33-601"><a href="#cb33-601" aria-label="569"></a><span class="co"># https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/University_of_Colorado_Boulder/daily/20260101/20260131</span></span>
-<span id="cb33-602"><a href="#cb33-602" aria-label="570"></a><span class="in">```</span></span>
-<span id="cb33-603"><a href="#cb33-603" aria-label="571"></a></span>
-<span id="cb33-604"><a href="#cb33-604" aria-label="572"></a>The encoding matters more than this example suggests: a band like "AC/DC" has a slash in its article title, and <span class="in">`quote("AC/DC", safe="")`</span> correctly produces <span class="in">`AC%2FDC`</span>. Paste the raw title into your f-string instead, and the API would interpret the slash as a path separator and return a 404.</span>
-<span id="cb33-605"><a href="#cb33-605" aria-label="573"></a></span>
-<span id="cb33-606"><a href="#cb33-606" aria-label="574"></a>**Query-parameter APIs** instead accept <span class="in">`key=value`</span> pairs after a <span class="in">`?`</span>, where order does not matter and many parameters are optional. The MediaWiki Action API — Wikipedia's general-purpose API, which you will explore in @sec-wikipedia — works this way. The <span class="in">`urlencode`</span> function converts a dictionary into a properly escaped query string:</span>
-<span id="cb33-607"><a href="#cb33-607" aria-label="575"></a></span>
-<span id="cb33-610"><a href="#cb33-610" aria-label="576"></a><span class="in">```{python}</span></span>
-<span id="cb33-611"><a href="#cb33-611" aria-label="577"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlencode</span>
-<span id="cb33-612"><a href="#cb33-612" aria-label="578"></a></span>
-<span id="cb33-613"><a href="#cb33-613" aria-label="579"></a>base_url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
-<span id="cb33-614"><a href="#cb33-614" aria-label="580"></a>params <span class="op">=</span> {</span>
-<span id="cb33-615"><a href="#cb33-615" aria-label="581"></a>    <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
-<span id="cb33-616"><a href="#cb33-616" aria-label="582"></a>    <span class="st">"format"</span>: <span class="st">"json"</span>,</span>
-<span id="cb33-617"><a href="#cb33-617" aria-label="583"></a>    <span class="st">"titles"</span>: <span class="st">"University of Colorado Boulder"</span>,</span>
-<span id="cb33-618"><a href="#cb33-618" aria-label="584"></a>    <span class="st">"prop"</span>: <span class="st">"info"</span>,</span>
-<span id="cb33-619"><a href="#cb33-619" aria-label="585"></a>}</span>
-<span id="cb33-620"><a href="#cb33-620" aria-label="586"></a></span>
-<span id="cb33-621"><a href="#cb33-621" aria-label="587"></a>query_string <span class="op">=</span> urlencode(params)</span>
-<span id="cb33-622"><a href="#cb33-622" aria-label="588"></a><span class="bu">print</span>(query_string)</span>
-<span id="cb33-623"><a href="#cb33-623" aria-label="589"></a><span class="co"># action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span>
-<span id="cb33-624"><a href="#cb33-624" aria-label="590"></a><span class="in">```</span></span>
-<span id="cb33-625"><a href="#cb33-625" aria-label="591"></a></span>
-<span id="cb33-626"><a href="#cb33-626" aria-label="592"></a>For query-parameter APIs, the <span class="in">`requests`</span> library can do this encoding for you: pass the dictionary as the <span class="in">`params`</span> argument. This is the preferred approach for API calls:</span>
-<span id="cb33-627"><a href="#cb33-627" aria-label="593"></a></span>
-<span id="cb33-630"><a href="#cb33-630" aria-label="594"></a><span class="in">```{python}</span></span>
-<span id="cb33-631"><a href="#cb33-631" aria-label="595"></a>response <span class="op">=</span> requests.get(base_url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
-<span id="cb33-632"><a href="#cb33-632" aria-label="596"></a><span class="bu">print</span>(response.url)  <span class="co"># The full URL that requests actually built</span></span>
-<span id="cb33-633"><a href="#cb33-633" aria-label="597"></a><span class="co"># https://en.wikipedia.org/w/api.php?action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span>
-<span id="cb33-634"><a href="#cb33-634" aria-label="598"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200</span></span>
-<span id="cb33-635"><a href="#cb33-635" aria-label="599"></a><span class="in">```</span></span>
-<span id="cb33-636"><a href="#cb33-636" aria-label="600"></a></span>
-<span id="cb33-637"><a href="#cb33-637" aria-label="601"></a>How do you know which pattern an API expects? Read its documentation — but the URL itself usually tells you. Values between slashes are path segments: build the URL with an f-string and <span class="in">`quote()`</span> each component. Values after a <span class="in">`?`</span> are query parameters: pass a dictionary via <span class="in">`params=`</span> and let <span class="in">`requests`</span> handle the escaping. REST-style endpoints that return one specific resource (like pageviews for one article) tend to use path segments; APIs with many optional settings (like the Action API's dozens of parameters) tend to use query strings. Mixing them up is a classic source of confusing 404s — query-encoding values that an API expects in its path sends the server a URL it cannot route. You will appreciate this distinction especially in @sec-wikipedia and @sec-government, where article titles and variable names frequently contain characters that require encoding.</span>
-<span id="cb33-638"><a href="#cb33-638" aria-label="602"></a></span>
-<span id="cb33-639"><a href="#cb33-639" aria-label="603"></a><span class="fu">## Recommended Exercises</span></span>
-<span id="cb33-640"><a href="#cb33-640" aria-label="604"></a></span>
-<span id="cb33-641"><a href="#cb33-641" aria-label="605"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
-<span id="cb33-642"><a href="#cb33-642" aria-label="606"></a></span>
-<span id="cb33-643"><a href="#cb33-643" aria-label="607"></a>You will build a URL diagnostic tool from the protocol layers this chapter covered — DNS, HTTP status codes, headers, and redirects — and use it to profile five real URLs.</span>
-<span id="cb33-644"><a href="#cb33-644" aria-label="608"></a></span>
-<span id="cb33-645"><a href="#cb33-645" aria-label="609"></a>**Step 1 — Take a URL apart.** Use <span class="in">`urlparse()`</span> on three URLs of different shapes — a plain page, a URL with a query string, and one of the API URLs from earlier chapters. For each, print the scheme, netloc, path, and query.</span>
-<span id="cb33-646"><a href="#cb33-646" aria-label="610"></a></span>
-<span id="cb33-649"><a href="#cb33-649" aria-label="611"></a><span class="in">```{python}</span></span>
-<span id="cb33-650"><a href="#cb33-650" aria-label="612"></a><span class="co"># Step 1: urlparse three different URLs and print their components.</span></span>
-<span id="cb33-651"><a href="#cb33-651" aria-label="613"></a><span class="co"># Your code here</span></span>
-<span id="cb33-652"><a href="#cb33-652" aria-label="614"></a><span class="in">```</span></span>
-<span id="cb33-653"><a href="#cb33-653" aria-label="615"></a></span>
-<span id="cb33-654"><a href="#cb33-654" aria-label="616"></a>**Step 2 — Resolve a name.** Use <span class="in">`dns.resolver`</span> to look up the A records for <span class="in">`en.wikipedia.org`</span> and two other domains you choose. Print the IP addresses. Do any share an address?</span>
-<span id="cb33-655"><a href="#cb33-655" aria-label="617"></a></span>
-<span id="cb33-658"><a href="#cb33-658" aria-label="618"></a><span class="in">```{python}</span></span>
-<span id="cb33-659"><a href="#cb33-659" aria-label="619"></a><span class="co"># Step 2: Resolve A records for three domains and print the IPs.</span></span>
-<span id="cb33-660"><a href="#cb33-660" aria-label="620"></a><span class="co"># Your code here</span></span>
-<span id="cb33-661"><a href="#cb33-661" aria-label="621"></a><span class="in">```</span></span>
-<span id="cb33-662"><a href="#cb33-662" aria-label="622"></a></span>
-<span id="cb33-663"><a href="#cb33-663" aria-label="623"></a>**Step 3 — Request with named headers.** Define your <span class="in">`HEADERS`</span> (@sec-ethics) and request one of the three URLs from Step 1. Print the status code and three response headers: <span class="in">`Content-Type`</span>, <span class="in">`Server`</span>, and <span class="in">`Content-Length`</span> (or the length of <span class="in">`response.content`</span> if the header is absent).</span>
-<span id="cb33-664"><a href="#cb33-664" aria-label="624"></a></span>
-<span id="cb33-667"><a href="#cb33-667" aria-label="625"></a><span class="in">```{python}</span></span>
-<span id="cb33-668"><a href="#cb33-668" aria-label="626"></a><span class="co"># Step 3: Make a request with your HEADERS and print the status code and three response headers.</span></span>
-<span id="cb33-669"><a href="#cb33-669" aria-label="627"></a><span class="co"># Your code here</span></span>
-<span id="cb33-670"><a href="#cb33-670" aria-label="628"></a><span class="in">```</span></span>
-<span id="cb33-671"><a href="#cb33-671" aria-label="629"></a></span>
-<span id="cb33-672"><a href="#cb33-672" aria-label="630"></a>**Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function <span class="in">`diagnose_url(url)`</span> that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check <span class="in">`response.history`</span>, and if it redirected, print where it ended up. Include a docstring.</span>
-<span id="cb33-673"><a href="#cb33-673" aria-label="631"></a></span>
-<span id="cb33-676"><a href="#cb33-676" aria-label="632"></a><span class="in">```{python}</span></span>
-<span id="cb33-677"><a href="#cb33-677" aria-label="633"></a><span class="co"># Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring. Use a timeout like `timeout=10` so an unresponsive URL does not stall the entire notebook.</span></span>
-<span id="cb33-678"><a href="#cb33-678" aria-label="634"></a><span class="co"># Your code here</span></span>
-<span id="cb33-679"><a href="#cb33-679" aria-label="635"></a><span class="in">```</span></span>
-<span id="cb33-680"><a href="#cb33-680" aria-label="636"></a></span>
-<span id="cb33-681"><a href="#cb33-681" aria-label="637"></a>**Step 5 — Profile five URLs.** Run <span class="in">`diagnose_url()`</span> on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an <span class="in">`http://`</span> address of a site that upgrades you to <span class="in">`https://`</span>), an API endpoint, and a site known to restrict automated access (@sec-post-api showed you one).</span>
-<span id="cb33-682"><a href="#cb33-682" aria-label="638"></a></span>
-<span id="cb33-683"><a href="#cb33-683" aria-label="639"></a>Record what you actually receive from the fifth site: its behavior can vary with your network, request headers, and the time of the request. Inspect a short excerpt of <span class="in">`response.text`</span> as well as the status and headers. A <span class="in">`200`</span> response or a small HTML body alone does not tell you whether you received the requested content, a page that needs JavaScript, or an access challenge. If the response does not clearly show a refusal, report that you could not confirm a block; you do not need to keep trying sites until one refuses you.</span>
-<span id="cb33-684"><a href="#cb33-684" aria-label="640"></a></span>
-<span id="cb33-687"><a href="#cb33-687" aria-label="641"></a><span class="in">```{python}</span></span>
-<span id="cb33-688"><a href="#cb33-688" aria-label="642"></a><span class="co"># Step 5: Diagnose five URLs -- working, 404, redirect, API, and potentially blocked.</span></span>
-<span id="cb33-689"><a href="#cb33-689" aria-label="643"></a><span class="co"># Your code here</span></span>
-<span id="cb33-690"><a href="#cb33-690" aria-label="644"></a><span class="in">```</span></span>
-<span id="cb33-691"><a href="#cb33-691" aria-label="645"></a></span>
-<span id="cb33-692"><a href="#cb33-692" aria-label="646"></a>**Step 6 — Interpret.** In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the fifth site, what evidence supports a refusal, successful access, or an uncertain result? If you observed a refusal, explain what you can infer about the layer involved (@sec-post-api). An HTTP response shows that you reached an HTTP-speaking server, but its status alone does not identify whether the response came from the site's application, a CDN, or a proxy; a connection error or timeout provides no HTTP status to interpret.</span>
-<span id="cb33-693"><a href="#cb33-693" aria-label="647"></a></span>
-<span id="cb33-696"><a href="#cb33-696" aria-label="648"></a><span class="in">```{python}</span></span>
-<span id="cb33-697"><a href="#cb33-697" aria-label="649"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
-<span id="cb33-698"><a href="#cb33-698" aria-label="650"></a><span class="in">```</span></span>
-<span id="cb33-699"><a href="#cb33-699" aria-label="651"></a></span>
-<span id="cb33-700"><a href="#cb33-700" aria-label="652"></a><span class="fu">## Additional Exercises</span></span>
-<span id="cb33-701"><a href="#cb33-701" aria-label="653"></a></span>
-<span id="cb33-702"><a href="#cb33-702" aria-label="654"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
-<span id="cb33-703"><a href="#cb33-703" aria-label="655"></a></span>
-<span id="cb33-704"><a href="#cb33-704" aria-label="656"></a><span class="ss">1. </span>**Browser developer tools.** Open a Wikipedia article and a commercial news site side by side, each with the Network tab open. Reload both pages and compare: how many requests does each make? What types of resources (HTML, CSS, JS, images, fonts, tracking) does each load? What does this tell you about modern web architecture?</span>
-<span id="cb33-705"><a href="#cb33-705" aria-label="657"></a></span>
-<span id="cb33-706"><a href="#cb33-706" aria-label="658"></a><span class="ss">2. </span>**DNS exploration.** Use <span class="in">`dns.resolver`</span> to look up the IP addresses for five related domains (e.g., <span class="in">`google.com`</span>, <span class="in">`youtube.com`</span>, <span class="in">`gmail.com`</span>, <span class="in">`drive.google.com`</span>, <span class="in">`cloud.google.com`</span>). Are any of them hosted at the same IP address? What does this tell you about Google's infrastructure?</span>
-<span id="cb33-707"><a href="#cb33-707" aria-label="659"></a></span>
-<span id="cb33-708"><a href="#cb33-708" aria-label="660"></a><span class="ss">3. </span>**Wikimedia pageviews.** Using the API pattern from this chapter, retrieve and plot daily pageview data for three related Wikipedia articles over the same time period. Identify any spikes and hypothesize about what real-world events caused them.</span>
-<span id="cb33-709"><a href="#cb33-709" aria-label="661"></a></span>
-<span id="cb33-710"><a href="#cb33-710" aria-label="662"></a><span class="ss">4. </span>**Network tab analysis.** Pick a website you visit frequently. Reload it with the browser's Network tab open and recording. Count and categorize all requests into types: HTML documents, CSS stylesheets, JavaScript files, images, fonts, and tracking/analytics scripts. What fraction of requests serve actual content vs. tracking and advertising? Write a brief analysis of what this reveals about the site's business model.</span>
-<span id="cb33-711"><a href="#cb33-711" aria-label="663"></a></span>
-<span id="cb33-712"><a href="#cb33-712" aria-label="664"></a><span class="ss">5. </span>**Graduate extension (INFO 5617).** Choose a website you might plausibly study in your own research and profile its delivery infrastructure. Use the browser's Network tab to record the time to first byte, the full redirect chain, and evidence of CDN involvement (inspect the <span class="in">`Server`</span>, <span class="in">`Via`</span>, and similar response headers), then run traceroute to the same host from your notebook (<span class="in">`!traceroute`</span>, or <span class="in">`!tracert`</span> on Windows) and geolocate a few of the hops. Write a 500-word memo connecting these protocol-level observations to research-infrastructure concerns: where does "the" site actually live, how stable are measurements of it likely to be across time and vantage points, and what would an automated collection pipeline need to handle — redirects, rate limits, geographically varying responses — to gather data from it reliably?</span>
-<span id="cb33-713"><a href="#cb33-713" aria-label="665"></a></span>
-<span id="cb33-714"><a href="#cb33-714" aria-label="666"></a><span class="fu">## Social History and Public Interest</span></span>
-<span id="cb33-715"><a href="#cb33-715" aria-label="667"></a></span>
-<span id="cb33-716"><a href="#cb33-716" aria-label="668"></a>The protocols described in this chapter were designed as public infrastructure. Vint Cerf and Bob Kahn developed TCP/IP in the 1970s for <span class="co">[</span><span class="ot">DARPA</span><span class="co">](https://www.darpa.mil/about/innovation-timeline/tcp-ip)</span>, creating a transport layer engineered for resilience under attack. Tim Berners-Lee invented HTTP and URLs at <span class="co">[</span><span class="ot">CERN</span><span class="co">](https://home.cern/science/computing/the-birth-of-the-web/)</span> in 1989–1991, and made the deliberate decision to release them into the public domain. The web was born open.</span>
-<span id="cb33-717"><a href="#cb33-717" aria-label="669"></a></span>
-<span id="cb33-718"><a href="#cb33-718" aria-label="670"></a>Browser developer tools embody this original spirit of openness. The ability to "view source" — to inspect exactly what a web server sends your browser — was a foundational feature of the web. It is what makes web data science possible. As you will see in @sec-post-api, the tension between this transparency and platforms' desire to control their data is one of the defining conflicts of the contemporary web.</span>
-<span id="cb33-719"><a href="#cb33-719" aria-label="671"></a></span>
-<span id="cb33-720"><a href="#cb33-720" aria-label="672"></a>This same tension extends past the browser. Packet sniffing and traceroute make the network's actual behavior directly observable — an open, inspectable internet was the original design, not an accident. But the same capability cuts both ways: watching your own traffic is transparency, and watching someone else's without consent is surveillance — the difference is not the tool, but who is doing the observing. User-Agent spoofing sits on the identity side of the same tension. The protocols in this chapter run on an honor system, where a client simply states who it is, and spoofing tests that trust the same way platforms' own obfuscation tests the openness @sec-post-api describes.</span>
-<span id="cb33-721"><a href="#cb33-721" aria-label="673"></a></span>
-<span id="cb33-722"><a href="#cb33-722" aria-label="674"></a>::: {.callout-note}</span>
-<span id="cb33-723"><a href="#cb33-723" aria-label="675"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb33-724"><a href="#cb33-724" aria-label="676"></a>The web's protocol stack was designed as public infrastructure — open standards documented in <span class="co">[</span><span class="ot">public RFCs</span><span class="co">](https://www.rfc-editor.org/)</span>, not proprietary products controlled by corporations. HTTP, HTML, DNS, and TCP/IP are all open protocols that anyone can implement. The "view source" capability and network inspection tools you learned in this chapter are features that embody **openness** (@sec-post-api). They exist because the web's architects believed that transparency was a feature, not a vulnerability. As platforms increasingly obfuscate their front-end code and move toward closed APIs, these tools become more important, not less.</span>
-<span id="cb33-725"><a href="#cb33-725" aria-label="677"></a>:::</span>
-<span id="cb33-726"><a href="#cb33-726" aria-label="678"></a></span>
-<span id="cb33-727"><a href="#cb33-727" aria-label="679"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb33-728"><a href="#cb33-728" aria-label="680"></a></span>
-<span id="cb33-729"><a href="#cb33-729" aria-label="681"></a><span class="ss">- </span>**`!ping` or `!traceroute` doesn't stop**: Without <span class="in">`-c`</span>, <span class="in">`ping`</span> on macOS and Linux runs until it is stopped. Press the notebook's ■ (interrupt) button, and add <span class="in">`-c 4`</span>.</span>
-<span id="cb33-730"><a href="#cb33-730" aria-label="682"></a><span class="ss">- </span>**`'traceroute' is not recognized`** (Windows) **or `tracert: command not found`** (macOS, Linux): The two systems name the tool differently. The chapter's cells choose with <span class="in">`platform.system()`</span>. On Linux without <span class="in">`traceroute`</span>, use <span class="in">`tracepath`</span>.</span>
-<span id="cb33-731"><a href="#cb33-731" aria-label="683"></a><span class="ss">- </span>**Every hop is `* * *`**: Many networks, campus Wi-Fi included, block the probes traceroute sends. Try another network, such as a phone hotspot. The path past the silent hops usually exists; it just isn't shown.</span>
-<span id="cb33-732"><a href="#cb33-732" aria-label="684"></a><span class="ss">- </span>**`wget --random-wait` has no visible effect**: It only randomizes a wait time you already set with <span class="in">`--wait`</span>; used alone, with no base wait to randomize, it does nothing.</span>
-<span id="cb33-733"><a href="#cb33-733" aria-label="685"></a><span class="ss">- </span>**403 from Wikimedia API**: You forgot the custom <span class="in">`User-Agent`</span> header.</span>
-<span id="cb33-734"><a href="#cb33-734" aria-label="686"></a><span class="ss">- </span>**DNS results varying by location**: Normal — content delivery networks return different IPs based on your geographic location.</span>
-<span id="cb33-735"><a href="#cb33-735" aria-label="687"></a><span class="ss">- </span>**`dns.resolver` raises `NoNameservers ... answered REFUSED`**: The kernel is querying campus resolvers (CU's are in the <span class="in">`128.138.x.x`</span> range), which only answer recursive queries from on-campus addresses. <span class="in">`dnspython`</span> reads DNS settings once per process, so a kernel started on campus or on VPN keeps them after you get home, even though <span class="in">`scutil --dns`</span> shows your current ones. <span class="in">`requests`</span> and your browser keep working, which makes it look specific to this exercise. Restart the kernel; if that doesn't fix it, build your own resolver with <span class="in">`r = dns.resolver.Resolver()`</span>, set <span class="in">`r.nameservers = ["8.8.8.8", "1.1.1.1"]`</span>, and call <span class="in">`r.resolve(...)`</span> instead of <span class="in">`dns.resolver.resolve(...)`</span>.</span>
-<span id="cb33-736"><a href="#cb33-736" aria-label="688"></a><span class="ss">- </span>**URL encoding issues**: Use <span class="in">`urllib.parse.quote()`</span> for article titles with spaces or special characters.</span>
-<span id="cb33-737"><a href="#cb33-737" aria-label="689"></a></span>
-<span id="cb33-738"><a href="#cb33-738" aria-label="690"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb33-739"><a href="#cb33-739" aria-label="691"></a></span>
-<span id="cb33-740"><a href="#cb33-740" aria-label="692"></a>The web is built on a layered stack of protocols: TCP/IP transports data, DNS resolves names to addresses, HTTP structures the conversation, and URLs identify the target. Traceroute and curl's verbose output make that transport layer directly observable, and the <span class="in">`User-Agent`</span> header — honest or deliberately spoofed — is how a server decides who, or what, it believes is asking. Understanding this stack transforms debugging from guesswork into systematic diagnosis. When a request fails, you can ask: can I reach the server at all? Am I resolving the right address? What status code did I get? Are my headers correct? Is my URL well-formed? This systematic approach carries through every chapter that follows.</span>
-<span id="cb33-741"><a href="#cb33-741" aria-label="693"></a></span>
-<span id="cb33-742"><a href="#cb33-742" aria-label="694"></a><span class="fu">## Further Reading</span></span>
-<span id="cb33-743"><a href="#cb33-743" aria-label="695"></a></span>
-<span id="cb33-744"><a href="#cb33-744" aria-label="696"></a><span class="ss">- </span>Mozilla Developer Network — How the Web Works: <span class="ot">&lt;https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works&gt;</span></span>
-<span id="cb33-745"><a href="#cb33-745" aria-label="697"></a><span class="ss">- </span>Mozilla Developer Network — HTTP Overview: <span class="ot">&lt;https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview&gt;</span></span>
-<span id="cb33-746"><a href="#cb33-746" aria-label="698"></a><span class="ss">- </span>IPython's shell commands, <span class="in">`!`</span> and <span class="in">`var = !command`</span>: <span class="ot">&lt;https://ipython.readthedocs.io/en/stable/interactive/python-ipython-diff.html#shell-assignment&gt;</span></span>
-<span id="cb33-747"><a href="#cb33-747" aria-label="699"></a><span class="ss">- </span>Wireshark, the standard GUI packet analyzer: <span class="ot">&lt;https://www.wireshark.org/&gt;</span></span>
-<span id="cb33-748"><a href="#cb33-748" aria-label="700"></a><span class="ss">- </span><span class="in">`dnspython`</span> documentation: <span class="ot">&lt;https://dnspython.readthedocs.io/&gt;</span></span>
-<span id="cb33-749"><a href="#cb33-749" aria-label="701"></a><span class="ss">- </span>Wikipedia — Internationalized domain name: <span class="ot">&lt;https://en.wikipedia.org/wiki/Internationalized_domain_name&gt;</span></span>
-<span id="cb33-750"><a href="#cb33-750" aria-label="702"></a><span class="ss">- </span>Mozilla Developer Network — HTTP Client Hints: <span class="ot">&lt;https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Client_hints&gt;</span></span>
-<span id="cb33-751"><a href="#cb33-751" aria-label="703"></a><span class="ss">- </span><span class="in">`curl`</span> manual: <span class="ot">&lt;https://curl.se/docs/manpage.html&gt;</span></span>
-<span id="cb33-752"><a href="#cb33-752" aria-label="704"></a><span class="ss">- </span>GNU <span class="in">`wget`</span> manual: <span class="ot">&lt;https://www.gnu.org/software/wget/manual/wget.html&gt;</span></span>
+<span id="cb33-302"><a href="#cb33-302" aria-label="286"></a><span class="co"># Test on a few URLs; without a User-Agent that names you, Wikipedia answers both with 403</span></span>
+<span id="cb33-303"><a href="#cb33-303" aria-label="287"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb33-304"><a href="#cb33-304" aria-label="288"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Python_(programming_language)"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb33-305"><a href="#cb33-305" aria-label="289"></a>diagnose_request(<span class="st">"https://en.wikipedia.org/wiki/Nonexistent_Page_12345"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb33-306"><a href="#cb33-306" aria-label="290"></a><span class="in">```</span></span>
+<span id="cb33-307"><a href="#cb33-307" aria-label="291"></a></span>
+<span id="cb33-308"><a href="#cb33-308" aria-label="292"></a>The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a <span class="in">`User-Agent`</span> header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:</span>
+<span id="cb33-309"><a href="#cb33-309" aria-label="293"></a></span>
+<span id="cb33-312"><a href="#cb33-312" aria-label="294"></a><span class="in">```{python}</span></span>
+<span id="cb33-313"><a href="#cb33-313" aria-label="295"></a><span class="im">import</span> time</span>
+<span id="cb33-314"><a href="#cb33-314" aria-label="296"></a></span>
+<span id="cb33-315"><a href="#cb33-315" aria-label="297"></a><span class="kw">def</span> get_with_backoff(url, headers<span class="op">=</span><span class="va">None</span>, max_retries<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb33-316"><a href="#cb33-316" aria-label="298"></a>    <span class="co">"""Retry a request with exponential backoff on 429 errors."""</span></span>
+<span id="cb33-317"><a href="#cb33-317" aria-label="299"></a>    <span class="cf">for</span> attempt <span class="kw">in</span> <span class="bu">range</span>(max_retries):</span>
+<span id="cb33-318"><a href="#cb33-318" aria-label="300"></a>        response <span class="op">=</span> requests.get(url, headers<span class="op">=</span>headers)</span>
+<span id="cb33-319"><a href="#cb33-319" aria-label="301"></a>        <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">429</span>:</span>
+<span id="cb33-320"><a href="#cb33-320" aria-label="302"></a>            wait_time <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> attempt  <span class="co"># 1s, 2s, 4s</span></span>
+<span id="cb33-321"><a href="#cb33-321" aria-label="303"></a>            <span class="bu">print</span>(<span class="ss">f"Rate limited. Waiting </span><span class="sc">{</span>wait_time<span class="sc">}</span><span class="ss">s before retry..."</span>)</span>
+<span id="cb33-322"><a href="#cb33-322" aria-label="304"></a>            time.sleep(wait_time)</span>
+<span id="cb33-323"><a href="#cb33-323" aria-label="305"></a>        <span class="cf">else</span>:</span>
+<span id="cb33-324"><a href="#cb33-324" aria-label="306"></a>            <span class="cf">return</span> response</span>
+<span id="cb33-325"><a href="#cb33-325" aria-label="307"></a>    <span class="cf">return</span> response  <span class="co"># Return the last response even if still 429</span></span>
+<span id="cb33-326"><a href="#cb33-326" aria-label="308"></a><span class="in">```</span></span>
+<span id="cb33-327"><a href="#cb33-327" aria-label="309"></a></span>
+<span id="cb33-328"><a href="#cb33-328" aria-label="310"></a>Exponential backoff doubles the wait time with each retry, giving the server progressively more breathing room. Many APIs include a <span class="in">`Retry-After`</span> header in their 429 responses that tells you exactly how long to wait — check for it with <span class="in">`response.headers.get("Retry-After")`</span> before falling back to your own backoff schedule.</span>
+<span id="cb33-329"><a href="#cb33-329" aria-label="311"></a></span>
+<span id="cb33-330"><a href="#cb33-330" aria-label="312"></a>Understanding status codes in context makes debugging much faster. A 403 from the Wikimedia API almost always means you forgot the <span class="in">`User-Agent`</span> header — the fix is a single line of code. A 403 from a news site might mean the site blocks all automated access, and no header change will help. A 404 could mean the page was deleted, the URL has a typo, or the site restructured its paths. A 500 is the server's problem, not yours — retry after a delay. Building this diagnostic intuition takes practice, but the pattern is always the same: check the status code, inspect the response headers, read the response body for error messages, and adjust your request accordingly. This systematic approach to debugging carries through every chapter that follows.</span>
+<span id="cb33-331"><a href="#cb33-331" aria-label="313"></a></span>
+<span id="cb33-332"><a href="#cb33-332" aria-label="314"></a><span class="fu">### Making API Requests with Custom Headers</span></span>
+<span id="cb33-333"><a href="#cb33-333" aria-label="315"></a></span>
+<span id="cb33-334"><a href="#cb33-334" aria-label="316"></a>Let us retrieve data from the Wikimedia pageviews API. This API requires a meaningful <span class="in">`User-Agent`</span> header — if you send the default <span class="in">`requests`</span> User-Agent, you will get a 403 error:</span>
+<span id="cb33-335"><a href="#cb33-335" aria-label="317"></a></span>
+<span id="cb33-338"><a href="#cb33-338" aria-label="318"></a><span class="in">```{python}</span></span>
+<span id="cb33-339"><a href="#cb33-339" aria-label="319"></a><span class="im">import</span> requests</span>
+<span id="cb33-340"><a href="#cb33-340" aria-label="320"></a></span>
+<span id="cb33-341"><a href="#cb33-341" aria-label="321"></a>article <span class="op">=</span> <span class="st">"University_of_Colorado_Boulder"</span></span>
+<span id="cb33-342"><a href="#cb33-342" aria-label="322"></a>api_url <span class="op">=</span> (</span>
+<span id="cb33-343"><a href="#cb33-343" aria-label="323"></a>    <span class="ss">f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
+<span id="cb33-344"><a href="#cb33-344" aria-label="324"></a>    <span class="ss">f"/en.wikipedia/all-access/all-agents/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
+<span id="cb33-345"><a href="#cb33-345" aria-label="325"></a>)</span>
+<span id="cb33-346"><a href="#cb33-346" aria-label="326"></a></span>
+<span id="cb33-347"><a href="#cb33-347" aria-label="327"></a><span class="co"># This will likely fail with a 403</span></span>
+<span id="cb33-348"><a href="#cb33-348" aria-label="328"></a>response <span class="op">=</span> requests.get(api_url)</span>
+<span id="cb33-349"><a href="#cb33-349" aria-label="329"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 403</span></span>
+<span id="cb33-350"><a href="#cb33-350" aria-label="330"></a></span>
+<span id="cb33-351"><a href="#cb33-351" aria-label="331"></a><span class="co"># Add a custom User-Agent header</span></span>
+<span id="cb33-352"><a href="#cb33-352" aria-label="332"></a>headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb33-353"><a href="#cb33-353" aria-label="333"></a>response <span class="op">=</span> requests.get(api_url, headers<span class="op">=</span>headers)</span>
+<span id="cb33-354"><a href="#cb33-354" aria-label="334"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200</span></span>
+<span id="cb33-355"><a href="#cb33-355" aria-label="335"></a></span>
+<span id="cb33-356"><a href="#cb33-356" aria-label="336"></a><span class="co"># Parse the JSON response</span></span>
+<span id="cb33-357"><a href="#cb33-357" aria-label="337"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb33-358"><a href="#cb33-358" aria-label="338"></a><span class="in">```</span></span>
+<span id="cb33-359"><a href="#cb33-359" aria-label="339"></a></span>
+<span id="cb33-360"><a href="#cb33-360" aria-label="340"></a>**From the terminal.** The same check, inspectable without Python: <span class="in">`curl -I`</span> fetches only the response headers — a fast way to confirm a status code without downloading the body — and <span class="in">`curl -v`</span> shows the entire request and response, close to what the Network tab's Headers pane showed you earlier in this chapter. Both work alongside <span class="in">`-A`</span> to set a User-Agent the same way the <span class="in">`headers`</span> dictionary above does. See "<span class="in">`curl`</span> and <span class="in">`wget`</span>" later in this chapter for these tools as full alternatives to <span class="in">`requests`</span>.</span>
+<span id="cb33-361"><a href="#cb33-361" aria-label="341"></a></span>
+<span id="cb33-362"><a href="#cb33-362" aria-label="342"></a>Now convert the response to a DataFrame and plot it:</span>
+<span id="cb33-363"><a href="#cb33-363" aria-label="343"></a></span>
+<span id="cb33-366"><a href="#cb33-366" aria-label="344"></a><span class="in">```{python}</span></span>
+<span id="cb33-367"><a href="#cb33-367" aria-label="345"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb33-368"><a href="#cb33-368" aria-label="346"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb33-369"><a href="#cb33-369" aria-label="347"></a></span>
+<span id="cb33-370"><a href="#cb33-370" aria-label="348"></a><span class="co"># The pageview data is nested inside data['items']</span></span>
+<span id="cb33-371"><a href="#cb33-371" aria-label="349"></a>df <span class="op">=</span> pd.DataFrame(data[<span class="st">"items"</span>])</span>
+<span id="cb33-372"><a href="#cb33-372" aria-label="350"></a>df[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">"timestamp"</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">00"</span>)</span>
+<span id="cb33-373"><a href="#cb33-373" aria-label="351"></a></span>
+<span id="cb33-374"><a href="#cb33-374" aria-label="352"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb33-375"><a href="#cb33-375" aria-label="353"></a>plt.plot(df[<span class="st">"timestamp"</span>], df[<span class="st">"views"</span>])</span>
+<span id="cb33-376"><a href="#cb33-376" aria-label="354"></a>plt.title(<span class="ss">f"Daily Pageviews: </span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb33-377"><a href="#cb33-377" aria-label="355"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
+<span id="cb33-378"><a href="#cb33-378" aria-label="356"></a>plt.ylabel(<span class="st">"Views"</span>)</span>
+<span id="cb33-379"><a href="#cb33-379" aria-label="357"></a>plt.tight_layout()</span>
+<span id="cb33-380"><a href="#cb33-380" aria-label="358"></a>plt.show()</span>
+<span id="cb33-381"><a href="#cb33-381" aria-label="359"></a><span class="in">```</span></span>
+<span id="cb33-382"><a href="#cb33-382" aria-label="360"></a></span>
+<span id="cb33-383"><a href="#cb33-383" aria-label="361"></a><span class="fu">### User-Agent Spoofing</span></span>
+<span id="cb33-384"><a href="#cb33-384" aria-label="362"></a></span>
+<span id="cb33-385"><a href="#cb33-385" aria-label="363"></a>Every request this chapter has made has honestly identified itself — <span class="in">`WebDataScience/1.0 (your-email@colorado.edu)`</span>, a real contact address a server operator could actually use to reach you. **User-Agent spoofing** means sending a <span class="in">`User-Agent`</span> header that claims to be something you are not: a specific browser, operating system, or device you are not actually running. It is worth understanding both because you will encounter it — some sites behave differently depending on what you claim to be — and because doing it yourself raises questions this book has otherwise been able to sidestep by simply identifying itself truthfully.</span>
+<span id="cb33-386"><a href="#cb33-386" aria-label="364"></a></span>
+<span id="cb33-387"><a href="#cb33-387" aria-label="365"></a>There are legitimate, unremarkable reasons to change a <span class="in">`User-Agent`</span>: testing how your own site renders on a phone without owning one, checking whether a page serves a simplified version to older browsers, or working around a service that blocks a legitimate research tool's honest identification for no defensible reason. There are also reasons that are not legitimate, covered below.</span>
+<span id="cb33-388"><a href="#cb33-388" aria-label="366"></a></span>
+<span id="cb33-389"><a href="#cb33-389" aria-label="367"></a>Mechanically, spoofing is nothing more than the <span class="in">`headers`</span> dictionary you already know how to build — just with a value that describes a browser and device you are not actually using:</span>
+<span id="cb33-390"><a href="#cb33-390" aria-label="368"></a></span>
+<span id="cb33-393"><a href="#cb33-393" aria-label="369"></a><span class="in">```{python}</span></span>
+<span id="cb33-394"><a href="#cb33-394" aria-label="370"></a><span class="im">import</span> requests</span>
+<span id="cb33-395"><a href="#cb33-395" aria-label="371"></a></span>
+<span id="cb33-396"><a href="#cb33-396" aria-label="372"></a><span class="co"># An honest identification, like every other request in this book</span></span>
+<span id="cb33-397"><a href="#cb33-397" aria-label="373"></a>honest_headers <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb33-398"><a href="#cb33-398" aria-label="374"></a></span>
+<span id="cb33-399"><a href="#cb33-399" aria-label="375"></a><span class="co"># A spoofed identification, claiming to be a specific desktop Chrome browser</span></span>
+<span id="cb33-400"><a href="#cb33-400" aria-label="376"></a>spoofed_headers <span class="op">=</span> {</span>
+<span id="cb33-401"><a href="#cb33-401" aria-label="377"></a>    <span class="st">"User-Agent"</span>: (</span>
+<span id="cb33-402"><a href="#cb33-402" aria-label="378"></a>        <span class="st">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "</span></span>
+<span id="cb33-403"><a href="#cb33-403" aria-label="379"></a>        <span class="st">"(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"</span></span>
+<span id="cb33-404"><a href="#cb33-404" aria-label="380"></a>    )</span>
+<span id="cb33-405"><a href="#cb33-405" aria-label="381"></a>}</span>
+<span id="cb33-406"><a href="#cb33-406" aria-label="382"></a></span>
+<span id="cb33-407"><a href="#cb33-407" aria-label="383"></a><span class="co"># httpbin.org's /user-agent endpoint just echoes back whatever header you sent --</span></span>
+<span id="cb33-408"><a href="#cb33-408" aria-label="384"></a><span class="co"># a safe, verifiable way to see exactly what a server receives, with no guessing</span></span>
+<span id="cb33-409"><a href="#cb33-409" aria-label="385"></a><span class="co"># about how any particular real site might currently react to it</span></span>
+<span id="cb33-410"><a href="#cb33-410" aria-label="386"></a><span class="bu">print</span>(requests.get(<span class="st">"https://httpbin.org/user-agent"</span>, headers<span class="op">=</span>honest_headers).json())</span>
+<span id="cb33-411"><a href="#cb33-411" aria-label="387"></a><span class="bu">print</span>(requests.get(<span class="st">"https://httpbin.org/user-agent"</span>, headers<span class="op">=</span>spoofed_headers).json())</span>
+<span id="cb33-412"><a href="#cb33-412" aria-label="388"></a><span class="in">```</span></span>
+<span id="cb33-413"><a href="#cb33-413" aria-label="389"></a></span>
+<span id="cb33-414"><a href="#cb33-414" aria-label="390"></a>The two responses differ only in the string you supplied — the server has no way to tell the second one apart from a real Chrome browser unless it looks at more than the <span class="in">`User-Agent`</span> header alone (more on that below). You already saw a real, working case of a site's behavior actually changing based on this exact header earlier in this chapter: the Wikimedia pageviews API's default <span class="in">`requests`</span> User-Agent got a 403, and a properly identified one got a 200. That is UA-based gatekeeping in its lightest, most common form — refusing an *unidentified* client — and it is already something you have done deliberately, just not by pretending to be a different, specific piece of software.</span>
+<span id="cb33-415"><a href="#cb33-415" aria-label="391"></a></span>
+<span id="cb33-416"><a href="#cb33-416" aria-label="392"></a>**What a User-Agent string actually contains.** The long, oddly-formatted string above packs in a browser's rendering engine, version, and operating system, largely for historical compatibility reasons rather than any coherent modern design — that is why even a current Chrome browser's User-Agent still contains the word "Mozilla." Because parsing these strings reliably is genuinely difficult, modern browsers increasingly expose the same information in a cleaner, structured way through [**User-Agent Client Hints**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Client_hints) — a newer set of headers (<span class="in">`Sec-CH-UA`</span> and related) that a server can request explicitly instead of parsing a free-text string. A server that checks the traditional <span class="in">`User-Agent`</span> header while ignoring Client Hints, or the reverse, can end up seeing a mismatch between what the two report — one of several signals, beyond the User-Agent header alone, that modern bot-detection systems use. The practical takeaway for this book is narrower than "how to avoid detection": simply changing a <span class="in">`User-Agent`</span> string is a weak, easily-noticed technique on its own, not a reliable way to make automated traffic indistinguishable from a real browser, and treating it as one will give you false confidence.</span>
+<span id="cb33-417"><a href="#cb33-417" aria-label="393"></a></span>
+<span id="cb33-418"><a href="#cb33-418" aria-label="394"></a>::: {.callout-important}</span>
+<span id="cb33-419"><a href="#cb33-419" aria-label="395"></a><span class="fu">## Ethical and Legal Considerations</span></span>
+<span id="cb33-420"><a href="#cb33-420" aria-label="396"></a></span>
+<span id="cb33-421"><a href="#cb33-421" aria-label="397"></a>Spoofing a <span class="in">`User-Agent`</span> is not illegal simply as a technical act — what matters is *what you do it for*. Checking how your own site renders on different devices is unremarkable; defeating a site's stated attempt to block automated access is a different act with real legal stakes, even though the code is identical either way. @sec-ethics covers those stakes in depth — the same analysis that applies to <span class="in">`robots.txt`</span> and Terms of Service applies here.</span>
+<span id="cb33-422"><a href="#cb33-422" aria-label="398"></a></span>
+<span id="cb33-423"><a href="#cb33-423" aria-label="399"></a>For coursework in this class, the rule is the one @sec-ethics already establishes for everything else: identify yourself honestly by default, and treat a site's explicit attempt to block automated access as a signal to stop and reconsider, not an obstacle to route around. If a legitimate research need ever leads you to consider doing otherwise, that is a conversation to have with your instructor first.</span>
+<span id="cb33-424"><a href="#cb33-424" aria-label="400"></a>:::</span>
+<span id="cb33-425"><a href="#cb33-425" aria-label="401"></a></span>
+<span id="cb33-426"><a href="#cb33-426" aria-label="402"></a><span class="fu">### Connections, Sessions, and Retries</span></span>
+<span id="cb33-427"><a href="#cb33-427" aria-label="403"></a></span>
+<span id="cb33-428"><a href="#cb33-428" aria-label="404"></a>Every bare <span class="in">`requests.get()`</span> call does more work than it appears to: it opens a fresh TCP connection to the server, performs the TLS handshake, sends the request, and tears the connection back down. For a single request, that overhead is negligible. But the chapters ahead will have you making dozens or hundreds of requests to the same host — one per Wikipedia article, one per bill, one per archived page — and paying the connection setup cost every time is wasteful for both you and the server.</span>
+<span id="cb33-429"><a href="#cb33-429" aria-label="405"></a></span>
+<span id="cb33-430"><a href="#cb33-430" aria-label="406"></a>A <span class="in">`requests.Session`</span> object fixes this. A Session keeps the underlying connection open and reuses it for subsequent requests to the same host, and it remembers headers, so you set your <span class="in">`User-Agent`</span> once instead of passing it to every call. A Session can also carry a retry policy: rather than hand-rolling backoff logic like the <span class="in">`get_with_backoff()`</span> function you wrote earlier, you can mount a <span class="in">`Retry`</span> configuration that automatically retries rate limits and transient server errors with exponentially increasing delays — and it honors any <span class="in">`Retry-After`</span> header the server sends:</span>
+<span id="cb33-431"><a href="#cb33-431" aria-label="407"></a></span>
+<span id="cb33-434"><a href="#cb33-434" aria-label="408"></a><span class="in">```{python}</span></span>
+<span id="cb33-435"><a href="#cb33-435" aria-label="409"></a><span class="im">import</span> requests</span>
+<span id="cb33-436"><a href="#cb33-436" aria-label="410"></a><span class="im">from</span> requests.adapters <span class="im">import</span> HTTPAdapter</span>
+<span id="cb33-437"><a href="#cb33-437" aria-label="411"></a><span class="im">from</span> urllib3.util.retry <span class="im">import</span> Retry</span>
+<span id="cb33-438"><a href="#cb33-438" aria-label="412"></a></span>
+<span id="cb33-439"><a href="#cb33-439" aria-label="413"></a><span class="co"># Create a session with persistent headers</span></span>
+<span id="cb33-440"><a href="#cb33-440" aria-label="414"></a>session <span class="op">=</span> requests.Session()</span>
+<span id="cb33-441"><a href="#cb33-441" aria-label="415"></a>session.headers.update(</span>
+<span id="cb33-442"><a href="#cb33-442" aria-label="416"></a>    {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span>
+<span id="cb33-443"><a href="#cb33-443" aria-label="417"></a>)</span>
+<span id="cb33-444"><a href="#cb33-444" aria-label="418"></a></span>
+<span id="cb33-445"><a href="#cb33-445" aria-label="419"></a><span class="co"># Retry up to 3 times on rate limits and server errors, waiting 1s, 2s, then 4s between attempts</span></span>
+<span id="cb33-446"><a href="#cb33-446" aria-label="420"></a>retries <span class="op">=</span> Retry(</span>
+<span id="cb33-447"><a href="#cb33-447" aria-label="421"></a>    total<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb33-448"><a href="#cb33-448" aria-label="422"></a>    backoff_factor<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb33-449"><a href="#cb33-449" aria-label="423"></a>    status_forcelist<span class="op">=</span>[<span class="dv">429</span>, <span class="dv">500</span>, <span class="dv">502</span>, <span class="dv">503</span>, <span class="dv">504</span>],</span>
+<span id="cb33-450"><a href="#cb33-450" aria-label="424"></a>)</span>
+<span id="cb33-451"><a href="#cb33-451" aria-label="425"></a>session.mount(<span class="st">"https://"</span>, HTTPAdapter(max_retries<span class="op">=</span>retries))</span>
+<span id="cb33-452"><a href="#cb33-452" aria-label="426"></a></span>
+<span id="cb33-453"><a href="#cb33-453" aria-label="427"></a><span class="co"># Use the session exactly like the requests module itself</span></span>
+<span id="cb33-454"><a href="#cb33-454" aria-label="428"></a>articles <span class="op">=</span> [<span class="st">"Python_(programming_language)"</span>, <span class="st">"Web_scraping"</span>, <span class="st">"Data_science"</span>]</span>
+<span id="cb33-455"><a href="#cb33-455" aria-label="429"></a><span class="cf">for</span> article <span class="kw">in</span> articles:</span>
+<span id="cb33-456"><a href="#cb33-456" aria-label="430"></a>    url <span class="op">=</span> <span class="ss">f"https://en.wikipedia.org/wiki/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb33-457"><a href="#cb33-457" aria-label="431"></a>    response <span class="op">=</span> session.get(url)  <span class="co"># Connection reused; headers already set</span></span>
+<span id="cb33-458"><a href="#cb33-458" aria-label="432"></a>    <span class="bu">print</span>(article, response.status_code, <span class="bu">len</span>(response.text))</span>
+<span id="cb33-459"><a href="#cb33-459" aria-label="433"></a><span class="co"># Python_(programming_language) 200 812394</span></span>
+<span id="cb33-460"><a href="#cb33-460" aria-label="434"></a><span class="co"># Web_scraping 200 145207</span></span>
+<span id="cb33-461"><a href="#cb33-461" aria-label="435"></a><span class="co"># Data_science 200 291846</span></span>
+<span id="cb33-462"><a href="#cb33-462" aria-label="436"></a><span class="in">```</span></span>
+<span id="cb33-463"><a href="#cb33-463" aria-label="437"></a></span>
+<span id="cb33-464"><a href="#cb33-464" aria-label="438"></a>The setup costs six lines, and everything after that behaves exactly like the <span class="in">`requests.get()`</span> calls you already know — <span class="in">`session.get()`</span> returns the same <span class="in">`Response`</span> object with the same <span class="in">`.json()`</span>, <span class="in">`.text`</span>, and <span class="in">`.status_code`</span>.</span>
+<span id="cb33-465"><a href="#cb33-465" aria-label="439"></a></span>
+<span id="cb33-466"><a href="#cb33-466" aria-label="440"></a>::: {.callout-tip}</span>
+<span id="cb33-467"><a href="#cb33-467" aria-label="441"></a>A <span class="in">`for`</span> loop around <span class="in">`requests.get()`</span> is your cue to create a <span class="in">`Session`</span> first. The scraping and API chapters ahead (@sec-static-pages, @sec-wikipedia, @sec-government) all involve exactly this kind of loop over many URLs at the same host, and this pattern carries over unchanged.</span>
+<span id="cb33-468"><a href="#cb33-468" aria-label="442"></a>:::</span>
+<span id="cb33-469"><a href="#cb33-469" aria-label="443"></a></span>
+<span id="cb33-470"><a href="#cb33-470" aria-label="444"></a><span class="fu">### `curl` and `wget`: Command-Line Alternatives to `requests`</span></span>
+<span id="cb33-471"><a href="#cb33-471" aria-label="445"></a></span>
+<span id="cb33-472"><a href="#cb33-472" aria-label="446"></a>Everything this chapter has done with <span class="in">`requests`</span> has a command-line equivalent. <span class="in">`curl`</span> and <span class="in">`wget`</span> are HTTP clients too — just ones you drive from the terminal instead of Python, and they are worth knowing for exactly the situations where opening a notebook is more overhead than the task deserves: a one-off check, a shell script, a scheduled job on a server that may not even have Python installed, or simply downloading a file straight to disk without writing code to do it.</span>
+<span id="cb33-473"><a href="#cb33-473" aria-label="447"></a></span>
+<span id="cb33-474"><a href="#cb33-474" aria-label="448"></a>The two tools split the same job differently. <span class="in">`curl`</span> is a general-purpose HTTP client built for fine control — headers, methods, authentication — and prints the response to your terminal by default. <span class="in">`wget`</span> is built specifically for downloading: it saves to disk automatically, resumes interrupted downloads, and, as you will see below, has built-in support for exactly the kind of polite, rate-limited fetching this book has been teaching you to write by hand in Python. <span class="in">`curl`</span> ships by default on macOS, Linux, and modern Windows; <span class="in">`wget`</span> is standard on most Linux distributions but often needs a separate install on macOS (<span class="in">`brew install wget`</span>).</span>
+<span id="cb33-475"><a href="#cb33-475" aria-label="449"></a></span>
+<span id="cb33-476"><a href="#cb33-476" aria-label="450"></a>Neither tool replaces Python for this book's actual work. They fetch; they do not parse. The moment you need to pull a value out of JSON, select an element out of HTML, or turn a response into a DataFrame, you are back to <span class="in">`requests`</span> and the rest of this book. <span class="in">`curl`</span> and <span class="in">`wget`</span> are for everything *before* that: getting the bytes.</span>
+<span id="cb33-477"><a href="#cb33-477" aria-label="451"></a></span>
+<span id="cb33-478"><a href="#cb33-478" aria-label="452"></a>**Setting a User-Agent.** The same header, the same reasons, from the command line instead of a <span class="in">`headers`</span> dictionary:</span>
+<span id="cb33-479"><a href="#cb33-479" aria-label="453"></a></span>
+<span id="cb33-480"><a href="#cb33-480" aria-label="454"></a><span class="in">```</span></span>
+<span id="cb33-481"><a href="#cb33-481" aria-label="455"></a><span class="in">curl -A "WebDataScience/1.0 (your-email@colorado.edu)" https://en.wikipedia.org/wiki/Web_scraping</span></span>
+<span id="cb33-482"><a href="#cb33-482" aria-label="456"></a><span class="in">wget --user-agent="WebDataScience/1.0 (your-email@colorado.edu)" https://en.wikipedia.org/wiki/Web_scraping</span></span>
+<span id="cb33-483"><a href="#cb33-483" aria-label="457"></a><span class="in">```</span></span>
+<span id="cb33-484"><a href="#cb33-484" aria-label="458"></a></span>
+<span id="cb33-485"><a href="#cb33-485" aria-label="459"></a><span class="in">`curl`</span> prints the response body to your terminal by default — add <span class="in">`-O`</span> to save it to a file named after the URL's last path segment, or <span class="in">`-o filename.html`</span> to choose the name yourself. <span class="in">`wget`</span> saves to disk automatically, without being asked.</span>
+<span id="cb33-486"><a href="#cb33-486" aria-label="460"></a></span>
+<span id="cb33-487"><a href="#cb33-487" aria-label="461"></a>**Replicating `time.sleep()` between requests.** This is where the two tools genuinely differ, not just in syntax. <span class="in">`wget`</span> has rate-limiting built in: <span class="in">`--wait=SECONDS`</span> pauses between each request when you give it more than one URL, and <span class="in">`--random-wait`</span> varies that pause between roughly half and one-and-a-half times the value you gave, so your request timing does not look as suspiciously uniform as a fixed delay does:</span>
+<span id="cb33-488"><a href="#cb33-488" aria-label="462"></a></span>
+<span id="cb33-489"><a href="#cb33-489" aria-label="463"></a><span class="in">```</span></span>
+<span id="cb33-490"><a href="#cb33-490" aria-label="464"></a><span class="in">wget --wait=2 --random-wait https://en.wikipedia.org/wiki/Python_(programming_language) https://en.wikipedia.org/wiki/Web_scraping</span></span>
+<span id="cb33-491"><a href="#cb33-491" aria-label="465"></a><span class="in">```</span></span>
+<span id="cb33-492"><a href="#cb33-492" aria-label="466"></a></span>
+<span id="cb33-493"><a href="#cb33-493" aria-label="467"></a><span class="in">`curl`</span> has no equivalent flag — you get the same behavior only by wrapping it in a shell loop and calling <span class="in">`sleep`</span> yourself, the command-line version of the <span class="in">`time.sleep()`</span> calls you have already written in Python:</span>
+<span id="cb33-494"><a href="#cb33-494" aria-label="468"></a></span>
+<span id="cb33-495"><a href="#cb33-495" aria-label="469"></a><span class="in">```</span></span>
+<span id="cb33-496"><a href="#cb33-496" aria-label="470"></a><span class="in">for url in "https://en.wikipedia.org/wiki/Python_(programming_language)" "https://en.wikipedia.org/wiki/Web_scraping"; do</span></span>
+<span id="cb33-497"><a href="#cb33-497" aria-label="471"></a><span class="in">  curl -O "$url"</span></span>
+<span id="cb33-498"><a href="#cb33-498" aria-label="472"></a><span class="in">  sleep 2</span></span>
+<span id="cb33-499"><a href="#cb33-499" aria-label="473"></a><span class="in">done</span></span>
+<span id="cb33-500"><a href="#cb33-500" aria-label="474"></a><span class="in">```</span></span>
+<span id="cb33-501"><a href="#cb33-501" aria-label="475"></a></span>
+<span id="cb33-502"><a href="#cb33-502" aria-label="476"></a>**Fetching several files from a server.** The <span class="in">`Session`</span> loop just above fetched three Wikipedia articles from Python:</span>
+<span id="cb33-503"><a href="#cb33-503" aria-label="477"></a></span>
+<span id="cb33-504"><a href="#cb33-504" aria-label="478"></a><span class="in">```python</span></span>
+<span id="cb33-505"><a href="#cb33-505" aria-label="479"></a>articles <span class="op">=</span> [<span class="st">"Python_(programming_language)"</span>, <span class="st">"Web_scraping"</span>, <span class="st">"Data_science"</span>]</span>
+<span id="cb33-506"><a href="#cb33-506" aria-label="480"></a><span class="cf">for</span> article <span class="kw">in</span> articles:</span>
+<span id="cb33-507"><a href="#cb33-507" aria-label="481"></a>    url <span class="op">=</span> <span class="ss">f"https://en.wikipedia.org/wiki/</span><span class="sc">{</span>article<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb33-508"><a href="#cb33-508" aria-label="482"></a>    response <span class="op">=</span> session.get(url)</span>
+<span id="cb33-509"><a href="#cb33-509" aria-label="483"></a><span class="in">```</span></span>
+<span id="cb33-510"><a href="#cb33-510" aria-label="484"></a></span>
+<span id="cb33-511"><a href="#cb33-511" aria-label="485"></a>The same task from the command line reads a list of URLs from a file, one per line, instead of looping over a Python list — with <span class="in">`wget`</span>'s rate-limiting doing the polite pause for you:</span>
+<span id="cb33-512"><a href="#cb33-512" aria-label="486"></a></span>
+<span id="cb33-513"><a href="#cb33-513" aria-label="487"></a><span class="in">```</span></span>
+<span id="cb33-514"><a href="#cb33-514" aria-label="488"></a><span class="in">cat &gt; articles.txt &lt;&lt; 'EOF'</span></span>
+<span id="cb33-515"><a href="#cb33-515" aria-label="489"></a><span class="in">https://en.wikipedia.org/wiki/Python_(programming_language)</span></span>
+<span id="cb33-516"><a href="#cb33-516" aria-label="490"></a><span class="in">https://en.wikipedia.org/wiki/Web_scraping</span></span>
+<span id="cb33-517"><a href="#cb33-517" aria-label="491"></a><span class="in">https://en.wikipedia.org/wiki/Data_science</span></span>
+<span id="cb33-518"><a href="#cb33-518" aria-label="492"></a><span class="in">EOF</span></span>
+<span id="cb33-519"><a href="#cb33-519" aria-label="493"></a></span>
+<span id="cb33-520"><a href="#cb33-520" aria-label="494"></a><span class="in">wget -i articles.txt --wait=2 --random-wait --user-agent="WebDataScience/1.0 (your-email@colorado.edu)"</span></span>
+<span id="cb33-521"><a href="#cb33-521" aria-label="495"></a><span class="in">```</span></span>
+<span id="cb33-522"><a href="#cb33-522" aria-label="496"></a></span>
+<span id="cb33-523"><a href="#cb33-523" aria-label="497"></a>Every file lands in your current directory, named after its own URL. This pattern — a text file of URLs, one <span class="in">`wget`</span> call, a <span class="in">`--wait`</span> you set once — is often the fastest way to grab a known, fixed set of files (an agency's list of CSV exports, a set of PDF filings) without writing a line of Python at all. If you later need to *do* something with what you downloaded beyond saving it to disk, that is your cue to switch back to <span class="in">`requests`</span> and the rest of this book.</span>
+<span id="cb33-524"><a href="#cb33-524" aria-label="498"></a></span>
+<span id="cb33-525"><a href="#cb33-525" aria-label="499"></a><span class="fu">## URLs: Anatomy and Parsing</span></span>
+<span id="cb33-526"><a href="#cb33-526" aria-label="500"></a></span>
+<span id="cb33-527"><a href="#cb33-527" aria-label="501"></a>URLs (Uniform Resource Locators) have a well-defined structure:</span>
+<span id="cb33-528"><a href="#cb33-528" aria-label="502"></a></span>
+<span id="cb33-529"><a href="#cb33-529" aria-label="503"></a><span class="in">```</span></span>
+<span id="cb33-530"><a href="#cb33-530" aria-label="504"></a><span class="in">scheme://userinfo@host:port/path?query#fragment</span></span>
+<span id="cb33-531"><a href="#cb33-531" aria-label="505"></a><span class="in">```</span></span>
+<span id="cb33-532"><a href="#cb33-532" aria-label="506"></a></span>
+<span id="cb33-533"><a href="#cb33-533" aria-label="507"></a>Never write regular expressions to parse URLs. Use the <span class="co">[</span><span class="ot">`urllib.parse`</span><span class="co">](https://docs.python.org/3/library/urllib.parse.html)</span> module instead:</span>
+<span id="cb33-534"><a href="#cb33-534" aria-label="508"></a></span>
+<span id="cb33-537"><a href="#cb33-537" aria-label="509"></a><span class="in">```{python}</span></span>
+<span id="cb33-538"><a href="#cb33-538" aria-label="510"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlparse, parse_qs</span>
+<span id="cb33-539"><a href="#cb33-539" aria-label="511"></a></span>
+<span id="cb33-540"><a href="#cb33-540" aria-label="512"></a>url <span class="op">=</span> <span class="st">"https://api.census.gov/data/2022/acs/acs5?get=NAME,B01001_001E&amp;for=place:07850&amp;in=state:08"</span></span>
+<span id="cb33-541"><a href="#cb33-541" aria-label="513"></a></span>
+<span id="cb33-542"><a href="#cb33-542" aria-label="514"></a>parsed <span class="op">=</span> urlparse(url)</span>
+<span id="cb33-543"><a href="#cb33-543" aria-label="515"></a><span class="bu">print</span>(<span class="ss">f"Scheme: </span><span class="sc">{</span>parsed<span class="sc">.</span>scheme<span class="sc">}</span><span class="ss">"</span>)      <span class="co"># https</span></span>
+<span id="cb33-544"><a href="#cb33-544" aria-label="516"></a><span class="bu">print</span>(<span class="ss">f"Host: </span><span class="sc">{</span>parsed<span class="sc">.</span>netloc<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># api.census.gov</span></span>
+<span id="cb33-545"><a href="#cb33-545" aria-label="517"></a><span class="bu">print</span>(<span class="ss">f"Path: </span><span class="sc">{</span>parsed<span class="sc">.</span>path<span class="sc">}</span><span class="ss">"</span>)          <span class="co"># /data/2022/acs/acs5</span></span>
+<span id="cb33-546"><a href="#cb33-546" aria-label="518"></a><span class="bu">print</span>(<span class="ss">f"Query: </span><span class="sc">{</span>parsed<span class="sc">.</span>query<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># get=NAME,...</span></span>
+<span id="cb33-547"><a href="#cb33-547" aria-label="519"></a></span>
+<span id="cb33-548"><a href="#cb33-548" aria-label="520"></a><span class="co"># Parse query parameters into a dictionary</span></span>
+<span id="cb33-549"><a href="#cb33-549" aria-label="521"></a>params <span class="op">=</span> parse_qs(parsed.query)</span>
+<span id="cb33-550"><a href="#cb33-550" aria-label="522"></a><span class="bu">print</span>(params)</span>
+<span id="cb33-551"><a href="#cb33-551" aria-label="523"></a><span class="co"># {'get': ['NAME,B01001_001E'], 'for': ['place:07850'], 'in': ['state:08']}</span></span>
+<span id="cb33-552"><a href="#cb33-552" aria-label="524"></a><span class="in">```</span></span>
+<span id="cb33-553"><a href="#cb33-553" aria-label="525"></a></span>
+<span id="cb33-554"><a href="#cb33-554" aria-label="526"></a>Understanding URL structure is essential for constructing API requests. In @sec-wikipedia through @sec-ai-apis, you will build URLs programmatically by assembling scheme, host, path, and query parameters.</span>
+<span id="cb33-555"><a href="#cb33-555" aria-label="527"></a></span>
+<span id="cb33-556"><a href="#cb33-556" aria-label="528"></a><span class="fu">### Building URLs Programmatically</span></span>
+<span id="cb33-557"><a href="#cb33-557" aria-label="529"></a></span>
+<span id="cb33-558"><a href="#cb33-558" aria-label="530"></a>Web APIs expect the values you supply in one of two places, and you need to recognize which pattern you are dealing with before you can build the URL correctly.</span>
+<span id="cb33-559"><a href="#cb33-559" aria-label="531"></a></span>
+<span id="cb33-560"><a href="#cb33-560" aria-label="532"></a>Both patterns below build URLs with Python's **f-strings** — a compact way to embed variables and expressions directly inside a string, written <span class="in">`f"...{expression}..."`</span>. This is an intermediate Python feature: an f-string evaluates whatever sits inside the curly braces and inserts the result directly into the string at that position.</span>
+<span id="cb33-561"><a href="#cb33-561" aria-label="533"></a></span>
+<span id="cb33-564"><a href="#cb33-564" aria-label="534"></a><span class="in">```{python}</span></span>
+<span id="cb33-565"><a href="#cb33-565" aria-label="535"></a>name <span class="op">=</span> <span class="st">"Boulder"</span></span>
+<span id="cb33-566"><a href="#cb33-566" aria-label="536"></a>count <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb33-567"><a href="#cb33-567" aria-label="537"></a></span>
+<span id="cb33-568"><a href="#cb33-568" aria-label="538"></a><span class="co"># An f-string: the "f" before the opening quote enables {expression} substitution</span></span>
+<span id="cb33-569"><a href="#cb33-569" aria-label="539"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> has </span><span class="sc">{</span>count<span class="sc">}</span><span class="ss"> things"</span>)          <span class="co"># Boulder has 3 things</span></span>
+<span id="cb33-570"><a href="#cb33-570" aria-label="540"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> has </span><span class="sc">{</span>count <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss"> things"</span>)      <span class="co"># expressions work too, not just variables</span></span>
+<span id="cb33-571"><a href="#cb33-571" aria-label="541"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">.</span>upper()<span class="sc">}</span><span class="ss"> has </span><span class="sc">{</span>count<span class="sc">}</span><span class="ss"> things"</span>)  <span class="co"># so do method calls</span></span>
+<span id="cb33-572"><a href="#cb33-572" aria-label="542"></a></span>
+<span id="cb33-573"><a href="#cb33-573" aria-label="543"></a><span class="co"># An ordinary string does none of this -- braces stay literal text</span></span>
+<span id="cb33-574"><a href="#cb33-574" aria-label="544"></a><span class="bu">print</span>(<span class="st">"</span><span class="sc">{name}</span><span class="st"> has </span><span class="sc">{count}</span><span class="st"> things"</span>)           <span class="co"># {name} has {count} things</span></span>
+<span id="cb33-575"><a href="#cb33-575" aria-label="545"></a><span class="in">```</span></span>
+<span id="cb33-576"><a href="#cb33-576" aria-label="546"></a></span>
+<span id="cb33-577"><a href="#cb33-577" aria-label="547"></a>An f-string can also span multiple lines by placing several adjacent string literals next to each other — Python concatenates them automatically, which is how the URL-building code below builds one long string across several lines without a single <span class="in">`+`</span>. The <span class="co">[</span><span class="ot">Python tutorial's section on formatted string literals</span><span class="co">](https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals)</span> covers the full syntax, including format specifiers (<span class="in">`{value:.2f}`</span> for two decimal places, and similar) that come up less often in this book but are worth knowing exist.</span>
+<span id="cb33-578"><a href="#cb33-578" aria-label="548"></a></span>
+<span id="cb33-579"><a href="#cb33-579" aria-label="549"></a>**Path-segment APIs** embed each value at a fixed position in the URL's path. The Wikimedia pageviews endpoint you used earlier works this way: project, access method, agent, article, granularity, and date range are all path segments in a required order. Build these URLs with an f-string over the components — but URL-encode any component that might contain special characters using <span class="in">`urllib.parse.quote`</span>, because a stray slash or space inside a path segment produces a URL the server cannot route:</span>
+<span id="cb33-580"><a href="#cb33-580" aria-label="550"></a></span>
+<span id="cb33-583"><a href="#cb33-583" aria-label="551"></a><span class="in">```{python}</span></span>
+<span id="cb33-584"><a href="#cb33-584" aria-label="552"></a><span class="im">from</span> urllib.parse <span class="im">import</span> quote</span>
+<span id="cb33-585"><a href="#cb33-585" aria-label="553"></a></span>
+<span id="cb33-586"><a href="#cb33-586" aria-label="554"></a><span class="co"># Each value occupies a fixed position in the path</span></span>
+<span id="cb33-587"><a href="#cb33-587" aria-label="555"></a>project <span class="op">=</span> <span class="st">"en.wikipedia"</span></span>
+<span id="cb33-588"><a href="#cb33-588" aria-label="556"></a>access <span class="op">=</span> <span class="st">"all-access"</span></span>
+<span id="cb33-589"><a href="#cb33-589" aria-label="557"></a>agent <span class="op">=</span> <span class="st">"all-agents"</span></span>
+<span id="cb33-590"><a href="#cb33-590" aria-label="558"></a>article <span class="op">=</span> <span class="st">"University of Colorado Boulder"</span>  <span class="co"># Note the spaces</span></span>
+<span id="cb33-591"><a href="#cb33-591" aria-label="559"></a></span>
+<span id="cb33-592"><a href="#cb33-592" aria-label="560"></a><span class="co"># Wikipedia titles replace spaces with underscores; quote() percent-encodes anything else that would break a path segment (slashes, question marks)</span></span>
+<span id="cb33-593"><a href="#cb33-593" aria-label="561"></a>encoded_article <span class="op">=</span> quote(article.replace(<span class="st">" "</span>, <span class="st">"_"</span>), safe<span class="op">=</span><span class="st">""</span>)</span>
+<span id="cb33-594"><a href="#cb33-594" aria-label="562"></a><span class="bu">print</span>(encoded_article)</span>
+<span id="cb33-595"><a href="#cb33-595" aria-label="563"></a><span class="co"># University_of_Colorado_Boulder</span></span>
+<span id="cb33-596"><a href="#cb33-596" aria-label="564"></a></span>
+<span id="cb33-597"><a href="#cb33-597" aria-label="565"></a>url <span class="op">=</span> (</span>
+<span id="cb33-598"><a href="#cb33-598" aria-label="566"></a>    <span class="st">"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"</span></span>
+<span id="cb33-599"><a href="#cb33-599" aria-label="567"></a>    <span class="ss">f"/</span><span class="sc">{</span>project<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>access<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>agent<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>encoded_article<span class="sc">}</span><span class="ss">/daily/20260101/20260131"</span></span>
+<span id="cb33-600"><a href="#cb33-600" aria-label="568"></a>)</span>
+<span id="cb33-601"><a href="#cb33-601" aria-label="569"></a><span class="bu">print</span>(url)</span>
+<span id="cb33-602"><a href="#cb33-602" aria-label="570"></a><span class="co"># https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/University_of_Colorado_Boulder/daily/20260101/20260131</span></span>
+<span id="cb33-603"><a href="#cb33-603" aria-label="571"></a><span class="in">```</span></span>
+<span id="cb33-604"><a href="#cb33-604" aria-label="572"></a></span>
+<span id="cb33-605"><a href="#cb33-605" aria-label="573"></a>The encoding matters more than this example suggests: a band like "AC/DC" has a slash in its article title, and <span class="in">`quote("AC/DC", safe="")`</span> correctly produces <span class="in">`AC%2FDC`</span>. Paste the raw title into your f-string instead, and the API would interpret the slash as a path separator and return a 404.</span>
+<span id="cb33-606"><a href="#cb33-606" aria-label="574"></a></span>
+<span id="cb33-607"><a href="#cb33-607" aria-label="575"></a>**Query-parameter APIs** instead accept <span class="in">`key=value`</span> pairs after a <span class="in">`?`</span>, where order does not matter and many parameters are optional. The MediaWiki Action API — Wikipedia's general-purpose API, which you will explore in @sec-wikipedia — works this way. The <span class="in">`urlencode`</span> function converts a dictionary into a properly escaped query string:</span>
+<span id="cb33-608"><a href="#cb33-608" aria-label="576"></a></span>
+<span id="cb33-611"><a href="#cb33-611" aria-label="577"></a><span class="in">```{python}</span></span>
+<span id="cb33-612"><a href="#cb33-612" aria-label="578"></a><span class="im">from</span> urllib.parse <span class="im">import</span> urlencode</span>
+<span id="cb33-613"><a href="#cb33-613" aria-label="579"></a></span>
+<span id="cb33-614"><a href="#cb33-614" aria-label="580"></a>base_url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
+<span id="cb33-615"><a href="#cb33-615" aria-label="581"></a>params <span class="op">=</span> {</span>
+<span id="cb33-616"><a href="#cb33-616" aria-label="582"></a>    <span class="st">"action"</span>: <span class="st">"query"</span>,</span>
+<span id="cb33-617"><a href="#cb33-617" aria-label="583"></a>    <span class="st">"format"</span>: <span class="st">"json"</span>,</span>
+<span id="cb33-618"><a href="#cb33-618" aria-label="584"></a>    <span class="st">"titles"</span>: <span class="st">"University of Colorado Boulder"</span>,</span>
+<span id="cb33-619"><a href="#cb33-619" aria-label="585"></a>    <span class="st">"prop"</span>: <span class="st">"info"</span>,</span>
+<span id="cb33-620"><a href="#cb33-620" aria-label="586"></a>}</span>
+<span id="cb33-621"><a href="#cb33-621" aria-label="587"></a></span>
+<span id="cb33-622"><a href="#cb33-622" aria-label="588"></a>query_string <span class="op">=</span> urlencode(params)</span>
+<span id="cb33-623"><a href="#cb33-623" aria-label="589"></a><span class="bu">print</span>(query_string)</span>
+<span id="cb33-624"><a href="#cb33-624" aria-label="590"></a><span class="co"># action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span>
+<span id="cb33-625"><a href="#cb33-625" aria-label="591"></a><span class="in">```</span></span>
+<span id="cb33-626"><a href="#cb33-626" aria-label="592"></a></span>
+<span id="cb33-627"><a href="#cb33-627" aria-label="593"></a>For query-parameter APIs, the <span class="in">`requests`</span> library can do this encoding for you: pass the dictionary as the <span class="in">`params`</span> argument. This is the preferred approach for API calls:</span>
+<span id="cb33-628"><a href="#cb33-628" aria-label="594"></a></span>
+<span id="cb33-631"><a href="#cb33-631" aria-label="595"></a><span class="in">```{python}</span></span>
+<span id="cb33-632"><a href="#cb33-632" aria-label="596"></a>response <span class="op">=</span> requests.get(base_url, params<span class="op">=</span>params, headers<span class="op">=</span>headers)</span>
+<span id="cb33-633"><a href="#cb33-633" aria-label="597"></a><span class="bu">print</span>(response.url)  <span class="co"># The full URL that requests actually built</span></span>
+<span id="cb33-634"><a href="#cb33-634" aria-label="598"></a><span class="co"># https://en.wikipedia.org/w/api.php?action=query&amp;format=json&amp;titles=University+of+Colorado+Boulder&amp;prop=info</span></span>
+<span id="cb33-635"><a href="#cb33-635" aria-label="599"></a><span class="bu">print</span>(response.status_code)  <span class="co"># 200</span></span>
+<span id="cb33-636"><a href="#cb33-636" aria-label="600"></a><span class="in">```</span></span>
+<span id="cb33-637"><a href="#cb33-637" aria-label="601"></a></span>
+<span id="cb33-638"><a href="#cb33-638" aria-label="602"></a>How do you know which pattern an API expects? Read its documentation — but the URL itself usually tells you. Values between slashes are path segments: build the URL with an f-string and <span class="in">`quote()`</span> each component. Values after a <span class="in">`?`</span> are query parameters: pass a dictionary via <span class="in">`params=`</span> and let <span class="in">`requests`</span> handle the escaping. REST-style endpoints that return one specific resource (like pageviews for one article) tend to use path segments; APIs with many optional settings (like the Action API's dozens of parameters) tend to use query strings. Mixing them up is a classic source of confusing 404s — query-encoding values that an API expects in its path sends the server a URL it cannot route. You will appreciate this distinction especially in @sec-wikipedia and @sec-government, where article titles and variable names frequently contain characters that require encoding.</span>
+<span id="cb33-639"><a href="#cb33-639" aria-label="603"></a></span>
+<span id="cb33-640"><a href="#cb33-640" aria-label="604"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb33-641"><a href="#cb33-641" aria-label="605"></a></span>
+<span id="cb33-642"><a href="#cb33-642" aria-label="606"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
+<span id="cb33-643"><a href="#cb33-643" aria-label="607"></a></span>
+<span id="cb33-644"><a href="#cb33-644" aria-label="608"></a>You will build a URL diagnostic tool from the protocol layers this chapter covered — DNS, HTTP status codes, headers, and redirects — and use it to profile five real URLs.</span>
+<span id="cb33-645"><a href="#cb33-645" aria-label="609"></a></span>
+<span id="cb33-646"><a href="#cb33-646" aria-label="610"></a>**Step 1 — Take a URL apart.** Use <span class="in">`urlparse()`</span> on three URLs of different shapes — a plain page, a URL with a query string, and one of the API URLs from earlier chapters. For each, print the scheme, netloc, path, and query.</span>
+<span id="cb33-647"><a href="#cb33-647" aria-label="611"></a></span>
+<span id="cb33-650"><a href="#cb33-650" aria-label="612"></a><span class="in">```{python}</span></span>
+<span id="cb33-651"><a href="#cb33-651" aria-label="613"></a><span class="co"># Step 1: urlparse three different URLs and print their components.</span></span>
+<span id="cb33-652"><a href="#cb33-652" aria-label="614"></a><span class="co"># Your code here</span></span>
+<span id="cb33-653"><a href="#cb33-653" aria-label="615"></a><span class="in">```</span></span>
+<span id="cb33-654"><a href="#cb33-654" aria-label="616"></a></span>
+<span id="cb33-655"><a href="#cb33-655" aria-label="617"></a>**Step 2 — Resolve a name.** Use <span class="in">`dns.resolver`</span> to look up the A records for <span class="in">`en.wikipedia.org`</span> and two other domains you choose. Print the IP addresses. Do any share an address?</span>
+<span id="cb33-656"><a href="#cb33-656" aria-label="618"></a></span>
+<span id="cb33-659"><a href="#cb33-659" aria-label="619"></a><span class="in">```{python}</span></span>
+<span id="cb33-660"><a href="#cb33-660" aria-label="620"></a><span class="co"># Step 2: Resolve A records for three domains and print the IPs.</span></span>
+<span id="cb33-661"><a href="#cb33-661" aria-label="621"></a><span class="co"># Your code here</span></span>
+<span id="cb33-662"><a href="#cb33-662" aria-label="622"></a><span class="in">```</span></span>
+<span id="cb33-663"><a href="#cb33-663" aria-label="623"></a></span>
+<span id="cb33-664"><a href="#cb33-664" aria-label="624"></a>**Step 3 — Request with named headers.** Define your <span class="in">`HEADERS`</span> (@sec-ethics) and request one of the three URLs from Step 1. Print the status code and three response headers: <span class="in">`Content-Type`</span>, <span class="in">`Server`</span>, and <span class="in">`Content-Length`</span> (or the length of <span class="in">`response.content`</span> if the header is absent).</span>
+<span id="cb33-665"><a href="#cb33-665" aria-label="625"></a></span>
+<span id="cb33-668"><a href="#cb33-668" aria-label="626"></a><span class="in">```{python}</span></span>
+<span id="cb33-669"><a href="#cb33-669" aria-label="627"></a><span class="co"># Step 3: Make a request with your HEADERS and print the status code and three response headers.</span></span>
+<span id="cb33-670"><a href="#cb33-670" aria-label="628"></a><span class="co"># Your code here</span></span>
+<span id="cb33-671"><a href="#cb33-671" aria-label="629"></a><span class="in">```</span></span>
+<span id="cb33-672"><a href="#cb33-672" aria-label="630"></a></span>
+<span id="cb33-673"><a href="#cb33-673" aria-label="631"></a>**Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function <span class="in">`diagnose_url(url)`</span> that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check <span class="in">`response.history`</span>, and if it redirected, print where it ended up. Include a docstring.</span>
+<span id="cb33-674"><a href="#cb33-674" aria-label="632"></a></span>
+<span id="cb33-677"><a href="#cb33-677" aria-label="633"></a><span class="in">```{python}</span></span>
+<span id="cb33-678"><a href="#cb33-678" aria-label="634"></a><span class="co"># Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring. Use a timeout like `timeout=10` so an unresponsive URL does not stall the entire notebook.</span></span>
+<span id="cb33-679"><a href="#cb33-679" aria-label="635"></a><span class="co"># Your code here</span></span>
+<span id="cb33-680"><a href="#cb33-680" aria-label="636"></a><span class="in">```</span></span>
+<span id="cb33-681"><a href="#cb33-681" aria-label="637"></a></span>
+<span id="cb33-682"><a href="#cb33-682" aria-label="638"></a>**Step 5 — Profile five URLs.** Run <span class="in">`diagnose_url()`</span> on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an <span class="in">`http://`</span> address of a site that upgrades you to <span class="in">`https://`</span>), an API endpoint, and a site known to restrict automated access (@sec-post-api showed you one).</span>
+<span id="cb33-683"><a href="#cb33-683" aria-label="639"></a></span>
+<span id="cb33-684"><a href="#cb33-684" aria-label="640"></a>Record what you actually receive from the fifth site: its behavior can vary with your network, request headers, and the time of the request. Inspect a short excerpt of <span class="in">`response.text`</span> as well as the status and headers. A <span class="in">`200`</span> response or a small HTML body alone does not tell you whether you received the requested content, a page that needs JavaScript, or an access challenge. If the response does not clearly show a refusal, report that you could not confirm a block; you do not need to keep trying sites until one refuses you.</span>
+<span id="cb33-685"><a href="#cb33-685" aria-label="641"></a></span>
+<span id="cb33-688"><a href="#cb33-688" aria-label="642"></a><span class="in">```{python}</span></span>
+<span id="cb33-689"><a href="#cb33-689" aria-label="643"></a><span class="co"># Step 5: Diagnose five URLs -- working, 404, redirect, API, and potentially blocked.</span></span>
+<span id="cb33-690"><a href="#cb33-690" aria-label="644"></a><span class="co"># Your code here</span></span>
+<span id="cb33-691"><a href="#cb33-691" aria-label="645"></a><span class="in">```</span></span>
+<span id="cb33-692"><a href="#cb33-692" aria-label="646"></a></span>
+<span id="cb33-693"><a href="#cb33-693" aria-label="647"></a>**Step 6 — Interpret.** In four to six sentences: What distinguished the API endpoint from the web pages in Content-Type and size? Where did the redirect send you, and why do sites do that? For the fifth site, what evidence supports a refusal, successful access, or an uncertain result? If you observed a refusal, explain what you can infer about the layer involved (@sec-post-api). An HTTP response shows that you reached an HTTP-speaking server, but its status alone does not identify whether the response came from the site's application, a CDN, or a proxy; a connection error or timeout provides no HTTP status to interpret.</span>
+<span id="cb33-694"><a href="#cb33-694" aria-label="648"></a></span>
+<span id="cb33-697"><a href="#cb33-697" aria-label="649"></a><span class="in">```{python}</span></span>
+<span id="cb33-698"><a href="#cb33-698" aria-label="650"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb33-699"><a href="#cb33-699" aria-label="651"></a><span class="in">```</span></span>
+<span id="cb33-700"><a href="#cb33-700" aria-label="652"></a></span>
+<span id="cb33-701"><a href="#cb33-701" aria-label="653"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb33-702"><a href="#cb33-702" aria-label="654"></a></span>
+<span id="cb33-703"><a href="#cb33-703" aria-label="655"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
+<span id="cb33-704"><a href="#cb33-704" aria-label="656"></a></span>
+<span id="cb33-705"><a href="#cb33-705" aria-label="657"></a><span class="ss">1. </span>**Browser developer tools.** Open a Wikipedia article and a commercial news site side by side, each with the Network tab open. Reload both pages and compare: how many requests does each make? What types of resources (HTML, CSS, JS, images, fonts, tracking) does each load? What does this tell you about modern web architecture?</span>
+<span id="cb33-706"><a href="#cb33-706" aria-label="658"></a></span>
+<span id="cb33-707"><a href="#cb33-707" aria-label="659"></a><span class="ss">2. </span>**DNS exploration.** Use <span class="in">`dns.resolver`</span> to look up the IP addresses for five related domains (e.g., <span class="in">`google.com`</span>, <span class="in">`youtube.com`</span>, <span class="in">`gmail.com`</span>, <span class="in">`drive.google.com`</span>, <span class="in">`cloud.google.com`</span>). Are any of them hosted at the same IP address? What does this tell you about Google's infrastructure?</span>
+<span id="cb33-708"><a href="#cb33-708" aria-label="660"></a></span>
+<span id="cb33-709"><a href="#cb33-709" aria-label="661"></a><span class="ss">3. </span>**Wikimedia pageviews.** Using the API pattern from this chapter, retrieve and plot daily pageview data for three related Wikipedia articles over the same time period. Identify any spikes and hypothesize about what real-world events caused them.</span>
+<span id="cb33-710"><a href="#cb33-710" aria-label="662"></a></span>
+<span id="cb33-711"><a href="#cb33-711" aria-label="663"></a><span class="ss">4. </span>**Network tab analysis.** Pick a website you visit frequently. Reload it with the browser's Network tab open and recording. Count and categorize all requests into types: HTML documents, CSS stylesheets, JavaScript files, images, fonts, and tracking/analytics scripts. What fraction of requests serve actual content vs. tracking and advertising? Write a brief analysis of what this reveals about the site's business model.</span>
+<span id="cb33-712"><a href="#cb33-712" aria-label="664"></a></span>
+<span id="cb33-713"><a href="#cb33-713" aria-label="665"></a><span class="ss">5. </span>**Graduate extension (INFO 5617).** Choose a website you might plausibly study in your own research and profile its delivery infrastructure. Use the browser's Network tab to record the time to first byte, the full redirect chain, and evidence of CDN involvement (inspect the <span class="in">`Server`</span>, <span class="in">`Via`</span>, and similar response headers), then run traceroute to the same host from your notebook (<span class="in">`!traceroute`</span>, or <span class="in">`!tracert`</span> on Windows) and geolocate a few of the hops. Write a 500-word memo connecting these protocol-level observations to research-infrastructure concerns: where does "the" site actually live, how stable are measurements of it likely to be across time and vantage points, and what would an automated collection pipeline need to handle — redirects, rate limits, geographically varying responses — to gather data from it reliably?</span>
+<span id="cb33-714"><a href="#cb33-714" aria-label="666"></a></span>
+<span id="cb33-715"><a href="#cb33-715" aria-label="667"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb33-716"><a href="#cb33-716" aria-label="668"></a></span>
+<span id="cb33-717"><a href="#cb33-717" aria-label="669"></a>The protocols described in this chapter were designed as public infrastructure. Vint Cerf and Bob Kahn developed TCP/IP in the 1970s for <span class="co">[</span><span class="ot">DARPA</span><span class="co">](https://www.darpa.mil/about/innovation-timeline/tcp-ip)</span>, creating a transport layer engineered for resilience under attack. Tim Berners-Lee invented HTTP and URLs at <span class="co">[</span><span class="ot">CERN</span><span class="co">](https://home.cern/science/computing/the-birth-of-the-web/)</span> in 1989–1991, and made the deliberate decision to release them into the public domain. The web was born open.</span>
+<span id="cb33-718"><a href="#cb33-718" aria-label="670"></a></span>
+<span id="cb33-719"><a href="#cb33-719" aria-label="671"></a>Browser developer tools embody this original spirit of openness. The ability to "view source" — to inspect exactly what a web server sends your browser — was a foundational feature of the web. It is what makes web data science possible. As you will see in @sec-post-api, the tension between this transparency and platforms' desire to control their data is one of the defining conflicts of the contemporary web.</span>
+<span id="cb33-720"><a href="#cb33-720" aria-label="672"></a></span>
+<span id="cb33-721"><a href="#cb33-721" aria-label="673"></a>This same tension extends past the browser. Packet sniffing and traceroute make the network's actual behavior directly observable — an open, inspectable internet was the original design, not an accident. But the same capability cuts both ways: watching your own traffic is transparency, and watching someone else's without consent is surveillance — the difference is not the tool, but who is doing the observing. User-Agent spoofing sits on the identity side of the same tension. The protocols in this chapter run on an honor system, where a client simply states who it is, and spoofing tests that trust the same way platforms' own obfuscation tests the openness @sec-post-api describes.</span>
+<span id="cb33-722"><a href="#cb33-722" aria-label="674"></a></span>
+<span id="cb33-723"><a href="#cb33-723" aria-label="675"></a>::: {.callout-note}</span>
+<span id="cb33-724"><a href="#cb33-724" aria-label="676"></a><span class="fu">## Public Interest Connection</span></span>
+<span id="cb33-725"><a href="#cb33-725" aria-label="677"></a>The web's protocol stack was designed as public infrastructure — open standards documented in <span class="co">[</span><span class="ot">public RFCs</span><span class="co">](https://www.rfc-editor.org/)</span>, not proprietary products controlled by corporations. HTTP, HTML, DNS, and TCP/IP are all open protocols that anyone can implement. The "view source" capability and network inspection tools you learned in this chapter are features that embody **openness** (@sec-post-api). They exist because the web's architects believed that transparency was a feature, not a vulnerability. As platforms increasingly obfuscate their front-end code and move toward closed APIs, these tools become more important, not less.</span>
+<span id="cb33-726"><a href="#cb33-726" aria-label="678"></a>:::</span>
+<span id="cb33-727"><a href="#cb33-727" aria-label="679"></a></span>
+<span id="cb33-728"><a href="#cb33-728" aria-label="680"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb33-729"><a href="#cb33-729" aria-label="681"></a></span>
+<span id="cb33-730"><a href="#cb33-730" aria-label="682"></a><span class="ss">- </span>**`!ping` or `!traceroute` doesn't stop**: Without <span class="in">`-c`</span>, <span class="in">`ping`</span> on macOS and Linux runs until it is stopped. Press the notebook's ■ (interrupt) button, and add <span class="in">`-c 4`</span>.</span>
+<span id="cb33-731"><a href="#cb33-731" aria-label="683"></a><span class="ss">- </span>**`'traceroute' is not recognized`** (Windows) **or `tracert: command not found`** (macOS, Linux): The two systems name the tool differently. The chapter's cells choose with <span class="in">`platform.system()`</span>. On Linux without <span class="in">`traceroute`</span>, use <span class="in">`tracepath`</span>.</span>
+<span id="cb33-732"><a href="#cb33-732" aria-label="684"></a><span class="ss">- </span>**Every hop is `* * *`**: Many networks, campus Wi-Fi included, block the probes traceroute sends. Try another network, such as a phone hotspot. The path past the silent hops usually exists; it just isn't shown.</span>
+<span id="cb33-733"><a href="#cb33-733" aria-label="685"></a><span class="ss">- </span>**`wget --random-wait` has no visible effect**: It only randomizes a wait time you already set with <span class="in">`--wait`</span>; used alone, with no base wait to randomize, it does nothing.</span>
+<span id="cb33-734"><a href="#cb33-734" aria-label="686"></a><span class="ss">- </span>**403 from Wikimedia API**: You forgot the custom <span class="in">`User-Agent`</span> header.</span>
+<span id="cb33-735"><a href="#cb33-735" aria-label="687"></a><span class="ss">- </span>**DNS results varying by location**: Normal — content delivery networks return different IPs based on your geographic location.</span>
+<span id="cb33-736"><a href="#cb33-736" aria-label="688"></a><span class="ss">- </span>**`dns.resolver` raises `NoNameservers ... answered REFUSED`**: The kernel is querying campus resolvers (CU's are in the <span class="in">`128.138.x.x`</span> range), which only answer recursive queries from on-campus addresses. <span class="in">`dnspython`</span> reads DNS settings once per process, so a kernel started on campus or on VPN keeps them after you get home, even though <span class="in">`scutil --dns`</span> shows your current ones. <span class="in">`requests`</span> and your browser keep working, which makes it look specific to this exercise. Restart the kernel; if that doesn't fix it, build your own resolver with <span class="in">`r = dns.resolver.Resolver()`</span>, set <span class="in">`r.nameservers = ["8.8.8.8", "1.1.1.1"]`</span>, and call <span class="in">`r.resolve(...)`</span> instead of <span class="in">`dns.resolver.resolve(...)`</span>.</span>
+<span id="cb33-737"><a href="#cb33-737" aria-label="689"></a><span class="ss">- </span>**URL encoding issues**: Use <span class="in">`urllib.parse.quote()`</span> for article titles with spaces or special characters.</span>
+<span id="cb33-738"><a href="#cb33-738" aria-label="690"></a></span>
+<span id="cb33-739"><a href="#cb33-739" aria-label="691"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb33-740"><a href="#cb33-740" aria-label="692"></a></span>
+<span id="cb33-741"><a href="#cb33-741" aria-label="693"></a>The web is built on a layered stack of protocols: TCP/IP transports data, DNS resolves names to addresses, HTTP structures the conversation, and URLs identify the target. Traceroute and curl's verbose output make that transport layer directly observable, and the <span class="in">`User-Agent`</span> header — honest or deliberately spoofed — is how a server decides who, or what, it believes is asking. Understanding this stack transforms debugging from guesswork into systematic diagnosis. When a request fails, you can ask: can I reach the server at all? Am I resolving the right address? What status code did I get? Are my headers correct? Is my URL well-formed? This systematic approach carries through every chapter that follows.</span>
+<span id="cb33-742"><a href="#cb33-742" aria-label="694"></a></span>
+<span id="cb33-743"><a href="#cb33-743" aria-label="695"></a><span class="fu">## Further Reading</span></span>
+<span id="cb33-744"><a href="#cb33-744" aria-label="696"></a></span>
+<span id="cb33-745"><a href="#cb33-745" aria-label="697"></a><span class="ss">- </span>Mozilla Developer Network — How the Web Works: <span class="ot">&lt;https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works&gt;</span></span>
+<span id="cb33-746"><a href="#cb33-746" aria-label="698"></a><span class="ss">- </span>Mozilla Developer Network — HTTP Overview: <span class="ot">&lt;https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview&gt;</span></span>
+<span id="cb33-747"><a href="#cb33-747" aria-label="699"></a><span class="ss">- </span>IPython's shell commands, <span class="in">`!`</span> and <span class="in">`var = !command`</span>: <span class="ot">&lt;https://ipython.readthedocs.io/en/stable/interactive/python-ipython-diff.html#shell-assignment&gt;</span></span>
+<span id="cb33-748"><a href="#cb33-748" aria-label="700"></a><span class="ss">- </span>Wireshark, the standard GUI packet analyzer: <span class="ot">&lt;https://www.wireshark.org/&gt;</span></span>
+<span id="cb33-749"><a href="#cb33-749" aria-label="701"></a><span class="ss">- </span><span class="in">`dnspython`</span> documentation: <span class="ot">&lt;https://dnspython.readthedocs.io/&gt;</span></span>
+<span id="cb33-750"><a href="#cb33-750" aria-label="702"></a><span class="ss">- </span>Wikipedia — Internationalized domain name: <span class="ot">&lt;https://en.wikipedia.org/wiki/Internationalized_domain_name&gt;</span></span>
+<span id="cb33-751"><a href="#cb33-751" aria-label="703"></a><span class="ss">- </span>Mozilla Developer Network — HTTP Client Hints: <span class="ot">&lt;https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Client_hints&gt;</span></span>
+<span id="cb33-752"><a href="#cb33-752" aria-label="704"></a><span class="ss">- </span><span class="in">`curl`</span> manual: <span class="ot">&lt;https://curl.se/docs/manpage.html&gt;</span></span>
+<span id="cb33-753"><a href="#cb33-753" aria-label="705"></a><span class="ss">- </span>GNU <span class="in">`wget`</span> manual: <span class="ot">&lt;https://www.gnu.org/software/wget/manual/wget.html&gt;</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
