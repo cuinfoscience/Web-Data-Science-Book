@@ -452,6 +452,9 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 ```
+::: {.callout-important}
+     This cell is the chapter's first use of `matplotlib`, which draws the chart. If you see `ModuleNotFoundError: No module named 'matplotlib'`, install it with `conda install -c conda-forge matplotlib` in a terminal where `webdata` is active, and restart your kernel.
+     :::
 
 The `.get()` method is your most important tool for navigating unfamiliar JSON. Unlike bracket notation (`data["key"]`), which raises a `KeyError` if the key is missing, `.get("key", default)` returns the default value silently. This is especially useful when API responses vary — some records might include optional fields that others omit.
 
@@ -607,6 +610,7 @@ RSS (Really Simple Syndication) deserves special mention as an early experiment 
 - **Parser selection**: Use `"xml"` for XML documents and `"html.parser"` or `"lxml"` for HTML. Using the wrong parser produces unexpected results.
 - **`json.JSONDecodeError`**: The string is not valid JSON. Common causes include trailing commas, single quotes (JSON requires double quotes), or the response containing HTML error pages instead of JSON.
 - **`KeyError` in dictionaries**: The key does not exist. Use `.get("key", default_value)` for safe access.
+- **`ModuleNotFoundError: No module named 'matplotlib'`**: Your environment is missing the plotting library. Install it with `conda install -c conda-forge matplotlib` in a terminal where `webdata` is active, and restart your kernel.
 - **Garbled accented letters, such as `SÃ¡nchez` for `Sánchez`**: `requests` decoded the body with the wrong character set, usually because the server's `Content-Type` header names none; `requests` then falls back to ISO-8859-1. Pass `response.content` to BeautifulSoup so the parser reads the encoding the document declares, or set `response.encoding = "utf-8"` before reading `response.text`.
 - **Confusion between `json.loads()` and `json.load()`**: `loads` parses a **s**tring; `load` parses a **f**ile object.
 
