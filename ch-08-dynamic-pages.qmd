@@ -873,7 +873,7 @@ print(len(links))
 
 ### Keeping the Session
 
-When you log in, the site sets a **session cookie**: a token your browser sends with every request after that, so the site knows it's you without asking for your password again. Selenium starts each browser with a new, empty profile, the folder where a browser keeps its cookies and settings, so the cookie is gone after `driver.quit()`. To keep it, give Chrome a profile folder of its own:
+When you log in, the site sets a **session cookie**: a token your browser sends with every request after that, so the site knows it's you without asking for your password again. Selenium starts each browser with a new, empty profile, the folder where a browser keeps its cookies and settings, so the cookie is gone after `driver.quit()`. To try to keep it, give Chrome a profile folder of its own:
 
 ```{python}
 from pathlib import Path
@@ -906,9 +906,59 @@ print(len(driver.find_elements(By.LINK_TEXT, "(Goodreads page)")))
 driver.quit()
 ```
 
-On the practice site, in October 2026, the session survived the restart. A real site decides how long its sessions last and can end one whenever it likes, so check at the start of every run, by counting something that only a logged-in visitor sees, before you collect anything. Only one browser at a time can use a profile folder, so quit one driver before you start the next.
+On the practice site, the session survived the restart in the author's test in October 2026. It did not on macOS with Chrome 154.0.8037.98 and Selenium 4.50.0, where the headless run printed 0 even though the login had worked. The likely reason is the kind of cookie the site sets. This site's cookie is named `session` and has no expiry date, which makes it a *session cookie*. Chrome treats those as temporary, so a profile folder may not keep it. A real site also decides how long its sessions last and can end one whenever it likes, so check at the start of every run, by counting something that only a logged-in visitor sees, before you collect anything. Only one browser at a time can use a profile folder, so quit one driver before you start the next.
 
-The profile folder now holds what the cookie holds: a way into your account that needs no password and no two-factor code. Treat it like your password. "Passwords and Other Credentials", below, says how.
+If your session doesn't survive, save the cookie to a file yourself. This cell logs in by hand as before, prints each cookie's expiry so you can see which kind you have, and writes the cookies to a file outside your project folder:
+
+```{python}
+import json
+from pathlib import Path
+
+from selenium import webdriver
+
+cookie_file = Path.home() / "selenium-profiles" / "quotes-cookies.json"
+cookie_file.parent.mkdir(exist_ok=True)
+
+driver = webdriver.Chrome()
+driver.get("https://quotes.toscrape.com/login")
+input("Log in in the Chrome window, then press Enter here")
+
+driver.get("https://quotes.toscrape.com/")
+for c in driver.get_cookies():
+    print(c["name"], "expiry:", c.get("expiry", "none"))
+# session expiry: none
+
+cookie_file.write_text(json.dumps(driver.get_cookies()))
+driver.quit()
+```
+
+Then load the cookie in a headless run. Visit the site first, because Selenium only accepts cookies for the page you are on:
+
+```{python}
+import json
+from pathlib import Path
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+
+cookie_file = Path.home() / "selenium-profiles" / "quotes-cookies.json"
+
+options = Options()
+options.add_argument("--headless=new")
+
+driver = webdriver.Chrome(options=options)
+driver.get("https://quotes.toscrape.com/")
+for c in json.loads(cookie_file.read_text()):
+    driver.add_cookie(c)
+
+driver.get("https://quotes.toscrape.com/")  # reload so the site sees the cookie
+print(len(driver.find_elements(By.LINK_TEXT, "(Goodreads page)")))
+# 10
+driver.quit()
+```
+
+The profile folder, or the cookie file, now holds what the cookie holds: a way into your account that needs no password and no two-factor code. Treat it like your password. "Passwords and Other Credentials", below, says how.
 
 ### What Changes When You Log In
 
@@ -921,7 +971,7 @@ The technical difference between this scraper and a logged-out one is a cookie. 
 
 ### Passwords and Other Credentials
 
-A **credential** is anything that proves to a site that you are you: a password; an API key or token, like those in @sec-government and @sec-social; and a session cookie, which a profile folder keeps. Whoever has one can act as you until it expires or you change it. Scraping projects leak credentials in a few predictable ways:
+A **credential** is anything that proves to a site that you are you: a password; an API key or token, like those in @sec-government and @sec-social; and a session cookie, which a profile folder or a saved cookie file keeps. Whoever has one can act as you until it expires or you change it. Scraping projects leak credentials in a few predictable ways:
 
 | Don't | Because |
 |---|---|
@@ -1262,6 +1312,7 @@ When platforms close their APIs and render content exclusively through JavaScrip
   `Failed to create a ProcessSingleton for your profile directory` means that another Chrome is still using the profile folder you passed with `--user-data-dir`, such as one that an earlier cell started and never quit: call `driver.quit()` on it, then start the new one. `No usable sandbox!` means that Chrome can't start its sandbox; on Ubuntu, see "When Selenium Manager Fails" above.
 - **A headless run finds fewer elements than a run with a window**: Save a screenshot with `driver.save_screenshot("check.png")` and look at it. Set `--window-size`; if the page itself is different, the site may be treating headless browsers differently ("Headless Mode").
 - **A logged-in run suddenly finds nothing**: The session ended, and the site is showing you its logged-out pages. Check for something only logged-in visitors see before you collect, and log in by hand again.
+- **A logged-in headless run finds nothing, though you logged in by hand**: The login cookie may be a session cookie, which has no expiry date and which Chrome can drop when it closes, even with a profile folder. Print `driver.get_cookies()` and look for `expiry`; if it is missing, save the cookies to a file and load them back, as shown in "Keeping the Session."
 - **Memory issues**: Each Selenium driver runs a full browser process. Close drivers promptly with `driver.quit()`.
 - **Playwright: `It looks like you are using Playwright Sync API inside the asyncio loop`**: You ran a sync script in a notebook. Run it from the terminal instead, or switch to the async API.
 - **Playwright: `Executable doesn't exist at ...`**: Playwright's browsers are missing, usually right after you install or upgrade the library. Run `python -m playwright install chromium`. The box under the error says to run `playwright install`; in `webdata` that shorter command can run the wrong program (see "Installing Playwright").
