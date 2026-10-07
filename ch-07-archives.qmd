@@ -470,8 +470,9 @@ os.makedirs("wayback_cache", exist_ok=True)
 
 def get_wayback_content_cached(url, date, headers=None):
     """Fetch a snapshot, reading from and writing to a local cache."""
-    # Key the cache file by the snapshot's target date
-    cache_path = f"wayback_cache/{date.strftime('%Y%m%d')}.json"
+    # Key the cache file by the page and the snapshot's target date, so two sites never share a file
+    safe_name = url.replace("/", "_")
+    cache_path = f"wayback_cache/{safe_name}_{date.strftime('%Y%m%d')}.json"
 
     if os.path.exists(cache_path):  # Already fetched — skip the network
         with open(cache_path, "r") as f:
