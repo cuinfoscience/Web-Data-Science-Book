@@ -1183,7 +1183,7 @@ You will measure the difference between what a static request sees and what a br
 # Your code here
 ```
 
-**Step 3 — Wait, then measure again.** Use `WebDriverWait` to wait for your target element to be present — the chapter shows the pattern — then record the length of `driver.page_source` and count the same target element, this time parsing `driver.page_source` with BeautifulSoup.
+**Step 3 — Wait, then measure again.** Use `WebDriverWait` to wait for your target element to be present — the chapter shows the pattern — then record the length of `driver.page_source` and count the same target element, this time parsing `driver.page_source` with BeautifulSoup. Expect the two lengths to be measuring slightly different things: `page_source` is the browser's own re-serialization of the page after parsing, not the bytes the server sent, so it drops the `<!DOCTYPE>` line and normalizes whitespace. On a page that was already fully formed, that can make the browser's number come out *smaller* than `len(response.text)` even though nothing is missing. A negative difference is a result worth reporting in Step 6, not a sign you measured wrong.
 
 ```{python}
 # Step 3: Wait for the content to load, then measure page_source length and re-count the same element.
