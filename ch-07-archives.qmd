@@ -541,8 +541,12 @@ corpus = [dictionary.doc2bow(doc) for doc in documents]
 index = similarities.SparseMatrixSimilarity(corpus, num_features=len(dictionary))
 sims = index[corpus[0]]
 print(f"Similarity between versions: {sims[1]:.3f}")
-# 1.0 = identical, 0.0 = completely different
+# 1.0 = same relative word frequencies, 0.0 = no shared tokens
 ```
+
+This is *cosine similarity* between word-frequency vectors. For two nonempty token lists, a score of 1 means the words occur in the same proportions, even if their order or the document's length differs. A score of 0 means the lists share no tokens after preprocessing; it does not show that the pages have unrelated meanings.
+
+Before interpreting the score, check the printed token counts and read the extracted text alongside the cached HTML. An image-based entrance page might contribute only "click," so its comparison with a page of prose tells you little about the site's content. If either token list is empty, cosine similarity is undefined: report insufficient text instead of interpreting a score. Text extraction also misses words in images and content loaded only by JavaScript.
 
 ### Visualizing Document Change Over Time
 
@@ -569,7 +573,7 @@ for i in range(1, len(corpus)):
 plt.figure(figsize=(12, 4))
 plt.plot(range(len(change_scores)), change_scores, marker="o")
 plt.xlabel("Version Transition")
-plt.ylabel("Change Score (0 = identical, 1 = completely different)")
+plt.ylabel("Change Score (0 = same word proportions, 1 = no shared tokens)")
 plt.title("Document Change Over Time")
 plt.tight_layout()
 plt.show()
