@@ -541,9 +541,11 @@ response = requests.get(url, headers=headers)
 
 print(response.status_code, len(response.text))
 # 202 0
+print(response.headers.get("x-amzn-waf-action"))
+# challenge
 ```
 
-Status code 202 means the request was accepted, and the body that came back is zero characters long — not a truncated cast list, not a missing infobox, nothing at all for BeautifulSoup to parse. Open the same URL in an actual browser and the page is there in full: title, cast, ratings, everything. The difference is what runs between the request and the pixels on your screen. IMDb builds this page with JavaScript that executes after the initial HTML arrives, and `requests` never runs JavaScript — it only ever sees whatever the server sent in that first response, which here is next to nothing.
+Status code 202 means the request was accepted, and the body that came back is zero characters long — not a truncated cast list, not a missing infobox, nothing at all for BeautifulSoup to parse. Open the same URL in an actual browser and the page is there in full: title, cast, ratings, everything. The difference is not how the page is built: choose View Page Source rather than Inspect, and the cast and ratings are already in the HTML the server sends a browser. The response headers explain it instead. IMDb's bot protection has answered with `x-amzn-waf-action: challenge`, asking your client to run a JavaScript challenge before it gets the page, and `requests` never runs JavaScript — it only ever sees whatever the server sent in that first response, which here is nothing.
 
 None of the eight strategies in this chapter close this gap, because none of them touch JavaScript execution; every one of them only ever operates on HTML that already exists in the response body. The tell is a response that comes back too fast, too short, or too empty relative to what the browser shows, and the fix is not a different BeautifulSoup pattern but a different tool: @sec-dynamic-pages covers Selenium and other approaches that drive an actual browser, wait for JavaScript to run, and hand you the HTML the human sees instead of the HTML the server first sent.
 
@@ -690,7 +692,7 @@ The Colorado General Assembly website ([leg.colorado.gov](https://leg.colorado.g
 - **Multiple tables on a page**: `read_html` and `find_all("table")` return all tables, including navigation elements. Inspect each to find the one with your data.
 - **Character encoding**: Watch for `\xa0` (non-breaking spaces) and other Unicode characters in names and text. Use `.strip()` and `.replace('\xa0', ' ')`.
 - **Elements that look unique but are not**: Always verify your `find_all` count against the expected number of results before building your parser.
-- **Dynamic content**: If `requests` + BeautifulSoup returns a nearly-empty page — or, as in Strategy 8, no page at all — the content is loaded by JavaScript after the initial response. See "Strategy 8: When 'Static' Isn't" above and @sec-dynamic-pages for Selenium-based solutions.
+- **Empty or near-empty responses**: If `requests` + BeautifulSoup returns a nearly-empty page, the content may be loaded by JavaScript after the initial response (see @sec-dynamic-pages). If it returns no page at all, as in Strategy 8, check the headers for a bot-protection challenge before assuming JavaScript rendering. See "Strategy 8: When 'Static' Isn't" above.
 
 ## Key Takeaways
 
