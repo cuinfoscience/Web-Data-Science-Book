@@ -151,7 +151,7 @@ print(api_quotes.shape)
 The JSON arrives already structured, with no HTML to parse. Nobody promised to keep an undocumented endpoint like this one stable, though, so save what you collect as you go, as @sec-archives recommends.
 
 A hidden API isn't always this easy to call. Its Request URL may carry a value that changes on every visit, such as a token or signature that the page's JavaScript computes, so an address you copy stops working. It may answer your `requests` call with `401` or `403` while the page gets `200`, because the page sends cookies or headers that you don't: compare the two with **Copy** → **Copy as cURL** (@sec-protocols). And some pages request no data at all, or request it only after clicks, typing, or scrolling that you would have to perform.
-
+**Privacy note.** A copied URL or cURL command can contain cookies, authorization tokens, or account information. Remove sensitive values before sharing one, and avoid sharing requests from sites where you are logged into.
 ## Setting Up Selenium
 
 When all three checks come up empty, as on those pages, you need a browser that runs the page's code for you. The rest of this chapter drives one in two ways: with Selenium in the notebook, and then with Playwright as a script, which can also catch a hidden API's replies as the page receives them ("Catching the JSON Behind a Page"). The Selenium examples start on simple pages like xkcd that do not strictly need a browser, because simple pages make the tool's basics easy to see.
