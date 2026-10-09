@@ -437,7 +437,7 @@ No verdicts are given for any of these. Some answer with data, some with a reque
 # Your code here
 ```
 
-**Step 2 — Probe the anchor by hand.** Request the OpenAlex endpoint with a 20-second timeout. Print the status code, the `content-type` header, and every response header whose name starts with `X-RateLimit`. Do not build the loop yet — make one request and look at it. In a comment, say what those headers tell you about the terms of access, and whether you received data or a budget.
+**Step 2 — Probe the anchor by hand using the the requests.get() pattern we leaned in this chapter.** Request the OpenAlex endpoint with a 20-second timeout. Print the status code, the `content-type` header, and every response header whose name starts with `X-RateLimit`. Do not build the loop yet — make one request and look at it. In a comment, say what those headers tell you about the terms of access, and whether you received data or a budget.
 
 ```{python}
 # Step 2: Request the OpenAlex endpoint; print status, content-type, and every X-RateLimit header.
