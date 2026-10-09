@@ -291,6 +291,8 @@ print(f"Date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
 
 Two of these parameters do server-side filtering that saves you cleanup work later. The `filter=statuscode:200` parameter returns only successful captures, so failed requests and redirects never reach your DataFrame. The `collapse=digest` parameter drops consecutive captures whose content hash is identical — the Archive often captures a page daily even when nothing changed, and collapsing on digest keeps one capture per distinct version. While developing, it is also worth adding `"limit": 100` to cap the response at a manageable size until your code works.
 
+**URL variants can affect archival results.** When querying the Wayback Machine, use a consistent URL format throughout your analysis. Variations such as `http://` versus `https://`, `www` versus a bare domain, or a trailing slash can produce different archival results. If a page appears to have unexpectedly few captures, try checking common URL variants before concluding that the page has little archival coverage.
+
 You can visualize how frequently the page was captured and how its size changed over time:
 
 ```{python}
