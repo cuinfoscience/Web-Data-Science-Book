@@ -470,7 +470,7 @@ div.csl-indent {
 <section id="this-chapters-files" class="level3" data-number="9.1.1">
 <h3 data-number="9.1.1" class="anchored" data-anchor-id="this-chapters-files"><span class="header-section-number">9.1.1</span> This Chapter’s Files</h3>
 <p>The chapter’s code reads copies of the city’s PDFs that the book keeps on GitHub, so that a class of readers doesn’t send hundreds of requests to the city’s server at once. “Getting the Files,” below, shows where the copies came from and how to download from the portal yourself. Each file downloads once, the first time you ask for it:</p>
-<div id="e49729be" class="cell" data-execution_count="1">
+<div id="e509b4c5" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
@@ -517,7 +517,7 @@ div.csl-indent {
 </ul>
 <p>What most PDFs don’t store is any of the structure you see: words, lines of text, paragraphs, columns, tables, or the order in which to read them. The gap between two words may be a space character, or just a wider gap between two characters. Everything else is inferred from position.</p>
 <p>You can see this with pdfplumber, which lists every object on a page with its coordinates. Positions are in <em>points</em>, 1/72 of an inch, measured from the page’s left edge (<code>x0</code>) and its top (<code>top</code>):</p>
-<div id="ae5f8f84" class="cell" data-execution_count="2">
+<div id="ab32ef4e" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> pdfplumber</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="cf">with</span> pdfplumber.<span class="bu">open</span>(report_2024) <span class="im">as</span> pdf:</span>
@@ -548,7 +548,7 @@ Figure&nbsp;9.1: The summary table on page 2 of the December 2024 report, drawn 
 </figure>
 </div>
 <p><strong>Metadata.</strong> A PDF also stores facts about itself: a title, an author, the program that made it, and dates. pypdf reads them:</p>
-<div id="de3ab2e9" class="cell" data-execution_count="3">
+<div id="c088b548" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">from</span> pypdf <span class="im">import</span> PdfReader</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a>reader <span class="op">=</span> PdfReader(report_2024)</span>
@@ -558,7 +558,7 @@ Figure&nbsp;9.1: The summary table on page 2 of the December 2024 report, drawn 
 </div>
 <p>The title and the creator look right. The subject, March 2018, in a report on December 2024, came from the Word template the report started from: five of the city’s seven year-end reports carry it. Metadata says what the software wrote, not what is true, so don’t date a document by it. The creator is worth reading, though, because it tells you how the file was made, which is what the next section is about.</p>
 <p><strong>Tagged PDFs.</strong> Some PDFs carry a second layer for assistive technology: a <em>structure tree</em> that marks headings, paragraphs, tables, and figures, sets the reading order, and holds <em>alternative text</em>, which a screen reader speaks in place of an image. PDF/UA (ISO 14289-1) is the standard for doing this well. Six of the seven year-end reports are tagged. In the December 2024 report, the picture of the monthly table has alternative text, and it reads the note again: “This table presents historical taxes by type. Please contact sales tax staff … for a screen readable version.” In December 2021, the three pictures of tables say what Word writes when nobody writes anything: “Table. Description automatically generated.” Tagging can make a PDF accessible, but only when someone fills it in.</p>
-<div id="a0dff77c" class="cell" data-execution_count="4">
+<div id="fca8fc79" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="bu">print</span>(<span class="st">"tagged:"</span>, <span class="st">"/StructTreeRoot"</span> <span class="kw">in</span> reader.trailer[<span class="st">"/Root"</span>])</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="co"># tagged: True</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -574,7 +574,7 @@ Figure&nbsp;9.1: The summary table on page 2 of the December 2024 report, drawn 
 <div class="callout-body-container callout-body">
 <p>PDF grew out of a printer language. In 1984 Adobe released PostScript, a programming language for describing pages: a laser printer ran a PostScript program, and the program drew the page. Around 1990, John Warnock, one of Adobe’s founders, wrote a six-page paper called “The Camelot Project” (<a href="https://blog.adobe.com/en/publish/2018/06/14/evolution-digital-document-celebrating-adobe-acrobats-25th-anniversary">Adobe’s account</a>). If every computer could display and print the same page description, he argued, people could send each other documents that looked the same everywhere. Adobe released Acrobat and version 1.0 of the Portable Document Format on June 15, 1993. PDF kept PostScript’s way of drawing a page, with fonts, coordinates, lines, and images, and dropped the programming: a PDF page is a fixed list of instructions rather than a program to run. From 1994 Adobe gave Acrobat Reader away, and it published the specification, so anyone could write software that reads or writes PDFs. That is why this chapter’s files come from so many makers: Word’s PDFMaker, Acrobat Distiller, a Canon scanner, and, for the minutes of 2000, the records portal itself.</p>
 <p>The file is a set of numbered <em>objects</em>: dictionaries, arrays, numbers, and strings, plus <em>streams</em> of compressed bytes, such as fonts, images, and each page’s drawing instructions. A <em>cross-reference table</em> records where each object starts, so a viewer can jump to page 15 without reading pages 1 to 14; since PDF 1.5 (2003) the table can itself be a compressed stream, as it is in this report. A viewer starts at the end of the file, whose last lines say where that table is (<a href="https://pypdf.readthedocs.io/en/latest/dev/pdf-format.html">pypdf’s guide to the format</a> walks through the parts). Each page object points to the fonts, images, and content stream it uses. Here are the December 2024 report’s first bytes, and the instructions that draw its running title on page 2:</p>
-<div id="ff8c51e7" class="cell" data-execution_count="5">
+<div id="806e8168" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a>raw <span class="op">=</span> report_2024.read_bytes()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a><span class="bu">print</span>(raw[:<span class="dv">8</span>])                                   <span class="co"># the header: the format and its version</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="bu">print</span>(raw[raw.find(<span class="st">b"&lt;&lt;"</span>):raw.find(<span class="st">b"&gt;&gt;"</span>) <span class="op">+</span> <span class="dv">2</span>])  <span class="co"># the first object: how the file is arranged</span></span>
@@ -613,7 +613,7 @@ Figure&nbsp;9.1: The summary table on page 2 of the December 2024 report, drawn 
 <p>Files mix them. Boulder’s revenue reports are born-digital, but their charts, and in some years their tables, are pictures.</p>
 <p><strong>Check 1: try to select the text.</strong> Open the PDF in a viewer and drag across a line. If the text highlights word by word, the page has characters. If nothing highlights, or the whole page highlights as one block, it’s an image.</p>
 <p><strong>Check 2: count characters and images on every page.</strong> This is check 1 done in code, for every page at once:</p>
-<div id="25764e0b" class="cell" data-execution_count="6">
+<div id="b4dfbb47" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="kw">def</span> page_profile(path):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>    <span class="co">"""Characters of extracted text, and number of images, on each page of a PDF."""</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>    reader <span class="op">=</span> PdfReader(path)</span>
@@ -652,7 +652,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 </figure>
 </div>
 <p><strong>Check 3: find out where the text came from.</strong> The minutes’ metadata names the machine that made them, and their text shows how well its OCR worked:</p>
-<div id="b5cd0d59" class="cell" data-execution_count="7">
+<div id="50bcce52" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a>minutes <span class="op">=</span> PdfReader(get_saved_copy(<span class="st">"council-minutes-2018-12-04.pdf"</span>))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="bu">print</span>(minutes.metadata.creator, <span class="st">"|"</span>, minutes.metadata.creation_date)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="cf">for</span> line <span class="kw">in</span> minutes.pages[<span class="dv">0</span>].extract_text().splitlines()[:<span class="dv">3</span>]:</span>
@@ -719,7 +719,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 </div>
 </div>
 <p>These two cells are the chapter’s only requests to the city’s server. Run them at home, not all at once in class: on October 6, 2026, the server stopped answering after 13 to 17 requests in a row, whether they came 30 or 60 seconds apart, and answered again after a five-minute pause. The first cell asks for the Revenue Reports folder’s list, as the folder page does:</p>
-<div id="c93d920b" class="cell" data-execution_count="8">
+<div id="db2792b7" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a>bundle <span class="op">=</span> get_saved_copy(<span class="st">"boulder-ca-bundle.pem"</span>)</span>
@@ -746,7 +746,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 <span id="cb8-24"><a href="#cb8-24" aria-label="24"></a><span class="co"># 194400 Revenue Report 2020 (16 pages)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Each document’s <code>entryId</code> is the number the portal’s download address needs. The second cell downloads the December 2024 report, which sits in the 2024 folder:</p>
-<div id="fca0efb4" class="cell" data-execution_count="9">
+<div id="c6220df7" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="im">import</span> hashlib</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>time.sleep(<span class="dv">30</span>)  <span class="co"># wait between requests to the city's server</span></span>
@@ -767,7 +767,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 <section id="text-with-pypdf" class="level2" data-number="9.5">
 <h2 data-number="9.5" class="anchored" data-anchor-id="text-with-pypdf"><span class="header-section-number">9.5</span> Text with pypdf</h2>
 <p>pypdf reads a PDF’s objects and runs each page’s drawing instructions from first to last, writing out characters in the order they are drawn. It is written in Python alone, so it installs anywhere, and it is the first tool to try on a page with a text layer. The minutes of December 5, 2024 were written in Word and saved as PDF, and every page has characters:</p>
-<div id="4e106b95" class="cell" data-execution_count="10">
+<div id="deac3d37" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># pypdf is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge pypdf</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="im">from</span> pypdf <span class="im">import</span> PdfReader</span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a></span>
@@ -790,7 +790,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 <span id="cb10-20"><a href="#cb10-20" aria-label="20"></a><span class="co"># Speer, Wallach, Winer</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Every word is there, and several are broken. “CITY” is split across two lines; “Call,” “Mayor,” and “Council” each leave their first letter on the line above; and the page number, which pypdf prints first because the page draws it first, reads “P age 1”. The page shows none of this. Its drawing instructions show where the breaks come from:</p>
-<div id="501b663f" class="cell" data-execution_count="11">
+<div id="18c6ceb7" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># The drawing instructions around the "M" of "Mayor"</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>stream <span class="op">=</span> minutes_2024.pages[<span class="dv">0</span>].get_contents().get_data().decode(<span class="st">"latin-1"</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>instructions <span class="op">=</span> stream.splitlines()</span>
@@ -804,7 +804,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 </div>
 <p>These are the operators from the aside on where PDF came from. The first <code>Tm</code> sets a 12-point size and puts the “M” 99.12 points from the left edge and 448.08 up from the bottom. The next <code>Tm</code> jumps to the start of a line higher up the page, and the <code>Td</code> after it moves 3.88 across and 1.14 down, in multiples of the 12-point size. That lands at 109.68 and 448.08, just right of the “M”. pypdf starts a new line of text whenever the position moves to another line, so the detour breaks the word, although “ayor” ends up beside the “M” on the page. Word drew the first letter of many paragraphs this way.</p>
 <p>pypdf’s second mode, <code>extraction_mode="layout"</code>, places each piece of text by its position, as on the page:</p>
-<div id="a35b81a3" class="cell" data-execution_count="12">
+<div id="326e3e9e" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a>layout <span class="op">=</span> minutes_2024.pages[<span class="dv">0</span>].extract_text(extraction_mode<span class="op">=</span><span class="st">"layout"</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="cf">for</span> line <span class="kw">in</span> layout.splitlines()[:<span class="dv">18</span>]:</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>    <span class="cf">if</span> line.strip():</span>
@@ -825,7 +825,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 <section id="cleanup-strategies" class="level3" data-number="9.5.1">
 <h3 data-number="9.5.1" class="anchored" data-anchor-id="cleanup-strategies"><span class="header-section-number">9.5.1</span> Cleanup Strategies</h3>
 <p>You can repair some of the damage with regular expressions, as long as you match what the extraction produced rather than what the page shows. A pattern for “Page 1” would miss pypdf’s “P age 1”:</p>
-<div id="789c95be" class="cell" data-execution_count="13">
+<div id="6c642fc8" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="im">import</span> re</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a><span class="kw">def</span> clean_page_text(raw_text):</span>
@@ -872,7 +872,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 <section id="regular-expressions-for-pdf-text" class="level3" data-number="9.5.2">
 <h3 data-number="9.5.2" class="anchored" data-anchor-id="regular-expressions-for-pdf-text"><span class="header-section-number">9.5.2</span> Regular Expressions for PDF Text</h3>
 <p>Regular expressions are your main tool for imposing structure on the text that comes out of a PDF. Where structured data formats give you fields and columns, PDF text gives you lines of characters, and a pattern carves out the pieces you need. Here are five, run on all eight pages of the December 5 minutes:</p>
-<div id="0c26b513" class="cell" data-execution_count="14">
+<div id="e724d65f" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a>full_text <span class="op">=</span> clean_page_text(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(page.extract_text() <span class="cf">for</span> page <span class="kw">in</span> minutes_2024.pages))</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a><span class="co"># 1. Dates written out, as the minutes write most of them ("December 5, 2024")</span></span>
@@ -916,7 +916,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 <section id="words-lines-and-tables-with-pdfplumber" class="level2" data-number="9.6">
 <h2 data-number="9.6" class="anchored" data-anchor-id="words-lines-and-tables-with-pdfplumber"><span class="header-section-number">9.6</span> Words, Lines, and Tables with pdfplumber</h2>
 <p>pdfplumber, which is built on the pdfminer.six library, starts from where each character ends up rather than the order in which it was drawn. It groups characters into words when the gap between them is under 3 points (its <code>x_tolerance</code>), and words into lines when their tops line up (<code>y_tolerance</code>). On the same page of the December 5 minutes:</p>
-<div id="1fe6c56f" class="cell" data-execution_count="15">
+<div id="40dcc1a5" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># pdfplumber is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge pdfplumber</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="cf">with</span> pdfplumber.<span class="bu">open</span>(get_saved_copy(<span class="st">"council-minutes-2024-12-05.pdf"</span>)) <span class="im">as</span> pdf:</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a>    <span class="cf">for</span> line <span class="kw">in</span> pdf.pages[<span class="dv">0</span>].extract_text().splitlines()[:<span class="dv">11</span>]:</span>
@@ -938,7 +938,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 <section id="finding-tables" class="level3" data-number="9.6.1">
 <h3 data-number="9.6.1" class="anchored" data-anchor-id="finding-tables"><span class="header-section-number">9.6.1</span> Finding Tables</h3>
 <p>A table in a PDF is characters that line up, usually with rules or shaded boxes around them, and pdfplumber’s table finder rebuilds the grid. By default it uses the <em>lines</em> strategy: it collects the page’s rules and the sides of its rectangles, joins those that nearly touch, and makes a cell wherever horizontal and vertical rules close a box. The <em>text</em> strategy infers columns from words that line up instead. Start with the summary page of the December 2024 report:</p>
-<div id="01fe61ef" class="cell" data-execution_count="16">
+<div id="2fb17ef1" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a>report <span class="op">=</span> pdfplumber.<span class="bu">open</span>(report_2024)  <span class="co"># closed at the end of this section, once the table is out</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>summary_page <span class="op">=</span> report.pages[<span class="dv">1</span>]</span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a>tables <span class="op">=</span> summary_page.find_tables()</span>
@@ -950,7 +950,7 @@ Figure&nbsp;9.2: Exhibit 3, sales and use tax by month, in the 2018 report (top)
 <span id="cb16-9"><a href="#cb16-9" aria-label="9"></a><span class="co"># [459, 470, 505, 495] 2 rows</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Each <code>bbox</code> is a table’s left, top, right, and bottom edge, in points. The page has two tables, and pdfplumber finds four: the second and fourth are fragments, small boxes inside the shaded headers of the real ones. Look closer at the first:</p>
-<div id="715483a6" class="cell" data-execution_count="17">
+<div id="b98978ae" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a>default_rows <span class="op">=</span> tables[<span class="dv">0</span>].extract()</span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="bu">print</span>(default_rows[<span class="op">-</span><span class="dv">1</span>][:<span class="dv">6</span>])</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a>total_row <span class="op">=</span> summary_page.search(<span class="st">"Total Sales and Use Tax"</span>)[<span class="dv">0</span>]</span>
@@ -970,7 +970,7 @@ Figure&nbsp;9.3: pdfplumber’s table finder on the December 2024 summary table.
 </figure>
 </div>
 <p>The fix is to tell pdfplumber where the columns are. The table it found already has them: the left and right edges of its cells. Pass those as <code>explicit_vertical_lines</code>, keep the page’s own horizontal rules, and crop the page just below the totals row, so that the footnote under the table stays out:</p>
-<div id="0b810d0e" class="cell" data-execution_count="18">
+<div id="5ebecf7c" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a>first <span class="op">=</span> tables[<span class="dv">0</span>]</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a>edges <span class="op">=</span> <span class="bu">sorted</span>({<span class="bu">round</span>(cell[<span class="dv">0</span>], <span class="dv">2</span>) <span class="cf">for</span> cell <span class="kw">in</span> first.cells} <span class="op">|</span> {<span class="bu">round</span>(cell[<span class="dv">2</span>], <span class="dv">2</span>) <span class="cf">for</span> cell <span class="kw">in</span> first.cells})</span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a>settings <span class="op">=</span> {<span class="st">"vertical_strategy"</span>: <span class="st">"explicit"</span>, <span class="st">"explicit_vertical_lines"</span>: edges, <span class="st">"horizontal_strategy"</span>: <span class="st">"lines"</span>}</span>
@@ -982,7 +982,7 @@ Figure&nbsp;9.3: pdfplumber’s table finder on the December 2024 summary table.
 <span id="cb18-9"><a href="#cb18-9" aria-label="9"></a><span class="co"># ['', 'Total Sales and Use Tax', '', '$175,517,129', '$173,908,431', '-$1,608,698']</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The header still comes out in pieces. It is three rows deep, with merged cells that come back as <code>None</code>, and the new column lines cut “December YTD” into “D” and “ecember YTD”. Name the columns yourself, and keep only the rows that have figures:</p>
-<div id="4bee3a24" class="cell" data-execution_count="19">
+<div id="9634d575" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a><span class="kw">def</span> summary_frame(rows, columns):</span>
@@ -1024,7 +1024,7 @@ Figure&nbsp;9.3: pdfplumber’s table finder on the December 2024 summary table.
 <span id="cb19-39"><a href="#cb19-39" aria-label="39"></a><span class="co">#                                  Total Sales and Use Tax 173908431</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>A table without rules needs the other strategy. Exhibit 3 in the 2018 report, the monthly table that later became a picture, has no rules at all:</p>
-<div id="16118332" class="cell" data-execution_count="20">
+<div id="96014c86" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="cf">with</span> pdfplumber.<span class="bu">open</span>(get_saved_copy(<span class="st">"revenue-report-2018.pdf"</span>)) <span class="im">as</span> pdf:</span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a>    exhibit_3_2018 <span class="op">=</span> pdf.pages[<span class="dv">14</span>]</span>
 <span id="cb20-3"><a href="#cb20-3" aria-label="3"></a>    <span class="bu">print</span>(<span class="bu">len</span>(exhibit_3_2018.find_tables()), <span class="st">"tables with the lines strategy"</span>)</span>
@@ -1041,7 +1041,7 @@ Figure&nbsp;9.3: pdfplumber’s table finder on the December 2024 summary table.
 <section id="when-there-is-no-text-layer-ocr" class="level2" data-number="9.7">
 <h2 data-number="9.7" class="anchored" data-anchor-id="when-there-is-no-text-layer-ocr"><span class="header-section-number">9.7</span> When There Is No Text Layer: OCR</h2>
 <p><em>Optical character recognition</em> (OCR) turns a picture of text into characters. An OCR engine finds the parts of a page that hold text, splits them into lines and words, and recognizes each character from its shape, using a model of the language to settle close calls. It works best on sharp, straight, high-contrast images of at least 300 dots per inch. <a href="https://github.com/tesseract-ocr/tesseract">Tesseract</a>, an engine that Hewlett-Packard built between 1985 and 1994, partly in Greeley, Colorado, and that Google developed from 2006, is the standard open-source choice. <code>pytesseract</code> runs Tesseract from Python, and OCRmyPDF uses it to add a text layer to a whole PDF. Both are in <code>webdata</code>, and conda-forge’s <code>ocrmypdf</code> brings Tesseract with it:</p>
-<div id="4dc123ea" class="cell" data-execution_count="21">
+<div id="a5efc04a" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># ocrmypdf and pytesseract are in webdata (chapter 1); an older environment adds them with: conda install -c conda-forge ocrmypdf pytesseract</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="im">import</span> pytesseract</span>
 <span id="cb21-3"><a href="#cb21-3" aria-label="3"></a></span>
@@ -1050,7 +1050,7 @@ Figure&nbsp;9.3: pdfplumber’s table finder on the December 2024 summary table.
 <span id="cb21-6"><a href="#cb21-6" aria-label="6"></a><span class="co"># 5.5.3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>A scanned page.</strong> Page 7 of the December 4, 2018 minutes is the page where the scanner’s own OCR garbled the motions (“What Kind of PDF Is It?”). The page is one image, which pypdf hands you as a Pillow image, and Tesseract reads that:</p>
-<div id="4871f3ec" class="cell" data-execution_count="22">
+<div id="03defbcb" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a>page_7 <span class="op">=</span> minutes.pages[<span class="dv">6</span>]  <span class="co"># minutes: the December 4, 2018 minutes, opened in "What Kind of PDF Is It?"</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a>scan <span class="op">=</span> page_7.images[<span class="dv">0</span>].image</span>
 <span id="cb22-3"><a href="#cb22-3" aria-label="3"></a><span class="bu">print</span>(scan.size, <span class="st">"pixels"</span>)</span>
@@ -1064,7 +1064,7 @@ Figure&nbsp;9.3: pdfplumber’s table finder on the December 2024 summary table.
 </div>
 <p>Where the scanner’s text layer reads “CouNcrr, Mnunrn WnlvnR MovED To ADopr OnorNaNcr 8302”, Tesseract reads every word of both lines, from the same image. The image is 2,556 pixels across a page 8.5 inches wide, so it has the 300 dots per inch that OCR needs.</p>
 <p><strong>A picture of a table.</strong> The December 2024 report’s Exhibit 3 is one image on page 15. Tesseract’s <em>page segmentation mode</em> tells it what layout to expect, and mode 6 says the image is one uniform block of text, which suits a table whose rows run straight across:</p>
-<div id="b41d4135" class="cell" data-execution_count="23">
+<div id="af129f14" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a>exhibit_3 <span class="op">=</span> PdfReader(report_2024).pages[<span class="dv">14</span>].images[<span class="dv">0</span>].image.convert(<span class="st">"L"</span>)  <span class="co"># "L": grayscale</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a>ocr_text <span class="op">=</span> pytesseract.image_to_string(exhibit_3, config<span class="op">=</span><span class="st">"--psm 6"</span>)</span>
 <span id="cb23-3"><a href="#cb23-3" aria-label="3"></a>ocr_lines <span class="op">=</span> ocr_text.splitlines()</span>
@@ -1077,7 +1077,7 @@ Figure&nbsp;9.3: pdfplumber’s table finder on the December 2024 summary table.
 <span id="cb23-10"><a href="#cb23-10" aria-label="10"></a><span class="co"># 2022 9,592,143 9,009,882 11,376,046 —11.242.614 10,608,781</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Tesseract reads most figures right, and gets the punctuation of a few wrong: periods for commas in “7,608.759” and “11.242.614”, and a stray dash before the second. The figures are whole dollars, so commas and periods can both be dropped. A stray mark that breaks a row’s pattern is harder, so set those rows aside and report them:</p>
-<div id="f5ab3eb5" class="cell" data-execution_count="24">
+<div id="75dbc22e" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a>NUMBER <span class="op">=</span> <span class="vs">r"</span><span class="pp">[—–-]</span><span class="op">?</span><span class="dv">\d</span><span class="pp">[</span><span class="dv">\d</span><span class="pp">.,]</span><span class="op">*</span><span class="vs">"</span>  <span class="co"># a figure as OCR may read it, with a stray dash, or periods for commas</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a>ROW <span class="op">=</span> re.<span class="bu">compile</span>(<span class="vs">r"</span><span class="dv">^</span><span class="kw">(</span><span class="fu">?P&lt;label&gt;</span><span class="pp">[A-Za-z ]</span><span class="op">*?</span><span class="kw">)</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="fu">?P&lt;year&gt;</span><span class="vs">20</span><span class="dv">\d\d</span><span class="kw">)</span><span class="dv">\s</span><span class="op">+</span><span class="kw">(</span><span class="fu">?P&lt;figures&gt;</span>(?:<span class="vs">"</span> <span class="op">+</span> NUMBER <span class="op">+</span> <span class="vs">r"</span><span class="dv">\s</span><span class="op">+</span><span class="er">)</span><span class="op">{13}</span><span class="er">)</span><span class="vs">"</span>)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-label="3"></a></span>
@@ -1106,14 +1106,14 @@ Figure&nbsp;9.3: pdfplumber’s table finder on the December 2024 summary table.
 <span id="cb24-26"><a href="#cb24-26" aria-label="26"></a><span class="co"># 2022 12,289,385 11,703,828 14,650,181 — 13,712,583</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The table has four taxes and their total, each with a row for every year from 2019 to 2024: 30 rows. 28 parsed, and the two set aside each have a stray mark, <code>”</code> or <code>—</code>, that breaks the pattern. A parsed row can still be wrong, though, since a misread digit leaves a well-formed number. The table checks itself, because each row’s twelve months add up to its total:</p>
-<div id="bc5c858e" class="cell" data-execution_count="25">
+<div id="2209a2d2" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a>gaps <span class="op">=</span> [<span class="bu">sum</span>(row[<span class="st">"months"</span>]) <span class="op">-</span> row[<span class="st">"total"</span>] <span class="cf">for</span> row <span class="kw">in</span> ocr_rows]</span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a><span class="bu">print</span>(<span class="st">"largest gap between the months and the total:"</span>, <span class="bu">max</span>(<span class="bu">abs</span>(gap) <span class="cf">for</span> gap <span class="kw">in</span> gaps), <span class="st">"dollars"</span>)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-label="3"></a><span class="co"># largest gap between the months and the total: 2 dollars</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Every parsed row adds up within $2, the rounding you’d expect. A digit misread anywhere but the last place would miss by $10 or more.</p>
 <p><strong>Confidence.</strong> Tesseract scores each word from 0 to 100, and the scores look like an alarm for misreads. They ring at the wrong times:</p>
-<div id="893380ba" class="cell" data-execution_count="26">
+<div id="442fcca3" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a>words <span class="op">=</span> pytesseract.image_to_data(exhibit_3, config<span class="op">=</span><span class="st">"--psm 6"</span>, output_type<span class="op">=</span>pytesseract.Output.DATAFRAME)</span>
 <span id="cb26-2"><a href="#cb26-2" aria-label="2"></a>words <span class="op">=</span> words[words[<span class="st">"conf"</span>] <span class="op">&gt;=</span> <span class="dv">0</span>]  <span class="co"># -1 marks a block or a line, not a word</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-label="3"></a><span class="bu">print</span>(<span class="bu">len</span>(words), <span class="st">"words;"</span>, (words[<span class="st">"conf"</span>] <span class="op">&lt;</span> <span class="dv">80</span>).<span class="bu">sum</span>(), <span class="st">"scored below 80"</span>)</span>
@@ -1135,7 +1135,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 </figure>
 </div>
 <p><strong>A whole file.</strong> OCRmyPDF does all of this for a whole PDF. It renders each page, runs Tesseract, and lays the recognized text over the image as an invisible layer, where a viewer can select it and pypdf can extract it. The minutes of December 19, 2000, which the portal made from scanned pages, have text on only three of their nine pages. <code>mode="redo"</code> replaces any earlier OCR layer and fills in the pages without one:</p>
-<div id="95482b7d" class="cell" data-execution_count="27">
+<div id="5b71b2bb" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-label="1"></a><span class="im">import</span> ocrmypdf</span>
 <span id="cb27-2"><a href="#cb27-2" aria-label="2"></a></span>
 <span id="cb27-3"><a href="#cb27-3" aria-label="3"></a>scan_2000 <span class="op">=</span> get_saved_copy(<span class="st">"council-minutes-2000-12-19.pdf"</span>)</span>
@@ -1148,7 +1148,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 <span id="cb27-10"><a href="#cb27-10" aria-label="10"></a><span class="co"># characters per page after:  [2270, 1698, 1663, 1465, 1709, 1597, 1751, 2283, 1164]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>It takes a few seconds. To find out whether it read the pages right, compare its text with the image, by hand, for the lines you need:</p>
-<div id="77904fea" class="cell" data-execution_count="28">
+<div id="99bb14e7" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-label="1"></a>first_page <span class="op">=</span> PdfReader(ocr_copy).pages[<span class="dv">0</span>].extract_text()</span>
 <span id="cb28-2"><a href="#cb28-2" aria-label="2"></a>start <span class="op">=</span> first_page.find(<span class="st">"Deputy Mayor Mock called"</span>)</span>
 <span id="cb28-3"><a href="#cb28-3" aria-label="3"></a>end <span class="op">=</span> first_page.find(<span class="st">"absent."</span>, start) <span class="op">+</span> <span class="bu">len</span>(<span class="st">"absent."</span>)</span>
@@ -1175,7 +1175,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 <li><strong>A record of what you did.</strong> Keep the manifest of files and hashes, the versions of the libraries, and the date of each run, so that someone else can audit your work and redo it.</li>
 </ol>
 <p>Write the checks as a function that returns a list of problems, so a pipeline can run them on every file and report what failed, instead of stopping at the first error or carrying on in silence:</p>
-<div id="86ec4e6b" class="cell" data-execution_count="29">
+<div id="561457c3" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-label="1"></a><span class="kw">def</span> check_summary(table, tolerance<span class="op">=</span><span class="dv">5</span>):</span>
 <span id="cb29-2"><a href="#cb29-2" aria-label="2"></a>    <span class="co">"""Check the revenue summary table's figures against each other.</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-label="3"></a></span>
@@ -1218,7 +1218,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 <span id="cb29-40"><a href="#cb29-40" aria-label="40"></a><span class="co"># default table: ['expected 9 rows of figures, found 8', "no row labeled 'Total Sales and Use Tax'"]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The case study on the revenue reports runs checks like these on all seven years in the saved copies. Two of the other checks take a few lines each. Here is the same table read through pypdf, compared with pdfplumber’s, and OCR’s total compared with the text:</p>
-<div id="c457eb6f" class="cell" data-execution_count="30">
+<div id="d1292aae" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-label="1"></a><span class="co"># pypdf puts each row of figures on one line; one pattern reads the label and the two years</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-label="2"></a>page_2 <span class="op">=</span> PdfReader(report_2024).pages[<span class="dv">1</span>].extract_text().split(<span class="st">"Other Tax Revenues"</span>)[<span class="dv">0</span>]</span>
 <span id="cb30-3"><a href="#cb30-3" aria-label="3"></a>FIGURE_ROW <span class="op">=</span> re.<span class="bu">compile</span>(<span class="vs">r"</span><span class="dv">^</span><span class="kw">(</span><span class="dv">.</span><span class="op">+?</span><span class="kw">)</span><span class="vs"> </span><span class="op">+</span><span class="ch">\$</span><span class="op">?</span><span class="kw">(</span><span class="pp">[</span><span class="dv">\d</span><span class="pp">,]</span><span class="op">+</span><span class="kw">)</span><span class="vs"> </span><span class="op">+</span><span class="ch">\$</span><span class="op">?</span><span class="kw">(</span><span class="pp">[</span><span class="dv">\d</span><span class="pp">,]</span><span class="op">+</span><span class="kw">)</span><span class="vs"> </span><span class="op">+</span><span class="vs">-</span><span class="op">?</span><span class="ch">\$</span><span class="op">?</span><span class="vs">-</span><span class="op">?</span><span class="pp">[</span><span class="dv">\d</span><span class="pp">,]</span><span class="op">+</span><span class="vs"> </span><span class="op">+</span><span class="vs">-</span><span class="op">?</span><span class="pp">[</span><span class="dv">\d</span><span class="pp">.]</span><span class="op">+</span><span class="vs">%"</span>, re.MULTILINE)</span>
@@ -1238,7 +1238,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 </div>
 <p>The two tools agree on every figure they share. Their one disagreement is a label: the subtotal’s name wraps onto a second line, and pypdf’s one-line pattern kept only “current economic activity”. OCR’s total from the picture equals the text’s to the dollar.</p>
 <p><strong>Measure a text extraction against a sample.</strong> For fields such as names, the check is a sample you code by hand, and two numbers describe how an extraction did against it. <em>Precision</em> is the share of what the extraction found that is right; <em>recall</em> is the share of what is there that it found. Here is a first attempt at attendance, the names after “present:”, on page 1 of the December 5 minutes:</p>
-<div id="57db4f33" class="cell" data-execution_count="31">
+<div id="ead0b470" class="cell" data-execution_count="31">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-label="1"></a><span class="co"># Coded by hand from the page: eight members in the room, and one online</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-label="2"></a>present_by_hand <span class="op">=</span> {<span class="st">"Adams"</span>, <span class="st">"Benjamin"</span>, <span class="st">"Brockett"</span>, <span class="st">"Folkerts"</span>, <span class="st">"Marquis"</span>, <span class="st">"Schuchard"</span>, <span class="st">"Speer"</span>, <span class="st">"Wallach"</span>, <span class="st">"Winer"</span>}</span>
 <span id="cb31-3"><a href="#cb31-3" aria-label="3"></a></span>
@@ -1264,7 +1264,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 <p>Boulder’s City Council publishes signed minutes of its public meetings <a href="https://documents.bouldercolorado.gov">online</a>. These PDFs contain structured information — council member attendance, public comment speakers, agenda items, voting records — that can be extracted and analyzed.</p>
 <section id="measuring-council-attendance" class="level3" data-number="9.9.1">
 <h3 data-number="9.9.1" class="anchored" data-anchor-id="measuring-council-attendance"><span class="header-section-number">9.9.1</span> Measuring Council Attendance</h3>
-<div id="874235f3" class="cell" data-execution_count="32">
+<div id="9a2407d4" class="cell" data-execution_count="32">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-label="1"></a><span class="im">import</span> os</span>
 <span id="cb32-2"><a href="#cb32-2" aria-label="2"></a><span class="im">from</span> pypdf <span class="im">import</span> PdfReader</span>
 <span id="cb32-3"><a href="#cb32-3" aria-label="3"></a></span>
@@ -1320,7 +1320,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 </section>
 <section id="building-the-pipeline" class="level3" data-number="9.9.2">
 <h3 data-number="9.9.2" class="anchored" data-anchor-id="building-the-pipeline"><span class="header-section-number">9.9.2</span> Building the Pipeline</h3>
-<div id="45410030" class="cell" data-execution_count="33">
+<div id="09c06f94" class="cell" data-execution_count="33">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-label="1"></a>results <span class="op">=</span> []</span>
 <span id="cb33-2"><a href="#cb33-2" aria-label="2"></a><span class="cf">for</span> pdf_file <span class="kw">in</span> pdf_files:</span>
 <span id="cb33-3"><a href="#cb33-3" aria-label="3"></a>    <span class="cf">try</span>:</span>
@@ -1343,7 +1343,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 </section>
 <section id="visualizing-trends" class="level3" data-number="9.9.3">
 <h3 data-number="9.9.3" class="anchored" data-anchor-id="visualizing-trends"><span class="header-section-number">9.9.3</span> Visualizing Trends</h3>
-<div id="68d6a01a" class="cell" data-execution_count="34">
+<div id="eb5b3de4" class="cell" data-execution_count="34">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb34-2"><a href="#cb34-2" aria-label="2"></a></span>
 <span id="cb34-3"><a href="#cb34-3" aria-label="3"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
@@ -1359,7 +1359,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 <h3 data-number="9.9.4" class="anchored" data-anchor-id="measuring-public-comment-frequency"><span class="header-section-number">9.9.4</span> Measuring Public Comment Frequency</h3>
 <p>One of the most civically valuable pieces of information buried in meeting minutes is how many members of the public showed up to speak. Public comment sections are where residents voice concerns about zoning changes, police oversight, budget priorities, and development projects. Extracting this data requires detective work: you need to identify the textual markers that signal a public comment section and then count the speakers within it.</p>
 <p>The challenge is that different municipalities format public comment sections differently, and even within the same city, the format may shift over time as clerks change or recording practices evolve. You are looking for patterns — section headers like “PUBLIC COMMENT” or “PUBLIC HEARING,” followed by names or numbered items indicating individual speakers. This is the kind of work where you iterate: try a pattern on one document, inspect the results manually, refine the pattern, test it on a second document, and adjust again. Start by printing the raw text of several public comment sections to understand the format before writing any extraction code.</p>
-<div id="7e82d237" class="cell" data-execution_count="35">
+<div id="42b86985" class="cell" data-execution_count="35">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-label="1"></a><span class="kw">def</span> count_public_comments(text):</span>
 <span id="cb35-2"><a href="#cb35-2" aria-label="2"></a>    <span class="co">"""Count the number of public comment speakers in meeting text.</span></span>
 <span id="cb35-3"><a href="#cb35-3" aria-label="3"></a></span>
@@ -1395,7 +1395,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 <span id="cb35-33"><a href="#cb35-33" aria-label="33"></a>    <span class="co"># Return the higher count (different formats capture different patterns)</span></span>
 <span id="cb35-34"><a href="#cb35-34" aria-label="34"></a>    <span class="cf">return</span> <span class="bu">max</span>(spoke_count, numbered_count)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="6ef48027" class="cell" data-execution_count="36">
+<div id="ac485c79" class="cell" data-execution_count="36">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-label="1"></a><span class="co"># Apply across all meeting files</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-label="2"></a>comment_counts <span class="op">=</span> []</span>
 <span id="cb36-3"><a href="#cb36-3" aria-label="3"></a><span class="cf">for</span> pdf_file <span class="kw">in</span> pdf_files:</span>
@@ -1425,7 +1425,7 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 <section id="building-a-reusable-pdf-pipeline" class="level2" data-number="9.10">
 <h2 data-number="9.10" class="anchored" data-anchor-id="building-a-reusable-pdf-pipeline"><span class="header-section-number">9.10</span> Building a Reusable PDF Pipeline</h2>
 <p>When you work with PDFs at scale — processing dozens or hundreds of documents from the same source — you need a structured pipeline. Here is a pattern that works for most government document collections:</p>
-<div id="25bc2a99" class="cell" data-execution_count="37">
+<div id="e97d2287" class="cell" data-execution_count="37">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-label="1"></a><span class="im">import</span> os</span>
 <span id="cb37-2"><a href="#cb37-2" aria-label="2"></a><span class="im">import</span> re</span>
 <span id="cb37-3"><a href="#cb37-3" aria-label="3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -1525,37 +1525,37 @@ Figure&nbsp;9.4: Retail sales tax by month in Exhibit 3 of the December 2024 rep
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will build a small PDF-to-DataFrame pipeline on real government documents: download, extract, clean, search, and tabulate.</p>
 <p><strong>Step 1 — Collect three PDFs.</strong> Find three PDF documents from one government source — city council minutes or agendas, board meeting minutes, budget summaries. Download each with <code>requests</code> and your <code>HEADERS</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), sleeping between downloads, and save them into a <code>pdfs/</code> directory — the caching discipline from <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, applied to documents.</p>
-<div id="f2363201" class="cell" data-execution_count="38">
+<div id="8db42657" class="cell" data-execution_count="38">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-label="1"></a><span class="co"># Step 1: Download three PDFs from one government source, politely, into a pdfs/ directory.</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Open and inspect.</strong> Open one of them with <code>PdfReader</code>. Print the number of pages and the raw extracted text of the first page.</p>
-<div id="0cd971cd" class="cell" data-execution_count="39">
+<div id="029d0cfc" class="cell" data-execution_count="39">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-label="1"></a><span class="co"># Step 2: Open one PDF with PdfReader; print the page count and the raw text of page one.</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Clean the text.</strong> Raw extraction is messy. Apply the chapter’s cleanup strategies — normalize whitespace, rejoin broken lines — and print the same passage before and after, so the difference is visible.</p>
-<div id="f926feb2" class="cell" data-execution_count="40">
+<div id="dc72ad0b" class="cell" data-execution_count="40">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-label="1"></a><span class="co"># Step 3: Write a cleanup function and show a before/after comparison.</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Extract a data element with a regex.</strong> Choose one consistent element to pull from the text — dates, dollar amounts, a name pattern, occurrences of a topic word — and extract it with <code>re.findall()</code>, following the chapter’s patterns. Print what you found in your first document.</p>
-<div id="2b08816f" class="cell" data-execution_count="41">
+<div id="6b9c2643" class="cell" data-execution_count="41">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-label="1"></a><span class="co"># Step 4: Use re.findall to extract your chosen element from one document.</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Scale to the corpus.</strong> Loop the whole pipeline — read, clean, extract — over all three PDFs, collecting one row per document into a DataFrame: filename, page count, characters of text extracted, and the count (or values) of your element.</p>
-<div id="5cbd4db0" class="cell" data-execution_count="42">
+<div id="117d58a0" class="cell" data-execution_count="42">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-label="1"></a><span class="co"># Step 5: Run the pipeline over all three PDFs and build a summary DataFrame.</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Visualize and inspect quality.</strong> Plot your element’s count per document. Then look at the characters-per-page figure for each document: did any document yield suspiciously little text?</p>
-<div id="1452c546" class="cell" data-execution_count="43">
+<div id="00802b9d" class="cell" data-execution_count="43">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-label="1"></a><span class="co"># Step 6: Plot the element counts and compute characters per page for each document.</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In four to six sentences: What did your element’s variation across documents suggest? Where did extraction quality worry you — and is the culprit the PDF (a scanned image, a complex layout) or your regex? What would you have to add before trusting this pipeline on a hundred documents?</p>
-<div id="d6dc22f0" class="cell" data-execution_count="44">
+<div id="20c300d1" class="cell" data-execution_count="44">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
