@@ -163,7 +163,12 @@ Selenium requires two components: the `selenium` Python library and a browser dr
 Chapter 1's `webdata` environment has both packages. Anaconda as it comes has neither, and neither does an older `webdata`. In either case, `import selenium` stops with `ModuleNotFoundError`, and none of this chapter's browser code runs until you install them. Run this cell once:
 
 ```{python}
+# Installing via anaconda
 %conda install -y -c conda-forge selenium selenium-manager
+```
+```{python}
+# Installing via Pip
+%pip install -U selenium
 ```
 
 It installs two packages from conda-forge into the Python that runs this notebook, whichever environment that is:
