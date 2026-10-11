@@ -656,8 +656,10 @@ The most common expected conditions you will use are:
 
 - `presence_of_element_located` — the element exists in the DOM (even if not visible)
 - `visibility_of_element_located` — the element is both present and visible on the page
-- `element_to_be_clickable` — the element is visible, enabled, and can receive clicks
+- `element_to_be_clickable` — the element is visible and enabled
 - `text_to_be_present_in_element` — specific text has appeared inside an element
+
+`element_to_be_clickable` does not check whether another element covers the one you want to click. A loading overlay or an open dialog can still intercept the click and raise `ElementClickInterceptedException`. If that happens, inspect the page to find what is covering the target. Wait for a temporary overlay to disappear, or close the dialog through its controls, before trying the click again. Selenium's [guide to intercepted clicks](https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/#elementclickinterceptedexception) explains these cases.
 
 Use these instead of `time.sleep()` whenever possible. The combination of `WebDriverWait` with explicit conditions makes your Selenium scripts both more reliable (they wait for exactly what they need) and faster (they proceed as soon as the condition is met rather than waiting a fixed duration). You will see this pattern used in the practical workflow section later in this chapter.
 
