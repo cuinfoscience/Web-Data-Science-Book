@@ -163,17 +163,19 @@ Selenium requires two components: the `selenium` Python library and a browser dr
 Chapter 1's `webdata` environment has both packages. Anaconda as it comes has neither, and neither does an older `webdata`. In either case, `import selenium` stops with `ModuleNotFoundError`, and none of this chapter's browser code runs until you install them. Run this cell once:
 
 ```{python}
-%conda install -y -c conda-forge selenium selenium-manager
+%conda install -y -c conda-forge "selenium>=4.20" selenium-manager
 ```
 
 It installs two packages from conda-forge into the Python that runs this notebook, whichever environment that is:
 
-- `selenium`, the Python library that you import;
+- `selenium`, the Python library that you import, at version 4.20 or later;
 - `selenium-manager`, the program that finds your browser and downloads its driver. conda-forge packages it separately. Installing `selenium` would bring it anyway, but naming it shows that there are two.
+
+The `>=4.20` sets a floor under the version. Without it, conda may pick an older `selenium` rather than update packages that are already installed. In Anaconda's own environment on a Mac in October 2026, `conda install -c conda-forge selenium selenium-manager` picked `selenium` 4.11.2, from 2023, and step 2 below then failed with `Unable to obtain working Selenium Manager binary`. With the floor, the same environment got 4.38.0, and conda updated four other packages to make room for it.
 
 The cell takes a minute or two. It worked if one of its last lines is `Executing transaction: done`, or, if both packages were there already, `All requested packages already installed`. conda may also print notices about other things, some starting with `WARNING`; they don't matter here. Then restart the kernel (**Kernel → Restart Kernel…**) and go on to step 1 below.
 
-From a terminal, the same install is `conda install -c conda-forge selenium selenium-manager`. Type it where the environment you use is active: after `conda activate webdata`, or where the prompt shows `(base)` for Anaconda's own environment. There, `conda list selenium` lists both packages, and `selenium-manager --version` prints Selenium Manager's version.
+From a terminal, the same install is `conda install -c conda-forge "selenium>=4.20" selenium-manager`. Type it where the environment you use is active: after `conda activate webdata`, or where the prompt shows `(base)` for Anaconda's own environment. There, `conda list selenium` lists both packages, and `selenium-manager --version` prints Selenium Manager's version.
 
 Selenium finds Selenium Manager through an environment variable, `SE_MANAGER_PATH`, which `conda activate` sets. A kernel gets its environment variables from the Jupyter that started it. So in a Jupyter started without `conda activate`, or started before the install, Selenium can't find Selenium Manager by itself. You don't need to restart Jupyter to fix that: step 1 below sets the variable.
 
@@ -205,7 +207,7 @@ os.environ["SE_AVOID_STATS"] = "true"          # send no usage statistics (optio
 # os.environ["SE_PROXY"] = "http://proxy.example.edu:3128"  # only behind a proxy
 ```
 
-If the version printed is older than 4.20 (April 2024), update both packages in a new cell with `%conda update -y -c conda-forge selenium selenium-manager`. Then restart the kernel and run this step again.
+If the version printed is older than 4.20 (April 2024), update both packages in a new cell with `%conda install -y -c conda-forge "selenium>=4.20" selenium-manager`. Then restart the kernel and run this step again.
 
 The `manager` lines look for Selenium Manager in `webdata`'s own folders, where conda-forge's package puts it: `bin` on macOS and Linux, `Scripts` on Windows. They change nothing when `SE_MANAGER_PATH` is already set. With `selenium` from `pip` instead, the program sits inside the package, nothing needs setting, and the line prints `inside the selenium package`.
 
