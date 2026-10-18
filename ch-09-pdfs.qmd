@@ -1478,10 +1478,10 @@ ocrmypdf.ocr(scan_2000, ocr_copy, language="eng", mode="redo", progress_bar=Fals
 # Characters of text on each page, before and after
 before = []
 for page in PdfReader(scan_2000).pages:
-    before.append(len(page.extract_text()))
+    before.append(len(page.extract_text() or ""))
 after = []
 for page in PdfReader(ocr_copy).pages:
-    after.append(len(page.extract_text()))
+    after.append(len(page.extract_text() or ""))
 print("characters per page before:", before)
 print("characters per page after: ", after)
 # characters per page before: [2207, 0, 0, 0, 1693, 1575, 0, 0, 0]
