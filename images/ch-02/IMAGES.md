@@ -8,8 +8,8 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 | File | Kind | Captured | Source | How |
 |---|---|---|---|---|
 | `robots-txt-reddit.png` | capture | 2026-09-25 | https://www.reddit.com/robots.txt | tools/shots: Google Chrome for Testing 154.0.8037.57, 600×400 at 2× |
-| `robots-txt-wikipedia.png` and `robots-txt-wikipedia_annotated.png`, `.pdf` | capture | 2026-09-24 | https://en.wikipedia.org/robots.txt | tools/shots: Google Chrome for Testing 154.0.8037.57, 800×600 at 2× |
-| `wikimedia-ua-policy.png` and `wikimedia-ua-policy_annotated.png`, `.pdf` | capture | 2026-09-24 | https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy | tools/shots: Google Chrome for Testing 154.0.8037.57, 800×700 at 2× |
+| `robots-txt-wikipedia.png` and `robots-txt-wikipedia_annotated.png`, `.pdf` | capture | 2026-10-19 | https://en.wikipedia.org/robots.txt | tools/shots: Google Chrome for Testing 154.0.8037.92, 800×600 at 2× |
+| `wikimedia-ua-policy.png` and `wikimedia-ua-policy_annotated.png`, `.pdf` | capture | 2026-10-19 | https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy | tools/shots: Google Chrome for Testing 154.0.8037.92, 800×700 at 2× |
 <!-- shots:end -->
 
 ## Notes

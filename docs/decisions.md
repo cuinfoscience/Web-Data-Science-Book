@@ -2,6 +2,18 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-19 · Markers have twice their first area
+
+**Decision.**
+- Numbered markers are 15.56 points across, and small ones 12 points: twice the area of the first markers (11 and 8.5 points). Their numbers are one font size larger. The course's handout markers (`handouts/common/handoutmarkers.sty`) match.
+- Figures pick up the new size when their markers are next drawn. A redraw needs the take the markers were measured on, so a figure whose take is gone is retaken.
+
+**Why.** The maintainer asked for every figure's circles to have twice the area, so they read at a glance on a projected slide as well as in the book (2026-10-19).
+
+**Status.** Chapter 10's figures are redrawn. Chapters 1–4 and the course figures are retaken, apart from the headed captures, which need `xdotool` (`bash tools/shots/bootstrap.sh --headed`) and keep the old markers until then: chapter 4's `view-source-rss-link`, chapter 5's three DevTools figures, and the course's `oscars-devtools`.
+
+**Where.** `tools/shots/lib/annotate.py` (`MARKER_PT`), `tools/shots/styles/shotmarkers.sty`, `tools/shots/README.md` ("Markers").
+
 ## 2026-10-16 · Chapter 10's tour captures three pages that robots.txt disallows, and shows usernames as they are
 
 **Decision.**
