@@ -9,7 +9,7 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 |---|---|---|---|---|
 | `crowdtangle-last-capture.png` | capture | 2026-09-25 | https://web.archive.org/web/20240814023608/https://www.crowdtangle.com/; https://web.archive.org/web/20240814023608if_/https://www.crowdtangle.com/ | tools/shots: Google Chrome for Testing 154.0.8037.57, 776×600 at 2× |
 | `dead-endpoints.png` | capture | 2026-09-24 | https://api.pushshift.io/reddit/search/submission/?q=test&size=1; https://api.crowdtangle.com/posts; https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=nasa | tools/shots: Google Chrome for Testing 154.0.8037.57, 560×400 at 2× |
-| `dsa-article-40.png` and `dsa-article-40_annotated.png`, `.pdf` | capture | 2026-09-24 | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2065 | tools/shots: Google Chrome for Testing 154.0.8037.57, 800×700 at 2× |
+| `dsa-article-40.png` and `dsa-article-40_annotated.png`, `.pdf` | capture | 2026-10-19 | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2065 | tools/shots: Google Chrome for Testing 154.0.8037.92, 800×700 at 2× |
 | `reddit-api-pricing.png` | capture | 2026-09-25 | https://web.archive.org/web/20230609174525/https://old.reddit.com/r/reddit/comments/145bram/addressing_the_community_about_changes_to_our_api/ | tools/shots: Google Chrome for Testing 154.0.8037.57, 776×600 at 2× |
 <!-- shots:end -->
 
