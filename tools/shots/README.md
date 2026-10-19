@@ -868,7 +868,7 @@ typing in pixel positions.
 ```yaml
 annotate:
   width_in: 2.625        # the whole figure's printed width; sets the markers' scale
-  size: small            # 11-point markers, or small ones (8.5 points)
+  size: small            # 15.56-point markers, or small ones (12 points)
   marks:
     - {n: 3, at: {selector: '.field--name-field-award-category-oscars', box: text}}
     - {n: 5, at: {selector: '.field--name-field-honoree-type', box: text}, column: honoree}

@@ -5,7 +5,7 @@ browser measured (lib/measure.py), so a retake moves the markers with the page:
 
     annotate:
       width_in: 2.625          # printed width of the whole figure; sets the markers' scale
-      size: small              # normal (11 pt) or small (8.5 pt) markers
+      size: small              # normal (15.56 pt) or small (12 pt) markers
       marks:
         - {n: 3, at: {selector: '.field--name-field-award-category-oscars', box: text}}
         - {n: 5, at: {selector: '.field--name-field-honoree-type', box: text}, column: a}
@@ -61,7 +61,9 @@ from . import measure
 from .env import ROOT, TOOL
 
 PT_PER_IN = 72.27
-MARKER_PT = {"normal": 11.0, "small": 8.5}
+# Twice the area of the first markers (11 and 8.5 points), so they read at a glance
+# on a projected slide (the maintainer, 2026-10-19; docs/decisions.md).
+MARKER_PT = {"normal": 15.56, "small": 12.0}
 BRACE_PT = 4.0          # the brace's amplitude (handoutmarkers.sty)
 ARM_PT = 2.0            # a bracket's short arm
 TIP_PT = 1.0            # from a brace's or bracket's tip to its marker or label

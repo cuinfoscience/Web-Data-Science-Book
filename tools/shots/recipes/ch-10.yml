@@ -49,7 +49,9 @@ figures:
         - {n: 3, at: {selector: '#ca-history a', box: text}, side: below}
         - {n: 4, at: {selector: '#p-lang-btn label', box: element}, side: left}
         # A wikilink's href is ./Title or /wiki/Title, depending on the parser; its title is the same in both
-        - {n: 5, at: {selector: '#mw-content-text p a[title="Colorado"]', nth: 0, box: text}, side: below, gap: 1}
+        # A link that ends its line, so the marker sits in the space before the infobox
+        # rather than on the next line's words
+        - {n: 5, at: {selector: '#mw-content-text p a[title="Flagship university"]', nth: 0, box: text}, side: right, gap: 1}
         - {n: 6, at: {selector: 'table.infobox caption', nth: 0, box: text}, side: left}
     drifts: true        # the article, and Wikipedia's skin
 
