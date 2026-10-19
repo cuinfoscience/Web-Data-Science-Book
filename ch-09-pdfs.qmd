@@ -100,12 +100,38 @@ The cell takes a minute or two. It worked if one of its last lines is `Executing
 
 From a terminal, the same install is `conda install -c conda-forge pypdf pdfplumber pytesseract tesseract`, typed where the environment you use is active: after `conda activate webdata`, or where the prompt shows `(base)`.
 
-To check, import the libraries and print their versions, and Tesseract's:
+Before importing anything, ask Python what it can find. The cell also looks for matplotlib, which the chapter never imports but Step 6 of the Recommended Exercises plots with:
+
+```{python}
+import importlib.util
+import shutil
+
+# The libraries the chapter imports, and matplotlib, which the exercises plot with in Step 6
+libraries = ["pypdf", "pdfplumber", "pytesseract", "matplotlib"]
+
+missing = []
+for name in libraries:
+    if importlib.util.find_spec(name) is None:  # None: Python can't find the library
+        missing.append(name)
+# The Tesseract program, which pytesseract runs; shutil.which() looks for it the way a terminal would
+if shutil.which("tesseract") is None:
+    missing.append("tesseract")
+
+if missing:
+    print("Missing:", ", ".join(missing))
+    print("Run this once, then restart the kernel: conda install -c conda-forge", " ".join(missing))
+else:
+    print("Everything the chapter needs is installed")
+# Everything the chapter needs is installed
+```
+
+If anything is missing, the cell names it and prints the one install command, instead of stopping at the first `ModuleNotFoundError`. Then import the libraries and print their versions, and Tesseract's:
 
 ```{python}
 import pypdf
 import pdfplumber
 import pytesseract
+import matplotlib.pyplot as plt  # the exercises plot with it in Step 6
 
 # Each library records its own version number
 print("pypdf", pypdf.__version__, "| pdfplumber", pdfplumber.__version__, "| pytesseract", pytesseract.__version__)
