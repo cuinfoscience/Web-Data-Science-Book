@@ -129,8 +129,9 @@ params = {
     "format": "json",                           # return the response as JSON
 }
 
-# Define this once near the top of your script and reuse it everywhere
-HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+# Define these once near the top of your script and reuse them everywhere
+CLIENT = "WebDataScience/1.0 (your-email@colorado.edu)"
+HEADERS = {"User-Agent": f"{CLIENT} python-requests/{requests.__version__}"}
 
 response = requests.get(url, params=params, headers=HEADERS)
 data = response.json()
@@ -139,7 +140,7 @@ print(data)
 # {'batchcomplete': '', 'query': {'pages': {'289672': {'pageid': 289672, 'ns': 0, 'title': 'University of Colorado Boulder', 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'pagelanguagehtmlcode': 'en', 'pagelanguagedir': 'ltr', 'touched': '2026-10-15T21:52:24Z', 'lastrevid': 1380246879, 'length': 95273}}}}
 ```
 
-The `HEADERS` constant deserves a comment before we go further. The [Wikimedia User-Agent policy](https://foundation.wikimedia.org/wiki/Policy:User-Agent_policy) asks every client to identify itself with a descriptive User-Agent string that includes contact information. Since 2026, Wikimedia's [rate limits](https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits) also depend on it: a client that identifies itself gets far more requests a minute than one that doesn't. Put your own email address in place of `your-email@colorado.edu`, keeping the form: a name and version, then your contact information in parentheses.
+The `HEADERS` constant deserves a comment before we go further. The [Wikimedia User-Agent policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy) asks every client to identify itself with a descriptive User-Agent string that includes contact information. Since 2026, Wikimedia's [rate limits](https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits) also depend on it: a client that identifies itself gets far more requests a minute than one that doesn't. Put your own email address in place of `your-email@colorado.edu`, keeping the policy's form: a name and version, your contact information in parentheses, then the library that sends the request and its version, here `python-requests/` and the number `requests.__version__` gives. `CLIENT` holds the first two parts on their own, because mwclient, later in this chapter, adds its own name and version to whatever you give it.
 
 The same request works in a browser. Paste the address that `requests` builds into the address bar, with `format=jsonfm` in place of `format=json`, and the API lays its JSON out as a web page (@fig-api-response). Under `pages` is one key, the page's ID ①, and under it the facts `prop=info` asks for, such as the article's length in bytes ②. The [API sandbox](https://en.wikipedia.org/wiki/Special:ApiSandbox) goes further: it builds a request from a form, with every module and parameter documented beside it, and shows the request it made, so you can copy it into Python.
 
@@ -486,7 +487,7 @@ conda-forge has version 0.10.1. The [Python Package Index](https://pypi.org/proj
 ```{python}
 
 site = mwclient.Site("en.wikipedia.org",
-                     clients_useragent="WebDataScience/1.0 (your-email@colorado.edu)")
+                     clients_useragent=CLIENT)
 page = site.pages["University of Colorado Boulder"]
 
 print(page.name, page.pageid, page.length)

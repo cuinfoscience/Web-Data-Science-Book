@@ -160,7 +160,7 @@ A draft pull request is fine when you want early feedback.
 
 **Code**
 
-- Every live request sends the book's User-Agent form, `WebDataScience/1.0 (your-email@colorado.edu)`, never the library default. Wikipedia refuses the default with status 403, and Wikimedia's rate limits give an identified client 200 requests a minute and an unidentified one 10.
+- Every live request sends the book's User-Agent form, `WebDataScience/1.0 (your-email@colorado.edu)`, never the library default. Chapter 10 adds the library and its version after it, `python-requests/2.x`, the full form [Wikimedia's User-Agent policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy) asks for. Wikipedia refuses the default with status 403, and Wikimedia's rate limits give an identified client 200 requests a minute and an unidentified one 10.
 - Give live requests a `timeout`, and check the response before parsing it: `response.raise_for_status()` before `response.json()`. A rate-limited site answers with an HTML error page, and `.json()` on that raises a confusing `JSONDecodeError` instead of the real problem.
 - Keep each code comment on one line. Code in the book doesn't run when the book builds; readers run it in the notebooks.
 - In **Recommended Exercises**, a step's code cell holds only comment prompts, such as `# Your code here`, never a solution. **Additional Exercises** are open-ended, and the graduate extension (INFO 5617) comes last.
