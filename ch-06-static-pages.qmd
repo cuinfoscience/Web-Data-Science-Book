@@ -30,7 +30,7 @@ Before you write a line of parsing code, it helps to place your project on two i
 | | Single site | Multiple sites |
 |---|---|---|
 | **Consistent design** | Box Office Mojo's weekly box office chart — the same table shape every week | English and French Wikipedia's film infoboxes — the same MediaWiki platform and the same key/value layout, with different labels |
-| **Inconsistent design** | oscars.org's ceremony pages — a winner's card and a nominee's card on the same page are not shaped the same | The Numbers, Box Office Mojo, and Rotten Tomatoes — three real sites tracking the same movies with three unrelated HTML structures |
+| **Inconsistent design** | oscars.org's ceremony pages — an acting honoree's card names a person and a film, while a Best Picture honoree's card has no separate film field | The Numbers, Box Office Mojo, and Rotten Tomatoes — three real sites tracking the same movies with three unrelated HTML structures |
 
 Where your project lands changes how much code you write and how long that code keeps working. A single site with a consistent template needs one parser, written once, that covers every page you will ever fetch from it. Multiple sites with inconsistent designs need one parser per site, each translating that site's own shape into a schema you define, reconciled together afterward.
 
