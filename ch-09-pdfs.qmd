@@ -807,6 +807,7 @@ print(len(words), "words;", (words["conf"] < 80).sum(), "scored below 80")
 # The confidence of two figures that Tesseract read with periods for commas
 for figure in ["8.832.480", "7,608.759"]:
     print(figure, words.loc[words["text"] == figure, "conf"].round().astype(int).tolist())
+# Output from Tesseract 5.5.3; the scores depend on the version, and 5.5.2 (conda-forge for Apple silicon, October 2026) prints 164 and [0]
 # 722 words; 163 scored below 80
 # 8.832.480 [3]
 # 7,608.759 [83]
