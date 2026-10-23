@@ -422,8 +422,7 @@ driver.find_element(By.ID, "nope")
 ```
 
 ```
-NoSuchElementException: Message: no such element: Unable to locate element: {"method":"css selector","selector":"[id="nope"]"}
-```
+- **`NoSuchElementException`**: Nothing on the page matched your locator at the moment Selenium looked. Three causes are common. The element hasn't appeared yet: wait for it with `WebDriverWait` and an expected condition, as "Waiting for Dynamic Content" does, rather than adding `time.sleep()`. The locator doesn't match: copy the value from developer tools, and remember that `By.LINK_TEXT` must match every character, so `"Prev"` fails where `"< Prev"` works. Or the element sits inside an `<iframe>`, a page within the page, which Selenium can't search until you switch into it with `driver.switch_to.frame()`; `driver.switch_to.default_content()` switches back.```
 
 ### The Eight Strategies
 
