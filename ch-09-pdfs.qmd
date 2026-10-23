@@ -268,6 +268,12 @@ Read each file's two lists together:
 - **The 2018 annual report** has pages with one to three images and little text: those are its charts. Its last page has 5,569 characters, because in 2018 the same monthly table was text.
 - **The minutes from December 4, 2018** have one image and about 1,700 characters on every page. One image filling the page, with plenty of text, is the third kind: a scan with a text layer.
 
+::: {.callout-tip}
+## Look past the document average
+
+Keep the per-page character counts from `page_profile()` when you summarize a document as characters per page. A long text page can raise the average enough to hide a page whose table is an image. Inspect pages with little text in a PDF viewer: a signature page may have little to extract, while a table with only its caption extracted needs OCR for its numbers. There is no character threshold that tells these apart. Compare the text with what you see on the page before deciding whether to run OCR.
+:::
+
 @fig-two-exhibit-3s shows the two reports' last pages. They look alike on screen. Try to select the numbers, though, and only the 2018 table's highlight; the counts above say why.
 
 ![Exhibit 3, sales and use tax by month, in the 2018 report (top), where the table is text, and in the December 2024 report (bottom), where it is a picture under a note. Drawn by pdfplumber. The note's phone number and email address are blacked out.](images/ch-09/two-exhibit-3s.png){#fig-two-exhibit-3s .lightbox fig-alt="Two crops of report pages, one above the other, each titled Exhibit 3: Sales Tax and Use Tax Separately by Month. The top one, from 2018, is a table of retail sales tax by month for 2012 to 2017. The bottom one, from December 2024, is the same kind of table for 2019 to 2024, under a note: This table presents historical taxes by type. Please contact sales tax staff at a blacked-out phone number and email for a screen readable version."}
@@ -1370,10 +1376,11 @@ You will build a small PDF-to-DataFrame pipeline on real government documents: d
 # Your code here
 ```
 
-**Step 6 — Visualize and inspect quality.** Plot your element's count per document. Then look at the characters-per-page figure for each document: did any document yield suspiciously little text?
+**Step 6 — Visualize and inspect quality.** Plot your element's count per document. Then look at the characters-per-page average for each document and use `page_profile()` to check the individual pages. Open a page with little extracted text in a PDF viewer: is it mostly blank, or did extraction miss visible text or numbers?
 
 ```{python}
 # Step 6: Plot the element counts and compute characters per page for each document.
+# Check individual page counts and inspect a page with little extracted text in a PDF viewer.
 # Your code here
 ```
 
