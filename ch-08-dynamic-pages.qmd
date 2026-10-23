@@ -164,6 +164,12 @@ Chapter 1's `webdata` environment has both packages. Anaconda as it comes has ne
 
 ```{python}
 %conda install -y -c conda-forge selenium selenium-manager
+ {.callout-note}
+If this cell runs but `import selenium` still raises `ModuleNotFoundError`, your notebook server may not be using the conda environment `%conda install` just modified — common on shared JupyterHub deployments. Run `%pip install selenium` in a new cell instead, then restart the kernel (**Kernel → Restart Kernel...**) before continuing.
+:::
+:::
+
+:::
 ```
 
 It installs two packages from conda-forge into the Python that runs this notebook, whichever environment that is:
