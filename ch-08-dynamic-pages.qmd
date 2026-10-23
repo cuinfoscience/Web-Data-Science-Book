@@ -1248,7 +1248,7 @@ When platforms close their APIs and render content exclusively through JavaScrip
 
 ## Common Issues to Debug
 
-- **`NoSuchElementException`**: The element does not exist yet because the page has not finished loading. Add `time.sleep()` or use explicit waits with `WebDriverWait`.
+- **`NoSuchElementException`**: The element does not exist yet because the page has not finished loading. Wait for it with `WebDriverWait` and an expected condition such as `presence_of_element_located`, as in "Waiting for Dynamic Content." A `time.sleep()` guesses at the delay; the wait checks for the element itself and fails loudly if it never appears.
 - **`StaleElementReferenceException`**: The DOM changed between when you found the element and when you tried to interact with it. Re-find the element.
 - **`SessionNotCreatedException: This version of ChromeDriver only supports Chrome version N`**: An older `chromedriver` on your `PATH` is overriding Selenium Manager; step 3 of "Before the First Browser" prints `False` when this happens. Delete it, or set `SE_SKIP_DRIVER_IN_PATH=true` (see "When Selenium Manager Fails" above). If there is no stray driver, a brand-new browser release may have outrun Selenium for a few days; updating the `selenium` package typically fixes it.
 - **`NoSuchDriverException: Unable to obtain driver for chrome`**, with `Unable to obtain working Selenium Manager binary` above it in the traceback: Selenium can't find Selenium Manager, usually because Jupyter started before you installed `selenium`, or without `webdata` active. Run step 1 of "Before the First Browser", or close Jupyter, run `conda activate webdata`, and start it again; restarting the kernel isn't enough.
