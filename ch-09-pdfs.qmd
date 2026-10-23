@@ -1349,7 +1349,7 @@ You will build a small PDF-to-DataFrame pipeline on real government documents: d
 # Your code here
 ```
 
-**Step 3 — Clean the text.** Raw extraction is messy. Apply the chapter's cleanup strategies — normalize whitespace, rejoin broken lines — and print the same passage before and after, so the difference is visible.
+**Step 3 — Clean the text.** Raw extraction is messy. Apply the chapter's cleanup strategies — collapse extra spaces and tabs, rejoin words split across lines, and keep meaningful line breaks — and print the same passage before and after, so the difference is visible.
 
 ```{python}
 # Step 3: Write a cleanup function and show a before/after comparison.
