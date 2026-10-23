@@ -1409,8 +1409,11 @@ The Boulder City Council case illustrates this tension at the local level. The s
 
 ## Common Issues to Debug
 
-- **Garbled text from scanned PDFs**: PyPDF extracts text only from PDFs that have a text layer. Truly scanned documents require OCR tools like Tesseract.
-- **Table data extracted as a text stream**: PyPDF is not a table extraction tool. For tabular data in PDFs, consider `pdfplumber` or `camelot`.
+- **Garbled text from scanned PDFs**: pypdf extracts text only from PDFs that have a text layer. A scanned page returns an empty string, or the scanner's own OCR, which can be worse ("What Kind of PDF Is It?"). Run Tesseract on the page image instead.
+- **Table data extracted as a text stream**: pypdf is not a table extraction tool. For tabular data in PDFs, use `pdfplumber`'s `extract_table()` ("Finding Tables").
+- **A table that comes back a row short, with no error**: pdfplumber's default `lines` strategy builds cells only where rules close a box, so a row with no vertical rules, like the summary table's totals row, falls outside the table. Count the rows you expect, and pass `explicit_vertical_lines` when one is missing.
+- **`SSLError: CERTIFICATE_VERIFY_FAILED` from a government portal**: the server leaves out an intermediate certificate that browsers find on their own and Python doesn't. Pass `verify=` a bundle that includes it, as "Getting the Files" does, and never `verify=False`.
+- **A portal that stops answering partway through a loop**: Boulder's records portal stopped responding after 13 to 17 requests in a row and recovered after about five minutes. Sleep between requests, cache every file, and check that each response starts with `%PDF-` before you save it.
 - **Regular expressions that work on one document but fail on another**: PDF formatting varies even within documents from the same source. Test your patterns on multiple files.
 - **Encoding issues**: Some PDFs use non-standard character encodings. Use `.encode('utf-8', errors='replace')` if needed.
 
