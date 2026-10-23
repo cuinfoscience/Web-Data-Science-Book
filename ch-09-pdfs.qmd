@@ -298,6 +298,8 @@ The checks route each page to a tool:
 | One image, and characters too | Scanned with a text layer | Test the text; if it's poor, run OCR again |
 | Text pages, with some image pages | Mixed | Route each page by itself |
 
+One thing that might help beginners is to check whether they can highlight or copy text from a PDF before trying to extract anything with Python. If the text can be selected, there is probably a text layer that a tool like pypdf can read. If the page is just an image, OCR might be needed instead. This quick check could save some time and help students understand which method to try first.
+
 ## Getting the Files
 
 The saved copies came from the city's records portal, [documents.bouldercolorado.gov](https://documents.bouldercolorado.gov/WebLink/Browse.aspx?id=194345&dbid=0&repo=LF8PROD2), which runs Laserfiche WebLink, software that many local governments use for their records. Open the Revenue Reports folder in a browser and you'll see four year folders and three annual reports. View Source shows almost none of it: the page is a shell that says "Loading...", and JavaScript fills in the list. Chapter 8's way of finding a hidden API (@sec-dynamic-pages, "Check 3: Watch the Network Tab") shows where the list comes from: a request named `GetFolderListing2`, which sends the folder's number and gets back JSON.
