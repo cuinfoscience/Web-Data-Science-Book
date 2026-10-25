@@ -121,7 +121,7 @@ Each chapter follows a consistent structure:
 3. **Library/framework introduction** — what tools you will use
 4. **Guided tutorial** with narrative code blocks
 5. **Exercises**: Recommended Exercises (one guided build of 5–7 steps, whose code cells hold only prompts) and Additional Exercises (open-ended, ending with a graduate extension for INFO 5617 students)
-6. **Social history and public interest** sidebar
+6. **Social history and public interest**: the chapter's history, and what it means for the public, with sources
 7. **Common debugging issues**
 8. **Key takeaways**
 9. **Further reading**
