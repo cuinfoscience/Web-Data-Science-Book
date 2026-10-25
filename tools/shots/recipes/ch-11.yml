@@ -15,7 +15,7 @@
 # Its sponsor is a member of Congress, a public official. Congress.gov refused the
 # toolkit's captures, so it is a hand capture (README, "Hand captures").
 #
-# The three renders are charts the chapter's own code draws, made by
+# The five renders are charts the chapter's own code draws, made by
 # tools/shots/renders/ch-11.py.
 chapter: ch-11
 qmd: ch-11-government.qmd
@@ -208,5 +208,50 @@ figures:
         the four keys set; it writes OUTDIR/co-generation-mix.png, 1600 by 900
         pixels. Import it with --tool naming matplotlib's and requests'
         versions.
+      text_px: 13
+    window: [800, 450]
+
+  - id: colorado-bills-stages
+    kind: render
+    mode: hand
+    section: "Following Every Link: How Far Each Bill Got"
+    brief: >-
+      Chart the bills that Colorado's current members of the 119th Congress
+      sponsored, one stacked bar per member, by the furthest milestone each
+      bill reached in its actions, as the chapter's code draws it.
+    url: https://api.congress.gov/v3/member/congress/119/CO?currentMember=true&format=json
+    api_client: true
+    hand:
+      why: >-
+        matplotlib draws it from Congress.gov's API, as the chapter's code
+        does, from one request per bill; no browser is involved
+      steps: >-
+        Run `python tools/shots/renders/ch-11.py OUTDIR --contact EMAIL` with
+        the four keys set; it writes OUTDIR/colorado-bills-stages.png, 1600
+        by 900 pixels. Import it with --tool naming matplotlib's and
+        requests' versions.
+      text_px: 13
+    window: [800, 450]
+
+  - id: state-electricity-bills
+    kind: render
+    mode: hand
+    section: "Combining Census and EIA Data"
+    brief: >-
+      Chart each state's average annual residential electricity bill in 2024,
+      from the EIA, against its median household income, from the ACS
+      2020-2024, joined through the Census Bureau's state crosswalk, as the
+      chapter's code draws it.
+    url: https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=annual&data[]=revenue&data[]=customers&data[]=price&facets[sectorid][]=RES&start=2024&end=2024
+    api_client: true
+    hand:
+      why: >-
+        matplotlib draws it from the Census Bureau's and the EIA's APIs, as
+        the chapter's code does; no browser is involved
+      steps: >-
+        Run `python tools/shots/renders/ch-11.py OUTDIR --contact EMAIL` with
+        the four keys set; it writes OUTDIR/state-electricity-bills.png, 1600
+        by 900 pixels. Import it with --tool naming matplotlib's and
+        requests' versions.
       text_px: 13
     window: [800, 450]

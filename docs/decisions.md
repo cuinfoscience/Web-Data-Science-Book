@@ -2,6 +2,19 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-25 · Chapter 11's fourth API is Congress.gov's, and its join is Census with the EIA
+
+**Decision.**
+- Congress.gov's API replaces the FEC's. Its idea is *follow the links*: a bill's record (H.R. 7730, the tour's bill) links to its cosponsors and actions; a list's `pagination.next` is the next request, whole; every bill Colorado's current delegation sponsored in the 119th Congress is followed to its actions to find the furthest milestone it reached; and `fromDateTime` asks which bills changed in a window.
+- The key travels in the `X-Api-Key` header, which every api.data.gov service accepts, so that links can be followed as they arrive and no printed URL holds the key.
+- "Combining Census and EIA Data" replaces "Combining Census and FRED Data": each state's ACS median household income joined to the EIA's 2024 residential revenue and customers, through the Census Bureau's state crosswalk (`state.txt`, FIPS code to postal code), with an outer join whose unmatched rows are shown.
+- Milestones are read from the actions' standard text ("Passed/agreed to in House", "Passed/agreed to in Senate", "Became Public Law"), not their action codes, whose authoritative list on Congress.gov refused the book's scripts (403, 2026-10-25).
+- The Recommended Exercises are unchanged; Additional Exercises 3 and 4 are rewritten for Congress.gov and for a join through a crosswalk.
+
+**Why.** The plan's PR B ([plan](plans/2026-10-25-ch11-four-apis.md), §4 and §6). Congress.gov's documentation gives 5,000 requests an hour; the delegation's 353 bills take one request each, which the chapter says, and reads `X-RateLimit-Remaining` before and after.
+
+**Where.** `ch-11-government.qmd`, "Congress.gov API", "Combining Census and EIA Data", Social History, Common Issues, Additional Exercises; `tools/shots/renders/ch-11.py` and `recipes/ch-11.yml` (two new renders); `index.qmd`, `README.md`, and `appendix-ai-disclosure.qmd`.
+
 ## 2026-10-25 · A chapter's public-interest connections and history live in one sourced section
 
 **Decision.**

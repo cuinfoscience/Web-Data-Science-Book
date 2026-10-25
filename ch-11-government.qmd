@@ -6,7 +6,8 @@
 - Find what an API offers before you ask for it: the Census Bureau's catalogs of variables and geographies, and its FIPS codes for places
 - Ask FRED to transform a series before it sends it: percent changes, annual averages, and other units and frequencies
 - Ask the EIA to filter its data before it sends it, with routes, facets, data columns, and sorting, and page through a large result with `offset` and `length`
-- Follow the links from one Congress.gov record to the records about it
+- Follow the links from one Congress.gov record to the records about it, page through a list with `next`, and ask only for what changed with `fromDateTime`
+- Join two agencies' data on a shared identifier, through a crosswalk when their codes differ, and check the rows that don't match
 - Trace a number on an agency's website to the API request that returns it
 :::
 
@@ -723,118 +724,246 @@ Compare this loop with @sec-wikipedia's. Wikipedia's API hands you a `continue` 
 - **Sort when you page.** Without a fixed order, nothing promises that the rows come back in the same order on the second request as on the first, and a row could appear on both pages or on neither.
 - **Filter first.** Paging is for results that are large after you have narrowed them. Before writing a loop, ask whether a facet, a shorter span, or a lower frequency would fit the request in one page.
 
-## FEC API
+## Congress.gov API
 
-The Federal Election Commission provides campaign finance data through a free API. This data enables accountability journalism and research on the influence of money in politics:
+Congress.gov is the official website for U.S. federal legislation, run by the Library of Congress with the House, the Senate, and the Government Publishing Office. Its API, documented at [api.congress.gov](https://api.congress.gov/) and in the Library's [GitHub repository](https://github.com/LibraryOfCongress/api.congress.gov), returns the same records: bills, members, committees, votes, and the *Congressional Record*. Its key is the api.data.gov key you stored as `DATAGOV_KEY`. A bill's record holds little data of its own. Mostly it holds links: to the bill's actions, its cosponsors, its text, its committees, each a record with its own address. Following those links, from one record to the records about it, is this section's idea.
+
+### A Bill and the Records It Links To
+
+Ask Congress.gov's API for H.R. 7730, the bill in @fig-congress-bill. Every api.data.gov service accepts the key in a header, `X-Api-Key`, as well as in the URL, according to api.data.gov's [developer manual](https://api.data.gov/docs/developer-manual/). In a header, the key stays out of every URL your code prints, and the links in the answer can be followed exactly as they arrive:
 
 ```{python}
-# Search for a candidate
-fec_search_url = "https://api.open.fec.gov/v1/candidates/search/"
-params = {
-    "q": "Biden",
-    "office": "P",
-    "election_year": 2024,
-    "api_key": datagov_key,   # FEC accepts api.data.gov keys
-    "per_page": 5
-}
+congress_base = "https://api.congress.gov/v3"
 
-response = requests.get(fec_search_url, params=params, headers=HEADERS, timeout=30)
-data = response.json()
+# The key goes in a header, not the URL, so no URL this section prints contains it
+congress_headers = HEADERS.copy()
+congress_headers["X-Api-Key"] = datagov_key
 
-for candidate in data["results"]:
-    print(f"{candidate['name']} ({candidate['party_full']})")
-    print(f"  ID: {candidate['candidate_id']}")
-    print(f"  State: {candidate['state']}")
-    print()
+response = requests.get(f"{congress_base}/bill/119/hr/7730", params={"format": "json"}, headers=congress_headers, timeout=30)
+response.raise_for_status()
+bill = response.json()["bill"]
+
+print(bill["title"])
+print("Sponsor:", bill["sponsors"][0]["fullName"])
+print("Latest action:", bill["latestAction"]["actionDate"], bill["latestAction"]["text"])
+
+# Most of the record is links: each says how many records sit behind it, and where they are
+for field, value in bill.items():
+    if isinstance(value, dict) and "url" in value:
+        print(f"{field:12} {value.get('count', ''):>3}  {value['url']}")
 ```
 
-### Getting Campaign Finance Data
+### Following the Links
 
-FEC identifiers follow a convention worth learning: candidate IDs begin with a letter for the office sought (`P` for president, `S` for Senate, `H` for House), while committee IDs begin with `C`. The ID below is therefore a *candidate* ID, and this endpoint returns that candidate's financial totals, aggregated across their authorized committees.
+Each link is a complete request: the address, with `format=json` already on it. Send it with the same headers, and the API answers with the records it promised. Here are two of them, the bill's cosponsors and its actions, the steps the bill has taken through Congress:
 
 ```{python}
-# Get financial totals for a candidate
-candidate_id = "P80000722"  # Biden's candidate ID ("P" = presidential)
+response = requests.get(bill["cosponsors"]["url"], headers=congress_headers, timeout=30)
+response.raise_for_status()
+for person in response.json()["cosponsors"]:
+    print(person["sponsorshipDate"], person["fullName"])
 
-fec_totals_url = f"https://api.open.fec.gov/v1/candidate/{candidate_id}/totals/"
-params = {
-    "api_key": datagov_key,   # FEC accepts api.data.gov keys
-    "election_year": 2024
-}
+# requests adds limit to the parameters the link already has
+response = requests.get(bill["actions"]["url"], params={"limit": 250}, headers=congress_headers, timeout=30)
+response.raise_for_status()
+actions = response.json()["actions"]
+print(len(actions), "actions; the milestones, oldest first:")
 
-response = requests.get(fec_totals_url, params=params, headers=HEADERS, timeout=30)
-data = response.json()
-
-for result in data["results"]:
-    print(f"Cycle: {result.get('cycle')}")
-    print(f"  Receipts: ${result.get('receipts', 0):,.0f}")
-    print(f"  Disbursements: ${result.get('disbursements', 0):,.0f}")
+milestones = ("Introduced in", "Passed/agreed to in", "Became Public Law")
+for action in reversed(actions):   # the API lists the newest first
+    if action["text"].startswith(milestones):
+        print(" ", action["actionDate"], action["text"][:60])
 ```
 
-## Combining Census and FRED Data
+COSPONSORS_PROSE
 
-The most compelling analyses often integrate data from multiple government sources to tell a story that no single dataset can tell alone. Census data provides snapshots of demographic and housing characteristics; FRED provides economic time series that capture the conditions under which those characteristics formed. Combining them reveals the relationship between macro-level economic forces and community-level outcomes.
+### Paging with `next`: Colorado's Delegation
+
+The same idea pages through a list. Ask for Colorado's current members of the 119th Congress, which met from January 2025 to January 2027, at the API's [member endpoint](https://github.com/LibraryOfCongress/api.congress.gov/blob/main/Documentation/MemberEndpoint.md):
 
 ```{python}
-# Define each endpoint explicitly so this block stands on its own -- reusing a leftover `url` variable from an earlier section is a classic source of silent bugs in long notebooks
-census_url = "https://api.census.gov/data/2022/acs/acs5"
-fred_url = "https://api.stlouisfed.org/fred/series/observations"
+params = {"currentMember": "true", "format": "json", "limit": 250}
+response = requests.get(f"{congress_base}/member/congress/119/CO", params=params, headers=congress_headers, timeout=30)
+response.raise_for_status()
+members = response.json()["members"]
 
-# Census: housing vintage by decade for Boulder
-housing_params = {
-    "get": "NAME,B25034_001E,B25034_002E,B25034_003E,B25034_004E,"
-           "B25034_005E,B25034_006E,B25034_007E",
-    "for": "place:07850",
-    "in": "state:08",
-    "key": census_key
-}
-response = requests.get(census_url, params=housing_params, headers=HEADERS, timeout=30)
-housing_data = response.json()
+for member in members:
+    print(f"{member['bioguideId']}  {member['name']:22} {member['partyName']:11} {member.get('district') or 'Senate'}")
+```
 
-def census_int(value):
-    """Convert a Census API value to int, or None if unavailable.
+Each member's `sponsored-legislation` lists everything they have sponsored, in every Congress they have served in, at most 250 items a page, as the API's [documentation](https://github.com/LibraryOfCongress/api.congress.gov#limit-and-offset) says. The response's `pagination` holds `count`, the total, and `next`, the full address of the next page, which is missing on the last page. That is a third way to page, after @sec-wikipedia's `continue` token and the EIA's `offset`: the server hands you the next request whole, and you send it. Keep the bills from the 119th Congress: House bills (`HR`) and Senate bills (`S`), leaving out resolutions and amendments, which have no `type`:
 
-    The Census API reports suppressed or unavailable values with
-    sentinel codes such as -666666666 rather than nulls, so never
-    trust a bare int() conversion.
-    """
-    if value is None or str(value).startswith("-6666"):
-        return None
-    return int(value)
+```{python}
+rows = []
+for member in members:
+    # The first page's address; every later page's address comes from the response
+    url = f"{congress_base}/member/{member['bioguideId']}/sponsored-legislation?format=json&limit=250"
+    while url:
+        response = requests.get(url, headers=congress_headers, timeout=30)
+        response.raise_for_status()
+        page = response.json()
+        for item in page["sponsoredLegislation"]:
+            if item.get("congress") == 119 and item.get("type") in ("HR", "S"):
+                rows.append({"member": member["name"], "type": item["type"], "number": item["number"], "title": item["title"]})
+        url = page["pagination"].get("next")   # missing on the last page
 
-decades = ["2020+", "2010s", "2000s", "1990s", "1980s", "1970s"]
-counts = [census_int(housing_data[1][i]) for i in range(2, 8)]
+bills = pd.DataFrame(rows)
+print(len(bills), "bills")
+print(bills["member"].value_counts().to_string())
+```
 
-# FRED: 30-year mortgage rates (annual average)
-mortgage_params = {
-    "series_id": "MORTGAGE30US",
-    "api_key": fred_key,
-    "file_type": "json",
-    "frequency": "a",
-    "observation_start": "1970-01-01"
-}
-df_mortgage = pd.DataFrame(
-    requests.get(fred_url, params=mortgage_params, headers=HEADERS, timeout=30).json()["observations"]
-)
-df_mortgage["date"] = pd.to_datetime(df_mortgage["date"])
-df_mortgage["rate"] = pd.to_numeric(df_mortgage["value"], errors="coerce")
+### Following Every Link: How Far Each Bill Got
 
-# Multi-panel figure
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+A bill's record says where it is now, but how far it got is in its actions. Congress.gov records each milestone in standard words, as in H.R. 7730's actions above: "Passed/agreed to in House", "Passed/agreed to in Senate", "Became Public Law". So follow every bill's `actions` link, one request a bill, and keep the furthest milestone each reached. The address of a bill's actions has the form you saw in its record, `bill/{congress}/{type}/{number}/actions`. With 300-odd bills, this cell takes a few minutes, and it spends one request a bill from your key's 5,000 an hour, the limit Congress.gov's [documentation](https://github.com/LibraryOfCongress/api.congress.gov#rate-limit) gives. Every response reports what is left in a header, `X-RateLimit-Remaining`:
 
-ax1.bar(decades, counts, color="steelblue")
-ax1.set_title("Boulder Housing Stock by Decade Built")
-ax1.set_ylabel("Housing Units")
-ax1.set_xlabel("Decade")
+```{python}
+print("Requests left this hour, before:", response.headers["X-RateLimit-Remaining"])
 
-ax2.plot(df_mortgage["date"], df_mortgage["rate"], color="darkred")
-ax2.set_title("30-Year Mortgage Rate (Annual Average)")
-ax2.set_ylabel("Interest Rate (%)")
+stages = []
+for bill_type, number in zip(bills["type"], bills["number"]):
+    url = f"{congress_base}/bill/119/{bill_type.lower()}/{number}/actions"
+    response = requests.get(url, params={"format": "json", "limit": 250}, headers=congress_headers, timeout=30)
+    response.raise_for_status()
+    texts = [action["text"] for action in response.json()["actions"]]
+    passed_house = any(text.startswith("Passed/agreed to in House") for text in texts)
+    passed_senate = any(text.startswith("Passed/agreed to in Senate") for text in texts)
+    if any(text.startswith("Became Public Law") for text in texts):
+        stages.append("became law")
+    elif passed_house and passed_senate:
+        stages.append("passed both chambers")
+    elif passed_house or passed_senate:
+        stages.append("passed one chamber")
+    else:
+        stages.append("introduced")
+bills["stage"] = stages
+
+print("Requests left this hour, after:", response.headers["X-RateLimit-Remaining"])
+print(bills["stage"].value_counts().to_string())
+```
+
+STAGES_PROSE
+
+```{python}
+order = ["introduced", "passed one chamber", "passed both chambers", "became law"]
+table = pd.crosstab(bills["member"], bills["stage"]).reindex(columns=order, fill_value=0)
+table = table.loc[table.sum(axis=1).sort_values().index]   # the most bills at the top
+
+ax = table.plot.barh(stacked=True, figsize=(8, 4.5))
+ax.set_title("Bills sponsored by Colorado's delegation, 119th Congress, by how far each got")
+ax.set_xlabel("Bills")
+ax.set_ylabel("")
+ax.legend(title="")
 plt.tight_layout()
 plt.show()
 ```
 
-The juxtaposition is revealing. Decades with low mortgage rates tend to correspond to more construction activity, while high-rate periods see building slow down. Boulder's housing stock tells a specific story: significant construction in the 1970s and 1990s, with constraints imposed by the city's growth management policies limiting new development regardless of interest rate conditions. This is the value of integrating multiple government data sources — economic trends provide context that makes local patterns interpretable. The Census tells you *what* the housing stock looks like today; FRED tells you *why* it looks that way, by revealing the economic conditions that shaped building decisions over decades. Neither dataset alone answers the question as well as both together.
+FIGURE_BILLS
+
+FIGURE_BILLS_PROSE
+
+### What Changed: `fromDateTime`
+
+Rerun that cell next week, and it makes the same 300-odd requests to learn about the few bills that moved. The list endpoints answer a cheaper question: which records changed in a window of time. `fromDateTime` and `toDateTime`, in the form `2026-10-01T00:00:00Z`, keep only the bills whose record was updated between them, parameters the bill endpoint lists in the API's interactive documentation at [api.congress.gov](https://api.congress.gov/). Page through every bill of the 119th Congress updated in the first week of October 2026, and check which of the delegation's are among them:
+
+```{python}
+changed = set()
+url = f"{congress_base}/bill/119?format=json&limit=250&fromDateTime=2026-10-01T00:00:00Z&toDateTime=2026-10-08T00:00:00Z"
+while url:
+    response = requests.get(url, headers=congress_headers, timeout=30)
+    response.raise_for_status()
+    page = response.json()
+    for item in page["bills"]:
+        changed.add((item["type"], item["number"]))
+    url = page["pagination"].get("next")
+print(len(changed), "bills changed that week")
+
+ours = [(bill_type, number) in changed for bill_type, number in zip(bills["type"], bills["number"])]
+print(bills[ours][["member", "type", "number", "stage"]].to_string(index=False))
+```
+
+FROMDATE_PROSE
+
+## Combining Census and EIA Data
+
+Each API in this chapter answers a question on its own. Some questions need two. What does electricity cost a household, against what households earn? The EIA (U.S. Energy Information Administration) knows what homes paid for electricity in each state; the Census Bureau's American Community Survey (ACS) knows the state's median household income. Joining them is a matter of putting each state's two numbers in one row, and the real work of a join is finding the identifier that says two rows are the same state.
+
+Ask each agency for every state. The Census Bureau's [API](https://www.census.gov/data/developers/guidance/api-user-guide.html) takes `for=state:*`; the EIA's [retail-sales route](https://www.eia.gov/opendata/browser/electricity/retail-sales) returns every state when you leave out the `stateid` facet. Ask the EIA for three of its data columns at once, the homes' revenue, customers, and price in 2024:
+
+```{python}
+params = {"get": "NAME,B19013_001E", "for": "state:*", "key": census_key}
+response = requests.get(census_base, params=params, headers=HEADERS, timeout=30)
+response.raise_for_status()
+rows = response.json()
+states = pd.DataFrame(rows[1:], columns=rows[0])
+states["income"] = pd.to_numeric(states["B19013_001E"])
+
+params = {
+    "frequency": "annual",
+    "data[]": ["revenue", "customers", "price"],   # three columns in one request
+    "facets[sectorid][]": "RES",                     # homes only
+    "start": "2024",
+    "end": "2024",
+}
+power = pd.DataFrame(eia_get("electricity/retail-sales/data/", params)["data"])
+
+print(len(states), "rows from the Census Bureau;", len(power), "from the EIA")
+print(states[["NAME", "state"]].head(3).to_string(index=False))
+print(power[["stateDescription", "stateid"]].head(3).to_string(index=False))
+```
+
+The two agencies name Colorado differently. The Census Bureau uses its FIPS code (Federal Information Processing Standards code), `08`; the EIA uses its postal abbreviation, `CO`. The state's name is in both, but a name is a poor key: a spelling, an abbreviation, or a "The" can keep two names for one place from matching. A **crosswalk** is a table that pairs one set of codes with the other, and the Census Bureau publishes one for states, a text file whose columns are separated by `|`, listed on its page of [FIPS codes](https://www.census.gov/library/reference/code-lists/ansi.html):
+
+```{python}
+import io
+
+response = requests.get("https://www2.census.gov/geo/docs/reference/state.txt", headers=HEADERS, timeout=30)
+response.raise_for_status()
+codes = pd.read_csv(io.StringIO(response.text), sep="|", dtype=str)   # dtype=str keeps "08" as "08"
+print(codes.head(3).to_string(index=False))
+```
+
+Join in two steps: the Census rows to the crosswalk on the FIPS code, then the result to the EIA's rows on the postal code. An **outer** join keeps every row from both sides, and pandas' [`merge()`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html) with `indicator=True` adds a column, `_merge`, that says where each row came from. Look at the rows that didn't match before you trust the ones that did:
+
+```{python}
+states = states.merge(codes[["STATE", "STUSAB"]], left_on="state", right_on="STATE", how="left")
+joined = states.merge(power, left_on="STUSAB", right_on="stateid", how="outer", indicator=True)
+
+print(joined["_merge"].value_counts().to_string())
+print("Only in the Census Bureau's data:", sorted(joined.loc[joined["_merge"] == "left_only", "NAME"]))
+print("Only in the EIA's data:", sorted(joined.loc[joined["_merge"] == "right_only", "stateDescription"]))
+```
+
+JOIN_PROSE
+
+```{python}
+both = joined[joined["_merge"] == "both"].copy()
+for column in ["revenue", "customers", "price"]:
+    both[column] = pd.to_numeric(both[column])   # the EIA's numbers arrive as strings
+
+both["annual_bill"] = both["revenue"] * 1_000_000 / both["customers"]   # revenue is in millions of dollars
+both["share"] = both["annual_bill"] / both["income"] * 100
+
+columns = ["NAME", "annual_bill", "income", "share"]
+print(both.sort_values("share", ascending=False)[columns].head(5).round(1).to_string(index=False))
+print(both.loc[both["STUSAB"] == "CO", columns].round(1).to_string(index=False))
+```
+
+SHARE_PROSE
+
+```{python}
+ax = both.plot.scatter(x="income", y="annual_bill", figsize=(8, 4.5))
+for _, row in both[both["STUSAB"].isin(["CO", "HI", "CA", "MS", "UT"])].iterrows():
+    ax.annotate(row["STUSAB"], (row["income"], row["annual_bill"]), xytext=(4, 4), textcoords="offset points")
+ax.set_title("Homes' electricity bills against household income, by state")
+ax.set_xlabel("Median household income, ACS 2020-2024 (dollars)")
+ax.set_ylabel("Average annual electricity bill, 2024 (dollars)")
+plt.tight_layout()
+plt.show()
+```
+
+FIGURE_STATES
+
+FIGURE_STATES_PROSE
 
 ## Recommended Exercises
 
@@ -892,9 +1021,9 @@ These are open-ended extensions — no scaffold, no fixed path. Use them for fur
 
 2. **FRED time series.** Retrieve two related economic time series for your local area or state using the FRED API. Plot them on the same or side-by-side axes. What story does the data tell? Common pairings include housing prices and mortgage rates, unemployment and job creation, or income and cost of living.
 
-3. **Campaign finance.** Using the FEC API, retrieve contribution data for a local congressional race. How much did each major candidate raise? Can you find differences in the geographic distribution or size distribution of contributions?
+3. **Who signs on.** Choose a member of Congress, such as your own representative. Using the Congress.gov API, list the bills they sponsored in the 119th Congress, and follow each bill's `cosponsors` link. Which bills drew cosponsors from the other party, and how many? Each cosponsor's record gives a party. Does the bipartisan share differ between bills that moved past introduction and bills that didn't?
 
-4. **Multi-source integration.** Combine data from at least two different government APIs (Census + FRED, Census + FEC, or FRED + FEC) into a single analysis. For example, compare median household income (Census) with campaign contributions (FEC) across congressional districts, or compare housing construction rates (Census) with interest rates (FRED).
+4. **Two agencies, one identifier.** Join two of this chapter's APIs on a shared identifier, through a crosswalk if their codes differ, as "Combining Census and EIA Data" does. For example, join the EIA's residential electricity price with the share of each state's homes heated by electricity (ACS table `B25040`, House Heating Fuel), or join Congress.gov's members for a state with that state's ACS figures. Report every row that didn't match, and say why it didn't.
 
 
 5. **Graduate extension (INFO 5617).** Read @lazer2020computational on the obstacles and opportunities facing computational social science. Then design and execute a small study that combines data from at least two of this chapter's government APIs to examine one obstacle or opportunity the paper raises — for example, the promise and difficulty of linking administrative data across agencies and geographic units. Write a formal limitations section that addresses measurement (what your variables actually capture) and coverage (which people, places, or time periods your linked data misses). The goal is not a definitive finding but a defensible design that takes the paper's warnings seriously.
@@ -905,7 +1034,9 @@ Government data APIs embody the value of **openness** from @sec-post-api: they e
 
 FRED, from the Federal Reserve Bank of St. Louis, grew from a similar philosophy. It descends from the paper data publications of Homer Jones, the bank's research director from 1958 to 1971, who wanted policymakers and members of the public alike to be able to judge the state of the economy for themselves; the data were printed and sent out by mail. FRED began in 1991 as a free electronic bulletin board that 620 users reached by modem, with 30 data series, and moved to the web in 1995 with 865 ([Federal Reserve Bank of St. Louis, 2016](https://www.stlouisfed.org/on-the-economy/2016/april/history-fred-federal-reserve-economic-data)). It now serves more than 800,000 series, to anyone, for free ([FRED](https://fred.stlouisfed.org/)).
 
-The FEC's public disclosure requirements enable some of the most important accountability journalism in American democracy. News organizations, research groups, and citizens use FEC data to track the flow of money in politics, identify potential conflicts of interest, and hold elected officials accountable. This data exists because of the [Federal Election Campaign Act (1971) and subsequent legislation](https://www.fec.gov/legal-resources/legislation/) mandating transparency in campaign finance.
+The EIA was established on October 1, 1977, under the Department of Energy Organization Act, as the federal government's independent authority for energy statistics and analysis ([EIA](https://www.eia.gov/about/)), on the same day the Department of Energy itself began work ([Department of Energy](https://www.energy.gov/lm/doe-history/doe-history-timeline)). Its independence is written into the law: its Administrator "shall not be required to obtain the approval of any other officer or employee of the Department" to collect or analyze information, nor, before publishing, anyone else's approval of "the substance of any statistical or forecasting technical reports" ([42 U.S.C. § 7135(d)](https://www.law.cornell.edu/uscode/text/42/7135)). The numbers in "EIA API v2", above, come from an agency built so that its energy statistics would not have to answer to its own department's policy.
+
+Congress's records reached the web through THOMAS, which the Library of Congress launched on January 5, 1995, as a bipartisan project initiated by the congressional leadership and named for Thomas Jefferson ([*Library of Congress Information Bulletin*, 1995](https://www.loc.gov/loc/lcib/9502/thomas.html)). Congress.gov replaced it: introduced in September 2012, it took over THOMAS's addresses in November 2013 ([Weber, 2015](https://blogs.loc.gov/law/2015/01/twenty-years-of-thomas/)), and THOMAS was retired on July 5, 2016 ([Nextgov, 2016](https://www.nextgov.com/digital-government/2016/04/library-of-congress-to-retire-thomas/220635/)). Before its API, people who wanted the data whole "scraped" Congress.gov or downloaded the Government Publishing Office's bulk files for some collections, "somewhat imperfect measures" in the Library's words; it introduced the API in beta in September 2022 ([Wood, 2022](https://blogs.loc.gov/law/2022/09/introducing-the-congress-gov-api/)) and took the beta label off a year later ([Reiter, 2023](https://blogs.loc.gov/law/2023/09/an-update-on-the-congress-gov-api/)).
 
 But government data infrastructure is not immune to erosion. Datasets are withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. In 2019 the Supreme Court refused to let the Commerce Department add a citizenship question to the 2020 census on the reason it had given, which "seems to have been contrived" ([*Department of Commerce v. New York*, 2019](https://www.supremecourt.gov/opinions/18pdf/18-966_bq7c.pdf)). In 2017, the first year of the first Trump administration, the Environmental Data & Governance Initiative documented agencies removing or overhauling webpages, documents, and whole websites about climate change, although it found no climate data removed [@edgi2018changing]. In early 2025, after an Office of Personnel Management memo applying an executive order on "gender ideology," the CDC, the FDA, and their parent department took down webpages and datasets, until a federal judge ordered them restored to their versions of January 30 ([Alder, 2025](https://fedscoop.com/federal-judge-orders-hhs-cdc-fda-to-restore-webpages-datasets/)). That August President Trump fired the commissioner of the Bureau of Labor Statistics after a weak jobs report, calling the data "rigged" ([PBS NewsHour, 2025](https://www.pbs.org/newshour/show/firing-of-labor-statistics-head-undermines-trust-in-key-data-ex-trump-official-warns)), and in December the American Statistical Association reported that most of the 13 federal statistical agencies had lost 20 to 30% of their staff ([ASA, 2025](https://www.amstat.org/news-listing/2025/12/10/new-report-documents-challenges-facing-federal-statistical-system--offers-roadmap-for-strengthening)). The fragility of government data infrastructure is itself a public interest concern, and a reason to record the date, version, and URL of every government dataset you use.
 
@@ -915,16 +1046,23 @@ But government data infrastructure is not immune to erosion. Datasets are withdr
 - **FIPS codes**: Geographic identifiers like `08` (Colorado) and `07850` (Boulder) are strings, not integers. Do not strip leading zeros.
 - **FRED series IDs**: These are alphanumeric strings; some families follow a pattern (like the SAIPE income series earlier in this chapter), but many do not. Use the FRED website search to find them, then copy the ID into your code exactly.
 - **API key exposure**: The most common mistake. Environment variables never enter your repository; if you use the JSON-file alternative, add `api_keys.json` to `.gitignore` *before* your first commit, or the key will persist in your git history even after deletion.
-- **Rate limiting**: Limits vary by agency. As of mid-2026, the Census API publishes no hard limit for keyed users (but expects polite use), FRED allows roughly 120 requests per minute, and the FEC allows 1,000 requests per hour with an upgraded key available on request. Check each API's documentation for current figures, and stay well within them, especially during automated collection.
+- **Rate limiting**: Limits vary by agency. As of mid-2026, the Census API publishes no hard limit for keyed users (but expects polite use), and FRED allows roughly 120 requests per minute. Check each API's documentation for current figures, and stay well within them, especially during automated collection.
+- **One api.data.gov key, one budget**: api.data.gov's default limit is 1,000 requests an hour, and "for each API key, these limits are applied across all api.data.gov API requests" ([developer manual](https://api.data.gov/docs/developer-manual/)). Congress.gov sets its own, 5,000 an hour. A loop over one agency's API spends the same key you use for another's; read `X-RateLimit-Remaining` before a long run. Going over blocks the key for up to an hour.
+- **The EIA's 5,000-row cap**: A request to the EIA's API returns at most 5,000 rows, with an `"incomplete return"` warning if more match. Filter with facets, a shorter span, or a lower frequency first; page with `offset` and `length` only for what is still too large ("Paging with `offset` and `length`", above).
+- **Congress.gov's links carry no key**: A link in a Congress.gov response, such as a bill's `actions` URL or a list's `next`, has `format=json` but not your key, and sent as it is, it fails with a 403 and `API_KEY_MISSING`. Send the key in the `X-Api-Key` header, as this chapter does, and every link works as it arrives.
+- **Congress.gov's format**: Ask for `format=json` on the first request, as this chapter does. The Library's announcement of the API in 2022 said that XML was its default ([Wood, 2022](https://blogs.loc.gov/law/2022/09/introducing-the-congress-gov-api/)); in October 2026 it answered JSON without being asked. Naming the format keeps your code from depending on a default.
 
 ## Key Takeaways
 
-Government APIs provide access to some of the most valuable, reliable, and stable data sources available. The Census Bureau, Federal Reserve, and FEC each serve a specific transparency mandate, and their APIs reflect this mission. The key skills — navigating complex variable catalogs, managing API keys securely, combining data from multiple sources, and understanding the institutional context behind the data — apply to every authenticated API you will encounter. These APIs exist because of public interest mandates, and using them effectively is itself a form of civic engagement.
+Government APIs provide access to some of the most valuable, reliable, and stable data sources available. The Census Bureau, the Federal Reserve Bank of St. Louis, the EIA, and the Library of Congress each serve a public mandate, and each API in this chapter carries an idea you will meet again: ask the API what you can ask for (the Census Bureau's catalogs); let the server compute (FRED's `units` and `frequency`); let the server filter (the EIA's facets); and follow the links (Congress.gov's records). Keep keys out of your notebooks, and when you combine two agencies' data, spend your effort on the identifiers that join them. These APIs exist because of public interest mandates, and using them effectively is itself a form of civic engagement.
 
 ## Further Reading
 
 - U.S. Census Bureau API: <https://www.census.gov/data/developers.html>
 - FRED API documentation: <https://fred.stlouisfed.org/docs/api/fred/>
-- FEC API documentation: <https://api.open.fec.gov/developers/>
+- EIA API documentation: <https://www.eia.gov/opendata/documentation.php>
+- Congress.gov API documentation: <https://api.congress.gov/>, and the Library of Congress's repository of endpoint guides: <https://github.com/LibraryOfCongress/api.congress.gov>
+- api.data.gov developer manual, on keys and rate limits: <https://api.data.gov/docs/developer-manual/>
+- @volden2014legislative — How far members' bills get, and why, measured across Congresses since the 1970s
 - @salganik2018bit — Chapter 2: Observing Behavior
 - @munzert2014automated — Chapter on working with web APIs
