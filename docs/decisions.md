@@ -7,7 +7,7 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 **Decision.**
 - Congress.gov's API replaces the FEC's. Its idea is *follow the links*: a bill's record (H.R. 7730, the tour's bill) links to its cosponsors and actions; a list's `pagination.next` is the next request, whole; every bill Colorado's current delegation sponsored in the 119th Congress is followed to its actions to find the furthest milestone it reached; and `fromDateTime` asks which bills changed in a window.
 - The key travels in the `X-Api-Key` header, which every api.data.gov service accepts, so that links can be followed as they arrive and no printed URL holds the key.
-- "Combining Census and EIA Data" replaces "Combining Census and FRED Data": each state's ACS median household income joined to the EIA's 2024 residential revenue and customers, through the Census Bureau's state crosswalk (`state.txt`, FIPS code to postal code), with an outer join whose unmatched rows are shown.
+- "Combining Census and EIA Data" replaces "Combining Census and FRED Data": each state's ACS median household income joined to the EIA's 2024 residential revenue and customers, through the Census Bureau's state crosswalk (`codes2020/national_state2020.txt`, FIPS code to postal code), with an outer join whose unmatched rows are shown.
 - Milestones are read from the actions' standard text ("Passed/agreed to in House", "Passed/agreed to in Senate", "Became Public Law"), not their action codes, whose authoritative list on Congress.gov refused the book's scripts (403, 2026-10-25).
 - The Recommended Exercises are unchanged; Additional Exercises 3 and 4 are rewritten for Congress.gov and for a join through a crosswalk.
 

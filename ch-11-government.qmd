@@ -751,6 +751,17 @@ print("Latest action:", bill["latestAction"]["actionDate"], bill["latestAction"]
 for field, value in bill.items():
     if isinstance(value, dict) and "url" in value:
         print(f"{field:12} {value.get('count', ''):>3}  {value['url']}")
+# Bankruptcy Threshold Adjustment Act
+# Sponsor: Rep. Cline, Ben [R-VA-6]
+# Latest action: 2026-10-14 Message on Senate action sent to the House.
+# actions       18  https://api.congress.gov/v3/bill/119/hr/7730/actions?format=json
+# committees     1  https://api.congress.gov/v3/bill/119/hr/7730/committees?format=json
+# cosponsors     6  https://api.congress.gov/v3/bill/119/hr/7730/cosponsors?format=json
+# relatedBills   2  https://api.congress.gov/v3/bill/119/hr/7730/relatedbills?format=json
+# subjects       4  https://api.congress.gov/v3/bill/119/hr/7730/subjects?format=json
+# summaries      1  https://api.congress.gov/v3/bill/119/hr/7730/summaries?format=json
+# textVersions   5  https://api.congress.gov/v3/bill/119/hr/7730/text?format=json
+# titles         7  https://api.congress.gov/v3/bill/119/hr/7730/titles?format=json
 ```
 
 ### Following the Links
@@ -770,16 +781,29 @@ actions = response.json()["actions"]
 print(len(actions), "actions; the milestones, oldest first:")
 
 milestones = ("Introduced in", "Passed/agreed to in", "Became Public Law")
+shown = set()
 for action in reversed(actions):   # the API lists the newest first
-    if action["text"].startswith(milestones):
+    # Some milestones are recorded twice, in the same words; print each once
+    if action["text"].startswith(milestones) and action["text"] not in shown:
         print(" ", action["actionDate"], action["text"][:60])
+        shown.add(action["text"])
+# 2026-02-26 Rep. Correa, J. Luis [D-CA-46]
+# 2026-02-26 Rep. Lee, Laurel M. [R-FL-15]
+# 2026-02-26 Rep. Neguse, Joe [D-CO-2]
+# 2026-03-24 Rep. Gooden, Lance [R-TX-5]
+# 2026-03-25 Rep. Lofgren, Zoe [D-CA-18]
+# 2026-06-08 Rep. Taylor, David J. [R-OH-2]
+# 18 actions; the milestones, oldest first:
+#   2026-02-26 Introduced in House
+#   2026-09-16 Passed/agreed to in House: On motion to suspend the rules an
+#   2026-09-28 Passed/agreed to in Senate: Passed Senate without amendment
 ```
 
-COSPONSORS_PROSE
+Rep. Joe Neguse, who represents Colorado's 2nd district, which includes Boulder, was one of the bill's three original cosponsors. The milestones trace its path: introduced on February 26, 2026, passed by the House on September 16 and by the Senate on September 28. The other actions, 18 in all, fill in the steps between: the committee's markup, its report, the floor debate, the messages between the chambers. Notice what the code didn't do. It never built an address for the cosponsors or the actions; it read each one from the record, and sent it.
 
 ### Paging with `next`: Colorado's Delegation
 
-The same idea pages through a list. Ask for Colorado's current members of the 119th Congress, which met from January 2025 to January 2027, at the API's [member endpoint](https://github.com/LibraryOfCongress/api.congress.gov/blob/main/Documentation/MemberEndpoint.md):
+The same idea pages through a list. Ask for Colorado's current members of the 119th Congress, which sits from January 2025 to January 2027, at the API's [member endpoint](https://github.com/LibraryOfCongress/api.congress.gov/blob/main/Documentation/MemberEndpoint.md):
 
 ```{python}
 params = {"currentMember": "true", "format": "json", "limit": 250}
@@ -789,6 +813,16 @@ members = response.json()["members"]
 
 for member in members:
     print(f"{member['bioguideId']}  {member['name']:22} {member['partyName']:11} {member.get('district') or 'Senate'}")
+# E000300  Evans, Gabe            Republican  8
+# C001137  Crank, Jeff            Republican  5
+# P000620  Pettersen, Brittany    Democratic  7
+# C001121  Crow, Jason            Democratic  6
+# N000191  Neguse, Joe            Democratic  2
+# H001100  Hurd, Jeff             Republican  3
+# D000197  DeGette, Diana         Democratic  1
+# B000825  Boebert, Lauren        Republican  4
+# H000273  Hickenlooper, John W.  Democratic  Senate
+# B001267  Bennet, Michael F.     Democratic  Senate
 ```
 
 Each member's `sponsored-legislation` lists everything they have sponsored, in every Congress they have served in, at most 250 items a page, as the API's [documentation](https://github.com/LibraryOfCongress/api.congress.gov#limit-and-offset) says. The response's `pagination` holds `count`, the total, and `next`, the full address of the next page, which is missing on the last page. That is a third way to page, after @sec-wikipedia's `continue` token and the EIA's `offset`: the server hands you the next request whole, and you send it. Keep the bills from the 119th Congress: House bills (`HR`) and Senate bills (`S`), leaving out resolutions and amendments, which have no `type`:
@@ -810,6 +844,18 @@ for member in members:
 bills = pd.DataFrame(rows)
 print(len(bills), "bills")
 print(bills["member"].value_counts().to_string())
+# 353 bills
+# member
+# Neguse, Joe              88
+# Bennet, Michael F.       72
+# Pettersen, Brittany      40
+# Hickenlooper, John W.    33
+# Crow, Jason              27
+# Hurd, Jeff               27
+# Evans, Gabe              23
+# Boebert, Lauren          20
+# DeGette, Diana           14
+# Crank, Jeff               9
 ```
 
 ### Following Every Link: How Far Each Bill Got
@@ -839,9 +885,18 @@ bills["stage"] = stages
 
 print("Requests left this hour, after:", response.headers["X-RateLimit-Remaining"])
 print(bills["stage"].value_counts().to_string())
+# Requests left this hour, before: 19208
+# Requests left this hour, after: 18855
+# stage
+# introduced              326
+# passed one chamber       25
+# became law                1
+# passed both chambers      1
 ```
 
-STAGES_PROSE
+Of the delegation's 353 bills, 326 had gone no further than introduction, 25 had passed one chamber, one had passed both, and one had become law: H.R. 2316, sponsored by Rep. Jeff Hurd, which became Public Law 119-40. The loop spent 353 requests, the difference between the two counts. Run it twice within an hour, and the difference can come out smaller than the requests made: the limit is per hour, so requests from more than an hour ago stop counting. (The key that ran this chapter's code has a higher limit than the default; a new key starts at 5,000.)
+
+A count of milestones is not a measure of a legislator's effectiveness. Senators and representatives work under different rules, and bills differ in what they would do. Volden and Wiseman's measure of legislative effectiveness follows the same stages, from introduction to law, and weighs each bill by how much it would change [@volden2014legislative]. A table of members by stage shows the shape of the delegation's year, and a stacked bar for each member draws it:
 
 ```{python}
 order = ["introduced", "passed one chamber", "passed both chambers", "became law"]
@@ -849,7 +904,7 @@ table = pd.crosstab(bills["member"], bills["stage"]).reindex(columns=order, fill
 table = table.loc[table.sum(axis=1).sort_values().index]   # the most bills at the top
 
 ax = table.plot.barh(stacked=True, figsize=(8, 4.5))
-ax.set_title("Bills sponsored by Colorado's delegation, 119th Congress, by how far each got")
+ax.set_title("Bills sponsored by Colorado's delegation, 119th Congress")
 ax.set_xlabel("Bills")
 ax.set_ylabel("")
 ax.legend(title="")
@@ -857,13 +912,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-FIGURE_BILLS
+![Bills sponsored by Colorado's ten current members of Congress in the 119th Congress, as of October 25, 2026, by the furthest milestone each had reached in Congress.gov's records, drawn by the code above.](images/ch-11/colorado-bills-stages.png){#fig-colorado-bills-stages .lightbox fig-alt="Stacked horizontal bar chart, one bar per member of Colorado's delegation, longest at the top. Rep. Neguse sponsored 88 bills, 2 of which passed one chamber; Sen. Bennet 72, 1 of which passed the Senate; Rep. Pettersen 40; Sen. Hickenlooper 33, 5 of which passed the Senate; Reps. Crow and Hurd 27 each; Rep. Evans 23, 8 of which passed the House; Rep. Boebert 20, one of which passed both chambers; Rep. DeGette 14; Rep. Crank 9. Nearly every bar is almost all the color for introduced. Rep. Hurd's ends with his one bill that became law."}
 
-FIGURE_BILLS_PROSE
+Almost every bar is almost all one color (@fig-colorado-bills-stages): introducing a bill is easy, and most bills stop there. The members whose bills moved are not the ones who introduced the most. Rep. Gabe Evans's 23 bills include 8 that passed the House, more than any other member's, and Sen. John Hickenlooper's 33 include 5 that passed the Senate. The figure is a snapshot of a Congress still in session, so any vote changes it, and running the loop again to find out costs another 353 requests.
 
 ### What Changed: `fromDateTime`
 
-Rerun that cell next week, and it makes the same 300-odd requests to learn about the few bills that moved. The list endpoints answer a cheaper question: which records changed in a window of time. `fromDateTime` and `toDateTime`, in the form `2026-10-01T00:00:00Z`, keep only the bills whose record was updated between them, parameters the bill endpoint lists in the API's interactive documentation at [api.congress.gov](https://api.congress.gov/). Page through every bill of the 119th Congress updated in the first week of October 2026, and check which of the delegation's are among them:
+Rerun that cell next week, and it makes the same 300-odd requests to learn about the few bills that moved. The list endpoints answer a cheaper question: which records changed in a window of time. `fromDateTime` and `toDateTime`, in the form `2026-10-01T00:00:00Z`, keep only the bills whose record was updated between them; the bill endpoint lists both in the API's interactive documentation at [api.congress.gov](https://api.congress.gov/). Page through every bill of the 119th Congress updated in the first week of October 2026, and check which of the delegation's are among them:
 
 ```{python}
 changed = set()
@@ -879,9 +934,26 @@ print(len(changed), "bills changed that week")
 
 ours = [(bill_type, number) in changed for bill_type, number in zip(bills["type"], bills["number"])]
 print(bills[ours][["member", "type", "number", "stage"]].to_string(index=False))
+# 925 bills changed that week
+#                member type number              stage
+#           Evans, Gabe   HR   9340 passed one chamber
+#   Pettersen, Brittany   HR  10216         introduced
+#   Pettersen, Brittany   HR   4718         introduced
+#   Pettersen, Brittany   HR   2461         introduced
+#   Pettersen, Brittany   HR   1734         introduced
+#           Crow, Jason   HR  10541         introduced
+#           Neguse, Joe   HR  10584         introduced
+#           Neguse, Joe   HR   4109         introduced
+#           Neguse, Joe   HR   2649         introduced
+#           Neguse, Joe   HR   2648         introduced
+#           Neguse, Joe   HR   1726         introduced
+#        DeGette, Diana   HR   8432         introduced
+#        DeGette, Diana   HR  10227         introduced
+# Hickenlooper, John W.    S   2437 passed one chamber
+#    Bennet, Michael F.    S   5444         introduced
 ```
 
-FROMDATE_PROSE
+In the first week of October 2026, 925 of the 119th Congress's bills changed, and 15 of them were the delegation's. Only those 15 need their actions asked for again. Two cautions. A bill's `updateDate` is "the date of the last update received" for it, "not a date corresponding to the legislative date or legislative action date," in the [documentation](https://github.com/LibraryOfCongress/api.congress.gov/blob/main/Documentation/BillEndpoint.md)'s words, so a change can be a corrected title or a new cosponsor as well as a vote: "changed" means "worth checking". And a window in the past can shrink. A bill updated on October 3 and again on October 20 now carries the later date, so it no longer appears in the first week of October. The dependable pattern is to save the time each run starts, and ask the next run for everything changed since then.
 
 ## Combining Census and EIA Data
 
@@ -909,31 +981,53 @@ power = pd.DataFrame(eia_get("electricity/retail-sales/data/", params)["data"])
 print(len(states), "rows from the Census Bureau;", len(power), "from the EIA")
 print(states[["NAME", "state"]].head(3).to_string(index=False))
 print(power[["stateDescription", "stateid"]].head(3).to_string(index=False))
+# 52 rows from the Census Bureau; 62 from the EIA
+#    NAME state
+# Alabama    01
+#  Alaska    02
+# Arizona    04
+# stateDescription stateid
+#           Alaska      AK
+#          Alabama      AL
+#         Arkansas      AR
 ```
 
-The two agencies name Colorado differently. The Census Bureau uses its FIPS code (Federal Information Processing Standards code), `08`; the EIA uses its postal abbreviation, `CO`. The state's name is in both, but a name is a poor key: a spelling, an abbreviation, or a "The" can keep two names for one place from matching. A **crosswalk** is a table that pairs one set of codes with the other, and the Census Bureau publishes one for states, a text file whose columns are separated by `|`, listed on its page of [FIPS codes](https://www.census.gov/library/reference/code-lists/ansi.html):
+The two agencies name Colorado differently. The Census Bureau uses its FIPS code (Federal Information Processing Standards code), `08`; the EIA uses its postal abbreviation, `CO`. The state's name is in both, but a name is a poor key: a spelling, an abbreviation, or a "The" can keep two names for one place from matching. A **crosswalk** is a table that pairs one set of codes with the other, and the Census Bureau publishes one for states, a text file whose columns are separated by `|`, listed on its page of [FIPS codes](https://www.census.gov/library/reference/code-lists/ansi.html) under "States":
 
 ```{python}
 import io
 
-response = requests.get("https://www2.census.gov/geo/docs/reference/state.txt", headers=HEADERS, timeout=30)
+response = requests.get("https://www2.census.gov/geo/docs/reference/codes2020/national_state2020.txt", headers=HEADERS, timeout=30)
 response.raise_for_status()
 codes = pd.read_csv(io.StringIO(response.text), sep="|", dtype=str)   # dtype=str keeps "08" as "08"
 print(codes.head(3).to_string(index=False))
+# STATE STATEFP  STATENS STATE_NAME
+#    AL      01 01779775    Alabama
+#    AK      02 01785533     Alaska
+#    AZ      04 01779777    Arizona
 ```
 
 Join in two steps: the Census rows to the crosswalk on the FIPS code, then the result to the EIA's rows on the postal code. An **outer** join keeps every row from both sides, and pandas' [`merge()`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html) with `indicator=True` adds a column, `_merge`, that says where each row came from. Look at the rows that didn't match before you trust the ones that did:
 
 ```{python}
-states = states.merge(codes[["STATE", "STUSAB"]], left_on="state", right_on="STATE", how="left")
-joined = states.merge(power, left_on="STUSAB", right_on="stateid", how="outer", indicator=True)
+# In the crosswalk, STATEFP is the FIPS code and STATE the postal code; the Census API's "state" column is a FIPS code
+states = states.merge(codes[["STATEFP", "STATE"]], left_on="state", right_on="STATEFP", how="left")
+joined = states.merge(power, left_on="STATE", right_on="stateid", how="outer", indicator=True)
 
 print(joined["_merge"].value_counts().to_string())
 print("Only in the Census Bureau's data:", sorted(joined.loc[joined["_merge"] == "left_only", "NAME"]))
 print("Only in the EIA's data:", sorted(joined.loc[joined["_merge"] == "right_only", "stateDescription"]))
+# _merge
+# both          51
+# right_only    11
+# left_only      1
+# Only in the Census Bureau's data: ['Puerto Rico']
+# Only in the EIA's data: ['East North Central', 'East South Central', 'Middle Atlantic', 'Mountain', 'New England', 'Pacific Contiguous', 'Pacific Noncontiguous', 'South Atlantic', 'U.S. Total', 'West North Central', 'West South Central']
 ```
 
-JOIN_PROSE
+Fifty-one rows matched: the fifty states and the District of Columbia. The one Census row without a partner is Puerto Rico, which the American Community Survey covers and the EIA's retail-sales route doesn't. The eleven EIA rows without a partner aren't states at all. They are regions (the Census Bureau's divisions, with the Pacific division split into its contiguous and noncontiguous states) and the U.S. total, which the EIA puts in the same column as the states, `stateid`. An inner join would have dropped all twelve without a word, and a sum of the EIA's column would have counted every state three times: as itself, in its region, and in the total.
+
+Keep the 51 rows that matched, and compute two things from them: a home's average annual electricity bill, the residential revenue divided by the number of residential customers, and that bill as a share of the state's median household income:
 
 ```{python}
 both = joined[joined["_merge"] == "both"].copy()
@@ -945,15 +1039,23 @@ both["share"] = both["annual_bill"] / both["income"] * 100
 
 columns = ["NAME", "annual_bill", "income", "share"]
 print(both.sort_values("share", ascending=False)[columns].head(5).round(1).to_string(index=False))
-print(both.loc[both["STUSAB"] == "CO", columns].round(1).to_string(index=False))
+print(both.loc[both["STATE"] == "CO", columns].round(1).to_string(index=False))
+#           NAME  annual_bill  income  share
+#    Mississippi       1857.9 56447.0    3.3
+#        Alabama       2082.0 63999.0    3.3
+#  West Virginia       1857.1 59608.0    3.1
+#      Louisiana       1691.5 60756.0    2.8
+# South Carolina       1794.1 69324.0    2.6
+#     NAME  annual_bill  income  share
+# Colorado       1206.9 95470.0    1.3
 ```
 
-SHARE_PROSE
+In Mississippi and Alabama, a home's electricity bill averaged 3.3 percent of the median household's income; in Colorado, 1.3 percent, \$1,207 a year against \$95,470. Two cautions come with the join. The years differ: the EIA's figures are for 2024, while the ACS estimate pools 2020 to 2024 and states it in 2024 dollars. And the units differ: an EIA customer is not the same thing as an ACS household, so the share is an approximation, worth saying so whenever you report it. Matching identifiers is the first step of a join; matching what the numbers mean is the second. A scatter plot puts every state on one page:
 
 ```{python}
 ax = both.plot.scatter(x="income", y="annual_bill", figsize=(8, 4.5))
-for _, row in both[both["STUSAB"].isin(["CO", "HI", "CA", "MS", "UT"])].iterrows():
-    ax.annotate(row["STUSAB"], (row["income"], row["annual_bill"]), xytext=(4, 4), textcoords="offset points")
+for _, row in both[both["STATE"].isin(["CO", "HI", "CA", "MS", "UT"])].iterrows():
+    ax.annotate(row["STATE"], (row["income"], row["annual_bill"]), xytext=(4, 4), textcoords="offset points")
 ax.set_title("Homes' electricity bills against household income, by state")
 ax.set_xlabel("Median household income, ACS 2020-2024 (dollars)")
 ax.set_ylabel("Average annual electricity bill, 2024 (dollars)")
@@ -961,9 +1063,36 @@ plt.tight_layout()
 plt.show()
 ```
 
-FIGURE_STATES
+![Each state's average annual residential electricity bill in 2024, from the EIA, against its median household income, from the ACS 5-year estimates for 2020–2024, joined through the Census Bureau's state crosswalk and drawn by the code above. Five states are labeled.](images/ch-11/state-electricity-bills.png){#fig-state-electricity-bills .lightbox fig-alt="Scatter plot of 51 points, one per state and the District of Columbia: median household income from about 56,000 to 110,000 dollars across the bottom, and the average annual electricity bill from about 1,100 to 2,550 dollars up the side. The points show no clear trend. Hawaii is at the top, at about 100,000 dollars of income and 2,550 dollars a year. Mississippi is at the far left, with the lowest income and a bill of about 1,860 dollars. California is near 99,000 and 1,930. Colorado and Utah are near the bottom right, at about 95,000 dollars of income and bills of about 1,200 and 1,130 dollars."}
 
-FIGURE_STATES_PROSE
+Electricity bills don't rise with income in any simple way (@fig-state-electricity-bills). Hawaii's homes paid the most, more than \$2,500 a year, and Colorado's and Utah's, in high-income states, paid among the least. The burden falls hardest where incomes are lowest, which is why Mississippi, Alabama, and West Virginia top the list of shares. Each of those findings rests on the join: on a crosswalk from one agency's codes to the other's, and on knowing which rows of each table were never states.
+
+## More Government APIs for Colorado
+
+The four APIs in this chapter are a small part of what governments publish. Each of these is free, documented, and has data about Colorado; most answer the same three questions you asked of this chapter's: what can I ask for, how do I narrow it, and how do I page through it. Where an API wants a key, the list says so.
+
+**Federal**
+
+1. **Bureau of Labor Statistics (BLS) [Public Data API](https://www.bls.gov/developers/).** Employment, unemployment, wages, and prices as time series, including Colorado's and each county's unemployment rate from the Local Area Unemployment Statistics. Version 1.0 needs no registration; version 2.0 needs a free key and allows more series and requests.
+2. **Bureau of Economic Analysis (BEA) [API](https://apps.bea.gov/api/signup/).** GDP and personal income for the nation, the states, counties, and metropolitan areas, such as personal income per capita in Boulder County. Requires a free key.
+3. **U.S. Geological Survey (USGS) [Water Data APIs](https://api.waterdata.usgs.gov/).** Streamflow and water levels from monitoring stations, such as the gauges on Boulder Creek and the South Platte. Its site offers a free key.
+4. **National Weather Service [API](https://www.weather.gov/documentation/services-web-api).** Forecasts, observations, and alerts for any point, such as `api.weather.gov/points/40.015,-105.2705` for Boulder. No key: instead, it asks every request for a User-Agent with your contact information, as this book's `HEADERS` do.
+5. **EPA [AirNow API](https://docs.airnowapi.org/).** Current and forecast air quality from more than 2,500 monitoring stations, including Colorado's. Requires a free account and key.
+6. **[USAspending API](https://api.usaspending.gov/).** Federal contracts, grants, and loans, by recipient, agency, and place, under the DATA Act, such as every federal award to recipients in Colorado. No key.
+7. **[OpenFEMA](https://www.fema.gov/about/openfema/api).** The Federal Emergency Management Agency's disaster declarations, assistance, and flood-insurance records, filtered with `$filter`, as in `state eq 'CO'`. Boulder County's records include the Marshall Fire of December 2021. No key.
+
+**State**
+
+8. **[Colorado Information Marketplace](https://data.colorado.gov/).** The State of Colorado's open-data portal: the Secretary of State's records of business entities, and many other datasets. Each dataset has an endpoint in the Socrata Open Data API ([SODA](https://dev.socrata.com/)), queried with a SQL-like language, SoQL. No key, but a free [application token](https://dev.socrata.com/docs/app-tokens.html) raises the limit on how fast you can ask.
+9. **Colorado Division of Water Resources' [CDSS REST API](https://dwr.state.co.us/Rest/GET/Help).** The Colorado Decision Support System's stream gauges, wells, diversions, and water rights. Answers anonymous and registered users; a free key raises the daily limits.
+10. **Regional Transportation District (RTD) [real-time feeds](https://www.rtd-denver.com/open-records/open-spatial-information/real-time-feeds).** Where the Denver area's buses and trains are, and their delays and alerts, in GTFS Realtime, a binary format (protocol buffers) rather than JSON. Used under RTD's license agreement.
+
+**Local**
+
+11. **[City of Boulder Open Data](https://open-data.bouldercolorado.gov/).** Construction permits, the police department's crime blotter and stops, parcels, and Open Space trails. Each dataset has an ArcGIS REST endpoint, which pages with `resultOffset` and filters with a `where` clause.
+12. **City and County of Denver [Open Data Catalog](https://opendata-geospatialdenver.hub.arcgis.com/).** Crime, 311 service requests, permits, and parcels for Denver, on the same ArcGIS platform as Boulder's.
+
+Before you build on any of them, read its terms, its limits, and its `robots.txt` where it has one (@sec-ethics), and note the date you used it: local portals rename and retire datasets more often than federal APIs do.
 
 ## Recommended Exercises
 
