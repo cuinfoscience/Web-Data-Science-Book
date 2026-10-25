@@ -2,6 +2,38 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-25 · Chapter 11 teaches four APIs, one idea each, with four keys under new names
+
+**Decision.**
+- Chapter 11 teaches Census (*what can I ask for?*), FRED (*let the server compute*), the EIA's API v2 (*let the server filter*), and Congress.gov's API v3 (*follow the links*). FEC leaves the chapter; its section stays until the second pull request replaces it with Congress.gov, and in the meantime its cells use `datagov_key`, since the FEC's API takes api.data.gov keys.
+- The keys are read from `CENSUS_KEY`, `FRED_KEY`, `EIA_KEY`, and `DATAGOV_KEY`, in place of `*_API_KEY`. The setup cell prints only whether each is set.
+- The chapter's tutorial cells are run live, with outputs written in as comments and fixed end dates, and every request sends `HEADERS`, the book's User-Agent form. `tools/shots/renders/ch-11.py` runs them and draws the chapter's three charts.
+- A tour, from each agency's web page to its request, opens the chapter, with a capture from each agency.
+
+**Why.** The maintainer decided the four APIs, their ideas, and the key names on 2026-10-25 ([plan](plans/2026-10-25-ch11-four-apis.md), §8). The chapter had never been run: 2 of its tutorial cells showed output, and none sent a User-Agent.
+
+**Where.** `ch-11-government.qmd`, `tools/shots/recipes/ch-11.yml`, `tools/shots/renders/ch-11.py`. The course's `docs/course-facts.md` lists the key names' other copies.
+
+## 2026-10-25 · Chapter 11 uses the 2020–2024 ACS and an annual Denver CPI
+
+**Decision.**
+- Chapter 11's Census requests use the ACS 5-year estimates for 2020–2024 (`data/2024/acs/acs5`), the newest, in place of 2018–2022. In them, 83 of Colorado's 482 places have no median household income (`-666666666`); in 2018–2022, 72 did. The chapter gives both.
+- The Denver-area CPI is FRED's `CUUSA433SA0`, Denver-Aurora-Lakewood, annual. The chapter's `CUURS49BSA0` doesn't exist on FRED (400, "The series does not exist", 2026-10-25); in the BLS's area codes S49B is San Francisco, and Denver is S48B, which FRED carries only as the annual and semiannual `CUUSA433` series. The comparison is annual: FRED averages the national monthly series (`CPIAUCNS`, `frequency=a`, `aggregation_method=avg`) and computes both years' percent changes (`units=pc1`), which is the FRED section's idea.
+
+**Why.** Each figure the chapter prints comes from a request run on 2026-10-25. The old text also called the Denver series bimonthly; the BLS publishes it semiannually and annually.
+
+**Where.** `ch-11-government.qmd`, "U.S. Census Bureau API" and "FRED API".
+
+## 2026-10-25 · A page with small text is captured as if zoomed
+
+**Decision.**
+- When a page's own text measures under the book's 11 pixels at 100%, its figure may be captured in a narrower window at a higher scale: a 640-pixel window at scale 2.5 gives the same pixels as an 800-pixel window zoomed to 125%. The recipe says so in a comment, and the caption says "zoomed to 125%". Chapter 11's `census-table` is the first.
+- A page whose layout needs a window wider than 1,000 pixels to show something, and whose text then fails the check, is captured at 800 pixels without it, and the text says what a wider window adds. Chapter 11's `congress-bill` leaves out the bill's tabs.
+
+**Why.** data.census.gov's labels are 10 and 11 pixels, which measured 9.7 in the book; Congress.gov's 13-pixel text in a 1,024-pixel window measured 9.1. A reader who zooms their browser sees what the zoomed capture shows, so the figure stays a real capture. The toolkit has no page-zoom setting, and scale already sets the device pixel ratio.
+
+**Where.** `tools/shots/recipes/ch-11.yml`, `images/ch-11/IMAGES.md`, `tools/shots/README.md` ("Sizes and markers").
+
 ## 2026-10-19 · Markers have twice their first area
 
 **Decision.**
