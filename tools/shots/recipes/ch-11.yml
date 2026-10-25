@@ -1,0 +1,212 @@
+# Recipes for Chapter 11's figures (ch-11-government.qmd). See tools/shots/README.md.
+#
+# "A Tour: From an Agency's Website to Its API" shows one page from each of the
+# chapter's four agencies, each the page behind a request the chapter's code
+# makes: a data.census.gov table, a FRED series, the EIA's API Dashboard, and a
+# Congress.gov bill. Every page is public and loads signed out. robots.txt on
+# each host allows these pages to the course's User-Agent (2026-10-25);
+# fred.stlouisfed.org asks for a 1-second Crawl-delay and www.congress.gov for 2,
+# both under the toolkit's 8-30 second pauses. www.congress.gov's robots.txt has
+# a group for Claude's agents, which doesn't govern captures (docs/decisions.md,
+# 2026-09-24).
+#
+# The bill, H.R. 7730 of the 119th Congress, the Bankruptcy Threshold Adjustment
+# Act, has passed the House and the Senate, so its tracker shows a bill in motion.
+# Its sponsor is a member of Congress, a public official. Congress.gov refused the
+# toolkit's captures, so it is a hand capture (README, "Hand captures").
+#
+# The three renders are charts the chapter's own code draws, made by
+# tools/shots/renders/ch-11.py.
+chapter: ch-11
+qmd: ch-11-government.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: census-table
+    kind: capture
+    section: "A Tour: From an Agency's Website to Its API"
+    brief: >-
+      Show the page a reader would find a Census number on, and the parts of it
+      that become the API request: table B19013's ID (marker 1), its product,
+      the 2024 ACS 5-year estimates (2), the geography, Boulder County (3), the
+      estimate with its margin of error (4), and the API button (5). Keep the
+      table's title, toolbar, and its one row; leave out the site's header and
+      the empty space under the table.
+    url: https://data.census.gov/table/ACSDT5Y2024.B19013?g=050XX00US08013
+    # A 640-pixel window at scale 2.5 is the page as an 800-pixel window shows it zoomed to 125%:
+    # at 100%, the site's 10- and 11-pixel labels measure under the book's 11 pixels
+    window: [640, 520]
+    scale: 2.5
+    steps:
+      - wait: {text: '^103,994$'}
+      - wait: {text: '±2,268'}
+    expect:
+      status: 200
+      text: ['Boulder County, Colorado', '103,994']
+    # At this width the filter and result panels fold into a button at the window's foot
+    crop: {top: 117, height: 275}
+    annotate:
+      marks:
+        - {n: 1, at: {selector: 'span.table-id', box: text}, side: left, gap: 2}
+        - {n: 2, at: {text: '^2024: ACS 5-Year Estimates Detailed Tables$', nth: 1}, side: right}   # the first match sits under the Universe chip, unseen
+        - {n: 3, at: {text: '^Boulder County, Colorado$'}, side: right}
+        - {n: 4, at: {text: '^±2,268$'}, side: left}
+        - {n: 5, at: {text: '^API$'}, side: below}
+    drifts: true        # the estimate changes with each release, and the site's look
+
+  - id: fred-series
+    kind: capture
+    section: "A Tour: From an Agency's Website to Its API"
+    brief: >-
+      Show a FRED series page and what on it maps to the API: the series ID
+      (marker 1), the units and frequency line (2), and Edit Graph, where the
+      site changes units and frequency (3). Keep the title through the buttons
+      and the top of the chart; leave out the rest of the chart and the notes.
+    url: https://fred.stlouisfed.org/series/MHICO08013A052NCEN
+    window: [800, 600]
+    steps:
+      - wait: {selector: '#edit-graph-button'}
+      - wait: {text: 'MHICO08013A052NCEN'}
+    expect:
+      status: 200
+      text: ['Boulder County, CO', 'Annual']
+    crop: {top: 50, height: 302}
+    annotate:
+      marks:
+        - {n: 1, at: {selector: '#series-title-text-container .smaller', box: text}, side: right}
+        - {n: 2, at: {selector: '#mobile-meta-col p.mb-2', box: text}, side: right}
+        - {n: 3, at: {selector: '#edit-graph-button'}, side: above}
+    drifts: true        # the latest observation, and the site's look
+
+  - id: eia-browser
+    kind: capture
+    section: "A Tour: From an Agency's Website to Its API"
+    brief: >-
+      Show the EIA's API Dashboard as a form that writes its own request: the
+      data type chosen, average price (marker 1), the facet filters, one state
+      and one sector (2), and the API URL the form builds from them (3). Keep
+      from the Data Type heading to the end of the API URL; leave out the
+      route menus above, the X-Params header below, and the table of results.
+    url: https://www.eia.gov/opendata/browser/electricity/retail-sales?frequency=annual&data=price;&facets=stateid;sectorid;&stateid=CO;&sectorid=RES;&sortColumn=period;&sortDirection=desc;
+    window: [800, 840]
+    steps:
+      - wait: {text: 'STATEID'}
+      - wait: {text: 'https://api\.eia\.gov/v2/electricity/retail-sales/data/'}
+      - wait: {network_idle: true}     # the dashboard keeps laying itself out after its text appears
+      - settle: 3
+      - scroll: {match: 'DATA TYPE', in: 'span.accordion-clickable', offset: 60}   # 60 clears the sticky header
+      - settle: 1
+    expect:
+      status: 200
+      text: ['1 of 62 selected', 'facets\[stateid\]\[\]=CO']
+    crop: {between: ['span.accordion-clickable', '.api-call-container .api-call-sub p'], pad: [8, 0, 12, 0]}
+    oversize: "the form's choices and the URL they build need 750 pixels of height to be seen together"
+    annotate:
+      marks:
+        - {n: 1, at: {selector: 'mat-checkbox.mat-mdc-checkbox-checked label', box: text}, side: right}
+        - {n: 2, shape: bracket, at: {selector: '.facet-title', all: true}, x: 20}
+        - {n: 3, at: {text: '^https://api\.eia\.gov/v2/electricity'}, side: left}
+    drifts: true        # the dashboard's look, and the counts of states and sectors
+
+  - id: congress-bill
+    kind: capture
+    mode: hand
+    section: "A Tour: From an Agency's Website to Its API"
+    brief: >-
+      Show a bill's page as the hub of the records the API links to: the bill's
+      number and title (marker 1), its sponsor (2), and the tracker that shows
+      how far it has come (3). From the title to the end of the overview box;
+      no search bar above it, and no sidebar or summary below. The tabs for the
+      bill's text, actions, and cosponsors appear only in a wider window, so
+      the text names them instead.
+    url: https://www.congress.gov/bill/119th-congress/house-bill/7730
+    hand:
+      why: >-
+        www.congress.gov answered the toolkit's captures with a Cloudflare
+        challenge (403) twice on 2026-10-25, 33 minutes apart, and the toolkit
+        doesn't get past a challenge. The maintainer took the screenshot in his
+        own browser.
+      steps: >-
+        Open the bill's page signed out, in a window whose page is about 720 CSS
+        pixels wide, and take a screenshot of the page from the title through
+        the overview box, at the display's scale (2 on a Retina Mac).
+      text_px: 13          # Congress.gov's body text
+    window: [720, 329]
+    scale: 2
+    crop: {top: 0, left: 0, width: 720, height: 329}
+    annotate:
+      marks:
+        - {n: 1, at: {xy: [26, 28, 940, 46]}, side: right}
+        - {n: 2, at: {xy: [338, 268, 532, 34]}, side: right}
+        - {n: 3, at: {xy: [338, 484, 984, 38]}, side: below}
+    drifts: true        # the bill's page moves as the bill does, and the site's look
+
+  - id: housing-boulder-longmont
+    kind: render
+    mode: hand
+    section: "Comparing Places"
+    brief: >-
+      Chart housing units by decade built in the cities of Boulder and
+      Longmont, from the ACS 5-year estimates for 2020-2024, as the chapter's
+      code draws it, oldest decade at the left.
+    url: https://api.census.gov/data/2024/acs/acs5?get=NAME,B25034_002E,B25034_003E,B25034_004E,B25034_005E,B25034_006E,B25034_007E,B25034_008E,B25034_009E,B25034_010E,B25034_011E&for=place:07850,45970&in=state:08
+    api_client: true
+    hand:
+      why: >-
+        matplotlib draws it from the Census API, as the chapter's code does; no
+        browser is involved
+      steps: >-
+        Run `python tools/shots/renders/ch-11.py OUTDIR --contact EMAIL` with
+        the four keys set; it writes OUTDIR/housing-boulder-longmont.png, 1600
+        by 900 pixels. Import it with --tool naming matplotlib's and requests'
+        versions.
+      text_px: 13
+    window: [800, 450]
+
+  - id: cpi-denver-national
+    kind: render
+    mode: hand
+    section: "Let the Server Compute: `frequency` and `aggregation_method`"
+    brief: >-
+      Chart annual inflation, 2015-2025, for the Denver area (CUUSA433SA0,
+      units=pc1) and the nation (CPIAUCNS, annual averages, units=pc1), both
+      computed by FRED, as paired bars, one pair a year, with the 2 percent
+      target as a dashed line.
+    url: https://api.stlouisfed.org/fred/series/observations?series_id=CPIAUCNS&frequency=a&aggregation_method=avg&units=pc1&observation_start=2015-01-01&observation_end=2025-12-31
+    api_client: true
+    hand:
+      why: >-
+        matplotlib draws it from FRED's API, as the chapter's code does; no
+        browser is involved
+      steps: >-
+        Run `python tools/shots/renders/ch-11.py OUTDIR --contact EMAIL` with
+        the four keys set; it writes OUTDIR/cpi-denver-national.png, 1600 by
+        800 pixels. Import it with --tool naming matplotlib's and requests'
+        versions.
+      text_px: 13
+    window: [800, 400]
+
+  - id: co-generation-mix
+    kind: render
+    mode: hand
+    section: "Let the Server Filter"
+    brief: >-
+      Chart the shares of Colorado's electricity generation from coal, gas,
+      wind, solar, and hydroelectric plants, 2001-2025, from the EIA's
+      electric-power-operational-data route, as the chapter's code draws it,
+      with a small tick label for every year.
+    url: https://api.eia.gov/v2/electricity/electric-power-operational-data/data/?frequency=annual&data[]=generation&facets[location][]=CO&facets[sectorid][]=99&start=2001&end=2025
+    api_client: true
+    hand:
+      why: >-
+        matplotlib draws it from the EIA's API, as the chapter's code does; no
+        browser is involved
+      steps: >-
+        Run `python tools/shots/renders/ch-11.py OUTDIR --contact EMAIL` with
+        the four keys set; it writes OUTDIR/co-generation-mix.png, 1600 by 900
+        pixels. Import it with --tool naming matplotlib's and requests'
+        versions.
+      text_px: 13
+    window: [800, 450]

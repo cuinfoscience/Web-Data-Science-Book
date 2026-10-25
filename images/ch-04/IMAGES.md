@@ -7,9 +7,9 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 <!-- shots:begin: generated from provenance.json by tools/shots; edits between these markers are replaced -->
 | File | Kind | Captured | Source | How |
 |---|---|---|---|---|
-| `forecast-json.png` and `forecast-json_annotated.png`, `.pdf` | capture | 2026-09-24 | https://api.open-meteo.com/v1/forecast?latitude=40.01&longitude=-105.27&daily=temperature_2m_max%2Ctemperature_2m_min&timezone=America%2FDenver | tools/shots: Google Chrome for Testing 154.0.8037.57, 600×520 at 2× |
-| `house-xml-tree.png` and `house-xml-tree_annotated.png`, `.pdf` | capture | 2026-09-24 | https://clerk.house.gov/xml/lists/MemberData.xml | tools/shots: Google Chrome for Testing 154.0.8037.57, 800×680 at 2× |
-| `rss-feed-xml.png` and `rss-feed-xml_annotated.png`, `.pdf` | capture | 2026-09-24 | https://feeds.bbci.co.uk/news/science_and_environment/rss.xml | tools/shots: Google Chrome for Testing 154.0.8037.57, 800×700 at 2× |
+| `forecast-json.png` and `forecast-json_annotated.png`, `.pdf` | capture | 2026-10-19 | https://api.open-meteo.com/v1/forecast?latitude=40.01&longitude=-105.27&daily=temperature_2m_max%2Ctemperature_2m_min&timezone=America%2FDenver | tools/shots: Google Chrome for Testing 154.0.8037.92, 600×520 at 2× |
+| `house-xml-tree.png` and `house-xml-tree_annotated.png`, `.pdf` | capture | 2026-10-19 | https://clerk.house.gov/xml/lists/MemberData.xml | tools/shots: Google Chrome for Testing 154.0.8037.92, 800×680 at 2× |
+| `rss-feed-xml.png` and `rss-feed-xml_annotated.png`, `.pdf` | capture | 2026-10-19 | https://feeds.bbci.co.uk/news/science_and_environment/rss.xml | tools/shots: Google Chrome for Testing 154.0.8037.92, 800×700 at 2× |
 | `view-source-rss-link.png` and `view-source-rss-link_annotated.png`, `.pdf` | capture | 2026-09-24 | view-source:https://www.pbs.org/newshour/ | tools/shots: Google Chrome for Testing 154.0.8037.57, 816×600 at 2× |
 <!-- shots:end -->
 

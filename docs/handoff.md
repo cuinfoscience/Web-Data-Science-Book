@@ -1,5 +1,10 @@
 # Hand-off note
 
+**Updated 2026-10-25: chapter 11 and week 11.** The sprint follows [`plans/2026-10-25-ch11-four-apis.md`](plans/2026-10-25-ch11-four-apis.md) (#288). Textbook PR A is open: the keys under their new names, the tour with four captures, Census and FRED rewritten and run live, the EIA's section, three renders, and the learning objectives. Still to come, in order:
+- **Course, after PR A merges:** lab Part 2 (FRED, EIA) from the merged chapter, Part 1 revised to it, and Wednesday's frames.
+- **Textbook PR B:** Congress.gov replaces FEC, the Census–EIA join replaces "Combining Census and FRED Data", Social History, Common Issues, Additional Exercises 3–4, Further Reading, and FEC out of `index.qmd`, `README.md`, and the AI-disclosure appendix. Until then, chapter 11's FEC section reads `datagov_key`, which the FEC's API accepts.
+- **Course, after PR B merges:** lab Part 3, Friday's frames, the deck's placeholders, and this note.
+
 **Updated 2026-10-06, later.** Merged since the review pass below:
 - #222: chapter 8's install cell for Selenium and Selenium Manager, and its two stub sections folded into their neighbors;
 - #229: chapter 8's hidden-API walkthrough in Check 3, the eight locator strategies compared with BeautifulSoup's `find_all()`, and the workflow's code marked as specific to Quotes to Scrape;

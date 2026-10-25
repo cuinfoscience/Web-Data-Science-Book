@@ -49,7 +49,7 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
   3. Library/framework introduction
   4. Guided tutorial with narrative code blocks
   5. Recommended Exercises (one guided build, 5–7 steps) followed by Additional Exercises (open-ended, "Graduate extension (INFO 5617)" last)
-  6. Social history / public interest data science sidebar
+  6. Social History and Public Interest: the chapter's one place for its history and for its connections to the post-API age framework (openness, oversight, ownership), with every factual claim linked to a primary source or cited from `references.bib`
   7. Common debugging issues
   8. Key takeaways
   9. Further reading links
@@ -58,7 +58,7 @@ PDF output is not currently configured; adding it would require TinyTeX and a `p
 - **Callout types**:
   - `.callout-tip` — Missing Manual cross-references, practical tips
   - `.callout-warning` — Ethical considerations, legal cautions, "Warning!" blocks about ToS violations
-  - `.callout-note` — Connections to the post-API age framework (openness, oversight, ownership)
+  - `.callout-note` — A short note that fits nowhere else. Not for connections to the post-API age framework or for historical asides: those go in the chapter's "Social History and Public Interest" section (`docs/decisions.md`, 2026-10-25)
   - `.callout-important` — Critical debugging or setup steps
 - **Data sources**: Use the specific sources from the course notebooks (leg.colorado.gov, the-numbers.com, Wikipedia, Boulder City Council PDFs, etc.). These may change; document the specific URLs and dates accessed.
 - **Exercises**: two sections per chapter. **Recommended Exercises** is the take-home assignment: one guided build of 5–7 numbered steps (`**Step N — Title.**` prose followed by a ```{python} block containing only comment prompts like `# Your code here` — never solution code), ending with an interpretation step answered in comments or Markdown. Steps may use only concepts from that chapter or earlier ones, never later chapters, and should cite earlier chapters with `@sec-` references. The empty cells flow into the companion notebook, which students complete and submit. **Additional Exercises** are open-ended items, no scaffold, with one **Graduate extension (INFO 5617)** exercise as the final numbered item — a scholarly reading paired with an open-ended, rigorous task for the 5000-level section. At least one exercise per chapter should involve a data source not used in the tutorial.
