@@ -40,30 +40,43 @@ Each of the four teaches one general idea about APIs, which you will meet again 
 
 Each of these APIs asks for an API key: a unique string that identifies your application, tracks your usage, and enforces rate limits. Proper key management is a professional practice that applies to every authenticated API in this book and beyond.
 
-::: {.callout-important}
-## Get Your Keys First
-This chapter uses four keys, all free. Request them now: most arrive in minutes, but the Census key works only after you click the link in its email.
+### Get Your Keys
 
-- **Census Bureau**: <https://api.census.gov/data/key_signup.html> (store it as `CENSUS_KEY`)
-- **FRED**: <https://fred.stlouisfed.org/docs/api/api_key.html>, after you create a free FRED account (`FRED_KEY`)
-- **EIA**: <https://www.eia.gov/opendata/register.php> (`EIA_KEY`)
-- **api.data.gov**, for Congress.gov: <https://api.data.gov/signup/> (`DATAGOV_KEY`). One api.data.gov key works for many federal APIs, Congress.gov's among them.
+This chapter uses four keys, all free. Request them now: most arrive in minutes, but the Census key works only after you click the link in its email. Each one gets a name, the environment variable your code will read it from:
 
-Store each key as an environment variable under the name in parentheses, as shown below. For the mechanics of setting environment variables on your operating system, see *Missing Manual* Chapter 34: Environment Variables and Secrets.
-:::
+- **The Census Bureau**: request a key at <https://api.census.gov/data/key_signup.html>, and store it as `CENSUS_KEY`.
+- **FRED** (Federal Reserve Economic Data): create a free FRED account, request a key at <https://fred.stlouisfed.org/docs/api/api_key.html>, and store it as `FRED_KEY`.
+- **The EIA** (U.S. Energy Information Administration): request a key at <https://www.eia.gov/opendata/register.php>, and store it as `EIA_KEY`.
+- **api.data.gov**, for Congress.gov: request a key at <https://api.data.gov/signup/>, and store it as `DATAGOV_KEY`. One api.data.gov key works for many federal APIs, Congress.gov's among them.
 
-**Never hardcode API keys in your notebooks.** If you share your notebook (on GitHub, in a class submission, with a collaborator), your key goes with it. Instead, store your keys as environment variables and read them at the top of your notebook:
+**Never hardcode API keys in your notebooks.** If you share your notebook (on GitHub, in a class submission, with a collaborator), your key goes with it. Store each key as an environment variable instead, and read it at the top of your notebook.
 
-### Environment Variables
+### Setting Environment Variables
+
+An environment variable is a name and a value that a program receives from whatever started it. Jupyter sees only the variables that were set before it started, so set them once, in one of two places, and then start Jupyter:
+
+- **In the `webdata` environment.** Conda can store variables with an environment, and sets them whenever the environment is active, whether you start Jupyter from a terminal or from Anaconda Navigator. This is the simpler choice for this course. In a terminal (on Windows, the Anaconda Prompt), run one line per key, with your own key in the quotes:
+
+  ```bash
+  conda env config vars set CENSUS_KEY="your-census-key" -n webdata
+  conda env config vars set FRED_KEY="your-fred-key" -n webdata
+  conda env config vars set EIA_KEY="your-eia-key" -n webdata
+  conda env config vars set DATAGOV_KEY="your-datagov-key" -n webdata
+  ```
+
+  Then run `conda activate webdata` again, or restart Navigator, before you start Jupyter. `conda env config vars list -n webdata` shows what is set; it prints the keys themselves, so don't paste its output anywhere.
+- **In your shell.** On macOS or Linux, add one line per key, such as `export CENSUS_KEY="your-census-key"`, to your shell's startup file: `~/.zshrc` on a Mac, `~/.bashrc` on most Linux systems. Open a new terminal, and start Jupyter from it. On Windows, run `setx CENSUS_KEY "your-census-key"` in a Command Prompt, once per key, and open a new prompt before starting Jupyter. A Jupyter started from Anaconda Navigator on a Mac doesn't read `~/.zshrc`, which is one reason to prefer the first way.
+
+The *Missing Manual*'s [Chapter 34: Environment Variables and Secrets](https://cuinfoscience.github.io/INFO-Missing-Manual/chapters/secrets.html#setting-environment-variables-in-your-shell) explains both, and a third way, a `.env` file read by `python-dotenv`.
+
+### Reading the Keys in Python
+
 
 ```{python}
 import os
 import requests
 
-# Set each key in your terminal before launching Jupyter:
-#   export CENSUS_KEY="your-key-here"     (macOS/Linux)
-#   set CENSUS_KEY=your-key-here          (Windows)
-# ...and likewise for FRED_KEY, EIA_KEY, and DATAGOV_KEY
+# Set the four keys once, as above, before you start Jupyter
 
 # Say whether each key is set, without ever printing the key itself
 for name in ["CENSUS_KEY", "FRED_KEY", "EIA_KEY", "DATAGOV_KEY"]:
@@ -86,8 +99,8 @@ If a line says `MISSING`, close Jupyter, set the variable, and start Jupyter aga
 
 The Census Bureau, FRED, and the EIA all take the key as a parameter in the URL, so the address `requests` sends, `response.url`, contains your key. Print a response's JSON, never its URL, and never paste a URL from an error message into a forum or a pull request without deleting the key first.
 
-::: {.callout-tip}
-## Alternative: A JSON Configuration File
+### Alternative: A JSON Configuration File
+
 Some projects keep keys in a local configuration file instead of environment variables. Create a file called `api_keys.json` containing `{"census": "your-key", "fred": "your-key", "eia": "your-key", "datagov": "your-key"}`, add it to your `.gitignore` **before your first commit**, and load it into the same variable names:
 
 ```{python}
@@ -103,11 +116,10 @@ datagov_key = keys["datagov"]
 ```
 
 Because both approaches end with the same four variables, every downstream code block in this chapter works unchanged either way.
-:::
 
 ::: {.callout-tip}
 ## Missing Manual Reference
-For a comprehensive guide to API keys, environment variables, `.env` files, and secrets management, see *Missing Manual* Chapter 34: Environment Variables and Secrets.
+For a comprehensive guide to API keys, environment variables, `.env` files, and secrets management, see the *Missing Manual*'s [Chapter 34: Environment Variables and Secrets](https://cuinfoscience.github.io/INFO-Missing-Manual/chapters/secrets.html).
 :::
 
 ## A Tour: From an Agency's Website to Its API
@@ -116,47 +128,48 @@ Every number this chapter's code retrieves is also on a web page, built for peop
 
 ### A Census Table
 
-[data.census.gov](https://data.census.gov/) is the Census Bureau's site for browsing its tables. @fig-census-table is table B19013, median household income, for Boulder County. The table's ID ① is the start of every variable in it: the estimate is `B19013_001E`. The product ② is the survey and its years, the ACS 5-year estimates for 2020–2024, which is `2024/acs/acs5` in the API's address. The column ③ is the geography, and the page's own address names it with the code `050XX00US08013`, whose last five digits are the county's FIPS code, `08013`: state `08`, county `013`. The estimate ④ comes with a margin of error, and the **API** button ⑤ opens the request that returns the table.
+[data.census.gov](https://data.census.gov/) is the U.S. Census Bureau's site for browsing its tables; the same tables come from its API, documented at [census.gov/data/developers](https://www.census.gov/data/developers.html). @fig-census-table is table B19013, median household income, for Boulder County. The table's ID ① is the start of every variable in it: the estimate is `B19013_001E`. The product ② is the survey and its years, the American Community Survey (ACS) 5-year estimates for 2020–2024, which is `2024/acs/acs5` in the API's address. The column ③ is the geography, and the page's own address names it with the code `050XX00US08013`, whose last five digits are the county's FIPS code (Federal Information Processing Standards code), `08013`: state `08`, county `013`. The estimate ④ comes with a margin of error, and the **API** button ⑤ opens the request that returns the table.
 
 ![Table B19013 on data.census.gov, October 2026, zoomed to 125%: the table's ID ①, the product, 2024 ACS 5-year estimates ②, the geography, Boulder County ③, the estimate and its margin of error ④, and the API button ⑤.](images/ch-11/census-table_annotated.png){#fig-census-table .lightbox fig-alt="Screenshot of data.census.gov showing table B19013, Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars). Marker 1: the table ID B19013. Marker 2: the label 2024: ACS 5-Year Estimates Detailed Tables. Marker 3: the column heading Boulder County, Colorado. Marker 4: the row Median household income in the past 12 months, with Estimate 103,994 and Margin of Error ±2,268. Marker 5: the API button in the toolbar."}
 
 ### A FRED Series
 
-Every FRED series has a page (@fig-fred-series). Its ID ① is what the API asks for: `MHICO08013A052NCEN`, which embeds Colorado's postal code and Boulder County's FIPS code, `08013`. The line under **Observations** ② gives the latest value, then the units and the frequency, which are what the API returns unless you ask for something else. **Edit Graph** ③ opens the site's controls for changing both, to percent change or to a lower frequency, and those controls are the API's `units` and `frequency` parameters.
+Every series in FRED (Federal Reserve Economic Data) has a page (@fig-fred-series), and the same series comes from FRED's API, documented at [fred.stlouisfed.org/docs/api/fred](https://fred.stlouisfed.org/docs/api/fred/). Its ID ① is what the API asks for: `MHICO08013A052NCEN`, which embeds Colorado's postal code and Boulder County's FIPS code (Federal Information Processing Standards code), `08013`. The line under **Observations** ② gives the latest value, then the units and the frequency, which are what the API returns unless you ask for something else. **Edit Graph** ③ opens the site's controls for changing both, to percent change or to a lower frequency, and those controls are the API's `units` and `frequency` parameters.
 
 ![The FRED page for `MHICO08013A052NCEN`, October 2026: the series ID ①, the latest observation with its units and frequency ②, and Edit Graph ③, where the site changes units and frequency.](images/ch-11/fred-series_annotated.png){#fig-fred-series .lightbox fig-alt="Screenshot of the FRED page Estimate of Median Household Income for Boulder County, CO. Marker 1: the series ID MHICO08013A052NCEN under the title. Marker 2: the line 2024: 103,293, Dollars, Not Seasonally Adjusted, Annual, under Observations. Below it: Updated Feb 9, 2026, and buttons for 1Y, 5Y, 10Y, and Max. Marker 3: the Edit Graph button, beside Download and View Map."}
 
 ### The EIA's API Dashboard
 
-The EIA builds its requests in the open. Its [API Dashboard](https://www.eia.gov/opendata/browser/) is a form: choose a route, a frequency, the data you want, and filters, and the page writes out the request it will send (@fig-eia-browser). Here the data type ① is the average price of electricity, and the filters ② keep one state of 62 and one sector of 6. Under them, the API URL ③ is the request, with each choice as a parameter: `data[0]=price`, `facets[stateid][]=CO`, `facets[sectorid][]=RES`. Add your key, and it returns the table under the form.
+The U.S. Energy Information Administration (EIA) builds its requests in the open. Its API is documented at [eia.gov/opendata/documentation.php](https://www.eia.gov/opendata/documentation.php), and its [API Dashboard](https://www.eia.gov/opendata/browser/) is a form: choose a route, a frequency, the data you want, and filters, and the page writes out the request it will send (@fig-eia-browser). Here the data type ① is the average price of electricity, and the filters ② keep one state of 62 and one sector of 6. Under them, the API URL ③ is the request, with each choice as a parameter: `data[0]=price`, `facets[stateid][]=CO`, `facets[sectorid][]=RES`. Add your key, and it returns the table under the form.
 
 ![The EIA's API Dashboard, October 2026, set to the route for retail electricity sales, annual: the data type, average price ①, the facet filters, one state and one sector ②, and the API URL the form builds ③.](images/ch-11/eia-browser_annotated.png){#fig-eia-browser .lightbox fig-alt="Screenshot of the EIA API Dashboard. Marker 1: the Data Type section, with Average Price of Electricity to Ultimate Customers checked among four choices. Marker 2: Filter by Facet, with STATEID 1 of 62 selected and SECTORID 1 of 6 selected. Marker 3: the API URL, https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=annual&data[0]=price&facets[stateid][]=CO&facets[sectorid][]=RES with sort, offset, and length parameters."}
 
 ### A Bill on Congress.gov
 
-A bill's page on Congress.gov (@fig-congress-bill) is the hub of a set of records. This one is H.R. 7730 ① of the 119th Congress, the Bankruptcy Threshold Adjustment Act, sponsored by Rep. Ben Cline of Virginia's 6th district ②. Its tracker ③ shows how far it has come: it has passed the House and the Senate, and its latest action, on October 14, 2026, sent the House a message on the Senate's action. It hasn't reached the President. The page links to the bill's committee report and to **All Actions**; in a window wider than about 1,000 pixels, tabs under the box also lead to its text, its actions, and its cosponsors, each a page of its own. In the API, the bill's record is `/v3/bill/119/hr/7730`, and it holds a link to each of those records, with a count: on October 25, 2026, 18 actions, 6 cosponsors, and 5 versions of its text.
+A bill's page on Congress.gov (@fig-congress-bill), the Library of Congress's site for legislation, is the hub of a set of records. Congress.gov's API, documented at [api.congress.gov](https://api.congress.gov/), returns the same records. This one is H.R. 7730 ① of the 119th Congress, the Bankruptcy Threshold Adjustment Act, sponsored by Rep. Ben Cline of Virginia's 6th district ②. Its tracker ③ shows how far it has come: it has passed the House and the Senate, and its latest action, on October 14, 2026, sent the House a message on the Senate's action. It hasn't reached the President. The page links to the bill's committee report and to **All Actions**; in a window wider than about 1,000 pixels, tabs under the box also lead to its text, its actions, and its cosponsors, each a page of its own. In the API, the bill's record is `/v3/bill/119/hr/7730`, and it holds a link to each of those records, with a count: on October 25, 2026, 18 actions, 6 cosponsors, and 5 versions of its text.
 
 ![H.R. 7730 on Congress.gov, October 2026, in a screenshot taken by hand, since the site refused the toolkit's captures: the bill's number and title ①, its sponsor ②, and the tracker, which shows it has passed the House and the Senate ③.](images/ch-11/congress-bill_annotated.png){#fig-congress-bill .lightbox fig-alt="Screenshot of the Congress.gov page H.R.7730, Bankruptcy Threshold Adjustment Act, 119th Congress (2025-2026). Marker 1: the bill's number and title. Marker 2: Sponsor, Rep. Cline, Ben R-VA-6, introduced 02/26/2026, above Committees, House - Judiciary, and Committee Reports, H. Rept. 119-783. Latest Action: Senate, 10/14/2026, Message on Senate action sent to the House, with a link to All Actions. Marker 3: a tracker of five steps, Introduced, Passed House, Passed Senate, To President, and Became Law, with Passed Senate highlighted."}
 
 ### From the Website to the API
 
-| What you see | Where | API request |
-|---|---|---|
-| A Census table for a county | data.census.gov | `api.census.gov/data/2024/acs/acs5?get=B19013_001E&for=county:013&in=state:08` |
-| The variables a table holds | the table's rows | `api.census.gov/data/2024/acs/acs5/variables.json` |
-| A FRED series | its page | `api.stlouisfed.org/fred/series/observations?series_id=…` |
-| A series in percent change, or at a lower frequency | Edit Graph | the same request, with `units=` or `frequency=` |
-| The EIA's data for one state and sector | the API Dashboard | `api.eia.gov/v2/electricity/retail-sales/data/?facets[stateid][]=CO&…` |
-| A bill | its page | `api.congress.gov/v3/bill/119/hr/7730` |
-| Its actions, cosponsors, and text | the bill's tabs, or its Bill Details menu | the links in the bill's record: `…/actions`, `…/cosponsors`, `…/text` |
+Each page in the tour is built for people to read, and each has a request behind it that returns the same thing to a program. The table pairs them, one API to a row:
+
+| API | The page | What it shows | The request that returns it |
+|---|---|---|---|
+| Census Bureau | a table on data.census.gov (@fig-census-table) | Boulder County's median household income | `api.census.gov/data/2024/acs/acs5?get=B19013_001E&for=county:013&in=state:08` |
+| FRED | a series' page (@fig-fred-series) | Boulder County's median household income, year by year | `api.stlouisfed.org/fred/series/observations?series_id=MHICO08013A052NCEN` |
+| EIA | the API Dashboard (@fig-eia-browser) | the price of electricity in Colorado's homes | `api.eia.gov/v2/electricity/retail-sales/data/?data[]=price&facets[stateid][]=CO&facets[sectorid][]=RES` |
+| Congress.gov | a bill's page (@fig-congress-bill) | H.R. 7730, and how far it has come | `api.congress.gov/v3/bill/119/hr/7730` |
+
+Every request also needs your key, which the table leaves out. The words in each request are the page's words: a table's ID, a series' ID, a state's code, a bill's number. That is why the tour comes first. The rest of the chapter takes the four APIs in the table's order, starting with the question every API raises before any data arrives: what can I ask for?
 
 ## U.S. Census Bureau API
 
-The Census Bureau provides access to an enormous range of demographic, economic, and housing data. Its home page is [census.gov](https://www.census.gov/). The American Community Survey alone contains more than 28,000 variables. The challenge is not access but navigation: knowing what you can ask for. The API answers that question itself, through two catalogs that come with every dataset, and reading them first is the habit this section teaches.
+The U.S. Census Bureau provides access to an enormous range of demographic, economic, and housing data. Its home page is [census.gov](https://www.census.gov/), and its API is documented at [census.gov/data/developers](https://www.census.gov/data/developers.html), with a [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) and a page for each dataset. The American Community Survey (ACS), the Bureau's yearly survey of a sample of households, alone contains more than 28,000 variables. The challenge is not access but navigation: knowing what you can ask for. The API answers that question itself, through two catalogs that come with every dataset, and reading them first is the habit this section teaches.
 
 ### What Can I Ask For? Variables
 
-Each Census dataset has an address. This chapter uses the ACS 5-year estimates for 2020–2024, at `https://api.census.gov/data/2024/acs/acs5`. Add `/variables.json` to that address, and you get every variable the dataset offers, with its label:
+Each Census dataset has an address. This chapter uses the American Community Survey (ACS) 5-year estimates for 2020–2024, documented at [census.gov/data/developers/data-sets/acs-5year.html](https://www.census.gov/data/developers/data-sets/acs-5year.html), whose address in the Census Bureau's API is `https://api.census.gov/data/2024/acs/acs5`. Add `/variables.json` to that address, and you get every variable the dataset offers, with its label:
 
 ```{python}
 import pandas as pd
@@ -203,7 +216,7 @@ The variable naming convention follows a pattern. `B19013` is the **group**, or 
 
 ### What Can I Ask For? Geographies
 
-The second catalog, `geography.json`, lists the geographies the dataset can be asked about, and what each one has to sit inside:
+The second catalog, `geography.json`, lists the geographies the American Community Survey (ACS) dataset can be asked about, and what each one has to sit inside. The Census API's [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) explains how a request names them:
 
 ```{python}
 response = requests.get(f"{census_base}/geography.json", headers=HEADERS, timeout=60)
@@ -222,11 +235,11 @@ for level in levels:
 # place   requires: ['state']
 ```
 
-Read `requires` as the request's grammar. A county is asked for `for=county:…` and `in=state:…`; a census tract needs both a state and a county in `in`. Places are identified by **FIPS codes**, numbers the federal government assigns: Colorado is state `08`, Boulder County is county `013` in it, and the city of Boulder is place `07850`. They are strings, not numbers: `08` without its zero is a different code. The Census Bureau lists them at [census.gov/library/reference/code-lists](https://www.census.gov/library/reference/code-lists/ansi.html).
+Read `requires` as the request's grammar. A county is asked for `for=county:…` and `in=state:…`; a census tract needs both a state and a county in `in`. Places are identified by **FIPS codes** (Federal Information Processing Standards codes), numbers the federal government assigns: Colorado is state `08`, Boulder County is county `013` in it, and the city of Boulder is place `07850`. They are strings, not numbers: `08` without its zero is a different code. The Census Bureau lists them at [census.gov/library/reference/code-lists](https://www.census.gov/library/reference/code-lists/ansi.html).
 
 ### Querying for a Place
 
-With a variable and a geography, the request is a few parameters. Here is the figure from @fig-census-table, with its margin of error:
+With a variable and a geography, a request to the Census Bureau's API is a few parameters, which its [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) lists: `get` names the variables, `for` the geography, `in` what that geography sits inside, and `key` your key. Places are named by their FIPS codes (Federal Information Processing Standards codes), and the variable here is from the American Community Survey (ACS). Here is the figure from @fig-census-table, with its margin of error:
 
 ```{python}
 params = {
@@ -246,7 +259,7 @@ The response is a list of lists: the first row is the column names, and each row
 
 ### Comparing Places
 
-Ask for several places at once by listing their codes. This request gets the age of the housing stock, group `B25034`, Year Structure Built, for the cities of Boulder and Longmont, and labels each column with the words from the catalog:
+Ask the Census Bureau's API for several places at once by listing their FIPS codes (Federal Information Processing Standards codes), as its [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) shows. This request gets the age of the housing stock from the American Community Survey (ACS), group `B25034`, Year Structure Built, for the cities of Boulder and Longmont, and labels each column with the words from the catalog:
 
 ```{python}
 # Lines 002 to 011: built 2020 or later, 2010 to 2019, ..., 1939 or earlier
@@ -283,6 +296,8 @@ print(housing)
 # Built 1939 or earlier                    3576                     2071
 ```
 
+The table holds the answer, but it takes reading: ten rows of two numbers each, newest first. A chart shows its shape at a glance. Draw one pair of bars for each decade, one bar per city, so that the two cities sit side by side wherever they differ. The labels came from the catalog, so the chart can use them as they are. Turn the table upside down first, so that time runs left to right, from the oldest decade to the newest:
+
 ```{python}
 import matplotlib.pyplot as plt
 
@@ -303,7 +318,7 @@ Boulder's housing is older than Longmont's (@fig-housing-boulder-longmont). Its 
 
 ### Every Place in a State, and a Number That Isn't
 
-A wildcard asks for every place of a kind: `for=place:*` with `in=state:08` returns all of Colorado's cities, towns, and census-designated places. Here is median household income for each of them:
+A wildcard asks the Census Bureau's API for every place of a kind, as its [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) describes: `for=place:*` with `in=state:08` returns all of Colorado's cities, towns, and census-designated places. The variable is again the American Community Survey's (ACS) median household income. Here is median household income for each of them:
 
 ```{python}
 params = {"get": "NAME,B19013_001E", "for": "place:*", "in": "state:08", "key": census_key}
@@ -343,11 +358,11 @@ Eighty-three of Colorado's 482 places have no estimate in the 2020–2024 survey
 
 ## FRED API
 
-The Federal Reserve Bank of St. Louis maintains FRED, one of the world's largest free collections of economic time series: more than 800,000 of them, covering macroeconomics, banking, labor markets, prices, and more. A series in FRED is a list of dates and values, and FRED will transform that list for you before it sends it: into percent changes, into annual averages, into logarithms. Asking the server to do that work is this section's idea. It saves code, and it gives everyone who asks the same way the same answer.
+The Federal Reserve Bank of St. Louis maintains FRED (Federal Reserve Economic Data), one of the world's largest free collections of economic time series, with an API documented at [fred.stlouisfed.org/docs/api/fred](https://fred.stlouisfed.org/docs/api/fred/): more than 800,000 of them, covering macroeconomics, banking, labor markets, prices, and more. A series in FRED is a list of dates and values, and FRED will transform that list for you before it sends it: into percent changes, into annual averages, into logarithms. Asking the server to do that work is this section's idea. It saves code, and it gives everyone who asks the same way the same answer.
 
 ### Finding Series IDs
 
-FRED organizes data by "series", each with a unique ID. The easiest way to find one is to search the [FRED website](https://fred.stlouisfed.org/) and read the ID off the series' page, as in @fig-fred-series. The `series` endpoint then describes a series before you download it:
+FRED (Federal Reserve Economic Data) organizes data by "series", each with a unique ID. The easiest way to find one is to search the [FRED website](https://fred.stlouisfed.org/) and read the ID off the series' page, as in @fig-fred-series. The API's [`series` endpoint](https://fred.stlouisfed.org/docs/api/fred/series.html) then describes a series before you download it:
 
 ```{python}
 fred_base = "https://api.stlouisfed.org/fred"
@@ -370,13 +385,15 @@ for field in ["title", "frequency", "units", "seasonal_adjustment", "observation
 # observation_end: 2024-01-01
 ```
 
-The series is an annual estimate from the Census Bureau's Small Area Income and Poverty Estimates (SAIPE) program, from 1989 to 2024. Its observations come from the `series/observations` endpoint. This function returns them as a DataFrame with real dates and numbers; FRED writes a missing value as `"."`, which `errors="coerce"` turns into `NaN`:
+The series is an annual estimate from the Census Bureau's Small Area Income and Poverty Estimates (SAIPE) program, from 1989 to 2024. Its observations come from the [`series/observations` endpoint](https://fred.stlouisfed.org/docs/api/fred/series_observations.html). This function asks for them and returns them as a DataFrame with real dates and numbers; FRED writes a missing value as `"."`, which `errors="coerce"` turns into `NaN`:
 
 ```{python}
 def fred_observations(series_id, **params):
     """Return a FRED series' observations as a DataFrame of dates and values."""
-    data = fred_get("series/observations", series_id=series_id, **params)
-    df = pd.DataFrame(data["observations"])[["date", "value"]]
+    params.update(series_id=series_id, api_key=fred_key, file_type="json")
+    response = requests.get(f"{fred_base}/series/observations", params=params, headers=HEADERS, timeout=30)
+    response.raise_for_status()
+    df = pd.DataFrame(response.json()["observations"])[["date", "value"]]
     df["date"] = pd.to_datetime(df["date"])
     df["value"] = pd.to_numeric(df["value"], errors="coerce")
     return df
@@ -392,19 +409,23 @@ print(income.tail(3).to_string(index=False))
 # 2024-01-01 103293.0
 ```
 
-FRED's 2024 figure for Boulder County, \$103,293, isn't the Census API's \$103,994. Both come from the Census Bureau, but from different programs: SAIPE models a single year's income from the ACS together with tax and benefit records, while the ACS 5-year estimate pools five years of survey responses. Name the program and the years whenever you cite one of them.
+FRED's 2024 figure for Boulder County, \$103,293, isn't the Census API's \$103,994. Both come from the Census Bureau, but from different programs: SAIPE models a single year's income from the ACS together with tax and benefit records, while the American Community Survey (ACS) 5-year estimate pools five years of survey responses. Name the program and the years whenever you cite one of them.
 
 ### Let the Server Compute: `units`
 
-The `units` parameter asks FRED to transform the values before it sends them. Ask for the same series with `units="pch"`, percent change from the previous observation, and the dollars become growth rates:
+The `units` parameter of the [`series/observations` endpoint](https://fred.stlouisfed.org/docs/api/fred/series_observations.html) asks FRED (Federal Reserve Economic Data) to transform a series' values before it sends them. Ask for the same series, Boulder County's median household income, twice more: with `units="chg"`, the change in dollars from the previous observation, and with `units="pch"`, the percent change. One series, three answers:
 
 ```{python}
+change = fred_observations("MHICO08013A052NCEN", units="chg", observation_end="2024-12-31")
 growth = fred_observations("MHICO08013A052NCEN", units="pch", observation_end="2024-12-31")
-print(growth.tail(3).to_string(index=False, float_format="%.1f"))
-#       date  value
-# 2022-01-01    6.9
-# 2023-01-01    0.6
-# 2024-01-01    6.3
+
+views = pd.DataFrame({"date": income["date"], "dollars": income["value"],
+                      "change": change["value"], "percent change": growth["value"]})
+print(views.tail(3).to_string(index=False, float_format="%.1f"))
+#       date  dollars  change  percent change
+# 2022-01-01  96584.0  6257.0             6.9
+# 2023-01-01  97170.0   586.0             0.6
+# 2024-01-01 103293.0  6123.0             6.3
 ```
 
 The values FRED can compute for any series:
@@ -421,27 +442,73 @@ The values FRED can compute for any series:
 
 ### Let the Server Compute: `frequency` and `aggregation_method`
 
-Comparing two series is harder when they're measured at different intervals. The Bureau of Labor Statistics publishes a Consumer Price Index (CPI) for the Denver area, and FRED carries it as `CUUSA433SA0`. Ask FRED what it is before you compare it with the nation's:
+A series' **frequency** is how often it is measured. FRED (Federal Reserve Economic Data) can lower it before it sends the data, from monthly to quarterly or annual, and the [`series/observations` endpoint](https://fred.stlouisfed.org/docs/api/fred/series_observations.html) documents how. Take one series through three requests: the Consumer Price Index (CPI) for all urban consumers in the United States, which the Bureau of Labor Statistics (BLS) publishes every month and FRED carries as `CPIAUCNS`. Ask FRED what it is first:
 
 ```{python}
-for series_id in ["CUUSA433SA0", "CPIAUCNS"]:
-    info = fred_get("series", series_id=series_id)["seriess"][0]
-    print(f"{series_id}: {info['title']} | {info['frequency']} | {info['seasonal_adjustment_short']}")
-# CUUSA433SA0: Consumer Price Index for All Urban Consumers: All items in Denver-Aurora-Lakewood, CO (CBSA) | Annual | NSA
-# CPIAUCNS: Consumer Price Index for All Urban Consumers: All Items in U.S. City Average | Monthly | NSA
+info = fred_get("series", series_id="CPIAUCNS")["seriess"][0]
+for field in ["title", "frequency", "units", "seasonal_adjustment"]:
+    print(f"{field}: {info[field]}")
+# title: Consumer Price Index for All Urban Consumers: All Items in U.S. City Average
+# frequency: Monthly
+# units: Index 1982-1984=100
+# seasonal_adjustment: Not Seasonally Adjusted
 ```
 
-Denver's is annual; the nation's is monthly. Both are not seasonally adjusted (`NSA`), so they are measured the same way, but a monthly series and an annual one can't be lined up row by row. You could download 132 months of national CPI and average each year in pandas. Or you can ask FRED to: `frequency="a"` converts the series to annual, `aggregation_method="avg"` says how (the mean of each year's months; `sum` and `eop`, the end of the period, are the others), and `units="pc1"` then gives each year's percent change from the year before. FRED applies the frequency first, then the units:
+It is a monthly index. Ask for it three ways, changing one parameter at a time:
+
+1. as published, one value a month;
+2. with `frequency="a"` and `aggregation_method="avg"`, which turns each year's twelve months into their mean (`sum` and `eop`, the end of the period, are the other methods);
+3. with `units="pc1"` added, the percent change of each year's mean from the year before's, which is the year's inflation. FRED applies the frequency first, then the units.
 
 ```{python}
-# Annual inflation for each, 2015-2025, computed by FRED
-years = {"observation_start": "2015-01-01", "observation_end": "2025-12-31"}
-denver = fred_observations("CUUSA433SA0", units="pc1", **years)
-national = fred_observations("CPIAUCNS", frequency="a", aggregation_method="avg", units="pc1", **years)
+years = {"observation_start": "2015-01-01", "observation_end": "2025-12-31"}   # fixed, so the answer doesn't change
 
-cpi = denver.merge(national, on="date", suffixes=("_denver", "_national"))
+monthly = fred_observations("CPIAUCNS", **years)
+annual = fred_observations("CPIAUCNS", frequency="a", aggregation_method="avg", **years)
+inflation = fred_observations("CPIAUCNS", frequency="a", aggregation_method="avg", units="pc1", **years)
+
+print(len(monthly), "months, and", len(annual), "years")
+table = pd.DataFrame({"year": annual["date"].dt.year, "mean index": annual["value"],
+                      "inflation (%)": inflation["value"]})
+print(table.to_string(index=False, float_format="%.1f"))
+# 132 months, and 11 years
+#  year  mean index  inflation (%)
+#  2015       237.0            0.1
+#  2016       240.0            1.3
+#  2017       245.1            2.1
+#  2018       251.1            2.4
+#  2019       255.7            1.8
+#  2020       258.8            1.2
+#  2021       271.0            4.7
+#  2022       292.7            8.0
+#  2023       304.7            4.1
+#  2024       313.7            2.9
+#  2025       321.9            2.6
+```
+
+Trust, but check once. Compute the same yearly means and percent changes in pandas, from the monthly values of the first request, and they should match FRED's:
+
+```{python}
+by_hand = monthly.groupby(monthly["date"].dt.year)["value"].mean()
+check = pd.DataFrame({"mean index": by_hand, "inflation (%)": by_hand.pct_change() * 100})
+print(check.tail(3).to_string(float_format="%.1f"))
+#       mean index  inflation (%)
+# date
+# 2023       304.7            4.1
+# 2024       313.7            2.9
+# 2025       321.9            2.6
+```
+
+They match. So `frequency="a"` with `aggregation_method="avg"` is the mean of each year's twelve months, and `units="pc1"` on top of it is the percent change in that mean, and you can describe the numbers that way when you write them up. The index itself, 321.9 in 2025, means that prices were 3.2 times what they were in 1982–1984, the period the index sets at 100. (Ask pandas for 2015's percent change, and it has none: the monthly request starts in January 2015. FRED reaches back to 2014's months itself.)
+
+With one series understood, comparing two is a matter of asking each the same question. The BLS also publishes a CPI for the Denver area, which FRED carries as `CUUSA433SA0`. It is annual already, so it needs only `units="pc1"` to give the same year-over-year inflation:
+
+```{python}
+denver = fred_observations("CUUSA433SA0", units="pc1", **years)
+
+cpi = denver.merge(inflation, on="date", suffixes=("_denver", "_national"))
 cpi["year"] = cpi["date"].dt.year
-print(cpi[["year", "value_denver", "value_national"]].round(1).to_string(index=False))
+print(cpi[["year", "value_denver", "value_national"]].to_string(index=False, float_format="%.1f"))
 #  year  value_denver  value_national
 #  2015           1.2             0.1
 #  2016           2.8             1.3
@@ -456,43 +523,33 @@ print(cpi[["year", "value_denver", "value_national"]].round(1).to_string(index=F
 #  2025           2.3             2.6
 ```
 
-Trust, but check once. The same annual change computed in pandas from the monthly values should match FRED's:
+Eleven years of two numbers each are easier to compare as pairs of bars, one pair a year, with a line across them at 2 percent, the Federal Reserve's target for inflation:
 
 ```{python}
-monthly = fred_observations("CPIAUCNS", observation_start="2023-01-01", observation_end="2025-12-31")
-annual_mean = monthly.groupby(monthly["date"].dt.year)["value"].mean()
-print((annual_mean.pct_change() * 100).round(1).dropna())
-# date
-# 2024    2.9
-# 2025    2.6
-# Name: value, dtype: float64
-```
+pairs = cpi.set_index("year")[["value_denver", "value_national"]]
+pairs.columns = ["Denver-Aurora-Lakewood", "United States"]
 
-The pandas results, 2.9 and 2.6, match FRED's for 2024 and 2025. So `aggregation_method="avg"` followed by `units="pc1"` is the percent change in the yearly mean of the monthly index, and you can describe it that way when you write up the numbers.
-
-```{python}
-fig, ax = plt.subplots(figsize=(8, 4))
-ax.plot(cpi["year"], cpi["value_denver"], marker="o", label="Denver-Aurora-Lakewood")
-ax.plot(cpi["year"], cpi["value_national"], marker="o", label="United States")
+ax = pairs.plot.bar(figsize=(8, 4), rot=0, width=0.8)
 ax.axhline(y=2, color="gray", linestyle="--", linewidth=1, label="2% target")
 ax.set_title("Annual inflation (CPI-U, percent change from the year before)")
 ax.set_ylabel("Percent")
+ax.set_xlabel("")
 ax.legend()
 plt.tight_layout()
 plt.show()
 ```
 
-![Annual inflation in the Denver area and the United States, 2015–2025, as FRED computes it from the CPI for all urban consumers, drawn by the code above.](images/ch-11/cpi-denver-national.png){#fig-cpi-denver-national .lightbox fig-alt="Line chart of annual inflation from 2015 to 2025 for the Denver area and the United States, with a dashed line at the 2 percent target. Denver runs above the nation from 2015 to 2018: 1.2 against 0.1 percent in 2015, and 3.4 against 2.1 in 2017. The nation is higher in 2021, 4.7 against 3.5. Both reach 8.0 percent in 2022. In 2024 and 2025, Denver is lower, 2.3 against 2.9 and 2.6."}
+![Annual inflation in the Denver area and the United States, 2015–2025, as FRED computes it from the CPI for all urban consumers, one pair of bars a year, drawn by the code above.](images/ch-11/cpi-denver-national.png){#fig-cpi-denver-national .lightbox fig-alt="Paired bar chart of annual inflation from 2015 to 2025, one pair of bars a year: the Denver area in blue and the United States in orange, with a dashed line at the 2 percent target. Denver's bar is taller from 2015 to 2020: 1.2 against 0.1 percent in 2015, and 3.4 against 2.1 in 2017. The nation's is taller in 2021, 4.7 against 3.5. Both reach 8.0 percent in 2022. Denver's is taller in 2023, 5.2 against 4.1, and shorter in 2024 and 2025, 2.3 against 2.9 and 2.6."}
 
-Prices in the Denver area rose faster than the nation's from 2015 to 2018 (@fig-cpi-denver-national): 3.4 percent in 2017 against 2.1. Both reached 8.0 percent in 2022, and since 2024 Denver's inflation has run below the nation's, 2.3 percent in 2025 against 2.6. Housing is the largest part of the CPI, so a natural next question is whether rent explains the gap; FRED's Denver series for rent of primary residence, `CUUSA433SEHA`, is a place to start. The same three parameters work on it unchanged.
+Prices in the Denver area rose faster than the nation's from 2015 to 2020 (@fig-cpi-denver-national): 3.4 percent in 2017 against 2.1. Both reached 8.0 percent in 2022, and since 2024 Denver's inflation has run below the nation's, 2.3 percent in 2025 against 2.6. Housing is the largest part of the CPI, so a natural next question is whether rent explains the gap; FRED's Denver series for rent of primary residence, `CUUSA433SEHA`, is a place to start, and the same parameters work on it unchanged.
 
 ## EIA API v2
 
-The EIA's API holds a great deal: every state's electricity prices and sales, every power plant's monthly generation, coal, oil, gas, and the agency's forecasts. You will never want all of it. Its design assumes that, and lets you name exactly the slice you want before the server sends anything: one state, one sector, one column, one span of years, in the order you choose. Narrowing a request on the server, instead of downloading everything and filtering in pandas, is this section's idea.
+The U.S. Energy Information Administration's (EIA) API, version 2, documented at [eia.gov/opendata/documentation.php](https://www.eia.gov/opendata/documentation.php), holds a great deal: every state's electricity prices and sales, every power plant's monthly generation, coal, oil, gas, and the agency's forecasts. You will never want all of it. Its design assumes that, and lets you name exactly the slice you want before the server sends anything: one state, one sector, one column, one span of years, in the order you choose. Narrowing a request on the server, instead of downloading everything and filtering in pandas, is this section's idea.
 
 ### Routes That Describe Themselves
 
-The API is a tree of **routes**, paths such as `electricity/retail-sales/`. Ask for a route without asking for its data, and it describes itself. At the top, it lists the routes under it:
+The EIA's (U.S. Energy Information Administration's) API is a tree of **routes**, paths such as `electricity/retail-sales/`, which its [documentation](https://www.eia.gov/opendata/documentation.php) describes. Ask for a route without asking for its data, and it describes itself. At the top, it lists the routes under it:
 
 ```{python}
 eia_base = "https://api.eia.gov/v2"
@@ -551,7 +608,7 @@ These are the same lists the API Dashboard's menus show in @fig-eia-browser: the
 
 ### Let the Server Filter
 
-Add `data/` to the route, and it returns rows. Each parameter narrows them: `data[]` names the columns, `facets[stateid][]` and `facets[sectorid][]` keep only the values you list, `start` and `end` fix the span, and `sort` orders the rows. The square brackets are part of the parameters' names, and `requests` encodes them for you:
+Add `data/` to an EIA (U.S. Energy Information Administration) route, and it returns rows; the API's [documentation](https://www.eia.gov/opendata/documentation.php) lists the parameters. Each parameter narrows them: `data[]` names the columns, `facets[stateid][]` and `facets[sectorid][]` keep only the values you list, `start` and `end` fix the span, and `sort` orders the rows. The square brackets are part of the parameters' names, and `requests` encodes them for you:
 
 ```{python}
 params = {
@@ -604,8 +661,12 @@ print(shares.loc[["2001", "2015", "2025"]].round(1))
 # 2025        24.7  32.0  30.0    9.9    3.0
 ```
 
+Three years in a table hide the path between them. The `shares` DataFrame already holds every year from 2001 to 2025, one column per source, which is the shape a line chart wants: one line per column, with the years along the bottom. The data are annual, so give the axis a tick for every year, in small type so that 25 labels fit:
+
 ```{python}
-ax = shares.plot(figsize=(8, 4.5), marker=".")
+shares.index = shares.index.astype(int)   # the years arrive as strings
+ax = shares.plot(figsize=(8, 4.5), marker=".", xticks=shares.index)
+ax.tick_params(axis="x", labelsize=7, labelrotation=90)
 ax.set_title("Colorado's electricity generation by source, 2001-2025")
 ax.set_ylabel("Share of all generation (%)")
 ax.set_xlabel("")
@@ -620,14 +681,17 @@ Coal made 76.7 percent of Colorado's electricity in 2001 and 24.7 percent in 202
 
 ### Paging with `offset` and `length`
 
-The EIA returns at most 5,000 rows a request. Ask for more, and you get the first 5,000 and a warning, `"incomplete return"`. Colorado's monthly generation from every source, 2001 to 2025, is 9,289 rows. The response says how many rows match in `total`, and you ask for the next page with `offset`, the number of rows to skip, and `length`, the number to return:
+The EIA's (U.S. Energy Information Administration's) API returns at most 5,000 rows a request, as its [documentation](https://www.eia.gov/opendata/documentation.php) says. Ask for more, and you get the first 5,000 and a warning, `"incomplete return"`. Colorado's monthly generation from every source, 2001 to 2025, is 9,289 rows. The response says how many rows match in `total`, and you ask for the next page with `offset`, the number of rows to skip, and `length`, the number to return:
 
 ```{python}
 def eia_get_all(route, params, page_size=5000):
     """Page through every row of an EIA data route, page_size rows at a time."""
     rows = []
     while True:
-        page = eia_get(route, dict(params, offset=len(rows), length=page_size))
+        page_params = dict(params, api_key=eia_key, offset=len(rows), length=page_size)
+        response = requests.get(f"{eia_base}/{route}", params=page_params, headers=HEADERS, timeout=60)
+        response.raise_for_status()
+        page = response.json()["response"]
         print(f"offset {len(rows):>5}: {len(page['data'])} rows of {page['total']}")
         rows.extend(page["data"])
         if len(rows) >= int(page["total"]) or not page["data"]:
