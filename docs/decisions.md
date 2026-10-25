@@ -9,6 +9,7 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 - The keys are read from `CENSUS_KEY`, `FRED_KEY`, `EIA_KEY`, and `DATAGOV_KEY`, in place of `*_API_KEY`. The setup cell prints only whether each is set.
 - The chapter's tutorial cells are run live, with outputs written in as comments and fixed end dates, and every request sends `HEADERS`, the book's User-Agent form. `tools/shots/renders/ch-11.py` runs them and draws the chapter's three charts.
 - A tour, from each agency's web page to its request, opens the chapter, with a capture from each agency.
+- Congress.gov refused the toolkit's captures (a Cloudflare challenge, 403, twice on 2026-10-25), so the tour's bill is a hand capture the maintainer took: H.R. 7730, the Bankruptcy Threshold Adjustment Act, which has passed the House and the Senate. It replaces H.R. 2316, which the capture was written for.
 
 **Why.** The maintainer decided the four APIs, their ideas, and the key names on 2026-10-25 ([plan](plans/2026-10-25-ch11-four-apis.md), §8). The chapter had never been run: 2 of its tutorial cells showed output, and none sent a User-Agent.
 

@@ -10,9 +10,10 @@
 # a group for Claude's agents, which doesn't govern captures (docs/decisions.md,
 # 2026-09-24).
 #
-# The bill, H.R. 2316 of the 119th Congress, was sponsored by a member of
-# Colorado's delegation, a public official, and became law, so its page shows
-# the whole tracker.
+# The bill, H.R. 7730 of the 119th Congress, the Bankruptcy Threshold Adjustment
+# Act, has passed the House and the Senate, so its tracker shows a bill in motion.
+# Its sponsor is a member of Congress, a public official. Congress.gov refused the
+# toolkit's captures, so it is a hand capture (README, "Hand captures").
 #
 # The three renders are charts the chapter's own code draws, made by
 # tools/shots/renders/ch-11.py.
@@ -111,30 +112,36 @@ figures:
 
   - id: congress-bill
     kind: capture
+    mode: hand
     section: "A Tour: From an Agency's Website to Its API"
     brief: >-
       Show a bill's page as the hub of the records the API links to: the bill's
-      number and title (marker 1), its sponsor (2), and its latest action with
-      the tracker showing it became law (3). Keep from the breadcrumbs to the
-      tracker; leave out the search bar above and the sidebar and summary
-      below. The tabs for the bill's text, actions, and cosponsors appear only
-      in a window about 1,000 pixels wide, where the page's 13-pixel text
-      measures 9 pixels in the book, so the caption names them instead.
-    url: https://www.congress.gov/bill/119th-congress/house-bill/2316
-    window: [800, 600]
-    pause: [12, 30]
-    steps:
-      - wait: {selector: 'ol.bill_progress'}
-    expect:
-      status: 200
-      text: ['Became Public Law No: 119-40']
-    crop: {between: ['.breadcrumbs', 'ol.bill_progress'], pad: [10, 0, 56, 0]}
+      number and title (marker 1), its sponsor (2), and the tracker that shows
+      how far it has come (3). From the title to the end of the overview box;
+      no search bar above it, and no sidebar or summary below. The tabs for the
+      bill's text, actions, and cosponsors appear only in a wider window, so
+      the text names them instead.
+    url: https://www.congress.gov/bill/119th-congress/house-bill/7730
+    hand:
+      why: >-
+        www.congress.gov answered the toolkit's captures with a Cloudflare
+        challenge (403) twice on 2026-10-25, 33 minutes apart, and the toolkit
+        doesn't get past a challenge. The maintainer took the screenshot in his
+        own browser.
+      steps: >-
+        Open the bill's page signed out, in a window whose page is about 720 CSS
+        pixels wide, and take a screenshot of the page from the title through
+        the overview box, at the display's scale (2 on a Retina Mac).
+      text_px: 13          # Congress.gov's body text
+    window: [720, 329]
+    scale: 2
+    crop: {top: 0, left: 0, width: 720, height: 329}
     annotate:
       marks:
-        - {n: 1, at: {selector: 'h1.legDetail', box: text}, side: below}
-        - {n: 2, at: {text: '^Rep\. Hurd, Jeff \[R-CO-3\]$'}, side: right, gap: 100}
-        - {n: 3, at: {selector: 'ol.bill_progress'}, side: right}
-    drifts: true        # the bill's page, and the site's look
+        - {n: 1, at: {xy: [26, 28, 940, 46]}, side: right}
+        - {n: 2, at: {xy: [338, 268, 532, 34]}, side: right}
+        - {n: 3, at: {xy: [338, 484, 984, 38]}, side: below}
+    drifts: true        # the bill's page moves as the bill does, and the site's look
 
   - id: housing-boulder-longmont
     kind: render
@@ -165,7 +172,8 @@ figures:
     brief: >-
       Chart annual inflation, 2015-2025, for the Denver area (CUUSA433SA0,
       units=pc1) and the nation (CPIAUCNS, annual averages, units=pc1), both
-      computed by FRED, with the 2 percent target as a dashed line.
+      computed by FRED, as paired bars, one pair a year, with the 2 percent
+      target as a dashed line.
     url: https://api.stlouisfed.org/fred/series/observations?series_id=CPIAUCNS&frequency=a&aggregation_method=avg&units=pc1&observation_start=2015-01-01&observation_end=2025-12-31
     api_client: true
     hand:
@@ -187,7 +195,8 @@ figures:
     brief: >-
       Chart the shares of Colorado's electricity generation from coal, gas,
       wind, solar, and hydroelectric plants, 2001-2025, from the EIA's
-      electric-power-operational-data route, as the chapter's code draws it.
+      electric-power-operational-data route, as the chapter's code draws it,
+      with a small tick label for every year.
     url: https://api.eia.gov/v2/electricity/electric-power-operational-data/data/?frequency=annual&data[]=generation&facets[location][]=CO&facets[sectorid][]=99&start=2001&end=2025
     api_client: true
     hand:
