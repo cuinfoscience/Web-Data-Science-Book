@@ -153,7 +153,8 @@ A draft pull request is fine when you want early feedback.
 **Markdown and Quarto**
 
 - Put a blank line before and after every heading, list, callout fence (`:::`), and code fence.
-- Use the callout that fits: `.callout-tip` for practical tips and *Missing Manual* references, `.callout-warning` for ethical and legal cautions, `.callout-note` for connections to the post-API age, and `.callout-important` for critical setup or debugging steps.
+- Use the callout that fits: `.callout-tip` for practical tips and *Missing Manual* references, `.callout-warning` for ethical and legal cautions, `.callout-note` for a short note that fits nowhere else, and `.callout-important` for critical setup or debugging steps.
+- A connection to the post-API age (openness, oversight, ownership), or a piece of history, goes in the chapter's "Social History and Public Interest" section, not in a callout. Link each fact there to its source, or cite it from `references.bib`.
 - Put code, file names, function names, and HTML tags in backticks: `` `requests.get()` ``, `` `robots.txt` ``, `` `<div>` ``.
 - Escape a dollar sign in prose as `\$`. Two unescaped dollar signs in one paragraph become math.
 - In a figure caption, keep square brackets inside backticks. A bare `]` ends the caption early.

@@ -2,6 +2,17 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-10-25 · A chapter's public-interest connections and history live in one sourced section
+
+**Decision.**
+- Each chapter's connections to the post-API age framework (**openness**, **oversight**, **ownership**) and its historical asides go in its "Social History and Public Interest" section, as prose, not in a "Public Interest Connection" or "Aside" callout. The 14 "Public Interest Connection" callouts, one in each of chapters 1, 2 and 4–15, were folded into their sections.
+- Every factual claim in that section links to a primary source (a statute, an agency's or organization's own page, a standard, the original investigation) or cites a work in `references.bib`.
+- Chapter 9's "Aside: Where PDF Came From, and What's in the File" was split: its history moved to the section, and its walkthrough of the file's bytes, which the tutorial uses later, stays in place as an ordinary subsection.
+
+**Why.** The maintainer asked for it on 2026-10-25. The same point, made in a callout near the top and again in the section at the end, read twice; and much of the history in the sections had no source.
+
+**Where.** `AGENTS.md` ("Chapter structure", "Callout types"), `CONTRIBUTING.md` ("Markdown and Quarto"), `README.md`, and each chapter's "Social History and Public Interest".
+
 ## 2026-10-25 · Chapter 11 teaches four APIs, one idea each, with four keys under new names
 
 **Decision.**
