@@ -218,7 +218,7 @@ The `rvstart` parameter fixes the newest edit the function will return, so runni
 
 ### Understanding Pagination
 
-The MediaWiki API limits the number of results returned per request. When more results are available, the response includes a `"continue"` key with parameters you must add to your next request. This loop — request, extract, check for continuation, update parameters, repeat — is the standard pagination pattern for most APIs. You will see it again in @sec-government and @sec-social.
+The MediaWiki API limits the number of results returned per request. When more results are available, the response includes a `"continue"` key with parameters you must add to your next request. This loop — request, extract, check for continuation, update parameters, repeat — is the standard pagination pattern for most APIs. You will see it again in @sec-government and @sec-social. The EIA's API in @sec-government pages the other common way: it reports how many rows match, and you ask for the next page by the number of rows to skip, `offset`, keeping count yourself instead of sending back a token.
 
 The critical mistake newcomers make is forgetting to check for continuation. Without the `while True` loop and `"continue"` check, you only get the first batch of results — potentially a small fraction of the total dataset.
 

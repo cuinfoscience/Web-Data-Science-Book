@@ -239,6 +239,17 @@ something the next agent would otherwise find out again, add a note here.
   book. At 1024 wide it would be 9.9, under the 11-pixel floor, so the relaxed
   limit suits DevTools zoomed to about 150%, not the XML viewer or View
   Source at 100%.
+- **Zoom a page with small text by narrowing the window and raising the
+  scale.** The toolkit has no page-zoom setting, but `window: [640, 520]` with
+  `scale: 2.5` gives the same pixels as an 800-pixel window zoomed to 125%,
+  and the caption says "zoomed to 125%". data.census.gov's 10- and 11-pixel
+  labels measured 9.7 pixels in the book at 100% and 14.6 this way (chapter
+  11's `census-table`). Check the layout at the narrower width: a site may
+  switch to its phone layout.
+- **A page that needs a wide window to show something** may not pass at that
+  width. Congress.gov shows a bill's tabs only from about 1,000 pixels, where
+  its 13-pixel text measures 9.1 pixels in the book; chapter 11 captures the
+  bill at 800 pixels and says in the text what a wider window adds.
 - **A marker on the bottom line can hang past the picture's edge.** The
   annotated image grows to hold it (by 3 pixels on ch-04's feed). To avoid
   that, end the crop a few pixels lower.
