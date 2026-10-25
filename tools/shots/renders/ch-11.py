@@ -1,9 +1,9 @@
-"""Chapter 11's renders: the charts that the chapter's own code draws from the Census, FRED, and EIA APIs.
+"""Chapter 11's renders: the charts that the chapter's own code draws from the Census, FRED, EIA, and Congress.gov APIs.
 
     python tools/shots/renders/ch-11.py OUTDIR --contact EMAIL
 
-Runs the code cells of ch-11-government.qmd, from "API Key Management" to the
-section after the EIA's, in order, as a reader would. It skips the cell that reads
+Runs the code cells of ch-11-government.qmd, from "API Key Management" to
+"Recommended Exercises", in order, as a reader would. It skips the cell that reads
 keys from `api_keys.json`, the alternative to environment variables, so the keys
 come from CENSUS_KEY, FRED_KEY, EIA_KEY, and DATAGOV_KEY. The chapter's
 User-Agent names `your-email@colorado.edu`; this script puts EMAIL in its place.
@@ -14,6 +14,8 @@ tools/shots/recipes/ch-11.yml gives:
     housing-boulder-longmont.png   housing units by decade built, two cities
     cpi-denver-national.png        annual inflation, Denver area and the nation
     co-generation-mix.png          Colorado's generation by source
+    colorado-bills-stages.png      the delegation's bills, by how far each got
+    state-electricity-bills.png    homes' electricity bills against income, by state
 
 Every request waits 1 second after the one before. The cells' printed output goes
 to standard output, with any key's value replaced by <KEY>, so that the output
@@ -41,7 +43,8 @@ import matplotlib.pyplot as plt
 import requests
 
 QMD = Path(__file__).resolve().parents[3] / "ch-11-government.qmd"
-NAMES = ["housing-boulder-longmont", "cpi-denver-national", "co-generation-mix"]
+NAMES = ["housing-boulder-longmont", "cpi-denver-national", "co-generation-mix",
+         "colorado-bills-stages", "state-electricity-bills"]
 PLACEHOLDER = "your-email@colorado.edu"
 KEYS = ["CENSUS_KEY", "FRED_KEY", "EIA_KEY", "DATAGOV_KEY"]
 PAUSE = 1.0
@@ -95,8 +98,7 @@ plt.show = save_figures
 
 text = QMD.read_text()
 start = text.index("## API Key Management")
-eia = text.index("## EIA API v2")
-end = text.index("\n## ", eia + 1)
+end = text.index("## Recommended Exercises")
 region = text[start:end]
 namespace, heading, failed = {}, "", False
 for m in re.finditer(r"^(#{2,3} [^\n]+)$|^```\{python\}\n(.*?)^```", region, re.M | re.S):
