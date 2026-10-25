@@ -460,7 +460,7 @@ div.csl-indent {
 <section id="authentication" class="level3" data-number="12.2.1">
 <h3 data-number="12.2.1" class="anchored" data-anchor-id="authentication"><span class="header-section-number">12.2.1</span> Authentication</h3>
 <p>Reddit’s API uses <strong>OAuth2</strong>, the authorization standard behind most platform APIs. The core idea: instead of sending your password with every request, your application exchanges its credentials for a scoped, revocable token. OAuth2 comes in several <em>flows</em> for different situations. The <strong>client credentials</strong> flow used below authenticates your <em>application</em> and grants read-only access to public data — sufficient for research collection. The <strong>authorization code</strong> flow additionally asks a <em>user</em> to grant your app permission to act on their behalf (post, vote, read private feeds); you will not need it in this chapter, but you will recognize it from every “Sign in with Google” dialog you have ever clicked through.</p>
-<div id="8104515b" class="cell" data-execution_count="1">
+<div id="099ae267" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="co"># praw is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge praw</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="im">import</span> praw</span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
@@ -491,7 +491,7 @@ div.csl-indent {
 </section>
 <section id="exploring-subreddits" class="level3" data-number="12.2.2">
 <h3 data-number="12.2.2" class="anchored" data-anchor-id="exploring-subreddits"><span class="header-section-number">12.2.2</span> Exploring Subreddits</h3>
-<div id="4382a34e" class="cell" data-execution_count="2">
+<div id="3f0a1d6d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
@@ -509,7 +509,7 @@ div.csl-indent {
 </section>
 <section id="retrieving-submissions" class="level3" data-number="12.2.3">
 <h3 data-number="12.2.3" class="anchored" data-anchor-id="retrieving-submissions"><span class="header-section-number">12.2.3</span> Retrieving Submissions</h3>
-<div id="2f534e61" class="cell" data-execution_count="3">
+<div id="25ea93e6" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co"># Get the top 25 submissions</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>submissions <span class="op">=</span> []</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="cf">for</span> submission <span class="kw">in</span> subreddit.top(limit<span class="op">=</span><span class="dv">25</span>, time_filter<span class="op">=</span><span class="st">"week"</span>):</span>
@@ -537,7 +537,7 @@ div.csl-indent {
 </section>
 <section id="comment-trees" class="level3" data-number="12.2.4">
 <h3 data-number="12.2.4" class="anchored" data-anchor-id="comment-trees"><span class="header-section-number">12.2.4</span> Comment Trees</h3>
-<div id="1e8c735d" class="cell" data-execution_count="4">
+<div id="d2f2a97b" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Take the current top submission from the subreddit's hot listing.</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="co"># (You can also pass any thread URL from your browser via</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="co"># reddit.submission(url="https://www.reddit.com/r/.../comments/..."))</span></span>
@@ -560,7 +560,7 @@ div.csl-indent {
 <section id="analyzing-comment-engagement" class="level3" data-number="12.2.5">
 <h3 data-number="12.2.5" class="anchored" data-anchor-id="analyzing-comment-engagement"><span class="header-section-number">12.2.5</span> Analyzing Comment Engagement</h3>
 <p>With the comment tree flattened into a DataFrame, you can start asking quantitative questions about how engagement varies with comment structure and position. One natural question: do deeper comments — replies to replies to replies — receive less attention than top-level responses? The <code>depth</code> field PRAW provides makes this straightforward to investigate.</p>
-<div id="5fd3eed8" class="cell" data-execution_count="5">
+<div id="d26cbf18" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
@@ -581,7 +581,7 @@ div.csl-indent {
 <span id="cb5-18"><a href="#cb5-18" aria-label="18"></a>plt.tight_layout()</span>
 <span id="cb5-19"><a href="#cb5-19" aria-label="19"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="6dbcbe9a" class="cell" data-execution_count="6">
+<div id="ec4b3b45" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="co"># Summary statistics by depth</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>depth_summary <span class="op">=</span> df_comments.groupby(<span class="st">"depth"</span>).agg(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>    mean_score<span class="op">=</span>(<span class="st">"score"</span>, <span class="st">"mean"</span>),</span>
@@ -599,25 +599,13 @@ div.csl-indent {
 <p>You can also compute the correlation between depth and score to quantify this relationship. A Spearman rank correlation is appropriate here because the score distribution is heavily skewed — a handful of top-level comments accumulate hundreds or thousands of votes while most comments hover near zero.</p>
 <p>The pattern you will typically observe is a clear decay: top-level comments (depth 0) receive the highest scores because they are the most visible, appearing directly below the submission. Each additional level of nesting reduces both visibility and engagement. This is not necessarily a reflection of comment quality — it is an artifact of Reddit’s interface design, where nested comments are progressively collapsed and harder to reach.</p>
 <p>Comment length tells a complementary story. Most Reddit comments are short — a few sentences at most — but the distribution has a long right tail of substantive, multi-paragraph responses. These longer comments often appear in subreddits with stricter moderation norms (like r/AskHistorians or r/science), where low-effort replies are actively removed. The relationship between platform governance and the data you can collect is not incidental; it is fundamental to interpreting what you find.</p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Public Interest Connection
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Reddit’s 2023 API pricing changes — from free to $0.24 per 1,000 calls — and the shutdown of the Pushshift archive are a live example of <strong>enclosure</strong> in action. The free tier still supports research use, but the death of third-party apps and Pushshift fundamentally changed what data is available and on whose terms <span class="citation" data-cites="baumgartner2020pushshift">(<a href="#ref-baumgartner2020pushshift" role="doc-biblioref">Baumgartner et al. 2020</a>)</span>.</p>
-</div>
-</div>
+<p>The rules that govern what you can collect from Reddit changed sharply in 2023, as “Social History and Public Interest”, at the end of this chapter, describes.</p>
 </section>
 </section>
 <section id="spotify-via-spotipy" class="level2" data-number="12.3">
 <h2 data-number="12.3" class="anchored" data-anchor-id="spotify-via-spotipy"><span class="header-section-number">12.3</span> Spotify via spotipy</h2>
 <p>Spotify’s API provides metadata about artists, albums, tracks, and playlists — a window into the catalog and popularity dynamics of the world’s largest music streaming platform:</p>
-<div id="fa4b3311" class="cell" data-execution_count="7">
+<div id="e35b771e" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># spotipy is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge spotipy</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="im">import</span> spotipy</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="im">from</span> spotipy.oauth2 <span class="im">import</span> SpotifyClientCredentials</span>
@@ -643,7 +631,7 @@ div.csl-indent {
 </div>
 <section id="searching-and-exploring" class="level3" data-number="12.3.1">
 <h3 data-number="12.3.1" class="anchored" data-anchor-id="searching-and-exploring"><span class="header-section-number">12.3.1</span> Searching and Exploring</h3>
-<div id="ac41cbfc" class="cell" data-execution_count="8">
+<div id="b9d49736" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co"># Search for an artist</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>results <span class="op">=</span> sp.search(q<span class="op">=</span><span class="st">"Queen"</span>, <span class="bu">type</span><span class="op">=</span><span class="st">"artist"</span>, limit<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="cf">for</span> artist <span class="kw">in</span> results[<span class="st">"artists"</span>][<span class="st">"items"</span>]:</span>
@@ -662,7 +650,7 @@ div.csl-indent {
 <section id="comparing-artists-with-catalog-metadata" class="level3" data-number="12.3.2">
 <h3 data-number="12.3.2" class="anchored" data-anchor-id="comparing-artists-with-catalog-metadata"><span class="header-section-number">12.3.2</span> Comparing Artists with Catalog Metadata</h3>
 <p>Metadata becomes revealing when you compare artists. Let us build a profile from three available endpoints — artist metadata, top tracks, and the album catalog — and compare two very different musicians:</p>
-<div id="bcf301e1" class="cell" data-execution_count="9">
+<div id="22334f3b" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="kw">def</span> get_artist_profile(sp, artist_name):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>    <span class="co">"""Build a metadata profile for an artist from public catalog data.</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a></span>
@@ -701,7 +689,7 @@ div.csl-indent {
 <span id="cb9-36"><a href="#cb9-36" aria-label="36"></a>          <span class="ss">f"</span><span class="sc">{</span>p[<span class="st">'followers'</span>]<span class="sc">:,}</span><span class="ss"> followers, "</span></span>
 <span id="cb9-37"><a href="#cb9-37" aria-label="37"></a>          <span class="ss">f"albums </span><span class="sc">{</span>p[<span class="st">'album_years'</span>][<span class="dv">0</span>]<span class="sc">}</span><span class="ss">–</span><span class="sc">{</span>p[<span class="st">'album_years'</span>][<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="c04450fd" class="cell" data-execution_count="10">
+<div id="9d84570c" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="co"># Compare the popularity distributions of each artist's top tracks</span></span>
@@ -718,7 +706,7 @@ div.csl-indent {
 </div>
 <p>Even without audio analysis, the catalog tells stories: Daft Punk’s compact discography of studio albums contrasts with Yo-Yo Ma’s decades-long recording career spanning dozens of releases; their popularity scores reveal how streaming-era attention concentrates on some catalogs and spreads thin across others.</p>
 <p>For playlist-based questions, <code>sp.playlist_tracks()</code> retrieves the contents of any <em>user-created</em> public playlist (Spotify-owned editorial playlists are no longer accessible to new apps):</p>
-<div id="d8a77387" class="cell" data-execution_count="11">
+<div id="faaf0c33" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Retrieve tracks from a user-created public playlist by its ID</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>playlist_id <span class="op">=</span> <span class="st">"spotify_playlist_id_here"</span>  <span class="co"># From the playlist's share link</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>items <span class="op">=</span> sp.playlist_tracks(playlist_id, limit<span class="op">=</span><span class="dv">100</span>)[<span class="st">"items"</span>]</span>
@@ -743,7 +731,7 @@ div.csl-indent {
 <section id="bluesky-via-at-protocol" class="level2" data-number="12.4">
 <h2 data-number="12.4" class="anchored" data-anchor-id="bluesky-via-at-protocol"><span class="header-section-number">12.4</span> Bluesky via AT Protocol</h2>
 <p>Bluesky, built on the AT Protocol, represents a structural alternative to proprietary platforms. Its open protocol means that API access is an architectural feature, not a business decision:</p>
-<div id="e887a843" class="cell" data-execution_count="12">
+<div id="283d4cf0" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># atproto is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge atproto</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="im">from</span> atproto <span class="im">import</span> Client</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a></span>
@@ -764,7 +752,7 @@ div.csl-indent {
 </div>
 <p>Note the authentication style: an <strong>app password</strong> generated in Bluesky’s settings, distinct from your account password and revocable at any time — the same delegated-credential principle as OAuth, implemented more simply.</p>
 <p>Any account’s public posts are available through <code>get_author_feed</code>:</p>
-<div id="8578161c" class="cell" data-execution_count="13">
+<div id="415b6db9" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Retrieve a user's recent posts (public data; any handle works)</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>feed <span class="op">=</span> client.app.bsky.feed.get_author_feed(</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>    {<span class="st">"actor"</span>: <span class="st">"bsky.app"</span>, <span class="st">"limit"</span>: <span class="dv">50</span>}</span>
@@ -789,7 +777,7 @@ div.csl-indent {
 <section id="building-a-bluesky-social-network" class="level3" data-number="12.4.1">
 <h3 data-number="12.4.1" class="anchored" data-anchor-id="building-a-bluesky-social-network"><span class="header-section-number">12.4.1</span> Building a Bluesky Social Network</h3>
 <p>The AT Protocol makes social graph data directly accessible, enabling network analysis that would be difficult on more restricted platforms:</p>
-<div id="ea71d19b" class="cell" data-execution_count="14">
+<div id="35ba1918" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="kw">def</span> get_social_graph(client, handle, direction<span class="op">=</span><span class="st">"followers"</span>, limit<span class="op">=</span><span class="dv">100</span>):</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a>    <span class="co">"""Get followers or following for a Bluesky user.</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a></span>
@@ -855,7 +843,7 @@ div.csl-indent {
 <section id="mastodon-via-mastodon.py" class="level2" data-number="12.5">
 <h2 data-number="12.5" class="anchored" data-anchor-id="mastodon-via-mastodon.py"><span class="header-section-number">12.5</span> Mastodon via Mastodon.py</h2>
 <p>Mastodon is a decentralized social network built on the ActivityPub protocol. Each server (instance) hosts its own API <span class="citation" data-cites="diener2026mastodonpy">(<a href="#ref-diener2026mastodonpy" role="doc-biblioref">Diener and Delcourt 2026</a>)</span>:</p>
-<div id="692b0ab5" class="cell" data-execution_count="15">
+<div id="f0b34497" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Mastodon.py is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge mastodon.py</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="im">from</span> mastodon <span class="im">import</span> Mastodon</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a></span>
@@ -888,7 +876,7 @@ div.csl-indent {
 <section id="working-across-instances" class="level3" data-number="12.5.1">
 <h3 data-number="12.5.1" class="anchored" data-anchor-id="working-across-instances"><span class="header-section-number">12.5.1</span> Working Across Instances</h3>
 <p>A key difference between Mastodon and centralized platforms is that there is no single API endpoint for “all of Mastodon.” Each instance maintains its own API, and you can only directly access the data on instances you authenticate with. This federated architecture means that comprehensive data collection requires accessing multiple instances — a fundamentally different research design challenge:</p>
-<div id="551586e0" class="cell" data-execution_count="16">
+<div id="abf12b97" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Search for accounts across the instance you're connected to</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>results <span class="op">=</span> mastodon.account_search(<span class="st">"data science"</span>, limit<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a><span class="cf">for</span> account <span class="kw">in</span> results:</span>
@@ -969,32 +957,32 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will profile and compare the public activity of two Bluesky accounts. Bluesky is the chapter’s lowest-friction platform — a free account and an app password are all you need, with no application process. Remember the chapter’s caution: social data is people data, so pick public, organizational, or public-figure accounts rather than private individuals.</p>
 <p><strong>Step 1 — Authenticate.</strong> Create an app password in Bluesky’s settings (never your real password — the chapter explains the difference), log in with the <code>atproto</code> <code>Client</code>, and print your own handle to confirm the session works. Keep the credential out of the notebook, loading it the way you loaded API keys in <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>.</p>
-<div id="f6ec3a5f" class="cell" data-execution_count="17">
+<div id="0eda381c" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># Step 1: Log in with the atproto Client using an app password loaded from an environment variable. Confirm with your handle, not the secret.</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Retrieve one account’s posts.</strong> Choose your first account and retrieve its 50 most recent posts with <code>get_author_feed</code>, building the list-of-dictionaries the chapter shows: text, created_at, likes, reposts, and whether each post is a reply. Convert to a DataFrame.</p>
-<div id="b0ce5d5e" class="cell" data-execution_count="18">
+<div id="f0f8fe08" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Step 2: Retrieve 50 posts from your first account with get_author_feed and build a DataFrame.</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Compute an activity profile.</strong> From the DataFrame, compute: average post length in characters, posts per day (use the first and last <code>created_at</code> to get the window), the fraction of posts that are replies, and mean likes per post.</p>
-<div id="b2daf0bb" class="cell" data-execution_count="19">
+<div id="95cc1b0f" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="co"># Step 3: Compute post length, posting rate, reply fraction, and mean likes.</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Repeat for a second account.</strong> Pick a second account you expect to behave differently — an institution vs.&nbsp;a person, a news outlet vs.&nbsp;a researcher — and run Steps 2–3 for it. Wrap the work in a function so you write the logic once, as you learned in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>.</p>
-<div id="5f80eadb" class="cell" data-execution_count="20">
+<div id="39a3c09a" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 4: Write a profile_account(handle) function and run it on your second account.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Compare.</strong> Combine the two profiles into a single two-row DataFrame, and plot one comparison you find informative — likes per post, or the distribution of post lengths for both accounts.</p>
-<div id="011ad61c" class="cell" data-execution_count="21">
+<div id="690d68a8" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># Step 5: Build the two-row comparison DataFrame and plot one comparison.</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: How do the two accounts differ, and did the numbers match your expectations? What does each account seem to use the platform <em>for</em>? What could you not measure from <code>get_author_feed</code> alone, and which of the chapter’s other endpoints (or platforms) would you need for it?</p>
-<div id="fd1d73eb" class="cell" data-execution_count="22">
+<div id="dc410df2" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1011,9 +999,10 @@ div.csl-indent {
 </section>
 <section id="social-history-and-public-interest" class="level2" data-number="12.9">
 <h2 data-number="12.9" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">12.9</span> Social History and Public Interest</h2>
-<p>The contrast between Reddit, Spotify, Bluesky, and Mastodon illustrates the governance spectrum described in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>. Reddit’s 2023 changes demonstrate how a platform can unilaterally restrict access that researchers depended on. Spotify’s trajectory — rich audio analysis data for a decade, then a 2024 deprecation that cut off new research applications — shows that even “productive commercial arrangements” narrow when the business calculus shifts. Bluesky and Mastodon represent structural alternatives where open protocols make enclosure architecturally harder.</p>
-<p>The PRAW library and Mastodon.py continue to work because their platforms maintain documented APIs. But the history of Twitter’s API — which went from the most important data source in computational social science to essentially inaccessible within a year of its acquisition — is a reminder that platform goodwill is not infrastructure.</p>
-<p>The Fediverse offers two distinct architectural responses to this problem. ActivityPub, the protocol underlying Mastodon, creates a federated network where each instance is independently operated but can communicate with others — much like email servers. No single company controls the protocol, so no single company can revoke access. The AT Protocol, which powers Bluesky, takes a different approach centered on portable identity: your account data, social graph, and content can move between providers, preventing the lock-in that makes platform migration so costly. Both represent structural alternatives to centralized platforms, distributing control rather than concentrating it. This is the architectural embodiment of <strong>ownership</strong> (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>) — users and communities, not corporations, control the infrastructure. For researchers, these open protocols mean that data access is a design feature rather than a business concession, offering more durable foundations for longitudinal research than any corporate API ever could. The trade-off is fragmentation: collecting comprehensive data from a federated network requires engaging with multiple instances, each with its own norms, moderation policies, and technical configurations. Decentralization solves the single-point-of-failure problem but introduces new challenges for research design that centralized platforms never posed.</p>
+<p>The contrast between Reddit, Spotify, Bluesky, and Mastodon illustrates the governance spectrum described in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>. Reddit’s 2023 changes demonstrate how a platform can unilaterally restrict access that researchers depended on. Spotify’s trajectory shows that even “productive commercial arrangements” narrow when the business calculus shifts: for years it offered rich audio analysis data, built on the work of The Echo Nest, a music-intelligence company it bought in 2014 (<a href="https://www.bgr.com/general/spotify-acquires-the-echo-nest/">Siegal, 2014</a>), then in November 2024 withdrew audio features, audio analysis, recommendations, and related artists from every new application, research ones included (<a href="https://developer.spotify.com/blog/2024-11-27-changes-to-the-web-api">Spotify, 2024</a>). Bluesky and Mastodon represent structural alternatives where open protocols make enclosure architecturally harder.</p>
+<p>Reddit’s 2023 changes are a live example of <strong>enclosure</strong> (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>). On 9 June 2023 the company set a price of $0.24 per 1,000 calls for heavy users of its API, effective 1 July (<a href="ch-03-post-api.html#fig-reddit-api-pricing" class="quarto-xref">Figure&nbsp;<span>3.1</span></a>). The developer of Apollo, a popular iPhone client, calculated that the new price would cost him more than $20 million a year, and shut the app down on 30 June (<a href="https://www.theverge.com/2023/6/8/23754183/apollo-reddit-app-shutting-down-api">Peters, 2023</a>). About a month before the price was announced, Reddit had cut off Pushshift <span class="citation" data-cites="baumgartner2020pushshift">(<a href="#ref-baumgartner2020pushshift" role="doc-biblioref">Baumgartner et al. 2020</a>)</span>, which an open letter from the Coalition for Independent Technology Research described as “a data resource widely used by communities, journalists, and thousands of academics worldwide” (<a href="https://independenttechresearch.org/reddit-data-access-letter/">2023</a>). Pushshift still answers, but only to Reddit’s moderators, as <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> found when it queried the old endpoint. The free tier described at the start of this chapter still supports noncommercial use, and Reddit runs a <a href="https://support.reddithelp.com/hc/en-us/articles/49381918834964-Reddit-for-Researchers-Program">program for researchers</a>. But with the third-party apps and the archive gone, what data is available, and on whose terms, is now Reddit’s decision.</p>
+<p>The PRAW library and Mastodon.py continue to work because their platforms maintain documented APIs. But the history of Twitter’s API, which went from the most important data source in computational social science to essentially inaccessible within a year of its 2022 acquisition, is a reminder that platform goodwill is not infrastructure. In February 2023, researchers learned that free access was ending (<a href="https://www.nature.com/articles/d41586-023-00460-z">Ledford, 2023</a>), and the studies built on it became difficult or impossible to reproduce <span class="citation" data-cites="davidson2023platform">(<a href="#ref-davidson2023platform" role="doc-biblioref">Davidson et al. 2023</a>)</span>.</p>
+<p>The Fediverse offers two distinct architectural responses to this problem. ActivityPub, the protocol underlying Mastodon, has been a <a href="https://www.w3.org/TR/activitypub/">W3C Recommendation</a> since January 2018. It creates a federated network where each instance is independently operated but can communicate with others, much like email servers; <a href="https://docs.joinmastodon.org/#federation">Mastodon’s own documentation</a> puts email and Mastodon in the same column. No single company controls the protocol, so no single company can revoke access. The AT Protocol, which powers Bluesky, takes a different approach centered on portable identity: its design assumes that a server holding your account may fail at any time, so your account data, social graph, and content can move to a new provider (<a href="https://atproto.com/guides/overview">AT Protocol, “Account portability”</a>), preventing the lock-in that makes platform migration so costly. Both represent structural alternatives to centralized platforms, distributing control rather than concentrating it. This is the architectural embodiment of <strong>ownership</strong> (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>) — users and communities, not corporations, control the infrastructure. For researchers, these open protocols mean that data access is a design feature rather than a business concession, offering more durable foundations for longitudinal research than any corporate API ever could. The trade-off is fragmentation: collecting comprehensive data from a federated network requires engaging with multiple instances, each with its own norms, moderation policies, and technical configurations. Decentralization solves the single-point-of-failure problem but introduces new challenges for research design that centralized platforms never posed.</p>
 </section>
 <section id="common-issues-to-debug" class="level2" data-number="12.10">
 <h2 data-number="12.10" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">12.10</span> Common Issues to Debug</h2>
@@ -1699,421 +1688,420 @@ Diener, Lorenz, and Corentin Delcourt. 2026. <span>“Mastodon.py: A <span>Pytho
 <span id="cb23-184"><a href="#cb23-184" aria-label="172"></a></span>
 <span id="cb23-185"><a href="#cb23-185" aria-label="173"></a>Comment length tells a complementary story. Most Reddit comments are short — a few sentences at most — but the distribution has a long right tail of substantive, multi-paragraph responses. These longer comments often appear in subreddits with stricter moderation norms (like r/AskHistorians or r/science), where low-effort replies are actively removed. The relationship between platform governance and the data you can collect is not incidental; it is fundamental to interpreting what you find.</span>
 <span id="cb23-186"><a href="#cb23-186" aria-label="174"></a></span>
-<span id="cb23-187"><a href="#cb23-187" aria-label="175"></a>::: {.callout-note}</span>
-<span id="cb23-188"><a href="#cb23-188" aria-label="176"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb23-189"><a href="#cb23-189" aria-label="177"></a>Reddit's 2023 API pricing changes — from free to $0.24 per 1,000 calls — and the shutdown of the Pushshift archive are a live example of **enclosure** in action. The free tier still supports research use, but the death of third-party apps and Pushshift fundamentally changed what data is available and on whose terms <span class="co">[</span><span class="ot">@baumgartner2020pushshift</span><span class="co">]</span>.</span>
-<span id="cb23-190"><a href="#cb23-190" aria-label="178"></a>:::</span>
-<span id="cb23-191"><a href="#cb23-191" aria-label="179"></a></span>
-<span id="cb23-192"><a href="#cb23-192" aria-label="180"></a><span class="fu">## Spotify via spotipy</span></span>
-<span id="cb23-193"><a href="#cb23-193" aria-label="181"></a></span>
-<span id="cb23-194"><a href="#cb23-194" aria-label="182"></a>Spotify's API provides metadata about artists, albums, tracks, and playlists — a window into the catalog and popularity dynamics of the world's largest music streaming platform:</span>
-<span id="cb23-195"><a href="#cb23-195" aria-label="183"></a></span>
-<span id="cb23-198"><a href="#cb23-198" aria-label="184"></a><span class="in">```{python}</span></span>
-<span id="cb23-199"><a href="#cb23-199" aria-label="185"></a><span class="co"># spotipy is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge spotipy</span></span>
-<span id="cb23-200"><a href="#cb23-200" aria-label="186"></a><span class="im">import</span> spotipy</span>
-<span id="cb23-201"><a href="#cb23-201" aria-label="187"></a><span class="im">from</span> spotipy.oauth2 <span class="im">import</span> SpotifyClientCredentials</span>
-<span id="cb23-202"><a href="#cb23-202" aria-label="188"></a></span>
-<span id="cb23-203"><a href="#cb23-203" aria-label="189"></a>auth <span class="op">=</span> SpotifyClientCredentials(</span>
-<span id="cb23-204"><a href="#cb23-204" aria-label="190"></a>    client_id<span class="op">=</span><span class="st">"your_spotify_client_id"</span>,</span>
-<span id="cb23-205"><a href="#cb23-205" aria-label="191"></a>    client_secret<span class="op">=</span><span class="st">"your_spotify_client_secret"</span></span>
-<span id="cb23-206"><a href="#cb23-206" aria-label="192"></a>)</span>
-<span id="cb23-207"><a href="#cb23-207" aria-label="193"></a>sp <span class="op">=</span> spotipy.Spotify(auth_manager<span class="op">=</span>auth)</span>
-<span id="cb23-208"><a href="#cb23-208" aria-label="194"></a><span class="in">```</span></span>
-<span id="cb23-209"><a href="#cb23-209" aria-label="195"></a></span>
-<span id="cb23-210"><a href="#cb23-210" aria-label="196"></a>::: {.callout-warning}</span>
-<span id="cb23-211"><a href="#cb23-211" aria-label="197"></a><span class="fu">## A Shrinking API</span></span>
-<span id="cb23-212"><a href="#cb23-212" aria-label="198"></a>In November 2024, Spotify removed several popular endpoints for newly created apps — including audio features, audio analysis, related artists, recommendations, and access to Spotify-owned editorial playlists. Applications registered before the change kept their access; new apps (including yours, if you register one for this course) receive a <span class="in">`403 Forbidden`</span> from those endpoints. The examples in this section use only endpoints available to new apps as of mid-2026 — but check the <span class="co">[</span><span class="ot">Spotify developer documentation</span><span class="co">](https://developer.spotify.com/documentation/web-api)</span> for the current state before building a project around any of them.</span>
-<span id="cb23-213"><a href="#cb23-213" aria-label="199"></a>:::</span>
-<span id="cb23-214"><a href="#cb23-214" aria-label="200"></a></span>
-<span id="cb23-215"><a href="#cb23-215" aria-label="201"></a><span class="fu">### Searching and Exploring</span></span>
-<span id="cb23-216"><a href="#cb23-216" aria-label="202"></a></span>
-<span id="cb23-219"><a href="#cb23-219" aria-label="203"></a><span class="in">```{python}</span></span>
-<span id="cb23-220"><a href="#cb23-220" aria-label="204"></a><span class="co"># Search for an artist</span></span>
-<span id="cb23-221"><a href="#cb23-221" aria-label="205"></a>results <span class="op">=</span> sp.search(q<span class="op">=</span><span class="st">"Queen"</span>, <span class="bu">type</span><span class="op">=</span><span class="st">"artist"</span>, limit<span class="op">=</span><span class="dv">5</span>)</span>
-<span id="cb23-222"><a href="#cb23-222" aria-label="206"></a><span class="cf">for</span> artist <span class="kw">in</span> results[<span class="st">"artists"</span>][<span class="st">"items"</span>]:</span>
-<span id="cb23-223"><a href="#cb23-223" aria-label="207"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>artist[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss"> — Followers: </span><span class="sc">{</span>artist[<span class="st">'followers'</span>][<span class="st">'total'</span>]<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb23-187"><a href="#cb23-187" aria-label="175"></a>The rules that govern what you can collect from Reddit changed sharply in 2023, as "Social History and Public Interest", at the end of this chapter, describes.</span>
+<span id="cb23-188"><a href="#cb23-188" aria-label="176"></a></span>
+<span id="cb23-189"><a href="#cb23-189" aria-label="177"></a><span class="fu">## Spotify via spotipy</span></span>
+<span id="cb23-190"><a href="#cb23-190" aria-label="178"></a></span>
+<span id="cb23-191"><a href="#cb23-191" aria-label="179"></a>Spotify's API provides metadata about artists, albums, tracks, and playlists — a window into the catalog and popularity dynamics of the world's largest music streaming platform:</span>
+<span id="cb23-192"><a href="#cb23-192" aria-label="180"></a></span>
+<span id="cb23-195"><a href="#cb23-195" aria-label="181"></a><span class="in">```{python}</span></span>
+<span id="cb23-196"><a href="#cb23-196" aria-label="182"></a><span class="co"># spotipy is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge spotipy</span></span>
+<span id="cb23-197"><a href="#cb23-197" aria-label="183"></a><span class="im">import</span> spotipy</span>
+<span id="cb23-198"><a href="#cb23-198" aria-label="184"></a><span class="im">from</span> spotipy.oauth2 <span class="im">import</span> SpotifyClientCredentials</span>
+<span id="cb23-199"><a href="#cb23-199" aria-label="185"></a></span>
+<span id="cb23-200"><a href="#cb23-200" aria-label="186"></a>auth <span class="op">=</span> SpotifyClientCredentials(</span>
+<span id="cb23-201"><a href="#cb23-201" aria-label="187"></a>    client_id<span class="op">=</span><span class="st">"your_spotify_client_id"</span>,</span>
+<span id="cb23-202"><a href="#cb23-202" aria-label="188"></a>    client_secret<span class="op">=</span><span class="st">"your_spotify_client_secret"</span></span>
+<span id="cb23-203"><a href="#cb23-203" aria-label="189"></a>)</span>
+<span id="cb23-204"><a href="#cb23-204" aria-label="190"></a>sp <span class="op">=</span> spotipy.Spotify(auth_manager<span class="op">=</span>auth)</span>
+<span id="cb23-205"><a href="#cb23-205" aria-label="191"></a><span class="in">```</span></span>
+<span id="cb23-206"><a href="#cb23-206" aria-label="192"></a></span>
+<span id="cb23-207"><a href="#cb23-207" aria-label="193"></a>::: {.callout-warning}</span>
+<span id="cb23-208"><a href="#cb23-208" aria-label="194"></a><span class="fu">## A Shrinking API</span></span>
+<span id="cb23-209"><a href="#cb23-209" aria-label="195"></a>In November 2024, Spotify removed several popular endpoints for newly created apps — including audio features, audio analysis, related artists, recommendations, and access to Spotify-owned editorial playlists. Applications registered before the change kept their access; new apps (including yours, if you register one for this course) receive a <span class="in">`403 Forbidden`</span> from those endpoints. The examples in this section use only endpoints available to new apps as of mid-2026 — but check the <span class="co">[</span><span class="ot">Spotify developer documentation</span><span class="co">](https://developer.spotify.com/documentation/web-api)</span> for the current state before building a project around any of them.</span>
+<span id="cb23-210"><a href="#cb23-210" aria-label="196"></a>:::</span>
+<span id="cb23-211"><a href="#cb23-211" aria-label="197"></a></span>
+<span id="cb23-212"><a href="#cb23-212" aria-label="198"></a><span class="fu">### Searching and Exploring</span></span>
+<span id="cb23-213"><a href="#cb23-213" aria-label="199"></a></span>
+<span id="cb23-216"><a href="#cb23-216" aria-label="200"></a><span class="in">```{python}</span></span>
+<span id="cb23-217"><a href="#cb23-217" aria-label="201"></a><span class="co"># Search for an artist</span></span>
+<span id="cb23-218"><a href="#cb23-218" aria-label="202"></a>results <span class="op">=</span> sp.search(q<span class="op">=</span><span class="st">"Queen"</span>, <span class="bu">type</span><span class="op">=</span><span class="st">"artist"</span>, limit<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb23-219"><a href="#cb23-219" aria-label="203"></a><span class="cf">for</span> artist <span class="kw">in</span> results[<span class="st">"artists"</span>][<span class="st">"items"</span>]:</span>
+<span id="cb23-220"><a href="#cb23-220" aria-label="204"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>artist[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss"> — Followers: </span><span class="sc">{</span>artist[<span class="st">'followers'</span>][<span class="st">'total'</span>]<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb23-221"><a href="#cb23-221" aria-label="205"></a></span>
+<span id="cb23-222"><a href="#cb23-222" aria-label="206"></a><span class="co"># Get the top artist's ID</span></span>
+<span id="cb23-223"><a href="#cb23-223" aria-label="207"></a>queen_id <span class="op">=</span> results[<span class="st">"artists"</span>][<span class="st">"items"</span>][<span class="dv">0</span>][<span class="st">"id"</span>]</span>
 <span id="cb23-224"><a href="#cb23-224" aria-label="208"></a></span>
-<span id="cb23-225"><a href="#cb23-225" aria-label="209"></a><span class="co"># Get the top artist's ID</span></span>
-<span id="cb23-226"><a href="#cb23-226" aria-label="210"></a>queen_id <span class="op">=</span> results[<span class="st">"artists"</span>][<span class="st">"items"</span>][<span class="dv">0</span>][<span class="st">"id"</span>]</span>
-<span id="cb23-227"><a href="#cb23-227" aria-label="211"></a></span>
-<span id="cb23-228"><a href="#cb23-228" aria-label="212"></a><span class="co"># Get top tracks</span></span>
-<span id="cb23-229"><a href="#cb23-229" aria-label="213"></a>top_tracks <span class="op">=</span> sp.artist_top_tracks(queen_id)</span>
-<span id="cb23-230"><a href="#cb23-230" aria-label="214"></a><span class="cf">for</span> track <span class="kw">in</span> top_tracks[<span class="st">"tracks"</span>][:<span class="dv">5</span>]:</span>
-<span id="cb23-231"><a href="#cb23-231" aria-label="215"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>track[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>track[<span class="st">'album'</span>][<span class="st">'name'</span>]<span class="sc">}</span><span class="ss">) — popularity </span><span class="sc">{</span>track[<span class="st">'popularity'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-232"><a href="#cb23-232" aria-label="216"></a><span class="in">```</span></span>
-<span id="cb23-233"><a href="#cb23-233" aria-label="217"></a></span>
-<span id="cb23-234"><a href="#cb23-234" aria-label="218"></a>Every artist and track carries a **popularity** score (0–100), Spotify's algorithmic measure derived from recent play counts. Artists also carry genre labels and follower counts. These fields support a surprising range of research questions about attention, catalog structure, and cultural markets.</span>
-<span id="cb23-235"><a href="#cb23-235" aria-label="219"></a></span>
-<span id="cb23-236"><a href="#cb23-236" aria-label="220"></a><span class="fu">### Comparing Artists with Catalog Metadata</span></span>
-<span id="cb23-237"><a href="#cb23-237" aria-label="221"></a></span>
-<span id="cb23-238"><a href="#cb23-238" aria-label="222"></a>Metadata becomes revealing when you compare artists. Let us build a profile from three available endpoints — artist metadata, top tracks, and the album catalog — and compare two very different musicians:</span>
-<span id="cb23-239"><a href="#cb23-239" aria-label="223"></a></span>
-<span id="cb23-242"><a href="#cb23-242" aria-label="224"></a><span class="in">```{python}</span></span>
-<span id="cb23-243"><a href="#cb23-243" aria-label="225"></a><span class="kw">def</span> get_artist_profile(sp, artist_name):</span>
-<span id="cb23-244"><a href="#cb23-244" aria-label="226"></a>    <span class="co">"""Build a metadata profile for an artist from public catalog data.</span></span>
-<span id="cb23-245"><a href="#cb23-245" aria-label="227"></a></span>
-<span id="cb23-246"><a href="#cb23-246" aria-label="228"></a><span class="co">    Parameters</span></span>
-<span id="cb23-247"><a href="#cb23-247" aria-label="229"></a><span class="co">    ----------</span></span>
-<span id="cb23-248"><a href="#cb23-248" aria-label="230"></a><span class="co">    sp : spotipy.Spotify</span></span>
-<span id="cb23-249"><a href="#cb23-249" aria-label="231"></a><span class="co">        Authenticated Spotify client</span></span>
-<span id="cb23-250"><a href="#cb23-250" aria-label="232"></a><span class="co">    artist_name : str</span></span>
-<span id="cb23-251"><a href="#cb23-251" aria-label="233"></a><span class="co">        Name of the artist to search for</span></span>
-<span id="cb23-252"><a href="#cb23-252" aria-label="234"></a></span>
-<span id="cb23-253"><a href="#cb23-253" aria-label="235"></a><span class="co">    Returns</span></span>
-<span id="cb23-254"><a href="#cb23-254" aria-label="236"></a><span class="co">    -------</span></span>
-<span id="cb23-255"><a href="#cb23-255" aria-label="237"></a><span class="co">    dict</span></span>
-<span id="cb23-256"><a href="#cb23-256" aria-label="238"></a><span class="co">        Artist metadata, top-track popularity, and album release years</span></span>
-<span id="cb23-257"><a href="#cb23-257" aria-label="239"></a><span class="co">    """</span></span>
-<span id="cb23-258"><a href="#cb23-258" aria-label="240"></a>    results <span class="op">=</span> sp.search(q<span class="op">=</span>artist_name, <span class="bu">type</span><span class="op">=</span><span class="st">"artist"</span>, limit<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb23-259"><a href="#cb23-259" aria-label="241"></a>    artist <span class="op">=</span> results[<span class="st">"artists"</span>][<span class="st">"items"</span>][<span class="dv">0</span>]</span>
+<span id="cb23-225"><a href="#cb23-225" aria-label="209"></a><span class="co"># Get top tracks</span></span>
+<span id="cb23-226"><a href="#cb23-226" aria-label="210"></a>top_tracks <span class="op">=</span> sp.artist_top_tracks(queen_id)</span>
+<span id="cb23-227"><a href="#cb23-227" aria-label="211"></a><span class="cf">for</span> track <span class="kw">in</span> top_tracks[<span class="st">"tracks"</span>][:<span class="dv">5</span>]:</span>
+<span id="cb23-228"><a href="#cb23-228" aria-label="212"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>track[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>track[<span class="st">'album'</span>][<span class="st">'name'</span>]<span class="sc">}</span><span class="ss">) — popularity </span><span class="sc">{</span>track[<span class="st">'popularity'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-229"><a href="#cb23-229" aria-label="213"></a><span class="in">```</span></span>
+<span id="cb23-230"><a href="#cb23-230" aria-label="214"></a></span>
+<span id="cb23-231"><a href="#cb23-231" aria-label="215"></a>Every artist and track carries a **popularity** score (0–100), Spotify's algorithmic measure derived from recent play counts. Artists also carry genre labels and follower counts. These fields support a surprising range of research questions about attention, catalog structure, and cultural markets.</span>
+<span id="cb23-232"><a href="#cb23-232" aria-label="216"></a></span>
+<span id="cb23-233"><a href="#cb23-233" aria-label="217"></a><span class="fu">### Comparing Artists with Catalog Metadata</span></span>
+<span id="cb23-234"><a href="#cb23-234" aria-label="218"></a></span>
+<span id="cb23-235"><a href="#cb23-235" aria-label="219"></a>Metadata becomes revealing when you compare artists. Let us build a profile from three available endpoints — artist metadata, top tracks, and the album catalog — and compare two very different musicians:</span>
+<span id="cb23-236"><a href="#cb23-236" aria-label="220"></a></span>
+<span id="cb23-239"><a href="#cb23-239" aria-label="221"></a><span class="in">```{python}</span></span>
+<span id="cb23-240"><a href="#cb23-240" aria-label="222"></a><span class="kw">def</span> get_artist_profile(sp, artist_name):</span>
+<span id="cb23-241"><a href="#cb23-241" aria-label="223"></a>    <span class="co">"""Build a metadata profile for an artist from public catalog data.</span></span>
+<span id="cb23-242"><a href="#cb23-242" aria-label="224"></a></span>
+<span id="cb23-243"><a href="#cb23-243" aria-label="225"></a><span class="co">    Parameters</span></span>
+<span id="cb23-244"><a href="#cb23-244" aria-label="226"></a><span class="co">    ----------</span></span>
+<span id="cb23-245"><a href="#cb23-245" aria-label="227"></a><span class="co">    sp : spotipy.Spotify</span></span>
+<span id="cb23-246"><a href="#cb23-246" aria-label="228"></a><span class="co">        Authenticated Spotify client</span></span>
+<span id="cb23-247"><a href="#cb23-247" aria-label="229"></a><span class="co">    artist_name : str</span></span>
+<span id="cb23-248"><a href="#cb23-248" aria-label="230"></a><span class="co">        Name of the artist to search for</span></span>
+<span id="cb23-249"><a href="#cb23-249" aria-label="231"></a></span>
+<span id="cb23-250"><a href="#cb23-250" aria-label="232"></a><span class="co">    Returns</span></span>
+<span id="cb23-251"><a href="#cb23-251" aria-label="233"></a><span class="co">    -------</span></span>
+<span id="cb23-252"><a href="#cb23-252" aria-label="234"></a><span class="co">    dict</span></span>
+<span id="cb23-253"><a href="#cb23-253" aria-label="235"></a><span class="co">        Artist metadata, top-track popularity, and album release years</span></span>
+<span id="cb23-254"><a href="#cb23-254" aria-label="236"></a><span class="co">    """</span></span>
+<span id="cb23-255"><a href="#cb23-255" aria-label="237"></a>    results <span class="op">=</span> sp.search(q<span class="op">=</span>artist_name, <span class="bu">type</span><span class="op">=</span><span class="st">"artist"</span>, limit<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb23-256"><a href="#cb23-256" aria-label="238"></a>    artist <span class="op">=</span> results[<span class="st">"artists"</span>][<span class="st">"items"</span>][<span class="dv">0</span>]</span>
+<span id="cb23-257"><a href="#cb23-257" aria-label="239"></a></span>
+<span id="cb23-258"><a href="#cb23-258" aria-label="240"></a>    top_tracks <span class="op">=</span> sp.artist_top_tracks(artist[<span class="st">"id"</span>])</span>
+<span id="cb23-259"><a href="#cb23-259" aria-label="241"></a>    albums <span class="op">=</span> sp.artist_albums(artist[<span class="st">"id"</span>], include_groups<span class="op">=</span><span class="st">"album"</span>, limit<span class="op">=</span><span class="dv">50</span>)</span>
 <span id="cb23-260"><a href="#cb23-260" aria-label="242"></a></span>
-<span id="cb23-261"><a href="#cb23-261" aria-label="243"></a>    top_tracks <span class="op">=</span> sp.artist_top_tracks(artist[<span class="st">"id"</span>])</span>
-<span id="cb23-262"><a href="#cb23-262" aria-label="244"></a>    albums <span class="op">=</span> sp.artist_albums(artist[<span class="st">"id"</span>], include_groups<span class="op">=</span><span class="st">"album"</span>, limit<span class="op">=</span><span class="dv">50</span>)</span>
-<span id="cb23-263"><a href="#cb23-263" aria-label="245"></a></span>
-<span id="cb23-264"><a href="#cb23-264" aria-label="246"></a>    <span class="cf">return</span> {</span>
-<span id="cb23-265"><a href="#cb23-265" aria-label="247"></a>        <span class="st">"name"</span>: artist[<span class="st">"name"</span>],</span>
-<span id="cb23-266"><a href="#cb23-266" aria-label="248"></a>        <span class="st">"followers"</span>: artist[<span class="st">"followers"</span>][<span class="st">"total"</span>],</span>
-<span id="cb23-267"><a href="#cb23-267" aria-label="249"></a>        <span class="st">"artist_popularity"</span>: artist[<span class="st">"popularity"</span>],</span>
-<span id="cb23-268"><a href="#cb23-268" aria-label="250"></a>        <span class="st">"genres"</span>: artist[<span class="st">"genres"</span>],</span>
-<span id="cb23-269"><a href="#cb23-269" aria-label="251"></a>        <span class="st">"top_track_popularity"</span>: [t[<span class="st">"popularity"</span>] <span class="cf">for</span> t <span class="kw">in</span> top_tracks[<span class="st">"tracks"</span>]],</span>
-<span id="cb23-270"><a href="#cb23-270" aria-label="252"></a>        <span class="st">"album_years"</span>: <span class="bu">sorted</span>({a[<span class="st">"release_date"</span>][:<span class="dv">4</span>] <span class="cf">for</span> a <span class="kw">in</span> albums[<span class="st">"items"</span>]}),</span>
-<span id="cb23-271"><a href="#cb23-271" aria-label="253"></a>    }</span>
+<span id="cb23-261"><a href="#cb23-261" aria-label="243"></a>    <span class="cf">return</span> {</span>
+<span id="cb23-262"><a href="#cb23-262" aria-label="244"></a>        <span class="st">"name"</span>: artist[<span class="st">"name"</span>],</span>
+<span id="cb23-263"><a href="#cb23-263" aria-label="245"></a>        <span class="st">"followers"</span>: artist[<span class="st">"followers"</span>][<span class="st">"total"</span>],</span>
+<span id="cb23-264"><a href="#cb23-264" aria-label="246"></a>        <span class="st">"artist_popularity"</span>: artist[<span class="st">"popularity"</span>],</span>
+<span id="cb23-265"><a href="#cb23-265" aria-label="247"></a>        <span class="st">"genres"</span>: artist[<span class="st">"genres"</span>],</span>
+<span id="cb23-266"><a href="#cb23-266" aria-label="248"></a>        <span class="st">"top_track_popularity"</span>: [t[<span class="st">"popularity"</span>] <span class="cf">for</span> t <span class="kw">in</span> top_tracks[<span class="st">"tracks"</span>]],</span>
+<span id="cb23-267"><a href="#cb23-267" aria-label="249"></a>        <span class="st">"album_years"</span>: <span class="bu">sorted</span>({a[<span class="st">"release_date"</span>][:<span class="dv">4</span>] <span class="cf">for</span> a <span class="kw">in</span> albums[<span class="st">"items"</span>]}),</span>
+<span id="cb23-268"><a href="#cb23-268" aria-label="250"></a>    }</span>
+<span id="cb23-269"><a href="#cb23-269" aria-label="251"></a></span>
+<span id="cb23-270"><a href="#cb23-270" aria-label="252"></a>profile_classical <span class="op">=</span> get_artist_profile(sp, <span class="st">"Yo-Yo Ma"</span>)</span>
+<span id="cb23-271"><a href="#cb23-271" aria-label="253"></a>profile_electronic <span class="op">=</span> get_artist_profile(sp, <span class="st">"Daft Punk"</span>)</span>
 <span id="cb23-272"><a href="#cb23-272" aria-label="254"></a></span>
-<span id="cb23-273"><a href="#cb23-273" aria-label="255"></a>profile_classical <span class="op">=</span> get_artist_profile(sp, <span class="st">"Yo-Yo Ma"</span>)</span>
-<span id="cb23-274"><a href="#cb23-274" aria-label="256"></a>profile_electronic <span class="op">=</span> get_artist_profile(sp, <span class="st">"Daft Punk"</span>)</span>
-<span id="cb23-275"><a href="#cb23-275" aria-label="257"></a></span>
-<span id="cb23-276"><a href="#cb23-276" aria-label="258"></a><span class="cf">for</span> p <span class="kw">in</span> (profile_classical, profile_electronic):</span>
-<span id="cb23-277"><a href="#cb23-277" aria-label="259"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>p[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss">: popularity </span><span class="sc">{</span>p[<span class="st">'artist_popularity'</span>]<span class="sc">}</span><span class="ss">, "</span></span>
-<span id="cb23-278"><a href="#cb23-278" aria-label="260"></a>          <span class="ss">f"</span><span class="sc">{</span>p[<span class="st">'followers'</span>]<span class="sc">:,}</span><span class="ss"> followers, "</span></span>
-<span id="cb23-279"><a href="#cb23-279" aria-label="261"></a>          <span class="ss">f"albums </span><span class="sc">{</span>p[<span class="st">'album_years'</span>][<span class="dv">0</span>]<span class="sc">}</span><span class="ss">–</span><span class="sc">{</span>p[<span class="st">'album_years'</span>][<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-280"><a href="#cb23-280" aria-label="262"></a><span class="in">```</span></span>
-<span id="cb23-281"><a href="#cb23-281" aria-label="263"></a></span>
-<span id="cb23-284"><a href="#cb23-284" aria-label="264"></a><span class="in">```{python}</span></span>
-<span id="cb23-285"><a href="#cb23-285" aria-label="265"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb23-286"><a href="#cb23-286" aria-label="266"></a></span>
-<span id="cb23-287"><a href="#cb23-287" aria-label="267"></a><span class="co"># Compare the popularity distributions of each artist's top tracks</span></span>
-<span id="cb23-288"><a href="#cb23-288" aria-label="268"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
-<span id="cb23-289"><a href="#cb23-289" aria-label="269"></a>ax.boxplot(</span>
-<span id="cb23-290"><a href="#cb23-290" aria-label="270"></a>    [profile_classical[<span class="st">"top_track_popularity"</span>],</span>
-<span id="cb23-291"><a href="#cb23-291" aria-label="271"></a>     profile_electronic[<span class="st">"top_track_popularity"</span>]],</span>
-<span id="cb23-292"><a href="#cb23-292" aria-label="272"></a>    tick_labels<span class="op">=</span>[profile_classical[<span class="st">"name"</span>], profile_electronic[<span class="st">"name"</span>]]</span>
-<span id="cb23-293"><a href="#cb23-293" aria-label="273"></a>)</span>
-<span id="cb23-294"><a href="#cb23-294" aria-label="274"></a>ax.set_ylabel(<span class="st">"Track Popularity (0–100)"</span>)</span>
-<span id="cb23-295"><a href="#cb23-295" aria-label="275"></a>ax.set_title(<span class="st">"Top-Track Popularity by Artist"</span>)</span>
-<span id="cb23-296"><a href="#cb23-296" aria-label="276"></a>plt.tight_layout()</span>
-<span id="cb23-297"><a href="#cb23-297" aria-label="277"></a>plt.show()</span>
-<span id="cb23-298"><a href="#cb23-298" aria-label="278"></a><span class="in">```</span></span>
-<span id="cb23-299"><a href="#cb23-299" aria-label="279"></a></span>
-<span id="cb23-300"><a href="#cb23-300" aria-label="280"></a>Even without audio analysis, the catalog tells stories: Daft Punk's compact discography of studio albums contrasts with Yo-Yo Ma's decades-long recording career spanning dozens of releases; their popularity scores reveal how streaming-era attention concentrates on some catalogs and spreads thin across others.</span>
-<span id="cb23-301"><a href="#cb23-301" aria-label="281"></a></span>
-<span id="cb23-302"><a href="#cb23-302" aria-label="282"></a>For playlist-based questions, <span class="in">`sp.playlist_tracks()`</span> retrieves the contents of any *user-created* public playlist (Spotify-owned editorial playlists are no longer accessible to new apps):</span>
-<span id="cb23-303"><a href="#cb23-303" aria-label="283"></a></span>
-<span id="cb23-306"><a href="#cb23-306" aria-label="284"></a><span class="in">```{python}</span></span>
-<span id="cb23-307"><a href="#cb23-307" aria-label="285"></a><span class="co"># Retrieve tracks from a user-created public playlist by its ID</span></span>
-<span id="cb23-308"><a href="#cb23-308" aria-label="286"></a>playlist_id <span class="op">=</span> <span class="st">"spotify_playlist_id_here"</span>  <span class="co"># From the playlist's share link</span></span>
-<span id="cb23-309"><a href="#cb23-309" aria-label="287"></a>items <span class="op">=</span> sp.playlist_tracks(playlist_id, limit<span class="op">=</span><span class="dv">100</span>)[<span class="st">"items"</span>]</span>
-<span id="cb23-310"><a href="#cb23-310" aria-label="288"></a></span>
-<span id="cb23-311"><a href="#cb23-311" aria-label="289"></a>tracks <span class="op">=</span> pd.DataFrame([{</span>
-<span id="cb23-312"><a href="#cb23-312" aria-label="290"></a>    <span class="st">"name"</span>: it[<span class="st">"track"</span>][<span class="st">"name"</span>],</span>
-<span id="cb23-313"><a href="#cb23-313" aria-label="291"></a>    <span class="st">"artist"</span>: it[<span class="st">"track"</span>][<span class="st">"artists"</span>][<span class="dv">0</span>][<span class="st">"name"</span>],</span>
-<span id="cb23-314"><a href="#cb23-314" aria-label="292"></a>    <span class="st">"popularity"</span>: it[<span class="st">"track"</span>][<span class="st">"popularity"</span>],</span>
-<span id="cb23-315"><a href="#cb23-315" aria-label="293"></a>    <span class="st">"duration_min"</span>: it[<span class="st">"track"</span>][<span class="st">"duration_ms"</span>] <span class="op">/</span> <span class="dv">60000</span>,</span>
-<span id="cb23-316"><a href="#cb23-316" aria-label="294"></a>    <span class="st">"release_year"</span>: <span class="bu">int</span>(it[<span class="st">"track"</span>][<span class="st">"album"</span>][<span class="st">"release_date"</span>][:<span class="dv">4</span>]),</span>
-<span id="cb23-317"><a href="#cb23-317" aria-label="295"></a>} <span class="cf">for</span> it <span class="kw">in</span> items <span class="cf">if</span> it[<span class="st">"track"</span>] <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>])</span>
+<span id="cb23-273"><a href="#cb23-273" aria-label="255"></a><span class="cf">for</span> p <span class="kw">in</span> (profile_classical, profile_electronic):</span>
+<span id="cb23-274"><a href="#cb23-274" aria-label="256"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>p[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss">: popularity </span><span class="sc">{</span>p[<span class="st">'artist_popularity'</span>]<span class="sc">}</span><span class="ss">, "</span></span>
+<span id="cb23-275"><a href="#cb23-275" aria-label="257"></a>          <span class="ss">f"</span><span class="sc">{</span>p[<span class="st">'followers'</span>]<span class="sc">:,}</span><span class="ss"> followers, "</span></span>
+<span id="cb23-276"><a href="#cb23-276" aria-label="258"></a>          <span class="ss">f"albums </span><span class="sc">{</span>p[<span class="st">'album_years'</span>][<span class="dv">0</span>]<span class="sc">}</span><span class="ss">–</span><span class="sc">{</span>p[<span class="st">'album_years'</span>][<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-277"><a href="#cb23-277" aria-label="259"></a><span class="in">```</span></span>
+<span id="cb23-278"><a href="#cb23-278" aria-label="260"></a></span>
+<span id="cb23-281"><a href="#cb23-281" aria-label="261"></a><span class="in">```{python}</span></span>
+<span id="cb23-282"><a href="#cb23-282" aria-label="262"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb23-283"><a href="#cb23-283" aria-label="263"></a></span>
+<span id="cb23-284"><a href="#cb23-284" aria-label="264"></a><span class="co"># Compare the popularity distributions of each artist's top tracks</span></span>
+<span id="cb23-285"><a href="#cb23-285" aria-label="265"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb23-286"><a href="#cb23-286" aria-label="266"></a>ax.boxplot(</span>
+<span id="cb23-287"><a href="#cb23-287" aria-label="267"></a>    [profile_classical[<span class="st">"top_track_popularity"</span>],</span>
+<span id="cb23-288"><a href="#cb23-288" aria-label="268"></a>     profile_electronic[<span class="st">"top_track_popularity"</span>]],</span>
+<span id="cb23-289"><a href="#cb23-289" aria-label="269"></a>    tick_labels<span class="op">=</span>[profile_classical[<span class="st">"name"</span>], profile_electronic[<span class="st">"name"</span>]]</span>
+<span id="cb23-290"><a href="#cb23-290" aria-label="270"></a>)</span>
+<span id="cb23-291"><a href="#cb23-291" aria-label="271"></a>ax.set_ylabel(<span class="st">"Track Popularity (0–100)"</span>)</span>
+<span id="cb23-292"><a href="#cb23-292" aria-label="272"></a>ax.set_title(<span class="st">"Top-Track Popularity by Artist"</span>)</span>
+<span id="cb23-293"><a href="#cb23-293" aria-label="273"></a>plt.tight_layout()</span>
+<span id="cb23-294"><a href="#cb23-294" aria-label="274"></a>plt.show()</span>
+<span id="cb23-295"><a href="#cb23-295" aria-label="275"></a><span class="in">```</span></span>
+<span id="cb23-296"><a href="#cb23-296" aria-label="276"></a></span>
+<span id="cb23-297"><a href="#cb23-297" aria-label="277"></a>Even without audio analysis, the catalog tells stories: Daft Punk's compact discography of studio albums contrasts with Yo-Yo Ma's decades-long recording career spanning dozens of releases; their popularity scores reveal how streaming-era attention concentrates on some catalogs and spreads thin across others.</span>
+<span id="cb23-298"><a href="#cb23-298" aria-label="278"></a></span>
+<span id="cb23-299"><a href="#cb23-299" aria-label="279"></a>For playlist-based questions, <span class="in">`sp.playlist_tracks()`</span> retrieves the contents of any *user-created* public playlist (Spotify-owned editorial playlists are no longer accessible to new apps):</span>
+<span id="cb23-300"><a href="#cb23-300" aria-label="280"></a></span>
+<span id="cb23-303"><a href="#cb23-303" aria-label="281"></a><span class="in">```{python}</span></span>
+<span id="cb23-304"><a href="#cb23-304" aria-label="282"></a><span class="co"># Retrieve tracks from a user-created public playlist by its ID</span></span>
+<span id="cb23-305"><a href="#cb23-305" aria-label="283"></a>playlist_id <span class="op">=</span> <span class="st">"spotify_playlist_id_here"</span>  <span class="co"># From the playlist's share link</span></span>
+<span id="cb23-306"><a href="#cb23-306" aria-label="284"></a>items <span class="op">=</span> sp.playlist_tracks(playlist_id, limit<span class="op">=</span><span class="dv">100</span>)[<span class="st">"items"</span>]</span>
+<span id="cb23-307"><a href="#cb23-307" aria-label="285"></a></span>
+<span id="cb23-308"><a href="#cb23-308" aria-label="286"></a>tracks <span class="op">=</span> pd.DataFrame([{</span>
+<span id="cb23-309"><a href="#cb23-309" aria-label="287"></a>    <span class="st">"name"</span>: it[<span class="st">"track"</span>][<span class="st">"name"</span>],</span>
+<span id="cb23-310"><a href="#cb23-310" aria-label="288"></a>    <span class="st">"artist"</span>: it[<span class="st">"track"</span>][<span class="st">"artists"</span>][<span class="dv">0</span>][<span class="st">"name"</span>],</span>
+<span id="cb23-311"><a href="#cb23-311" aria-label="289"></a>    <span class="st">"popularity"</span>: it[<span class="st">"track"</span>][<span class="st">"popularity"</span>],</span>
+<span id="cb23-312"><a href="#cb23-312" aria-label="290"></a>    <span class="st">"duration_min"</span>: it[<span class="st">"track"</span>][<span class="st">"duration_ms"</span>] <span class="op">/</span> <span class="dv">60000</span>,</span>
+<span id="cb23-313"><a href="#cb23-313" aria-label="291"></a>    <span class="st">"release_year"</span>: <span class="bu">int</span>(it[<span class="st">"track"</span>][<span class="st">"album"</span>][<span class="st">"release_date"</span>][:<span class="dv">4</span>]),</span>
+<span id="cb23-314"><a href="#cb23-314" aria-label="292"></a>} <span class="cf">for</span> it <span class="kw">in</span> items <span class="cf">if</span> it[<span class="st">"track"</span>] <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>])</span>
+<span id="cb23-315"><a href="#cb23-315" aria-label="293"></a></span>
+<span id="cb23-316"><a href="#cb23-316" aria-label="294"></a><span class="bu">print</span>(tracks.describe())</span>
+<span id="cb23-317"><a href="#cb23-317" aria-label="295"></a><span class="in">```</span></span>
 <span id="cb23-318"><a href="#cb23-318" aria-label="296"></a></span>
-<span id="cb23-319"><a href="#cb23-319" aria-label="297"></a><span class="bu">print</span>(tracks.describe())</span>
-<span id="cb23-320"><a href="#cb23-320" aria-label="298"></a><span class="in">```</span></span>
-<span id="cb23-321"><a href="#cb23-321" aria-label="299"></a></span>
-<span id="cb23-322"><a href="#cb23-322" aria-label="300"></a><span class="fu">### The Audio Features Story: An Enclosure Case Study</span></span>
-<span id="cb23-323"><a href="#cb23-323" aria-label="301"></a></span>
-<span id="cb23-324"><a href="#cb23-324" aria-label="302"></a>For more than a decade, the Spotify API's signature research offering was **audio features**: algorithmic scores for every track's danceability, energy, valence (musical positivity), tempo, and more. Hundreds of published studies used them to map genres, model hit prediction, and study the emotional texture of playlists. The November 2024 deprecation cut new applications off from all of it — right as generative AI made music data newly valuable, and without a stated research alternative. It is @sec-post-api's **enclosure** pattern in miniature: a rich, freely available data resource, withdrawn by unilateral platform decision, with the accumulated literature now resting on measurements that new researchers cannot reproduce.</span>
-<span id="cb23-325"><a href="#cb23-325" aria-label="303"></a></span>
-<span id="cb23-326"><a href="#cb23-326" aria-label="304"></a>The episode also carries a methodological lesson that outlives the endpoints. Audio features were never ground truth about music — they were Spotify's proprietary algorithmic interpretations, learned from training data and reflecting particular cultural assumptions about what makes music "danceable" or "positive." The same holds for the popularity scores you *can* still retrieve: they are engagement-weighted, region-influenced, and recomputed on Spotify's schedule. When you analyze platform data, you are always analyzing the platform's model of the world as much as the world itself.</span>
-<span id="cb23-327"><a href="#cb23-327" aria-label="305"></a></span>
-<span id="cb23-328"><a href="#cb23-328" aria-label="306"></a><span class="fu">## Bluesky via AT Protocol</span></span>
-<span id="cb23-329"><a href="#cb23-329" aria-label="307"></a></span>
-<span id="cb23-330"><a href="#cb23-330" aria-label="308"></a>Bluesky, built on the AT Protocol, represents a structural alternative to proprietary platforms. Its open protocol means that API access is an architectural feature, not a business decision:</span>
-<span id="cb23-331"><a href="#cb23-331" aria-label="309"></a></span>
-<span id="cb23-334"><a href="#cb23-334" aria-label="310"></a><span class="in">```{python}</span></span>
-<span id="cb23-335"><a href="#cb23-335" aria-label="311"></a><span class="co"># atproto is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge atproto</span></span>
-<span id="cb23-336"><a href="#cb23-336" aria-label="312"></a><span class="im">from</span> atproto <span class="im">import</span> Client</span>
+<span id="cb23-319"><a href="#cb23-319" aria-label="297"></a><span class="fu">### The Audio Features Story: An Enclosure Case Study</span></span>
+<span id="cb23-320"><a href="#cb23-320" aria-label="298"></a></span>
+<span id="cb23-321"><a href="#cb23-321" aria-label="299"></a>For more than a decade, the Spotify API's signature research offering was **audio features**: algorithmic scores for every track's danceability, energy, valence (musical positivity), tempo, and more. Hundreds of published studies used them to map genres, model hit prediction, and study the emotional texture of playlists. The November 2024 deprecation cut new applications off from all of it — right as generative AI made music data newly valuable, and without a stated research alternative. It is @sec-post-api's **enclosure** pattern in miniature: a rich, freely available data resource, withdrawn by unilateral platform decision, with the accumulated literature now resting on measurements that new researchers cannot reproduce.</span>
+<span id="cb23-322"><a href="#cb23-322" aria-label="300"></a></span>
+<span id="cb23-323"><a href="#cb23-323" aria-label="301"></a>The episode also carries a methodological lesson that outlives the endpoints. Audio features were never ground truth about music — they were Spotify's proprietary algorithmic interpretations, learned from training data and reflecting particular cultural assumptions about what makes music "danceable" or "positive." The same holds for the popularity scores you *can* still retrieve: they are engagement-weighted, region-influenced, and recomputed on Spotify's schedule. When you analyze platform data, you are always analyzing the platform's model of the world as much as the world itself.</span>
+<span id="cb23-324"><a href="#cb23-324" aria-label="302"></a></span>
+<span id="cb23-325"><a href="#cb23-325" aria-label="303"></a><span class="fu">## Bluesky via AT Protocol</span></span>
+<span id="cb23-326"><a href="#cb23-326" aria-label="304"></a></span>
+<span id="cb23-327"><a href="#cb23-327" aria-label="305"></a>Bluesky, built on the AT Protocol, represents a structural alternative to proprietary platforms. Its open protocol means that API access is an architectural feature, not a business decision:</span>
+<span id="cb23-328"><a href="#cb23-328" aria-label="306"></a></span>
+<span id="cb23-331"><a href="#cb23-331" aria-label="307"></a><span class="in">```{python}</span></span>
+<span id="cb23-332"><a href="#cb23-332" aria-label="308"></a><span class="co"># atproto is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge atproto</span></span>
+<span id="cb23-333"><a href="#cb23-333" aria-label="309"></a><span class="im">from</span> atproto <span class="im">import</span> Client</span>
+<span id="cb23-334"><a href="#cb23-334" aria-label="310"></a></span>
+<span id="cb23-335"><a href="#cb23-335" aria-label="311"></a>client <span class="op">=</span> Client()</span>
+<span id="cb23-336"><a href="#cb23-336" aria-label="312"></a>client.login(<span class="st">"your-handle.bsky.social"</span>, <span class="st">"your-app-password"</span>)</span>
 <span id="cb23-337"><a href="#cb23-337" aria-label="313"></a></span>
-<span id="cb23-338"><a href="#cb23-338" aria-label="314"></a>client <span class="op">=</span> Client()</span>
-<span id="cb23-339"><a href="#cb23-339" aria-label="315"></a>client.login(<span class="st">"your-handle.bsky.social"</span>, <span class="st">"your-app-password"</span>)</span>
-<span id="cb23-340"><a href="#cb23-340" aria-label="316"></a></span>
-<span id="cb23-341"><a href="#cb23-341" aria-label="317"></a><span class="co"># Get your own profile</span></span>
-<span id="cb23-342"><a href="#cb23-342" aria-label="318"></a>profile <span class="op">=</span> client.app.bsky.actor.get_profile({<span class="st">"actor"</span>: client.me.did})</span>
-<span id="cb23-343"><a href="#cb23-343" aria-label="319"></a><span class="bu">print</span>(<span class="ss">f"Handle: </span><span class="sc">{</span>profile<span class="sc">.</span>handle<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-344"><a href="#cb23-344" aria-label="320"></a><span class="bu">print</span>(<span class="ss">f"Followers: </span><span class="sc">{</span>profile<span class="sc">.</span>followers_count<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-345"><a href="#cb23-345" aria-label="321"></a><span class="bu">print</span>(<span class="ss">f"Following: </span><span class="sc">{</span>profile<span class="sc">.</span>follows_count<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-346"><a href="#cb23-346" aria-label="322"></a></span>
-<span id="cb23-347"><a href="#cb23-347" aria-label="323"></a><span class="co"># Get your timeline</span></span>
-<span id="cb23-348"><a href="#cb23-348" aria-label="324"></a>timeline <span class="op">=</span> client.app.bsky.feed.get_timeline({<span class="st">"limit"</span>: <span class="dv">10</span>})</span>
-<span id="cb23-349"><a href="#cb23-349" aria-label="325"></a><span class="cf">for</span> item <span class="kw">in</span> timeline.feed:</span>
-<span id="cb23-350"><a href="#cb23-350" aria-label="326"></a>    post <span class="op">=</span> item.post</span>
-<span id="cb23-351"><a href="#cb23-351" aria-label="327"></a>    <span class="bu">print</span>(<span class="ss">f"@</span><span class="sc">{</span>post<span class="sc">.</span>author<span class="sc">.</span>handle<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>post<span class="sc">.</span>record<span class="sc">.</span>text[:<span class="dv">80</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-352"><a href="#cb23-352" aria-label="328"></a><span class="in">```</span></span>
-<span id="cb23-353"><a href="#cb23-353" aria-label="329"></a></span>
-<span id="cb23-354"><a href="#cb23-354" aria-label="330"></a>Note the authentication style: an **app password** generated in Bluesky's settings, distinct from your account password and revocable at any time — the same delegated-credential principle as OAuth, implemented more simply.</span>
-<span id="cb23-355"><a href="#cb23-355" aria-label="331"></a></span>
-<span id="cb23-356"><a href="#cb23-356" aria-label="332"></a>Any account's public posts are available through <span class="in">`get_author_feed`</span>:</span>
-<span id="cb23-357"><a href="#cb23-357" aria-label="333"></a></span>
-<span id="cb23-360"><a href="#cb23-360" aria-label="334"></a><span class="in">```{python}</span></span>
-<span id="cb23-361"><a href="#cb23-361" aria-label="335"></a><span class="co"># Retrieve a user's recent posts (public data; any handle works)</span></span>
-<span id="cb23-362"><a href="#cb23-362" aria-label="336"></a>feed <span class="op">=</span> client.app.bsky.feed.get_author_feed(</span>
-<span id="cb23-363"><a href="#cb23-363" aria-label="337"></a>    {<span class="st">"actor"</span>: <span class="st">"bsky.app"</span>, <span class="st">"limit"</span>: <span class="dv">50</span>}</span>
-<span id="cb23-364"><a href="#cb23-364" aria-label="338"></a>)</span>
-<span id="cb23-365"><a href="#cb23-365" aria-label="339"></a></span>
-<span id="cb23-366"><a href="#cb23-366" aria-label="340"></a>posts <span class="op">=</span> []</span>
-<span id="cb23-367"><a href="#cb23-367" aria-label="341"></a><span class="cf">for</span> item <span class="kw">in</span> feed.feed:</span>
-<span id="cb23-368"><a href="#cb23-368" aria-label="342"></a>    post <span class="op">=</span> item.post</span>
-<span id="cb23-369"><a href="#cb23-369" aria-label="343"></a>    posts.append({</span>
-<span id="cb23-370"><a href="#cb23-370" aria-label="344"></a>        <span class="st">"text"</span>: post.record.text,</span>
-<span id="cb23-371"><a href="#cb23-371" aria-label="345"></a>        <span class="st">"created_at"</span>: post.record.created_at,</span>
-<span id="cb23-372"><a href="#cb23-372" aria-label="346"></a>        <span class="st">"likes"</span>: post.like_count,</span>
-<span id="cb23-373"><a href="#cb23-373" aria-label="347"></a>        <span class="st">"reposts"</span>: post.repost_count,</span>
-<span id="cb23-374"><a href="#cb23-374" aria-label="348"></a>        <span class="st">"is_reply"</span>: post.record.reply <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>,</span>
-<span id="cb23-375"><a href="#cb23-375" aria-label="349"></a>    })</span>
-<span id="cb23-376"><a href="#cb23-376" aria-label="350"></a></span>
-<span id="cb23-377"><a href="#cb23-377" aria-label="351"></a>df_posts <span class="op">=</span> pd.DataFrame(posts)</span>
-<span id="cb23-378"><a href="#cb23-378" aria-label="352"></a><span class="bu">print</span>(<span class="ss">f"Posts retrieved: </span><span class="sc">{</span><span class="bu">len</span>(df_posts)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-379"><a href="#cb23-379" aria-label="353"></a><span class="bu">print</span>(<span class="ss">f"Replies: </span><span class="sc">{</span>df_posts[<span class="st">'is_reply'</span>]<span class="sc">.</span>mean()<span class="sc">:.0%}</span><span class="ss">"</span>)</span>
-<span id="cb23-380"><a href="#cb23-380" aria-label="354"></a><span class="in">```</span></span>
-<span id="cb23-381"><a href="#cb23-381" aria-label="355"></a></span>
-<span id="cb23-382"><a href="#cb23-382" aria-label="356"></a>The key difference from Reddit and Spotify: Bluesky's protocol is designed so that no single company controls API access. Your identity, social graph, and data are portable across any service that implements the AT Protocol.</span>
-<span id="cb23-383"><a href="#cb23-383" aria-label="357"></a></span>
-<span id="cb23-384"><a href="#cb23-384" aria-label="358"></a><span class="fu">### Building a Bluesky Social Network</span></span>
-<span id="cb23-385"><a href="#cb23-385" aria-label="359"></a></span>
-<span id="cb23-386"><a href="#cb23-386" aria-label="360"></a>The AT Protocol makes social graph data directly accessible, enabling network analysis that would be difficult on more restricted platforms:</span>
-<span id="cb23-387"><a href="#cb23-387" aria-label="361"></a></span>
-<span id="cb23-390"><a href="#cb23-390" aria-label="362"></a><span class="in">```{python}</span></span>
-<span id="cb23-391"><a href="#cb23-391" aria-label="363"></a><span class="kw">def</span> get_social_graph(client, handle, direction<span class="op">=</span><span class="st">"followers"</span>, limit<span class="op">=</span><span class="dv">100</span>):</span>
-<span id="cb23-392"><a href="#cb23-392" aria-label="364"></a>    <span class="co">"""Get followers or following for a Bluesky user.</span></span>
-<span id="cb23-393"><a href="#cb23-393" aria-label="365"></a></span>
-<span id="cb23-394"><a href="#cb23-394" aria-label="366"></a><span class="co">    Parameters</span></span>
-<span id="cb23-395"><a href="#cb23-395" aria-label="367"></a><span class="co">    ----------</span></span>
-<span id="cb23-396"><a href="#cb23-396" aria-label="368"></a><span class="co">    client : atproto.Client</span></span>
-<span id="cb23-397"><a href="#cb23-397" aria-label="369"></a><span class="co">        Authenticated Bluesky client</span></span>
-<span id="cb23-398"><a href="#cb23-398" aria-label="370"></a><span class="co">    handle : str</span></span>
-<span id="cb23-399"><a href="#cb23-399" aria-label="371"></a><span class="co">        The user's handle (e.g., 'username.bsky.social')</span></span>
-<span id="cb23-400"><a href="#cb23-400" aria-label="372"></a><span class="co">    direction : str</span></span>
-<span id="cb23-401"><a href="#cb23-401" aria-label="373"></a><span class="co">        'followers' or 'following'</span></span>
-<span id="cb23-402"><a href="#cb23-402" aria-label="374"></a><span class="co">    limit : int</span></span>
-<span id="cb23-403"><a href="#cb23-403" aria-label="375"></a><span class="co">        Maximum number of accounts to retrieve</span></span>
-<span id="cb23-404"><a href="#cb23-404" aria-label="376"></a></span>
-<span id="cb23-405"><a href="#cb23-405" aria-label="377"></a><span class="co">    Returns</span></span>
-<span id="cb23-406"><a href="#cb23-406" aria-label="378"></a><span class="co">    -------</span></span>
-<span id="cb23-407"><a href="#cb23-407" aria-label="379"></a><span class="co">    list</span></span>
-<span id="cb23-408"><a href="#cb23-408" aria-label="380"></a><span class="co">        List of dictionaries with handle and display name</span></span>
-<span id="cb23-409"><a href="#cb23-409" aria-label="381"></a><span class="co">    """</span></span>
-<span id="cb23-410"><a href="#cb23-410" aria-label="382"></a>    results <span class="op">=</span> []</span>
-<span id="cb23-411"><a href="#cb23-411" aria-label="383"></a>    cursor <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb23-412"><a href="#cb23-412" aria-label="384"></a></span>
-<span id="cb23-413"><a href="#cb23-413" aria-label="385"></a>    <span class="cf">while</span> <span class="bu">len</span>(results) <span class="op">&lt;</span> limit:</span>
-<span id="cb23-414"><a href="#cb23-414" aria-label="386"></a>        <span class="cf">if</span> direction <span class="op">==</span> <span class="st">"followers"</span>:</span>
-<span id="cb23-415"><a href="#cb23-415" aria-label="387"></a>            response <span class="op">=</span> client.app.bsky.graph.get_followers(</span>
-<span id="cb23-416"><a href="#cb23-416" aria-label="388"></a>                {<span class="st">"actor"</span>: handle, <span class="st">"limit"</span>: <span class="dv">50</span>, <span class="st">"cursor"</span>: cursor}</span>
-<span id="cb23-417"><a href="#cb23-417" aria-label="389"></a>            )</span>
-<span id="cb23-418"><a href="#cb23-418" aria-label="390"></a>            accounts <span class="op">=</span> response.followers</span>
-<span id="cb23-419"><a href="#cb23-419" aria-label="391"></a>        <span class="cf">else</span>:</span>
-<span id="cb23-420"><a href="#cb23-420" aria-label="392"></a>            response <span class="op">=</span> client.app.bsky.graph.get_follows(</span>
-<span id="cb23-421"><a href="#cb23-421" aria-label="393"></a>                {<span class="st">"actor"</span>: handle, <span class="st">"limit"</span>: <span class="dv">50</span>, <span class="st">"cursor"</span>: cursor}</span>
-<span id="cb23-422"><a href="#cb23-422" aria-label="394"></a>            )</span>
-<span id="cb23-423"><a href="#cb23-423" aria-label="395"></a>            accounts <span class="op">=</span> response.follows</span>
-<span id="cb23-424"><a href="#cb23-424" aria-label="396"></a></span>
-<span id="cb23-425"><a href="#cb23-425" aria-label="397"></a>        <span class="cf">for</span> account <span class="kw">in</span> accounts:</span>
-<span id="cb23-426"><a href="#cb23-426" aria-label="398"></a>            results.append({</span>
-<span id="cb23-427"><a href="#cb23-427" aria-label="399"></a>                <span class="st">"handle"</span>: account.handle,</span>
-<span id="cb23-428"><a href="#cb23-428" aria-label="400"></a>                <span class="st">"display_name"</span>: account.display_name <span class="kw">or</span> <span class="st">""</span>,</span>
-<span id="cb23-429"><a href="#cb23-429" aria-label="401"></a>                <span class="st">"description"</span>: (account.description <span class="kw">or</span> <span class="st">""</span>)[:<span class="dv">100</span>]</span>
-<span id="cb23-430"><a href="#cb23-430" aria-label="402"></a>            })</span>
-<span id="cb23-431"><a href="#cb23-431" aria-label="403"></a></span>
-<span id="cb23-432"><a href="#cb23-432" aria-label="404"></a>        cursor <span class="op">=</span> response.cursor</span>
-<span id="cb23-433"><a href="#cb23-433" aria-label="405"></a>        <span class="cf">if</span> <span class="kw">not</span> cursor <span class="kw">or</span> <span class="kw">not</span> accounts:</span>
-<span id="cb23-434"><a href="#cb23-434" aria-label="406"></a>            <span class="cf">break</span></span>
-<span id="cb23-435"><a href="#cb23-435" aria-label="407"></a></span>
-<span id="cb23-436"><a href="#cb23-436" aria-label="408"></a>    <span class="cf">return</span> results[:limit]</span>
-<span id="cb23-437"><a href="#cb23-437" aria-label="409"></a></span>
-<span id="cb23-438"><a href="#cb23-438" aria-label="410"></a><span class="co"># Get followers for a user</span></span>
-<span id="cb23-439"><a href="#cb23-439" aria-label="411"></a>followers <span class="op">=</span> get_social_graph(client, <span class="st">"your-handle.bsky.social"</span>, <span class="st">"followers"</span>)</span>
-<span id="cb23-440"><a href="#cb23-440" aria-label="412"></a>following <span class="op">=</span> get_social_graph(client, <span class="st">"your-handle.bsky.social"</span>, <span class="st">"following"</span>)</span>
+<span id="cb23-338"><a href="#cb23-338" aria-label="314"></a><span class="co"># Get your own profile</span></span>
+<span id="cb23-339"><a href="#cb23-339" aria-label="315"></a>profile <span class="op">=</span> client.app.bsky.actor.get_profile({<span class="st">"actor"</span>: client.me.did})</span>
+<span id="cb23-340"><a href="#cb23-340" aria-label="316"></a><span class="bu">print</span>(<span class="ss">f"Handle: </span><span class="sc">{</span>profile<span class="sc">.</span>handle<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-341"><a href="#cb23-341" aria-label="317"></a><span class="bu">print</span>(<span class="ss">f"Followers: </span><span class="sc">{</span>profile<span class="sc">.</span>followers_count<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-342"><a href="#cb23-342" aria-label="318"></a><span class="bu">print</span>(<span class="ss">f"Following: </span><span class="sc">{</span>profile<span class="sc">.</span>follows_count<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-343"><a href="#cb23-343" aria-label="319"></a></span>
+<span id="cb23-344"><a href="#cb23-344" aria-label="320"></a><span class="co"># Get your timeline</span></span>
+<span id="cb23-345"><a href="#cb23-345" aria-label="321"></a>timeline <span class="op">=</span> client.app.bsky.feed.get_timeline({<span class="st">"limit"</span>: <span class="dv">10</span>})</span>
+<span id="cb23-346"><a href="#cb23-346" aria-label="322"></a><span class="cf">for</span> item <span class="kw">in</span> timeline.feed:</span>
+<span id="cb23-347"><a href="#cb23-347" aria-label="323"></a>    post <span class="op">=</span> item.post</span>
+<span id="cb23-348"><a href="#cb23-348" aria-label="324"></a>    <span class="bu">print</span>(<span class="ss">f"@</span><span class="sc">{</span>post<span class="sc">.</span>author<span class="sc">.</span>handle<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>post<span class="sc">.</span>record<span class="sc">.</span>text[:<span class="dv">80</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-349"><a href="#cb23-349" aria-label="325"></a><span class="in">```</span></span>
+<span id="cb23-350"><a href="#cb23-350" aria-label="326"></a></span>
+<span id="cb23-351"><a href="#cb23-351" aria-label="327"></a>Note the authentication style: an **app password** generated in Bluesky's settings, distinct from your account password and revocable at any time — the same delegated-credential principle as OAuth, implemented more simply.</span>
+<span id="cb23-352"><a href="#cb23-352" aria-label="328"></a></span>
+<span id="cb23-353"><a href="#cb23-353" aria-label="329"></a>Any account's public posts are available through <span class="in">`get_author_feed`</span>:</span>
+<span id="cb23-354"><a href="#cb23-354" aria-label="330"></a></span>
+<span id="cb23-357"><a href="#cb23-357" aria-label="331"></a><span class="in">```{python}</span></span>
+<span id="cb23-358"><a href="#cb23-358" aria-label="332"></a><span class="co"># Retrieve a user's recent posts (public data; any handle works)</span></span>
+<span id="cb23-359"><a href="#cb23-359" aria-label="333"></a>feed <span class="op">=</span> client.app.bsky.feed.get_author_feed(</span>
+<span id="cb23-360"><a href="#cb23-360" aria-label="334"></a>    {<span class="st">"actor"</span>: <span class="st">"bsky.app"</span>, <span class="st">"limit"</span>: <span class="dv">50</span>}</span>
+<span id="cb23-361"><a href="#cb23-361" aria-label="335"></a>)</span>
+<span id="cb23-362"><a href="#cb23-362" aria-label="336"></a></span>
+<span id="cb23-363"><a href="#cb23-363" aria-label="337"></a>posts <span class="op">=</span> []</span>
+<span id="cb23-364"><a href="#cb23-364" aria-label="338"></a><span class="cf">for</span> item <span class="kw">in</span> feed.feed:</span>
+<span id="cb23-365"><a href="#cb23-365" aria-label="339"></a>    post <span class="op">=</span> item.post</span>
+<span id="cb23-366"><a href="#cb23-366" aria-label="340"></a>    posts.append({</span>
+<span id="cb23-367"><a href="#cb23-367" aria-label="341"></a>        <span class="st">"text"</span>: post.record.text,</span>
+<span id="cb23-368"><a href="#cb23-368" aria-label="342"></a>        <span class="st">"created_at"</span>: post.record.created_at,</span>
+<span id="cb23-369"><a href="#cb23-369" aria-label="343"></a>        <span class="st">"likes"</span>: post.like_count,</span>
+<span id="cb23-370"><a href="#cb23-370" aria-label="344"></a>        <span class="st">"reposts"</span>: post.repost_count,</span>
+<span id="cb23-371"><a href="#cb23-371" aria-label="345"></a>        <span class="st">"is_reply"</span>: post.record.reply <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>,</span>
+<span id="cb23-372"><a href="#cb23-372" aria-label="346"></a>    })</span>
+<span id="cb23-373"><a href="#cb23-373" aria-label="347"></a></span>
+<span id="cb23-374"><a href="#cb23-374" aria-label="348"></a>df_posts <span class="op">=</span> pd.DataFrame(posts)</span>
+<span id="cb23-375"><a href="#cb23-375" aria-label="349"></a><span class="bu">print</span>(<span class="ss">f"Posts retrieved: </span><span class="sc">{</span><span class="bu">len</span>(df_posts)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-376"><a href="#cb23-376" aria-label="350"></a><span class="bu">print</span>(<span class="ss">f"Replies: </span><span class="sc">{</span>df_posts[<span class="st">'is_reply'</span>]<span class="sc">.</span>mean()<span class="sc">:.0%}</span><span class="ss">"</span>)</span>
+<span id="cb23-377"><a href="#cb23-377" aria-label="351"></a><span class="in">```</span></span>
+<span id="cb23-378"><a href="#cb23-378" aria-label="352"></a></span>
+<span id="cb23-379"><a href="#cb23-379" aria-label="353"></a>The key difference from Reddit and Spotify: Bluesky's protocol is designed so that no single company controls API access. Your identity, social graph, and data are portable across any service that implements the AT Protocol.</span>
+<span id="cb23-380"><a href="#cb23-380" aria-label="354"></a></span>
+<span id="cb23-381"><a href="#cb23-381" aria-label="355"></a><span class="fu">### Building a Bluesky Social Network</span></span>
+<span id="cb23-382"><a href="#cb23-382" aria-label="356"></a></span>
+<span id="cb23-383"><a href="#cb23-383" aria-label="357"></a>The AT Protocol makes social graph data directly accessible, enabling network analysis that would be difficult on more restricted platforms:</span>
+<span id="cb23-384"><a href="#cb23-384" aria-label="358"></a></span>
+<span id="cb23-387"><a href="#cb23-387" aria-label="359"></a><span class="in">```{python}</span></span>
+<span id="cb23-388"><a href="#cb23-388" aria-label="360"></a><span class="kw">def</span> get_social_graph(client, handle, direction<span class="op">=</span><span class="st">"followers"</span>, limit<span class="op">=</span><span class="dv">100</span>):</span>
+<span id="cb23-389"><a href="#cb23-389" aria-label="361"></a>    <span class="co">"""Get followers or following for a Bluesky user.</span></span>
+<span id="cb23-390"><a href="#cb23-390" aria-label="362"></a></span>
+<span id="cb23-391"><a href="#cb23-391" aria-label="363"></a><span class="co">    Parameters</span></span>
+<span id="cb23-392"><a href="#cb23-392" aria-label="364"></a><span class="co">    ----------</span></span>
+<span id="cb23-393"><a href="#cb23-393" aria-label="365"></a><span class="co">    client : atproto.Client</span></span>
+<span id="cb23-394"><a href="#cb23-394" aria-label="366"></a><span class="co">        Authenticated Bluesky client</span></span>
+<span id="cb23-395"><a href="#cb23-395" aria-label="367"></a><span class="co">    handle : str</span></span>
+<span id="cb23-396"><a href="#cb23-396" aria-label="368"></a><span class="co">        The user's handle (e.g., 'username.bsky.social')</span></span>
+<span id="cb23-397"><a href="#cb23-397" aria-label="369"></a><span class="co">    direction : str</span></span>
+<span id="cb23-398"><a href="#cb23-398" aria-label="370"></a><span class="co">        'followers' or 'following'</span></span>
+<span id="cb23-399"><a href="#cb23-399" aria-label="371"></a><span class="co">    limit : int</span></span>
+<span id="cb23-400"><a href="#cb23-400" aria-label="372"></a><span class="co">        Maximum number of accounts to retrieve</span></span>
+<span id="cb23-401"><a href="#cb23-401" aria-label="373"></a></span>
+<span id="cb23-402"><a href="#cb23-402" aria-label="374"></a><span class="co">    Returns</span></span>
+<span id="cb23-403"><a href="#cb23-403" aria-label="375"></a><span class="co">    -------</span></span>
+<span id="cb23-404"><a href="#cb23-404" aria-label="376"></a><span class="co">    list</span></span>
+<span id="cb23-405"><a href="#cb23-405" aria-label="377"></a><span class="co">        List of dictionaries with handle and display name</span></span>
+<span id="cb23-406"><a href="#cb23-406" aria-label="378"></a><span class="co">    """</span></span>
+<span id="cb23-407"><a href="#cb23-407" aria-label="379"></a>    results <span class="op">=</span> []</span>
+<span id="cb23-408"><a href="#cb23-408" aria-label="380"></a>    cursor <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb23-409"><a href="#cb23-409" aria-label="381"></a></span>
+<span id="cb23-410"><a href="#cb23-410" aria-label="382"></a>    <span class="cf">while</span> <span class="bu">len</span>(results) <span class="op">&lt;</span> limit:</span>
+<span id="cb23-411"><a href="#cb23-411" aria-label="383"></a>        <span class="cf">if</span> direction <span class="op">==</span> <span class="st">"followers"</span>:</span>
+<span id="cb23-412"><a href="#cb23-412" aria-label="384"></a>            response <span class="op">=</span> client.app.bsky.graph.get_followers(</span>
+<span id="cb23-413"><a href="#cb23-413" aria-label="385"></a>                {<span class="st">"actor"</span>: handle, <span class="st">"limit"</span>: <span class="dv">50</span>, <span class="st">"cursor"</span>: cursor}</span>
+<span id="cb23-414"><a href="#cb23-414" aria-label="386"></a>            )</span>
+<span id="cb23-415"><a href="#cb23-415" aria-label="387"></a>            accounts <span class="op">=</span> response.followers</span>
+<span id="cb23-416"><a href="#cb23-416" aria-label="388"></a>        <span class="cf">else</span>:</span>
+<span id="cb23-417"><a href="#cb23-417" aria-label="389"></a>            response <span class="op">=</span> client.app.bsky.graph.get_follows(</span>
+<span id="cb23-418"><a href="#cb23-418" aria-label="390"></a>                {<span class="st">"actor"</span>: handle, <span class="st">"limit"</span>: <span class="dv">50</span>, <span class="st">"cursor"</span>: cursor}</span>
+<span id="cb23-419"><a href="#cb23-419" aria-label="391"></a>            )</span>
+<span id="cb23-420"><a href="#cb23-420" aria-label="392"></a>            accounts <span class="op">=</span> response.follows</span>
+<span id="cb23-421"><a href="#cb23-421" aria-label="393"></a></span>
+<span id="cb23-422"><a href="#cb23-422" aria-label="394"></a>        <span class="cf">for</span> account <span class="kw">in</span> accounts:</span>
+<span id="cb23-423"><a href="#cb23-423" aria-label="395"></a>            results.append({</span>
+<span id="cb23-424"><a href="#cb23-424" aria-label="396"></a>                <span class="st">"handle"</span>: account.handle,</span>
+<span id="cb23-425"><a href="#cb23-425" aria-label="397"></a>                <span class="st">"display_name"</span>: account.display_name <span class="kw">or</span> <span class="st">""</span>,</span>
+<span id="cb23-426"><a href="#cb23-426" aria-label="398"></a>                <span class="st">"description"</span>: (account.description <span class="kw">or</span> <span class="st">""</span>)[:<span class="dv">100</span>]</span>
+<span id="cb23-427"><a href="#cb23-427" aria-label="399"></a>            })</span>
+<span id="cb23-428"><a href="#cb23-428" aria-label="400"></a></span>
+<span id="cb23-429"><a href="#cb23-429" aria-label="401"></a>        cursor <span class="op">=</span> response.cursor</span>
+<span id="cb23-430"><a href="#cb23-430" aria-label="402"></a>        <span class="cf">if</span> <span class="kw">not</span> cursor <span class="kw">or</span> <span class="kw">not</span> accounts:</span>
+<span id="cb23-431"><a href="#cb23-431" aria-label="403"></a>            <span class="cf">break</span></span>
+<span id="cb23-432"><a href="#cb23-432" aria-label="404"></a></span>
+<span id="cb23-433"><a href="#cb23-433" aria-label="405"></a>    <span class="cf">return</span> results[:limit]</span>
+<span id="cb23-434"><a href="#cb23-434" aria-label="406"></a></span>
+<span id="cb23-435"><a href="#cb23-435" aria-label="407"></a><span class="co"># Get followers for a user</span></span>
+<span id="cb23-436"><a href="#cb23-436" aria-label="408"></a>followers <span class="op">=</span> get_social_graph(client, <span class="st">"your-handle.bsky.social"</span>, <span class="st">"followers"</span>)</span>
+<span id="cb23-437"><a href="#cb23-437" aria-label="409"></a>following <span class="op">=</span> get_social_graph(client, <span class="st">"your-handle.bsky.social"</span>, <span class="st">"following"</span>)</span>
+<span id="cb23-438"><a href="#cb23-438" aria-label="410"></a></span>
+<span id="cb23-439"><a href="#cb23-439" aria-label="411"></a><span class="bu">print</span>(<span class="ss">f"Followers: </span><span class="sc">{</span><span class="bu">len</span>(followers)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-440"><a href="#cb23-440" aria-label="412"></a><span class="bu">print</span>(<span class="ss">f"Following: </span><span class="sc">{</span><span class="bu">len</span>(following)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb23-441"><a href="#cb23-441" aria-label="413"></a></span>
-<span id="cb23-442"><a href="#cb23-442" aria-label="414"></a><span class="bu">print</span>(<span class="ss">f"Followers: </span><span class="sc">{</span><span class="bu">len</span>(followers)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-443"><a href="#cb23-443" aria-label="415"></a><span class="bu">print</span>(<span class="ss">f"Following: </span><span class="sc">{</span><span class="bu">len</span>(following)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-444"><a href="#cb23-444" aria-label="416"></a></span>
-<span id="cb23-445"><a href="#cb23-445" aria-label="417"></a><span class="co"># Find mutual connections</span></span>
-<span id="cb23-446"><a href="#cb23-446" aria-label="418"></a>follower_handles <span class="op">=</span> {f[<span class="st">"handle"</span>] <span class="cf">for</span> f <span class="kw">in</span> followers}</span>
-<span id="cb23-447"><a href="#cb23-447" aria-label="419"></a>following_handles <span class="op">=</span> {f[<span class="st">"handle"</span>] <span class="cf">for</span> f <span class="kw">in</span> following}</span>
-<span id="cb23-448"><a href="#cb23-448" aria-label="420"></a>mutuals <span class="op">=</span> follower_handles <span class="op">&amp;</span> following_handles</span>
-<span id="cb23-449"><a href="#cb23-449" aria-label="421"></a><span class="bu">print</span>(<span class="ss">f"Mutual connections: </span><span class="sc">{</span><span class="bu">len</span>(mutuals)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-450"><a href="#cb23-450" aria-label="422"></a><span class="in">```</span></span>
-<span id="cb23-451"><a href="#cb23-451" aria-label="423"></a></span>
-<span id="cb23-452"><a href="#cb23-452" aria-label="424"></a><span class="fu">## Mastodon via Mastodon.py</span></span>
-<span id="cb23-453"><a href="#cb23-453" aria-label="425"></a></span>
-<span id="cb23-454"><a href="#cb23-454" aria-label="426"></a>Mastodon is a decentralized social network built on the ActivityPub protocol. Each server (instance) hosts its own API <span class="co">[</span><span class="ot">@diener2026mastodonpy</span><span class="co">]</span>:</span>
-<span id="cb23-455"><a href="#cb23-455" aria-label="427"></a></span>
-<span id="cb23-458"><a href="#cb23-458" aria-label="428"></a><span class="in">```{python}</span></span>
-<span id="cb23-459"><a href="#cb23-459" aria-label="429"></a><span class="co"># Mastodon.py is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge mastodon.py</span></span>
-<span id="cb23-460"><a href="#cb23-460" aria-label="430"></a><span class="im">from</span> mastodon <span class="im">import</span> Mastodon</span>
-<span id="cb23-461"><a href="#cb23-461" aria-label="431"></a></span>
-<span id="cb23-462"><a href="#cb23-462" aria-label="432"></a><span class="co"># One-time setup: register an app on your home instance, then log in.</span></span>
-<span id="cb23-463"><a href="#cb23-463" aria-label="433"></a><span class="co"># Both calls save credentials to local files you should .gitignore.</span></span>
-<span id="cb23-464"><a href="#cb23-464" aria-label="434"></a><span class="co"># Mastodon.create_app(</span></span>
-<span id="cb23-465"><a href="#cb23-465" aria-label="435"></a><span class="co">#     "WebDataScience",</span></span>
-<span id="cb23-466"><a href="#cb23-466" aria-label="436"></a><span class="co">#     api_base_url="https://mastodon.social",</span></span>
-<span id="cb23-467"><a href="#cb23-467" aria-label="437"></a><span class="co">#     to_file="app_cred.secret"</span></span>
+<span id="cb23-442"><a href="#cb23-442" aria-label="414"></a><span class="co"># Find mutual connections</span></span>
+<span id="cb23-443"><a href="#cb23-443" aria-label="415"></a>follower_handles <span class="op">=</span> {f[<span class="st">"handle"</span>] <span class="cf">for</span> f <span class="kw">in</span> followers}</span>
+<span id="cb23-444"><a href="#cb23-444" aria-label="416"></a>following_handles <span class="op">=</span> {f[<span class="st">"handle"</span>] <span class="cf">for</span> f <span class="kw">in</span> following}</span>
+<span id="cb23-445"><a href="#cb23-445" aria-label="417"></a>mutuals <span class="op">=</span> follower_handles <span class="op">&amp;</span> following_handles</span>
+<span id="cb23-446"><a href="#cb23-446" aria-label="418"></a><span class="bu">print</span>(<span class="ss">f"Mutual connections: </span><span class="sc">{</span><span class="bu">len</span>(mutuals)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-447"><a href="#cb23-447" aria-label="419"></a><span class="in">```</span></span>
+<span id="cb23-448"><a href="#cb23-448" aria-label="420"></a></span>
+<span id="cb23-449"><a href="#cb23-449" aria-label="421"></a><span class="fu">## Mastodon via Mastodon.py</span></span>
+<span id="cb23-450"><a href="#cb23-450" aria-label="422"></a></span>
+<span id="cb23-451"><a href="#cb23-451" aria-label="423"></a>Mastodon is a decentralized social network built on the ActivityPub protocol. Each server (instance) hosts its own API <span class="co">[</span><span class="ot">@diener2026mastodonpy</span><span class="co">]</span>:</span>
+<span id="cb23-452"><a href="#cb23-452" aria-label="424"></a></span>
+<span id="cb23-455"><a href="#cb23-455" aria-label="425"></a><span class="in">```{python}</span></span>
+<span id="cb23-456"><a href="#cb23-456" aria-label="426"></a><span class="co"># Mastodon.py is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge mastodon.py</span></span>
+<span id="cb23-457"><a href="#cb23-457" aria-label="427"></a><span class="im">from</span> mastodon <span class="im">import</span> Mastodon</span>
+<span id="cb23-458"><a href="#cb23-458" aria-label="428"></a></span>
+<span id="cb23-459"><a href="#cb23-459" aria-label="429"></a><span class="co"># One-time setup: register an app on your home instance, then log in.</span></span>
+<span id="cb23-460"><a href="#cb23-460" aria-label="430"></a><span class="co"># Both calls save credentials to local files you should .gitignore.</span></span>
+<span id="cb23-461"><a href="#cb23-461" aria-label="431"></a><span class="co"># Mastodon.create_app(</span></span>
+<span id="cb23-462"><a href="#cb23-462" aria-label="432"></a><span class="co">#     "WebDataScience",</span></span>
+<span id="cb23-463"><a href="#cb23-463" aria-label="433"></a><span class="co">#     api_base_url="https://mastodon.social",</span></span>
+<span id="cb23-464"><a href="#cb23-464" aria-label="434"></a><span class="co">#     to_file="app_cred.secret"</span></span>
+<span id="cb23-465"><a href="#cb23-465" aria-label="435"></a><span class="co"># )</span></span>
+<span id="cb23-466"><a href="#cb23-466" aria-label="436"></a><span class="co"># Mastodon(client_id="app_cred.secret").log_in(</span></span>
+<span id="cb23-467"><a href="#cb23-467" aria-label="437"></a><span class="co">#     "your-email", "your-password", to_file="user_cred.secret"</span></span>
 <span id="cb23-468"><a href="#cb23-468" aria-label="438"></a><span class="co"># )</span></span>
-<span id="cb23-469"><a href="#cb23-469" aria-label="439"></a><span class="co"># Mastodon(client_id="app_cred.secret").log_in(</span></span>
-<span id="cb23-470"><a href="#cb23-470" aria-label="440"></a><span class="co">#     "your-email", "your-password", to_file="user_cred.secret"</span></span>
-<span id="cb23-471"><a href="#cb23-471" aria-label="441"></a><span class="co"># )</span></span>
-<span id="cb23-472"><a href="#cb23-472" aria-label="442"></a></span>
-<span id="cb23-473"><a href="#cb23-473" aria-label="443"></a><span class="co"># In every session afterward, authenticate with the saved token</span></span>
-<span id="cb23-474"><a href="#cb23-474" aria-label="444"></a>mastodon <span class="op">=</span> Mastodon(</span>
-<span id="cb23-475"><a href="#cb23-475" aria-label="445"></a>    access_token<span class="op">=</span><span class="st">"user_cred.secret"</span>,</span>
-<span id="cb23-476"><a href="#cb23-476" aria-label="446"></a>    api_base_url<span class="op">=</span><span class="st">"https://mastodon.social"</span></span>
-<span id="cb23-477"><a href="#cb23-477" aria-label="447"></a>)</span>
+<span id="cb23-469"><a href="#cb23-469" aria-label="439"></a></span>
+<span id="cb23-470"><a href="#cb23-470" aria-label="440"></a><span class="co"># In every session afterward, authenticate with the saved token</span></span>
+<span id="cb23-471"><a href="#cb23-471" aria-label="441"></a>mastodon <span class="op">=</span> Mastodon(</span>
+<span id="cb23-472"><a href="#cb23-472" aria-label="442"></a>    access_token<span class="op">=</span><span class="st">"user_cred.secret"</span>,</span>
+<span id="cb23-473"><a href="#cb23-473" aria-label="443"></a>    api_base_url<span class="op">=</span><span class="st">"https://mastodon.social"</span></span>
+<span id="cb23-474"><a href="#cb23-474" aria-label="444"></a>)</span>
+<span id="cb23-475"><a href="#cb23-475" aria-label="445"></a></span>
+<span id="cb23-476"><a href="#cb23-476" aria-label="446"></a><span class="co"># Get the public timeline</span></span>
+<span id="cb23-477"><a href="#cb23-477" aria-label="447"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb23-478"><a href="#cb23-478" aria-label="448"></a></span>
-<span id="cb23-479"><a href="#cb23-479" aria-label="449"></a><span class="co"># Get the public timeline</span></span>
-<span id="cb23-480"><a href="#cb23-480" aria-label="450"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
-<span id="cb23-481"><a href="#cb23-481" aria-label="451"></a></span>
-<span id="cb23-482"><a href="#cb23-482" aria-label="452"></a>timeline <span class="op">=</span> mastodon.timeline_public(limit<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb23-483"><a href="#cb23-483" aria-label="453"></a><span class="cf">for</span> toot <span class="kw">in</span> timeline:</span>
-<span id="cb23-484"><a href="#cb23-484" aria-label="454"></a>    <span class="co"># Statuses arrive as HTML; strip tags before analysis</span></span>
-<span id="cb23-485"><a href="#cb23-485" aria-label="455"></a>    text <span class="op">=</span> BeautifulSoup(toot[<span class="st">"content"</span>], <span class="st">"html.parser"</span>).get_text()</span>
-<span id="cb23-486"><a href="#cb23-486" aria-label="456"></a>    <span class="bu">print</span>(<span class="ss">f"@</span><span class="sc">{</span>toot[<span class="st">'account'</span>][<span class="st">'username'</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>text[:<span class="dv">80</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-487"><a href="#cb23-487" aria-label="457"></a><span class="in">```</span></span>
-<span id="cb23-488"><a href="#cb23-488" aria-label="458"></a></span>
-<span id="cb23-489"><a href="#cb23-489" aria-label="459"></a><span class="fu">### Working Across Instances</span></span>
-<span id="cb23-490"><a href="#cb23-490" aria-label="460"></a></span>
-<span id="cb23-491"><a href="#cb23-491" aria-label="461"></a>A key difference between Mastodon and centralized platforms is that there is no single API endpoint for "all of Mastodon." Each instance maintains its own API, and you can only directly access the data on instances you authenticate with. This federated architecture means that comprehensive data collection requires accessing multiple instances — a fundamentally different research design challenge:</span>
-<span id="cb23-492"><a href="#cb23-492" aria-label="462"></a></span>
-<span id="cb23-495"><a href="#cb23-495" aria-label="463"></a><span class="in">```{python}</span></span>
-<span id="cb23-496"><a href="#cb23-496" aria-label="464"></a><span class="co"># Search for accounts across the instance you're connected to</span></span>
-<span id="cb23-497"><a href="#cb23-497" aria-label="465"></a>results <span class="op">=</span> mastodon.account_search(<span class="st">"data science"</span>, limit<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb23-498"><a href="#cb23-498" aria-label="466"></a><span class="cf">for</span> account <span class="kw">in</span> results:</span>
-<span id="cb23-499"><a href="#cb23-499" aria-label="467"></a>    <span class="bu">print</span>(<span class="ss">f"@</span><span class="sc">{</span>account[<span class="st">'acct'</span>]<span class="sc">}</span><span class="ss"> — </span><span class="sc">{</span>account[<span class="st">'followers_count'</span>]<span class="sc">}</span><span class="ss"> followers"</span>)</span>
-<span id="cb23-500"><a href="#cb23-500" aria-label="468"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>account[<span class="st">'note'</span>][:<span class="dv">100</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-501"><a href="#cb23-501" aria-label="469"></a>    <span class="bu">print</span>()</span>
-<span id="cb23-502"><a href="#cb23-502" aria-label="470"></a></span>
-<span id="cb23-503"><a href="#cb23-503" aria-label="471"></a><span class="co"># Get a user's recent statuses (toots)</span></span>
-<span id="cb23-504"><a href="#cb23-504" aria-label="472"></a>user_id <span class="op">=</span> results[<span class="dv">0</span>][<span class="st">"id"</span>]</span>
-<span id="cb23-505"><a href="#cb23-505" aria-label="473"></a>statuses <span class="op">=</span> mastodon.account_statuses(user_id, limit<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb23-506"><a href="#cb23-506" aria-label="474"></a></span>
-<span id="cb23-507"><a href="#cb23-507" aria-label="475"></a><span class="cf">for</span> status <span class="kw">in</span> statuses[:<span class="dv">5</span>]:</span>
-<span id="cb23-508"><a href="#cb23-508" aria-label="476"></a>    <span class="co"># created_at is a datetime object; content is HTML</span></span>
-<span id="cb23-509"><a href="#cb23-509" aria-label="477"></a>    text <span class="op">=</span> BeautifulSoup(status[<span class="st">"content"</span>], <span class="st">"html.parser"</span>).get_text()</span>
-<span id="cb23-510"><a href="#cb23-510" aria-label="478"></a>    <span class="bu">print</span>(<span class="ss">f"  [</span><span class="sc">{</span>status[<span class="st">'created_at'</span>]<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">] </span><span class="sc">{</span>text[:<span class="dv">100</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-511"><a href="#cb23-511" aria-label="479"></a></span>
-<span id="cb23-512"><a href="#cb23-512" aria-label="480"></a><span class="co"># Track a hashtag</span></span>
-<span id="cb23-513"><a href="#cb23-513" aria-label="481"></a>tagged <span class="op">=</span> mastodon.timeline_hashtag(<span class="st">"datascience"</span>, limit<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb23-514"><a href="#cb23-514" aria-label="482"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Recent posts tagged #datascience: </span><span class="sc">{</span><span class="bu">len</span>(tagged)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-515"><a href="#cb23-515" aria-label="483"></a><span class="in">```</span></span>
-<span id="cb23-516"><a href="#cb23-516" aria-label="484"></a></span>
-<span id="cb23-517"><a href="#cb23-517" aria-label="485"></a><span class="fu">## Comparing Platform Architectures</span></span>
-<span id="cb23-518"><a href="#cb23-518" aria-label="486"></a></span>
-<span id="cb23-519"><a href="#cb23-519" aria-label="487"></a>The four platforms in this chapter represent fundamentally different governance architectures, and these differences shape what data is available, on what terms, and how durable the access is.</span>
-<span id="cb23-520"><a href="#cb23-520" aria-label="488"></a></span>
-<span id="cb23-521"><a href="#cb23-521" aria-label="489"></a><span class="pp">|</span> Platform <span class="pp">|</span> Protocol <span class="pp">|</span> Authentication <span class="pp">|</span> Rate Limit (free) <span class="pp">|</span> Data Ownership <span class="pp">|</span></span>
-<span id="cb23-522"><a href="#cb23-522" aria-label="490"></a><span class="pp">|----------|----------|----------------|-------------------|----------------|</span></span>
-<span id="cb23-523"><a href="#cb23-523" aria-label="491"></a><span class="pp">|</span> Reddit <span class="pp">|</span> Proprietary REST API <span class="pp">|</span> OAuth2 <span class="pp">|</span> 100 QPM <span class="pp">|</span> Platform-controlled <span class="pp">|</span></span>
-<span id="cb23-524"><a href="#cb23-524" aria-label="492"></a><span class="pp">|</span> Spotify <span class="pp">|</span> Proprietary REST API <span class="pp">|</span> OAuth2 / Client Credentials <span class="pp">|</span> ~180 RPM <span class="pp">|</span> Platform-controlled <span class="pp">|</span></span>
-<span id="cb23-525"><a href="#cb23-525" aria-label="493"></a><span class="pp">|</span> Bluesky <span class="pp">|</span> AT Protocol (open) <span class="pp">|</span> App password <span class="pp">|</span> Generous, per-PDS <span class="pp">|</span> User-portable <span class="pp">|</span></span>
-<span id="cb23-526"><a href="#cb23-526" aria-label="494"></a><span class="pp">|</span> Mastodon <span class="pp">|</span> ActivityPub (open) <span class="pp">|</span> OAuth2, per-instance <span class="pp">|</span> Varies by instance <span class="pp">|</span> Instance-governed <span class="pp">|</span></span>
-<span id="cb23-527"><a href="#cb23-527" aria-label="495"></a></span>
-<span id="cb23-528"><a href="#cb23-528" aria-label="496"></a>The structural difference matters: Reddit and Spotify can unilaterally change their API terms because they control both the platform and the protocol. Bluesky and Mastodon cannot — or at least, no single entity can — because the protocols are open standards that anyone can implement. This is the architectural embodiment of the **ownership** value from @sec-post-api.</span>
-<span id="cb23-529"><a href="#cb23-529" aria-label="497"></a></span>
-<span id="cb23-530"><a href="#cb23-530" aria-label="498"></a><span class="fu">## Recommended Exercises</span></span>
-<span id="cb23-531"><a href="#cb23-531" aria-label="499"></a></span>
-<span id="cb23-532"><a href="#cb23-532" aria-label="500"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
-<span id="cb23-533"><a href="#cb23-533" aria-label="501"></a></span>
-<span id="cb23-534"><a href="#cb23-534" aria-label="502"></a>You will profile and compare the public activity of two Bluesky accounts. Bluesky is the chapter's lowest-friction platform — a free account and an app password are all you need, with no application process. Remember the chapter's caution: social data is people data, so pick public, organizational, or public-figure accounts rather than private individuals.</span>
-<span id="cb23-535"><a href="#cb23-535" aria-label="503"></a></span>
-<span id="cb23-536"><a href="#cb23-536" aria-label="504"></a>**Step 1 — Authenticate.** Create an app password in Bluesky's settings (never your real password — the chapter explains the difference), log in with the <span class="in">`atproto`</span> <span class="in">`Client`</span>, and print your own handle to confirm the session works. Keep the credential out of the notebook, loading it the way you loaded API keys in @sec-government.</span>
-<span id="cb23-537"><a href="#cb23-537" aria-label="505"></a></span>
-<span id="cb23-540"><a href="#cb23-540" aria-label="506"></a><span class="in">```{python}</span></span>
-<span id="cb23-541"><a href="#cb23-541" aria-label="507"></a><span class="co"># Step 1: Log in with the atproto Client using an app password loaded from an environment variable. Confirm with your handle, not the secret.</span></span>
-<span id="cb23-542"><a href="#cb23-542" aria-label="508"></a><span class="co"># Your code here</span></span>
-<span id="cb23-543"><a href="#cb23-543" aria-label="509"></a><span class="in">```</span></span>
-<span id="cb23-544"><a href="#cb23-544" aria-label="510"></a></span>
-<span id="cb23-545"><a href="#cb23-545" aria-label="511"></a>**Step 2 — Retrieve one account's posts.** Choose your first account and retrieve its 50 most recent posts with <span class="in">`get_author_feed`</span>, building the list-of-dictionaries the chapter shows: text, created_at, likes, reposts, and whether each post is a reply. Convert to a DataFrame.</span>
-<span id="cb23-546"><a href="#cb23-546" aria-label="512"></a></span>
-<span id="cb23-549"><a href="#cb23-549" aria-label="513"></a><span class="in">```{python}</span></span>
-<span id="cb23-550"><a href="#cb23-550" aria-label="514"></a><span class="co"># Step 2: Retrieve 50 posts from your first account with get_author_feed and build a DataFrame.</span></span>
-<span id="cb23-551"><a href="#cb23-551" aria-label="515"></a><span class="co"># Your code here</span></span>
-<span id="cb23-552"><a href="#cb23-552" aria-label="516"></a><span class="in">```</span></span>
-<span id="cb23-553"><a href="#cb23-553" aria-label="517"></a></span>
-<span id="cb23-554"><a href="#cb23-554" aria-label="518"></a>**Step 3 — Compute an activity profile.** From the DataFrame, compute: average post length in characters, posts per day (use the first and last <span class="in">`created_at`</span> to get the window), the fraction of posts that are replies, and mean likes per post.</span>
-<span id="cb23-555"><a href="#cb23-555" aria-label="519"></a></span>
-<span id="cb23-558"><a href="#cb23-558" aria-label="520"></a><span class="in">```{python}</span></span>
-<span id="cb23-559"><a href="#cb23-559" aria-label="521"></a><span class="co"># Step 3: Compute post length, posting rate, reply fraction, and mean likes.</span></span>
-<span id="cb23-560"><a href="#cb23-560" aria-label="522"></a><span class="co"># Your code here</span></span>
-<span id="cb23-561"><a href="#cb23-561" aria-label="523"></a><span class="in">```</span></span>
-<span id="cb23-562"><a href="#cb23-562" aria-label="524"></a></span>
-<span id="cb23-563"><a href="#cb23-563" aria-label="525"></a>**Step 4 — Repeat for a second account.** Pick a second account you expect to behave differently — an institution vs. a person, a news outlet vs. a researcher — and run Steps 2–3 for it. Wrap the work in a function so you write the logic once, as you learned in @sec-static-pages.</span>
-<span id="cb23-564"><a href="#cb23-564" aria-label="526"></a></span>
-<span id="cb23-567"><a href="#cb23-567" aria-label="527"></a><span class="in">```{python}</span></span>
-<span id="cb23-568"><a href="#cb23-568" aria-label="528"></a><span class="co"># Step 4: Write a profile_account(handle) function and run it on your second account.</span></span>
-<span id="cb23-569"><a href="#cb23-569" aria-label="529"></a><span class="co"># Your code here</span></span>
-<span id="cb23-570"><a href="#cb23-570" aria-label="530"></a><span class="in">```</span></span>
-<span id="cb23-571"><a href="#cb23-571" aria-label="531"></a></span>
-<span id="cb23-572"><a href="#cb23-572" aria-label="532"></a>**Step 5 — Compare.** Combine the two profiles into a single two-row DataFrame, and plot one comparison you find informative — likes per post, or the distribution of post lengths for both accounts.</span>
-<span id="cb23-573"><a href="#cb23-573" aria-label="533"></a></span>
-<span id="cb23-576"><a href="#cb23-576" aria-label="534"></a><span class="in">```{python}</span></span>
-<span id="cb23-577"><a href="#cb23-577" aria-label="535"></a><span class="co"># Step 5: Build the two-row comparison DataFrame and plot one comparison.</span></span>
-<span id="cb23-578"><a href="#cb23-578" aria-label="536"></a><span class="co"># Your code here</span></span>
-<span id="cb23-579"><a href="#cb23-579" aria-label="537"></a><span class="in">```</span></span>
-<span id="cb23-580"><a href="#cb23-580" aria-label="538"></a></span>
-<span id="cb23-581"><a href="#cb23-581" aria-label="539"></a>**Step 6 — Interpret.** In four to six sentences: How do the two accounts differ, and did the numbers match your expectations? What does each account seem to use the platform *for*? What could you not measure from <span class="in">`get_author_feed`</span> alone, and which of the chapter's other endpoints (or platforms) would you need for it?</span>
-<span id="cb23-582"><a href="#cb23-582" aria-label="540"></a></span>
-<span id="cb23-585"><a href="#cb23-585" aria-label="541"></a><span class="in">```{python}</span></span>
-<span id="cb23-586"><a href="#cb23-586" aria-label="542"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
-<span id="cb23-587"><a href="#cb23-587" aria-label="543"></a><span class="in">```</span></span>
-<span id="cb23-588"><a href="#cb23-588" aria-label="544"></a></span>
-<span id="cb23-589"><a href="#cb23-589" aria-label="545"></a><span class="fu">## Additional Exercises</span></span>
-<span id="cb23-590"><a href="#cb23-590" aria-label="546"></a></span>
-<span id="cb23-591"><a href="#cb23-591" aria-label="547"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
-<span id="cb23-592"><a href="#cb23-592" aria-label="548"></a></span>
-<span id="cb23-593"><a href="#cb23-593" aria-label="549"></a><span class="ss">1. </span>**Reddit analysis.** Compare two subreddits on the same broad topic (e.g., r/science and r/askscience). How do submission patterns, comment engagement, and moderation structures differ?</span>
-<span id="cb23-594"><a href="#cb23-594" aria-label="550"></a></span>
-<span id="cb23-595"><a href="#cb23-595" aria-label="551"></a><span class="ss">2. </span>**Discography metadata.** Using spotipy, analyze an artist's full discography with <span class="in">`sp.artist_albums()`</span> and <span class="in">`sp.album_tracks()`</span>. How has their release cadence changed over their career? Do older or newer releases hold higher popularity scores today? What does that pattern suggest about how streaming shapes attention to back catalogs?</span>
-<span id="cb23-596"><a href="#cb23-596" aria-label="552"></a></span>
-<span id="cb23-597"><a href="#cb23-597" aria-label="553"></a><span class="ss">3. </span>**Open vs. closed.** Attempt to retrieve the same type of information (user profile, social graph, recent posts) from both Bluesky and Reddit. Compare the ease of access, the richness of the data, and the authentication requirements. What does this comparison tell you about platform governance?</span>
+<span id="cb23-479"><a href="#cb23-479" aria-label="449"></a>timeline <span class="op">=</span> mastodon.timeline_public(limit<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb23-480"><a href="#cb23-480" aria-label="450"></a><span class="cf">for</span> toot <span class="kw">in</span> timeline:</span>
+<span id="cb23-481"><a href="#cb23-481" aria-label="451"></a>    <span class="co"># Statuses arrive as HTML; strip tags before analysis</span></span>
+<span id="cb23-482"><a href="#cb23-482" aria-label="452"></a>    text <span class="op">=</span> BeautifulSoup(toot[<span class="st">"content"</span>], <span class="st">"html.parser"</span>).get_text()</span>
+<span id="cb23-483"><a href="#cb23-483" aria-label="453"></a>    <span class="bu">print</span>(<span class="ss">f"@</span><span class="sc">{</span>toot[<span class="st">'account'</span>][<span class="st">'username'</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>text[:<span class="dv">80</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-484"><a href="#cb23-484" aria-label="454"></a><span class="in">```</span></span>
+<span id="cb23-485"><a href="#cb23-485" aria-label="455"></a></span>
+<span id="cb23-486"><a href="#cb23-486" aria-label="456"></a><span class="fu">### Working Across Instances</span></span>
+<span id="cb23-487"><a href="#cb23-487" aria-label="457"></a></span>
+<span id="cb23-488"><a href="#cb23-488" aria-label="458"></a>A key difference between Mastodon and centralized platforms is that there is no single API endpoint for "all of Mastodon." Each instance maintains its own API, and you can only directly access the data on instances you authenticate with. This federated architecture means that comprehensive data collection requires accessing multiple instances — a fundamentally different research design challenge:</span>
+<span id="cb23-489"><a href="#cb23-489" aria-label="459"></a></span>
+<span id="cb23-492"><a href="#cb23-492" aria-label="460"></a><span class="in">```{python}</span></span>
+<span id="cb23-493"><a href="#cb23-493" aria-label="461"></a><span class="co"># Search for accounts across the instance you're connected to</span></span>
+<span id="cb23-494"><a href="#cb23-494" aria-label="462"></a>results <span class="op">=</span> mastodon.account_search(<span class="st">"data science"</span>, limit<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb23-495"><a href="#cb23-495" aria-label="463"></a><span class="cf">for</span> account <span class="kw">in</span> results:</span>
+<span id="cb23-496"><a href="#cb23-496" aria-label="464"></a>    <span class="bu">print</span>(<span class="ss">f"@</span><span class="sc">{</span>account[<span class="st">'acct'</span>]<span class="sc">}</span><span class="ss"> — </span><span class="sc">{</span>account[<span class="st">'followers_count'</span>]<span class="sc">}</span><span class="ss"> followers"</span>)</span>
+<span id="cb23-497"><a href="#cb23-497" aria-label="465"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>account[<span class="st">'note'</span>][:<span class="dv">100</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-498"><a href="#cb23-498" aria-label="466"></a>    <span class="bu">print</span>()</span>
+<span id="cb23-499"><a href="#cb23-499" aria-label="467"></a></span>
+<span id="cb23-500"><a href="#cb23-500" aria-label="468"></a><span class="co"># Get a user's recent statuses (toots)</span></span>
+<span id="cb23-501"><a href="#cb23-501" aria-label="469"></a>user_id <span class="op">=</span> results[<span class="dv">0</span>][<span class="st">"id"</span>]</span>
+<span id="cb23-502"><a href="#cb23-502" aria-label="470"></a>statuses <span class="op">=</span> mastodon.account_statuses(user_id, limit<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb23-503"><a href="#cb23-503" aria-label="471"></a></span>
+<span id="cb23-504"><a href="#cb23-504" aria-label="472"></a><span class="cf">for</span> status <span class="kw">in</span> statuses[:<span class="dv">5</span>]:</span>
+<span id="cb23-505"><a href="#cb23-505" aria-label="473"></a>    <span class="co"># created_at is a datetime object; content is HTML</span></span>
+<span id="cb23-506"><a href="#cb23-506" aria-label="474"></a>    text <span class="op">=</span> BeautifulSoup(status[<span class="st">"content"</span>], <span class="st">"html.parser"</span>).get_text()</span>
+<span id="cb23-507"><a href="#cb23-507" aria-label="475"></a>    <span class="bu">print</span>(<span class="ss">f"  [</span><span class="sc">{</span>status[<span class="st">'created_at'</span>]<span class="sc">.</span>date()<span class="sc">}</span><span class="ss">] </span><span class="sc">{</span>text[:<span class="dv">100</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-508"><a href="#cb23-508" aria-label="476"></a></span>
+<span id="cb23-509"><a href="#cb23-509" aria-label="477"></a><span class="co"># Track a hashtag</span></span>
+<span id="cb23-510"><a href="#cb23-510" aria-label="478"></a>tagged <span class="op">=</span> mastodon.timeline_hashtag(<span class="st">"datascience"</span>, limit<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb23-511"><a href="#cb23-511" aria-label="479"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Recent posts tagged #datascience: </span><span class="sc">{</span><span class="bu">len</span>(tagged)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-512"><a href="#cb23-512" aria-label="480"></a><span class="in">```</span></span>
+<span id="cb23-513"><a href="#cb23-513" aria-label="481"></a></span>
+<span id="cb23-514"><a href="#cb23-514" aria-label="482"></a><span class="fu">## Comparing Platform Architectures</span></span>
+<span id="cb23-515"><a href="#cb23-515" aria-label="483"></a></span>
+<span id="cb23-516"><a href="#cb23-516" aria-label="484"></a>The four platforms in this chapter represent fundamentally different governance architectures, and these differences shape what data is available, on what terms, and how durable the access is.</span>
+<span id="cb23-517"><a href="#cb23-517" aria-label="485"></a></span>
+<span id="cb23-518"><a href="#cb23-518" aria-label="486"></a><span class="pp">|</span> Platform <span class="pp">|</span> Protocol <span class="pp">|</span> Authentication <span class="pp">|</span> Rate Limit (free) <span class="pp">|</span> Data Ownership <span class="pp">|</span></span>
+<span id="cb23-519"><a href="#cb23-519" aria-label="487"></a><span class="pp">|----------|----------|----------------|-------------------|----------------|</span></span>
+<span id="cb23-520"><a href="#cb23-520" aria-label="488"></a><span class="pp">|</span> Reddit <span class="pp">|</span> Proprietary REST API <span class="pp">|</span> OAuth2 <span class="pp">|</span> 100 QPM <span class="pp">|</span> Platform-controlled <span class="pp">|</span></span>
+<span id="cb23-521"><a href="#cb23-521" aria-label="489"></a><span class="pp">|</span> Spotify <span class="pp">|</span> Proprietary REST API <span class="pp">|</span> OAuth2 / Client Credentials <span class="pp">|</span> ~180 RPM <span class="pp">|</span> Platform-controlled <span class="pp">|</span></span>
+<span id="cb23-522"><a href="#cb23-522" aria-label="490"></a><span class="pp">|</span> Bluesky <span class="pp">|</span> AT Protocol (open) <span class="pp">|</span> App password <span class="pp">|</span> Generous, per-PDS <span class="pp">|</span> User-portable <span class="pp">|</span></span>
+<span id="cb23-523"><a href="#cb23-523" aria-label="491"></a><span class="pp">|</span> Mastodon <span class="pp">|</span> ActivityPub (open) <span class="pp">|</span> OAuth2, per-instance <span class="pp">|</span> Varies by instance <span class="pp">|</span> Instance-governed <span class="pp">|</span></span>
+<span id="cb23-524"><a href="#cb23-524" aria-label="492"></a></span>
+<span id="cb23-525"><a href="#cb23-525" aria-label="493"></a>The structural difference matters: Reddit and Spotify can unilaterally change their API terms because they control both the platform and the protocol. Bluesky and Mastodon cannot — or at least, no single entity can — because the protocols are open standards that anyone can implement. This is the architectural embodiment of the **ownership** value from @sec-post-api.</span>
+<span id="cb23-526"><a href="#cb23-526" aria-label="494"></a></span>
+<span id="cb23-527"><a href="#cb23-527" aria-label="495"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb23-528"><a href="#cb23-528" aria-label="496"></a></span>
+<span id="cb23-529"><a href="#cb23-529" aria-label="497"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
+<span id="cb23-530"><a href="#cb23-530" aria-label="498"></a></span>
+<span id="cb23-531"><a href="#cb23-531" aria-label="499"></a>You will profile and compare the public activity of two Bluesky accounts. Bluesky is the chapter's lowest-friction platform — a free account and an app password are all you need, with no application process. Remember the chapter's caution: social data is people data, so pick public, organizational, or public-figure accounts rather than private individuals.</span>
+<span id="cb23-532"><a href="#cb23-532" aria-label="500"></a></span>
+<span id="cb23-533"><a href="#cb23-533" aria-label="501"></a>**Step 1 — Authenticate.** Create an app password in Bluesky's settings (never your real password — the chapter explains the difference), log in with the <span class="in">`atproto`</span> <span class="in">`Client`</span>, and print your own handle to confirm the session works. Keep the credential out of the notebook, loading it the way you loaded API keys in @sec-government.</span>
+<span id="cb23-534"><a href="#cb23-534" aria-label="502"></a></span>
+<span id="cb23-537"><a href="#cb23-537" aria-label="503"></a><span class="in">```{python}</span></span>
+<span id="cb23-538"><a href="#cb23-538" aria-label="504"></a><span class="co"># Step 1: Log in with the atproto Client using an app password loaded from an environment variable. Confirm with your handle, not the secret.</span></span>
+<span id="cb23-539"><a href="#cb23-539" aria-label="505"></a><span class="co"># Your code here</span></span>
+<span id="cb23-540"><a href="#cb23-540" aria-label="506"></a><span class="in">```</span></span>
+<span id="cb23-541"><a href="#cb23-541" aria-label="507"></a></span>
+<span id="cb23-542"><a href="#cb23-542" aria-label="508"></a>**Step 2 — Retrieve one account's posts.** Choose your first account and retrieve its 50 most recent posts with <span class="in">`get_author_feed`</span>, building the list-of-dictionaries the chapter shows: text, created_at, likes, reposts, and whether each post is a reply. Convert to a DataFrame.</span>
+<span id="cb23-543"><a href="#cb23-543" aria-label="509"></a></span>
+<span id="cb23-546"><a href="#cb23-546" aria-label="510"></a><span class="in">```{python}</span></span>
+<span id="cb23-547"><a href="#cb23-547" aria-label="511"></a><span class="co"># Step 2: Retrieve 50 posts from your first account with get_author_feed and build a DataFrame.</span></span>
+<span id="cb23-548"><a href="#cb23-548" aria-label="512"></a><span class="co"># Your code here</span></span>
+<span id="cb23-549"><a href="#cb23-549" aria-label="513"></a><span class="in">```</span></span>
+<span id="cb23-550"><a href="#cb23-550" aria-label="514"></a></span>
+<span id="cb23-551"><a href="#cb23-551" aria-label="515"></a>**Step 3 — Compute an activity profile.** From the DataFrame, compute: average post length in characters, posts per day (use the first and last <span class="in">`created_at`</span> to get the window), the fraction of posts that are replies, and mean likes per post.</span>
+<span id="cb23-552"><a href="#cb23-552" aria-label="516"></a></span>
+<span id="cb23-555"><a href="#cb23-555" aria-label="517"></a><span class="in">```{python}</span></span>
+<span id="cb23-556"><a href="#cb23-556" aria-label="518"></a><span class="co"># Step 3: Compute post length, posting rate, reply fraction, and mean likes.</span></span>
+<span id="cb23-557"><a href="#cb23-557" aria-label="519"></a><span class="co"># Your code here</span></span>
+<span id="cb23-558"><a href="#cb23-558" aria-label="520"></a><span class="in">```</span></span>
+<span id="cb23-559"><a href="#cb23-559" aria-label="521"></a></span>
+<span id="cb23-560"><a href="#cb23-560" aria-label="522"></a>**Step 4 — Repeat for a second account.** Pick a second account you expect to behave differently — an institution vs. a person, a news outlet vs. a researcher — and run Steps 2–3 for it. Wrap the work in a function so you write the logic once, as you learned in @sec-static-pages.</span>
+<span id="cb23-561"><a href="#cb23-561" aria-label="523"></a></span>
+<span id="cb23-564"><a href="#cb23-564" aria-label="524"></a><span class="in">```{python}</span></span>
+<span id="cb23-565"><a href="#cb23-565" aria-label="525"></a><span class="co"># Step 4: Write a profile_account(handle) function and run it on your second account.</span></span>
+<span id="cb23-566"><a href="#cb23-566" aria-label="526"></a><span class="co"># Your code here</span></span>
+<span id="cb23-567"><a href="#cb23-567" aria-label="527"></a><span class="in">```</span></span>
+<span id="cb23-568"><a href="#cb23-568" aria-label="528"></a></span>
+<span id="cb23-569"><a href="#cb23-569" aria-label="529"></a>**Step 5 — Compare.** Combine the two profiles into a single two-row DataFrame, and plot one comparison you find informative — likes per post, or the distribution of post lengths for both accounts.</span>
+<span id="cb23-570"><a href="#cb23-570" aria-label="530"></a></span>
+<span id="cb23-573"><a href="#cb23-573" aria-label="531"></a><span class="in">```{python}</span></span>
+<span id="cb23-574"><a href="#cb23-574" aria-label="532"></a><span class="co"># Step 5: Build the two-row comparison DataFrame and plot one comparison.</span></span>
+<span id="cb23-575"><a href="#cb23-575" aria-label="533"></a><span class="co"># Your code here</span></span>
+<span id="cb23-576"><a href="#cb23-576" aria-label="534"></a><span class="in">```</span></span>
+<span id="cb23-577"><a href="#cb23-577" aria-label="535"></a></span>
+<span id="cb23-578"><a href="#cb23-578" aria-label="536"></a>**Step 6 — Interpret.** In four to six sentences: How do the two accounts differ, and did the numbers match your expectations? What does each account seem to use the platform *for*? What could you not measure from <span class="in">`get_author_feed`</span> alone, and which of the chapter's other endpoints (or platforms) would you need for it?</span>
+<span id="cb23-579"><a href="#cb23-579" aria-label="537"></a></span>
+<span id="cb23-582"><a href="#cb23-582" aria-label="538"></a><span class="in">```{python}</span></span>
+<span id="cb23-583"><a href="#cb23-583" aria-label="539"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb23-584"><a href="#cb23-584" aria-label="540"></a><span class="in">```</span></span>
+<span id="cb23-585"><a href="#cb23-585" aria-label="541"></a></span>
+<span id="cb23-586"><a href="#cb23-586" aria-label="542"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb23-587"><a href="#cb23-587" aria-label="543"></a></span>
+<span id="cb23-588"><a href="#cb23-588" aria-label="544"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
+<span id="cb23-589"><a href="#cb23-589" aria-label="545"></a></span>
+<span id="cb23-590"><a href="#cb23-590" aria-label="546"></a><span class="ss">1. </span>**Reddit analysis.** Compare two subreddits on the same broad topic (e.g., r/science and r/askscience). How do submission patterns, comment engagement, and moderation structures differ?</span>
+<span id="cb23-591"><a href="#cb23-591" aria-label="547"></a></span>
+<span id="cb23-592"><a href="#cb23-592" aria-label="548"></a><span class="ss">2. </span>**Discography metadata.** Using spotipy, analyze an artist's full discography with <span class="in">`sp.artist_albums()`</span> and <span class="in">`sp.album_tracks()`</span>. How has their release cadence changed over their career? Do older or newer releases hold higher popularity scores today? What does that pattern suggest about how streaming shapes attention to back catalogs?</span>
+<span id="cb23-593"><a href="#cb23-593" aria-label="549"></a></span>
+<span id="cb23-594"><a href="#cb23-594" aria-label="550"></a><span class="ss">3. </span>**Open vs. closed.** Attempt to retrieve the same type of information (user profile, social graph, recent posts) from both Bluesky and Reddit. Compare the ease of access, the richness of the data, and the authentication requirements. What does this comparison tell you about platform governance?</span>
+<span id="cb23-595"><a href="#cb23-595" aria-label="551"></a></span>
+<span id="cb23-596"><a href="#cb23-596" aria-label="552"></a><span class="ss">4. </span>**Playlist fingerprints.** Choose two user-created public Spotify playlists representing different genres (e.g., country vs. electronic — note that Spotify-owned editorial playlists are not accessible to new apps). Retrieve their contents with <span class="in">`sp.playlist_tracks()`</span> and compare the playlists on available metadata: track popularity, duration, release year, and the number of distinct artists. Create overlapping distribution plots for at least two of these measures. How well can you distinguish the genres from metadata alone — and what would you be missing without audio analysis?</span>
+<span id="cb23-597"><a href="#cb23-597" aria-label="553"></a></span>
 <span id="cb23-598"><a href="#cb23-598" aria-label="554"></a></span>
-<span id="cb23-599"><a href="#cb23-599" aria-label="555"></a><span class="ss">4. </span>**Playlist fingerprints.** Choose two user-created public Spotify playlists representing different genres (e.g., country vs. electronic — note that Spotify-owned editorial playlists are not accessible to new apps). Retrieve their contents with <span class="in">`sp.playlist_tracks()`</span> and compare the playlists on available metadata: track popularity, duration, release year, and the number of distinct artists. Create overlapping distribution plots for at least two of these measures. How well can you distinguish the genres from metadata alone — and what would you be missing without audio analysis?</span>
+<span id="cb23-599"><a href="#cb23-599" aria-label="555"></a><span class="ss">5. </span>**Graduate extension (INFO 5617).** Read @bruns2019after and @davidson2023platform. Then design (do not execute) a measurement plan for studying the same construct — for example, cross-partisan interaction, or the spread of health misinformation — on one proprietary platform and one federated platform from this chapter. For each: specify the endpoints and fields you would use, the sampling frame, what the platform's access rules prevent you from observing, and how those constraints could bias your conclusions. Conclude with an assessment of whether the two platforms' results would be comparable at all.</span>
 <span id="cb23-600"><a href="#cb23-600" aria-label="556"></a></span>
-<span id="cb23-601"><a href="#cb23-601" aria-label="557"></a></span>
-<span id="cb23-602"><a href="#cb23-602" aria-label="558"></a><span class="ss">5. </span>**Graduate extension (INFO 5617).** Read @bruns2019after and @davidson2023platform. Then design (do not execute) a measurement plan for studying the same construct — for example, cross-partisan interaction, or the spread of health misinformation — on one proprietary platform and one federated platform from this chapter. For each: specify the endpoints and fields you would use, the sampling frame, what the platform's access rules prevent you from observing, and how those constraints could bias your conclusions. Conclude with an assessment of whether the two platforms' results would be comparable at all.</span>
-<span id="cb23-603"><a href="#cb23-603" aria-label="559"></a></span>
-<span id="cb23-604"><a href="#cb23-604" aria-label="560"></a><span class="fu">## Social History and Public Interest</span></span>
-<span id="cb23-605"><a href="#cb23-605" aria-label="561"></a></span>
-<span id="cb23-606"><a href="#cb23-606" aria-label="562"></a>The contrast between Reddit, Spotify, Bluesky, and Mastodon illustrates the governance spectrum described in @sec-post-api. Reddit's 2023 changes demonstrate how a platform can unilaterally restrict access that researchers depended on. Spotify's trajectory — rich audio analysis data for a decade, then a 2024 deprecation that cut off new research applications — shows that even "productive commercial arrangements" narrow when the business calculus shifts. Bluesky and Mastodon represent structural alternatives where open protocols make enclosure architecturally harder.</span>
-<span id="cb23-607"><a href="#cb23-607" aria-label="563"></a></span>
-<span id="cb23-608"><a href="#cb23-608" aria-label="564"></a>The PRAW library and Mastodon.py continue to work because their platforms maintain documented APIs. But the history of Twitter's API — which went from the most important data source in computational social science to essentially inaccessible within a year of its acquisition — is a reminder that platform goodwill is not infrastructure.</span>
-<span id="cb23-609"><a href="#cb23-609" aria-label="565"></a></span>
-<span id="cb23-610"><a href="#cb23-610" aria-label="566"></a>The Fediverse offers two distinct architectural responses to this problem. ActivityPub, the protocol underlying Mastodon, creates a federated network where each instance is independently operated but can communicate with others — much like email servers. No single company controls the protocol, so no single company can revoke access. The AT Protocol, which powers Bluesky, takes a different approach centered on portable identity: your account data, social graph, and content can move between providers, preventing the lock-in that makes platform migration so costly. Both represent structural alternatives to centralized platforms, distributing control rather than concentrating it. This is the architectural embodiment of **ownership** (@sec-post-api) — users and communities, not corporations, control the infrastructure. For researchers, these open protocols mean that data access is a design feature rather than a business concession, offering more durable foundations for longitudinal research than any corporate API ever could. The trade-off is fragmentation: collecting comprehensive data from a federated network requires engaging with multiple instances, each with its own norms, moderation policies, and technical configurations. Decentralization solves the single-point-of-failure problem but introduces new challenges for research design that centralized platforms never posed.</span>
-<span id="cb23-611"><a href="#cb23-611" aria-label="567"></a></span>
-<span id="cb23-612"><a href="#cb23-612" aria-label="568"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb23-613"><a href="#cb23-613" aria-label="569"></a></span>
-<span id="cb23-614"><a href="#cb23-614" aria-label="570"></a><span class="ss">- </span>**PRAW `OAuthException`**: Double-check your <span class="in">`client_id`</span>, <span class="in">`client_secret`</span>, and <span class="in">`user_agent`</span>. The user_agent must be unique and descriptive.</span>
-<span id="cb23-615"><a href="#cb23-615" aria-label="571"></a><span class="ss">- </span>**Spotify `403 Forbidden` on audio features, recommendations, or related artists**: These endpoints were deprecated for apps created after November 2024. This is not a bug in your code — the access no longer exists for new apps.</span>
-<span id="cb23-616"><a href="#cb23-616" aria-label="572"></a><span class="ss">- </span>**Spotify client credentials vs. authorization code**: Client credentials flow cannot access user-specific data like listening history. It works for public search, artist, album, track, and user-created playlist data.</span>
-<span id="cb23-617"><a href="#cb23-617" aria-label="573"></a><span class="ss">- </span>**Bluesky `atproto` SDK**: Still evolving; API may change between versions. Check the changelog before upgrading.</span>
-<span id="cb23-618"><a href="#cb23-618" aria-label="574"></a><span class="ss">- </span>**Mastodon instance differences**: Different instances have different rate limits, rules, and may block automated access. Always register your app properly.</span>
-<span id="cb23-619"><a href="#cb23-619" aria-label="575"></a><span class="ss">- </span>**Mastodon HTML content**: Status <span class="in">`content`</span> fields arrive as HTML and <span class="in">`created_at`</span> fields as <span class="in">`datetime`</span> objects — strip tags with BeautifulSoup and use datetime methods rather than string slicing.</span>
-<span id="cb23-620"><a href="#cb23-620" aria-label="576"></a></span>
-<span id="cb23-621"><a href="#cb23-621" aria-label="577"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb23-622"><a href="#cb23-622" aria-label="578"></a></span>
-<span id="cb23-623"><a href="#cb23-623" aria-label="579"></a>Platform APIs provide access to behavioral data at unprecedented scale, but that access is conditional, costly, and fragile. The pattern across all four platforms is the same: authenticate, construct requests, parse nested JSON, convert to DataFrames. The difference is in governance: who controls the data, on what terms, and what happens when they change the rules. Build skills across both proprietary and open platforms so that the closure of any single source does not shut down your research.</span>
-<span id="cb23-624"><a href="#cb23-624" aria-label="580"></a></span>
-<span id="cb23-625"><a href="#cb23-625" aria-label="581"></a><span class="fu">## Further Reading</span></span>
-<span id="cb23-626"><a href="#cb23-626" aria-label="582"></a></span>
-<span id="cb23-627"><a href="#cb23-627" aria-label="583"></a><span class="ss">- </span>PRAW documentation: <span class="ot">&lt;https://praw.readthedocs.io/&gt;</span></span>
-<span id="cb23-628"><a href="#cb23-628" aria-label="584"></a><span class="ss">- </span>spotipy documentation: <span class="ot">&lt;https://spotipy.readthedocs.io/&gt;</span></span>
-<span id="cb23-629"><a href="#cb23-629" aria-label="585"></a><span class="ss">- </span>AT Protocol SDK: <span class="ot">&lt;https://atproto.blue/&gt;</span></span>
-<span id="cb23-630"><a href="#cb23-630" aria-label="586"></a><span class="ss">- </span>Mastodon.py documentation: <span class="ot">&lt;https://mastodonpy.readthedocs.io/&gt;</span></span>
-<span id="cb23-631"><a href="#cb23-631" aria-label="587"></a><span class="ss">- </span>@baumgartner2020pushshift — the Pushshift Reddit dataset</span>
-<span id="cb23-632"><a href="#cb23-632" aria-label="588"></a><span class="ss">- </span>@diener2026mastodonpy — the Mastodon.py library</span>
-<span id="cb23-633"><a href="#cb23-633" aria-label="589"></a><span class="ss">- </span>@bruns2019after — platforms versus scholarly research after the APIcalypse</span>
+<span id="cb23-601"><a href="#cb23-601" aria-label="557"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb23-602"><a href="#cb23-602" aria-label="558"></a></span>
+<span id="cb23-603"><a href="#cb23-603" aria-label="559"></a>The contrast between Reddit, Spotify, Bluesky, and Mastodon illustrates the governance spectrum described in @sec-post-api. Reddit's 2023 changes demonstrate how a platform can unilaterally restrict access that researchers depended on. Spotify's trajectory shows that even "productive commercial arrangements" narrow when the business calculus shifts: for years it offered rich audio analysis data, built on the work of The Echo Nest, a music-intelligence company it bought in 2014 (<span class="co">[</span><span class="ot">Siegal, 2014</span><span class="co">](https://www.bgr.com/general/spotify-acquires-the-echo-nest/)</span>), then in November 2024 withdrew audio features, audio analysis, recommendations, and related artists from every new application, research ones included (<span class="co">[</span><span class="ot">Spotify, 2024</span><span class="co">](https://developer.spotify.com/blog/2024-11-27-changes-to-the-web-api)</span>). Bluesky and Mastodon represent structural alternatives where open protocols make enclosure architecturally harder.</span>
+<span id="cb23-604"><a href="#cb23-604" aria-label="560"></a></span>
+<span id="cb23-605"><a href="#cb23-605" aria-label="561"></a>Reddit's 2023 changes are a live example of **enclosure** (@sec-post-api). On 9 June 2023 the company set a price of \$0.24 per 1,000 calls for heavy users of its API, effective 1 July (@fig-reddit-api-pricing). The developer of Apollo, a popular iPhone client, calculated that the new price would cost him more than \$20 million a year, and shut the app down on 30 June (<span class="co">[</span><span class="ot">Peters, 2023</span><span class="co">](https://www.theverge.com/2023/6/8/23754183/apollo-reddit-app-shutting-down-api)</span>). About a month before the price was announced, Reddit had cut off Pushshift <span class="co">[</span><span class="ot">@baumgartner2020pushshift</span><span class="co">]</span>, which an open letter from the Coalition for Independent Technology Research described as "a data resource widely used by communities, journalists, and thousands of academics worldwide" (<span class="co">[</span><span class="ot">2023</span><span class="co">](https://independenttechresearch.org/reddit-data-access-letter/)</span>). Pushshift still answers, but only to Reddit's moderators, as @sec-post-api found when it queried the old endpoint. The free tier described at the start of this chapter still supports noncommercial use, and Reddit runs a <span class="co">[</span><span class="ot">program for researchers</span><span class="co">](https://support.reddithelp.com/hc/en-us/articles/49381918834964-Reddit-for-Researchers-Program)</span>. But with the third-party apps and the archive gone, what data is available, and on whose terms, is now Reddit's decision.</span>
+<span id="cb23-606"><a href="#cb23-606" aria-label="562"></a></span>
+<span id="cb23-607"><a href="#cb23-607" aria-label="563"></a>The PRAW library and Mastodon.py continue to work because their platforms maintain documented APIs. But the history of Twitter's API, which went from the most important data source in computational social science to essentially inaccessible within a year of its 2022 acquisition, is a reminder that platform goodwill is not infrastructure. In February 2023, researchers learned that free access was ending (<span class="co">[</span><span class="ot">Ledford, 2023</span><span class="co">](https://www.nature.com/articles/d41586-023-00460-z)</span>), and the studies built on it became difficult or impossible to reproduce <span class="co">[</span><span class="ot">@davidson2023platform</span><span class="co">]</span>.</span>
+<span id="cb23-608"><a href="#cb23-608" aria-label="564"></a></span>
+<span id="cb23-609"><a href="#cb23-609" aria-label="565"></a>The Fediverse offers two distinct architectural responses to this problem. ActivityPub, the protocol underlying Mastodon, has been a <span class="co">[</span><span class="ot">W3C Recommendation</span><span class="co">](https://www.w3.org/TR/activitypub/)</span> since January 2018. It creates a federated network where each instance is independently operated but can communicate with others, much like email servers; <span class="co">[</span><span class="ot">Mastodon's own documentation</span><span class="co">](https://docs.joinmastodon.org/#federation)</span> puts email and Mastodon in the same column. No single company controls the protocol, so no single company can revoke access. The AT Protocol, which powers Bluesky, takes a different approach centered on portable identity: its design assumes that a server holding your account may fail at any time, so your account data, social graph, and content can move to a new provider (<span class="co">[</span><span class="ot">AT Protocol, "Account portability"</span><span class="co">](https://atproto.com/guides/overview)</span>), preventing the lock-in that makes platform migration so costly. Both represent structural alternatives to centralized platforms, distributing control rather than concentrating it. This is the architectural embodiment of **ownership** (@sec-post-api) — users and communities, not corporations, control the infrastructure. For researchers, these open protocols mean that data access is a design feature rather than a business concession, offering more durable foundations for longitudinal research than any corporate API ever could. The trade-off is fragmentation: collecting comprehensive data from a federated network requires engaging with multiple instances, each with its own norms, moderation policies, and technical configurations. Decentralization solves the single-point-of-failure problem but introduces new challenges for research design that centralized platforms never posed.</span>
+<span id="cb23-610"><a href="#cb23-610" aria-label="566"></a></span>
+<span id="cb23-611"><a href="#cb23-611" aria-label="567"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb23-612"><a href="#cb23-612" aria-label="568"></a></span>
+<span id="cb23-613"><a href="#cb23-613" aria-label="569"></a><span class="ss">- </span>**PRAW `OAuthException`**: Double-check your <span class="in">`client_id`</span>, <span class="in">`client_secret`</span>, and <span class="in">`user_agent`</span>. The user_agent must be unique and descriptive.</span>
+<span id="cb23-614"><a href="#cb23-614" aria-label="570"></a><span class="ss">- </span>**Spotify `403 Forbidden` on audio features, recommendations, or related artists**: These endpoints were deprecated for apps created after November 2024. This is not a bug in your code — the access no longer exists for new apps.</span>
+<span id="cb23-615"><a href="#cb23-615" aria-label="571"></a><span class="ss">- </span>**Spotify client credentials vs. authorization code**: Client credentials flow cannot access user-specific data like listening history. It works for public search, artist, album, track, and user-created playlist data.</span>
+<span id="cb23-616"><a href="#cb23-616" aria-label="572"></a><span class="ss">- </span>**Bluesky `atproto` SDK**: Still evolving; API may change between versions. Check the changelog before upgrading.</span>
+<span id="cb23-617"><a href="#cb23-617" aria-label="573"></a><span class="ss">- </span>**Mastodon instance differences**: Different instances have different rate limits, rules, and may block automated access. Always register your app properly.</span>
+<span id="cb23-618"><a href="#cb23-618" aria-label="574"></a><span class="ss">- </span>**Mastodon HTML content**: Status <span class="in">`content`</span> fields arrive as HTML and <span class="in">`created_at`</span> fields as <span class="in">`datetime`</span> objects — strip tags with BeautifulSoup and use datetime methods rather than string slicing.</span>
+<span id="cb23-619"><a href="#cb23-619" aria-label="575"></a></span>
+<span id="cb23-620"><a href="#cb23-620" aria-label="576"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb23-621"><a href="#cb23-621" aria-label="577"></a></span>
+<span id="cb23-622"><a href="#cb23-622" aria-label="578"></a>Platform APIs provide access to behavioral data at unprecedented scale, but that access is conditional, costly, and fragile. The pattern across all four platforms is the same: authenticate, construct requests, parse nested JSON, convert to DataFrames. The difference is in governance: who controls the data, on what terms, and what happens when they change the rules. Build skills across both proprietary and open platforms so that the closure of any single source does not shut down your research.</span>
+<span id="cb23-623"><a href="#cb23-623" aria-label="579"></a></span>
+<span id="cb23-624"><a href="#cb23-624" aria-label="580"></a><span class="fu">## Further Reading</span></span>
+<span id="cb23-625"><a href="#cb23-625" aria-label="581"></a></span>
+<span id="cb23-626"><a href="#cb23-626" aria-label="582"></a><span class="ss">- </span>PRAW documentation: <span class="ot">&lt;https://praw.readthedocs.io/&gt;</span></span>
+<span id="cb23-627"><a href="#cb23-627" aria-label="583"></a><span class="ss">- </span>spotipy documentation: <span class="ot">&lt;https://spotipy.readthedocs.io/&gt;</span></span>
+<span id="cb23-628"><a href="#cb23-628" aria-label="584"></a><span class="ss">- </span>AT Protocol SDK: <span class="ot">&lt;https://atproto.blue/&gt;</span></span>
+<span id="cb23-629"><a href="#cb23-629" aria-label="585"></a><span class="ss">- </span>Mastodon.py documentation: <span class="ot">&lt;https://mastodonpy.readthedocs.io/&gt;</span></span>
+<span id="cb23-630"><a href="#cb23-630" aria-label="586"></a><span class="ss">- </span>@baumgartner2020pushshift — the Pushshift Reddit dataset</span>
+<span id="cb23-631"><a href="#cb23-631" aria-label="587"></a><span class="ss">- </span>@diener2026mastodonpy — the Mastodon.py library</span>
+<span id="cb23-632"><a href="#cb23-632" aria-label="588"></a><span class="ss">- </span>@bruns2019after — platforms versus scholarly research after the APIcalypse</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

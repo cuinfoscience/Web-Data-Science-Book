@@ -441,7 +441,7 @@ div.csl-indent {
 </section>
 <section id="the-openai-api" class="level2" data-number="13.2">
 <h2 data-number="13.2" class="anchored" data-anchor-id="the-openai-api"><span class="header-section-number">13.2</span> The OpenAI API</h2>
-<div id="6b7d6744" class="cell" data-execution_count="1">
+<div id="3628385d" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="co"># openai is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge openai</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
@@ -451,7 +451,7 @@ div.csl-indent {
 </div>
 <section id="basic-chat-completion" class="level3" data-number="13.2.1">
 <h3 data-number="13.2.1" class="anchored" data-anchor-id="basic-chat-completion"><span class="header-section-number">13.2.1</span> Basic Chat Completion</h3>
-<div id="bd31bc3a" class="cell" data-execution_count="2">
+<div id="20e16cb0" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a>response <span class="op">=</span> client.chat.completions.create(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>    messages<span class="op">=</span>[</span>
@@ -481,7 +481,7 @@ div.csl-indent {
 <section id="customizing-roles" class="level3" data-number="13.2.2">
 <h3 data-number="13.2.2" class="anchored" data-anchor-id="customizing-roles"><span class="header-section-number">13.2.2</span> Customizing Roles</h3>
 <p>The <code>system</code> message sets the assistant’s behavior. The <code>user</code> message is your input. The <code>assistant</code> message lets you simulate prior conversation turns:</p>
-<div id="e3e97b5e" class="cell" data-execution_count="3">
+<div id="492a5d4d" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a>response <span class="op">=</span> client.chat.completions.create(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a>    messages<span class="op">=</span>[</span>
@@ -496,7 +496,7 @@ div.csl-indent {
 <section id="structured-output-and-few-shot-prompting" class="level3" data-number="13.2.3">
 <h3 data-number="13.2.3" class="anchored" data-anchor-id="structured-output-and-few-shot-prompting"><span class="header-section-number">13.2.3</span> Structured Output and Few-Shot Prompting</h3>
 <p>For research applications, you typically want structured data, not free text. Use few-shot prompting — providing examples of the desired input-output format:</p>
-<div id="e06e9742" class="cell" data-execution_count="4">
+<div id="c90f581b" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a>prompt <span class="op">=</span> <span class="st">"""Classify the following bill summary into one of these categories: </span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="st">education, healthcare, environment, taxation, criminal_justice, other.</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a></span>
@@ -528,7 +528,7 @@ div.csl-indent {
 <section id="text-embeddings" class="level2" data-number="13.3">
 <h2 data-number="13.3" class="anchored" data-anchor-id="text-embeddings"><span class="header-section-number">13.3</span> Text Embeddings</h2>
 <p>Embeddings are vector representations that encode the semantic meaning of text. You can use them to measure document similarity:</p>
-<div id="064056bc" class="cell" data-execution_count="5">
+<div id="bf5cfdbd" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="kw">def</span> get_embedding(text, model<span class="op">=</span><span class="st">"text-embedding-3-small"</span>):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>    <span class="co">"""Get the embedding vector for a text string."""</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a>    response <span class="op">=</span> client.embeddings.create(<span class="bu">input</span><span class="op">=</span>text, model<span class="op">=</span>model)</span>
@@ -567,7 +567,7 @@ div.csl-indent {
 <p>Let us apply these tools to a concrete web data science task. Suppose you have scraped bill summaries from the Colorado General Assembly website (building on the scraping techniques from <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>). You want to classify each bill by policy area, extract the key stakeholders mentioned, and measure how similar bills are to each other.</p>
 <section id="step-1-classifying-bills" class="level3" data-number="13.4.1">
 <h3 data-number="13.4.1" class="anchored" data-anchor-id="step-1-classifying-bills"><span class="header-section-number">13.4.1</span> Step 1: Classifying Bills</h3>
-<div id="34bd01fc" class="cell" data-execution_count="6">
+<div id="c5d28e92" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="kw">def</span> classify_bill(summary, client):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>    <span class="co">"""Classify a bill summary into a policy category.</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co">    </span></span>
@@ -619,7 +619,7 @@ div.csl-indent {
 <section id="step-2-extracting-structured-information" class="level3" data-number="13.4.2">
 <h3 data-number="13.4.2" class="anchored" data-anchor-id="step-2-extracting-structured-information"><span class="header-section-number">13.4.2</span> Step 2: Extracting Structured Information</h3>
 <p>You can use few-shot prompting to extract multiple fields at once:</p>
-<div id="0eec41d6" class="cell" data-execution_count="7">
+<div id="1930fa2c" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> json</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a>extraction_prompt <span class="op">=</span> <span class="st">"""Extract the following fields from this bill summary as JSON:</span></span>
@@ -654,7 +654,7 @@ div.csl-indent {
 <section id="structured-outputs-letting-the-api-enforce-the-format" class="level3" data-number="13.4.3">
 <h3 data-number="13.4.3" class="anchored" data-anchor-id="structured-outputs-letting-the-api-enforce-the-format"><span class="header-section-number">13.4.3</span> Structured Outputs: Letting the API Enforce the Format</h3>
 <p>The <code>try/except</code> pattern above treats malformed JSON as a fact of life. It remains a good fallback — and it teaches you exactly what can go wrong — but for production work, current best practice is to have the API enforce the format for you. OpenAI’s <strong>Structured Outputs</strong> feature accepts a JSON Schema and guarantees that the response conforms to it:</p>
-<div id="eef21623" class="cell" data-execution_count="8">
+<div id="b6586fb1" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co"># Define the schema the response must follow</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>bill_schema <span class="op">=</span> {</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a>    <span class="st">"name"</span>: <span class="st">"bill_classification"</span>,</span>
@@ -695,7 +695,7 @@ div.csl-indent {
 <section id="step-3-measuring-similarity-with-embeddings" class="level3" data-number="13.4.4">
 <h3 data-number="13.4.4" class="anchored" data-anchor-id="step-3-measuring-similarity-with-embeddings"><span class="header-section-number">13.4.4</span> Step 3: Measuring Similarity with Embeddings</h3>
 <p>Embeddings let you move beyond keyword matching to semantic similarity. Two bills about “school funding” and “educational resource allocation” would have low keyword overlap but high embedding similarity:</p>
-<div id="8e80d682" class="cell" data-execution_count="9">
+<div id="b62fe1c2" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a><span class="im">from</span> scipy.spatial.distance <span class="im">import</span> cosine</span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a></span>
@@ -736,7 +736,7 @@ div.csl-indent {
 <section id="fine-tuning-for-domain-specific-tasks" class="level2" data-number="13.5">
 <h2 data-number="13.5" class="anchored" data-anchor-id="fine-tuning-for-domain-specific-tasks"><span class="header-section-number">13.5</span> Fine-Tuning for Domain-Specific Tasks</h2>
 <p>Sometimes a general model does not produce consistent results for your specific task. Fine-tuning lets you train the model on your own examples:</p>
-<div id="3e2cd53d" class="cell" data-execution_count="10">
+<div id="0401c126" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># Prepare training data in JSONL format</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="co"># Each line is a complete conversation demonstrating the desired behavior</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a>training_data <span class="op">=</span> [</span>
@@ -784,7 +784,7 @@ div.csl-indent {
 <section id="cost-management" class="level2" data-number="13.6">
 <h2 data-number="13.6" class="anchored" data-anchor-id="cost-management"><span class="header-section-number">13.6</span> Cost Management</h2>
 <p>LLM API calls cost money. Before running a large batch, estimate the cost:</p>
-<div id="af9b4505" class="cell" data-execution_count="11">
+<div id="9711e291" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co"># Rough cost estimation for GPT-4o-mini</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="co"># Input: ~$0.15 per 1M tokens; Output: ~$0.60 per 1M tokens</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a><span class="co"># A typical bill summary is ~200 tokens; a classification response is ~5 tokens</span></span>
@@ -808,7 +808,7 @@ div.csl-indent {
 <section id="the-anthropic-api" class="level2" data-number="13.8">
 <h2 data-number="13.8" class="anchored" data-anchor-id="the-anthropic-api"><span class="header-section-number">13.8</span> The Anthropic API</h2>
 <p>Anthropic’s Claude provides an alternative LLM API with a similar interface:</p>
-<div id="c6bc3a04" class="cell" data-execution_count="12">
+<div id="0843733b" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># anthropic is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge anthropic</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="im">from</span> anthropic <span class="im">import</span> Anthropic</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a></span>
@@ -827,7 +827,7 @@ div.csl-indent {
 <section id="comparing-model-outputs" class="level3" data-number="13.8.1">
 <h3 data-number="13.8.1" class="anchored" data-anchor-id="comparing-model-outputs"><span class="header-section-number">13.8.1</span> Comparing Model Outputs</h3>
 <p>When you use LLMs for research tasks like content classification, a critical question is whether your results depend on which model you chose. The answer, almost always, is yes — and the degree of that dependence matters for the credibility of your findings. You can test this directly by sending the same prompt to both APIs and comparing their responses.</p>
-<div id="c04f9690" class="cell" data-execution_count="13">
+<div id="5739d60c" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Send the same classification prompt to both models</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>bill_text <span class="op">=</span> <span class="st">"Establishes new emission standards for power plants operating in Colorado."</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a></span>
@@ -886,32 +886,32 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one. You will need an API key for one LLM provider; the whole exercise fits comfortably inside the small free-tier or trial budgets the chapter discusses.</p>
 <p>You will run a miniature human–AI agreement study: classify a small corpus yourself, have a model classify the same items, and measure where you disagree. This is the validation habit that separates using LLMs from trusting them.</p>
 <p><strong>Step 1 — Configure the client.</strong> Load your API key from an environment variable (<a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>) and create the client, following the chapter’s setup. Confirm it works with a single trivial completion. Never paste the key into the notebook you submit.</p>
-<div id="38aac4da" class="cell" data-execution_count="14">
+<div id="9f0f716e" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 1: Load your API key from the environment, create the client, and run one test completion.</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Assemble a corpus.</strong> Collect 15 short text items using any earlier chapter’s technique — Bluesky posts (<a href="ch-12-social.html" class="quarto-xref"><span>Chapter 12</span></a>), Wikipedia revision comments (<a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>), RSS headlines (<a href="ch-04-data-formats.html" class="quarto-xref"><span>Chapter 4</span></a>). Put them in a DataFrame with an <code>id</code> and a <code>text</code> column, and save it to CSV before spending any API budget on it (<a href="ch-01-introduction.html" class="quarto-xref"><span>Chapter 1</span></a>).</p>
-<div id="cb87d219" class="cell" data-execution_count="15">
+<div id="c64dea82" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 2: Collect 15 short texts with an earlier chapter's method, build a DataFrame, and save it to CSV.</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Design the task and label by hand.</strong> Define a classification scheme with three or four mutually exclusive labels appropriate to your corpus (e.g., news / opinion / promotion / other). Write the labels and one-sentence definitions in a comment, then classify all 15 items yourself, adding a <code>human_label</code> column. Do this <em>before</em> the model sees anything — order matters for honesty.</p>
-<div id="e246c941" class="cell" data-execution_count="16">
+<div id="3d567621" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Step 3: Define your labels in a comment and hand-label all 15 items into a human_label column BEFORE running the model.</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Prompt the model.</strong> Write a classification prompt using the chapter’s few-shot pattern: the label set, the definitions, one example per label, and the instruction to answer with a single label only. Loop it over the corpus into a <code>model_label</code> column, keeping temperature at 0 as the chapter recommends for classification.</p>
-<div id="c86933c5" class="cell" data-execution_count="17">
+<div id="7b872c4b" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># Step 4: Write the few-shot prompt and classify all 15 items into a model_label column.</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Measure agreement.</strong> Compute the agreement rate, and cross-tabulate <code>human_label</code> against <code>model_label</code> with <code>pd.crosstab()</code>. Pull out the disagreeing rows and read them.</p>
-<div id="50162639" class="cell" data-execution_count="18">
+<div id="dbb26b78" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Step 5: Compute the agreement rate, build the crosstab, and display every disagreement.</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: What was your agreement rate, and are the disagreements random or systematic — does the model confuse one label pair in particular? On rereading, were any disagreements cases where the <em>model</em> was right? What would you change — in the labels, the definitions, or the prompt — before scaling this to a thousand items, and roughly what would that thousand-item run cost?</p>
-<div id="618267be" class="cell" data-execution_count="19">
+<div id="3bee2c30" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -928,22 +928,10 @@ div.csl-indent {
 </section>
 <section id="social-history-and-public-interest" class="level2" data-number="13.11">
 <h2 data-number="13.11" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">13.11</span> Social History and Public Interest</h2>
-<p>LLMs have accelerated the enclosure dynamics described in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — the enormous value of user-generated content as training data has given platforms new incentives to restrict access. At the same time, LLMs provide researchers with powerful analytical tools that can partially offset restricted data access: if you can retrieve even a small sample of text, LLMs can help you code, classify, and extract information from it at scales that would be impossible manually <span class="citation" data-cites="ziems2024can">(<a href="#ref-ziems2024can" role="doc-biblioref">Ziems et al. 2024</a>)</span>.</p>
-<p>The key challenge is reproducibility. LLM outputs are non-deterministic (even with <code>temperature=0</code>, there is some variation), model versions change, and the cost structure means that replication requires financial investment. These properties require new norms for documentation and disclosure — see <a href="appendix-ai-disclosure.html" class="quarto-xref"><span>Appendix B</span></a>.</p>
-<p>There is also a cost-based access inequality shaping who can use these tools for research. Flagship models cost more than an order of magnitude more per token than the same providers’ small models — GPT-4o versus GPT-4o-mini, for example — creating a tier system where well-funded labs can afford the most capable models while under-resourced researchers are limited to cheaper, less capable alternatives. Open-weight models like LLaMA, Mistral, and Qwen represent a partial counterbalance — their weights are freely available for download and local inference. But running these models requires significant GPU infrastructure, creating a different kind of barrier rooted in compute rather than API fees. The result is a landscape where access to the most capable AI tools is stratified by institutional resources, raising questions about whose research questions get answered and whose analytical methods are considered state-of-the-art.</p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Public Interest Connection
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The cost structure of LLM APIs creates a form of <strong>oversight</strong> asymmetry (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>). Well-resourced organizations can afford to run large-scale analyses that smaller teams cannot replicate or verify. Open-weight models and transparent pricing help, but the fundamental tension between capability and accessibility remains unresolved.</p>
-</div>
-</div>
+<p>LLMs have accelerated the enclosure dynamics described in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>: the enormous value of user-generated content as training data has given platforms new incentives to restrict access. When Reddit filed to go public in February 2024, it reported data licensing arrangements worth $203.0 million, signed that January, and told investors that it expected its data “to continue to be a key element in the training of future LLMs” (<a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm">Reddit, 2024</a>). Websites have restricted access too. An audit of 14,000 web domains found that in a single year, 2023 to 2024, new rules in <code>robots.txt</code> files (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>) had fully restricted about 5% of the text in C4, a widely used training corpus, and more than 28% of its most actively maintained sources; its authors expect the closing of the open web to affect academic research as well as commercial AI <span class="citation" data-cites="longpre2024consent">(<a href="#ref-longpre2024consent" role="doc-biblioref">Longpre et al. 2024</a>)</span>. At the same time, LLMs provide researchers with powerful analytical tools that can partially offset restricted data access: if you can retrieve even a small sample of text, LLMs can help you code, classify, and extract information from it at scales that would be impossible manually <span class="citation" data-cites="ziems2024can">(<a href="#ref-ziems2024can" role="doc-biblioref">Ziems et al. 2024</a>)</span>.</p>
+<p>The key challenge is reproducibility. LLM outputs are non-deterministic: in a study of 829 code-generation problems, the same prompt often returned different code from one request to the next, and setting <code>temperature=0</code> reduced the variation without removing it <span class="citation" data-cites="ouyang2024empirical">(<a href="#ref-ouyang2024empirical" role="doc-biblioref">Ouyang et al. 2024</a>)</span>. Model versions change, too. Two versions of the same commercial model, released three months apart in 2023, differed sharply on the same tasks, such as identifying prime numbers <span class="citation" data-cites="chen2024how">(<a href="#ref-chen2024how" role="doc-biblioref">Chen et al. 2024</a>)</span>. And the cost structure means that replication requires financial investment. These properties require new norms for documentation and disclosure; see <a href="appendix-ai-disclosure.html" class="quarto-xref"><span>Appendix B</span></a>.</p>
+<p>There is also a cost-based access inequality shaping who can use these tools for research. Flagship models cost more than an order of magnitude more per token than the same providers’ small models. In October 2026, OpenAI listed GPT-4o at $2.50 per million input tokens and GPT-4o-mini at $0.15, about a seventeenth as much (<a href="https://developers.openai.com/api/docs/pricing">OpenAI, “Pricing”</a>). The result is a tier system where well-funded labs can afford the most capable models while under-resourced researchers are limited to cheaper, less capable alternatives. Open-weight models like LLaMA, Mistral, and Qwen represent a partial counterbalance: their weights are freely available for download and local inference, and a model that you hold cannot be changed under you, which <span class="citation" data-cites="spirling2023why">Spirling (<a href="#ref-spirling2023why" role="doc-biblioref">2023</a>)</span> argues makes open models essential for reproducible research. But running these models requires significant GPU infrastructure, creating a different kind of barrier rooted in compute rather than API fees. The National Artificial Intelligence Research Resource, which the U.S. National Science Foundation began as a pilot in 2024, is one public response: it connects researchers and educators to computing, data, and training they could not otherwise reach (<a href="https://www.nsf.gov/focus-areas/si/nairr">NSF</a>; <a href="https://nairrpilot.org/">NAIRR Pilot</a>). The result is a landscape where access to the most capable AI tools is stratified by institutional resources, raising questions about whose research questions get answered and whose analytical methods are considered state-of-the-art.</p>
+<p>That stratification is also a problem of <strong>oversight</strong> (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>). A well-resourced organization can run an analysis at a scale that a smaller team can neither replicate nor verify. Open weights and transparent pricing help: an analysis of “open” AI in <em>Nature</em> finds that the most open models allow some forms of oversight and experimentation, while the concentration of data, labor, and computing power in a few companies remains <span class="citation" data-cites="widder2024why">(<a href="#ref-widder2024why" role="doc-biblioref">Widder et al. 2024</a>)</span>. The tension between capability and accessibility is unresolved.</p>
 </section>
 <section id="common-issues-to-debug" class="level2" data-number="13.12">
 <h2 data-number="13.12" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">13.12</span> Common Issues to Debug</h2>
@@ -970,6 +958,21 @@ div.csl-indent {
 <!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-chen2024how" class="csl-entry" role="listitem">
+Chen, Lingjiao, Matei Zaharia, and James Zou. 2024. <span>“How Is <span>ChatGPT</span>’s Behavior Changing over Time?”</span> <em>Harvard Data Science Review</em> 6 (2). <a href="https://doi.org/10.1162/99608f92.5317da47">https://doi.org/10.1162/99608f92.5317da47</a>.
+</div>
+<div id="ref-longpre2024consent" class="csl-entry" role="listitem">
+Longpre, Shayne, Robert Mahari, Ariel Lee, et al. 2024. <span>“Consent in Crisis: The Rapid Decline of the <span>AI</span> Data Commons.”</span> <em>Advances in Neural Information Processing Systems</em> 37: 108042–87. <a href="https://doi.org/10.52202/079017-3431">https://doi.org/10.52202/079017-3431</a>.
+</div>
+<div id="ref-ouyang2024empirical" class="csl-entry" role="listitem">
+Ouyang, Shuyin, Jie M. Zhang, Mark Harman, and Meng Wang. 2024. <span>“An Empirical Study of the Non-Determinism of <span>ChatGPT</span> in Code Generation.”</span> <em>ACM Transactions on Software Engineering and Methodology</em> 34 (2): 1–28. <a href="https://doi.org/10.1145/3697010">https://doi.org/10.1145/3697010</a>.
+</div>
+<div id="ref-spirling2023why" class="csl-entry" role="listitem">
+Spirling, Arthur. 2023. <span>“Why Open-Source Generative <span>AI</span> Models Are an Ethical Way Forward for Science.”</span> <em>Nature</em> 616 (7957): 413. <a href="https://doi.org/10.1038/d41586-023-01295-4">https://doi.org/10.1038/d41586-023-01295-4</a>.
+</div>
+<div id="ref-widder2024why" class="csl-entry" role="listitem">
+Widder, David Gray, Meredith Whittaker, and Sarah Myers West. 2024. <span>“Why <span>‘Open’</span> <span>AI</span> Systems Are Actually Closed, and Why This Matters.”</span> <em>Nature</em> 635 (8040): 827–33. <a href="https://doi.org/10.1038/s41586-024-08141-1">https://doi.org/10.1038/s41586-024-08141-1</a>.
+</div>
 <div id="ref-ziems2024can" class="csl-entry" role="listitem">
 Ziems, Caleb, William Held, Omar Shaikh, Jiaao Chen, Zhehao Zhang, and Diyi Yang. 2024. <span>“Can Large Language Models Transform Computational Social Science?”</span> <em>Computational Linguistics</em> 50 (1): 237–91. <a href="https://doi.org/10.1162/coli_a_00502">https://doi.org/10.1162/coli_a_00502</a>.
 </div>
@@ -1970,33 +1973,30 @@ Ziems, Caleb, William Held, Omar Shaikh, Jiaao Chen, Zhehao Zhang, and Diyi Yang
 <span id="cb20-566"><a href="#cb20-566" aria-label="528"></a></span>
 <span id="cb20-567"><a href="#cb20-567" aria-label="529"></a><span class="fu">## Social History and Public Interest</span></span>
 <span id="cb20-568"><a href="#cb20-568" aria-label="530"></a></span>
-<span id="cb20-569"><a href="#cb20-569" aria-label="531"></a>LLMs have accelerated the enclosure dynamics described in @sec-post-api — the enormous value of user-generated content as training data has given platforms new incentives to restrict access. At the same time, LLMs provide researchers with powerful analytical tools that can partially offset restricted data access: if you can retrieve even a small sample of text, LLMs can help you code, classify, and extract information from it at scales that would be impossible manually <span class="co">[</span><span class="ot">@ziems2024can</span><span class="co">]</span>.</span>
+<span id="cb20-569"><a href="#cb20-569" aria-label="531"></a>LLMs have accelerated the enclosure dynamics described in @sec-post-api: the enormous value of user-generated content as training data has given platforms new incentives to restrict access. When Reddit filed to go public in February 2024, it reported data licensing arrangements worth \$203.0 million, signed that January, and told investors that it expected its data "to continue to be a key element in the training of future LLMs" (<span class="co">[</span><span class="ot">Reddit, 2024</span><span class="co">](https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm)</span>). Websites have restricted access too. An audit of 14,000 web domains found that in a single year, 2023 to 2024, new rules in <span class="in">`robots.txt`</span> files (@sec-ethics) had fully restricted about 5% of the text in C4, a widely used training corpus, and more than 28% of its most actively maintained sources; its authors expect the closing of the open web to affect academic research as well as commercial AI <span class="co">[</span><span class="ot">@longpre2024consent</span><span class="co">]</span>. At the same time, LLMs provide researchers with powerful analytical tools that can partially offset restricted data access: if you can retrieve even a small sample of text, LLMs can help you code, classify, and extract information from it at scales that would be impossible manually <span class="co">[</span><span class="ot">@ziems2024can</span><span class="co">]</span>.</span>
 <span id="cb20-570"><a href="#cb20-570" aria-label="532"></a></span>
-<span id="cb20-571"><a href="#cb20-571" aria-label="533"></a>The key challenge is reproducibility. LLM outputs are non-deterministic (even with <span class="in">`temperature=0`</span>, there is some variation), model versions change, and the cost structure means that replication requires financial investment. These properties require new norms for documentation and disclosure — see @sec-appendix-ai-disclosure.</span>
+<span id="cb20-571"><a href="#cb20-571" aria-label="533"></a>The key challenge is reproducibility. LLM outputs are non-deterministic: in a study of 829 code-generation problems, the same prompt often returned different code from one request to the next, and setting <span class="in">`temperature=0`</span> reduced the variation without removing it <span class="co">[</span><span class="ot">@ouyang2024empirical</span><span class="co">]</span>. Model versions change, too. Two versions of the same commercial model, released three months apart in 2023, differed sharply on the same tasks, such as identifying prime numbers <span class="co">[</span><span class="ot">@chen2024how</span><span class="co">]</span>. And the cost structure means that replication requires financial investment. These properties require new norms for documentation and disclosure; see @sec-appendix-ai-disclosure.</span>
 <span id="cb20-572"><a href="#cb20-572" aria-label="534"></a></span>
-<span id="cb20-573"><a href="#cb20-573" aria-label="535"></a>There is also a cost-based access inequality shaping who can use these tools for research. Flagship models cost more than an order of magnitude more per token than the same providers' small models — GPT-4o versus GPT-4o-mini, for example — creating a tier system where well-funded labs can afford the most capable models while under-resourced researchers are limited to cheaper, less capable alternatives. Open-weight models like LLaMA, Mistral, and Qwen represent a partial counterbalance — their weights are freely available for download and local inference. But running these models requires significant GPU infrastructure, creating a different kind of barrier rooted in compute rather than API fees. The result is a landscape where access to the most capable AI tools is stratified by institutional resources, raising questions about whose research questions get answered and whose analytical methods are considered state-of-the-art.</span>
+<span id="cb20-573"><a href="#cb20-573" aria-label="535"></a>There is also a cost-based access inequality shaping who can use these tools for research. Flagship models cost more than an order of magnitude more per token than the same providers' small models. In October 2026, OpenAI listed GPT-4o at \$2.50 per million input tokens and GPT-4o-mini at \$0.15, about a seventeenth as much (<span class="co">[</span><span class="ot">OpenAI, "Pricing"</span><span class="co">](https://developers.openai.com/api/docs/pricing)</span>). The result is a tier system where well-funded labs can afford the most capable models while under-resourced researchers are limited to cheaper, less capable alternatives. Open-weight models like LLaMA, Mistral, and Qwen represent a partial counterbalance: their weights are freely available for download and local inference, and a model that you hold cannot be changed under you, which @spirling2023why argues makes open models essential for reproducible research. But running these models requires significant GPU infrastructure, creating a different kind of barrier rooted in compute rather than API fees. The National Artificial Intelligence Research Resource, which the U.S. National Science Foundation began as a pilot in 2024, is one public response: it connects researchers and educators to computing, data, and training they could not otherwise reach (<span class="co">[</span><span class="ot">NSF</span><span class="co">](https://www.nsf.gov/focus-areas/si/nairr)</span>; <span class="co">[</span><span class="ot">NAIRR Pilot</span><span class="co">](https://nairrpilot.org/)</span>). The result is a landscape where access to the most capable AI tools is stratified by institutional resources, raising questions about whose research questions get answered and whose analytical methods are considered state-of-the-art.</span>
 <span id="cb20-574"><a href="#cb20-574" aria-label="536"></a></span>
-<span id="cb20-575"><a href="#cb20-575" aria-label="537"></a>::: {.callout-note}</span>
-<span id="cb20-576"><a href="#cb20-576" aria-label="538"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb20-577"><a href="#cb20-577" aria-label="539"></a>The cost structure of LLM APIs creates a form of **oversight** asymmetry (@sec-post-api). Well-resourced organizations can afford to run large-scale analyses that smaller teams cannot replicate or verify. Open-weight models and transparent pricing help, but the fundamental tension between capability and accessibility remains unresolved.</span>
-<span id="cb20-578"><a href="#cb20-578" aria-label="540"></a>:::</span>
-<span id="cb20-579"><a href="#cb20-579" aria-label="541"></a></span>
-<span id="cb20-580"><a href="#cb20-580" aria-label="542"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb20-581"><a href="#cb20-581" aria-label="543"></a></span>
-<span id="cb20-582"><a href="#cb20-582" aria-label="544"></a><span class="ss">- </span>**API key exposure**: Use environment variables. Never commit keys to version control.</span>
-<span id="cb20-583"><a href="#cb20-583" aria-label="545"></a><span class="ss">- </span>**Rate limiting and costs**: Estimate costs before large batch runs. Use <span class="in">`gpt-4o-mini`</span> for development, <span class="in">`gpt-4o`</span> for production.</span>
-<span id="cb20-584"><a href="#cb20-584" aria-label="546"></a><span class="ss">- </span>**JSON parsing failures**: When requesting structured output, the model may not follow your format exactly. Use <span class="in">`try/except`</span> around JSON parsing.</span>
-<span id="cb20-585"><a href="#cb20-585" aria-label="547"></a><span class="ss">- </span>**Model version changes**: Pin your model version in code. Document which model you used in your methods section.</span>
-<span id="cb20-586"><a href="#cb20-586" aria-label="548"></a></span>
-<span id="cb20-587"><a href="#cb20-587" aria-label="549"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb20-588"><a href="#cb20-588" aria-label="550"></a></span>
-<span id="cb20-589"><a href="#cb20-589" aria-label="551"></a>LLM APIs are powerful tools for processing web data, but they require careful handling: non-determinism, cost, and reproducibility challenges are real. Use them for tasks where their strengths — scale, multilingual capability, structured extraction — outweigh their weaknesses. Always validate outputs against manual inspection. And treat the API like any other: read the documentation, manage your keys, and parse your responses carefully.</span>
-<span id="cb20-590"><a href="#cb20-590" aria-label="552"></a></span>
-<span id="cb20-591"><a href="#cb20-591" aria-label="553"></a><span class="fu">## Further Reading</span></span>
-<span id="cb20-592"><a href="#cb20-592" aria-label="554"></a></span>
-<span id="cb20-593"><a href="#cb20-593" aria-label="555"></a><span class="ss">- </span>OpenAI API documentation: <span class="ot">&lt;https://platform.openai.com/docs/&gt;</span></span>
-<span id="cb20-594"><a href="#cb20-594" aria-label="556"></a><span class="ss">- </span>Anthropic API documentation: <span class="ot">&lt;https://docs.anthropic.com/&gt;</span></span>
-<span id="cb20-595"><a href="#cb20-595" aria-label="557"></a><span class="ss">- </span>@ziems2024can — LLMs and computational social science</span>
+<span id="cb20-575"><a href="#cb20-575" aria-label="537"></a>That stratification is also a problem of **oversight** (@sec-post-api). A well-resourced organization can run an analysis at a scale that a smaller team can neither replicate nor verify. Open weights and transparent pricing help: an analysis of "open" AI in *Nature* finds that the most open models allow some forms of oversight and experimentation, while the concentration of data, labor, and computing power in a few companies remains <span class="co">[</span><span class="ot">@widder2024why</span><span class="co">]</span>. The tension between capability and accessibility is unresolved.</span>
+<span id="cb20-576"><a href="#cb20-576" aria-label="538"></a></span>
+<span id="cb20-577"><a href="#cb20-577" aria-label="539"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb20-578"><a href="#cb20-578" aria-label="540"></a></span>
+<span id="cb20-579"><a href="#cb20-579" aria-label="541"></a><span class="ss">- </span>**API key exposure**: Use environment variables. Never commit keys to version control.</span>
+<span id="cb20-580"><a href="#cb20-580" aria-label="542"></a><span class="ss">- </span>**Rate limiting and costs**: Estimate costs before large batch runs. Use <span class="in">`gpt-4o-mini`</span> for development, <span class="in">`gpt-4o`</span> for production.</span>
+<span id="cb20-581"><a href="#cb20-581" aria-label="543"></a><span class="ss">- </span>**JSON parsing failures**: When requesting structured output, the model may not follow your format exactly. Use <span class="in">`try/except`</span> around JSON parsing.</span>
+<span id="cb20-582"><a href="#cb20-582" aria-label="544"></a><span class="ss">- </span>**Model version changes**: Pin your model version in code. Document which model you used in your methods section.</span>
+<span id="cb20-583"><a href="#cb20-583" aria-label="545"></a></span>
+<span id="cb20-584"><a href="#cb20-584" aria-label="546"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb20-585"><a href="#cb20-585" aria-label="547"></a></span>
+<span id="cb20-586"><a href="#cb20-586" aria-label="548"></a>LLM APIs are powerful tools for processing web data, but they require careful handling: non-determinism, cost, and reproducibility challenges are real. Use them for tasks where their strengths — scale, multilingual capability, structured extraction — outweigh their weaknesses. Always validate outputs against manual inspection. And treat the API like any other: read the documentation, manage your keys, and parse your responses carefully.</span>
+<span id="cb20-587"><a href="#cb20-587" aria-label="549"></a></span>
+<span id="cb20-588"><a href="#cb20-588" aria-label="550"></a><span class="fu">## Further Reading</span></span>
+<span id="cb20-589"><a href="#cb20-589" aria-label="551"></a></span>
+<span id="cb20-590"><a href="#cb20-590" aria-label="552"></a><span class="ss">- </span>OpenAI API documentation: <span class="ot">&lt;https://platform.openai.com/docs/&gt;</span></span>
+<span id="cb20-591"><a href="#cb20-591" aria-label="553"></a><span class="ss">- </span>Anthropic API documentation: <span class="ot">&lt;https://docs.anthropic.com/&gt;</span></span>
+<span id="cb20-592"><a href="#cb20-592" aria-label="554"></a><span class="ss">- </span>@ziems2024can — LLMs and computational social science</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

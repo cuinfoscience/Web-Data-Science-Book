@@ -535,7 +535,7 @@ div.csl-indent {
 </section>
 <section id="reading-the-keys-in-python" class="level3" data-number="11.2.3">
 <h3 data-number="11.2.3" class="anchored" data-anchor-id="reading-the-keys-in-python"><span class="header-section-number">11.2.3</span> Reading the Keys in Python</h3>
-<div id="08306c6d" class="cell" data-execution_count="1">
+<div id="74f27131" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="im">import</span> requests</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
@@ -563,7 +563,7 @@ div.csl-indent {
 <section id="alternative-a-json-configuration-file" class="level3" data-number="11.2.4">
 <h3 data-number="11.2.4" class="anchored" data-anchor-id="alternative-a-json-configuration-file"><span class="header-section-number">11.2.4</span> Alternative: A JSON Configuration File</h3>
 <p>Some projects keep keys in a local configuration file instead of environment variables. Create a file called <code>api_keys.json</code> containing <code>{"census": "your-key", "fred": "your-key", "eia": "your-key", "datagov": "your-key"}</code>, add it to your <code>.gitignore</code> <strong>before your first commit</strong>, and load it into the same variable names:</p>
-<div id="4212226c" class="cell" data-execution_count="2">
+<div id="9fbb7da3" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">import</span> json</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"api_keys.json"</span>) <span class="im">as</span> f:</span>
@@ -703,7 +703,7 @@ Figure&nbsp;11.4: H.R. 7730 on Congress.gov, October 2026, in a screenshot taken
 <section id="what-can-i-ask-for-variables" class="level3" data-number="11.4.1">
 <h3 data-number="11.4.1" class="anchored" data-anchor-id="what-can-i-ask-for-variables"><span class="header-section-number">11.4.1</span> What Can I Ask For? Variables</h3>
 <p>Each Census dataset has an address. This chapter uses the American Community Survey (ACS) 5-year estimates for 2020–2024, documented at <a href="https://www.census.gov/data/developers/data-sets/acs-5year.html">census.gov/data/developers/data-sets/acs-5year.html</a>, whose address in the Census Bureau’s API is <code>https://api.census.gov/data/2024/acs/acs5</code>. Add <code>/variables.json</code> to that address, and you get every variable the dataset offers, with its label:</p>
-<div id="8fa13b34" class="cell" data-execution_count="3">
+<div id="ac9b5ee5" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>census_base <span class="op">=</span> <span class="st">"https://api.census.gov/data/2024/acs/acs5"</span>   <span class="co"># ACS 5-year estimates, 2020-2024</span></span>
@@ -737,7 +737,7 @@ Figure&nbsp;11.4: H.R. 7730 on Congress.gov, October 2026, in a screenshot taken
 <span id="cb4-31"><a href="#cb4-31" aria-label="31"></a><span class="co"># B29004_001E | Median Household Income for Households With a Citizen, Voting-Age Householder (in 2024 Inflation-Adjusted Dollars)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Each hit is the first line of a table about median household income. <code>B19013_001E</code> is the one for all households, the figure in <a href="#fig-census-table" class="quarto-xref">Figure&nbsp;<span>11.1</span></a>. The tables before it break the same measure down by the householder’s race and ethnicity, and those after it by household size, the householder’s age, receipt of SNAP benefits, and whether the household owns or rents; the last is for households whose householder is a citizen of voting age. Look up <code>B19013_001E</code>, and the catalog tells you more:</p>
-<div id="bb1d2bb6" class="cell" data-execution_count="4">
+<div id="3ad56c5c" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="bu">print</span>(variables[<span class="st">"B19013_001E"</span>])</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a><span class="co"># {'label': 'Estimate!!Median household income in the past 12 months (in 2024 inflation-adjusted dollars)', 'concept': 'Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars)', 'predicateType': 'int', 'group': 'B19013', 'limit': 0, 'attributes': 'B19013_001EA,B19013_001M,B19013_001MA'}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -746,7 +746,7 @@ Figure&nbsp;11.4: H.R. 7730 on Congress.gov, October 2026, in a screenshot taken
 <section id="what-can-i-ask-for-geographies" class="level3" data-number="11.4.2">
 <h3 data-number="11.4.2" class="anchored" data-anchor-id="what-can-i-ask-for-geographies"><span class="header-section-number">11.4.2</span> What Can I Ask For? Geographies</h3>
 <p>The second catalog, <code>geography.json</code>, lists the geographies the American Community Survey (ACS) dataset can be asked about, and what each one has to sit inside. The Census API’s <a href="https://www.census.gov/data/developers/guidance/api-user-guide.html">user guide</a> explains how a request names them:</p>
-<div id="4795d096" class="cell" data-execution_count="5">
+<div id="7b456d9b" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a>response <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>census_base<span class="sc">}</span><span class="ss">/geography.json"</span>, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">60</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>response.raise_for_status()</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>levels <span class="op">=</span> response.json()[<span class="st">"fips"</span>]</span>
@@ -767,7 +767,7 @@ Figure&nbsp;11.4: H.R. 7730 on Congress.gov, October 2026, in a screenshot taken
 <section id="querying-for-a-place" class="level3" data-number="11.4.3">
 <h3 data-number="11.4.3" class="anchored" data-anchor-id="querying-for-a-place"><span class="header-section-number">11.4.3</span> Querying for a Place</h3>
 <p>With a variable and a geography, a request to the Census Bureau’s API is a few parameters, which its <a href="https://www.census.gov/data/developers/guidance/api-user-guide.html">user guide</a> lists: <code>get</code> names the variables, <code>for</code> the geography, <code>in</code> what that geography sits inside, and <code>key</code> your key. Places are named by their FIPS codes (Federal Information Processing Standards codes), and the variable here is from the American Community Survey (ACS). Here is the figure from <a href="#fig-census-table" class="quarto-xref">Figure&nbsp;<span>11.1</span></a>, with its margin of error:</p>
-<div id="f103adbf" class="cell" data-execution_count="6">
+<div id="3fc95e5c" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a>params <span class="op">=</span> {</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a>    <span class="st">"get"</span>: <span class="st">"NAME,B19013_001E,B19013_001M"</span>,   <span class="co"># the place's name, the estimate, and its margin of error</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a>    <span class="st">"for"</span>: <span class="st">"county:013"</span>,                     <span class="co"># Boulder County...</span></span>
@@ -785,7 +785,7 @@ Figure&nbsp;11.4: H.R. 7730 on Congress.gov, October 2026, in a screenshot taken
 <section id="comparing-places" class="level3" data-number="11.4.4">
 <h3 data-number="11.4.4" class="anchored" data-anchor-id="comparing-places"><span class="header-section-number">11.4.4</span> Comparing Places</h3>
 <p>Ask the Census Bureau’s API for several places at once by listing their FIPS codes (Federal Information Processing Standards codes), as its <a href="https://www.census.gov/data/developers/guidance/api-user-guide.html">user guide</a> shows. This request gets the age of the housing stock from the American Community Survey (ACS), group <code>B25034</code>, Year Structure Built, for the cities of Boulder and Longmont, and labels each column with the words from the catalog:</p>
-<div id="81f422a9" class="cell" data-execution_count="7">
+<div id="7414ed0c" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co"># Lines 002 to 011: built 2020 or later, 2010 to 2019, ..., 1939 or earlier</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>housing_vars <span class="op">=</span> [<span class="ss">f"B25034_</span><span class="sc">{</span>line<span class="sc">:03d}</span><span class="ss">E"</span> <span class="cf">for</span> line <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, <span class="dv">12</span>)]</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a></span>
@@ -820,7 +820,7 @@ Figure&nbsp;11.4: H.R. 7730 on Congress.gov, October 2026, in a screenshot taken
 <span id="cb8-32"><a href="#cb8-32" aria-label="32"></a><span class="co"># Built 1939 or earlier                    3576                     2071</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The table holds the answer, but it takes reading: ten rows of two numbers each, newest first. A chart shows its shape at a glance. Draw one pair of bars for each decade, one bar per city, so that the two cities sit side by side wherever they differ. The labels came from the catalog, so the chart can use them as they are. Turn the table upside down first, so that time runs left to right, from the oldest decade to the newest:</p>
-<div id="edf6a127" class="cell" data-execution_count="8">
+<div id="132ff49d" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a><span class="co"># Oldest decade at the left, newest at the right</span></span>
@@ -848,7 +848,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 <section id="every-place-in-a-state-and-a-number-that-isnt" class="level3" data-number="11.4.5">
 <h3 data-number="11.4.5" class="anchored" data-anchor-id="every-place-in-a-state-and-a-number-that-isnt"><span class="header-section-number">11.4.5</span> Every Place in a State, and a Number That Isn’t</h3>
 <p>A wildcard asks the Census Bureau’s API for every place of a kind, as its <a href="https://www.census.gov/data/developers/guidance/api-user-guide.html">user guide</a> describes: <code>for=place:*</code> with <code>in=state:08</code> returns all of Colorado’s cities, towns, and census-designated places. The variable is again the American Community Survey’s (ACS) median household income. Here is median household income for each of them:</p>
-<div id="968df6ea" class="cell" data-execution_count="9">
+<div id="d882fe34" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a>params <span class="op">=</span> {<span class="st">"get"</span>: <span class="st">"NAME,B19013_001E"</span>, <span class="st">"for"</span>: <span class="st">"place:*"</span>, <span class="st">"in"</span>: <span class="st">"state:08"</span>, <span class="st">"key"</span>: census_key}</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a>response <span class="op">=</span> requests.get(census_base, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a>response.raise_for_status()</span>
@@ -870,7 +870,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 <span id="cb10-19"><a href="#cb10-19" aria-label="19"></a><span class="co"># Name: income, dtype: float64</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>A median household income of minus 666 million dollars is not a number: it is a <strong>sentinel</strong>, a code that stands for “no estimate”. The Census Bureau’s <a href="https://www.census.gov/data/developers/data-sets/acs-1year/notes-on-acs-estimate-and-annotation-values.html">notes on ACS estimate values</a> list several, and <code>-666666666</code> means that the estimate could not be computed, because the survey had too few sample observations there. In a small town, that is common. Left in, the sentinels drag every average far below zero. Replace them with a missing value before you compute anything:</p>
-<div id="e042034a" class="cell" data-execution_count="10">
+<div id="f06c38ef" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>no_estimate <span class="op">=</span> places[<span class="st">"income"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">666666666</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>no_estimate<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span><span class="bu">len</span>(places)<span class="sc">}</span><span class="ss"> places have no estimate"</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a></span>
@@ -888,7 +888,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 <section id="finding-series-ids" class="level3" data-number="11.5.1">
 <h3 data-number="11.5.1" class="anchored" data-anchor-id="finding-series-ids"><span class="header-section-number">11.5.1</span> Finding Series IDs</h3>
 <p>FRED (Federal Reserve Economic Data) organizes data by “series”, each with a unique ID. The easiest way to find one is to search the <a href="https://fred.stlouisfed.org/">FRED website</a> and read the ID off the series’ page, as in <a href="#fig-fred-series" class="quarto-xref">Figure&nbsp;<span>11.2</span></a>. The API’s <a href="https://fred.stlouisfed.org/docs/api/fred/series.html"><code>series</code> endpoint</a> then describes a series before you download it:</p>
-<div id="7a0b6a3d" class="cell" data-execution_count="11">
+<div id="37aa391b" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a>fred_base <span class="op">=</span> <span class="st">"https://api.stlouisfed.org/fred"</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a><span class="kw">def</span> fred_get(endpoint, <span class="op">**</span>params):</span>
@@ -909,7 +909,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 <span id="cb12-18"><a href="#cb12-18" aria-label="18"></a><span class="co"># observation_end: 2024-01-01</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The series is an annual estimate from the Census Bureau’s Small Area Income and Poverty Estimates (SAIPE) program, from 1989 to 2024. Its observations come from the <a href="https://fred.stlouisfed.org/docs/api/fred/series_observations.html"><code>series/observations</code> endpoint</a>. This function asks for them and returns them as a DataFrame with real dates and numbers; FRED writes a missing value as <code>"."</code>, which <code>errors="coerce"</code> turns into <code>NaN</code>:</p>
-<div id="ea58c0d7" class="cell" data-execution_count="12">
+<div id="1378f0a4" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="kw">def</span> fred_observations(series_id, <span class="op">**</span>params):</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>    <span class="co">"""Return a FRED series' observations as a DataFrame of dates and values."""</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>    params.update(series_id<span class="op">=</span>series_id, api_key<span class="op">=</span>fred_key, file_type<span class="op">=</span><span class="st">"json"</span>)</span>
@@ -935,7 +935,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 <section id="let-the-server-compute-units" class="level3" data-number="11.5.2">
 <h3 data-number="11.5.2" class="anchored" data-anchor-id="let-the-server-compute-units"><span class="header-section-number">11.5.2</span> Let the Server Compute: <code>units</code></h3>
 <p>The <code>units</code> parameter of the <a href="https://fred.stlouisfed.org/docs/api/fred/series_observations.html"><code>series/observations</code> endpoint</a> asks FRED (Federal Reserve Economic Data) to transform a series’ values before it sends them. Ask for the same series, Boulder County’s median household income, twice more: with <code>units="chg"</code>, the change in dollars from the previous observation, and with <code>units="pch"</code>, the percent change. One series, three answers:</p>
-<div id="f3e71687" class="cell" data-execution_count="13">
+<div id="98aebfb6" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a>change <span class="op">=</span> fred_observations(<span class="st">"MHICO08013A052NCEN"</span>, units<span class="op">=</span><span class="st">"chg"</span>, observation_end<span class="op">=</span><span class="st">"2024-12-31"</span>)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a>growth <span class="op">=</span> fred_observations(<span class="st">"MHICO08013A052NCEN"</span>, units<span class="op">=</span><span class="st">"pch"</span>, observation_end<span class="op">=</span><span class="st">"2024-12-31"</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a></span>
@@ -990,7 +990,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 <section id="let-the-server-compute-frequency-and-aggregation_method" class="level3" data-number="11.5.3">
 <h3 data-number="11.5.3" class="anchored" data-anchor-id="let-the-server-compute-frequency-and-aggregation_method"><span class="header-section-number">11.5.3</span> Let the Server Compute: <code>frequency</code> and <code>aggregation_method</code></h3>
 <p>A series’ <strong>frequency</strong> is how often it is measured. FRED (Federal Reserve Economic Data) can lower it before it sends the data, from monthly to quarterly or annual, and the <a href="https://fred.stlouisfed.org/docs/api/fred/series_observations.html"><code>series/observations</code> endpoint</a> documents how. Take one series through three requests: the Consumer Price Index (CPI) for all urban consumers in the United States, which the Bureau of Labor Statistics (BLS) publishes every month and FRED carries as <code>CPIAUCNS</code>. Ask FRED what it is first:</p>
-<div id="76e1571f" class="cell" data-execution_count="14">
+<div id="fdd2bb4b" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a>info <span class="op">=</span> fred_get(<span class="st">"series"</span>, series_id<span class="op">=</span><span class="st">"CPIAUCNS"</span>)[<span class="st">"seriess"</span>][<span class="dv">0</span>]</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="cf">for</span> field <span class="kw">in</span> [<span class="st">"title"</span>, <span class="st">"frequency"</span>, <span class="st">"units"</span>, <span class="st">"seasonal_adjustment"</span>]:</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>field<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>info[field]<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -1005,7 +1005,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 <li>with <code>frequency="a"</code> and <code>aggregation_method="avg"</code>, which turns each year’s twelve months into their mean (<code>sum</code> and <code>eop</code>, the end of the period, are the other methods);</li>
 <li>with <code>units="pc1"</code> added, the percent change of each year’s mean from the year before’s, which is the year’s inflation. FRED applies the frequency first, then the units.</li>
 </ol>
-<div id="f899de3e" class="cell" data-execution_count="15">
+<div id="a82ba132" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a>years <span class="op">=</span> {<span class="st">"observation_start"</span>: <span class="st">"2015-01-01"</span>, <span class="st">"observation_end"</span>: <span class="st">"2025-12-31"</span>}   <span class="co"># fixed, so the answer doesn't change</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a>monthly <span class="op">=</span> fred_observations(<span class="st">"CPIAUCNS"</span>, <span class="op">**</span>years)</span>
@@ -1031,7 +1031,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 <span id="cb16-23"><a href="#cb16-23" aria-label="23"></a><span class="co">#  2025       321.9            2.6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Trust, but check once. Compute the same yearly means and percent changes in pandas, from the monthly values of the first request, and they should match FRED’s:</p>
-<div id="cd5acfa3" class="cell" data-execution_count="16">
+<div id="f2f5d330" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a>by_hand <span class="op">=</span> monthly.groupby(monthly[<span class="st">"date"</span>].dt.year)[<span class="st">"value"</span>].mean()</span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a>check <span class="op">=</span> pd.DataFrame({<span class="st">"mean index"</span>: by_hand, <span class="st">"inflation (%)"</span>: by_hand.pct_change() <span class="op">*</span> <span class="dv">100</span>})</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a><span class="bu">print</span>(check.tail(<span class="dv">3</span>).to_string(float_format<span class="op">=</span><span class="st">"</span><span class="sc">%.1f</span><span class="st">"</span>))</span>
@@ -1043,7 +1043,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 </div>
 <p>They match. So <code>frequency="a"</code> with <code>aggregation_method="avg"</code> is the mean of each year’s twelve months, and <code>units="pc1"</code> on top of it is the percent change in that mean, and you can describe the numbers that way when you write them up. The index itself, 321.9 in 2025, means that prices were 3.2 times what they were in 1982–1984, the period the index sets at 100. (Ask pandas for 2015’s percent change, and it has none: the monthly request starts in January 2015. FRED reaches back to 2014’s months itself.)</p>
 <p>With one series understood, comparing two is a matter of asking each the same question. The BLS also publishes a CPI for the Denver area, which FRED carries as <code>CUUSA433SA0</code>. It is annual already, so it needs only <code>units="pc1"</code> to give the same year-over-year inflation:</p>
-<div id="77ed60f1" class="cell" data-execution_count="17">
+<div id="a01e3511" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a>denver <span class="op">=</span> fred_observations(<span class="st">"CUUSA433SA0"</span>, units<span class="op">=</span><span class="st">"pc1"</span>, <span class="op">**</span>years)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a>cpi <span class="op">=</span> denver.merge(inflation, on<span class="op">=</span><span class="st">"date"</span>, suffixes<span class="op">=</span>(<span class="st">"_denver"</span>, <span class="st">"_national"</span>))</span>
@@ -1063,7 +1063,7 @@ Figure&nbsp;11.5: Housing units by the decade they were built, in the cities of 
 <span id="cb18-17"><a href="#cb18-17" aria-label="17"></a><span class="co">#  2025           2.3             2.6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Eleven years of two numbers each are easier to compare as pairs of bars, one pair a year, with a line across them at 2 percent, the Federal Reserve’s target for inflation:</p>
-<div id="c9258d57" class="cell" data-execution_count="18">
+<div id="eb9ec227" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a>pairs <span class="op">=</span> cpi.set_index(<span class="st">"year"</span>)[[<span class="st">"value_denver"</span>, <span class="st">"value_national"</span>]]</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a>pairs.columns <span class="op">=</span> [<span class="st">"Denver-Aurora-Lakewood"</span>, <span class="st">"United States"</span>]</span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a></span>
@@ -1095,7 +1095,7 @@ Figure&nbsp;11.6: Annual inflation in the Denver area and the United States, 201
 <section id="routes-that-describe-themselves" class="level3" data-number="11.6.1">
 <h3 data-number="11.6.1" class="anchored" data-anchor-id="routes-that-describe-themselves"><span class="header-section-number">11.6.1</span> Routes That Describe Themselves</h3>
 <p>The EIA’s (U.S. Energy Information Administration’s) API is a tree of <strong>routes</strong>, paths such as <code>electricity/retail-sales/</code>, which its <a href="https://www.eia.gov/opendata/documentation.php">documentation</a> describes. Ask for a route without asking for its data, and it describes itself. At the top, it lists the routes under it:</p>
-<div id="4f833478" class="cell" data-execution_count="19">
+<div id="9a66fbd2" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a>eia_base <span class="op">=</span> <span class="st">"https://api.eia.gov/v2"</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-label="3"></a><span class="kw">def</span> eia_get(route, params<span class="op">=</span><span class="va">None</span>):</span>
@@ -1116,7 +1116,7 @@ Figure&nbsp;11.6: Annual inflation in the Denver area and the United States, 201
 <span id="cb20-18"><a href="#cb20-18" aria-label="18"></a><span class="co"># facility-fuel                    Electric Power Operations for Individual Power Plants (Annual and Monthly)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>A route with data under it describes that data instead: how often it is measured, the <strong>facets</strong> it can be filtered by, the <strong>data columns</strong> it holds, with their units, and the span it covers:</p>
-<div id="3c940fb3" class="cell" data-execution_count="20">
+<div id="a781ea82" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a>meta <span class="op">=</span> eia_get(<span class="st">"electricity/retail-sales/"</span>)</span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="bu">print</span>(<span class="st">"Frequencies:"</span>, [f[<span class="st">"id"</span>] <span class="cf">for</span> f <span class="kw">in</span> meta[<span class="st">"frequency"</span>]])</span>
 <span id="cb21-3"><a href="#cb21-3" aria-label="3"></a><span class="bu">print</span>(<span class="st">"Facets:"</span>, [f[<span class="st">"id"</span>] <span class="cf">for</span> f <span class="kw">in</span> meta[<span class="st">"facets"</span>]])</span>
@@ -1132,7 +1132,7 @@ Figure&nbsp;11.6: Annual inflation in the Denver area and the United States, 201
 <span id="cb21-13"><a href="#cb21-13" aria-label="13"></a><span class="co"># From 2001-01 to 2026-08</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Each facet lists its own values, at <code>facet/</code> and the facet’s name:</p>
-<div id="064c9206" class="cell" data-execution_count="21">
+<div id="e14c2e84" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a>sectors <span class="op">=</span> eia_get(<span class="st">"electricity/retail-sales/facet/sectorid/"</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="cf">for</span> facet <span class="kw">in</span> sectors[<span class="st">"facets"</span>]:</span>
 <span id="cb22-3"><a href="#cb22-3" aria-label="3"></a>    <span class="bu">print</span>(facet[<span class="st">"id"</span>], facet[<span class="st">"name"</span>])</span>
@@ -1148,7 +1148,7 @@ Figure&nbsp;11.6: Annual inflation in the Denver area and the United States, 201
 <section id="let-the-server-filter" class="level3" data-number="11.6.2">
 <h3 data-number="11.6.2" class="anchored" data-anchor-id="let-the-server-filter"><span class="header-section-number">11.6.2</span> Let the Server Filter</h3>
 <p>Add <code>data/</code> to an EIA (U.S. Energy Information Administration) route, and it returns rows; the API’s <a href="https://www.eia.gov/opendata/documentation.php">documentation</a> lists the parameters. Each parameter narrows them: <code>data[]</code> names the columns, <code>facets[stateid][]</code> and <code>facets[sectorid][]</code> keep only the values you list, <code>start</code> and <code>end</code> fix the span, and <code>sort</code> orders the rows. The square brackets are part of the parameters’ names, and <code>requests</code> encodes them for you:</p>
-<div id="dfea2bf9" class="cell" data-execution_count="22">
+<div id="97b9913a" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a>params <span class="op">=</span> {</span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a>    <span class="st">"frequency"</span>: <span class="st">"annual"</span>,</span>
 <span id="cb23-3"><a href="#cb23-3" aria-label="3"></a>    <span class="st">"data[]"</span>: <span class="st">"price"</span>,              <span class="co"># one column: the average price</span></span>
@@ -1171,7 +1171,7 @@ Figure&nbsp;11.6: Annual inflation in the Denver area and the United States, 201
 </div>
 <p>Colorado’s households paid 15.69 cents a kilowatt-hour on average in 2025. The request returned 25 rows, one a year, from a route that holds every state and sector by month, quarter, and year, and nothing else crossed the network. The prices arrive as strings, as the Census Bureau’s numbers do, so convert them with <code>pd.to_numeric()</code> before computing with them; <code>total</code> is a string too.</p>
 <p>A facet can take several values: give <code>requests</code> a list, and it repeats the parameter once for each. This request asks the route for power plants’ operations for Colorado’s generation from five sources, plus all sources together:</p>
-<div id="6880ea9e" class="cell" data-execution_count="23">
+<div id="95da0fee" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a>params <span class="op">=</span> {</span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a>    <span class="st">"frequency"</span>: <span class="st">"annual"</span>,</span>
 <span id="cb24-3"><a href="#cb24-3" aria-label="3"></a>    <span class="st">"data[]"</span>: <span class="st">"generation"</span>,</span>
@@ -1196,7 +1196,7 @@ Figure&nbsp;11.6: Annual inflation in the Denver area and the United States, 201
 <span id="cb24-22"><a href="#cb24-22" aria-label="22"></a><span class="co"># 2025        24.7  32.0  30.0    9.9    3.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Three years in a table hide the path between them. The <code>shares</code> DataFrame already holds every year from 2001 to 2025, one column per source, which is the shape a line chart wants: one line per column, with the years along the bottom. The data are annual, so give the axis a tick for every year, in small type so that 25 labels fit:</p>
-<div id="1f361101" class="cell" data-execution_count="24">
+<div id="5efe6840" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a>shares.index <span class="op">=</span> shares.index.astype(<span class="bu">int</span>)   <span class="co"># the years arrive as strings</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a>ax <span class="op">=</span> shares.plot(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">4.5</span>), marker<span class="op">=</span><span class="st">"."</span>, xticks<span class="op">=</span>shares.index)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-label="3"></a>ax.tick_params(axis<span class="op">=</span><span class="st">"x"</span>, labelsize<span class="op">=</span><span class="dv">7</span>, labelrotation<span class="op">=</span><span class="dv">90</span>)</span>
@@ -1222,7 +1222,7 @@ Figure&nbsp;11.7: Colorado’s electricity generation from coal, natural gas, wi
 <section id="paging-with-offset-and-length" class="level3" data-number="11.6.3">
 <h3 data-number="11.6.3" class="anchored" data-anchor-id="paging-with-offset-and-length"><span class="header-section-number">11.6.3</span> Paging with <code>offset</code> and <code>length</code></h3>
 <p>The EIA’s (U.S. Energy Information Administration’s) API returns at most 5,000 rows a request, as its <a href="https://www.eia.gov/opendata/documentation.php">documentation</a> says. Ask for more, and you get the first 5,000 and a warning, <code>"incomplete return"</code>. Colorado’s monthly generation from every source, 2001 to 2025, is 9,289 rows. The response says how many rows match in <code>total</code>, and you ask for the next page with <code>offset</code>, the number of rows to skip, and <code>length</code>, the number to return:</p>
-<div id="90058edf" class="cell" data-execution_count="25">
+<div id="dc0ec0e2" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a><span class="kw">def</span> eia_get_all(route, params, page_size<span class="op">=</span><span class="dv">5000</span>):</span>
 <span id="cb26-2"><a href="#cb26-2" aria-label="2"></a>    <span class="co">"""Page through every row of an EIA data route, page_size rows at a time."""</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-label="3"></a>    rows <span class="op">=</span> []</span>
@@ -1266,7 +1266,7 @@ Figure&nbsp;11.7: Colorado’s electricity generation from coal, natural gas, wi
 <section id="fec-api" class="level2" data-number="11.7">
 <h2 data-number="11.7" class="anchored" data-anchor-id="fec-api"><span class="header-section-number">11.7</span> FEC API</h2>
 <p>The Federal Election Commission provides campaign finance data through a free API. This data enables accountability journalism and research on the influence of money in politics:</p>
-<div id="7d4132f6" class="cell" data-execution_count="26">
+<div id="57dc154a" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-label="1"></a><span class="co"># Search for a candidate</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-label="2"></a>fec_search_url <span class="op">=</span> <span class="st">"https://api.open.fec.gov/v1/candidates/search/"</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-label="3"></a>params <span class="op">=</span> {</span>
@@ -1289,7 +1289,7 @@ Figure&nbsp;11.7: Colorado’s electricity generation from coal, natural gas, wi
 <section id="getting-campaign-finance-data" class="level3" data-number="11.7.1">
 <h3 data-number="11.7.1" class="anchored" data-anchor-id="getting-campaign-finance-data"><span class="header-section-number">11.7.1</span> Getting Campaign Finance Data</h3>
 <p>FEC identifiers follow a convention worth learning: candidate IDs begin with a letter for the office sought (<code>P</code> for president, <code>S</code> for Senate, <code>H</code> for House), while committee IDs begin with <code>C</code>. The ID below is therefore a <em>candidate</em> ID, and this endpoint returns that candidate’s financial totals, aggregated across their authorized committees.</p>
-<div id="e6ef77e4" class="cell" data-execution_count="27">
+<div id="036024f3" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-label="1"></a><span class="co"># Get financial totals for a candidate</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-label="2"></a>candidate_id <span class="op">=</span> <span class="st">"P80000722"</span>  <span class="co"># Biden's candidate ID ("P" = presidential)</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-label="3"></a></span>
@@ -1312,7 +1312,7 @@ Figure&nbsp;11.7: Colorado’s electricity generation from coal, natural gas, wi
 <section id="combining-census-and-fred-data" class="level2" data-number="11.8">
 <h2 data-number="11.8" class="anchored" data-anchor-id="combining-census-and-fred-data"><span class="header-section-number">11.8</span> Combining Census and FRED Data</h2>
 <p>The most compelling analyses often integrate data from multiple government sources to tell a story that no single dataset can tell alone. Census data provides snapshots of demographic and housing characteristics; FRED provides economic time series that capture the conditions under which those characteristics formed. Combining them reveals the relationship between macro-level economic forces and community-level outcomes.</p>
-<div id="1235731d" class="cell" data-execution_count="28">
+<div id="9cc4f658" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-label="1"></a><span class="co"># Define each endpoint explicitly so this block stands on its own -- reusing a leftover `url` variable from an earlier section is a classic source of silent bugs in long notebooks</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-label="2"></a>census_url <span class="op">=</span> <span class="st">"https://api.census.gov/data/2022/acs/acs5"</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-label="3"></a>fred_url <span class="op">=</span> <span class="st">"https://api.stlouisfed.org/fred/series/observations"</span></span>
@@ -1377,33 +1377,33 @@ Figure&nbsp;11.7: Colorado’s electricity generation from coal, natural gas, wi
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one. You will need your Census and FRED keys from the start of this chapter.</p>
 <p>You will answer one comparative question about Colorado with two federal data sources: how does a Census measure vary across the state’s counties, and what has a related economic indicator done over time?</p>
 <p><strong>Step 1 — Load your keys safely.</strong> Load your Census and FRED API keys from environment variables or your <code>api_keys.json</code>, exactly as the chapter shows. Confirm both loaded by printing only their lengths — never the keys themselves, since the notebook is what you submit.</p>
-<div id="70654c66" class="cell" data-execution_count="29">
+<div id="7cdbf6f8" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-label="1"></a><span class="co"># Step 1: Load your Census and FRED keys and confirm they are present</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-label="2"></a><span class="co"># WITHOUT printing them.</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-label="3"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Query every Colorado county.</strong> Choose one ACS variable you care about (browse the groups catalog to pick it; median household income is <code>B19013_001E</code>). Query the Census API with <code>for=county:*</code> and <code>in=state:08</code> to get all Colorado counties in one call.</p>
-<div id="bce94b2d" class="cell" data-execution_count="30">
+<div id="3bbebbc0" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-label="1"></a><span class="co"># Step 2: Retrieve your chosen ACS variable for every Colorado county.</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Build and clean the DataFrame.</strong> First row is headers, the rest is data — the same shape you handled in <a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>. Convert your variable to numeric, sort by it, and print the top and bottom five counties.</p>
-<div id="55e5caa9" class="cell" data-execution_count="31">
+<div id="73786eb1" class="cell" data-execution_count="31">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-label="1"></a><span class="co"># Step 3: Build the DataFrame, convert to numeric, sort, and print the extremes.</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Visualize the geography.</strong> Make a horizontal bar chart of the top 20 counties by your variable, labeled with county names.</p>
-<div id="ed570758" class="cell" data-execution_count="32">
+<div id="dacbaf44" class="cell" data-execution_count="32">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-label="1"></a><span class="co"># Step 4: Bar chart of the top 20 counties.</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Add the time dimension with FRED.</strong> Find one FRED series related to your Census variable for Colorado (unemployment rate, home price index, per-capita income — the chapter shows how to search for series IDs). Retrieve it, build a DataFrame with real dates, and plot the series over the last two decades.</p>
-<div id="24880829" class="cell" data-execution_count="33">
+<div id="a624f4bf" class="cell" data-execution_count="33">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-label="1"></a><span class="co"># Step 5: Retrieve a related FRED series for Colorado and plot it over time.</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: What geographic pattern did the county ranking reveal, and does it match what you know about Colorado? How does the FRED trend contextualize the Census snapshot — is the cross-sectional picture stable or a moment in a moving series? What would you need to be careful about before combining these two sources in one analysis (different geographies, different definitions, different vintages)?</p>
-<div id="32e6d15e" class="cell" data-execution_count="34">
+<div id="b08468dc" class="cell" data-execution_count="34">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1417,25 +1417,13 @@ Figure&nbsp;11.7: Colorado’s electricity generation from coal, natural gas, wi
 <li><p><strong>Multi-source integration.</strong> Combine data from at least two different government APIs (Census + FRED, Census + FEC, or FRED + FEC) into a single analysis. For example, compare median household income (Census) with campaign contributions (FEC) across congressional districts, or compare housing construction rates (Census) with interest rates (FRED).</p></li>
 <li><p><strong>Graduate extension (INFO 5617).</strong> Read <span class="citation" data-cites="lazer2020computational">Lazer et al. (<a href="#ref-lazer2020computational" role="doc-biblioref">2020</a>)</span> on the obstacles and opportunities facing computational social science. Then design and execute a small study that combines data from at least two of this chapter’s government APIs to examine one obstacle or opportunity the paper raises — for example, the promise and difficulty of linking administrative data across agencies and geographic units. Write a formal limitations section that addresses measurement (what your variables actually capture) and coverage (which people, places, or time periods your linked data misses). The goal is not a definitive finding but a defensible design that takes the paper’s warnings seriously.</p></li>
 </ol>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Public Interest Connection
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Government data APIs embody the value of <strong>openness</strong> from <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — they exist because of democratic commitments to transparency. But government data infrastructure is not immune to erosion. Datasets are occasionally withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. The fragility of government data infrastructure is itself a public interest concern.</p>
-</div>
-</div>
 </section>
 <section id="social-history-and-public-interest" class="level2" data-number="11.11">
 <h2 data-number="11.11" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">11.11</span> Social History and Public Interest</h2>
-<p>The Census Bureau has been counting the American population since 1790, making the decennial census one of the oldest continuous data collection programs in the world. The American Community Survey, launched in 2005, replaced the census long form with continuous measurement, providing annual estimates of demographic, social, economic, and housing characteristics. The decision to make this data freely accessible through APIs reflects a commitment to the idea that public data should be accessible to all, not just to researchers with institutional subscriptions or specialized software.</p>
-<p>FRED was created by the Federal Reserve Bank of St.&nbsp;Louis with a similar philosophy: economic data should be freely accessible to anyone who wants it. Before FRED, accessing Federal Reserve data required specialized terminals or institutional subscriptions. By making the data freely available and well-documented, FRED democratized access to economic information that was previously the province of Wall Street and government insiders.</p>
-<p>The FEC’s public disclosure requirements enable some of the most important accountability journalism in American democracy. News organizations, research groups, and citizens use FEC data to track the flow of money in politics, identify potential conflicts of interest, and hold elected officials accountable. This data exists because of the Federal Election Campaign Act (1971) and subsequent legislation mandating transparency in campaign finance.</p>
+<p>Government data APIs embody the value of <strong>openness</strong> from <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>: they exist because of democratic commitments to transparency. The Census Bureau has been counting the American population every ten years since 1790 (<a href="https://www.census.gov/about/history.html">Census Bureau</a>). The American Community Survey, in full operation since 2005, replaced the census long form, last used in 2000, with a survey taken every year, so that communities get current estimates of demographic, social, economic, and housing characteristics every year instead of once a decade (<a href="https://www.census.gov/about/history/historical-censuses-and-surveys/census-programs-surveys/demographic/american-community-survey.html">Census Bureau</a>). The Bureau opened its first public API in July 2012 (<a href="https://www.census.gov/newsroom/archives/2012-pr/cb12-135.html">Census Bureau, 2012</a>). The decision to make this data freely accessible through APIs reflects a commitment to the idea that public data should be accessible to all, not just to researchers with institutional subscriptions or specialized software.</p>
+<p>FRED, from the Federal Reserve Bank of St.&nbsp;Louis, grew from a similar philosophy. It descends from the paper data publications of Homer Jones, the bank’s research director from 1958 to 1971, who wanted policymakers and members of the public alike to be able to judge the state of the economy for themselves; the data were printed and sent out by mail. FRED began in 1991 as a free electronic bulletin board that 620 users reached by modem, with 30 data series, and moved to the web in 1995 with 865 (<a href="https://www.stlouisfed.org/on-the-economy/2016/april/history-fred-federal-reserve-economic-data">Federal Reserve Bank of St.&nbsp;Louis, 2016</a>). It now serves more than 800,000 series, to anyone, for free (<a href="https://fred.stlouisfed.org/">FRED</a>).</p>
+<p>The FEC’s public disclosure requirements enable some of the most important accountability journalism in American democracy. News organizations, research groups, and citizens use FEC data to track the flow of money in politics, identify potential conflicts of interest, and hold elected officials accountable. This data exists because of the <a href="https://www.fec.gov/legal-resources/legislation/">Federal Election Campaign Act (1971) and subsequent legislation</a> mandating transparency in campaign finance.</p>
+<p>But government data infrastructure is not immune to erosion. Datasets are withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. In 2019 the Supreme Court refused to let the Commerce Department add a citizenship question to the 2020 census on the reason it had given, which “seems to have been contrived” (<a href="https://www.supremecourt.gov/opinions/18pdf/18-966_bq7c.pdf"><em>Department of Commerce v. New York</em>, 2019</a>). In 2017, the first year of the first Trump administration, the Environmental Data &amp; Governance Initiative documented agencies removing or overhauling webpages, documents, and whole websites about climate change, although it found no climate data removed <span class="citation" data-cites="edgi2018changing">(<a href="#ref-edgi2018changing" role="doc-biblioref">Environmental Data &amp; Governance Initiative 2018</a>)</span>. In early 2025, after an Office of Personnel Management memo applying an executive order on “gender ideology,” the CDC, the FDA, and their parent department took down webpages and datasets, until a federal judge ordered them restored to their versions of January 30 (<a href="https://fedscoop.com/federal-judge-orders-hhs-cdc-fda-to-restore-webpages-datasets/">Alder, 2025</a>). That August President Trump fired the commissioner of the Bureau of Labor Statistics after a weak jobs report, calling the data “rigged” (<a href="https://www.pbs.org/newshour/show/firing-of-labor-statistics-head-undermines-trust-in-key-data-ex-trump-official-warns">PBS NewsHour, 2025</a>), and in December the American Statistical Association reported that most of the 13 federal statistical agencies had lost 20 to 30% of their staff (<a href="https://www.amstat.org/news-listing/2025/12/10/new-report-documents-challenges-facing-federal-statistical-system--offers-roadmap-for-strengthening">ASA, 2025</a>). The fragility of government data infrastructure is itself a public interest concern, and a reason to record the date, version, and URL of every government dataset you use.</p>
 </section>
 <section id="common-issues-to-debug" class="level2" data-number="11.12">
 <h2 data-number="11.12" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">11.12</span> Common Issues to Debug</h2>
@@ -1465,6 +1453,9 @@ Figure&nbsp;11.7: Colorado’s electricity generation from coal, natural gas, wi
 <!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-edgi2018changing" class="csl-entry" role="listitem">
+Environmental Data &amp; Governance Initiative. 2018. <em>Changing the Digital Climate: How Climate Change Web Content Is Being Censored Under the <span>Trump</span> Administration</em>. Environmental Data &amp; Governance Initiative. <a href="https://100days.envirodatagov.org/changing-digital-climate/">https://100days.envirodatagov.org/changing-digital-climate/</a>.
+</div>
 <div id="ref-lazer2020computational" class="csl-entry" role="listitem">
 Lazer, David M. J., Alex Pentland, Duncan J. Watts, et al. 2020. <span>“Computational Social Science: Obstacles and Opportunities.”</span> <em>Science</em> 369 (6507): 1060–62. <a href="https://doi.org/10.1126/science.aaz8170">https://doi.org/10.1126/science.aaz8170</a>.
 </div>
@@ -2842,38 +2833,35 @@ Salganik, Matthew J. 2018. <em>Bit by Bit: Social Research in the Digital Age</e
 <span id="cb36-967"><a href="#cb36-967" aria-label="899"></a></span>
 <span id="cb36-968"><a href="#cb36-968" aria-label="900"></a><span class="ss">5. </span>**Graduate extension (INFO 5617).** Read @lazer2020computational on the obstacles and opportunities facing computational social science. Then design and execute a small study that combines data from at least two of this chapter's government APIs to examine one obstacle or opportunity the paper raises — for example, the promise and difficulty of linking administrative data across agencies and geographic units. Write a formal limitations section that addresses measurement (what your variables actually capture) and coverage (which people, places, or time periods your linked data misses). The goal is not a definitive finding but a defensible design that takes the paper's warnings seriously.</span>
 <span id="cb36-969"><a href="#cb36-969" aria-label="901"></a></span>
-<span id="cb36-970"><a href="#cb36-970" aria-label="902"></a>::: {.callout-note}</span>
-<span id="cb36-971"><a href="#cb36-971" aria-label="903"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb36-972"><a href="#cb36-972" aria-label="904"></a>Government data APIs embody the value of **openness** from @sec-post-api — they exist because of democratic commitments to transparency. But government data infrastructure is not immune to erosion. Datasets are occasionally withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. The fragility of government data infrastructure is itself a public interest concern.</span>
-<span id="cb36-973"><a href="#cb36-973" aria-label="905"></a>:::</span>
-<span id="cb36-974"><a href="#cb36-974" aria-label="906"></a></span>
-<span id="cb36-975"><a href="#cb36-975" aria-label="907"></a><span class="fu">## Social History and Public Interest</span></span>
-<span id="cb36-976"><a href="#cb36-976" aria-label="908"></a></span>
-<span id="cb36-977"><a href="#cb36-977" aria-label="909"></a>The Census Bureau has been counting the American population since 1790, making the decennial census one of the oldest continuous data collection programs in the world. The American Community Survey, launched in 2005, replaced the census long form with continuous measurement, providing annual estimates of demographic, social, economic, and housing characteristics. The decision to make this data freely accessible through APIs reflects a commitment to the idea that public data should be accessible to all, not just to researchers with institutional subscriptions or specialized software.</span>
-<span id="cb36-978"><a href="#cb36-978" aria-label="910"></a></span>
-<span id="cb36-979"><a href="#cb36-979" aria-label="911"></a>FRED was created by the Federal Reserve Bank of St. Louis with a similar philosophy: economic data should be freely accessible to anyone who wants it. Before FRED, accessing Federal Reserve data required specialized terminals or institutional subscriptions. By making the data freely available and well-documented, FRED democratized access to economic information that was previously the province of Wall Street and government insiders.</span>
-<span id="cb36-980"><a href="#cb36-980" aria-label="912"></a></span>
-<span id="cb36-981"><a href="#cb36-981" aria-label="913"></a>The FEC's public disclosure requirements enable some of the most important accountability journalism in American democracy. News organizations, research groups, and citizens use FEC data to track the flow of money in politics, identify potential conflicts of interest, and hold elected officials accountable. This data exists because of the Federal Election Campaign Act (1971) and subsequent legislation mandating transparency in campaign finance.</span>
-<span id="cb36-982"><a href="#cb36-982" aria-label="914"></a></span>
-<span id="cb36-983"><a href="#cb36-983" aria-label="915"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb36-984"><a href="#cb36-984" aria-label="916"></a></span>
-<span id="cb36-985"><a href="#cb36-985" aria-label="917"></a><span class="ss">- </span>**Census variable codes**: The naming convention is opaque. Bookmark the variable catalog and use it as a reference. Variables ending in <span class="in">`E`</span> are estimates; those ending in <span class="in">`M`</span> are margins of error.</span>
-<span id="cb36-986"><a href="#cb36-986" aria-label="918"></a><span class="ss">- </span>**FIPS codes**: Geographic identifiers like <span class="in">`08`</span> (Colorado) and <span class="in">`07850`</span> (Boulder) are strings, not integers. Do not strip leading zeros.</span>
-<span id="cb36-987"><a href="#cb36-987" aria-label="919"></a><span class="ss">- </span>**FRED series IDs**: These are alphanumeric strings; some families follow a pattern (like the SAIPE income series earlier in this chapter), but many do not. Use the FRED website search to find them, then copy the ID into your code exactly.</span>
-<span id="cb36-988"><a href="#cb36-988" aria-label="920"></a><span class="ss">- </span>**API key exposure**: The most common mistake. Environment variables never enter your repository; if you use the JSON-file alternative, add <span class="in">`api_keys.json`</span> to <span class="in">`.gitignore`</span> *before* your first commit, or the key will persist in your git history even after deletion.</span>
-<span id="cb36-989"><a href="#cb36-989" aria-label="921"></a><span class="ss">- </span>**Rate limiting**: Limits vary by agency. As of mid-2026, the Census API publishes no hard limit for keyed users (but expects polite use), FRED allows roughly 120 requests per minute, and the FEC allows 1,000 requests per hour with an upgraded key available on request. Check each API's documentation for current figures, and stay well within them, especially during automated collection.</span>
-<span id="cb36-990"><a href="#cb36-990" aria-label="922"></a></span>
-<span id="cb36-991"><a href="#cb36-991" aria-label="923"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb36-992"><a href="#cb36-992" aria-label="924"></a></span>
-<span id="cb36-993"><a href="#cb36-993" aria-label="925"></a>Government APIs provide access to some of the most valuable, reliable, and stable data sources available. The Census Bureau, Federal Reserve, and FEC each serve a specific transparency mandate, and their APIs reflect this mission. The key skills — navigating complex variable catalogs, managing API keys securely, combining data from multiple sources, and understanding the institutional context behind the data — apply to every authenticated API you will encounter. These APIs exist because of public interest mandates, and using them effectively is itself a form of civic engagement.</span>
-<span id="cb36-994"><a href="#cb36-994" aria-label="926"></a></span>
-<span id="cb36-995"><a href="#cb36-995" aria-label="927"></a><span class="fu">## Further Reading</span></span>
-<span id="cb36-996"><a href="#cb36-996" aria-label="928"></a></span>
-<span id="cb36-997"><a href="#cb36-997" aria-label="929"></a><span class="ss">- </span>U.S. Census Bureau API: <span class="ot">&lt;https://www.census.gov/data/developers.html&gt;</span></span>
-<span id="cb36-998"><a href="#cb36-998" aria-label="930"></a><span class="ss">- </span>FRED API documentation: <span class="ot">&lt;https://fred.stlouisfed.org/docs/api/fred/&gt;</span></span>
-<span id="cb36-999"><a href="#cb36-999" aria-label="931"></a><span class="ss">- </span>FEC API documentation: <span class="ot">&lt;https://api.open.fec.gov/developers/&gt;</span></span>
-<span id="cb36-1000"><a href="#cb36-1000" aria-label="932"></a><span class="ss">- </span>@salganik2018bit — Chapter 2: Observing Behavior</span>
-<span id="cb36-1001"><a href="#cb36-1001" aria-label="933"></a><span class="ss">- </span>@munzert2014automated — Chapter on working with web APIs</span>
+<span id="cb36-970"><a href="#cb36-970" aria-label="902"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb36-971"><a href="#cb36-971" aria-label="903"></a></span>
+<span id="cb36-972"><a href="#cb36-972" aria-label="904"></a>Government data APIs embody the value of **openness** from @sec-post-api: they exist because of democratic commitments to transparency. The Census Bureau has been counting the American population every ten years since 1790 (<span class="co">[</span><span class="ot">Census Bureau</span><span class="co">](https://www.census.gov/about/history.html)</span>). The American Community Survey, in full operation since 2005, replaced the census long form, last used in 2000, with a survey taken every year, so that communities get current estimates of demographic, social, economic, and housing characteristics every year instead of once a decade (<span class="co">[</span><span class="ot">Census Bureau</span><span class="co">](https://www.census.gov/about/history/historical-censuses-and-surveys/census-programs-surveys/demographic/american-community-survey.html)</span>). The Bureau opened its first public API in July 2012 (<span class="co">[</span><span class="ot">Census Bureau, 2012</span><span class="co">](https://www.census.gov/newsroom/archives/2012-pr/cb12-135.html)</span>). The decision to make this data freely accessible through APIs reflects a commitment to the idea that public data should be accessible to all, not just to researchers with institutional subscriptions or specialized software.</span>
+<span id="cb36-973"><a href="#cb36-973" aria-label="905"></a></span>
+<span id="cb36-974"><a href="#cb36-974" aria-label="906"></a>FRED, from the Federal Reserve Bank of St. Louis, grew from a similar philosophy. It descends from the paper data publications of Homer Jones, the bank's research director from 1958 to 1971, who wanted policymakers and members of the public alike to be able to judge the state of the economy for themselves; the data were printed and sent out by mail. FRED began in 1991 as a free electronic bulletin board that 620 users reached by modem, with 30 data series, and moved to the web in 1995 with 865 (<span class="co">[</span><span class="ot">Federal Reserve Bank of St. Louis, 2016</span><span class="co">](https://www.stlouisfed.org/on-the-economy/2016/april/history-fred-federal-reserve-economic-data)</span>). It now serves more than 800,000 series, to anyone, for free (<span class="co">[</span><span class="ot">FRED</span><span class="co">](https://fred.stlouisfed.org/)</span>).</span>
+<span id="cb36-975"><a href="#cb36-975" aria-label="907"></a></span>
+<span id="cb36-976"><a href="#cb36-976" aria-label="908"></a>The FEC's public disclosure requirements enable some of the most important accountability journalism in American democracy. News organizations, research groups, and citizens use FEC data to track the flow of money in politics, identify potential conflicts of interest, and hold elected officials accountable. This data exists because of the <span class="co">[</span><span class="ot">Federal Election Campaign Act (1971) and subsequent legislation</span><span class="co">](https://www.fec.gov/legal-resources/legislation/)</span> mandating transparency in campaign finance.</span>
+<span id="cb36-977"><a href="#cb36-977" aria-label="909"></a></span>
+<span id="cb36-978"><a href="#cb36-978" aria-label="910"></a>But government data infrastructure is not immune to erosion. Datasets are withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. In 2019 the Supreme Court refused to let the Commerce Department add a citizenship question to the 2020 census on the reason it had given, which "seems to have been contrived" (<span class="co">[</span><span class="ot">*Department of Commerce v. New York*, 2019</span><span class="co">](https://www.supremecourt.gov/opinions/18pdf/18-966_bq7c.pdf)</span>). In 2017, the first year of the first Trump administration, the Environmental Data &amp; Governance Initiative documented agencies removing or overhauling webpages, documents, and whole websites about climate change, although it found no climate data removed <span class="co">[</span><span class="ot">@edgi2018changing</span><span class="co">]</span>. In early 2025, after an Office of Personnel Management memo applying an executive order on "gender ideology," the CDC, the FDA, and their parent department took down webpages and datasets, until a federal judge ordered them restored to their versions of January 30 (<span class="co">[</span><span class="ot">Alder, 2025</span><span class="co">](https://fedscoop.com/federal-judge-orders-hhs-cdc-fda-to-restore-webpages-datasets/)</span>). That August President Trump fired the commissioner of the Bureau of Labor Statistics after a weak jobs report, calling the data "rigged" (<span class="co">[</span><span class="ot">PBS NewsHour, 2025</span><span class="co">](https://www.pbs.org/newshour/show/firing-of-labor-statistics-head-undermines-trust-in-key-data-ex-trump-official-warns)</span>), and in December the American Statistical Association reported that most of the 13 federal statistical agencies had lost 20 to 30% of their staff (<span class="co">[</span><span class="ot">ASA, 2025</span><span class="co">](https://www.amstat.org/news-listing/2025/12/10/new-report-documents-challenges-facing-federal-statistical-system--offers-roadmap-for-strengthening)</span>). The fragility of government data infrastructure is itself a public interest concern, and a reason to record the date, version, and URL of every government dataset you use.</span>
+<span id="cb36-979"><a href="#cb36-979" aria-label="911"></a></span>
+<span id="cb36-980"><a href="#cb36-980" aria-label="912"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb36-981"><a href="#cb36-981" aria-label="913"></a></span>
+<span id="cb36-982"><a href="#cb36-982" aria-label="914"></a><span class="ss">- </span>**Census variable codes**: The naming convention is opaque. Bookmark the variable catalog and use it as a reference. Variables ending in <span class="in">`E`</span> are estimates; those ending in <span class="in">`M`</span> are margins of error.</span>
+<span id="cb36-983"><a href="#cb36-983" aria-label="915"></a><span class="ss">- </span>**FIPS codes**: Geographic identifiers like <span class="in">`08`</span> (Colorado) and <span class="in">`07850`</span> (Boulder) are strings, not integers. Do not strip leading zeros.</span>
+<span id="cb36-984"><a href="#cb36-984" aria-label="916"></a><span class="ss">- </span>**FRED series IDs**: These are alphanumeric strings; some families follow a pattern (like the SAIPE income series earlier in this chapter), but many do not. Use the FRED website search to find them, then copy the ID into your code exactly.</span>
+<span id="cb36-985"><a href="#cb36-985" aria-label="917"></a><span class="ss">- </span>**API key exposure**: The most common mistake. Environment variables never enter your repository; if you use the JSON-file alternative, add <span class="in">`api_keys.json`</span> to <span class="in">`.gitignore`</span> *before* your first commit, or the key will persist in your git history even after deletion.</span>
+<span id="cb36-986"><a href="#cb36-986" aria-label="918"></a><span class="ss">- </span>**Rate limiting**: Limits vary by agency. As of mid-2026, the Census API publishes no hard limit for keyed users (but expects polite use), FRED allows roughly 120 requests per minute, and the FEC allows 1,000 requests per hour with an upgraded key available on request. Check each API's documentation for current figures, and stay well within them, especially during automated collection.</span>
+<span id="cb36-987"><a href="#cb36-987" aria-label="919"></a></span>
+<span id="cb36-988"><a href="#cb36-988" aria-label="920"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb36-989"><a href="#cb36-989" aria-label="921"></a></span>
+<span id="cb36-990"><a href="#cb36-990" aria-label="922"></a>Government APIs provide access to some of the most valuable, reliable, and stable data sources available. The Census Bureau, Federal Reserve, and FEC each serve a specific transparency mandate, and their APIs reflect this mission. The key skills — navigating complex variable catalogs, managing API keys securely, combining data from multiple sources, and understanding the institutional context behind the data — apply to every authenticated API you will encounter. These APIs exist because of public interest mandates, and using them effectively is itself a form of civic engagement.</span>
+<span id="cb36-991"><a href="#cb36-991" aria-label="923"></a></span>
+<span id="cb36-992"><a href="#cb36-992" aria-label="924"></a><span class="fu">## Further Reading</span></span>
+<span id="cb36-993"><a href="#cb36-993" aria-label="925"></a></span>
+<span id="cb36-994"><a href="#cb36-994" aria-label="926"></a><span class="ss">- </span>U.S. Census Bureau API: <span class="ot">&lt;https://www.census.gov/data/developers.html&gt;</span></span>
+<span id="cb36-995"><a href="#cb36-995" aria-label="927"></a><span class="ss">- </span>FRED API documentation: <span class="ot">&lt;https://fred.stlouisfed.org/docs/api/fred/&gt;</span></span>
+<span id="cb36-996"><a href="#cb36-996" aria-label="928"></a><span class="ss">- </span>FEC API documentation: <span class="ot">&lt;https://api.open.fec.gov/developers/&gt;</span></span>
+<span id="cb36-997"><a href="#cb36-997" aria-label="929"></a><span class="ss">- </span>@salganik2018bit — Chapter 2: Observing Behavior</span>
+<span id="cb36-998"><a href="#cb36-998" aria-label="930"></a><span class="ss">- </span>@munzert2014automated — Chapter on working with web APIs</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

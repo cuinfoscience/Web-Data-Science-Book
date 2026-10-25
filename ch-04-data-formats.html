@@ -448,7 +448,7 @@ div.csl-indent {
 <section id="the-tree-structure" class="level3" data-number="4.2.1">
 <h3 data-number="4.2.1" class="anchored" data-anchor-id="the-tree-structure"><span class="header-section-number">4.2.1</span> The Tree Structure</h3>
 <p>XML organizes data as a hierarchy of nested tags. Each tag can contain text, attributes, and child tags. Here is a simplified example of Congressional member data, using the same tag names as the real U.S. House data feed you will retrieve later in this chapter:</p>
-<div id="e75c9e80" class="cell" data-execution_count="1">
+<div id="642db182" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a>house_raw <span class="op">=</span> <span class="st">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="st">&lt;MemberData publish-date="July 1, 2026"&gt;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="st">  &lt;members&gt;</span></span>
@@ -483,7 +483,7 @@ div.csl-indent {
 </section>
 <section id="parsing-with-beautifulsoup" class="level3" data-number="4.2.2">
 <h3 data-number="4.2.2" class="anchored" data-anchor-id="parsing-with-beautifulsoup"><span class="header-section-number">4.2.2</span> Parsing with BeautifulSoup</h3>
-<div id="7eb1a78b" class="cell" data-execution_count="2">
+<div id="9e4bffbb" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>soup <span class="op">=</span> BeautifulSoup(house_raw, <span class="st">"xml"</span>)</span>
@@ -503,7 +503,7 @@ div.csl-indent {
 </div>
 </div>
 <p>The power of BeautifulSoup is in its search methods. The <code>.find()</code> method returns the first tag matching your criteria — searching all descendants, no matter how deeply nested. The <code>.find_all()</code> method returns all matching tags as a list:</p>
-<div id="bf607bd6" class="cell" data-execution_count="3">
+<div id="c4ad583b" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co"># Find all member tags</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>members <span class="op">=</span> soup.find_all(<span class="st">"member"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="bu">print</span>(<span class="bu">len</span>(members))  <span class="co"># 2</span></span>
@@ -519,7 +519,7 @@ div.csl-indent {
 </div>
 <p>Notice that <code>member.find("firstname")</code> works even though <code>&lt;firstname&gt;</code> sits inside a nested <code>&lt;member-info&gt;</code> block — <code>.find()</code> searches the entire subtree beneath a tag. Also notice which names you can reach with dot notation. Shortcuts like <code>soup.members.member</code> only work for tag names that are valid Python identifiers; hyphenated names like <code>&lt;member-info&gt;</code> and <code>&lt;state-fullname&gt;</code> break dot notation (Python would read <code>soup.member-info</code> as subtraction), so you must use <code>.find()</code> for them.</p>
 <p>XML tags can also carry <strong>attributes</strong> — key-value pairs inside the opening tag itself. In this schema, the <code>&lt;state&gt;</code> tag stores the two-letter postal code as an attribute and spells out the full state name in a child tag. BeautifulSoup exposes attributes through dictionary-style bracket notation:</p>
-<div id="d8eadc83" class="cell" data-execution_count="4">
+<div id="48e620a2" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Attributes are accessed with brackets, text with .text</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>state_tag <span class="op">=</span> soup.find(<span class="st">"state"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="bu">print</span>(state_tag[<span class="st">"postal-code"</span>])               <span class="co"># CO</span></span>
@@ -533,7 +533,7 @@ div.csl-indent {
 <section id="extracting-and-counting" class="level3" data-number="4.2.3">
 <h3 data-number="4.2.3" class="anchored" data-anchor-id="extracting-and-counting"><span class="header-section-number">4.2.3</span> Extracting and Counting</h3>
 <p>A common pattern is extracting all values for a particular tag and then analyzing the distribution:</p>
-<div id="b7fedff5" class="cell" data-execution_count="5">
+<div id="6aabd0f3" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Count party affiliations</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>parties <span class="op">=</span> [m.find(<span class="st">"party"</span>).text <span class="cf">for</span> m <span class="kw">in</span> soup.find_all(<span class="st">"member"</span>)]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="bu">print</span>(parties)</span>
@@ -546,7 +546,7 @@ div.csl-indent {
 <span id="cb5-10"><a href="#cb5-10" aria-label="10"></a><span class="co"># Counter({'D': 1, 'R': 1}) — with full data you'd see actual totals</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The <code>.contents</code> method gives you a list of a tag’s direct children, which is useful for exploring unfamiliar XML structures:</p>
-<div id="0c206ba2" class="cell" data-execution_count="6">
+<div id="2754c836" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a>first_member <span class="op">=</span> soup.find(<span class="st">"member"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="bu">print</span>(first_member.contents)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co"># A list of child tags and whitespace strings</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -566,7 +566,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 </figure>
 </div>
 <p>In Python, fetch the file with <code>requests</code> and parse it with BeautifulSoup’s <code>"xml"</code> parser:</p>
-<div id="84859cd0" class="cell" data-execution_count="7">
+<div id="4cdf4405" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a></span>
@@ -602,7 +602,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="from-xml-to-dataframe" class="level3" data-number="4.2.5">
 <h3 data-number="4.2.5" class="anchored" data-anchor-id="from-xml-to-dataframe"><span class="header-section-number">4.2.5</span> From XML to DataFrame</h3>
 <p>Counting party affiliations is useful, but the larger payoff is converting the XML into a DataFrame for systematic analysis. The pattern is straightforward: use <code>find_all()</code> to get all records, extract the fields you need from each one, build a list of dictionaries, and pass it to <code>pd.DataFrame()</code>:</p>
-<div id="c5638137" class="cell" data-execution_count="8">
+<div id="53d2d551" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="co"># Extract structured data from each member</span></span>
@@ -629,7 +629,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 </div>
 <p>Note the <code>state</code> field: because the postal code is stored as an attribute of the <code>&lt;state&gt;</code> tag rather than as its text, we grab the tag once with <code>.find("state")</code> and then use bracket notation — the same pattern you practiced on the synthetic example. The <code>district</code> column contains strings like <code>"1st"</code> and <code>"At Large"</code> rather than numbers, a reminder that XML gives you text and any type conversion is your job.</p>
 <p>With the full Congressional dataset, you can now perform real analysis:</p>
-<div id="b212578e" class="cell" data-execution_count="9">
+<div id="f10cd04b" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co"># Party breakdown</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a><span class="bu">print</span>(df.groupby(<span class="st">"party"</span>).size())</span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a><span class="co">#</span></span>
@@ -665,13 +665,13 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="lists-and-dictionaries" class="level3" data-number="4.3.1">
 <h3 data-number="4.3.1" class="anchored" data-anchor-id="lists-and-dictionaries"><span class="header-section-number">4.3.1</span> Lists and Dictionaries</h3>
 <p>JSON maps onto two Python data structures you already know. A JSON <strong>array</strong> is a Python <strong>list</strong> — ordered, indexed by position:</p>
-<div id="60cb54c3" class="cell" data-execution_count="10">
+<div id="af4ef573" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a>classroom <span class="op">=</span> [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Carol"</span>]</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="bu">print</span>(classroom[<span class="dv">0</span>])   <span class="co"># "Alice"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="bu">print</span>(<span class="bu">len</span>(classroom))  <span class="co"># 3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>A JSON object naturally maps to a Python dictionary, which is accessed by key. Python dictionaries preserve insertion order, but JSON object member order should not be relied on:</p>
-<div id="db46a04c" class="cell" data-execution_count="11">
+<div id="0f1e78d1" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>state <span class="op">=</span> {</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>    <span class="st">"name"</span>: <span class="st">"Colorado"</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>    <span class="st">"capital"</span>: <span class="st">"Denver"</span>,</span>
@@ -684,7 +684,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="nested-structures" class="level3" data-number="4.3.2">
 <h3 data-number="4.3.2" class="anchored" data-anchor-id="nested-structures"><span class="header-section-number">4.3.2</span> Nested Structures</h3>
 <p>Real-world JSON data nests these structures inside each other. A dictionary can contain lists, lists can contain dictionaries, and the nesting can go several levels deep:</p>
-<div id="5ff81441" class="cell" data-execution_count="12">
+<div id="d83fee67" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a>schools <span class="op">=</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a>    <span class="st">"School 1"</span>: {</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>        <span class="st">"Classroom A"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>],</span>
@@ -704,7 +704,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="the-list-of-dictionaries-pattern" class="level3" data-number="4.3.3">
 <h3 data-number="4.3.3" class="anchored" data-anchor-id="the-list-of-dictionaries-pattern"><span class="header-section-number">4.3.3</span> The List-of-Dictionaries Pattern</h3>
 <p>The most common JSON pattern you will encounter in web data is a list of dictionaries, where each dictionary represents a record and each key-value pair represents a field:</p>
-<div id="037ebfa6" class="cell" data-execution_count="13">
+<div id="e514ad28" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a>census_data <span class="op">=</span> [</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>    {<span class="st">"state"</span>: <span class="st">"Colorado"</span>, <span class="st">"year"</span>: <span class="dv">2020</span>, <span class="st">"population"</span>: <span class="dv">5773714</span>},</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>    {<span class="st">"state"</span>: <span class="st">"Colorado"</span>, <span class="st">"year"</span>: <span class="dv">2010</span>, <span class="st">"population"</span>: <span class="dv">5029196</span>},</span>
@@ -715,7 +715,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <span id="cb13-8"><a href="#cb13-8" aria-label="8"></a><span class="bu">print</span>(census_data[<span class="dv">0</span>][<span class="st">"population"</span>])  <span class="co"># 5773714</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This pattern converts directly into a pandas DataFrame:</p>
-<div id="49e103e8" class="cell" data-execution_count="14">
+<div id="da31dd79" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a>df <span class="op">=</span> pd.DataFrame(census_data)</span>
@@ -730,7 +730,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="parsing-json-strings" class="level3" data-number="4.3.4">
 <h3 data-number="4.3.4" class="anchored" data-anchor-id="parsing-json-strings"><span class="header-section-number">4.3.4</span> Parsing JSON Strings</h3>
 <p>When you receive JSON data from the web (as a string), you need to parse it into Python objects. Python’s built-in <a href="https://docs.python.org/3/library/json.html"><code>json</code> module</a> does the work; its documentation lists every option these functions take:</p>
-<div id="c7f821b3" class="cell" data-execution_count="15">
+<div id="793d9238" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="im">import</span> json</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="co"># Parse a JSON string into a Python object</span></span>
@@ -744,7 +744,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <span id="cb15-11"><a href="#cb15-11" aria-label="11"></a><span class="bu">print</span>(json_output)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>When working with <code>requests</code>, the <code>.json()</code> method on a response object does this parsing for you automatically:</p>
-<div id="2906d78d" class="cell" data-execution_count="16">
+<div id="14df3910" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a>response <span class="op">=</span> requests.get(<span class="st">"https://jsonverse.dev/examples/json-metrics.json"</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>data <span class="op">=</span> response.json()  <span class="co"># Equivalent to json.loads(response.text)</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a><span class="bu">print</span>(data)</span>
@@ -756,7 +756,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="working-with-a-real-json-object" class="level3" data-number="4.3.5">
 <h3 data-number="4.3.5" class="anchored" data-anchor-id="working-with-a-real-json-object"><span class="header-section-number">4.3.5</span> Working with a Real JSON Object</h3>
 <p>Here is a simplified version of a social media post object, similar to what Twitter’s API used to return:</p>
-<div id="41dc16bb" class="cell" data-execution_count="17">
+<div id="a60df09c" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a>tweet <span class="op">=</span> {</span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a>    <span class="st">"id"</span>: <span class="dv">266031293945503744</span>,</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a>    <span class="st">"text"</span>: <span class="st">"Four more years."</span>,</span>
@@ -790,7 +790,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="handling-deeply-nested-json" class="level3" data-number="4.3.6">
 <h3 data-number="4.3.6" class="anchored" data-anchor-id="handling-deeply-nested-json"><span class="header-section-number">4.3.6</span> Handling Deeply Nested JSON</h3>
 <p>The Twitter example above is only two levels deep. Real API responses often nest data three or four levels down, and the path to the data you need is not always obvious. Let us work through a live example using the Open-Meteo weather API, which returns a forecast for Boulder, Colorado:</p>
-<div id="ac20df19" class="cell" data-execution_count="18">
+<div id="2ceb2c28" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://api.open-meteo.com/v1/forecast"</span></span>
@@ -833,7 +833,7 @@ Figure&nbsp;4.2: The chapter’s Open-Meteo request, its full URL pasted into Ch
 </figure>
 </div>
 <p>The strategy is always the same: start with <code>type()</code> and <code>.keys()</code> at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:</p>
-<div id="e11512b3" class="cell" data-execution_count="19">
+<div id="d895b854" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a></span>
@@ -915,21 +915,8 @@ Figure&nbsp;4.2: The chapter’s Open-Meteo request, its full URL pasted into Ch
 <section id="where-youll-actually-find-each-format" class="level3" data-number="4.4.1">
 <h3 data-number="4.4.1" class="anchored" data-anchor-id="where-youll-actually-find-each-format"><span class="header-section-number">4.4.1</span> Where you’ll actually find each format</h3>
 <p>Format choice is rarely arbitrary once you know what to look for. <strong>JSON dominates anywhere a program is the primary reader.</strong> REST APIs return it almost by default now — SOAP, the XML-based protocol REST displaced, requires wrapping every request in an XML namespace envelope that JSON has no equivalent for, which is part of why SOAP’s use has been declining for years while REST and GraphQL have grown. JSON Web Tokens (JWTs), the credential your browser holds after you log into a site, are JSON underneath. Configuration files for modern developer tooling — <code>package.json</code>, <code>tsconfig.json</code>, VS Code’s <code>settings.json</code> — are JSON because the ecosystem around them is JavaScript-adjacent and a program on both ends is doing the reading.</p>
-<p><strong>XML persists where a human sometimes needs to read the document, where a strict contract matters, or where the data predates the JSON era.</strong> Government and legislative systems (the House roster you are about to parse), SEC filings, and enterprise data-interchange formats still commonly use XML, partly out of legacy and partly because XSD validation gives an institution a way to guarantee — mechanically, not by convention — that a submitted document has the fields it is supposed to have. RSS and Atom feeds are XML for historical reasons this chapter’s next section covers. And XML shows up somewhere many people never notice: open a <code>.docx</code>, <code>.xlsx</code>, or <code>.svg</code> file’s internals, and you are looking at XML. Office Open XML files are literally a zip archive of XML documents; SVG is XML that a browser renders directly as a vector image. Wherever a format needs to be both a <em>document</em> and <em>data</em> at once, XML’s willingness to carry markup alongside content is doing real work that JSON, by design, cannot.</p>
+<p><strong>XML persists where a human sometimes needs to read the document, where a strict contract matters, or where the data predates the JSON era.</strong> Government and legislative systems (the House roster you are about to parse), SEC filings, and enterprise data-interchange formats still commonly use XML, partly out of legacy and partly because XSD validation gives an institution a way to guarantee — mechanically, not by convention — that a submitted document has the fields it is supposed to have. RSS and Atom feeds are XML for historical reasons that “Social History and Public Interest”, at the end of this chapter, covers. And XML shows up somewhere many people never notice: open a <code>.docx</code>, <code>.xlsx</code>, or <code>.svg</code> file’s internals, and you are looking at XML. Office Open XML files are literally a zip archive of XML documents; SVG is XML that a browser renders directly as a vector image. Wherever a format needs to be both a <em>document</em> and <em>data</em> at once, XML’s willingness to carry markup alongside content is doing real work that JSON, by design, cannot.</p>
 <p>HTML — which you will parse extensively beginning in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a> — is structurally similar to XML and is parsed with the same BeautifulSoup methods.</p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Public Interest Connection
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The choice of data format is itself a transparency decision. When governments and institutions publish data in machine-readable XML or JSON, they embody <strong>openness</strong> — making information practically accessible to anyone with basic programming skills. When the same data is published as scanned PDFs or proprietary spreadsheets, it creates barriers to the kind of <strong>oversight</strong> that democratic accountability requires (<a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>). Advocating for open data formats is one of the most concrete things a data scientist can do to serve the public interest.</p>
-</div>
-</div>
 <div class="callout callout-style-simple callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1047,7 +1034,7 @@ Figure&nbsp;4.3: PBS NewsHour’s home page in View Source, searched with Chrome
 </div>
 </div>
 </div>
-<div id="7d5e6d60" class="cell" data-execution_count="20">
+<div id="5220cce7" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 1: Define HEADERS and choose an RSS feed URL you have checked against the site's robots.txt.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -1062,32 +1049,32 @@ Figure&nbsp;4.4: BBC News’s science and environment feed in Chrome, October 20
 </figcaption>
 </figure>
 </div>
-<div id="e161ba3f" class="cell" data-execution_count="21">
+<div id="12dfad36" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># Step 2: Fetch the feed and inspect the first 500 characters of raw XML.</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Parse the tree.</strong> Parse the response with BeautifulSoup’s <code>"xml"</code> parser, use <code>find_all()</code> to collect the items, and print how many the feed contains.</p>
-<div id="8e30a184" class="cell" data-execution_count="22">
+<div id="5e3ca4bf" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># Step 3: Parse with the "xml" parser, find_all the repeating items, and count them.</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Extract to a DataFrame.</strong> Loop over the items, building a list of dictionaries with each item’s title, link, and publication date — the list-of-dictionaries pattern from this chapter — then convert to a DataFrame.</p>
-<div id="39fc0154" class="cell" data-execution_count="23">
+<div id="d0ab13cc" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="co"># Step 4: Build a list of dicts (title, link, pubDate) and convert it to a DataFrame.</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Fetch nested JSON.</strong> Retrieve the Boulder forecast from <code>https://api.open-meteo.com/v1/forecast?latitude=40.01&amp;longitude=-105.27&amp;daily=temperature_2m_max&amp;timezone=America/Denver</code> and parse it with <code>.json()</code>. Print the top-level keys, then the keys under <code>"daily"</code> — map the nesting before you extract anything.</p>
-<div id="fd90fb37" class="cell" data-execution_count="24">
+<div id="685de639" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="co"># Step 5: Fetch the Open-Meteo forecast, parse the JSON, and print the top-level keys and the keys nested under "daily".</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Extract the parallel lists.</strong> The <code>"daily"</code> object holds parallel lists of dates and temperatures. Build a DataFrame from them and plot maximum temperature over the forecast days.</p>
-<div id="bf9312c2" class="cell" data-execution_count="25">
+<div id="ae0df057" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a><span class="co"># Step 6: Build a DataFrame of dates and max temperatures, then plot it.</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In three to five sentences: The RSS feed nested repeating <em>elements</em>; the forecast nested parallel <em>lists</em>. Which was easier to get into a DataFrame, and why? What did you have to know about each structure before you could write the extraction code?</p>
-<div id="ec2516f0" class="cell" data-execution_count="26">
+<div id="7948f7b0" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1103,9 +1090,9 @@ Figure&nbsp;4.4: BBC News’s science and environment feed in Chrome, October 20
 </section>
 <section id="social-history-and-public-interest" class="level2" data-number="4.7">
 <h2 data-number="4.7" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">4.7</span> Social History and Public Interest</h2>
-<p>XML emerged in the late 1990s from the standardization efforts of the <a href="https://www.w3.org/">World Wide Web Consortium (W3C)</a>, designed to be a universal format for document and data exchange. Its verbosity made it rigorous but heavy. JSON was created by Douglas Crockford in the early 2000s as a lightweight alternative that leveraged JavaScript’s native object syntax. Its simplicity and the rise of AJAX-powered web applications made it the default format for APIs by the 2010s.</p>
-<p>The politics of data formats may seem esoteric, but format choices have real consequences for access and transparency. When a government publishes budget data as XML, it is machine-readable by design. When it publishes the same data as a scanned PDF, it is technically “public” but practically inaccessible — a form of the soft enclosure discussed in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>. Open government data initiatives like data.gov have pushed for machine-readable formats precisely because format determines who can actually use the data.</p>
-<p>RSS (Really Simple Syndication) deserves special mention as an early experiment in open data distribution. Built on XML, RSS feeds allowed anyone to subscribe to updates from blogs, news sites, and podcasts without visiting each site individually. In the mid-2000s, RSS was the backbone of the blogosphere and an early tool for computational journalism — researchers could subscribe to thousands of news feeds and analyze coverage patterns at scale. But RSS declined as social media platforms offered their own proprietary feed algorithms. Facebook, Twitter, and later platforms replaced the open, user-controlled subscription model with opaque algorithmic curation. The decline of RSS was one of the earliest examples of the enclosure pattern that <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> describes: an open protocol replaced by a proprietary system that centralized control over information distribution.</p>
+<p>XML emerged in the late 1990s from the standardization efforts of the <a href="https://www.w3.org/">World Wide Web Consortium (W3C)</a>, designed to be a universal format for document and data exchange; the W3C published XML 1.0 as a Recommendation in February 1998 (<a href="https://www.w3.org/TR/1998/REC-xml-19980210">Bray, Paoli, and Sperberg-McQueen, 1998</a>). Its verbosity made it rigorous but heavy. Douglas Crockford specified JSON at <a href="https://www.json.org/json-en.html">json.org</a> as a lightweight alternative built on a subset of JavaScript’s object syntax, and in July 2006 he described it for the Internet Engineering Task Force in <a href="https://www.rfc-editor.org/rfc/rfc4627">RFC 4627</a>. Its simplicity and the rise of AJAX-powered web applications made it the default format for APIs by the 2010s, although the 2005 essay that named Ajax spelled out its X as XML (<a href="https://designftw.mit.edu/lectures/apis/ajax_adaptive_path.pdf">Garrett, 2005</a>). JSON is now an Internet Standard, <a href="https://www.rfc-editor.org/rfc/rfc8259">RFC 8259</a> (December 2017), and an Ecma standard, <a href="https://ecma-international.org/publications-and-standards/standards/ecma-404/">ECMA-404</a>, whose second edition appeared the same month. The editor of RFC 8259, Tim Bray, was also one of the three editors of XML 1.0.</p>
+<p>The politics of data formats may seem esoteric, but the choice of format is itself a transparency decision. When governments and institutions publish data in machine-readable XML or JSON, they embody <strong>openness</strong>, making information practically accessible to anyone with basic programming skills. When they publish the same data as a scanned PDF or a proprietary spreadsheet, it is technically “public” but practically inaccessible, a form of the soft enclosure discussed in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>, and it puts up barriers to the kind of <strong>oversight</strong> that democratic accountability requires. Open government data initiatives have pushed for machine-readable formats precisely because format determines who can actually use the data. In the United States, <a href="https://data.gov/about/">Data.gov</a> launched in 2009, the year the Open Government Directive told federal agencies to publish information online “in open formats” (<a href="https://obamawhitehouse.archives.gov/open/documents/open-government-directive">Office of Management and Budget, 2009</a>). <a href="https://www.govinfo.gov/content/pkg/FR-2013-05-14/pdf/2013-11533.pdf">Executive Order 13642</a>, in May 2013, made “open and machine readable” the new default for government information, and the OPEN Government Data Act, Title II of the Foundations for Evidence-Based Policymaking Act of 2018, signed in January 2019, wrote the requirement into law (<a href="https://www.govinfo.gov/content/pkg/PLAW-115publ435/html/PLAW-115publ435.htm">Public Law 115-435</a>). Advocating for open data formats is one of the most concrete things a data scientist can do to serve the public interest.</p>
+<p>RSS deserves special mention as an early experiment in open data distribution. Netscape published the first version, RSS 0.90, in March 1999, and RSS 2.0, whose name the specification expands as Really Simple Syndication, followed in 2002 (<a href="https://www.rssboard.org/rss-history">RSS Advisory Board</a>; <a href="https://www.rssboard.org/rss-specification">RSS 2.0 specification</a>). Atom, a rival XML feed format, became an IETF standard in December 2005 (<a href="https://www.rfc-editor.org/rfc/rfc4287">RFC 4287</a>). Built on XML, RSS feeds allowed anyone to subscribe to updates from blogs, news sites, and podcasts without visiting each site individually. In the mid-2000s, RSS was the backbone of the blogosphere and an early tool for computational journalism and research: Media Cloud, an open platform for studying news coverage, has gathered stories since 2008 largely through news sites’ RSS feeds <span class="citation" data-cites="roberts2021media">(<a href="#ref-roberts2021media" role="doc-biblioref">Roberts et al. 2021</a>)</span>. But RSS declined as social media platforms offered their own proprietary feed algorithms. Facebook, Twitter, and later platforms replaced the open, user-controlled subscription model with opaque algorithmic curation. Google retired its feed reader, Google Reader, on July 1, 2013, saying that its usage had declined (<a href="https://blog.google/company-news/inside-google/company-announcements/a-second-spring-of-cleaning/">Google, 2013</a>), and Media Cloud’s builders report that fewer sites now offer feeds at all <span class="citation" data-cites="roberts2021media">(<a href="#ref-roberts2021media" role="doc-biblioref">Roberts et al. 2021</a>)</span>. The decline of RSS was one of the earliest examples of the enclosure pattern that <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> describes: an open protocol replaced by a proprietary system that centralized control over information distribution. Podcasts kept the open model longest; Apple Podcasts, for one, still takes shows from RSS feeds and publishes the <a href="https://podcasters.apple.com/support/823-podcast-requirements">requirements</a> a feed must meet.</p>
 </section>
 <section id="common-issues-to-debug" class="level2" data-number="4.8">
 <h2 data-number="4.8" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">4.8</span> Common Issues to Debug</h2>
@@ -1146,6 +1133,9 @@ Gebru, Timnit, Jamie Morgenstern, Brenda Vecchione, et al. 2021. <span>“Datash
 </div>
 <div id="ref-mitchell2018web" class="csl-entry" role="listitem">
 Mitchell, Ryan. 2018. <em>Web Scraping with <span>Python</span>: Collecting More Data from the Modern Web</em>. 2nd ed. O’Reilly Media.
+</div>
+<div id="ref-roberts2021media" class="csl-entry" role="listitem">
+Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media Cloud</span>: Massive Open Source Collection of Global News on the Open Web.”</span> <em>Proceedings of the International AAAI Conference on Web and Social Media</em> 15: 1034–45. <a href="https://doi.org/10.1609/icwsm.v15i1.18127">https://doi.org/10.1609/icwsm.v15i1.18127</a>.
 </div>
 </div>
 </section>
@@ -2091,156 +2081,151 @@ Mitchell, Ryan. 2018. <em>Web Scraping with <span>Python</span>: Collecting More
 <span id="cb27-513"><a href="#cb27-513" aria-label="475"></a></span>
 <span id="cb27-514"><a href="#cb27-514" aria-label="476"></a>Format choice is rarely arbitrary once you know what to look for. **JSON dominates anywhere a program is the primary reader.** REST APIs return it almost by default now — SOAP, the XML-based protocol REST displaced, requires wrapping every request in an XML namespace envelope that JSON has no equivalent for, which is part of why SOAP's use has been declining for years while REST and GraphQL have grown. JSON Web Tokens (JWTs), the credential your browser holds after you log into a site, are JSON underneath. Configuration files for modern developer tooling — <span class="in">`package.json`</span>, <span class="in">`tsconfig.json`</span>, VS Code's <span class="in">`settings.json`</span> — are JSON because the ecosystem around them is JavaScript-adjacent and a program on both ends is doing the reading.</span>
 <span id="cb27-515"><a href="#cb27-515" aria-label="477"></a></span>
-<span id="cb27-516"><a href="#cb27-516" aria-label="478"></a>**XML persists where a human sometimes needs to read the document, where a strict contract matters, or where the data predates the JSON era.** Government and legislative systems (the House roster you are about to parse), SEC filings, and enterprise data-interchange formats still commonly use XML, partly out of legacy and partly because XSD validation gives an institution a way to guarantee — mechanically, not by convention — that a submitted document has the fields it is supposed to have. RSS and Atom feeds are XML for historical reasons this chapter's next section covers. And XML shows up somewhere many people never notice: open a <span class="in">`.docx`</span>, <span class="in">`.xlsx`</span>, or <span class="in">`.svg`</span> file's internals, and you are looking at XML. Office Open XML files are literally a zip archive of XML documents; SVG is XML that a browser renders directly as a vector image. Wherever a format needs to be both a *document* and *data* at once, XML's willingness to carry markup alongside content is doing real work that JSON, by design, cannot.</span>
+<span id="cb27-516"><a href="#cb27-516" aria-label="478"></a>**XML persists where a human sometimes needs to read the document, where a strict contract matters, or where the data predates the JSON era.** Government and legislative systems (the House roster you are about to parse), SEC filings, and enterprise data-interchange formats still commonly use XML, partly out of legacy and partly because XSD validation gives an institution a way to guarantee — mechanically, not by convention — that a submitted document has the fields it is supposed to have. RSS and Atom feeds are XML for historical reasons that "Social History and Public Interest", at the end of this chapter, covers. And XML shows up somewhere many people never notice: open a <span class="in">`.docx`</span>, <span class="in">`.xlsx`</span>, or <span class="in">`.svg`</span> file's internals, and you are looking at XML. Office Open XML files are literally a zip archive of XML documents; SVG is XML that a browser renders directly as a vector image. Wherever a format needs to be both a *document* and *data* at once, XML's willingness to carry markup alongside content is doing real work that JSON, by design, cannot.</span>
 <span id="cb27-517"><a href="#cb27-517" aria-label="479"></a></span>
 <span id="cb27-518"><a href="#cb27-518" aria-label="480"></a>HTML — which you will parse extensively beginning in @sec-static-pages — is structurally similar to XML and is parsed with the same BeautifulSoup methods.</span>
 <span id="cb27-519"><a href="#cb27-519" aria-label="481"></a></span>
-<span id="cb27-520"><a href="#cb27-520" aria-label="482"></a>::: {.callout-note}</span>
-<span id="cb27-521"><a href="#cb27-521" aria-label="483"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb27-522"><a href="#cb27-522" aria-label="484"></a>The choice of data format is itself a transparency decision. When governments and institutions publish data in machine-readable XML or JSON, they embody **openness** — making information practically accessible to anyone with basic programming skills. When the same data is published as scanned PDFs or proprietary spreadsheets, it creates barriers to the kind of **oversight** that democratic accountability requires (@sec-post-api). Advocating for open data formats is one of the most concrete things a data scientist can do to serve the public interest.</span>
+<span id="cb27-520"><a href="#cb27-520" aria-label="482"></a>::: {.callout-tip}</span>
+<span id="cb27-521"><a href="#cb27-521" aria-label="483"></a><span class="fu">## Missing Manual Reference</span></span>
+<span id="cb27-522"><a href="#cb27-522" aria-label="484"></a>For more on data file formats including CSV, TSV, and other common structures, see *Missing Manual* <span class="co">[</span><span class="ot">Chapter 20: Data File Formats</span><span class="co">](https://cuinfoscience.github.io/INFO-Missing-Manual/chapters/data-file-formats.html)</span>.</span>
 <span id="cb27-523"><a href="#cb27-523" aria-label="485"></a>:::</span>
 <span id="cb27-524"><a href="#cb27-524" aria-label="486"></a></span>
-<span id="cb27-525"><a href="#cb27-525" aria-label="487"></a>::: {.callout-tip}</span>
-<span id="cb27-526"><a href="#cb27-526" aria-label="488"></a><span class="fu">## Missing Manual Reference</span></span>
-<span id="cb27-527"><a href="#cb27-527" aria-label="489"></a>For more on data file formats including CSV, TSV, and other common structures, see *Missing Manual* <span class="co">[</span><span class="ot">Chapter 20: Data File Formats</span><span class="co">](https://cuinfoscience.github.io/INFO-Missing-Manual/chapters/data-file-formats.html)</span>.</span>
-<span id="cb27-528"><a href="#cb27-528" aria-label="490"></a>:::</span>
-<span id="cb27-529"><a href="#cb27-529" aria-label="491"></a></span>
-<span id="cb27-530"><a href="#cb27-530" aria-label="492"></a><span class="fu">## Recommended Exercises</span></span>
-<span id="cb27-531"><a href="#cb27-531" aria-label="493"></a></span>
-<span id="cb27-532"><a href="#cb27-532" aria-label="494"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
-<span id="cb27-533"><a href="#cb27-533" aria-label="495"></a></span>
-<span id="cb27-534"><a href="#cb27-534" aria-label="496"></a>You will parse one real dataset in each format: an RSS feed (XML) and a weather forecast (JSON), ending with both as DataFrames.</span>
+<span id="cb27-525"><a href="#cb27-525" aria-label="487"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb27-526"><a href="#cb27-526" aria-label="488"></a></span>
+<span id="cb27-527"><a href="#cb27-527" aria-label="489"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
+<span id="cb27-528"><a href="#cb27-528" aria-label="490"></a></span>
+<span id="cb27-529"><a href="#cb27-529" aria-label="491"></a>You will parse one real dataset in each format: an RSS feed (XML) and a weather forecast (JSON), ending with both as DataFrames.</span>
+<span id="cb27-530"><a href="#cb27-530" aria-label="492"></a></span>
+<span id="cb27-531"><a href="#cb27-531" aria-label="493"></a>**Step 1 — Set up politely.** Define your <span class="in">`HEADERS`</span> with a named <span class="in">`User-Agent`</span> (@sec-ethics). Find an RSS feed from a news outlet or podcast — most sites serve one at <span class="in">`/rss`</span> or <span class="in">`/feed`</span> — and check the site's <span class="in">`robots.txt`</span> permits fetching it.</span>
+<span id="cb27-532"><a href="#cb27-532" aria-label="494"></a></span>
+<span id="cb27-533"><a href="#cb27-533" aria-label="495"></a>::: {.callout-tip}</span>
+<span id="cb27-534"><a href="#cb27-534" aria-label="496"></a><span class="fu">## Starter feeds</span></span>
 <span id="cb27-535"><a href="#cb27-535" aria-label="497"></a></span>
-<span id="cb27-536"><a href="#cb27-536" aria-label="498"></a>**Step 1 — Set up politely.** Define your <span class="in">`HEADERS`</span> with a named <span class="in">`User-Agent`</span> (@sec-ethics). Find an RSS feed from a news outlet or podcast — most sites serve one at <span class="in">`/rss`</span> or <span class="in">`/feed`</span> — and check the site's <span class="in">`robots.txt`</span> permits fetching it.</span>
+<span id="cb27-536"><a href="#cb27-536" aria-label="498"></a>Five news outlets and five data/tech podcasts, researched as of September 2026. RSS URLs move over time — treat these as a starting point, not a guarantee; the status-code check in Step 2 is exactly how you'd notice if one has moved.</span>
 <span id="cb27-537"><a href="#cb27-537" aria-label="499"></a></span>
-<span id="cb27-538"><a href="#cb27-538" aria-label="500"></a>::: {.callout-tip}</span>
-<span id="cb27-539"><a href="#cb27-539" aria-label="501"></a><span class="fu">## Starter feeds</span></span>
-<span id="cb27-540"><a href="#cb27-540" aria-label="502"></a></span>
-<span id="cb27-541"><a href="#cb27-541" aria-label="503"></a>Five news outlets and five data/tech podcasts, researched as of September 2026. RSS URLs move over time — treat these as a starting point, not a guarantee; the status-code check in Step 2 is exactly how you'd notice if one has moved.</span>
-<span id="cb27-542"><a href="#cb27-542" aria-label="504"></a></span>
-<span id="cb27-543"><a href="#cb27-543" aria-label="505"></a>**News**</span>
-<span id="cb27-544"><a href="#cb27-544" aria-label="506"></a></span>
-<span id="cb27-545"><a href="#cb27-545" aria-label="507"></a><span class="pp">|</span> Outlet <span class="pp">|</span> Feed <span class="pp">|</span></span>
-<span id="cb27-546"><a href="#cb27-546" aria-label="508"></a><span class="pp">|---|---|</span></span>
-<span id="cb27-547"><a href="#cb27-547" aria-label="509"></a><span class="pp">|</span> The New York Times <span class="pp">|</span> <span class="in">`https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml`</span> <span class="pp">|</span></span>
-<span id="cb27-548"><a href="#cb27-548" aria-label="510"></a><span class="pp">|</span> BBC News <span class="pp">|</span> <span class="in">`https://feeds.bbci.co.uk/news/rss.xml`</span> <span class="pp">|</span></span>
-<span id="cb27-549"><a href="#cb27-549" aria-label="511"></a><span class="pp">|</span> The Guardian <span class="pp">|</span> <span class="in">`https://www.theguardian.com/world/rss`</span> <span class="pp">|</span></span>
-<span id="cb27-550"><a href="#cb27-550" aria-label="512"></a><span class="pp">|</span> PBS NewsHour <span class="pp">|</span> <span class="in">`https://www.pbs.org/newshour/feeds/rss/headlines`</span> <span class="pp">|</span></span>
-<span id="cb27-551"><a href="#cb27-551" aria-label="513"></a><span class="pp">|</span> Al Jazeera <span class="pp">|</span> <span class="in">`https://www.aljazeera.com/xml/rss/all.xml`</span> <span class="pp">|</span></span>
-<span id="cb27-552"><a href="#cb27-552" aria-label="514"></a></span>
-<span id="cb27-553"><a href="#cb27-553" aria-label="515"></a>AP and Reuters are conspicuously absent: both discontinued their public RSS feeds (Reuters in 2020, AP some time after) — a small, real instance of the decline this chapter describes below.</span>
-<span id="cb27-554"><a href="#cb27-554" aria-label="516"></a></span>
-<span id="cb27-555"><a href="#cb27-555" aria-label="517"></a>**Podcasts (data, tech, and data journalism)**</span>
-<span id="cb27-556"><a href="#cb27-556" aria-label="518"></a></span>
-<span id="cb27-557"><a href="#cb27-557" aria-label="519"></a><span class="pp">|</span> Podcast <span class="pp">|</span> Feed <span class="pp">|</span></span>
-<span id="cb27-558"><a href="#cb27-558" aria-label="520"></a><span class="pp">|---|---|</span></span>
-<span id="cb27-559"><a href="#cb27-559" aria-label="521"></a><span class="pp">|</span> Data Skeptic <span class="pp">|</span> <span class="in">`https://dataskeptic.libsyn.com/rss`</span> <span class="pp">|</span></span>
-<span id="cb27-560"><a href="#cb27-560" aria-label="522"></a><span class="pp">|</span> Planet Money (NPR) <span class="pp">|</span> <span class="in">`https://feeds.npr.org/510289/podcast.xml`</span> <span class="pp">|</span></span>
-<span id="cb27-561"><a href="#cb27-561" aria-label="523"></a><span class="pp">|</span> The Changelog <span class="pp">|</span> <span class="in">`https://changelog.com/podcast/feed`</span> — note: its <span class="in">`robots.txt`</span> disallows all crawlers, so this feed fails Step 1's check <span class="pp">|</span></span>
-<span id="cb27-562"><a href="#cb27-562" aria-label="524"></a><span class="pp">|</span> Data Engineering Podcast <span class="pp">|</span> no single published URL — find it on <span class="co">[</span><span class="ot">dataengineeringpodcast.com</span><span class="co">](https://www.dataengineeringpodcast.com/)</span> using the technique below <span class="pp">|</span></span>
-<span id="cb27-563"><a href="#cb27-563" aria-label="525"></a><span class="pp">|</span> The PolicyViz Podcast <span class="pp">|</span> no single published URL — find it on <span class="co">[</span><span class="ot">policyviz.com/podcast</span><span class="co">](https://policyviz.com/podcast/)</span> using the technique below <span class="pp">|</span></span>
-<span id="cb27-564"><a href="#cb27-564" aria-label="526"></a></span>
-<span id="cb27-565"><a href="#cb27-565" aria-label="527"></a>**Finding a feed this list doesn't cover.** Most sites don't advertise their feed on the homepage:</span>
+<span id="cb27-538"><a href="#cb27-538" aria-label="500"></a>**News**</span>
+<span id="cb27-539"><a href="#cb27-539" aria-label="501"></a></span>
+<span id="cb27-540"><a href="#cb27-540" aria-label="502"></a><span class="pp">|</span> Outlet <span class="pp">|</span> Feed <span class="pp">|</span></span>
+<span id="cb27-541"><a href="#cb27-541" aria-label="503"></a><span class="pp">|---|---|</span></span>
+<span id="cb27-542"><a href="#cb27-542" aria-label="504"></a><span class="pp">|</span> The New York Times <span class="pp">|</span> <span class="in">`https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml`</span> <span class="pp">|</span></span>
+<span id="cb27-543"><a href="#cb27-543" aria-label="505"></a><span class="pp">|</span> BBC News <span class="pp">|</span> <span class="in">`https://feeds.bbci.co.uk/news/rss.xml`</span> <span class="pp">|</span></span>
+<span id="cb27-544"><a href="#cb27-544" aria-label="506"></a><span class="pp">|</span> The Guardian <span class="pp">|</span> <span class="in">`https://www.theguardian.com/world/rss`</span> <span class="pp">|</span></span>
+<span id="cb27-545"><a href="#cb27-545" aria-label="507"></a><span class="pp">|</span> PBS NewsHour <span class="pp">|</span> <span class="in">`https://www.pbs.org/newshour/feeds/rss/headlines`</span> <span class="pp">|</span></span>
+<span id="cb27-546"><a href="#cb27-546" aria-label="508"></a><span class="pp">|</span> Al Jazeera <span class="pp">|</span> <span class="in">`https://www.aljazeera.com/xml/rss/all.xml`</span> <span class="pp">|</span></span>
+<span id="cb27-547"><a href="#cb27-547" aria-label="509"></a></span>
+<span id="cb27-548"><a href="#cb27-548" aria-label="510"></a>AP and Reuters are conspicuously absent: both discontinued their public RSS feeds (Reuters in 2020, AP some time after) — a small, real instance of the decline this chapter describes below.</span>
+<span id="cb27-549"><a href="#cb27-549" aria-label="511"></a></span>
+<span id="cb27-550"><a href="#cb27-550" aria-label="512"></a>**Podcasts (data, tech, and data journalism)**</span>
+<span id="cb27-551"><a href="#cb27-551" aria-label="513"></a></span>
+<span id="cb27-552"><a href="#cb27-552" aria-label="514"></a><span class="pp">|</span> Podcast <span class="pp">|</span> Feed <span class="pp">|</span></span>
+<span id="cb27-553"><a href="#cb27-553" aria-label="515"></a><span class="pp">|---|---|</span></span>
+<span id="cb27-554"><a href="#cb27-554" aria-label="516"></a><span class="pp">|</span> Data Skeptic <span class="pp">|</span> <span class="in">`https://dataskeptic.libsyn.com/rss`</span> <span class="pp">|</span></span>
+<span id="cb27-555"><a href="#cb27-555" aria-label="517"></a><span class="pp">|</span> Planet Money (NPR) <span class="pp">|</span> <span class="in">`https://feeds.npr.org/510289/podcast.xml`</span> <span class="pp">|</span></span>
+<span id="cb27-556"><a href="#cb27-556" aria-label="518"></a><span class="pp">|</span> The Changelog <span class="pp">|</span> <span class="in">`https://changelog.com/podcast/feed`</span> — note: its <span class="in">`robots.txt`</span> disallows all crawlers, so this feed fails Step 1's check <span class="pp">|</span></span>
+<span id="cb27-557"><a href="#cb27-557" aria-label="519"></a><span class="pp">|</span> Data Engineering Podcast <span class="pp">|</span> no single published URL — find it on <span class="co">[</span><span class="ot">dataengineeringpodcast.com</span><span class="co">](https://www.dataengineeringpodcast.com/)</span> using the technique below <span class="pp">|</span></span>
+<span id="cb27-558"><a href="#cb27-558" aria-label="520"></a><span class="pp">|</span> The PolicyViz Podcast <span class="pp">|</span> no single published URL — find it on <span class="co">[</span><span class="ot">policyviz.com/podcast</span><span class="co">](https://policyviz.com/podcast/)</span> using the technique below <span class="pp">|</span></span>
+<span id="cb27-559"><a href="#cb27-559" aria-label="521"></a></span>
+<span id="cb27-560"><a href="#cb27-560" aria-label="522"></a>**Finding a feed this list doesn't cover.** Most sites don't advertise their feed on the homepage:</span>
+<span id="cb27-561"><a href="#cb27-561" aria-label="523"></a></span>
+<span id="cb27-562"><a href="#cb27-562" aria-label="524"></a><span class="ss">- </span>Try appending <span class="in">`/rss`</span>, <span class="in">`/feed`</span>, or <span class="in">`/rss.xml`</span> to the site's root URL — the most common convention.</span>
+<span id="cb27-563"><a href="#cb27-563" aria-label="525"></a><span class="ss">- </span>View the page source, not the rendered page (right-click the page and choose **View Page Source**, or press Ctrl + U; ⌘ + ⌥ + U on a Mac), and search it for <span class="in">`application/rss+xml`</span>. The <span class="in">`&lt;link&gt;`</span> tag with that <span class="in">`type`</span> names the feed's address in its <span class="in">`href`</span>, even when nothing on the page itself links to the feed (@fig-view-source-rss-link).</span>
+<span id="cb27-564"><a href="#cb27-564" aria-label="526"></a><span class="ss">- </span>For a podcast specifically, check its listing on a podcast directory (Apple Podcasts, Podchaser, Listen Notes) — most display or link to the canonical feed even when the show's own site doesn't.</span>
+<span id="cb27-565"><a href="#cb27-565" aria-label="527"></a><span class="ss">- </span>Look for a small RSS icon or a "Subscribe" link, often in a page footer or sidebar.</span>
 <span id="cb27-566"><a href="#cb27-566" aria-label="528"></a></span>
-<span id="cb27-567"><a href="#cb27-567" aria-label="529"></a><span class="ss">- </span>Try appending <span class="in">`/rss`</span>, <span class="in">`/feed`</span>, or <span class="in">`/rss.xml`</span> to the site's root URL — the most common convention.</span>
-<span id="cb27-568"><a href="#cb27-568" aria-label="530"></a><span class="ss">- </span>View the page source, not the rendered page (right-click the page and choose **View Page Source**, or press Ctrl + U; ⌘ + ⌥ + U on a Mac), and search it for <span class="in">`application/rss+xml`</span>. The <span class="in">`&lt;link&gt;`</span> tag with that <span class="in">`type`</span> names the feed's address in its <span class="in">`href`</span>, even when nothing on the page itself links to the feed (@fig-view-source-rss-link).</span>
-<span id="cb27-569"><a href="#cb27-569" aria-label="531"></a><span class="ss">- </span>For a podcast specifically, check its listing on a podcast directory (Apple Podcasts, Podchaser, Listen Notes) — most display or link to the canonical feed even when the show's own site doesn't.</span>
-<span id="cb27-570"><a href="#cb27-570" aria-label="532"></a><span class="ss">- </span>Look for a small RSS icon or a "Subscribe" link, often in a page footer or sidebar.</span>
-<span id="cb27-571"><a href="#cb27-571" aria-label="533"></a></span>
-<span id="cb27-572"><a href="#cb27-572" aria-label="534"></a><span class="al">![PBS NewsHour's home page in View Source, searched with Chrome's find bar (Ctrl + F, or ⌘ + F on a Mac) for `application/rss+xml`, September 2026. The one match is on line 33, in a `&lt;link rel="alternate"&gt;` whose `href` ① is the feed's address. The address bar shows the `view-source:` prefix; typed before any address, it opens that page's source.](images/ch-04/view-source-rss-link_annotated.png)</span>{#fig-view-source-rss-link .lightbox fig-alt="Screenshot of Chrome's toolbar over a View Source page. The address bar reads view-source<span class="sc">:https:</span>//www.pbs.org/newshour/, and the find bar holds application/rss+xml, match 1 of 1. Under the end of a script, line 32 is a canonical link, and line 33 is a link with rel alternate, href https://www.pbs.org/newshour/feeds/rss/headlines, and type application/rss+xml, highlighted. Marker 1 is beside the href."}</span>
-<span id="cb27-573"><a href="#cb27-573" aria-label="535"></a>:::</span>
-<span id="cb27-574"><a href="#cb27-574" aria-label="536"></a></span>
-<span id="cb27-577"><a href="#cb27-577" aria-label="537"></a><span class="in">```{python}</span></span>
-<span id="cb27-578"><a href="#cb27-578" aria-label="538"></a><span class="co"># Step 1: Define HEADERS and choose an RSS feed URL you have checked against the site's robots.txt.</span></span>
-<span id="cb27-579"><a href="#cb27-579" aria-label="539"></a><span class="co"># Your code here</span></span>
-<span id="cb27-580"><a href="#cb27-580" aria-label="540"></a><span class="in">```</span></span>
-<span id="cb27-581"><a href="#cb27-581" aria-label="541"></a></span>
-<span id="cb27-582"><a href="#cb27-582" aria-label="542"></a>**Step 2 — Fetch and inspect the XML.** Retrieve the feed with <span class="in">`requests`</span>. Print the status code and the first 500 characters. Identify the repeating element by eye — for RSS it is <span class="in">`&lt;item&gt;`</span>. Chrome draws a feed served as XML as a tree you can fold (@fig-rss-feed-xml), and a feed served as <span class="in">`application/rss+xml`</span>, such as PBS NewsHour's, as plain text.</span>
-<span id="cb27-583"><a href="#cb27-583" aria-label="543"></a></span>
-<span id="cb27-584"><a href="#cb27-584" aria-label="544"></a><span class="al">![BBC News's science and environment feed in Chrome, October 2026. `&lt;rss&gt;` ① holds one `&lt;channel&gt;` ②: the feed's title, description, and link, then one `&lt;item&gt;` ③ per story, each with a title, description, link, `guid`, date, and thumbnail; the second `&lt;item&gt;` ③ begins at the bottom. Each `CDATA` wrapper marks text the parser takes as it is, and BeautifulSoup's `.text` returns what is inside. The channel's `&lt;image&gt;` and `&lt;copyright&gt;` are folded, and Chrome doesn't wrap CDATA, so the first description runs past the edge.](images/ch-04/rss-feed-xml_annotated.png)</span>{#fig-rss-feed-xml .lightbox fig-alt="Screenshot of Chrome's tree view of the feed. Marker 1: the rss root tag and its namespaces. Marker 2: channel, with title BBC News, description BBC News - Science &amp; Environment, a link, and folded image and copyright. Marker 3: the first item, titled Mission set to blast off for Mars to grab a piece of its moon, with description, link, guid, pubDate of 19 October 2026, and thumbnail. Marker 3 again: the second item."}</span>
-<span id="cb27-585"><a href="#cb27-585" aria-label="545"></a></span>
-<span id="cb27-588"><a href="#cb27-588" aria-label="546"></a><span class="in">```{python}</span></span>
-<span id="cb27-589"><a href="#cb27-589" aria-label="547"></a><span class="co"># Step 2: Fetch the feed and inspect the first 500 characters of raw XML.</span></span>
-<span id="cb27-590"><a href="#cb27-590" aria-label="548"></a><span class="co"># Your code here</span></span>
-<span id="cb27-591"><a href="#cb27-591" aria-label="549"></a><span class="in">```</span></span>
-<span id="cb27-592"><a href="#cb27-592" aria-label="550"></a></span>
-<span id="cb27-593"><a href="#cb27-593" aria-label="551"></a>**Step 3 — Parse the tree.** Parse the response with BeautifulSoup's <span class="in">`"xml"`</span> parser, use <span class="in">`find_all()`</span> to collect the items, and print how many the feed contains.</span>
-<span id="cb27-594"><a href="#cb27-594" aria-label="552"></a></span>
-<span id="cb27-597"><a href="#cb27-597" aria-label="553"></a><span class="in">```{python}</span></span>
-<span id="cb27-598"><a href="#cb27-598" aria-label="554"></a><span class="co"># Step 3: Parse with the "xml" parser, find_all the repeating items, and count them.</span></span>
-<span id="cb27-599"><a href="#cb27-599" aria-label="555"></a><span class="co"># Your code here</span></span>
-<span id="cb27-600"><a href="#cb27-600" aria-label="556"></a><span class="in">```</span></span>
-<span id="cb27-601"><a href="#cb27-601" aria-label="557"></a></span>
-<span id="cb27-602"><a href="#cb27-602" aria-label="558"></a>**Step 4 — Extract to a DataFrame.** Loop over the items, building a list of dictionaries with each item's title, link, and publication date — the list-of-dictionaries pattern from this chapter — then convert to a DataFrame.</span>
-<span id="cb27-603"><a href="#cb27-603" aria-label="559"></a></span>
-<span id="cb27-606"><a href="#cb27-606" aria-label="560"></a><span class="in">```{python}</span></span>
-<span id="cb27-607"><a href="#cb27-607" aria-label="561"></a><span class="co"># Step 4: Build a list of dicts (title, link, pubDate) and convert it to a DataFrame.</span></span>
-<span id="cb27-608"><a href="#cb27-608" aria-label="562"></a><span class="co"># Your code here</span></span>
-<span id="cb27-609"><a href="#cb27-609" aria-label="563"></a><span class="in">```</span></span>
-<span id="cb27-610"><a href="#cb27-610" aria-label="564"></a></span>
-<span id="cb27-611"><a href="#cb27-611" aria-label="565"></a>**Step 5 — Fetch nested JSON.** Retrieve the Boulder forecast from <span class="in">`https://api.open-meteo.com/v1/forecast?latitude=40.01&amp;longitude=-105.27&amp;daily=temperature_2m_max&amp;timezone=America/Denver`</span> and parse it with <span class="in">`.json()`</span>. Print the top-level keys, then the keys under <span class="in">`"daily"`</span> — map the nesting before you extract anything.</span>
-<span id="cb27-612"><a href="#cb27-612" aria-label="566"></a></span>
-<span id="cb27-615"><a href="#cb27-615" aria-label="567"></a><span class="in">```{python}</span></span>
-<span id="cb27-616"><a href="#cb27-616" aria-label="568"></a><span class="co"># Step 5: Fetch the Open-Meteo forecast, parse the JSON, and print the top-level keys and the keys nested under "daily".</span></span>
-<span id="cb27-617"><a href="#cb27-617" aria-label="569"></a><span class="co"># Your code here</span></span>
-<span id="cb27-618"><a href="#cb27-618" aria-label="570"></a><span class="in">```</span></span>
-<span id="cb27-619"><a href="#cb27-619" aria-label="571"></a></span>
-<span id="cb27-620"><a href="#cb27-620" aria-label="572"></a>**Step 6 — Extract the parallel lists.** The <span class="in">`"daily"`</span> object holds parallel lists of dates and temperatures. Build a DataFrame from them and plot maximum temperature over the forecast days.</span>
-<span id="cb27-621"><a href="#cb27-621" aria-label="573"></a></span>
-<span id="cb27-624"><a href="#cb27-624" aria-label="574"></a><span class="in">```{python}</span></span>
-<span id="cb27-625"><a href="#cb27-625" aria-label="575"></a><span class="co"># Step 6: Build a DataFrame of dates and max temperatures, then plot it.</span></span>
-<span id="cb27-626"><a href="#cb27-626" aria-label="576"></a><span class="co"># Your code here</span></span>
-<span id="cb27-627"><a href="#cb27-627" aria-label="577"></a><span class="in">```</span></span>
-<span id="cb27-628"><a href="#cb27-628" aria-label="578"></a></span>
-<span id="cb27-629"><a href="#cb27-629" aria-label="579"></a>**Step 7 — Interpret.** In three to five sentences: The RSS feed nested repeating *elements*; the forecast nested parallel *lists*. Which was easier to get into a DataFrame, and why? What did you have to know about each structure before you could write the extraction code?</span>
-<span id="cb27-630"><a href="#cb27-630" aria-label="580"></a></span>
-<span id="cb27-633"><a href="#cb27-633" aria-label="581"></a><span class="in">```{python}</span></span>
-<span id="cb27-634"><a href="#cb27-634" aria-label="582"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span>
-<span id="cb27-635"><a href="#cb27-635" aria-label="583"></a><span class="in">```</span></span>
-<span id="cb27-636"><a href="#cb27-636" aria-label="584"></a></span>
-<span id="cb27-637"><a href="#cb27-637" aria-label="585"></a><span class="fu">## Additional Exercises</span></span>
-<span id="cb27-638"><a href="#cb27-638" aria-label="586"></a></span>
-<span id="cb27-639"><a href="#cb27-639" aria-label="587"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
-<span id="cb27-640"><a href="#cb27-640" aria-label="588"></a></span>
-<span id="cb27-641"><a href="#cb27-641" aria-label="589"></a><span class="ss">1. </span>**XML vs. JSON comparison.** Find a data source that provides the same information in both XML and JSON formats (e.g., a government API or data service). Retrieve both versions and compare: how does the structure differ? Which is easier to parse in Python? Which contains more metadata?</span>
-<span id="cb27-642"><a href="#cb27-642" aria-label="590"></a></span>
-<span id="cb27-643"><a href="#cb27-643" aria-label="591"></a><span class="ss">2. </span>**Reusable extraction function.** Write a function <span class="in">`xml_to_dataframe(soup, tag_name, fields)`</span> that takes a BeautifulSoup object, the name of the repeating tag (e.g., <span class="in">`"member"`</span>), and a list of child tag names to extract (e.g., <span class="in">`["firstname", "lastname", "party"]`</span>). The function should return a DataFrame. Test it on the Congressional XML from this chapter, then try it on an RSS feed (where the repeating tag is <span class="in">`"item"`</span> and the fields might be <span class="in">`["title", "link", "pubDate"]`</span>).</span>
-<span id="cb27-644"><a href="#cb27-644" aria-label="592"></a></span>
-<span id="cb27-645"><a href="#cb27-645" aria-label="593"></a><span class="ss">3. </span>**Weather data analysis.** Retrieve a 7-day forecast from the Open-Meteo API for Boulder, CO using the URL pattern from this chapter. Navigate the nested JSON response, build a DataFrame with dates and both high and low temperatures, and create a plot showing both temperature series. Add a horizontal line at 0°C and annotate any days where the low drops below freezing.</span>
-<span id="cb27-646"><a href="#cb27-646" aria-label="594"></a></span>
-<span id="cb27-647"><a href="#cb27-647" aria-label="595"></a><span class="ss">4. </span>**Graduate extension (INFO 5617).** Select a public XML or JSON dataset in the wild — a data.gov feed, an SEC EDGAR filing, a city open-data API, or something from your own research area. Write a datasheet-style critique of it in the spirit of @gebru2021datasheets: what does the schema and its documentation tell you (or fail to tell you) about how the data was collected, what its fields mean, and what uses it was designed for? Evaluate concrete design choices — attributes versus child tags, nesting depth, naming conventions, the presence or absence of a published schema — and how each helps or hinders a researcher trying to reuse the data. Conclude with two specific recommendations the publisher could adopt to improve interoperability and documentation.</span>
-<span id="cb27-648"><a href="#cb27-648" aria-label="596"></a></span>
-<span id="cb27-649"><a href="#cb27-649" aria-label="597"></a><span class="fu">## Social History and Public Interest</span></span>
-<span id="cb27-650"><a href="#cb27-650" aria-label="598"></a></span>
-<span id="cb27-651"><a href="#cb27-651" aria-label="599"></a>XML emerged in the late 1990s from the standardization efforts of the <span class="co">[</span><span class="ot">World Wide Web Consortium (W3C)</span><span class="co">](https://www.w3.org/)</span>, designed to be a universal format for document and data exchange. Its verbosity made it rigorous but heavy. JSON was created by Douglas Crockford in the early 2000s as a lightweight alternative that leveraged JavaScript's native object syntax. Its simplicity and the rise of AJAX-powered web applications made it the default format for APIs by the 2010s.</span>
-<span id="cb27-652"><a href="#cb27-652" aria-label="600"></a></span>
-<span id="cb27-653"><a href="#cb27-653" aria-label="601"></a>The politics of data formats may seem esoteric, but format choices have real consequences for access and transparency. When a government publishes budget data as XML, it is machine-readable by design. When it publishes the same data as a scanned PDF, it is technically "public" but practically inaccessible — a form of the soft enclosure discussed in @sec-post-api. Open government data initiatives like data.gov have pushed for machine-readable formats precisely because format determines who can actually use the data.</span>
-<span id="cb27-654"><a href="#cb27-654" aria-label="602"></a></span>
-<span id="cb27-655"><a href="#cb27-655" aria-label="603"></a>RSS (Really Simple Syndication) deserves special mention as an early experiment in open data distribution. Built on XML, RSS feeds allowed anyone to subscribe to updates from blogs, news sites, and podcasts without visiting each site individually. In the mid-2000s, RSS was the backbone of the blogosphere and an early tool for computational journalism — researchers could subscribe to thousands of news feeds and analyze coverage patterns at scale. But RSS declined as social media platforms offered their own proprietary feed algorithms. Facebook, Twitter, and later platforms replaced the open, user-controlled subscription model with opaque algorithmic curation. The decline of RSS was one of the earliest examples of the enclosure pattern that @sec-post-api describes: an open protocol replaced by a proprietary system that centralized control over information distribution.</span>
-<span id="cb27-656"><a href="#cb27-656" aria-label="604"></a></span>
-<span id="cb27-657"><a href="#cb27-657" aria-label="605"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb27-658"><a href="#cb27-658" aria-label="606"></a></span>
-<span id="cb27-659"><a href="#cb27-659" aria-label="607"></a><span class="ss">- </span>**Parser selection**: Use <span class="in">`"xml"`</span> for XML documents and <span class="in">`"html.parser"`</span> or <span class="in">`"lxml"`</span> for HTML. Using the wrong parser produces unexpected results.</span>
-<span id="cb27-660"><a href="#cb27-660" aria-label="608"></a><span class="ss">- </span>**`json.JSONDecodeError`**: The string is not valid JSON. Common causes include trailing commas, single quotes (JSON requires double quotes), or the response containing HTML error pages instead of JSON.</span>
-<span id="cb27-661"><a href="#cb27-661" aria-label="609"></a><span class="ss">- </span>**`KeyError` in dictionaries**: The key does not exist. Use <span class="in">`.get("key", default_value)`</span> for safe access.</span>
-<span id="cb27-662"><a href="#cb27-662" aria-label="610"></a><span class="ss">- </span>**Garbled accented letters, such as `SÃ¡nchez` for `Sánchez`**: <span class="in">`requests`</span> decoded the body with the wrong character set, usually because the server's <span class="in">`Content-Type`</span> header names none; <span class="in">`requests`</span> then falls back to ISO-8859-1. Pass <span class="in">`response.content`</span> to BeautifulSoup so the parser reads the encoding the document declares, or set <span class="in">`response.encoding = "utf-8"`</span> before reading <span class="in">`response.text`</span>.</span>
-<span id="cb27-663"><a href="#cb27-663" aria-label="611"></a><span class="ss">- </span>**Confusion between `json.loads()` and `json.load()`**: `loads` parses a **s**tring; `load` parses a **f**ile object.</span>
-<span id="cb27-664"><a href="#cb27-664" aria-label="612"></a></span>
-<span id="cb27-665"><a href="#cb27-665" aria-label="613"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb27-666"><a href="#cb27-666" aria-label="614"></a></span>
-<span id="cb27-667"><a href="#cb27-667" aria-label="615"></a>XML and JSON are the two structural languages of web data. XML organizes data as a tree of nested tags; BeautifulSoup makes that tree navigable through <span class="in">`.find()`</span>, <span class="in">`.find_all()`</span>, and <span class="in">`.text`</span>. JSON organizes data as nested lists and dictionaries; Python's native data structures map directly onto it. The skill of converting nested structures into flat DataFrames — the list-of-dictionaries-to-DataFrame pipeline — is the bridge between raw web data and analysis, and you will use it in nearly every subsequent chapter.</span>
-<span id="cb27-668"><a href="#cb27-668" aria-label="616"></a></span>
-<span id="cb27-669"><a href="#cb27-669" aria-label="617"></a><span class="fu">## Further Reading</span></span>
-<span id="cb27-670"><a href="#cb27-670" aria-label="618"></a></span>
-<span id="cb27-671"><a href="#cb27-671" aria-label="619"></a><span class="ss">- </span>BeautifulSoup documentation: <span class="ot">&lt;https://www.crummy.com/software/BeautifulSoup/bs4/doc/&gt;</span></span>
-<span id="cb27-672"><a href="#cb27-672" aria-label="620"></a><span class="ss">- </span>Python <span class="in">`json`</span> module: <span class="ot">&lt;https://docs.python.org/3/library/json.html&gt;</span></span>
-<span id="cb27-673"><a href="#cb27-673" aria-label="621"></a><span class="ss">- </span>W3C XML specification: <span class="ot">&lt;https://www.w3.org/XML/&gt;</span></span>
-<span id="cb27-674"><a href="#cb27-674" aria-label="622"></a><span class="ss">- </span>JSON specification: <span class="ot">&lt;https://www.json.org/&gt;</span></span>
-<span id="cb27-675"><a href="#cb27-675" aria-label="623"></a><span class="ss">- </span>awesome-rsshub-routes, a health-checked directory of official and RSSHub-generated feeds: <span class="ot">&lt;https://github.com/JackyST0/awesome-rsshub-routes&gt;</span></span>
-<span id="cb27-676"><a href="#cb27-676" aria-label="624"></a><span class="ss">- </span>awesome-rss-feeds, a curated list of RSS feeds and OPML files: <span class="ot">&lt;https://github.com/plenaryapp/awesome-rss-feeds&gt;</span></span>
-<span id="cb27-677"><a href="#cb27-677" aria-label="625"></a><span class="ss">- </span>RSS.com's roundup of popular podcast RSS feeds: <span class="ot">&lt;https://rss.com/blog/popular-rss-feeds/#the-most-popular-podcast-rss-feeds&gt;</span></span>
-<span id="cb27-678"><a href="#cb27-678" aria-label="626"></a><span class="ss">  - </span>Examples of JSON versus XML: <span class="ot">&lt;https://www.json.org/example.html&gt;</span></span>
-<span id="cb27-679"><a href="#cb27-679" aria-label="627"></a><span class="ss">- </span>@mitchell2018web — Chapter 1: Your First Web Scraper</span>
+<span id="cb27-567"><a href="#cb27-567" aria-label="529"></a><span class="al">![PBS NewsHour's home page in View Source, searched with Chrome's find bar (Ctrl + F, or ⌘ + F on a Mac) for `application/rss+xml`, September 2026. The one match is on line 33, in a `&lt;link rel="alternate"&gt;` whose `href` ① is the feed's address. The address bar shows the `view-source:` prefix; typed before any address, it opens that page's source.](images/ch-04/view-source-rss-link_annotated.png)</span>{#fig-view-source-rss-link .lightbox fig-alt="Screenshot of Chrome's toolbar over a View Source page. The address bar reads view-source<span class="sc">:https:</span>//www.pbs.org/newshour/, and the find bar holds application/rss+xml, match 1 of 1. Under the end of a script, line 32 is a canonical link, and line 33 is a link with rel alternate, href https://www.pbs.org/newshour/feeds/rss/headlines, and type application/rss+xml, highlighted. Marker 1 is beside the href."}</span>
+<span id="cb27-568"><a href="#cb27-568" aria-label="530"></a>:::</span>
+<span id="cb27-569"><a href="#cb27-569" aria-label="531"></a></span>
+<span id="cb27-572"><a href="#cb27-572" aria-label="532"></a><span class="in">```{python}</span></span>
+<span id="cb27-573"><a href="#cb27-573" aria-label="533"></a><span class="co"># Step 1: Define HEADERS and choose an RSS feed URL you have checked against the site's robots.txt.</span></span>
+<span id="cb27-574"><a href="#cb27-574" aria-label="534"></a><span class="co"># Your code here</span></span>
+<span id="cb27-575"><a href="#cb27-575" aria-label="535"></a><span class="in">```</span></span>
+<span id="cb27-576"><a href="#cb27-576" aria-label="536"></a></span>
+<span id="cb27-577"><a href="#cb27-577" aria-label="537"></a>**Step 2 — Fetch and inspect the XML.** Retrieve the feed with <span class="in">`requests`</span>. Print the status code and the first 500 characters. Identify the repeating element by eye — for RSS it is <span class="in">`&lt;item&gt;`</span>. Chrome draws a feed served as XML as a tree you can fold (@fig-rss-feed-xml), and a feed served as <span class="in">`application/rss+xml`</span>, such as PBS NewsHour's, as plain text.</span>
+<span id="cb27-578"><a href="#cb27-578" aria-label="538"></a></span>
+<span id="cb27-579"><a href="#cb27-579" aria-label="539"></a><span class="al">![BBC News's science and environment feed in Chrome, October 2026. `&lt;rss&gt;` ① holds one `&lt;channel&gt;` ②: the feed's title, description, and link, then one `&lt;item&gt;` ③ per story, each with a title, description, link, `guid`, date, and thumbnail; the second `&lt;item&gt;` ③ begins at the bottom. Each `CDATA` wrapper marks text the parser takes as it is, and BeautifulSoup's `.text` returns what is inside. The channel's `&lt;image&gt;` and `&lt;copyright&gt;` are folded, and Chrome doesn't wrap CDATA, so the first description runs past the edge.](images/ch-04/rss-feed-xml_annotated.png)</span>{#fig-rss-feed-xml .lightbox fig-alt="Screenshot of Chrome's tree view of the feed. Marker 1: the rss root tag and its namespaces. Marker 2: channel, with title BBC News, description BBC News - Science &amp; Environment, a link, and folded image and copyright. Marker 3: the first item, titled Mission set to blast off for Mars to grab a piece of its moon, with description, link, guid, pubDate of 19 October 2026, and thumbnail. Marker 3 again: the second item."}</span>
+<span id="cb27-580"><a href="#cb27-580" aria-label="540"></a></span>
+<span id="cb27-583"><a href="#cb27-583" aria-label="541"></a><span class="in">```{python}</span></span>
+<span id="cb27-584"><a href="#cb27-584" aria-label="542"></a><span class="co"># Step 2: Fetch the feed and inspect the first 500 characters of raw XML.</span></span>
+<span id="cb27-585"><a href="#cb27-585" aria-label="543"></a><span class="co"># Your code here</span></span>
+<span id="cb27-586"><a href="#cb27-586" aria-label="544"></a><span class="in">```</span></span>
+<span id="cb27-587"><a href="#cb27-587" aria-label="545"></a></span>
+<span id="cb27-588"><a href="#cb27-588" aria-label="546"></a>**Step 3 — Parse the tree.** Parse the response with BeautifulSoup's <span class="in">`"xml"`</span> parser, use <span class="in">`find_all()`</span> to collect the items, and print how many the feed contains.</span>
+<span id="cb27-589"><a href="#cb27-589" aria-label="547"></a></span>
+<span id="cb27-592"><a href="#cb27-592" aria-label="548"></a><span class="in">```{python}</span></span>
+<span id="cb27-593"><a href="#cb27-593" aria-label="549"></a><span class="co"># Step 3: Parse with the "xml" parser, find_all the repeating items, and count them.</span></span>
+<span id="cb27-594"><a href="#cb27-594" aria-label="550"></a><span class="co"># Your code here</span></span>
+<span id="cb27-595"><a href="#cb27-595" aria-label="551"></a><span class="in">```</span></span>
+<span id="cb27-596"><a href="#cb27-596" aria-label="552"></a></span>
+<span id="cb27-597"><a href="#cb27-597" aria-label="553"></a>**Step 4 — Extract to a DataFrame.** Loop over the items, building a list of dictionaries with each item's title, link, and publication date — the list-of-dictionaries pattern from this chapter — then convert to a DataFrame.</span>
+<span id="cb27-598"><a href="#cb27-598" aria-label="554"></a></span>
+<span id="cb27-601"><a href="#cb27-601" aria-label="555"></a><span class="in">```{python}</span></span>
+<span id="cb27-602"><a href="#cb27-602" aria-label="556"></a><span class="co"># Step 4: Build a list of dicts (title, link, pubDate) and convert it to a DataFrame.</span></span>
+<span id="cb27-603"><a href="#cb27-603" aria-label="557"></a><span class="co"># Your code here</span></span>
+<span id="cb27-604"><a href="#cb27-604" aria-label="558"></a><span class="in">```</span></span>
+<span id="cb27-605"><a href="#cb27-605" aria-label="559"></a></span>
+<span id="cb27-606"><a href="#cb27-606" aria-label="560"></a>**Step 5 — Fetch nested JSON.** Retrieve the Boulder forecast from <span class="in">`https://api.open-meteo.com/v1/forecast?latitude=40.01&amp;longitude=-105.27&amp;daily=temperature_2m_max&amp;timezone=America/Denver`</span> and parse it with <span class="in">`.json()`</span>. Print the top-level keys, then the keys under <span class="in">`"daily"`</span> — map the nesting before you extract anything.</span>
+<span id="cb27-607"><a href="#cb27-607" aria-label="561"></a></span>
+<span id="cb27-610"><a href="#cb27-610" aria-label="562"></a><span class="in">```{python}</span></span>
+<span id="cb27-611"><a href="#cb27-611" aria-label="563"></a><span class="co"># Step 5: Fetch the Open-Meteo forecast, parse the JSON, and print the top-level keys and the keys nested under "daily".</span></span>
+<span id="cb27-612"><a href="#cb27-612" aria-label="564"></a><span class="co"># Your code here</span></span>
+<span id="cb27-613"><a href="#cb27-613" aria-label="565"></a><span class="in">```</span></span>
+<span id="cb27-614"><a href="#cb27-614" aria-label="566"></a></span>
+<span id="cb27-615"><a href="#cb27-615" aria-label="567"></a>**Step 6 — Extract the parallel lists.** The <span class="in">`"daily"`</span> object holds parallel lists of dates and temperatures. Build a DataFrame from them and plot maximum temperature over the forecast days.</span>
+<span id="cb27-616"><a href="#cb27-616" aria-label="568"></a></span>
+<span id="cb27-619"><a href="#cb27-619" aria-label="569"></a><span class="in">```{python}</span></span>
+<span id="cb27-620"><a href="#cb27-620" aria-label="570"></a><span class="co"># Step 6: Build a DataFrame of dates and max temperatures, then plot it.</span></span>
+<span id="cb27-621"><a href="#cb27-621" aria-label="571"></a><span class="co"># Your code here</span></span>
+<span id="cb27-622"><a href="#cb27-622" aria-label="572"></a><span class="in">```</span></span>
+<span id="cb27-623"><a href="#cb27-623" aria-label="573"></a></span>
+<span id="cb27-624"><a href="#cb27-624" aria-label="574"></a>**Step 7 — Interpret.** In three to five sentences: The RSS feed nested repeating *elements*; the forecast nested parallel *lists*. Which was easier to get into a DataFrame, and why? What did you have to know about each structure before you could write the extraction code?</span>
+<span id="cb27-625"><a href="#cb27-625" aria-label="575"></a></span>
+<span id="cb27-628"><a href="#cb27-628" aria-label="576"></a><span class="in">```{python}</span></span>
+<span id="cb27-629"><a href="#cb27-629" aria-label="577"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span>
+<span id="cb27-630"><a href="#cb27-630" aria-label="578"></a><span class="in">```</span></span>
+<span id="cb27-631"><a href="#cb27-631" aria-label="579"></a></span>
+<span id="cb27-632"><a href="#cb27-632" aria-label="580"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb27-633"><a href="#cb27-633" aria-label="581"></a></span>
+<span id="cb27-634"><a href="#cb27-634" aria-label="582"></a>These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.</span>
+<span id="cb27-635"><a href="#cb27-635" aria-label="583"></a></span>
+<span id="cb27-636"><a href="#cb27-636" aria-label="584"></a><span class="ss">1. </span>**XML vs. JSON comparison.** Find a data source that provides the same information in both XML and JSON formats (e.g., a government API or data service). Retrieve both versions and compare: how does the structure differ? Which is easier to parse in Python? Which contains more metadata?</span>
+<span id="cb27-637"><a href="#cb27-637" aria-label="585"></a></span>
+<span id="cb27-638"><a href="#cb27-638" aria-label="586"></a><span class="ss">2. </span>**Reusable extraction function.** Write a function <span class="in">`xml_to_dataframe(soup, tag_name, fields)`</span> that takes a BeautifulSoup object, the name of the repeating tag (e.g., <span class="in">`"member"`</span>), and a list of child tag names to extract (e.g., <span class="in">`["firstname", "lastname", "party"]`</span>). The function should return a DataFrame. Test it on the Congressional XML from this chapter, then try it on an RSS feed (where the repeating tag is <span class="in">`"item"`</span> and the fields might be <span class="in">`["title", "link", "pubDate"]`</span>).</span>
+<span id="cb27-639"><a href="#cb27-639" aria-label="587"></a></span>
+<span id="cb27-640"><a href="#cb27-640" aria-label="588"></a><span class="ss">3. </span>**Weather data analysis.** Retrieve a 7-day forecast from the Open-Meteo API for Boulder, CO using the URL pattern from this chapter. Navigate the nested JSON response, build a DataFrame with dates and both high and low temperatures, and create a plot showing both temperature series. Add a horizontal line at 0°C and annotate any days where the low drops below freezing.</span>
+<span id="cb27-641"><a href="#cb27-641" aria-label="589"></a></span>
+<span id="cb27-642"><a href="#cb27-642" aria-label="590"></a><span class="ss">4. </span>**Graduate extension (INFO 5617).** Select a public XML or JSON dataset in the wild — a data.gov feed, an SEC EDGAR filing, a city open-data API, or something from your own research area. Write a datasheet-style critique of it in the spirit of @gebru2021datasheets: what does the schema and its documentation tell you (or fail to tell you) about how the data was collected, what its fields mean, and what uses it was designed for? Evaluate concrete design choices — attributes versus child tags, nesting depth, naming conventions, the presence or absence of a published schema — and how each helps or hinders a researcher trying to reuse the data. Conclude with two specific recommendations the publisher could adopt to improve interoperability and documentation.</span>
+<span id="cb27-643"><a href="#cb27-643" aria-label="591"></a></span>
+<span id="cb27-644"><a href="#cb27-644" aria-label="592"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb27-645"><a href="#cb27-645" aria-label="593"></a></span>
+<span id="cb27-646"><a href="#cb27-646" aria-label="594"></a>XML emerged in the late 1990s from the standardization efforts of the <span class="co">[</span><span class="ot">World Wide Web Consortium (W3C)</span><span class="co">](https://www.w3.org/)</span>, designed to be a universal format for document and data exchange; the W3C published XML 1.0 as a Recommendation in February 1998 (<span class="co">[</span><span class="ot">Bray, Paoli, and Sperberg-McQueen, 1998</span><span class="co">](https://www.w3.org/TR/1998/REC-xml-19980210)</span>). Its verbosity made it rigorous but heavy. Douglas Crockford specified JSON at <span class="co">[</span><span class="ot">json.org</span><span class="co">](https://www.json.org/json-en.html)</span> as a lightweight alternative built on a subset of JavaScript's object syntax, and in July 2006 he described it for the Internet Engineering Task Force in <span class="co">[</span><span class="ot">RFC 4627</span><span class="co">](https://www.rfc-editor.org/rfc/rfc4627)</span>. Its simplicity and the rise of AJAX-powered web applications made it the default format for APIs by the 2010s, although the 2005 essay that named Ajax spelled out its X as XML (<span class="co">[</span><span class="ot">Garrett, 2005</span><span class="co">](https://designftw.mit.edu/lectures/apis/ajax_adaptive_path.pdf)</span>). JSON is now an Internet Standard, <span class="co">[</span><span class="ot">RFC 8259</span><span class="co">](https://www.rfc-editor.org/rfc/rfc8259)</span> (December 2017), and an Ecma standard, <span class="co">[</span><span class="ot">ECMA-404</span><span class="co">](https://ecma-international.org/publications-and-standards/standards/ecma-404/)</span>, whose second edition appeared the same month. The editor of RFC 8259, Tim Bray, was also one of the three editors of XML 1.0.</span>
+<span id="cb27-647"><a href="#cb27-647" aria-label="595"></a></span>
+<span id="cb27-648"><a href="#cb27-648" aria-label="596"></a>The politics of data formats may seem esoteric, but the choice of format is itself a transparency decision. When governments and institutions publish data in machine-readable XML or JSON, they embody **openness**, making information practically accessible to anyone with basic programming skills. When they publish the same data as a scanned PDF or a proprietary spreadsheet, it is technically "public" but practically inaccessible, a form of the soft enclosure discussed in @sec-post-api, and it puts up barriers to the kind of **oversight** that democratic accountability requires. Open government data initiatives have pushed for machine-readable formats precisely because format determines who can actually use the data. In the United States, <span class="co">[</span><span class="ot">Data.gov</span><span class="co">](https://data.gov/about/)</span> launched in 2009, the year the Open Government Directive told federal agencies to publish information online "in open formats" (<span class="co">[</span><span class="ot">Office of Management and Budget, 2009</span><span class="co">](https://obamawhitehouse.archives.gov/open/documents/open-government-directive)</span>). <span class="co">[</span><span class="ot">Executive Order 13642</span><span class="co">](https://www.govinfo.gov/content/pkg/FR-2013-05-14/pdf/2013-11533.pdf)</span>, in May 2013, made "open and machine readable" the new default for government information, and the OPEN Government Data Act, Title II of the Foundations for Evidence-Based Policymaking Act of 2018, signed in January 2019, wrote the requirement into law (<span class="co">[</span><span class="ot">Public Law 115-435</span><span class="co">](https://www.govinfo.gov/content/pkg/PLAW-115publ435/html/PLAW-115publ435.htm)</span>). Advocating for open data formats is one of the most concrete things a data scientist can do to serve the public interest.</span>
+<span id="cb27-649"><a href="#cb27-649" aria-label="597"></a></span>
+<span id="cb27-650"><a href="#cb27-650" aria-label="598"></a>RSS deserves special mention as an early experiment in open data distribution. Netscape published the first version, RSS 0.90, in March 1999, and RSS 2.0, whose name the specification expands as Really Simple Syndication, followed in 2002 (<span class="co">[</span><span class="ot">RSS Advisory Board</span><span class="co">](https://www.rssboard.org/rss-history)</span>; <span class="co">[</span><span class="ot">RSS 2.0 specification</span><span class="co">](https://www.rssboard.org/rss-specification)</span>). Atom, a rival XML feed format, became an IETF standard in December 2005 (<span class="co">[</span><span class="ot">RFC 4287</span><span class="co">](https://www.rfc-editor.org/rfc/rfc4287)</span>). Built on XML, RSS feeds allowed anyone to subscribe to updates from blogs, news sites, and podcasts without visiting each site individually. In the mid-2000s, RSS was the backbone of the blogosphere and an early tool for computational journalism and research: Media Cloud, an open platform for studying news coverage, has gathered stories since 2008 largely through news sites' RSS feeds <span class="co">[</span><span class="ot">@roberts2021media</span><span class="co">]</span>. But RSS declined as social media platforms offered their own proprietary feed algorithms. Facebook, Twitter, and later platforms replaced the open, user-controlled subscription model with opaque algorithmic curation. Google retired its feed reader, Google Reader, on July 1, 2013, saying that its usage had declined (<span class="co">[</span><span class="ot">Google, 2013</span><span class="co">](https://blog.google/company-news/inside-google/company-announcements/a-second-spring-of-cleaning/)</span>), and Media Cloud's builders report that fewer sites now offer feeds at all <span class="co">[</span><span class="ot">@roberts2021media</span><span class="co">]</span>. The decline of RSS was one of the earliest examples of the enclosure pattern that @sec-post-api describes: an open protocol replaced by a proprietary system that centralized control over information distribution. Podcasts kept the open model longest; Apple Podcasts, for one, still takes shows from RSS feeds and publishes the <span class="co">[</span><span class="ot">requirements</span><span class="co">](https://podcasters.apple.com/support/823-podcast-requirements)</span> a feed must meet.</span>
+<span id="cb27-651"><a href="#cb27-651" aria-label="599"></a></span>
+<span id="cb27-652"><a href="#cb27-652" aria-label="600"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb27-653"><a href="#cb27-653" aria-label="601"></a></span>
+<span id="cb27-654"><a href="#cb27-654" aria-label="602"></a><span class="ss">- </span>**Parser selection**: Use <span class="in">`"xml"`</span> for XML documents and <span class="in">`"html.parser"`</span> or <span class="in">`"lxml"`</span> for HTML. Using the wrong parser produces unexpected results.</span>
+<span id="cb27-655"><a href="#cb27-655" aria-label="603"></a><span class="ss">- </span>**`json.JSONDecodeError`**: The string is not valid JSON. Common causes include trailing commas, single quotes (JSON requires double quotes), or the response containing HTML error pages instead of JSON.</span>
+<span id="cb27-656"><a href="#cb27-656" aria-label="604"></a><span class="ss">- </span>**`KeyError` in dictionaries**: The key does not exist. Use <span class="in">`.get("key", default_value)`</span> for safe access.</span>
+<span id="cb27-657"><a href="#cb27-657" aria-label="605"></a><span class="ss">- </span>**Garbled accented letters, such as `SÃ¡nchez` for `Sánchez`**: <span class="in">`requests`</span> decoded the body with the wrong character set, usually because the server's <span class="in">`Content-Type`</span> header names none; <span class="in">`requests`</span> then falls back to ISO-8859-1. Pass <span class="in">`response.content`</span> to BeautifulSoup so the parser reads the encoding the document declares, or set <span class="in">`response.encoding = "utf-8"`</span> before reading <span class="in">`response.text`</span>.</span>
+<span id="cb27-658"><a href="#cb27-658" aria-label="606"></a><span class="ss">- </span>**Confusion between `json.loads()` and `json.load()`**: `loads` parses a **s**tring; `load` parses a **f**ile object.</span>
+<span id="cb27-659"><a href="#cb27-659" aria-label="607"></a></span>
+<span id="cb27-660"><a href="#cb27-660" aria-label="608"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb27-661"><a href="#cb27-661" aria-label="609"></a></span>
+<span id="cb27-662"><a href="#cb27-662" aria-label="610"></a>XML and JSON are the two structural languages of web data. XML organizes data as a tree of nested tags; BeautifulSoup makes that tree navigable through <span class="in">`.find()`</span>, <span class="in">`.find_all()`</span>, and <span class="in">`.text`</span>. JSON organizes data as nested lists and dictionaries; Python's native data structures map directly onto it. The skill of converting nested structures into flat DataFrames — the list-of-dictionaries-to-DataFrame pipeline — is the bridge between raw web data and analysis, and you will use it in nearly every subsequent chapter.</span>
+<span id="cb27-663"><a href="#cb27-663" aria-label="611"></a></span>
+<span id="cb27-664"><a href="#cb27-664" aria-label="612"></a><span class="fu">## Further Reading</span></span>
+<span id="cb27-665"><a href="#cb27-665" aria-label="613"></a></span>
+<span id="cb27-666"><a href="#cb27-666" aria-label="614"></a><span class="ss">- </span>BeautifulSoup documentation: <span class="ot">&lt;https://www.crummy.com/software/BeautifulSoup/bs4/doc/&gt;</span></span>
+<span id="cb27-667"><a href="#cb27-667" aria-label="615"></a><span class="ss">- </span>Python <span class="in">`json`</span> module: <span class="ot">&lt;https://docs.python.org/3/library/json.html&gt;</span></span>
+<span id="cb27-668"><a href="#cb27-668" aria-label="616"></a><span class="ss">- </span>W3C XML specification: <span class="ot">&lt;https://www.w3.org/XML/&gt;</span></span>
+<span id="cb27-669"><a href="#cb27-669" aria-label="617"></a><span class="ss">- </span>JSON specification: <span class="ot">&lt;https://www.json.org/&gt;</span></span>
+<span id="cb27-670"><a href="#cb27-670" aria-label="618"></a><span class="ss">- </span>awesome-rsshub-routes, a health-checked directory of official and RSSHub-generated feeds: <span class="ot">&lt;https://github.com/JackyST0/awesome-rsshub-routes&gt;</span></span>
+<span id="cb27-671"><a href="#cb27-671" aria-label="619"></a><span class="ss">- </span>awesome-rss-feeds, a curated list of RSS feeds and OPML files: <span class="ot">&lt;https://github.com/plenaryapp/awesome-rss-feeds&gt;</span></span>
+<span id="cb27-672"><a href="#cb27-672" aria-label="620"></a><span class="ss">- </span>RSS.com's roundup of popular podcast RSS feeds: <span class="ot">&lt;https://rss.com/blog/popular-rss-feeds/#the-most-popular-podcast-rss-feeds&gt;</span></span>
+<span id="cb27-673"><a href="#cb27-673" aria-label="621"></a><span class="ss">  - </span>Examples of JSON versus XML: <span class="ot">&lt;https://www.json.org/example.html&gt;</span></span>
+<span id="cb27-674"><a href="#cb27-674" aria-label="622"></a><span class="ss">- </span>@mitchell2018web — Chapter 1: Your First Web Scraper</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

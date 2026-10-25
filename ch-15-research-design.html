@@ -561,7 +561,7 @@ div.csl-indent {
 <section id="data-quality-and-validation" class="level2" data-number="15.6">
 <h2 data-number="15.6" class="anchored" data-anchor-id="data-quality-and-validation"><span class="header-section-number">15.6</span> Data Quality and Validation</h2>
 <p>Web data is messy. Scrapers fail silently, APIs return incomplete results, and the same information can appear in different formats across sources. Build validation into your pipeline:</p>
-<div id="511a1ad3" class="cell" data-execution_count="1">
+<div id="3c6c48b3" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="kw">def</span> validate_dataset(df, expected_columns, min_rows<span class="op">=</span><span class="dv">10</span>):</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a>    <span class="co">"""Basic validation checks for a scraped dataset.</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co">    </span></span>
@@ -679,7 +679,7 @@ div.csl-indent {
 <section id="visualization-as-argument" class="level3" data-number="15.9.1">
 <h3 data-number="15.9.1" class="anchored" data-anchor-id="visualization-as-argument"><span class="header-section-number">15.9.1</span> Visualization as Argument</h3>
 <p>Consider the difference between a default plot and one designed to communicate a finding. A default <code>plt.plot()</code> call with no labels, no title, and no context forces the reader to guess what they are looking at. A well-designed figure makes its argument legible at a glance: the title states a claim, the annotations connect data patterns to real-world causes, and the axis labels include units so the reader can evaluate the evidence independently.</p>
-<div id="6252b291" class="cell" data-execution_count="2">
+<div id="fb662b7e" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a><span class="im">import</span> matplotlib.dates <span class="im">as</span> mdates</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -720,34 +720,21 @@ div.csl-indent {
 <span id="cb3-38"><a href="#cb3-38" aria-label="38"></a><span class="co"># plt.show()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Notice that the title does not say “Wikipedia Pageviews for Affordable Care Act Over Time” — that merely describes the axes. Instead, it states a finding: public attention spikes around legislative and health crises. The annotations connect specific peaks to specific events, transforming a line chart into an argument about the relationship between political events and public information-seeking behavior. The clean axis formatting and removal of chart junk (top and right spines) keep the reader’s attention on the data rather than on visual noise. When you build a figure, ask yourself: if a reader saw only this image and its title, would they understand the claim you are making?</p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Public Interest Connection
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Research design is where the values of <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> stop being abstractions and become decisions. <strong>Openness</strong> is a design choice: a pipeline built for reproducibility — pinned environments, documented collection parameters, archived raw data — stays verifiable even as the platforms beneath it erode. <strong>Oversight</strong> is a question choice: studies designed around accountability questions serve publics, not just literatures. <strong>Ownership</strong> is an infrastructure choice: collecting into datasets and tools that others can reuse means your project outlives your paper.</p>
-</div>
-</div>
 </section>
 </section>
 <section id="social-history-and-public-interest" class="level2" data-number="15.10">
 <h2 data-number="15.10" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">15.10</span> Social History and Public Interest</h2>
-<p>Every data source in this book carries a social history — someone fought to make it public, keep it public, or archive it before it vanished. As you design your own research, return to the values introduced in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>:</p>
+<p>Every data source in this book carries a social history — someone fought to make it public, keep it public, or archive it before it vanished. Research design is where the values introduced in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> stop being abstractions and become decisions. As you design your own research, return to them:</p>
 <ul>
-<li><strong>Openness</strong>: Will you publish your code, data (to the extent ethically permissible), and methods so others can evaluate and build on your work?</li>
-<li><strong>Oversight</strong>: Does your research contribute to independent accountability — helping citizens, journalists, or policymakers understand systems that affect them?</li>
-<li><strong>Ownership</strong>: Are you building infrastructure (datasets, tools, pipelines) that others can use, or are you extracting value from public resources without contributing back?</li>
+<li><strong>Openness</strong> is a design choice. Will you publish your code, data (to the extent ethically permissible), and methods so others can evaluate and build on your work? A pipeline built for reproducibility, with pinned environments, documented collection parameters, and archived raw data, stays verifiable even as the platforms beneath it erode <span class="citation" data-cites="peng2011reproducible wilson2017good">(<a href="#ref-peng2011reproducible" role="doc-biblioref">Peng 2011</a>; <a href="#ref-wilson2017good" role="doc-biblioref">Wilson et al. 2017</a>)</span>.</li>
+<li><strong>Oversight</strong> is a question choice. Does your research contribute to independent accountability, helping citizens, journalists, or policymakers understand systems that affect them? Studies designed around accountability questions serve publics, not just literatures.</li>
+<li><strong>Ownership</strong> is an infrastructure choice. Are you building infrastructure (datasets, tools, pipelines) that others can use, or are you extracting value from public resources without contributing back? Datasets and tools that others can find, understand, and reuse <span class="citation" data-cites="wilkinson2016fair gebru2021datasheets">(<a href="#ref-wilkinson2016fair" role="doc-biblioref"><span class="nocase">Wilkinson et al.</span> 2016</a>; <a href="#ref-gebru2021datasheets" role="doc-biblioref">Gebru et al. 2021</a>)</span> mean that your project outlives your paper.</li>
 </ul>
 <p>These questions do not have formulaic answers. But asking them is itself a practice of responsible web data science.</p>
 <section id="data-journalism-as-a-model" class="level3" data-number="15.10.1">
 <h3 data-number="15.10.1" class="anchored" data-anchor-id="data-journalism-as-a-model"><span class="header-section-number">15.10.1</span> Data Journalism as a Model</h3>
-<p>Some of the most compelling examples of web data science in practice come not from academia but from data journalism. Consider ProPublica’s “Dollars for Docs” investigation: it began with a straightforward question — which doctors receive payments from pharmaceutical companies? — and pursued it by scraping publicly available but practically inaccessible disclosure databases maintained by drug manufacturers. The team cleaned, standardized, and linked records across companies, then published a searchable database that allowed local journalists across the country to investigate payment patterns in their own communities. The project moved from question to data collection to analysis to public accountability, following the same arc that a strong research proposal describes.</p>
-<p>Academic researchers can learn several things from this model. Data journalists are accountable to an audience that will scrutinize their methods and challenge their conclusions. This pressure produces methodological transparency: the best data journalism outlets publish their code, describe their scraping and cleaning procedures, and explain the limitations of their data. They also structure their findings as narratives rather than tables of regression coefficients, making complex analyses accessible to non-specialist readers without sacrificing rigor. The journalistic commitment to showing your work — publishing the underlying data, linking to source documents, and explaining analytical choices — aligns directly with the reproducibility standards discussed earlier in this chapter.</p>
+<p>Some of the most compelling examples of web data science in practice come not from academia but from data journalism. Consider ProPublica’s “Dollars for Docs” investigation: it began in 2010 with a straightforward question — which doctors receive payments from pharmaceutical companies? — and pursued it by scraping publicly available but practically inaccessible disclosure databases maintained by drug manufacturers. Several companies had been ordered to disclose whom they paid to speak and consult, and the project’s developer found their websites made “their records cumbersome to all but the most cursory of examinations” (<a href="https://www.propublica.org/nerds/the-coders-cause-in-dollars-for-docs">Nguyen, 2010</a>). The team cleaned, standardized, and linked records across companies, then published a searchable database, and its reporters showed other newsrooms how to use it to investigate payment patterns in their own communities (<a href="https://www.propublica.org/podcast/reporters-discuss-how-to-use-dollars-for-docs-data">ProPublica, 2010</a>). The project moved from question to data collection to analysis to public accountability, following the same arc that a strong research proposal describes. The same year, the Affordable Care Act made such reporting a federal requirement for drug and medical device makers (<a href="https://www.law.cornell.edu/uscode/text/42/1320a-7h">42 U.S.C. § 1320a-7h</a>), and the payments now appear in the federal <a href="https://www.cms.gov/priorities/key-initiatives/open-payments">Open Payments</a> database. ProPublica’s own database, which covered payments from August 2013 to December 2018, was last updated in October 2019 and now sends readers to Open Payments for newer data (<a href="https://projects.propublica.org/docdollars/">ProPublica</a>).</p>
+<p>Academic researchers can learn several things from this model. Data journalists are accountable to an audience that will scrutinize their methods and challenge their conclusions. This pressure produces methodological transparency: the best data journalism outlets publish their code, describe their scraping and cleaning procedures, and explain the limitations of their data. The Markup, for example, calls this its “Show Your Work” philosophy and publishes the datasets and code behind its reporting whenever it can (<a href="https://themarkup.org/about">The Markup, “About”</a>). They also structure their findings as narratives rather than tables of regression coefficients, making complex analyses accessible to non-specialist readers without sacrificing rigor. The journalistic commitment to showing your work — publishing the underlying data, linking to source documents, and explaining analytical choices — aligns directly with the reproducibility standards discussed earlier in this chapter.</p>
 <p>The practitioners who do this work well — computational social scientists, civic technologists, data journalists — share a common profile: they combine data fluency with deep domain expertise. They understand not just how to scrape a website or query an API but why the data matters, who it affects, and what questions it can and cannot answer. This integration of technical and substantive knowledge is precisely what this book aims to develop. The tools you have learned are necessary but not sufficient; pairing them with domain knowledge, ethical reflection, and a commitment to public accountability is what transforms data collection into genuine contribution.</p>
 </section>
 </section>
@@ -756,31 +743,31 @@ div.csl-indent {
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook and submit the completed notebook. This chapter’s exercise is written rather than coded: each cell below asks for a few sentences, not a program. Write your answers as comments or convert the cells to Markdown — either is fine. The steps follow the proposal arc from this chapter, and each should take a paragraph at most.</p>
 <p>By the end you will have a one-page skeleton of a research design — the seed of the Final Project proposal, and of the full proposal in the Additional Exercises.</p>
 <p><strong>Step 1 — The question.</strong> State one research question that web data could answer. Apply this chapter’s criteria: it should be specific enough to be answerable, and it should name the <em>construct</em> you actually care about (attention, opinion, participation, price), not just a dataset you find interesting.</p>
-<div id="a055afc6" class="cell" data-execution_count="3">
+<div id="2286f67f" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Step 1: State your research question, and name the construct it is really about. Write as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — The data source and access method.</strong> Name the data source that would answer it and the specific technique from this book you would use — an API (<a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>, <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>, <a href="ch-12-social.html" class="quarto-xref"><span>Chapter 12</span></a>), scraping (<a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, <a href="ch-08-dynamic-pages.html" class="quarto-xref"><span>Chapter 8</span></a>), archives (<a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>), PDFs (<a href="ch-09-pdfs.html" class="quarto-xref"><span>Chapter 9</span></a>), or automated collection (<a href="ch-14-automation.html" class="quarto-xref"><span>Chapter 14</span></a>). Note what the source’s access rules (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>, <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>) permit.</p>
-<div id="f7772a65" class="cell" data-execution_count="4">
+<div id="32531ce5" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Step 2: Name the source, the chapter technique you would use, and what the access rules permit.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — The design.</strong> Which of the chapter’s four designs is this — longitudinal tracking, cross-sectional snapshot, content analysis, or a natural experiment? Say why that design fits your question, and what your unit of analysis is.</p>
-<div id="b91a7cb5" class="cell" data-execution_count="5">
+<div id="d84ea425" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="co"># Step 3: Name the design, justify it, and state the unit of analysis.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Sampling and representativeness.</strong> Who or what is in your data, and who is missing? Apply the chapter’s discussion: what population does your source actually represent, and how does that differ from the population your question is about?</p>
-<div id="c4091585" class="cell" data-execution_count="6">
+<div id="cab8e809" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># Step 4: Describe the sample, the population it represents, and the gap between that and the population your question targets.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Measurement validity.</strong> Make the construct-validity argument: why does the thing you can count (pageviews, posts, mentions, dollar amounts) measure the thing you care about? Name the strongest objection to that link, and one check that would strengthen it.</p>
-<div id="87e69efe" class="cell" data-execution_count="7">
+<div id="441811de" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co"># Step 5: Make the construct validity argument, name its weakest point, and propose one validation check.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Limitations and contingency.</strong> Name the two threats most likely to undermine the study — draw on the chapter’s validity discussion and the erosion scenarios of <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — and write a one-sentence contingency for each: if the source closes or changes mid-study, what is your fallback?</p>
-<div id="99a2f6b2" class="cell" data-execution_count="8">
+<div id="703fd3ef" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co"># Step 6: Two biggest threats, and a contingency plan for each.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Ethics and human subjects.</strong> Does this study involve people’s data? Apply the chapter’s IRB discussion and the framework from <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>: would it need review, what would you collect at minimum, and what would you refuse to collect?</p>
-<div id="bdb48ba5" class="cell" data-execution_count="9">
+<div id="e3fa748f" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co"># Step 7: The ethical determination -- IRB or not, and the collection boundaries you would set.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -841,11 +828,20 @@ Lazer, David M. J., Alex Pentland, Duncan J. Watts, et al. 2020. <span>“Comput
 <div id="ref-lazer2014parable" class="csl-entry" role="listitem">
 Lazer, David, Ryan Kennedy, Gary King, and Alessandro Vespignani. 2014. <span>“The Parable of <span>Google Flu</span>: Traps in Big Data Analysis.”</span> <em>Science</em> 343 (6176): 1203–5. <a href="https://doi.org/10.1126/science.1248506">https://doi.org/10.1126/science.1248506</a>.
 </div>
+<div id="ref-peng2011reproducible" class="csl-entry" role="listitem">
+Peng, Roger D. 2011. <span>“Reproducible Research in Computational Science.”</span> <em>Science</em> 334 (6060): 1226–27. <a href="https://doi.org/10.1126/science.1213847">https://doi.org/10.1126/science.1213847</a>.
+</div>
 <div id="ref-rogers2019doing" class="csl-entry" role="listitem">
 Rogers, Richard. 2019. <em>Doing Digital Methods</em>. SAGE Publications.
 </div>
 <div id="ref-salganik2018bit" class="csl-entry" role="listitem">
 Salganik, Matthew J. 2018. <em>Bit by Bit: Social Research in the Digital Age</em>. Princeton University Press. <a href="https://www.bitbybitbook.com/">https://www.bitbybitbook.com/</a>.
+</div>
+<div id="ref-wilkinson2016fair" class="csl-entry" role="listitem">
+<span class="nocase">Wilkinson, Mark D., Michel Dumontier, IJsbrand Jan Aalbersberg, et al.</span> 2016. <span>“The <span>FAIR</span> Guiding Principles for Scientific Data Management and Stewardship.”</span> <em>Scientific Data</em> 3: 160018. <a href="https://doi.org/10.1038/sdata.2016.18">https://doi.org/10.1038/sdata.2016.18</a>.
+</div>
+<div id="ref-wilson2017good" class="csl-entry" role="listitem">
+Wilson, Greg, Jennifer Bryan, Karen Cranston, Justin Kitzes, Lex Nederbragt, and Tracy K. Teal. 2017. <span>“Good Enough Practices in Scientific Computing.”</span> <em>PLOS Computational Biology</em> 13 (6): e1005510. <a href="https://doi.org/10.1371/journal.pcbi.1005510">https://doi.org/10.1371/journal.pcbi.1005510</a>.
 </div>
 </div>
 </section>
@@ -1592,115 +1588,110 @@ Salganik, Matthew J. 2018. <em>Bit by Bit: Social Research in the Digital Age</e
 <span id="cb11-280"><a href="#cb11-280" aria-label="276"></a></span>
 <span id="cb11-281"><a href="#cb11-281" aria-label="277"></a>Notice that the title does not say "Wikipedia Pageviews for Affordable Care Act Over Time" — that merely describes the axes. Instead, it states a finding: public attention spikes around legislative and health crises. The annotations connect specific peaks to specific events, transforming a line chart into an argument about the relationship between political events and public information-seeking behavior. The clean axis formatting and removal of chart junk (top and right spines) keep the reader's attention on the data rather than on visual noise. When you build a figure, ask yourself: if a reader saw only this image and its title, would they understand the claim you are making?</span>
 <span id="cb11-282"><a href="#cb11-282" aria-label="278"></a></span>
-<span id="cb11-283"><a href="#cb11-283" aria-label="279"></a>::: {.callout-note}</span>
-<span id="cb11-284"><a href="#cb11-284" aria-label="280"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb11-285"><a href="#cb11-285" aria-label="281"></a>Research design is where the values of @sec-post-api stop being abstractions and become decisions. **Openness** is a design choice: a pipeline built for reproducibility — pinned environments, documented collection parameters, archived raw data — stays verifiable even as the platforms beneath it erode. **Oversight** is a question choice: studies designed around accountability questions serve publics, not just literatures. **Ownership** is an infrastructure choice: collecting into datasets and tools that others can reuse means your project outlives your paper.</span>
-<span id="cb11-286"><a href="#cb11-286" aria-label="282"></a>:::</span>
-<span id="cb11-287"><a href="#cb11-287" aria-label="283"></a></span>
-<span id="cb11-288"><a href="#cb11-288" aria-label="284"></a><span class="fu">## Social History and Public Interest</span></span>
-<span id="cb11-289"><a href="#cb11-289" aria-label="285"></a></span>
-<span id="cb11-290"><a href="#cb11-290" aria-label="286"></a>Every data source in this book carries a social history — someone fought to make it public, keep it public, or archive it before it vanished. As you design your own research, return to the values introduced in @sec-post-api:</span>
-<span id="cb11-291"><a href="#cb11-291" aria-label="287"></a></span>
-<span id="cb11-292"><a href="#cb11-292" aria-label="288"></a><span class="ss">- </span>**Openness**: Will you publish your code, data (to the extent ethically permissible), and methods so others can evaluate and build on your work?</span>
-<span id="cb11-293"><a href="#cb11-293" aria-label="289"></a><span class="ss">- </span>**Oversight**: Does your research contribute to independent accountability — helping citizens, journalists, or policymakers understand systems that affect them?</span>
-<span id="cb11-294"><a href="#cb11-294" aria-label="290"></a><span class="ss">- </span>**Ownership**: Are you building infrastructure (datasets, tools, pipelines) that others can use, or are you extracting value from public resources without contributing back?</span>
-<span id="cb11-295"><a href="#cb11-295" aria-label="291"></a></span>
-<span id="cb11-296"><a href="#cb11-296" aria-label="292"></a>These questions do not have formulaic answers. But asking them is itself a practice of responsible web data science.</span>
-<span id="cb11-297"><a href="#cb11-297" aria-label="293"></a></span>
-<span id="cb11-298"><a href="#cb11-298" aria-label="294"></a><span class="fu">### Data Journalism as a Model</span></span>
-<span id="cb11-299"><a href="#cb11-299" aria-label="295"></a></span>
-<span id="cb11-300"><a href="#cb11-300" aria-label="296"></a>Some of the most compelling examples of web data science in practice come not from academia but from data journalism. Consider ProPublica's "Dollars for Docs" investigation: it began with a straightforward question — which doctors receive payments from pharmaceutical companies? — and pursued it by scraping publicly available but practically inaccessible disclosure databases maintained by drug manufacturers. The team cleaned, standardized, and linked records across companies, then published a searchable database that allowed local journalists across the country to investigate payment patterns in their own communities. The project moved from question to data collection to analysis to public accountability, following the same arc that a strong research proposal describes.</span>
-<span id="cb11-301"><a href="#cb11-301" aria-label="297"></a></span>
-<span id="cb11-302"><a href="#cb11-302" aria-label="298"></a>Academic researchers can learn several things from this model. Data journalists are accountable to an audience that will scrutinize their methods and challenge their conclusions. This pressure produces methodological transparency: the best data journalism outlets publish their code, describe their scraping and cleaning procedures, and explain the limitations of their data. They also structure their findings as narratives rather than tables of regression coefficients, making complex analyses accessible to non-specialist readers without sacrificing rigor. The journalistic commitment to showing your work — publishing the underlying data, linking to source documents, and explaining analytical choices — aligns directly with the reproducibility standards discussed earlier in this chapter.</span>
-<span id="cb11-303"><a href="#cb11-303" aria-label="299"></a></span>
-<span id="cb11-304"><a href="#cb11-304" aria-label="300"></a>The practitioners who do this work well — computational social scientists, civic technologists, data journalists — share a common profile: they combine data fluency with deep domain expertise. They understand not just how to scrape a website or query an API but why the data matters, who it affects, and what questions it can and cannot answer. This integration of technical and substantive knowledge is precisely what this book aims to develop. The tools you have learned are necessary but not sufficient; pairing them with domain knowledge, ethical reflection, and a commitment to public accountability is what transforms data collection into genuine contribution.</span>
-<span id="cb11-305"><a href="#cb11-305" aria-label="301"></a></span>
-<span id="cb11-306"><a href="#cb11-306" aria-label="302"></a><span class="fu">## Recommended Exercises</span></span>
-<span id="cb11-307"><a href="#cb11-307" aria-label="303"></a></span>
-<span id="cb11-308"><a href="#cb11-308" aria-label="304"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook and submit the completed notebook. This chapter's exercise is written rather than coded: each cell below asks for a few sentences, not a program. Write your answers as comments or convert the cells to Markdown — either is fine. The steps follow the proposal arc from this chapter, and each should take a paragraph at most.</span>
-<span id="cb11-309"><a href="#cb11-309" aria-label="305"></a></span>
-<span id="cb11-310"><a href="#cb11-310" aria-label="306"></a>By the end you will have a one-page skeleton of a research design — the seed of the Final Project proposal, and of the full proposal in the Additional Exercises.</span>
-<span id="cb11-311"><a href="#cb11-311" aria-label="307"></a></span>
-<span id="cb11-312"><a href="#cb11-312" aria-label="308"></a>**Step 1 — The question.** State one research question that web data could answer. Apply this chapter's criteria: it should be specific enough to be answerable, and it should name the *construct* you actually care about (attention, opinion, participation, price), not just a dataset you find interesting.</span>
-<span id="cb11-313"><a href="#cb11-313" aria-label="309"></a></span>
-<span id="cb11-316"><a href="#cb11-316" aria-label="310"></a><span class="in">```{python}</span></span>
-<span id="cb11-317"><a href="#cb11-317" aria-label="311"></a><span class="co"># Step 1: State your research question, and name the construct it is really about. Write as comments, or convert this cell to Markdown.</span></span>
-<span id="cb11-318"><a href="#cb11-318" aria-label="312"></a><span class="in">```</span></span>
-<span id="cb11-319"><a href="#cb11-319" aria-label="313"></a></span>
-<span id="cb11-320"><a href="#cb11-320" aria-label="314"></a>**Step 2 — The data source and access method.** Name the data source that would answer it and the specific technique from this book you would use — an API (@sec-wikipedia, @sec-government, @sec-social), scraping (@sec-static-pages, @sec-dynamic-pages), archives (@sec-archives), PDFs (@sec-pdfs), or automated collection (@sec-automation). Note what the source's access rules (@sec-ethics, @sec-post-api) permit.</span>
-<span id="cb11-321"><a href="#cb11-321" aria-label="315"></a></span>
-<span id="cb11-324"><a href="#cb11-324" aria-label="316"></a><span class="in">```{python}</span></span>
-<span id="cb11-325"><a href="#cb11-325" aria-label="317"></a><span class="co"># Step 2: Name the source, the chapter technique you would use, and what the access rules permit.</span></span>
-<span id="cb11-326"><a href="#cb11-326" aria-label="318"></a><span class="in">```</span></span>
-<span id="cb11-327"><a href="#cb11-327" aria-label="319"></a></span>
-<span id="cb11-328"><a href="#cb11-328" aria-label="320"></a>**Step 3 — The design.** Which of the chapter's four designs is this — longitudinal tracking, cross-sectional snapshot, content analysis, or a natural experiment? Say why that design fits your question, and what your unit of analysis is.</span>
-<span id="cb11-329"><a href="#cb11-329" aria-label="321"></a></span>
-<span id="cb11-332"><a href="#cb11-332" aria-label="322"></a><span class="in">```{python}</span></span>
-<span id="cb11-333"><a href="#cb11-333" aria-label="323"></a><span class="co"># Step 3: Name the design, justify it, and state the unit of analysis.</span></span>
-<span id="cb11-334"><a href="#cb11-334" aria-label="324"></a><span class="in">```</span></span>
-<span id="cb11-335"><a href="#cb11-335" aria-label="325"></a></span>
-<span id="cb11-336"><a href="#cb11-336" aria-label="326"></a>**Step 4 — Sampling and representativeness.** Who or what is in your data, and who is missing? Apply the chapter's discussion: what population does your source actually represent, and how does that differ from the population your question is about?</span>
-<span id="cb11-337"><a href="#cb11-337" aria-label="327"></a></span>
-<span id="cb11-340"><a href="#cb11-340" aria-label="328"></a><span class="in">```{python}</span></span>
-<span id="cb11-341"><a href="#cb11-341" aria-label="329"></a><span class="co"># Step 4: Describe the sample, the population it represents, and the gap between that and the population your question targets.</span></span>
-<span id="cb11-342"><a href="#cb11-342" aria-label="330"></a><span class="in">```</span></span>
-<span id="cb11-343"><a href="#cb11-343" aria-label="331"></a></span>
-<span id="cb11-344"><a href="#cb11-344" aria-label="332"></a>**Step 5 — Measurement validity.** Make the construct-validity argument: why does the thing you can count (pageviews, posts, mentions, dollar amounts) measure the thing you care about? Name the strongest objection to that link, and one check that would strengthen it.</span>
-<span id="cb11-345"><a href="#cb11-345" aria-label="333"></a></span>
-<span id="cb11-348"><a href="#cb11-348" aria-label="334"></a><span class="in">```{python}</span></span>
-<span id="cb11-349"><a href="#cb11-349" aria-label="335"></a><span class="co"># Step 5: Make the construct validity argument, name its weakest point, and propose one validation check.</span></span>
-<span id="cb11-350"><a href="#cb11-350" aria-label="336"></a><span class="in">```</span></span>
-<span id="cb11-351"><a href="#cb11-351" aria-label="337"></a></span>
-<span id="cb11-352"><a href="#cb11-352" aria-label="338"></a>**Step 6 — Limitations and contingency.** Name the two threats most likely to undermine the study — draw on the chapter's validity discussion and the erosion scenarios of @sec-post-api — and write a one-sentence contingency for each: if the source closes or changes mid-study, what is your fallback?</span>
-<span id="cb11-353"><a href="#cb11-353" aria-label="339"></a></span>
-<span id="cb11-356"><a href="#cb11-356" aria-label="340"></a><span class="in">```{python}</span></span>
-<span id="cb11-357"><a href="#cb11-357" aria-label="341"></a><span class="co"># Step 6: Two biggest threats, and a contingency plan for each.</span></span>
-<span id="cb11-358"><a href="#cb11-358" aria-label="342"></a><span class="in">```</span></span>
-<span id="cb11-359"><a href="#cb11-359" aria-label="343"></a></span>
-<span id="cb11-360"><a href="#cb11-360" aria-label="344"></a>**Step 7 — Ethics and human subjects.** Does this study involve people's data? Apply the chapter's IRB discussion and the framework from @sec-ethics: would it need review, what would you collect at minimum, and what would you refuse to collect?</span>
-<span id="cb11-361"><a href="#cb11-361" aria-label="345"></a></span>
-<span id="cb11-364"><a href="#cb11-364" aria-label="346"></a><span class="in">```{python}</span></span>
-<span id="cb11-365"><a href="#cb11-365" aria-label="347"></a><span class="co"># Step 7: The ethical determination -- IRB or not, and the collection boundaries you would set.</span></span>
-<span id="cb11-366"><a href="#cb11-366" aria-label="348"></a><span class="in">```</span></span>
-<span id="cb11-367"><a href="#cb11-367" aria-label="349"></a></span>
-<span id="cb11-368"><a href="#cb11-368" aria-label="350"></a><span class="fu">## Additional Exercises</span></span>
-<span id="cb11-369"><a href="#cb11-369" aria-label="351"></a></span>
-<span id="cb11-370"><a href="#cb11-370" aria-label="352"></a>These are open-ended extensions — no scaffold, no fixed path. The first expands your skeleton from above into a full proposal.</span>
-<span id="cb11-371"><a href="#cb11-371" aria-label="353"></a></span>
-<span id="cb11-372"><a href="#cb11-372" aria-label="354"></a><span class="ss">1. </span>**Research proposal.** Write a 1,500-word research proposal for a web data science project — expanding the skeleton you built in the Recommended Exercises. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.</span>
-<span id="cb11-373"><a href="#cb11-373" aria-label="355"></a></span>
-<span id="cb11-374"><a href="#cb11-374" aria-label="356"></a><span class="ss">2. </span>**Validity threats.** Identify three potential threats to validity in a hypothetical study that uses scraped social media data to measure public opinion. For each threat, propose a mitigation strategy.</span>
-<span id="cb11-375"><a href="#cb11-375" aria-label="357"></a></span>
-<span id="cb11-376"><a href="#cb11-376" aria-label="358"></a><span class="ss">3. </span>**Data documentation.** Take a dataset you collected in an earlier chapter and write a "datasheet" following @gebru2021datasheets: what does each variable measure, how was it collected, what are the known quality issues, and how should it be cited?</span>
-<span id="cb11-377"><a href="#cb11-377" aria-label="359"></a></span>
-<span id="cb11-378"><a href="#cb11-378" aria-label="360"></a><span class="ss">4. </span>**Data limitations assessment.** Choose a dataset you collected in an earlier chapter. Write a 500-word assessment of its limitations, covering: sampling bias (what is included and excluded?), measurement validity (does your variable actually measure what you claim?), temporal scope (what period does the data cover, and what might have changed?), and platform constraints (how does the platform's design shape the data you can collect?).</span>
-<span id="cb11-379"><a href="#cb11-379" aria-label="361"></a></span>
-<span id="cb11-380"><a href="#cb11-380" aria-label="362"></a><span class="ss">5. </span>**Multi-method design.** Design a research study that combines at least three techniques from this book (e.g., API data collection, web scraping, PDF extraction, text analysis, or automated collection). Write a one-page methods section that describes your data sources, collection procedures, analysis plan, and anticipated limitations. This should read like a methods section in an academic paper.</span>
-<span id="cb11-381"><a href="#cb11-381" aria-label="363"></a></span>
-<span id="cb11-382"><a href="#cb11-382" aria-label="364"></a><span class="ss">6. </span>**Graduate extension (INFO 5617).** Write a complete pre-registration-style research design of two to three pages for a study you could actually execute. Specify the research question, data sources, sampling frame, and measurement strategy, making an explicit construct validity argument for each measure <span class="co">[</span><span class="ot">@salganik2018bit</span><span class="co">]</span>. Then confront the threats: enumerate the validity risks (including algorithm dynamics <span class="co">[</span><span class="ot">@lazer2014parable</span><span class="co">]</span>), sketch the IRB determination you would request and why, and write a contingency plan for the platform-erosion scenarios of @sec-post-api. The discipline of specifying everything before collecting anything is the point — a design you cannot write down is a design you have not finished.</span>
-<span id="cb11-383"><a href="#cb11-383" aria-label="365"></a></span>
-<span id="cb11-384"><a href="#cb11-384" aria-label="366"></a><span class="fu">## Common Pitfalls</span></span>
-<span id="cb11-385"><a href="#cb11-385" aria-label="367"></a></span>
-<span id="cb11-386"><a href="#cb11-386" aria-label="368"></a>Research design failures are harder to debug than code failures — there is no traceback, just a dataset that cannot answer your question. Watch for these:</span>
-<span id="cb11-387"><a href="#cb11-387" aria-label="369"></a></span>
-<span id="cb11-388"><a href="#cb11-388" aria-label="370"></a><span class="ss">- </span>**Collecting before defining the unit of analysis.** Is a row of your dataset a post, a user, a day, or a community? Deciding after collection usually means collecting again.</span>
-<span id="cb11-389"><a href="#cb11-389" aria-label="371"></a><span class="ss">- </span>**Sampling on the dependent variable.** Studying only viral posts to learn what makes posts go viral tells you nothing without the posts that never took off.</span>
-<span id="cb11-390"><a href="#cb11-390" aria-label="372"></a><span class="ss">- </span>**Ignoring bot and spam contamination.** On many platforms, automated accounts generate a substantial share of raw activity; skipping this filter means measuring bots while making claims about people.</span>
-<span id="cb11-391"><a href="#cb11-391" aria-label="373"></a><span class="ss">- </span>**Survivorship bias in longitudinal scrapes.** The accounts, pages, and posts still visible at collection time are the survivors; deleted and suspended content is invisible precisely because something happened to it.</span>
-<span id="cb11-392"><a href="#cb11-392" aria-label="374"></a><span class="ss">- </span>**Changing instrumentation mid-collection.** Editing your scraper's selectors, query parameters, or sampling logic partway through a collection creates artificial discontinuities that look like real change — the algorithm dynamics problem, self-inflicted.</span>
-<span id="cb11-393"><a href="#cb11-393" aria-label="375"></a><span class="ss">- </span>**Validating only at analysis time.** If your first quality check happens months after collection began, so does your discovery that a site redesign in June silently emptied half your columns.</span>
-<span id="cb11-394"><a href="#cb11-394" aria-label="376"></a></span>
-<span id="cb11-395"><a href="#cb11-395" aria-label="377"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb11-396"><a href="#cb11-396" aria-label="378"></a></span>
-<span id="cb11-397"><a href="#cb11-397" aria-label="379"></a>Technical skill without research design produces data, not knowledge. Every project needs a clear question, a defensible data collection strategy, honest assessment of limitations, and responsible communication of findings. The web is the richest data source humanity has ever created; using it well is both a technical and an ethical challenge. The skills in this book — scraping, API access, PDF extraction, NLP, LLM analysis, automation — are means, not ends. The end is producing knowledge that serves openness, oversight, and ownership.</span>
-<span id="cb11-398"><a href="#cb11-398" aria-label="380"></a></span>
-<span id="cb11-399"><a href="#cb11-399" aria-label="381"></a><span class="fu">## Further Reading</span></span>
-<span id="cb11-400"><a href="#cb11-400" aria-label="382"></a></span>
-<span id="cb11-401"><a href="#cb11-401" aria-label="383"></a><span class="ss">- </span>@salganik2018bit — comprehensive treatment of digital-age research design</span>
-<span id="cb11-402"><a href="#cb11-402" aria-label="384"></a><span class="ss">- </span>@gebru2021datasheets — a framework for documenting datasets</span>
-<span id="cb11-403"><a href="#cb11-403" aria-label="385"></a><span class="ss">- </span>@lazer2020computational — obstacles and opportunities in computational social science</span>
-<span id="cb11-404"><a href="#cb11-404" aria-label="386"></a><span class="ss">- </span>@vanatteveldt2022computational — methods for computational analysis of communication</span>
-<span id="cb11-405"><a href="#cb11-405" aria-label="387"></a><span class="ss">- </span>@rogers2019doing — qualitative and critical approaches to digital methods</span>
+<span id="cb11-283"><a href="#cb11-283" aria-label="279"></a><span class="fu">## Social History and Public Interest</span></span>
+<span id="cb11-284"><a href="#cb11-284" aria-label="280"></a></span>
+<span id="cb11-285"><a href="#cb11-285" aria-label="281"></a>Every data source in this book carries a social history — someone fought to make it public, keep it public, or archive it before it vanished. Research design is where the values introduced in @sec-post-api stop being abstractions and become decisions. As you design your own research, return to them:</span>
+<span id="cb11-286"><a href="#cb11-286" aria-label="282"></a></span>
+<span id="cb11-287"><a href="#cb11-287" aria-label="283"></a><span class="ss">- </span>**Openness** is a design choice. Will you publish your code, data (to the extent ethically permissible), and methods so others can evaluate and build on your work? A pipeline built for reproducibility, with pinned environments, documented collection parameters, and archived raw data, stays verifiable even as the platforms beneath it erode <span class="co">[</span><span class="ot">@peng2011reproducible; @wilson2017good</span><span class="co">]</span>.</span>
+<span id="cb11-288"><a href="#cb11-288" aria-label="284"></a><span class="ss">- </span>**Oversight** is a question choice. Does your research contribute to independent accountability, helping citizens, journalists, or policymakers understand systems that affect them? Studies designed around accountability questions serve publics, not just literatures.</span>
+<span id="cb11-289"><a href="#cb11-289" aria-label="285"></a><span class="ss">- </span>**Ownership** is an infrastructure choice. Are you building infrastructure (datasets, tools, pipelines) that others can use, or are you extracting value from public resources without contributing back? Datasets and tools that others can find, understand, and reuse <span class="co">[</span><span class="ot">@wilkinson2016fair; @gebru2021datasheets</span><span class="co">]</span> mean that your project outlives your paper.</span>
+<span id="cb11-290"><a href="#cb11-290" aria-label="286"></a></span>
+<span id="cb11-291"><a href="#cb11-291" aria-label="287"></a>These questions do not have formulaic answers. But asking them is itself a practice of responsible web data science.</span>
+<span id="cb11-292"><a href="#cb11-292" aria-label="288"></a></span>
+<span id="cb11-293"><a href="#cb11-293" aria-label="289"></a><span class="fu">### Data Journalism as a Model</span></span>
+<span id="cb11-294"><a href="#cb11-294" aria-label="290"></a></span>
+<span id="cb11-295"><a href="#cb11-295" aria-label="291"></a>Some of the most compelling examples of web data science in practice come not from academia but from data journalism. Consider ProPublica's "Dollars for Docs" investigation: it began in 2010 with a straightforward question — which doctors receive payments from pharmaceutical companies? — and pursued it by scraping publicly available but practically inaccessible disclosure databases maintained by drug manufacturers. Several companies had been ordered to disclose whom they paid to speak and consult, and the project's developer found their websites made "their records cumbersome to all but the most cursory of examinations" (<span class="co">[</span><span class="ot">Nguyen, 2010</span><span class="co">](https://www.propublica.org/nerds/the-coders-cause-in-dollars-for-docs)</span>). The team cleaned, standardized, and linked records across companies, then published a searchable database, and its reporters showed other newsrooms how to use it to investigate payment patterns in their own communities (<span class="co">[</span><span class="ot">ProPublica, 2010</span><span class="co">](https://www.propublica.org/podcast/reporters-discuss-how-to-use-dollars-for-docs-data)</span>). The project moved from question to data collection to analysis to public accountability, following the same arc that a strong research proposal describes. The same year, the Affordable Care Act made such reporting a federal requirement for drug and medical device makers (<span class="co">[</span><span class="ot">42 U.S.C. § 1320a-7h</span><span class="co">](https://www.law.cornell.edu/uscode/text/42/1320a-7h)</span>), and the payments now appear in the federal <span class="co">[</span><span class="ot">Open Payments</span><span class="co">](https://www.cms.gov/priorities/key-initiatives/open-payments)</span> database. ProPublica's own database, which covered payments from August 2013 to December 2018, was last updated in October 2019 and now sends readers to Open Payments for newer data (<span class="co">[</span><span class="ot">ProPublica</span><span class="co">](https://projects.propublica.org/docdollars/)</span>).</span>
+<span id="cb11-296"><a href="#cb11-296" aria-label="292"></a></span>
+<span id="cb11-297"><a href="#cb11-297" aria-label="293"></a>Academic researchers can learn several things from this model. Data journalists are accountable to an audience that will scrutinize their methods and challenge their conclusions. This pressure produces methodological transparency: the best data journalism outlets publish their code, describe their scraping and cleaning procedures, and explain the limitations of their data. The Markup, for example, calls this its "Show Your Work" philosophy and publishes the datasets and code behind its reporting whenever it can (<span class="co">[</span><span class="ot">The Markup, "About"</span><span class="co">](https://themarkup.org/about)</span>). They also structure their findings as narratives rather than tables of regression coefficients, making complex analyses accessible to non-specialist readers without sacrificing rigor. The journalistic commitment to showing your work — publishing the underlying data, linking to source documents, and explaining analytical choices — aligns directly with the reproducibility standards discussed earlier in this chapter.</span>
+<span id="cb11-298"><a href="#cb11-298" aria-label="294"></a></span>
+<span id="cb11-299"><a href="#cb11-299" aria-label="295"></a>The practitioners who do this work well — computational social scientists, civic technologists, data journalists — share a common profile: they combine data fluency with deep domain expertise. They understand not just how to scrape a website or query an API but why the data matters, who it affects, and what questions it can and cannot answer. This integration of technical and substantive knowledge is precisely what this book aims to develop. The tools you have learned are necessary but not sufficient; pairing them with domain knowledge, ethical reflection, and a commitment to public accountability is what transforms data collection into genuine contribution.</span>
+<span id="cb11-300"><a href="#cb11-300" aria-label="296"></a></span>
+<span id="cb11-301"><a href="#cb11-301" aria-label="297"></a><span class="fu">## Recommended Exercises</span></span>
+<span id="cb11-302"><a href="#cb11-302" aria-label="298"></a></span>
+<span id="cb11-303"><a href="#cb11-303" aria-label="299"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook and submit the completed notebook. This chapter's exercise is written rather than coded: each cell below asks for a few sentences, not a program. Write your answers as comments or convert the cells to Markdown — either is fine. The steps follow the proposal arc from this chapter, and each should take a paragraph at most.</span>
+<span id="cb11-304"><a href="#cb11-304" aria-label="300"></a></span>
+<span id="cb11-305"><a href="#cb11-305" aria-label="301"></a>By the end you will have a one-page skeleton of a research design — the seed of the Final Project proposal, and of the full proposal in the Additional Exercises.</span>
+<span id="cb11-306"><a href="#cb11-306" aria-label="302"></a></span>
+<span id="cb11-307"><a href="#cb11-307" aria-label="303"></a>**Step 1 — The question.** State one research question that web data could answer. Apply this chapter's criteria: it should be specific enough to be answerable, and it should name the *construct* you actually care about (attention, opinion, participation, price), not just a dataset you find interesting.</span>
+<span id="cb11-308"><a href="#cb11-308" aria-label="304"></a></span>
+<span id="cb11-311"><a href="#cb11-311" aria-label="305"></a><span class="in">```{python}</span></span>
+<span id="cb11-312"><a href="#cb11-312" aria-label="306"></a><span class="co"># Step 1: State your research question, and name the construct it is really about. Write as comments, or convert this cell to Markdown.</span></span>
+<span id="cb11-313"><a href="#cb11-313" aria-label="307"></a><span class="in">```</span></span>
+<span id="cb11-314"><a href="#cb11-314" aria-label="308"></a></span>
+<span id="cb11-315"><a href="#cb11-315" aria-label="309"></a>**Step 2 — The data source and access method.** Name the data source that would answer it and the specific technique from this book you would use — an API (@sec-wikipedia, @sec-government, @sec-social), scraping (@sec-static-pages, @sec-dynamic-pages), archives (@sec-archives), PDFs (@sec-pdfs), or automated collection (@sec-automation). Note what the source's access rules (@sec-ethics, @sec-post-api) permit.</span>
+<span id="cb11-316"><a href="#cb11-316" aria-label="310"></a></span>
+<span id="cb11-319"><a href="#cb11-319" aria-label="311"></a><span class="in">```{python}</span></span>
+<span id="cb11-320"><a href="#cb11-320" aria-label="312"></a><span class="co"># Step 2: Name the source, the chapter technique you would use, and what the access rules permit.</span></span>
+<span id="cb11-321"><a href="#cb11-321" aria-label="313"></a><span class="in">```</span></span>
+<span id="cb11-322"><a href="#cb11-322" aria-label="314"></a></span>
+<span id="cb11-323"><a href="#cb11-323" aria-label="315"></a>**Step 3 — The design.** Which of the chapter's four designs is this — longitudinal tracking, cross-sectional snapshot, content analysis, or a natural experiment? Say why that design fits your question, and what your unit of analysis is.</span>
+<span id="cb11-324"><a href="#cb11-324" aria-label="316"></a></span>
+<span id="cb11-327"><a href="#cb11-327" aria-label="317"></a><span class="in">```{python}</span></span>
+<span id="cb11-328"><a href="#cb11-328" aria-label="318"></a><span class="co"># Step 3: Name the design, justify it, and state the unit of analysis.</span></span>
+<span id="cb11-329"><a href="#cb11-329" aria-label="319"></a><span class="in">```</span></span>
+<span id="cb11-330"><a href="#cb11-330" aria-label="320"></a></span>
+<span id="cb11-331"><a href="#cb11-331" aria-label="321"></a>**Step 4 — Sampling and representativeness.** Who or what is in your data, and who is missing? Apply the chapter's discussion: what population does your source actually represent, and how does that differ from the population your question is about?</span>
+<span id="cb11-332"><a href="#cb11-332" aria-label="322"></a></span>
+<span id="cb11-335"><a href="#cb11-335" aria-label="323"></a><span class="in">```{python}</span></span>
+<span id="cb11-336"><a href="#cb11-336" aria-label="324"></a><span class="co"># Step 4: Describe the sample, the population it represents, and the gap between that and the population your question targets.</span></span>
+<span id="cb11-337"><a href="#cb11-337" aria-label="325"></a><span class="in">```</span></span>
+<span id="cb11-338"><a href="#cb11-338" aria-label="326"></a></span>
+<span id="cb11-339"><a href="#cb11-339" aria-label="327"></a>**Step 5 — Measurement validity.** Make the construct-validity argument: why does the thing you can count (pageviews, posts, mentions, dollar amounts) measure the thing you care about? Name the strongest objection to that link, and one check that would strengthen it.</span>
+<span id="cb11-340"><a href="#cb11-340" aria-label="328"></a></span>
+<span id="cb11-343"><a href="#cb11-343" aria-label="329"></a><span class="in">```{python}</span></span>
+<span id="cb11-344"><a href="#cb11-344" aria-label="330"></a><span class="co"># Step 5: Make the construct validity argument, name its weakest point, and propose one validation check.</span></span>
+<span id="cb11-345"><a href="#cb11-345" aria-label="331"></a><span class="in">```</span></span>
+<span id="cb11-346"><a href="#cb11-346" aria-label="332"></a></span>
+<span id="cb11-347"><a href="#cb11-347" aria-label="333"></a>**Step 6 — Limitations and contingency.** Name the two threats most likely to undermine the study — draw on the chapter's validity discussion and the erosion scenarios of @sec-post-api — and write a one-sentence contingency for each: if the source closes or changes mid-study, what is your fallback?</span>
+<span id="cb11-348"><a href="#cb11-348" aria-label="334"></a></span>
+<span id="cb11-351"><a href="#cb11-351" aria-label="335"></a><span class="in">```{python}</span></span>
+<span id="cb11-352"><a href="#cb11-352" aria-label="336"></a><span class="co"># Step 6: Two biggest threats, and a contingency plan for each.</span></span>
+<span id="cb11-353"><a href="#cb11-353" aria-label="337"></a><span class="in">```</span></span>
+<span id="cb11-354"><a href="#cb11-354" aria-label="338"></a></span>
+<span id="cb11-355"><a href="#cb11-355" aria-label="339"></a>**Step 7 — Ethics and human subjects.** Does this study involve people's data? Apply the chapter's IRB discussion and the framework from @sec-ethics: would it need review, what would you collect at minimum, and what would you refuse to collect?</span>
+<span id="cb11-356"><a href="#cb11-356" aria-label="340"></a></span>
+<span id="cb11-359"><a href="#cb11-359" aria-label="341"></a><span class="in">```{python}</span></span>
+<span id="cb11-360"><a href="#cb11-360" aria-label="342"></a><span class="co"># Step 7: The ethical determination -- IRB or not, and the collection boundaries you would set.</span></span>
+<span id="cb11-361"><a href="#cb11-361" aria-label="343"></a><span class="in">```</span></span>
+<span id="cb11-362"><a href="#cb11-362" aria-label="344"></a></span>
+<span id="cb11-363"><a href="#cb11-363" aria-label="345"></a><span class="fu">## Additional Exercises</span></span>
+<span id="cb11-364"><a href="#cb11-364" aria-label="346"></a></span>
+<span id="cb11-365"><a href="#cb11-365" aria-label="347"></a>These are open-ended extensions — no scaffold, no fixed path. The first expands your skeleton from above into a full proposal.</span>
+<span id="cb11-366"><a href="#cb11-366" aria-label="348"></a></span>
+<span id="cb11-367"><a href="#cb11-367" aria-label="349"></a><span class="ss">1. </span>**Research proposal.** Write a 1,500-word research proposal for a web data science project — expanding the skeleton you built in the Recommended Exercises. Include all six components: motivation, data source, methods, expected results, implications, and limitations. Be specific about which tools from this book you would use and why.</span>
+<span id="cb11-368"><a href="#cb11-368" aria-label="350"></a></span>
+<span id="cb11-369"><a href="#cb11-369" aria-label="351"></a><span class="ss">2. </span>**Validity threats.** Identify three potential threats to validity in a hypothetical study that uses scraped social media data to measure public opinion. For each threat, propose a mitigation strategy.</span>
+<span id="cb11-370"><a href="#cb11-370" aria-label="352"></a></span>
+<span id="cb11-371"><a href="#cb11-371" aria-label="353"></a><span class="ss">3. </span>**Data documentation.** Take a dataset you collected in an earlier chapter and write a "datasheet" following @gebru2021datasheets: what does each variable measure, how was it collected, what are the known quality issues, and how should it be cited?</span>
+<span id="cb11-372"><a href="#cb11-372" aria-label="354"></a></span>
+<span id="cb11-373"><a href="#cb11-373" aria-label="355"></a><span class="ss">4. </span>**Data limitations assessment.** Choose a dataset you collected in an earlier chapter. Write a 500-word assessment of its limitations, covering: sampling bias (what is included and excluded?), measurement validity (does your variable actually measure what you claim?), temporal scope (what period does the data cover, and what might have changed?), and platform constraints (how does the platform's design shape the data you can collect?).</span>
+<span id="cb11-374"><a href="#cb11-374" aria-label="356"></a></span>
+<span id="cb11-375"><a href="#cb11-375" aria-label="357"></a><span class="ss">5. </span>**Multi-method design.** Design a research study that combines at least three techniques from this book (e.g., API data collection, web scraping, PDF extraction, text analysis, or automated collection). Write a one-page methods section that describes your data sources, collection procedures, analysis plan, and anticipated limitations. This should read like a methods section in an academic paper.</span>
+<span id="cb11-376"><a href="#cb11-376" aria-label="358"></a></span>
+<span id="cb11-377"><a href="#cb11-377" aria-label="359"></a><span class="ss">6. </span>**Graduate extension (INFO 5617).** Write a complete pre-registration-style research design of two to three pages for a study you could actually execute. Specify the research question, data sources, sampling frame, and measurement strategy, making an explicit construct validity argument for each measure <span class="co">[</span><span class="ot">@salganik2018bit</span><span class="co">]</span>. Then confront the threats: enumerate the validity risks (including algorithm dynamics <span class="co">[</span><span class="ot">@lazer2014parable</span><span class="co">]</span>), sketch the IRB determination you would request and why, and write a contingency plan for the platform-erosion scenarios of @sec-post-api. The discipline of specifying everything before collecting anything is the point — a design you cannot write down is a design you have not finished.</span>
+<span id="cb11-378"><a href="#cb11-378" aria-label="360"></a></span>
+<span id="cb11-379"><a href="#cb11-379" aria-label="361"></a><span class="fu">## Common Pitfalls</span></span>
+<span id="cb11-380"><a href="#cb11-380" aria-label="362"></a></span>
+<span id="cb11-381"><a href="#cb11-381" aria-label="363"></a>Research design failures are harder to debug than code failures — there is no traceback, just a dataset that cannot answer your question. Watch for these:</span>
+<span id="cb11-382"><a href="#cb11-382" aria-label="364"></a></span>
+<span id="cb11-383"><a href="#cb11-383" aria-label="365"></a><span class="ss">- </span>**Collecting before defining the unit of analysis.** Is a row of your dataset a post, a user, a day, or a community? Deciding after collection usually means collecting again.</span>
+<span id="cb11-384"><a href="#cb11-384" aria-label="366"></a><span class="ss">- </span>**Sampling on the dependent variable.** Studying only viral posts to learn what makes posts go viral tells you nothing without the posts that never took off.</span>
+<span id="cb11-385"><a href="#cb11-385" aria-label="367"></a><span class="ss">- </span>**Ignoring bot and spam contamination.** On many platforms, automated accounts generate a substantial share of raw activity; skipping this filter means measuring bots while making claims about people.</span>
+<span id="cb11-386"><a href="#cb11-386" aria-label="368"></a><span class="ss">- </span>**Survivorship bias in longitudinal scrapes.** The accounts, pages, and posts still visible at collection time are the survivors; deleted and suspended content is invisible precisely because something happened to it.</span>
+<span id="cb11-387"><a href="#cb11-387" aria-label="369"></a><span class="ss">- </span>**Changing instrumentation mid-collection.** Editing your scraper's selectors, query parameters, or sampling logic partway through a collection creates artificial discontinuities that look like real change — the algorithm dynamics problem, self-inflicted.</span>
+<span id="cb11-388"><a href="#cb11-388" aria-label="370"></a><span class="ss">- </span>**Validating only at analysis time.** If your first quality check happens months after collection began, so does your discovery that a site redesign in June silently emptied half your columns.</span>
+<span id="cb11-389"><a href="#cb11-389" aria-label="371"></a></span>
+<span id="cb11-390"><a href="#cb11-390" aria-label="372"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb11-391"><a href="#cb11-391" aria-label="373"></a></span>
+<span id="cb11-392"><a href="#cb11-392" aria-label="374"></a>Technical skill without research design produces data, not knowledge. Every project needs a clear question, a defensible data collection strategy, honest assessment of limitations, and responsible communication of findings. The web is the richest data source humanity has ever created; using it well is both a technical and an ethical challenge. The skills in this book — scraping, API access, PDF extraction, NLP, LLM analysis, automation — are means, not ends. The end is producing knowledge that serves openness, oversight, and ownership.</span>
+<span id="cb11-393"><a href="#cb11-393" aria-label="375"></a></span>
+<span id="cb11-394"><a href="#cb11-394" aria-label="376"></a><span class="fu">## Further Reading</span></span>
+<span id="cb11-395"><a href="#cb11-395" aria-label="377"></a></span>
+<span id="cb11-396"><a href="#cb11-396" aria-label="378"></a><span class="ss">- </span>@salganik2018bit — comprehensive treatment of digital-age research design</span>
+<span id="cb11-397"><a href="#cb11-397" aria-label="379"></a><span class="ss">- </span>@gebru2021datasheets — a framework for documenting datasets</span>
+<span id="cb11-398"><a href="#cb11-398" aria-label="380"></a><span class="ss">- </span>@lazer2020computational — obstacles and opportunities in computational social science</span>
+<span id="cb11-399"><a href="#cb11-399" aria-label="381"></a><span class="ss">- </span>@vanatteveldt2022computational — methods for computational analysis of communication</span>
+<span id="cb11-400"><a href="#cb11-400" aria-label="382"></a><span class="ss">- </span>@rogers2019doing — qualitative and critical approaches to digital methods</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

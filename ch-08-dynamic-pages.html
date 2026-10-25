@@ -492,7 +492,7 @@ div.csl-indent {
 <section id="check-1-view-source" class="level3" data-number="8.2.1">
 <h3 data-number="8.2.1" class="anchored" data-anchor-id="check-1-view-source"><span class="header-section-number">8.2.1</span> Check 1: View Source</h3>
 <p>Open <a href="https://quotes.toscrape.com/js/" class="uri">https://quotes.toscrape.com/js/</a>. Ten quotes appear on the screen, yet <code>requests</code> finds none of them:</p>
-<div id="3dbed5ae" class="cell" data-execution_count="1">
+<div id="d44ad13d" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
@@ -515,7 +515,7 @@ Figure&nbsp;8.1: View Source for <code>quotes.toscrape.com/js/</code>, from <cod
 </figure>
 </div>
 <p>Data inside a script is still data your <code>requests</code> response already contains. A regular expression can cut the array out, and because it is written in JSON syntax, <code>json.loads()</code> (<a href="ch-04-data-formats.html" class="quarto-xref"><span>Chapter 4</span></a>) can parse it:</p>
-<div id="965d5805" class="cell" data-execution_count="2">
+<div id="38260fe2" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">import</span> json</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="im">import</span> re</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
@@ -556,7 +556,7 @@ Figure&nbsp;8.3: The Network tab on <code>quotes.toscrape.com/scroll</code>, fil
 <p>What you have found is a <strong>hidden API</strong>, also called an undocumented or internal API. The page’s JavaScript asks the server for quotes, the server answers with JSON (<a href="ch-04-data-formats.html" class="quarto-xref"><span>Chapter 4</span></a>), and the script builds the boxes you see from the reply. The API is hidden only in that nobody publishes it: no documentation lists its address or its parameters, it needs no key, and the site has made no promise to keep it working. Everything you need to use it is in the Network tab. Three steps take you from that request to a scraper: find the endpoint, test one request, and write the loop.</p>
 <p><strong>Find the endpoint.</strong> Click the request and open <strong>Headers</strong>. Under <strong>General</strong>, the <strong>Request URL</strong> is the address the page asked for, <code>https://quotes.toscrape.com/api/quotes?page=2</code>. The <strong>Request Method</strong> is <code>GET</code> and the <strong>Status Code</strong> is <code>200</code>, and under <strong>Response Headers</strong>, <code>Content-Type</code> is <code>application/json</code>. The address has two parts that do different jobs. Everything before the <code>?</code> is the <strong>endpoint</strong>, <code>https://quotes.toscrape.com/api/quotes</code>, which stays the same from request to request. After the <code>?</code> comes the <strong>query string</strong>, <code>page=2</code>, which the <strong>Payload</strong> tab lists as a parameter on its own line. Click <code>quotes?page=3</code> and only the parameter changes: that is what your loop will change. To copy an address exactly, right-click the request and choose <strong>Copy</strong> → <strong>Copy URL</strong>.</p>
 <p><strong>Test one request.</strong> Before you write a loop, make one request from Python and look at what comes back:</p>
-<div id="de689bab" class="cell" data-execution_count="3">
+<div id="4d8d4db1" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a>response <span class="op">=</span> requests.get(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>    <span class="st">"https://quotes.toscrape.com/api/quotes"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a>    params<span class="op">=</span>{<span class="st">"page"</span>: <span class="dv">1</span>},</span>
@@ -582,7 +582,7 @@ Figure&nbsp;8.3: The Network tab on <code>quotes.toscrape.com/scroll</code>, fil
 </ul>
 <p>With no documentation to read, tests like these are how you learn what an undocumented API accepts. Keep each one small, and pause between them.</p>
 <p><strong>Write the scraper.</strong> The loop asks for one page at a time until <code>has_next</code> says to stop. Check the site’s terms first (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), then request the pages directly, with a pause between them:</p>
-<div id="0cbb4277" class="cell" data-execution_count="4">
+<div id="41cb87f0" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -625,7 +625,7 @@ Figure&nbsp;8.3: The Network tab on <code>quotes.toscrape.com/scroll</code>, fil
 <section id="installing-selenium-and-selenium-manager" class="level3" data-number="8.3.1">
 <h3 data-number="8.3.1" class="anchored" data-anchor-id="installing-selenium-and-selenium-manager"><span class="header-section-number">8.3.1</span> Installing Selenium and Selenium Manager</h3>
 <p>Chapter 1’s <code>webdata</code> environment has both packages. Anaconda as it comes has neither, and neither does an older <code>webdata</code>. In either case, <code>import selenium</code> stops with <code>ModuleNotFoundError</code>, and none of this chapter’s browser code runs until you install them. Run this cell once:</p>
-<div id="dcb42ab0" class="cell" data-execution_count="5">
+<div id="4ffeeac0" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="op">%</span>conda install <span class="op">-</span>y <span class="op">-</span>c conda<span class="op">-</span>forge selenium selenium<span class="op">-</span>manager</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>It installs two packages from conda-forge into the Python that runs this notebook, whichever environment that is:</p>
@@ -642,7 +642,7 @@ Figure&nbsp;8.3: The Network tab on <code>quotes.toscrape.com/scroll</code>, fil
 <p>Creating a driver takes one line, <code>webdriver.Chrome()</code>, and that line does three jobs before a window appears. It reads your settings; it runs Selenium Manager, which finds your browser and downloads whatever is missing; and it starts the driver and the browser. When the line fails, the error rarely says which job went wrong. So do the first two jobs yourself, one cell at a time, and check the result before you start the browser.</p>
 <p>The first run downloads files. The driver is about 10 MB. On a machine without Chrome, Selenium Manager also downloads <strong>Chrome for Testing</strong>, a build of Chrome made for automation, at about 190 MB. A download that size can take minutes on busy Wi-Fi, and in a cell of its own it can’t be mistaken for a frozen scraper.</p>
 <p><strong>Step 1: settings first.</strong> Selenium Manager takes its settings from environment variables and reads them each time it runs, so set them before anything starts it:</p>
-<div id="a22f4851" class="cell" data-execution_count="6">
+<div id="cacf0576" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">import</span> os</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="im">import</span> sys</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -665,7 +665,7 @@ Figure&nbsp;8.3: The Network tab on <code>quotes.toscrape.com/scroll</code>, fil
 <p>The <code>manager</code> lines look for Selenium Manager in <code>webdata</code>’s own folders, where conda-forge’s package puts it: <code>bin</code> on macOS and Linux, <code>Scripts</code> on Windows. They change nothing when <code>SE_MANAGER_PATH</code> is already set. With <code>selenium</code> from <code>pip</code> instead, the program sits inside the package, nothing needs setting, and the line prints <code>inside the selenium package</code>.</p>
 <p>Of the three settings after them, the first matters most: it tells Selenium Manager to ignore any driver already on your system <code>PATH</code> and use one it has matched to your browser. The end of this section shows what happens without it. The second setting stops the usage statistics that Selenium Manager otherwise sends. The third is for networks that require a proxy; “When Selenium Manager Fails” below says when you need it.</p>
 <p><strong>Step 2: run Selenium Manager.</strong> Ask it for the driver and browser that <code>webdriver.Chrome()</code> would use, with its log turned on so that you can read each decision:</p>
-<div id="4011c25a" class="cell" data-execution_count="7">
+<div id="6174395f" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> logging</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="im">from</span> selenium.webdriver.common.selenium_manager <span class="im">import</span> SeleniumManager</span>
@@ -689,7 +689,7 @@ DEBUG Driver path: ~/.cache/selenium/chromedriver/linux64/154.0.8037.57/chromedr
 DEBUG Browser path: ~/.cache/selenium/chrome/linux64/154.0.8037.57/chrome</code></pre>
 <p>Read it from the top. Selenium Manager found an old driver on the machine’s <code>PATH</code>, left there by an npm package. It found no Chrome, so it downloaded Chrome for Testing 154 and the driver made for it, and it skipped the old driver because of the first setting. Both went into its cache folder, <code>~/.cache/selenium</code> (<code>%USERPROFILE%\.cache\selenium</code> on Windows), where the next run finds them without downloading anything. On a machine with Chrome installed, the log says <code>Detected browser: chrome</code> and the version instead, and only the driver is downloaded.</p>
 <p><strong>Step 3: check before you start the browser.</strong> Look at the two paths Selenium Manager returned:</p>
-<div id="97995405" class="cell" data-execution_count="8">
+<div id="a929b501" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>driver_path <span class="op">=</span> Path(paths[<span class="st">"driver_path"</span>])</span>
@@ -716,7 +716,7 @@ Driver chosen by Selenium Manager: True</code></pre>
 <section id="starting-the-browser" class="level3" data-number="8.3.3">
 <h3 data-number="8.3.3" class="anchored" data-anchor-id="starting-the-browser"><span class="header-section-number">8.3.3</span> Starting the Browser</h3>
 <p>Now create the driver:</p>
-<div id="6abbd4a7" class="cell" data-execution_count="9">
+<div id="9c9372fe" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>driver <span class="op">=</span> webdriver.Chrome()</span>
@@ -843,7 +843,7 @@ Figure&nbsp;8.4: A browser started by <code>webdriver.Chrome()</code> on a machi
 <section id="navigating-and-finding-elements" class="level2" data-number="8.4">
 <h2 data-number="8.4" class="anchored" data-anchor-id="navigating-and-finding-elements"><span class="header-section-number">8.4</span> Navigating and Finding Elements</h2>
 <p><code>driver.get()</code> loads a page, as typing its address into the browser does. To read part of the page or act on it, you first find its element, with <code>find_element()</code>:</p>
-<div id="40eded82" class="cell" data-execution_count="10">
+<div id="a22ead46" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a>driver.get(<span class="st">"https://xkcd.com"</span>)</span>
@@ -856,7 +856,7 @@ Figure&nbsp;8.4: A browser started by <code>webdriver.Chrome()</code> on a machi
 <section id="what-by-does" class="level3" data-number="8.4.1">
 <h3 data-number="8.4.1" class="anchored" data-anchor-id="what-by-does"><span class="header-section-number">8.4.1</span> What <code>By</code> Does</h3>
 <p>In your code, <code>By</code> is a class whose attributes are plain strings, the names of the strategies:</p>
-<div id="7073ec0f" class="cell" data-execution_count="11">
+<div id="ba93b763" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="bu">print</span>(By.ID, By.CSS_SELECTOR, By.XPATH, sep<span class="op">=</span><span class="st">" | "</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="co"># id | css selector | xpath</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -935,7 +935,7 @@ Figure&nbsp;8.4: A browser started by <code>webdriver.Chrome()</code> on a machi
 </tbody>
 </table>
 <p>Here are five of them on xkcd’s front page, in October 2026:</p>
-<div id="91cf7391" class="cell" data-execution_count="12">
+<div id="027b95d6" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># By class name: two rows of navigation links, above and below the comic</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="bu">print</span>(<span class="bu">len</span>(driver.find_elements(By.CLASS_NAME, <span class="st">"comicNav"</span>)))</span>
 <span id="cb22-3"><a href="#cb22-3" aria-label="3"></a><span class="co"># 2</span></span>
@@ -968,7 +968,7 @@ Figure&nbsp;8.4: A browser started by <code>webdriver.Chrome()</code> on a machi
 <h3 data-number="8.4.3" class="anchored" data-anchor-id="one-element-or-many"><span class="header-section-number">8.4.3</span> One Element or Many</h3>
 <p><code>find_element()</code> returns the first match, in the order the elements appear in the page, and raises <code>NoSuchElementException</code> when nothing matches. <code>find_elements()</code>, plural, returns a list of every match, and an empty list when nothing matches. That makes it the way to ask whether something exists without risking an error: “A Practical Selenium Workflow” uses it to find out whether a page has a <strong>Next</strong> link.</p>
 <p>To search inside an element, call the same methods on the element instead of on the driver. With XPath, start the expression with a dot. Without the dot, <code>//</code> searches the whole page, whichever element you call it on:</p>
-<div id="786806f2" class="cell" data-execution_count="13">
+<div id="fa65a615" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a>nav <span class="op">=</span> driver.find_element(By.CLASS_NAME, <span class="st">"comicNav"</span>)  <span class="co"># the first row</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-label="3"></a><span class="bu">print</span>(<span class="bu">len</span>(nav.find_elements(By.XPATH, <span class="st">".//a"</span>)))  <span class="co"># the links inside this row</span></span>
@@ -981,7 +981,7 @@ Figure&nbsp;8.4: A browser started by <code>webdriver.Chrome()</code> on a machi
 <section id="how-this-differs-from-beautifulsoups-find_all" class="level3" data-number="8.4.4">
 <h3 data-number="8.4.4" class="anchored" data-anchor-id="how-this-differs-from-beautifulsoups-find_all"><span class="header-section-number">8.4.4</span> How This Differs from BeautifulSoup’s <code>find_all()</code></h3>
 <p>Selenium’s <code>find_elements()</code> and BeautifulSoup’s <code>find_all()</code> (<a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>) look alike: each takes a description and returns a list of matches. On the quotes page whose JavaScript writes the quotes, they find the same ten:</p>
-<div id="d61c214b" class="cell" data-execution_count="14">
+<div id="c399b06b" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a></span>
 <span id="cb24-3"><a href="#cb24-3" aria-label="3"></a>driver.get(<span class="st">"https://quotes.toscrape.com/js/"</span>)</span>
@@ -1054,7 +1054,7 @@ Figure&nbsp;8.4: A browser started by <code>webdriver.Chrome()</code> on a machi
 </tbody>
 </table>
 <p>Two of those rows are easy to trip over. The first is <strong>text</strong>. xkcd keeps a transcript of many comics in a <code>&lt;div id="transcript"&gt;</code> that its style hides (<code>display: none</code>). Selenium’s <code>.text</code> returns only what the browser displays, so for the transcript it returns an empty string. BeautifulSoup returns the text in the markup, hidden or not:</p>
-<div id="ba901885" class="cell" data-execution_count="15">
+<div id="eadbac65" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a>driver.get(<span class="st">"https://xkcd.com/353/"</span>)  <span class="co"># The comic "Python"</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a>transcript <span class="op">=</span> driver.find_element(By.ID, <span class="st">"transcript"</span>)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-label="3"></a><span class="bu">print</span>(<span class="bu">repr</span>(transcript.text))</span>
@@ -1084,7 +1084,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 </figure>
 </div>
 <p>You can extract both attributes:</p>
-<div id="90a7b390" class="cell" data-execution_count="16">
+<div id="183a0cf9" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a>driver.get(<span class="st">"https://xkcd.com"</span>)  <span class="co"># Back to the latest comic</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-label="2"></a></span>
 <span id="cb26-3"><a href="#cb26-3" aria-label="3"></a><span class="co"># Find the comic image</span></span>
@@ -1100,7 +1100,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <p>Selenium can simulate clicks, keyboard input, and scrolling — anything a human user would do:</p>
 <section id="clicking" class="level3" data-number="8.6.1">
 <h3 data-number="8.6.1" class="anchored" data-anchor-id="clicking"><span class="header-section-number">8.6.1</span> Clicking</h3>
-<div id="4a70003c" class="cell" data-execution_count="17">
+<div id="94cac8d2" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-label="1"></a><span class="co"># Click the "Random" button to navigate to a random comic</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-label="2"></a>random_button <span class="op">=</span> driver.find_element(By.XPATH, <span class="st">"//ul[@class='comicNav']//a[contains(text(),'Random')]"</span>)</span>
 <span id="cb27-3"><a href="#cb27-3" aria-label="3"></a>random_button.click()</span>
@@ -1116,7 +1116,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <section id="typing-and-searching" class="level3" data-number="8.6.2">
 <h3 data-number="8.6.2" class="anchored" data-anchor-id="typing-and-searching"><span class="header-section-number">8.6.2</span> Typing and Searching</h3>
 <p>Selenium can type into forms and submit them. We will demonstrate with Wikipedia’s search box: Wikipedia’s robots policy is permissive toward automated access, and its markup is stable enough that this example should keep working for years. (Search engines like Google, by contrast, explicitly prohibit automated queries in their Terms of Service — where you point your automation matters as much as how you write it.)</p>
-<div id="11bbdb00" class="cell" data-execution_count="18">
+<div id="50bb6cca" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-label="1"></a><span class="im">from</span> selenium.webdriver.common.keys <span class="im">import</span> Keys</span>
 <span id="cb28-2"><a href="#cb28-2" aria-label="2"></a></span>
 <span id="cb28-3"><a href="#cb28-3" aria-label="3"></a><span class="co"># Navigate to the Wikipedia portal</span></span>
@@ -1159,7 +1159,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <section id="scrolling" class="level3" data-number="8.6.3">
 <h3 data-number="8.6.3" class="anchored" data-anchor-id="scrolling"><span class="header-section-number">8.6.3</span> Scrolling</h3>
 <p>Some pages load content as you scroll (infinite scroll). You can simulate this:</p>
-<div id="749820bd" class="cell" data-execution_count="19">
+<div id="6c9c522f" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-label="1"></a><span class="im">from</span> selenium.webdriver.common.keys <span class="im">import</span> Keys</span>
 <span id="cb29-2"><a href="#cb29-2" aria-label="2"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-label="3"></a>body <span class="op">=</span> driver.find_element(By.TAG_NAME, <span class="st">"body"</span>)</span>
@@ -1173,7 +1173,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <section id="waiting-for-dynamic-content" class="level3" data-number="8.6.4">
 <h3 data-number="8.6.4" class="anchored" data-anchor-id="waiting-for-dynamic-content"><span class="header-section-number">8.6.4</span> Waiting for Dynamic Content</h3>
 <p>The <code>time.sleep()</code> calls in the examples above are a crude approach to waiting for content to load. A better strategy is <em>explicit waits</em>, which pause execution until a specific condition is met:</p>
-<div id="9f392a86" class="cell" data-execution_count="20">
+<div id="97d54c34" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-label="1"></a><span class="im">from</span> selenium.webdriver.support.ui <span class="im">import</span> WebDriverWait</span>
 <span id="cb30-2"><a href="#cb30-2" aria-label="2"></a><span class="im">from</span> selenium.webdriver.support <span class="im">import</span> expected_conditions <span class="im">as</span> EC</span>
 <span id="cb30-3"><a href="#cb30-3" aria-label="3"></a></span>
@@ -1201,7 +1201,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <section id="scraping-infinite-scroll-pages" class="level3" data-number="8.6.5">
 <h3 data-number="8.6.5" class="anchored" data-anchor-id="scraping-infinite-scroll-pages"><span class="header-section-number">8.6.5</span> Scraping Infinite Scroll Pages</h3>
 <p>Many modern websites load content progressively as you scroll — social media feeds, image galleries, and product listings all use this pattern. The technique for scraping these pages involves scrolling to the bottom, waiting for new content to load, and repeating until no more content appears:</p>
-<div id="e1c02bc6" class="cell" data-execution_count="21">
+<div id="24a1a6d9" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-label="1"></a><span class="kw">def</span> scrape_infinite_scroll(driver, max_scrolls<span class="op">=</span><span class="dv">20</span>, scroll_pause<span class="op">=</span><span class="dv">2</span>):</span>
 <span id="cb31-2"><a href="#cb31-2" aria-label="2"></a>    <span class="co">"""Scroll an infinite-scroll page and collect all loaded content."""</span></span>
 <span id="cb31-3"><a href="#cb31-3" aria-label="3"></a>    last_height <span class="op">=</span> driver.execute_script(<span class="st">"return document.body.scrollHeight"</span>)</span>
@@ -1230,7 +1230,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <section id="passing-to-beautifulsoup" class="level2" data-number="8.7">
 <h2 data-number="8.7" class="anchored" data-anchor-id="passing-to-beautifulsoup"><span class="header-section-number">8.7</span> Passing to BeautifulSoup</h2>
 <p>Once the page is fully rendered in the browser, you can extract the complete HTML and parse it with the familiar BeautifulSoup tools:</p>
-<div id="6376eb55" class="cell" data-execution_count="22">
+<div id="35d8b319" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-label="1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb32-2"><a href="#cb32-2" aria-label="2"></a></span>
 <span id="cb32-3"><a href="#cb32-3" aria-label="3"></a><span class="co"># Get the fully-rendered page source from Selenium</span></span>
@@ -1244,7 +1244,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <p>This hybrid approach — Selenium for rendering, BeautifulSoup for parsing — gives you the best of both worlds. Selenium excels at navigating, clicking, scrolling, and waiting for JavaScript to execute. BeautifulSoup excels at searching and extracting data from HTML. By combining them, you avoid the awkwardness of using Selenium’s relatively limited element-finding API for complex extraction tasks while still getting access to the fully-rendered page content.</p>
 <p>The workflow is always the same: use Selenium to get the page into the state you need (scrolled, clicked, searched, logged in), then hand off the rendered HTML to BeautifulSoup for extraction. Think of Selenium as the hands that navigate the browser and BeautifulSoup as the eyes that read the content. This division of labor keeps your code cleaner and more maintainable than trying to do everything with Selenium alone.</p>
 <p>When you have what you need, quit the browser:</p>
-<div id="759ec600" class="cell" data-execution_count="23">
+<div id="03295801" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-label="1"></a>driver.quit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><code>quit()</code> closes all of the browser’s windows and stops chromedriver too; <code>driver.close()</code> closes only the current window. After <code>quit()</code>, any call on <code>driver</code> raises an error, so each section that follows starts a browser of its own.</p>
@@ -1252,7 +1252,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <section id="headless-mode" class="level2" data-number="8.8">
 <h2 data-number="8.8" class="anchored" data-anchor-id="headless-mode"><span class="header-section-number">8.8</span> Headless Mode</h2>
 <p>Selenium doesn’t need a window on your screen. In <strong>headless mode</strong>, the browser does everything it does in a window: it requests the page, runs the page’s JavaScript, builds the DOM, and lays the page out at a set size. It just draws none of it on your screen. Your code works the same either way: <code>driver.get()</code>, <code>find_element()</code>, the waits, clicks, and scrolling from earlier in this chapter, and <code>driver.page_source</code>.</p>
-<div id="f64fb762" class="cell" data-execution_count="24">
+<div id="a4a06fb7" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-label="1"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
 <span id="cb34-2"><a href="#cb34-2" aria-label="2"></a><span class="im">from</span> selenium.webdriver.chrome.options <span class="im">import</span> Options</span>
 <span id="cb34-3"><a href="#cb34-3" aria-label="3"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
@@ -1300,7 +1300,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 </div>
 <p>This fragility reinforces a principle from <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>: when an API is available, use it. Selenium is a powerful last resort for cases where you ethically need data that no API provides, but it is slow, resource-intensive, and brittle compared to API access. Try an API first, static scraping second, and a browser last, the order that “Choosing a Tool”, at the end of this chapter, lays out in full.</p>
 <p>When a browser is the only way in, fragility is an argument for writing Selenium code defensively, not for avoiding Selenium. Here is a complete workflow that pulls together everything this chapter has covered. We will automate a multi-page interaction on the JavaScript version of Quotes to Scrape: navigating to the site, waiting for JavaScript to render the quotes, extracting the data, and repeating across multiple pages. As the View Source check showed, this particular page does not strictly need a browser; it stands in for sites that do, and it will not change under you. The code itself works on Quotes to Scrape and nowhere else, as the Oscars parser of Strategy 6 in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a> works only on oscars.org.</p>
-<div id="56d6b761" class="cell" data-execution_count="25">
+<div id="d9698f7d" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-label="1"></a><span class="im">import</span> time</span>
 <span id="cb35-2"><a href="#cb35-2" aria-label="2"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
 <span id="cb35-3"><a href="#cb35-3" aria-label="3"></a><span class="im">from</span> selenium.webdriver.chrome.options <span class="im">import</span> Options</span>
@@ -1379,7 +1379,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <section id="logging-in-by-hand" class="level3" data-number="8.10.1">
 <h3 data-number="8.10.1" class="anchored" data-anchor-id="logging-in-by-hand"><span class="header-section-number">8.10.1</span> Logging In by Hand</h3>
 <p>Quotes to Scrape has a practice login page that accepts any username and password. Once you’re logged in, each quote shows a link to its author’s Goodreads page, which visitors who aren’t logged in don’t see. Start a browser with a window, and let the notebook wait while you log in:</p>
-<div id="1dbecb34" class="cell" data-execution_count="26">
+<div id="5d3fd84e" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-label="1"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
 <span id="cb36-2"><a href="#cb36-2" aria-label="2"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
 <span id="cb36-3"><a href="#cb36-3" aria-label="3"></a></span>
@@ -1397,7 +1397,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <section id="keeping-the-session" class="level3" data-number="8.10.2">
 <h3 data-number="8.10.2" class="anchored" data-anchor-id="keeping-the-session"><span class="header-section-number">8.10.2</span> Keeping the Session</h3>
 <p>When you log in, the site sets a <strong>session cookie</strong>: a token your browser sends with every request after that, so the site knows it’s you without asking for your password again. Selenium starts each browser with a new, empty profile, the folder where a browser keeps its cookies and settings, so the cookie is gone after <code>driver.quit()</code>. To keep it, give Chrome a profile folder of its own:</p>
-<div id="ce8fd212" class="cell" data-execution_count="27">
+<div id="4668ea13" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-label="1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb37-2"><a href="#cb37-2" aria-label="2"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-label="3"></a><span class="im">from</span> selenium.webdriver.chrome.options <span class="im">import</span> Options</span>
@@ -1414,7 +1414,7 @@ Figure&nbsp;8.5: Developer tools on xkcd with the comic’s <code>&lt;img&gt;</c
 <span id="cb37-14"><a href="#cb37-14" aria-label="14"></a>driver.quit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The next run can start from that profile, headless, and skip the login:</p>
-<div id="03ae777c" class="cell" data-execution_count="28">
+<div id="a80c2149" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-label="1"></a>options <span class="op">=</span> Options()</span>
 <span id="cb38-2"><a href="#cb38-2" aria-label="2"></a>options.add_argument(<span class="ss">f"--user-data-dir=</span><span class="sc">{</span>profile<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb38-3"><a href="#cb38-3" aria-label="3"></a>options.add_argument(<span class="st">"--headless=new"</span>)</span>
@@ -1489,7 +1489,7 @@ Table&nbsp;8.1: Common ways that scraping projects leak credentials.
 <li><strong>Log in by hand when you can.</strong> The <code>input()</code> pause keeps the password out of your code entirely.</li>
 <li><strong>When code must log in by itself</strong>, as a job that runs on a schedule must, read the password from an environment variable, the way <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a> reads API keys, or ask for it with <code>getpass()</code>, which hides what you type and keeps it out of the notebook:</li>
 </ul>
-<div id="38ad44de" class="cell" data-execution_count="29">
+<div id="f40de1c3" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-label="1"></a><span class="im">import</span> os</span>
 <span id="cb39-2"><a href="#cb39-2" aria-label="2"></a><span class="im">from</span> getpass <span class="im">import</span> getpass</span>
 <span id="cb39-3"><a href="#cb39-3" aria-label="3"></a></span>
@@ -1733,32 +1733,32 @@ Figure&nbsp;8.6: Playwright’s codegen recorder. Every click in the browser, ab
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will measure the difference between what a static request sees and what a browser sees, on a site where that difference matters.</p>
 <p><strong>Step 1 — Fetch statically first.</strong> Choose a JavaScript-heavy site — a news site’s live section, a social feed, a site the chapter mentioned. Check its <code>robots.txt</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), then fetch it with <code>requests.get()</code> and your <code>HEADERS</code>. Record the length of <code>response.text</code> and count a target element with BeautifulSoup (<a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>) — headlines, list items, whatever the page is made of.</p>
-<div id="3c544dad" class="cell" data-execution_count="30">
+<div id="8bf6b250" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-label="1"></a><span class="co"># Step 1: Fetch your chosen page with requests, record the HTML length, and count your target element with BeautifulSoup.</span></span>
 <span id="cb50-2"><a href="#cb50-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Start a headless browser.</strong> Set up a headless Selenium driver following the chapter’s setup code, and load the same URL with <code>driver.get()</code>.</p>
-<div id="a6faba77" class="cell" data-execution_count="31">
+<div id="e257eb94" class="cell" data-execution_count="31">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-label="1"></a><span class="co"># Step 2: Configure a headless driver and load the same URL.</span></span>
 <span id="cb51-2"><a href="#cb51-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Wait, then measure again.</strong> Use <code>WebDriverWait</code> to wait for your target element to be present — the chapter shows the pattern — then record the length of <code>driver.page_source</code> and count the same target element, this time parsing <code>driver.page_source</code> with BeautifulSoup. Expect the two lengths to be measuring slightly different things: <code>page_source</code> is the browser’s own re-serialization of the page after parsing, not the bytes the server sent, so it drops the <code>&lt;!DOCTYPE&gt;</code> line and normalizes whitespace. On a page that was already fully formed, that can make the browser’s number come out <em>smaller</em> than <code>len(response.text)</code> even though nothing is missing. A negative difference is a result worth reporting in Step 6, not a sign you measured wrong.</p>
-<div id="e3da1da6" class="cell" data-execution_count="32">
+<div id="397d90ae" class="cell" data-execution_count="32">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-label="1"></a><span class="co"># Step 3: Wait for the content to load, then measure page_source length and re-count the same element.</span></span>
 <span id="cb52-2"><a href="#cb52-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Load more.</strong> Make the page reveal content a plain request never sees: scroll to the bottom with the chapter’s scrolling pattern (or click a “Load More” button if the site has one), wait, and count your element a third time.</p>
-<div id="36075ad7" class="cell" data-execution_count="33">
+<div id="892b9caf" class="cell" data-execution_count="33">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-label="1"></a><span class="co"># Step 4: Scroll or click to load more content, wait, and count again.</span></span>
 <span id="cb53-2"><a href="#cb53-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Tabulate and clean up.</strong> Build a small DataFrame with one row per measurement — static request, initial Selenium load, after scrolling — and columns for HTML length and element count. Then close the browser with <code>driver.quit()</code>, as the chapter insists.</p>
-<div id="52b61aaf" class="cell" data-execution_count="34">
+<div id="ba8de24b" class="cell" data-execution_count="34">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-label="1"></a><span class="co"># Step 5: Build the comparison DataFrame, then driver.quit().</span></span>
 <span id="cb54-2"><a href="#cb54-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: How much of the page did the static request miss? Would you classify this site as static, partially dynamic, or fully dynamic? Given the speed difference you experienced, when is Selenium worth the cost for this site — and when would <code>requests</code> alone do?</p>
-<div id="667b4ade" class="cell" data-execution_count="35">
+<div id="173eaed8" class="cell" data-execution_count="35">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1790,22 +1790,10 @@ Figure&nbsp;8.6: Playwright’s codegen recorder. Every click in the browser, ab
 </section>
 <section id="social-history-and-public-interest" class="level2" data-number="8.16">
 <h2 data-number="8.16" class="anchored" data-anchor-id="social-history-and-public-interest"><span class="header-section-number">8.16</span> Social History and Public Interest</h2>
-<p>The shift from server-rendered to client-rendered web pages represents a fundamental change in the web’s architecture. JavaScript frameworks like React, Angular, and Vue have made the web more interactive but also more opaque to automated observation. The ability to “view source” — once a straightforward way to see exactly what a page contained — now often reveals only a JavaScript bootstrap that fetches and renders content dynamically.</p>
-<p>This architectural shift interacts with the enclosure dynamics described in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures — CAPTCHAs, bot detection, dynamically-generated class names — become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes. The tools in this chapter are a response to that architectural shift — they exist because the simpler approaches taught in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a> are no longer sufficient for much of the modern web.</p>
-<p>Neither tool was built for research. Selenium began in 2004 at ThoughtWorks in Chicago, where Jason Huggins wrote “JavaScriptTestRunner” to test an internal time-and-expenses application; Playwright came from Microsoft in 2020, built by engineers who had worked on Google’s Puppeteer, to test web applications across browsers. Researchers borrowed both because testing a website and observing one require the same ability: making a real browser do what a person would do, on demand, and recording what appears. The AI agents that now drive browsers through Playwright MCP extend the same borrowing to software that decides for itself what to click.</p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Public Interest Connection
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>When platforms close their APIs and render content exclusively through JavaScript, browser automation becomes the last-resort path to data that serves the public interest. The tools in this chapter exist because of the <strong>enclosure</strong> dynamic from <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a> — the progressive restriction of access to data that was once openly available. Researchers studying algorithmic bias, misinformation, and platform governance increasingly depend on Selenium-based methods precisely because the APIs that once served these research needs have been shut down or restricted beyond practical use.</p>
-</div>
-</div>
+<p>The shift from server-rendered to client-rendered web pages represents a fundamental change in the web’s architecture. JavaScript frameworks like <a href="https://react.dev/">React</a>, <a href="https://angular.dev/">Angular</a>, and <a href="https://vuejs.org/">Vue</a> have made the web more interactive but also more opaque to automated observation. The ability to “view source,” once a straightforward way to see exactly what a page contained, now often reveals only a JavaScript bootstrap that fetches and renders content dynamically.</p>
+<p>This architectural shift interacts with the <strong>enclosure</strong> dynamic described in <a href="ch-03-post-api.html" class="quarto-xref"><span>Chapter 3</span></a>, the progressive restriction of access to data that was once openly available. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures, such as CAPTCHAs, bot detection, and dynamically generated class names, become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes <span class="citation" data-cites="freelon2018computational">(<a href="#ref-freelon2018computational" role="doc-biblioref">Freelon 2018</a>)</span>. The tools in this chapter are a response to that architectural shift: they exist because the simpler approaches taught in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a> are no longer sufficient for much of the modern web.</p>
+<p>When platforms also close their APIs, browser automation becomes the last-resort path to data that serves the public interest. The APIs that once served research have been shut down or restricted beyond practical use <span class="citation" data-cites="bruns2019after davidson2023platform">(<a href="#ref-bruns2019after" role="doc-biblioref">Bruns 2019</a>; <a href="#ref-davidson2023platform" role="doc-biblioref">Davidson et al. 2023</a>)</span>. Meta shut down CrowdTangle, a tool that researchers and journalists used to track how posts spread on Facebook and Instagram, on August 14, 2024, although researchers had asked the company to keep it running through January 2025, past the U.S. election (<a href="https://www.gpb.org/news/2024/08/14/meta-shutters-tool-used-fight-disinformation-despite-outcry">Kerr, 2024</a>). Researchers studying algorithmic bias, misinformation, and platform governance increasingly depend on Selenium-based methods instead. One audit of online housing markets trained sock-puppet profiles, each a fresh Firefox browser driven by Python and Selenium, and found that the housing ads a profile was shown differed by its assigned race, and its property recommendations by its assigned gender <span class="citation" data-cites="asplund2020auditing">(<a href="#ref-asplund2020auditing" role="doc-biblioref">Asplund et al. 2020</a>)</span>. The Markup’s investigation of Amazon’s search results, in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, collected its pages the same way.</p>
+<p>Neither tool was built for research. Selenium began in 2004 at ThoughtWorks in Chicago, where Jason Huggins wrote “JavaScriptTestRunner” to test an internal time-and-expenses application (<a href="https://www.selenium.dev/history/">Selenium project</a>); Playwright came from Microsoft in 2020, built by the team that had built Google’s Puppeteer, to test web applications across browsers (<a href="https://www.infoq.com/news/2020/01/playwright-browser-automation/">Schiemann, 2020</a>). Researchers borrowed both because testing a website and observing one require the same ability: making a real browser do what a person would do, on demand, and recording what appears. The AI agents that now drive browsers through <a href="https://playwright.dev/docs/getting-started-mcp">Playwright MCP</a>, which lets a language model operate a browser through the Model Context Protocol, extend the same borrowing to software that decides for itself what to click.</p>
 </section>
 <section id="common-issues-to-debug" class="level2" data-number="8.17">
 <h2 data-number="8.17" class="anchored" data-anchor-id="common-issues-to-debug"><span class="header-section-number">8.17</span> Common Issues to Debug</h2>
@@ -1853,6 +1841,18 @@ Figure&nbsp;8.6: Playwright’s codegen recorder. Every click in the browser, ab
 <!-- -->
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-asplund2020auditing" class="csl-entry" role="listitem">
+Asplund, Joshua, Motahhare Eslami, Hari Sundaram, Christian Sandvig, and Karrie Karahalios. 2020. <span>“Auditing Race and Gender Discrimination in Online Housing Markets.”</span> <em>Proceedings of the International AAAI Conference on Web and Social Media</em> 14: 24–35. <a href="https://doi.org/10.1609/icwsm.v14i1.7276">https://doi.org/10.1609/icwsm.v14i1.7276</a>.
+</div>
+<div id="ref-bruns2019after" class="csl-entry" role="listitem">
+Bruns, Axel. 2019. <span>“After the ’<span>APIcalypse</span>’: Social Media Platforms and Their Fight Against Critical Scholarly Research.”</span> <em>Information, Communication &amp; Society</em> 22 (11): 1544–66. <a href="https://doi.org/10.1080/1369118X.2019.1637447">https://doi.org/10.1080/1369118X.2019.1637447</a>.
+</div>
+<div id="ref-davidson2023platform" class="csl-entry" role="listitem">
+Davidson, Brittany I., Darja Wischerath, Daniel Racek, et al. 2023. <span>“Platform-Controlled Social Media <span>APIs</span> Threaten Open Science.”</span> <em>Nature Human Behaviour</em> 7: 2054–57. <a href="https://doi.org/10.1038/s41562-023-01750-2">https://doi.org/10.1038/s41562-023-01750-2</a>.
+</div>
+<div id="ref-freelon2018computational" class="csl-entry" role="listitem">
+Freelon, Deen. 2018. <span>“Computational Research in the Post-<span>API</span> Age.”</span> <em>Political Communication</em> 35 (4): 665–68. <a href="https://doi.org/10.1080/10584609.2018.1477506">https://doi.org/10.1080/10584609.2018.1477506</a>.
+</div>
 <div id="ref-mitchell2018web" class="csl-entry" role="listitem">
 Mitchell, Ryan. 2018. <em>Web Scraping with <span>Python</span>: Collecting More Data from the Modern Web</em>. 2nd ed. O’Reilly Media.
 </div>
@@ -3560,58 +3560,55 @@ Mitchell, Ryan. 2018. <em>Web Scraping with <span>Python</span>: Collecting More
 <span id="cb57-1305"><a href="#cb57-1305" aria-label="1235"></a></span>
 <span id="cb57-1306"><a href="#cb57-1306" aria-label="1236"></a><span class="fu">## Social History and Public Interest</span></span>
 <span id="cb57-1307"><a href="#cb57-1307" aria-label="1237"></a></span>
-<span id="cb57-1308"><a href="#cb57-1308" aria-label="1238"></a>The shift from server-rendered to client-rendered web pages represents a fundamental change in the web's architecture. JavaScript frameworks like React, Angular, and Vue have made the web more interactive but also more opaque to automated observation. The ability to "view source" — once a straightforward way to see exactly what a page contained — now often reveals only a JavaScript bootstrap that fetches and renders content dynamically.</span>
+<span id="cb57-1308"><a href="#cb57-1308" aria-label="1238"></a>The shift from server-rendered to client-rendered web pages represents a fundamental change in the web's architecture. JavaScript frameworks like <span class="co">[</span><span class="ot">React</span><span class="co">](https://react.dev/)</span>, <span class="co">[</span><span class="ot">Angular</span><span class="co">](https://angular.dev/)</span>, and <span class="co">[</span><span class="ot">Vue</span><span class="co">](https://vuejs.org/)</span> have made the web more interactive but also more opaque to automated observation. The ability to "view source," once a straightforward way to see exactly what a page contained, now often reveals only a JavaScript bootstrap that fetches and renders content dynamically.</span>
 <span id="cb57-1309"><a href="#cb57-1309" aria-label="1239"></a></span>
-<span id="cb57-1310"><a href="#cb57-1310" aria-label="1240"></a>This architectural shift interacts with the enclosure dynamics described in @sec-post-api. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures — CAPTCHAs, bot detection, dynamically-generated class names — become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes. The tools in this chapter are a response to that architectural shift — they exist because the simpler approaches taught in @sec-static-pages are no longer sufficient for much of the modern web.</span>
+<span id="cb57-1310"><a href="#cb57-1310" aria-label="1240"></a>This architectural shift interacts with the **enclosure** dynamic described in @sec-post-api, the progressive restriction of access to data that was once openly available. When platforms render content client-side, they gain another layer of control over automated access. Anti-scraping measures, such as CAPTCHAs, bot detection, and dynamically generated class names, become easier to implement. Researchers who once could rely on simple HTTP requests increasingly need browser automation to access the same data, raising both the technical barrier and the ethical stakes <span class="co">[</span><span class="ot">@freelon2018computational</span><span class="co">]</span>. The tools in this chapter are a response to that architectural shift: they exist because the simpler approaches taught in @sec-static-pages are no longer sufficient for much of the modern web.</span>
 <span id="cb57-1311"><a href="#cb57-1311" aria-label="1241"></a></span>
-<span id="cb57-1312"><a href="#cb57-1312" aria-label="1242"></a>Neither tool was built for research. Selenium began in 2004 at ThoughtWorks in Chicago, where Jason Huggins wrote "JavaScriptTestRunner" to test an internal time-and-expenses application; Playwright came from Microsoft in 2020, built by engineers who had worked on Google's Puppeteer, to test web applications across browsers. Researchers borrowed both because testing a website and observing one require the same ability: making a real browser do what a person would do, on demand, and recording what appears. The AI agents that now drive browsers through Playwright MCP extend the same borrowing to software that decides for itself what to click.</span>
+<span id="cb57-1312"><a href="#cb57-1312" aria-label="1242"></a>When platforms also close their APIs, browser automation becomes the last-resort path to data that serves the public interest. The APIs that once served research have been shut down or restricted beyond practical use <span class="co">[</span><span class="ot">@bruns2019after; @davidson2023platform</span><span class="co">]</span>. Meta shut down CrowdTangle, a tool that researchers and journalists used to track how posts spread on Facebook and Instagram, on August 14, 2024, although researchers had asked the company to keep it running through January 2025, past the U.S. election (<span class="co">[</span><span class="ot">Kerr, 2024</span><span class="co">](https://www.gpb.org/news/2024/08/14/meta-shutters-tool-used-fight-disinformation-despite-outcry)</span>). Researchers studying algorithmic bias, misinformation, and platform governance increasingly depend on Selenium-based methods instead. One audit of online housing markets trained sock-puppet profiles, each a fresh Firefox browser driven by Python and Selenium, and found that the housing ads a profile was shown differed by its assigned race, and its property recommendations by its assigned gender <span class="co">[</span><span class="ot">@asplund2020auditing</span><span class="co">]</span>. The Markup's investigation of Amazon's search results, in @sec-static-pages, collected its pages the same way.</span>
 <span id="cb57-1313"><a href="#cb57-1313" aria-label="1243"></a></span>
-<span id="cb57-1314"><a href="#cb57-1314" aria-label="1244"></a>::: {.callout-note}</span>
-<span id="cb57-1315"><a href="#cb57-1315" aria-label="1245"></a><span class="fu">## Public Interest Connection</span></span>
-<span id="cb57-1316"><a href="#cb57-1316" aria-label="1246"></a>When platforms close their APIs and render content exclusively through JavaScript, browser automation becomes the last-resort path to data that serves the public interest. The tools in this chapter exist because of the **enclosure** dynamic from @sec-post-api — the progressive restriction of access to data that was once openly available. Researchers studying algorithmic bias, misinformation, and platform governance increasingly depend on Selenium-based methods precisely because the APIs that once served these research needs have been shut down or restricted beyond practical use.</span>
-<span id="cb57-1317"><a href="#cb57-1317" aria-label="1247"></a>:::</span>
-<span id="cb57-1318"><a href="#cb57-1318" aria-label="1248"></a></span>
-<span id="cb57-1319"><a href="#cb57-1319" aria-label="1249"></a><span class="fu">## Common Issues to Debug</span></span>
-<span id="cb57-1320"><a href="#cb57-1320" aria-label="1250"></a></span>
-<span id="cb57-1321"><a href="#cb57-1321" aria-label="1251"></a><span class="ss">- </span>**`NoSuchElementException`**: The element does not exist yet because the page has not finished loading. Add <span class="in">`time.sleep()`</span> or use explicit waits with <span class="in">`WebDriverWait`</span>.</span>
-<span id="cb57-1322"><a href="#cb57-1322" aria-label="1252"></a><span class="ss">- </span>**`StaleElementReferenceException`**: The DOM changed between when you found the element and when you tried to interact with it. Re-find the element.</span>
-<span id="cb57-1323"><a href="#cb57-1323" aria-label="1253"></a><span class="ss">- </span>**`SessionNotCreatedException: This version of ChromeDriver only supports Chrome version N`**: An older <span class="in">`chromedriver`</span> on your <span class="in">`PATH`</span> is overriding Selenium Manager; step 3 of "Before the First Browser" prints <span class="in">`False`</span> when this happens. Delete it, or set <span class="in">`SE_SKIP_DRIVER_IN_PATH=true`</span> (see "When Selenium Manager Fails" above). If there is no stray driver, a brand-new browser release may have outrun Selenium for a few days; updating the <span class="in">`selenium`</span> package typically fixes it.</span>
-<span id="cb57-1324"><a href="#cb57-1324" aria-label="1254"></a><span class="ss">- </span>**`NoSuchDriverException: Unable to obtain driver for chrome`**, with <span class="in">`Unable to obtain working Selenium Manager binary`</span> above it in the traceback: Selenium can't find Selenium Manager, usually because Jupyter started before you installed <span class="in">`selenium`</span>, or without <span class="in">`webdata`</span> active. Run step 1 of "Before the First Browser", or close Jupyter, run <span class="in">`conda activate webdata`</span>, and start it again; restarting the kernel isn't enough.</span>
-<span id="cb57-1325"><a href="#cb57-1325" aria-label="1255"></a><span class="ss">- </span>**`SessionNotCreatedException: session not created: Chrome instance exited`**: Chrome stopped as soon as it started, and the exception doesn't say why; ChromeDriver's log does. Start the driver with a log, run the cell again, and search <span class="in">`chromedriver.log`</span> for <span class="in">`profile`</span> and <span class="in">`sandbox`</span>:</span>
-<span id="cb57-1326"><a href="#cb57-1326" aria-label="1256"></a></span>
-<span id="cb57-1327"><a href="#cb57-1327" aria-label="1257"></a>  <span class="in">```python</span></span>
-<span id="cb57-1328"><a href="#cb57-1328" aria-label="1258"></a>  service <span class="op">=</span> webdriver.ChromeService(service_args<span class="op">=</span>[<span class="st">"--verbose"</span>], log_output<span class="op">=</span><span class="st">"chromedriver.log"</span>)</span>
-<span id="cb57-1329"><a href="#cb57-1329" aria-label="1259"></a>  driver <span class="op">=</span> webdriver.Chrome(service<span class="op">=</span>service)</span>
-<span id="cb57-1330"><a href="#cb57-1330" aria-label="1260"></a>  <span class="in">```</span></span>
-<span id="cb57-1331"><a href="#cb57-1331" aria-label="1261"></a></span>
-<span id="cb57-1332"><a href="#cb57-1332" aria-label="1262"></a>  <span class="in">`Failed to create a ProcessSingleton for your profile directory`</span> means that another Chrome is still using the profile folder you passed with <span class="in">`--user-data-dir`</span>, such as one that an earlier cell started and never quit: call <span class="in">`driver.quit()`</span> on it, then start the new one. <span class="in">`No usable sandbox!`</span> means that Chrome can't start its sandbox; on Ubuntu, see "When Selenium Manager Fails" above.</span>
-<span id="cb57-1333"><a href="#cb57-1333" aria-label="1263"></a><span class="ss">- </span>**A headless run finds fewer elements than a run with a window**: Save a screenshot with <span class="in">`driver.save_screenshot("check.png")`</span> and look at it. Set <span class="in">`--window-size`</span>; if the page itself is different, the site may be treating headless browsers differently ("Headless Mode").</span>
-<span id="cb57-1334"><a href="#cb57-1334" aria-label="1264"></a><span class="ss">- </span>**A logged-in run suddenly finds nothing**: The session ended, and the site is showing you its logged-out pages. Check for something only logged-in visitors see before you collect, and log in by hand again.</span>
-<span id="cb57-1335"><a href="#cb57-1335" aria-label="1265"></a><span class="ss">- </span>**Memory issues**: Each Selenium driver runs a full browser process. Close drivers promptly with <span class="in">`driver.quit()`</span>.</span>
-<span id="cb57-1336"><a href="#cb57-1336" aria-label="1266"></a><span class="ss">- </span>**Playwright: `It looks like you are using Playwright Sync API inside the asyncio loop`**: You ran a sync script in a notebook. Run it from the terminal instead, or switch to the async API.</span>
-<span id="cb57-1337"><a href="#cb57-1337" aria-label="1267"></a><span class="ss">- </span>**Playwright: `Executable doesn't exist at ...`**: Playwright's browsers are missing, usually right after you install or upgrade the library. Run <span class="in">`python -m playwright install chromium`</span>. The box under the error says to run <span class="in">`playwright install`</span>; in <span class="in">`webdata`</span> that shorter command can run the wrong program (see "Installing Playwright").</span>
-<span id="cb57-1338"><a href="#cb57-1338" aria-label="1268"></a><span class="ss">- </span>**Playwright: `exec: .../python3.14: not found`, or conda prints `ClobberError` for `bin/playwright` or `SafetyError` for `lib/node_modules/playwright/cli.js`**: conda-forge's <span class="in">`playwright-python`</span> and <span class="in">`playwright`</span> both install the <span class="in">`playwright`</span> command, and conda wrote one over the other. Because conda hard-links files from its package cache, installing <span class="in">`playwright-python`</span> in a second environment can rewrite the command in <span class="in">`webdata`</span> as well, so that it starts the second environment's Python, which fails once that environment is deleted. The library is not damaged: <span class="in">`python -m playwright`</span> still works (checked on 2026-10-05 with <span class="in">`playwright-python`</span> 1.62.0 and <span class="in">`playwright`</span> 1.63.0).</span>
-<span id="cb57-1339"><a href="#cb57-1339" aria-label="1269"></a></span>
-<span id="cb57-1340"><a href="#cb57-1340" aria-label="1270"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb57-1341"><a href="#cb57-1341" aria-label="1271"></a></span>
-<span id="cb57-1342"><a href="#cb57-1342" aria-label="1272"></a>The modern web is dynamic: JavaScript renders content after the initial HTML loads, making it invisible to static scraping tools. Before you reach for a browser, check by hand: the data may be in the page source, inside a script, or arriving as JSON you can request directly. When you do need a browser, Selenium controls a real one from your notebook, with Selenium Manager fetching the driver, and the browser if you need one, letting you access fully-rendered pages, simulate user interactions, and extract content that <span class="in">`requests`</span> cannot see. The browser needs no window: headless, it does the same work out of sight, and a screenshot shows you what it saw. It can also log in as you, which is where a scraper's costs shift from money to your account, a contract, and the people in the data; log in by hand, and treat the session it leaves behind like your password. Playwright does the same from scripts, waits on its own, and can record a script while you click; AI agents can drive it too, but for research, have them write a script you can read and rerun rather than browse on your behalf. Every one of these tools is slow, fragile, and resource-intensive next to an API — a last resort when APIs and static scraping are unavailable. The hybrid approach of a browser for rendering plus BeautifulSoup for parsing gives you full access to the modern web while keeping your parsing code familiar.</span>
-<span id="cb57-1343"><a href="#cb57-1343" aria-label="1273"></a></span>
-<span id="cb57-1344"><a href="#cb57-1344" aria-label="1274"></a><span class="fu">## Further Reading</span></span>
-<span id="cb57-1345"><a href="#cb57-1345" aria-label="1275"></a></span>
-<span id="cb57-1346"><a href="#cb57-1346" aria-label="1276"></a><span class="ss">- </span>Selenium documentation: <span class="ot">&lt;https://www.selenium.dev/documentation/&gt;</span></span>
-<span id="cb57-1347"><a href="#cb57-1347" aria-label="1277"></a><span class="ss">- </span>Selenium Manager: <span class="ot">&lt;https://www.selenium.dev/documentation/selenium_manager/&gt;</span></span>
-<span id="cb57-1348"><a href="#cb57-1348" aria-label="1278"></a><span class="ss">- </span>Selenium's pages on each browser (Chrome, Edge, Firefox, Safari): <span class="ot">&lt;https://www.selenium.dev/documentation/webdriver/browsers/&gt;</span></span>
-<span id="cb57-1349"><a href="#cb57-1349" aria-label="1279"></a><span class="ss">- </span>Apple, "About WebDriver for Safari": <span class="ot">&lt;https://developer.apple.com/documentation/webkit/about-webdriver-for-safari&gt;</span></span>
-<span id="cb57-1350"><a href="#cb57-1350" aria-label="1280"></a><span class="ss">- </span>Mozilla, geckodriver usage, including Firefox snaps: <span class="ot">&lt;https://firefox-source-docs.mozilla.org/testing/geckodriver/Usage.html&gt;</span></span>
-<span id="cb57-1351"><a href="#cb57-1351" aria-label="1281"></a><span class="ss">- </span>Chrome for Developers, "Chrome Headless mode": <span class="ot">&lt;https://developer.chrome.com/docs/automation-and-testing/headless&gt;</span></span>
-<span id="cb57-1352"><a href="#cb57-1352" aria-label="1282"></a><span class="ss">- </span>Chromium, "AppArmor User Namespace Restrictions vs. Chromium Developer Builds", on why downloaded builds of Chrome can't start their sandbox on Ubuntu: <span class="ot">&lt;https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md&gt;</span></span>
-<span id="cb57-1353"><a href="#cb57-1353" aria-label="1283"></a><span class="ss">- </span>Python's <span class="in">`getpass`</span> module: <span class="ot">&lt;https://docs.python.org/3/library/getpass.html&gt;</span></span>
-<span id="cb57-1354"><a href="#cb57-1354" aria-label="1284"></a><span class="ss">- </span>OWASP, "Secrets Management Cheat Sheet": <span class="ot">&lt;https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html&gt;</span></span>
-<span id="cb57-1355"><a href="#cb57-1355" aria-label="1285"></a><span class="ss">- </span>Selenium Python bindings: <span class="ot">&lt;https://selenium-python.readthedocs.io/&gt;</span></span>
-<span id="cb57-1356"><a href="#cb57-1356" aria-label="1286"></a><span class="ss">- </span>Playwright for Python: <span class="ot">&lt;https://playwright.dev/python/&gt;</span></span>
-<span id="cb57-1357"><a href="#cb57-1357" aria-label="1287"></a><span class="ss">- </span>Playwright MCP: <span class="ot">&lt;https://playwright.dev/mcp/introduction&gt;</span></span>
-<span id="cb57-1358"><a href="#cb57-1358" aria-label="1288"></a><span class="ss">- </span>Web Scraping Sandbox (Quotes to Scrape and Books to Scrape): <span class="ot">&lt;https://toscrape.com/&gt;</span></span>
-<span id="cb57-1359"><a href="#cb57-1359" aria-label="1289"></a><span class="ss">- </span>@mitchell2018web — Chapter 11: Scraping JavaScript</span>
+<span id="cb57-1314"><a href="#cb57-1314" aria-label="1244"></a>Neither tool was built for research. Selenium began in 2004 at ThoughtWorks in Chicago, where Jason Huggins wrote "JavaScriptTestRunner" to test an internal time-and-expenses application (<span class="co">[</span><span class="ot">Selenium project</span><span class="co">](https://www.selenium.dev/history/)</span>); Playwright came from Microsoft in 2020, built by the team that had built Google's Puppeteer, to test web applications across browsers (<span class="co">[</span><span class="ot">Schiemann, 2020</span><span class="co">](https://www.infoq.com/news/2020/01/playwright-browser-automation/)</span>). Researchers borrowed both because testing a website and observing one require the same ability: making a real browser do what a person would do, on demand, and recording what appears. The AI agents that now drive browsers through <span class="co">[</span><span class="ot">Playwright MCP</span><span class="co">](https://playwright.dev/docs/getting-started-mcp)</span>, which lets a language model operate a browser through the Model Context Protocol, extend the same borrowing to software that decides for itself what to click.</span>
+<span id="cb57-1315"><a href="#cb57-1315" aria-label="1245"></a></span>
+<span id="cb57-1316"><a href="#cb57-1316" aria-label="1246"></a><span class="fu">## Common Issues to Debug</span></span>
+<span id="cb57-1317"><a href="#cb57-1317" aria-label="1247"></a></span>
+<span id="cb57-1318"><a href="#cb57-1318" aria-label="1248"></a><span class="ss">- </span>**`NoSuchElementException`**: The element does not exist yet because the page has not finished loading. Add <span class="in">`time.sleep()`</span> or use explicit waits with <span class="in">`WebDriverWait`</span>.</span>
+<span id="cb57-1319"><a href="#cb57-1319" aria-label="1249"></a><span class="ss">- </span>**`StaleElementReferenceException`**: The DOM changed between when you found the element and when you tried to interact with it. Re-find the element.</span>
+<span id="cb57-1320"><a href="#cb57-1320" aria-label="1250"></a><span class="ss">- </span>**`SessionNotCreatedException: This version of ChromeDriver only supports Chrome version N`**: An older <span class="in">`chromedriver`</span> on your <span class="in">`PATH`</span> is overriding Selenium Manager; step 3 of "Before the First Browser" prints <span class="in">`False`</span> when this happens. Delete it, or set <span class="in">`SE_SKIP_DRIVER_IN_PATH=true`</span> (see "When Selenium Manager Fails" above). If there is no stray driver, a brand-new browser release may have outrun Selenium for a few days; updating the <span class="in">`selenium`</span> package typically fixes it.</span>
+<span id="cb57-1321"><a href="#cb57-1321" aria-label="1251"></a><span class="ss">- </span>**`NoSuchDriverException: Unable to obtain driver for chrome`**, with <span class="in">`Unable to obtain working Selenium Manager binary`</span> above it in the traceback: Selenium can't find Selenium Manager, usually because Jupyter started before you installed <span class="in">`selenium`</span>, or without <span class="in">`webdata`</span> active. Run step 1 of "Before the First Browser", or close Jupyter, run <span class="in">`conda activate webdata`</span>, and start it again; restarting the kernel isn't enough.</span>
+<span id="cb57-1322"><a href="#cb57-1322" aria-label="1252"></a><span class="ss">- </span>**`SessionNotCreatedException: session not created: Chrome instance exited`**: Chrome stopped as soon as it started, and the exception doesn't say why; ChromeDriver's log does. Start the driver with a log, run the cell again, and search <span class="in">`chromedriver.log`</span> for <span class="in">`profile`</span> and <span class="in">`sandbox`</span>:</span>
+<span id="cb57-1323"><a href="#cb57-1323" aria-label="1253"></a></span>
+<span id="cb57-1324"><a href="#cb57-1324" aria-label="1254"></a>  <span class="in">```python</span></span>
+<span id="cb57-1325"><a href="#cb57-1325" aria-label="1255"></a>  service <span class="op">=</span> webdriver.ChromeService(service_args<span class="op">=</span>[<span class="st">"--verbose"</span>], log_output<span class="op">=</span><span class="st">"chromedriver.log"</span>)</span>
+<span id="cb57-1326"><a href="#cb57-1326" aria-label="1256"></a>  driver <span class="op">=</span> webdriver.Chrome(service<span class="op">=</span>service)</span>
+<span id="cb57-1327"><a href="#cb57-1327" aria-label="1257"></a>  <span class="in">```</span></span>
+<span id="cb57-1328"><a href="#cb57-1328" aria-label="1258"></a></span>
+<span id="cb57-1329"><a href="#cb57-1329" aria-label="1259"></a>  <span class="in">`Failed to create a ProcessSingleton for your profile directory`</span> means that another Chrome is still using the profile folder you passed with <span class="in">`--user-data-dir`</span>, such as one that an earlier cell started and never quit: call <span class="in">`driver.quit()`</span> on it, then start the new one. <span class="in">`No usable sandbox!`</span> means that Chrome can't start its sandbox; on Ubuntu, see "When Selenium Manager Fails" above.</span>
+<span id="cb57-1330"><a href="#cb57-1330" aria-label="1260"></a><span class="ss">- </span>**A headless run finds fewer elements than a run with a window**: Save a screenshot with <span class="in">`driver.save_screenshot("check.png")`</span> and look at it. Set <span class="in">`--window-size`</span>; if the page itself is different, the site may be treating headless browsers differently ("Headless Mode").</span>
+<span id="cb57-1331"><a href="#cb57-1331" aria-label="1261"></a><span class="ss">- </span>**A logged-in run suddenly finds nothing**: The session ended, and the site is showing you its logged-out pages. Check for something only logged-in visitors see before you collect, and log in by hand again.</span>
+<span id="cb57-1332"><a href="#cb57-1332" aria-label="1262"></a><span class="ss">- </span>**Memory issues**: Each Selenium driver runs a full browser process. Close drivers promptly with <span class="in">`driver.quit()`</span>.</span>
+<span id="cb57-1333"><a href="#cb57-1333" aria-label="1263"></a><span class="ss">- </span>**Playwright: `It looks like you are using Playwright Sync API inside the asyncio loop`**: You ran a sync script in a notebook. Run it from the terminal instead, or switch to the async API.</span>
+<span id="cb57-1334"><a href="#cb57-1334" aria-label="1264"></a><span class="ss">- </span>**Playwright: `Executable doesn't exist at ...`**: Playwright's browsers are missing, usually right after you install or upgrade the library. Run <span class="in">`python -m playwright install chromium`</span>. The box under the error says to run <span class="in">`playwright install`</span>; in <span class="in">`webdata`</span> that shorter command can run the wrong program (see "Installing Playwright").</span>
+<span id="cb57-1335"><a href="#cb57-1335" aria-label="1265"></a><span class="ss">- </span>**Playwright: `exec: .../python3.14: not found`, or conda prints `ClobberError` for `bin/playwright` or `SafetyError` for `lib/node_modules/playwright/cli.js`**: conda-forge's <span class="in">`playwright-python`</span> and <span class="in">`playwright`</span> both install the <span class="in">`playwright`</span> command, and conda wrote one over the other. Because conda hard-links files from its package cache, installing <span class="in">`playwright-python`</span> in a second environment can rewrite the command in <span class="in">`webdata`</span> as well, so that it starts the second environment's Python, which fails once that environment is deleted. The library is not damaged: <span class="in">`python -m playwright`</span> still works (checked on 2026-10-05 with <span class="in">`playwright-python`</span> 1.62.0 and <span class="in">`playwright`</span> 1.63.0).</span>
+<span id="cb57-1336"><a href="#cb57-1336" aria-label="1266"></a></span>
+<span id="cb57-1337"><a href="#cb57-1337" aria-label="1267"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb57-1338"><a href="#cb57-1338" aria-label="1268"></a></span>
+<span id="cb57-1339"><a href="#cb57-1339" aria-label="1269"></a>The modern web is dynamic: JavaScript renders content after the initial HTML loads, making it invisible to static scraping tools. Before you reach for a browser, check by hand: the data may be in the page source, inside a script, or arriving as JSON you can request directly. When you do need a browser, Selenium controls a real one from your notebook, with Selenium Manager fetching the driver, and the browser if you need one, letting you access fully-rendered pages, simulate user interactions, and extract content that <span class="in">`requests`</span> cannot see. The browser needs no window: headless, it does the same work out of sight, and a screenshot shows you what it saw. It can also log in as you, which is where a scraper's costs shift from money to your account, a contract, and the people in the data; log in by hand, and treat the session it leaves behind like your password. Playwright does the same from scripts, waits on its own, and can record a script while you click; AI agents can drive it too, but for research, have them write a script you can read and rerun rather than browse on your behalf. Every one of these tools is slow, fragile, and resource-intensive next to an API — a last resort when APIs and static scraping are unavailable. The hybrid approach of a browser for rendering plus BeautifulSoup for parsing gives you full access to the modern web while keeping your parsing code familiar.</span>
+<span id="cb57-1340"><a href="#cb57-1340" aria-label="1270"></a></span>
+<span id="cb57-1341"><a href="#cb57-1341" aria-label="1271"></a><span class="fu">## Further Reading</span></span>
+<span id="cb57-1342"><a href="#cb57-1342" aria-label="1272"></a></span>
+<span id="cb57-1343"><a href="#cb57-1343" aria-label="1273"></a><span class="ss">- </span>Selenium documentation: <span class="ot">&lt;https://www.selenium.dev/documentation/&gt;</span></span>
+<span id="cb57-1344"><a href="#cb57-1344" aria-label="1274"></a><span class="ss">- </span>Selenium Manager: <span class="ot">&lt;https://www.selenium.dev/documentation/selenium_manager/&gt;</span></span>
+<span id="cb57-1345"><a href="#cb57-1345" aria-label="1275"></a><span class="ss">- </span>Selenium's pages on each browser (Chrome, Edge, Firefox, Safari): <span class="ot">&lt;https://www.selenium.dev/documentation/webdriver/browsers/&gt;</span></span>
+<span id="cb57-1346"><a href="#cb57-1346" aria-label="1276"></a><span class="ss">- </span>Apple, "About WebDriver for Safari": <span class="ot">&lt;https://developer.apple.com/documentation/webkit/about-webdriver-for-safari&gt;</span></span>
+<span id="cb57-1347"><a href="#cb57-1347" aria-label="1277"></a><span class="ss">- </span>Mozilla, geckodriver usage, including Firefox snaps: <span class="ot">&lt;https://firefox-source-docs.mozilla.org/testing/geckodriver/Usage.html&gt;</span></span>
+<span id="cb57-1348"><a href="#cb57-1348" aria-label="1278"></a><span class="ss">- </span>Chrome for Developers, "Chrome Headless mode": <span class="ot">&lt;https://developer.chrome.com/docs/automation-and-testing/headless&gt;</span></span>
+<span id="cb57-1349"><a href="#cb57-1349" aria-label="1279"></a><span class="ss">- </span>Chromium, "AppArmor User Namespace Restrictions vs. Chromium Developer Builds", on why downloaded builds of Chrome can't start their sandbox on Ubuntu: <span class="ot">&lt;https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md&gt;</span></span>
+<span id="cb57-1350"><a href="#cb57-1350" aria-label="1280"></a><span class="ss">- </span>Python's <span class="in">`getpass`</span> module: <span class="ot">&lt;https://docs.python.org/3/library/getpass.html&gt;</span></span>
+<span id="cb57-1351"><a href="#cb57-1351" aria-label="1281"></a><span class="ss">- </span>OWASP, "Secrets Management Cheat Sheet": <span class="ot">&lt;https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html&gt;</span></span>
+<span id="cb57-1352"><a href="#cb57-1352" aria-label="1282"></a><span class="ss">- </span>Selenium Python bindings: <span class="ot">&lt;https://selenium-python.readthedocs.io/&gt;</span></span>
+<span id="cb57-1353"><a href="#cb57-1353" aria-label="1283"></a><span class="ss">- </span>Playwright for Python: <span class="ot">&lt;https://playwright.dev/python/&gt;</span></span>
+<span id="cb57-1354"><a href="#cb57-1354" aria-label="1284"></a><span class="ss">- </span>Playwright MCP: <span class="ot">&lt;https://playwright.dev/mcp/introduction&gt;</span></span>
+<span id="cb57-1355"><a href="#cb57-1355" aria-label="1285"></a><span class="ss">- </span>Web Scraping Sandbox (Quotes to Scrape and Books to Scrape): <span class="ot">&lt;https://toscrape.com/&gt;</span></span>
+<span id="cb57-1356"><a href="#cb57-1356" aria-label="1286"></a><span class="ss">- </span>@mitchell2018web — Chapter 11: Scraping JavaScript</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
