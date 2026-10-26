@@ -1,7 +1,9 @@
 # Hand-off note
 
-**Updated 2026-10-25: chapter 11 and week 11.** The sprint follows [`plans/2026-10-25-ch11-four-apis.md`](plans/2026-10-25-ch11-four-apis.md) (#288). PR A (#289, #290) and the Social History fold-in (#291) are merged, and the course's lab Parts 1 and 2 follow them. This note's pull request is PR B: Congress.gov replaces the FEC, the Census–EIA join replaces "Combining Census and FRED Data", and Social History, Common Issues, Additional Exercises 3–4, Further Reading, `index.qmd`, `README.md`, and the AI-disclosure appendix follow. Still to come:
-- **Course, after PR B merges:** lab Part 3 (Congress.gov, then the join) from the merged chapter, Friday's frames and revision menu, the deck's last placeholder, and this note.
+**Updated 2026-10-26: chapter 11 and week 11, after Monday's lab.** Chapter 11's PR A and PR B (#289–#294) are merged. This note's pull request acts on the instructor's notes from Monday: chapter 11 drops Congress.gov (three APIs, three keys), its Census section goes from the website's table to the API in concrete steps, and "API Key Management" says what to do when a key reads `MISSING`. The course side waits for a session that can reach the course repository; its changes are in [`plans/2026-10-26-week11-after-monday.md`](plans/2026-10-26-week11-after-monday.md):
+- **Wednesday:** Part 1's steps 4–5, then FRED, then the EIA if time allows; Part 1 revised to match the chapter.
+- **Friday:** the EIA, then perhaps the Census–EIA join, then the revision block. No Congress.gov.
+- **Course facts:** `DATAGOV_KEY` comes out of the key names' row and its copies.
 
 **Updated 2026-10-06, later.** Merged since the review pass below:
 - #222: chapter 8's install cell for Selenium and Selenium Manager, and its two stub sections folded into their neighbors;
