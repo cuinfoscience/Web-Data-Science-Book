@@ -66,7 +66,65 @@ An environment variable is a name and a value that a program receives from whate
   ```
 
   Then run `conda activate webdata` again, or restart Navigator, before you start Jupyter. `conda env config vars list -n webdata` shows what is set; it prints the keys themselves, so don't paste its output anywhere.
-- **In your shell.** On macOS or Linux, add one line per key, such as `export CENSUS_KEY="your-census-key"`, to your shell's startup file: `~/.zshrc` on a Mac, `~/.bashrc` on most Linux systems. Open a new terminal, and start Jupyter from it. On Windows, run `setx CENSUS_KEY "your-census-key"` in a Command Prompt, once per key, and open a new prompt before starting Jupyter. A Jupyter started from Anaconda Navigator on a Mac doesn't read `~/.zshrc`, which is one reason to prefer the first way.
+- **In your shell.** Each operating system has its own way to store a variable for every program you start afterward. Use the one for yours, with your own keys in the quotes.
+
+  **macOS.** The Mac's terminal runs zsh, its [default shell](https://support.apple.com/en-us/102360), which reads the file `~/.zshrc` each time a terminal opens. Open it in a text editor from the terminal (`nano` saves with Control-O and quits with Control-X), and add one line per key at the end:
+
+  ```bash
+  nano ~/.zshrc
+  ```
+
+  ```bash
+  export CENSUS_KEY="your-census-key"
+  export FRED_KEY="your-fred-key"
+  export EIA_KEY="your-eia-key"
+  export DATAGOV_KEY="your-datagov-key"
+  ```
+
+  Then open a new terminal, check that a key is set without printing it, and start Jupyter from that terminal:
+
+  ```bash
+  echo ${CENSUS_KEY:+CENSUS_KEY is set}
+  jupyter lab
+  ```
+
+  A Jupyter started from Anaconda Navigator on a Mac doesn't read `~/.zshrc`, which is one reason to prefer the `webdata` environment.
+
+  **Linux.** Most Linux systems run bash, which reads `~/.bashrc`. The lines are the same; only the file differs:
+
+  ```bash
+  nano ~/.bashrc
+  ```
+
+  ```bash
+  export CENSUS_KEY="your-census-key"
+  export FRED_KEY="your-fred-key"
+  export EIA_KEY="your-eia-key"
+  export DATAGOV_KEY="your-datagov-key"
+  ```
+
+  Open a new terminal, check, and start Jupyter from it:
+
+  ```bash
+  echo ${CENSUS_KEY:+CENSUS_KEY is set}
+  jupyter lab
+  ```
+
+  **Windows.** In a Command Prompt or the Anaconda Prompt, [`setx`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/setx) stores a variable for your user account, one line per key:
+
+  ```bat
+  setx CENSUS_KEY "your-census-key"
+  setx FRED_KEY "your-fred-key"
+  setx EIA_KEY "your-eia-key"
+  setx DATAGOV_KEY "your-datagov-key"
+  ```
+
+  Variables set with `setx` "are available in future command windows only, not in the current command window," as Microsoft's documentation puts it. So close the prompt, open a new one, check, and start Jupyter from it:
+
+  ```bat
+  if defined CENSUS_KEY echo CENSUS_KEY is set
+  jupyter lab
+  ```
 
 The *Missing Manual*'s [Chapter 34: Environment Variables and Secrets](https://cuinfoscience.github.io/INFO-Missing-Manual/chapters/secrets.html#setting-environment-variables-in-your-shell) explains both, and a third way, a `.env` file read by `python-dotenv`.
 
