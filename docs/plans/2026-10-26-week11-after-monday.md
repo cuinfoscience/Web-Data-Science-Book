@@ -1,6 +1,6 @@
 # Plan: week 11 after Monday's lab
 
-**Status:** Proposed 2026-10-26, from the instructor's notes on Monday's live-coding lab. The textbook side is the pull request that adds this plan; the course side needs a session that can reach the course repository (`cuinfoscience/INFO4617-Fall2026`), which this one couldn't. It replaces the week in [`2026-10-25-ch11-four-apis.md`](2026-10-25-ch11-four-apis.md), §5, for Wednesday and Friday.
+**Status:** Proposed 2026-10-26, with Friday's join decided the same day, from the instructor's notes on Monday's live-coding lab. The textbook side is the pull request that adds this plan; the course side needs a session that can reach the course repository (`cuinfoscience/INFO4617-Fall2026`), which this one couldn't. It replaces the week in [`2026-10-25-ch11-four-apis.md`](2026-10-25-ch11-four-apis.md), §5, for Wednesday and Friday.
 
 ## What Monday showed
 
@@ -38,9 +38,9 @@ Follow course `labs/AUTHORING.md` as before: run with `labs/tools/run_key.py`, c
 3. **FRED:** series metadata; observations with a fixed end date; `units`; `frequency` with `aggregation_method`, Denver against the nation.
 4. **The EIA, if time allows:** routes that describe themselves; a facet's values; Colorado's residential price. Paging can wait for Friday.
 
-**Part 3, Friday:** no Congress.gov.
+**Part 3, Friday:** no Congress.gov. The instructor decided on 2026-10-26 that Friday includes the Census–EIA join.
 - the EIA, from wherever Wednesday stopped, through paging with `offset` and `length`;
-- if time allows, the Census–EIA join, which reuses Monday's Census and Wednesday's EIA;
+- the Census–EIA join, "Combining Census and EIA Data", which reuses Monday's Census and Wednesday's EIA: every state from each agency, the Census Bureau's state crosswalk from FIPS code to postal code, an outer join whose unmatched rows are shown (Puerto Rico, and the EIA's regions and U.S. total), and each state's electricity bill as a share of its median household income;
 - "What did we learn?";
 - the Friday revision block, aimed at sections no pull request this week will touch again.
 
@@ -50,5 +50,4 @@ Follow course `labs/AUTHORING.md` as before: run with `labs/tools/run_key.py`, c
 
 ## Open questions for the instructor
 
-- Does Friday include the join, or stop at the EIA?
 - Should the students' copy of Part 1 be regenerated, given that students already have Monday's copy?
