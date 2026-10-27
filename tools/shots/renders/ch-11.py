@@ -1,11 +1,11 @@
-"""Chapter 11's renders: the charts that the chapter's own code draws from the Census, FRED, EIA, and Congress.gov APIs.
+"""Chapter 11's renders: the charts that the chapter's own code draws from the Census, FRED, and EIA APIs.
 
     python tools/shots/renders/ch-11.py OUTDIR --contact EMAIL
 
 Runs the code cells of ch-11-government.qmd, from "API Key Management" to
 "Recommended Exercises", in order, as a reader would. It skips the cell that reads
 keys from `api_keys.json`, the alternative to environment variables, so the keys
-come from CENSUS_KEY, FRED_KEY, EIA_KEY, and DATAGOV_KEY. The chapter's
+come from CENSUS_KEY, FRED_KEY, and EIA_KEY. The chapter's
 User-Agent names `your-email@colorado.edu`; this script puts EMAIL in its place.
 Each figure the code would show is saved to OUTDIR, 1600 pixels wide (an
 800-pixel frame at scale 2), under the name its recipe in
@@ -14,7 +14,6 @@ tools/shots/recipes/ch-11.yml gives:
     housing-boulder-longmont.png   housing units by decade built, two cities
     cpi-denver-national.png        annual inflation, Denver area and the nation
     co-generation-mix.png          Colorado's generation by source
-    colorado-bills-stages.png      the delegation's bills, by how far each got
     state-electricity-bills.png    homes' electricity bills against income, by state
 
 Every request waits 1 second after the one before. The cells' printed output goes
@@ -44,9 +43,9 @@ import requests
 
 QMD = Path(__file__).resolve().parents[3] / "ch-11-government.qmd"
 NAMES = ["housing-boulder-longmont", "cpi-denver-national", "co-generation-mix",
-         "colorado-bills-stages", "state-electricity-bills"]
+         "state-electricity-bills"]
 PLACEHOLDER = "your-email@colorado.edu"
-KEYS = ["CENSUS_KEY", "FRED_KEY", "EIA_KEY", "DATAGOV_KEY"]
+KEYS = ["CENSUS_KEY", "FRED_KEY", "EIA_KEY"]
 PAUSE = 1.0
 
 args = argparse.ArgumentParser()

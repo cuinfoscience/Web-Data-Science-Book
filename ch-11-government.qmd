@@ -3,10 +3,9 @@
 ::: {.callout-tip}
 ## Learning Objectives
 - Keep API keys out of your notebooks, in environment variables, and check that each one is set without printing it
-- Find what an API offers before you ask for it: the Census Bureau's catalogs of variables and geographies, and its FIPS codes for places
+- Find what an API offers before you ask for it: go from a table on the Census Bureau's website to its group and variables in the API, and get the same numbers back for a state, a county, and a city
 - Ask FRED to transform a series before it sends it: percent changes, annual averages, and other units and frequencies
 - Ask the EIA to filter its data before it sends it, with routes, facets, data columns, and sorting, and page through a large result with `offset` and `length`
-- Follow the links from one Congress.gov record to the records about it, page through a list with `next`, and ask only for what changed with `fromDateTime`
 - Join two agencies' data on a shared identifier, through a crosswalk when their codes differ, and check the rows that don't match
 - Trace a number on an agency's website to the API request that returns it
 :::
@@ -19,23 +18,21 @@ Run this chapter's code as you read: open the [companion notebook](https://githu
 
 ## Public Data by Mandate
 
-Government APIs exist because a law or a public charter says the data must be published, not because publishing it suits a business plan. This chapter uses four of them:
+Government APIs exist because a law or a public charter says the data must be published, not because publishing it suits a business plan. This chapter uses three of them:
 
 - **The U.S. Census Bureau.** The Constitution requires a count of the population every ten years, and the Bureau's American Community Survey (ACS) asks a sample of households about income, housing, work, and much else every year.
 - **FRED** (Federal Reserve Economic Data), from the Federal Reserve Bank of St. Louis. FRED collects more than 800,000 time series from the agencies that produce them, among them the Bureau of Labor Statistics, the Bureau of Economic Analysis, and the Census Bureau, and serves them in one format.
 - **The U.S. Energy Information Administration (EIA).** The Department of Energy Organization Act of 1977 made the EIA the department's statistical agency, and it publishes what the country produces, buys, and pays for energy, state by state.
-- **Congress.gov**, from the Library of Congress: every bill, its sponsors, what happened to it, and its text.
 
 As a result, these APIs embody the **openness** value described in @sec-post-api: public data, freely accessible, maintained by public mandate rather than platform goodwill. They also tend to be more *stable* than commercial offerings, since an agency doesn't pivot its business model or get acquired. But they are often less *polished*: the documentation can be dense, variable names cryptic, and error messages unhelpful.
 
-Each of the four teaches one general idea about APIs, which you will meet again in every API you use:
+Each of the three teaches one general idea about APIs, which you will meet again in every API you use:
 
 | API | The idea | What you'll do |
 |---|---|---|
-| Census | *What can I ask for?* | Read the catalogs of variables and geographies before asking for data |
+| Census | *What can I ask for?* | Find a table's group and its variables in the API's catalogs before asking for data |
 | FRED | *Let the server compute* | Ask for percent changes and annual averages instead of computing them |
 | EIA | *Let the server filter* | Narrow a route to one state, one sector, and one column, and page through the rest |
-| Congress.gov | *Follow the links* | Go from a bill to its actions, cosponsors, and text, one link at a time |
 
 ## API Key Management
 
@@ -43,12 +40,11 @@ Each of these APIs asks for an API key: a unique string that identifies your app
 
 ### Get Your Keys
 
-This chapter uses four keys, all free. Request them now: most arrive in minutes, but the Census key works only after you click the link in its email. Each one gets a name, the environment variable your code will read it from:
+This chapter uses three keys, all free. Request them now: most arrive in minutes, but the Census key works only after you click the link in its email. Each one gets a name, the environment variable your code will read it from:
 
 - **The Census Bureau**: request a key at <https://api.census.gov/data/key_signup.html>, and store it as `CENSUS_KEY`.
 - **FRED** (Federal Reserve Economic Data): create a free FRED account, request a key at <https://fred.stlouisfed.org/docs/api/api_key.html>, and store it as `FRED_KEY`.
 - **The EIA** (U.S. Energy Information Administration): request a key at <https://www.eia.gov/opendata/register.php>, and store it as `EIA_KEY`.
-- **api.data.gov**, for Congress.gov: request a key at <https://api.data.gov/signup/>, and store it as `DATAGOV_KEY`. One api.data.gov key works for many federal APIs, Congress.gov's among them.
 
 **Never hardcode API keys in your notebooks.** If you share your notebook (on GitHub, in a class submission, with a collaborator), your key goes with it. Store each key as an environment variable instead, and read it at the top of your notebook.
 
@@ -62,7 +58,6 @@ An environment variable is a name and a value that a program receives from whate
   conda env config vars set CENSUS_KEY="your-census-key" -n webdata
   conda env config vars set FRED_KEY="your-fred-key" -n webdata
   conda env config vars set EIA_KEY="your-eia-key" -n webdata
-  conda env config vars set DATAGOV_KEY="your-datagov-key" -n webdata
   ```
 
   Then run `conda activate webdata` again, or restart Navigator, before you start Jupyter. `conda env config vars list -n webdata` shows what is set; it prints the keys themselves, so don't paste its output anywhere.
@@ -78,7 +73,6 @@ An environment variable is a name and a value that a program receives from whate
   export CENSUS_KEY="your-census-key"
   export FRED_KEY="your-fred-key"
   export EIA_KEY="your-eia-key"
-  export DATAGOV_KEY="your-datagov-key"
   ```
 
   Then open a new terminal, check that a key is set without printing it, and start Jupyter from that terminal:
@@ -100,7 +94,6 @@ An environment variable is a name and a value that a program receives from whate
   export CENSUS_KEY="your-census-key"
   export FRED_KEY="your-fred-key"
   export EIA_KEY="your-eia-key"
-  export DATAGOV_KEY="your-datagov-key"
   ```
 
   Open a new terminal, check, and start Jupyter from it:
@@ -116,7 +109,6 @@ An environment variable is a name and a value that a program receives from whate
   setx CENSUS_KEY "your-census-key"
   setx FRED_KEY "your-fred-key"
   setx EIA_KEY "your-eia-key"
-  setx DATAGOV_KEY "your-datagov-key"
   ```
 
   Variables set with `setx` "are available in future command windows only, not in the current command window," as Microsoft's documentation puts it. So close the prompt, open a new one, check, and start Jupyter from it:
@@ -135,32 +127,57 @@ The *Missing Manual*'s [Chapter 34: Environment Variables and Secrets](https://c
 import os
 import requests
 
-# Set the four keys once, as above, before you start Jupyter
+# Set the three keys once, as above, before you start Jupyter
 
 # Say whether each key is set, without ever printing the key itself
-for name in ["CENSUS_KEY", "FRED_KEY", "EIA_KEY", "DATAGOV_KEY"]:
+for name in ["CENSUS_KEY", "FRED_KEY", "EIA_KEY"]:
     print(f"{name}: {'set' if os.environ.get(name) else 'MISSING'}")
 
 census_key = os.environ.get("CENSUS_KEY")
 fred_key = os.environ.get("FRED_KEY")
 eia_key = os.environ.get("EIA_KEY")
-datagov_key = os.environ.get("DATAGOV_KEY")
 
 # Every request in this chapter says who is asking, as chapter 1's did; put your own address here
 HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 # CENSUS_KEY: set
 # FRED_KEY: set
 # EIA_KEY: set
-# DATAGOV_KEY: set
 ```
 
-If a line says `MISSING`, close Jupyter, set the variable, and start Jupyter again from the same terminal: a program sees only the environment variables that were set before it started. Every code block in the rest of this chapter assumes `census_key`, `fred_key`, `eia_key`, `datagov_key`, and `HEADERS` are defined.
+Every code block in the rest of this chapter assumes `census_key`, `fred_key`, `eia_key`, and `HEADERS` are defined. `os.environ.get()` returns `None` for a variable that isn't set; `os.environ["CENSUS_KEY"]`, with square brackets, raises a `KeyError` instead. Either way, the variable isn't there.
+
+### When a Key Says `MISSING`
+
+If a line says `MISSING`, or `os.environ["CENSUS_KEY"]` raises `KeyError`, the Python running your notebook received no variable by that name. Setting it somewhere isn't enough: it has to be set where Jupyter can see it, before Jupyter starts. The usual causes:
+
+- **Jupyter started before the variable was set, or from somewhere else.** `export` sets a variable in one terminal window, for the programs you start from that window afterward. A Jupyter that was already running, or that you started from Anaconda Navigator, another terminal, or VS Code, never receives it. Quit Jupyter and start it again from the terminal where you ran `export`, or store the keys in the `webdata` environment, which every way of starting Jupyter in it receives.
+- **`export` ran in a notebook cell.** A cell such as `!export CENSUS_KEY="..."` starts a shell, sets the variable in that shell, and closes it; the notebook's Python never sees it, and your key is now saved in the notebook.
+- **`export` on Windows.** Windows has no `export` command. Use `setx`, as above, then open a new prompt: `setx` changes only windows opened after it.
+- **`conda env config vars set`, without reactivating.** The variables arrive the next time the environment is activated: run `conda activate webdata` again, or restart Navigator, and then start Jupyter.
+- **A different name.** The name must match exactly, in capitals: `CENSUS_KEY`, not `census_key` or `CENSUS_API_KEY`.
+
+When you can't find the cause and need to keep working, ask for the missing keys in the notebook itself. `getpass()` shows a password box under the cell; what you paste isn't displayed, isn't saved in the notebook, and lasts until the kernel restarts:
+
+```{python}
+from getpass import getpass
+
+# Ask only for keys that are missing; what you paste stays out of the notebook
+for name in ["CENSUS_KEY", "FRED_KEY", "EIA_KEY"]:
+    if not os.environ.get(name):
+        os.environ[name] = getpass(f"{name} isn't set. Paste it here: ")
+
+census_key = os.environ["CENSUS_KEY"]
+fred_key = os.environ["FRED_KEY"]
+eia_key = os.environ["EIA_KEY"]
+```
+
+Treat this as a stopgap: the next time you start Jupyter, it asks again. Fix the cause when you have time.
 
 The Census Bureau, FRED, and the EIA all take the key as a parameter in the URL, so the address `requests` sends, `response.url`, contains your key. Print a response's JSON, never its URL, and never paste a URL from an error message into a forum or a pull request without deleting the key first.
 
 ### Alternative: A JSON Configuration File
 
-Some projects keep keys in a local configuration file instead of environment variables. Create a file called `api_keys.json` containing `{"census": "your-key", "fred": "your-key", "eia": "your-key", "datagov": "your-key"}`, add it to your `.gitignore` **before your first commit**, and load it into the same variable names:
+Some projects keep keys in a local configuration file instead of environment variables. Create a file called `api_keys.json` containing `{"census": "your-key", "fred": "your-key", "eia": "your-key"}`, add it to your `.gitignore` **before your first commit**, and load it into the same variable names:
 
 ```{python}
 import json
@@ -171,10 +188,9 @@ with open("api_keys.json") as f:
 census_key = keys["census"]
 fred_key = keys["fred"]
 eia_key = keys["eia"]
-datagov_key = keys["datagov"]
 ```
 
-Because both approaches end with the same four variables, every downstream code block in this chapter works unchanged either way.
+Because both approaches end with the same three variables, every downstream code block in this chapter works unchanged either way.
 
 ::: {.callout-tip}
 ## Missing Manual Reference
@@ -183,7 +199,7 @@ For a comprehensive guide to API keys, environment variables, `.env` files, and 
 
 ## A Tour: From an Agency's Website to Its API
 
-Every number this chapter's code retrieves is also on a web page, built for people to read. Start there. The page tells you what the agency calls the thing you want, which table or series it belongs to, and what place or period it covers, and those are the words the API wants. Two of the four sites go further, and show you the request itself.
+Every number this chapter's code retrieves is also on a web page, built for people to read. Start there. The page tells you what the agency calls the thing you want, which table or series it belongs to, and what place or period it covers, and those are the words the API wants. Two of the three sites go further, and show you the request itself.
 
 ### A Census Table
 
@@ -203,12 +219,6 @@ The U.S. Energy Information Administration (EIA) builds its requests in the open
 
 ![The EIA's API Dashboard, October 2026, set to the route for retail electricity sales, annual: the data type, average price ①, the facet filters, one state and one sector ②, and the API URL the form builds ③.](images/ch-11/eia-browser_annotated.png){#fig-eia-browser .lightbox fig-alt="Screenshot of the EIA API Dashboard. Marker 1: the Data Type section, with Average Price of Electricity to Ultimate Customers checked among four choices. Marker 2: Filter by Facet, with STATEID 1 of 62 selected and SECTORID 1 of 6 selected. Marker 3: the API URL, https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=annual&data[0]=price&facets[stateid][]=CO&facets[sectorid][]=RES with sort, offset, and length parameters."}
 
-### A Bill on Congress.gov
-
-A bill's page on Congress.gov (@fig-congress-bill), the Library of Congress's site for legislation, is the hub of a set of records. Congress.gov's API, documented at [api.congress.gov](https://api.congress.gov/), returns the same records. This one is H.R. 7730 ① of the 119th Congress, the Bankruptcy Threshold Adjustment Act, sponsored by Rep. Ben Cline of Virginia's 6th district ②. Its tracker ③ shows how far it has come: it has passed the House and the Senate, and its latest action, on October 14, 2026, sent the House a message on the Senate's action. It hasn't reached the President. The page links to the bill's committee report and to **All Actions**, and the tabs under the box ④ lead to its text, its actions, its cosponsors, and more, each a page of its own with a count. In the API, the bill's record is `/v3/bill/119/hr/7730`, and it holds a link to each of those records, with a count: on October 25, 2026, 18 actions, 6 cosponsors, and 5 versions of its text. The counts don't all agree: the page's **Actions** tab counts 14 where the API's record counts 18.
-
-![H.R. 7730 on Congress.gov, October 2026: the bill's number and title ①, its sponsor ②, the tracker, which shows it has passed the House and the Senate ③, and the tabs that lead to its summary, text, actions, cosponsors, and other records ④.](images/ch-11/congress-bill_annotated.png){#fig-congress-bill .lightbox fig-alt="Screenshot of Congress.gov's page for H.R.7730, Bankruptcy Threshold Adjustment Act. Marker 1: the number and title. Marker 2: Sponsor, Rep. Cline, Ben [R-VA-6], introduced 02/26/2026; below it, the latest action, a Senate message of 10/14/2026. Marker 3: a five-step tracker with Passed Senate highlighted. Marker 4: tabs including Text (5), Actions (14), and Cosponsors (6)."}
-
 ### From the Website to the API
 
 Each page in the tour is built for people to read, and each has a request behind it that returns the same thing to a program. The table pairs them, one API to a row:
@@ -218,87 +228,81 @@ Each page in the tour is built for people to read, and each has a request behind
 | Census Bureau | a table on data.census.gov (@fig-census-table) | Boulder County's median household income | `api.census.gov/data/2024/acs/acs5?get=B19013_001E&for=county:013&in=state:08` |
 | FRED | a series' page (@fig-fred-series) | Boulder County's median household income, year by year | `api.stlouisfed.org/fred/series/observations?series_id=MHICO08013A052NCEN` |
 | EIA | the API Dashboard (@fig-eia-browser) | the price of electricity in Colorado's homes | `api.eia.gov/v2/electricity/retail-sales/data/?data[]=price&facets[stateid][]=CO&facets[sectorid][]=RES` |
-| Congress.gov | a bill's page (@fig-congress-bill) | H.R. 7730, and how far it has come | `api.congress.gov/v3/bill/119/hr/7730` |
 
-Every request also needs your key, which the table leaves out. The words in each request are the page's words: a table's ID, a series' ID, a state's code, a bill's number. That is why the tour comes first. The rest of the chapter takes the four APIs in the table's order, starting with the question every API raises before any data arrives: what can I ask for?
+Every request also needs your key, which the table leaves out. The words in each request are the page's words: a table's ID, a series' ID, a state's code. That is why the tour comes first. The rest of the chapter takes the three APIs in the table's order, starting with the question every API raises before any data arrives: what can I ask for?
 
 ## U.S. Census Bureau API
 
-The U.S. Census Bureau provides access to an enormous range of demographic, economic, and housing data. Its home page is [census.gov](https://www.census.gov/), and its API is documented at [census.gov/data/developers](https://www.census.gov/data/developers.html), with a [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) and a page for each dataset. The American Community Survey (ACS), the Bureau's yearly survey of a sample of households, alone contains more than 28,000 variables. The challenge is not access but navigation: knowing what you can ask for. The API answers that question itself, through two catalogs that come with every dataset, and reading them first is the habit this section teaches.
+The U.S. Census Bureau provides access to an enormous range of demographic, economic, and housing data. Its home page is [census.gov](https://www.census.gov/), and its API is documented at [census.gov/data/developers](https://www.census.gov/data/developers.html), with a [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) and a page for each dataset. The American Community Survey (ACS), the Bureau's yearly survey of a sample of households, alone holds about 1,200 tables. The challenge is not access but navigation: knowing what you can ask for. This section answers that question the way you would by hand, starting from the table on the website in @fig-census-table and ending with the same numbers from the API.
 
-### What Can I Ask For? Variables
+### From the Website's Table to the API's Group
 
-Each Census dataset has an address. This chapter uses the American Community Survey (ACS) 5-year estimates for 2020–2024, documented at [census.gov/data/developers/data-sets/acs-5year.html](https://www.census.gov/data/developers/data-sets/acs-5year.html), whose address in the Census Bureau's API is `https://api.census.gov/data/2024/acs/acs5`. Add `/variables.json` to that address, and you get every variable the dataset offers, with its label:
+Each Census dataset has an address. This chapter uses the ACS 5-year estimates for 2020–2024, documented at [census.gov/data/developers/data-sets/acs-5year.html](https://www.census.gov/data/developers/data-sets/acs-5year.html), whose address in the API is `https://api.census.gov/data/2024/acs/acs5`. That is the product ② in @fig-census-table.
+
+The website calls B19013 a table; the API calls it a **group**. Every group the dataset holds is listed, with its title, at `groups.json`, and as a web page at [api.census.gov/data/2024/acs/acs5/groups.html](https://api.census.gov/data/2024/acs/acs5/groups.html), where your browser's Find works as well as code does. Search the titles for the words on the website's table:
 
 ```{python}
 import pandas as pd
 
 census_base = "https://api.census.gov/data/2024/acs/acs5"   # ACS 5-year estimates, 2020-2024
 
-# Every variable in the dataset, with its label: about 10 MB, so fetch it once and keep it
-response = requests.get(f"{census_base}/variables.json", headers=HEADERS, timeout=60)
+# Every group (table) in the dataset, with its title
+response = requests.get(f"{census_base}/groups.json", headers=HEADERS, timeout=60)
 response.raise_for_status()
-variables = response.json()["variables"]
-print(f"{len(variables):,} variables")
+groups = response.json()["groups"]
+print(f"{len(groups):,} groups")
 
-# Search the descriptions for the words you would use yourself, and show each table's first line
-for var_id, info in sorted(variables.items()):
-    concept = info.get("concept", "")
-    if concept.lower().startswith("median household income") and var_id.endswith("_001E"):
-        print(var_id, "|", concept)
-# 28,475 variables
-# B19013A_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (White Alone Householder)
-# B19013B_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Black or African American Alone Householder)
-# B19013C_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (American Indian and Alaska Native Alone Householder)
-# B19013D_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Asian Alone Householder)
-# B19013E_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Native Hawaiian and Other Pacific Islander Alone Householder)
-# B19013F_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Some Other Race Alone Householder)
-# B19013G_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Two or More Races Householder)
-# B19013H_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (White Alone, Not Hispanic or Latino Householder)
-# B19013I_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Hispanic or Latino Householder)
-# B19013_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars)
-# B19019_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Household Size
-# B19049_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Age of Householder
-# B22008_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Receipt of Food Stamps/SNAP in the Past 12 Months
-# B25119_001E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Tenure
-# B29004_001E | Median Household Income for Households With a Citizen, Voting-Age Householder (in 2024 Inflation-Adjusted Dollars)
+# Search the titles for the words on the website's table
+for group in sorted(groups, key=lambda g: g["name"]):
+    if "median household income" in group["description"].lower():
+        print(group["name"], "|", group["description"])
+# 1,199 groups
+# B19013 | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars)
+# B19013A | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (White Alone Householder)
+# B19013B | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Black or African American Alone Householder)
+# B19013C | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (American Indian and Alaska Native Alone Householder)
+# B19013D | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Asian Alone Householder)
+# B19013E | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Native Hawaiian and Other Pacific Islander Alone Householder)
+# B19013F | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Some Other Race Alone Householder)
+# B19013G | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Two or More Races Householder)
+# B19013H | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (White Alone, Not Hispanic or Latino Householder)
+# B19013I | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) (Hispanic or Latino Householder)
+# B19019 | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Household Size
+# B19049 | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Age of Householder
+# B22008 | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Receipt of Food Stamps/SNAP in the Past 12 Months
+# B25099 | Mortgage Status by Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars)
+# B25119 | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Tenure
+# B29004 | Median Household Income for Households With a Citizen, Voting-Age Householder (in 2024 Inflation-Adjusted Dollars)
 ```
 
-Each hit is the first line of a table about median household income. `B19013_001E` is the one for all households, the figure in @fig-census-table. The tables before it break the same measure down by the householder's race and ethnicity, and those after it by household size, the householder's age, receipt of SNAP benefits, and whether the household owns or rents; the last is for households whose householder is a citizen of voting age. Look up `B19013_001E`, and the catalog tells you more:
+`B19013` is the group for all households, the table in @fig-census-table. The groups after it with a letter, `B19013A` to `B19013I`, are the same measure for households of one race or ethnicity, and the rest break it down by household size, the householder's age, receipt of SNAP benefits, mortgage status, whether the household owns or rents, and citizenship. Had you started from a topic instead of a table, the same search, with your own words, is how you would find one.
+
+### From the Group to Its Variables
+
+A group's own address, `groups/B19013.json`, lists its **variables**: every column the table has, each with a label. Its web page is [groups/B19013.html](https://api.census.gov/data/2024/acs/acs5/groups/B19013.html):
 
 ```{python}
-print(variables["B19013_001E"])
-# {'label': 'Estimate!!Median household income in the past 12 months (in 2024 inflation-adjusted dollars)', 'concept': 'Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars)', 'predicateType': 'int', 'group': 'B19013', 'limit': 0, 'attributes': 'B19013_001EA,B19013_001M,B19013_001MA'}
-```
-
-The variable naming convention follows a pattern. `B19013` is the **group**, or table: the same code as on data.census.gov. `_001` is the line in that table, and `E` means estimate. Its `attributes` name its partners, among them `B19013_001M`, the margin of error. The ACS is a survey of a sample, so every estimate comes with a margin of error, and a difference between two places smaller than their margins may be no difference at all. The groups index at <https://api.census.gov/data/2024/acs/acs5/groups.html> lists every group, which helps when you know the topic but not the words its labels use.
-
-### What Can I Ask For? Geographies
-
-The second catalog, `geography.json`, lists the geographies the American Community Survey (ACS) dataset can be asked about, and what each one has to sit inside. The Census API's [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) explains how a request names them:
-
-```{python}
-response = requests.get(f"{census_base}/geography.json", headers=HEADERS, timeout=60)
+response = requests.get(f"{census_base}/groups/B19013.json", headers=HEADERS, timeout=30)
 response.raise_for_status()
-levels = response.json()["fips"]
-print(f"{len(levels)} kinds of geography")
+group_vars = response.json()["variables"]
 
-# Summary levels: 040 is a state, 050 a county, 140 a census tract, 160 a place
-for level in levels:
-    if level["geoLevelDisplay"] in ("040", "050", "140", "160"):
-        print(f"{level['name']:7} requires: {level.get('requires', [])}")
-# 65 kinds of geography
-# state   requires: []
-# county  requires: ['state']
-# tract   requires: ['state', 'county']
-# place   requires: ['state']
+for var_id, info in sorted(group_vars.items()):
+    print(f"{var_id:13} {info['label']}")
+# B19013_001E   Estimate!!Median household income in the past 12 months (in 2024 inflation-adjusted dollars)
+# B19013_001EA  Annotation of Estimate!!Median household income in the past 12 months (in 2024 inflation-adjusted dollars)
+# B19013_001M   Margin of Error!!Median household income in the past 12 months (in 2024 inflation-adjusted dollars)
+# B19013_001MA  Annotation of Margin of Error!!Median household income in the past 12 months (in 2024 inflation-adjusted dollars)
+# GEO_ID        Geography
+# NAME          Geographic Area Name
 ```
 
-Read `requires` as the request's grammar. A county is asked for `for=county:…` and `in=state:…`; a census tract needs both a state and a county in `in`. Places are identified by **FIPS codes** (Federal Information Processing Standards codes), numbers the federal government assigns: Colorado is state `08`, Boulder County is county `013` in it, and the city of Boulder is place `07850`. They are strings, not numbers: `08` without its zero is a different code. The Census Bureau lists them at [census.gov/library/reference/code-lists](https://www.census.gov/library/reference/code-lists/ansi.html).
+Each variable's name follows a pattern. `B19013` is the group, `_001` the line in the table, and the last letter what the line holds: `E` the estimate, `M` its margin of error, and `EA` and `MA` their annotations, which say why an estimate or a margin is missing; when one is, the estimate itself holds a code, as "Every Place in a State", below, shows. The `!!` in a label separates its levels, the way the website's table indents its rows. `NAME` and `GEO_ID` describe the place. B19013 has one line, so it has one estimate; a bigger group, such as `B25034`, Year Structure Built, has one estimate for each of its eleven lines, which "Comparing Places" uses.
 
-### Querying for a Place
+The ACS is a survey of a sample, so every estimate comes with a margin of error, and a difference between two places smaller than their margins may be no difference at all. Ask for `M` whenever you ask for `E`.
 
-With a variable and a geography, a request to the Census Bureau's API is a few parameters, which its [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) lists: `get` names the variables, `for` the geography, `in` what that geography sits inside, and `key` your key. Places are named by their FIPS codes (Federal Information Processing Standards codes), and the variable here is from the American Community Survey (ACS). Here is the figure from @fig-census-table, with its margin of error:
+### The Same Numbers from the API
+
+With a group and its variables, a request to the API is a few parameters, which its [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) lists: `get` names the variables, `for` the place, `in` what that place sits inside, and `key` your key. Here is the figure from @fig-census-table, with its margin of error:
 
 ```{python}
 params = {
@@ -314,11 +318,37 @@ print(rows)
 # [['NAME', 'B19013_001E', 'B19013_001M', 'state', 'county'], ['Boulder County, Colorado', '103994', '2268', '08', '013']]
 ```
 
-The response is a list of lists: the first row is the column names, and each row after it is one place. Every value is a string, the numbers included, and the geography's codes come back as columns of their own. The estimate matches the website's, and the margin of error is the website's "±2,268".
+The estimate matches the website's ④, \$103,994, and the margin of error is its "±2,268". The response is a list of lists: the first row is the column names, and each row after it is one place. Every value is a string, the numbers included, and the place's codes come back as columns of their own.
+
+### The Same Variable for a State, a County, and a City
+
+Places are named by **FIPS codes** (Federal Information Processing Standards codes), numbers the federal government assigns: Colorado is state `08`; Boulder County is county `013` in Colorado; the city of Boulder is place `07850` in Colorado. You already have one of them. The website's address in @fig-census-table ends `g=050XX00US08013`: `050` means a county, and `08013` is the state's code followed by the county's. Change only `for` and `in`, and the same request asks about a different kind of place:
+
+```{python}
+# The same two variables for three places, each named by its FIPS codes
+places_to_ask = [
+    {"for": "state:08"},                         # Colorado
+    {"for": "county:013", "in": "state:08"},     # Boulder County, in Colorado
+    {"for": "place:07850", "in": "state:08"},    # the city of Boulder, in Colorado
+]
+for geography in places_to_ask:
+    params = {"get": "NAME,B19013_001E,B19013_001M", "key": census_key, **geography}
+    response = requests.get(census_base, params=params, headers=HEADERS, timeout=30)
+    response.raise_for_status()
+    name, estimate, margin = response.json()[1][:3]
+    print(f"{name:26} {int(estimate):>8,} ± {int(margin):,}")
+# Colorado                     95,470 ± 578
+# Boulder County, Colorado    103,994 ± 2,268
+# Boulder city, Colorado       87,493 ± 6,221
+```
+
+A state needs only `for`; a county or a city also needs `in`, the state it sits in, because county and place codes are numbered within each state: county `013` is a different county in every state that has one. FIPS codes are strings: `08` without its zero is a different code. To ask about another kind of place, such as a census tract or a ZIP code area, two pages of the dataset's documentation show the way. [geography.html](https://api.census.gov/data/2024/acs/acs5/geography.html) lists each kind of place and what it has to sit inside; [examples.html](https://api.census.gov/data/2024/acs/acs5/examples.html) gives a working request for each, ready to copy. The Census Bureau lists the codes themselves at [census.gov/library/reference/code-lists](https://www.census.gov/library/reference/code-lists/ansi.html).
+
+The city's median household income, \$87,493, is lower than both the county's and the state's. Its margin of error, ±6,221, is almost three times the county's and more than ten times the state's: the smaller the place, the fewer of its households are in the survey's sample. Before you say that two places differ, compare the difference with their margins.
 
 ### Comparing Places
 
-Ask the Census Bureau's API for several places at once by listing their FIPS codes (Federal Information Processing Standards codes), as its [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) shows. This request gets the age of the housing stock from the American Community Survey (ACS), group `B25034`, Year Structure Built, for the cities of Boulder and Longmont, and labels each column with the words from the catalog:
+Ask the Census Bureau's API for several places at once by listing their FIPS codes (Federal Information Processing Standards codes), as its [user guide](https://www.census.gov/data/developers/guidance/api-user-guide.html) shows. This request gets the age of the housing stock from the American Community Survey (ACS), group `B25034`, Year Structure Built, for the cities of Boulder and Longmont, and labels each column with the words from the group's variables:
 
 ```{python}
 # Lines 002 to 011: built 2020 or later, 2010 to 2019, ..., 1939 or earlier
@@ -338,8 +368,11 @@ rows = response.json()
 df = pd.DataFrame(rows[1:], columns=rows[0])
 df[housing_vars] = df[housing_vars].apply(pd.to_numeric)
 
-# The last part of each label is the decade, such as "Built 2010 to 2019"
-labels = {var: variables[var]["label"].split("!!")[-1] for var in housing_vars}
+# The group's labels; the last part of each is the decade, such as "Built 2010 to 2019"
+response = requests.get(f"{census_base}/groups/B25034.json", headers=HEADERS, timeout=30)
+response.raise_for_status()
+b25034 = response.json()["variables"]
+labels = {var: b25034[var]["label"].split("!!")[-1] for var in housing_vars}
 housing = df.set_index("NAME")[housing_vars].rename(columns=labels).T
 print(housing)
 # NAME                   Boulder city, Colorado  Longmont city, Colorado
@@ -355,7 +388,7 @@ print(housing)
 # Built 1939 or earlier                    3576                     2071
 ```
 
-The table holds the answer, but it takes reading: ten rows of two numbers each, newest first. A chart shows its shape at a glance. Draw one pair of bars for each decade, one bar per city, so that the two cities sit side by side wherever they differ. The labels came from the catalog, so the chart can use them as they are. Turn the table upside down first, so that time runs left to right, from the oldest decade to the newest:
+The table holds the answer, but it takes reading: ten rows of two numbers each, newest first. A chart shows its shape at a glance. Draw one pair of bars for each decade, one bar per city, so that the two cities sit side by side wherever they differ. The labels came from the group's variables, so the chart can use them as they are. Turn the table upside down first, so that time runs left to right, from the oldest decade to the newest:
 
 ```{python}
 import matplotlib.pyplot as plt
@@ -782,237 +815,6 @@ Compare this loop with @sec-wikipedia's. Wikipedia's API hands you a `continue` 
 - **Sort when you page.** Without a fixed order, nothing promises that the rows come back in the same order on the second request as on the first, and a row could appear on both pages or on neither.
 - **Filter first.** Paging is for results that are large after you have narrowed them. Before writing a loop, ask whether a facet, a shorter span, or a lower frequency would fit the request in one page.
 
-## Congress.gov API
-
-Congress.gov is the official website for U.S. federal legislation, run by the Library of Congress with the House, the Senate, and the Government Publishing Office. Its API, documented at [api.congress.gov](https://api.congress.gov/) and in the Library's [GitHub repository](https://github.com/LibraryOfCongress/api.congress.gov), returns the same records: bills, members, committees, votes, and the *Congressional Record*. Its key is the api.data.gov key you stored as `DATAGOV_KEY`. A bill's record holds little data of its own. Mostly it holds links: to the bill's actions, its cosponsors, its text, its committees, each a record with its own address. Following those links, from one record to the records about it, is this section's idea.
-
-### A Bill and the Records It Links To
-
-Ask Congress.gov's API for H.R. 7730, the bill in @fig-congress-bill. Every api.data.gov service accepts the key in a header, `X-Api-Key`, as well as in the URL, according to api.data.gov's [developer manual](https://api.data.gov/docs/developer-manual/). In a header, the key stays out of every URL your code prints, and the links in the answer can be followed exactly as they arrive:
-
-```{python}
-congress_base = "https://api.congress.gov/v3"
-
-# The key goes in a header, not the URL, so no URL this section prints contains it
-congress_headers = HEADERS.copy()
-congress_headers["X-Api-Key"] = datagov_key
-
-response = requests.get(f"{congress_base}/bill/119/hr/7730", params={"format": "json"}, headers=congress_headers, timeout=30)
-response.raise_for_status()
-bill = response.json()["bill"]
-
-print(bill["title"])
-print("Sponsor:", bill["sponsors"][0]["fullName"])
-print("Latest action:", bill["latestAction"]["actionDate"], bill["latestAction"]["text"])
-
-# Most of the record is links: each says how many records sit behind it, and where they are
-for field, value in bill.items():
-    if isinstance(value, dict) and "url" in value:
-        print(f"{field:12} {value.get('count', ''):>3}  {value['url']}")
-# Bankruptcy Threshold Adjustment Act
-# Sponsor: Rep. Cline, Ben [R-VA-6]
-# Latest action: 2026-10-14 Message on Senate action sent to the House.
-# actions       18  https://api.congress.gov/v3/bill/119/hr/7730/actions?format=json
-# committees     1  https://api.congress.gov/v3/bill/119/hr/7730/committees?format=json
-# cosponsors     6  https://api.congress.gov/v3/bill/119/hr/7730/cosponsors?format=json
-# relatedBills   2  https://api.congress.gov/v3/bill/119/hr/7730/relatedbills?format=json
-# subjects       4  https://api.congress.gov/v3/bill/119/hr/7730/subjects?format=json
-# summaries      1  https://api.congress.gov/v3/bill/119/hr/7730/summaries?format=json
-# textVersions   5  https://api.congress.gov/v3/bill/119/hr/7730/text?format=json
-# titles         7  https://api.congress.gov/v3/bill/119/hr/7730/titles?format=json
-```
-
-### Following the Links
-
-Each link is a complete request: the address, with `format=json` already on it. Send it with the same headers, and the API answers with the records it promised. Here are two of them, the bill's cosponsors and its actions, the steps the bill has taken through Congress:
-
-```{python}
-response = requests.get(bill["cosponsors"]["url"], headers=congress_headers, timeout=30)
-response.raise_for_status()
-for person in response.json()["cosponsors"]:
-    print(person["sponsorshipDate"], person["fullName"])
-
-# requests adds limit to the parameters the link already has
-response = requests.get(bill["actions"]["url"], params={"limit": 250}, headers=congress_headers, timeout=30)
-response.raise_for_status()
-actions = response.json()["actions"]
-print(len(actions), "actions; the milestones, oldest first:")
-
-milestones = ("Introduced in", "Passed/agreed to in", "Became Public Law")
-shown = set()
-for action in reversed(actions):   # the API lists the newest first
-    # Some milestones are recorded twice, in the same words; print each once
-    if action["text"].startswith(milestones) and action["text"] not in shown:
-        print(" ", action["actionDate"], action["text"][:60])
-        shown.add(action["text"])
-# 2026-02-26 Rep. Correa, J. Luis [D-CA-46]
-# 2026-02-26 Rep. Lee, Laurel M. [R-FL-15]
-# 2026-02-26 Rep. Neguse, Joe [D-CO-2]
-# 2026-03-24 Rep. Gooden, Lance [R-TX-5]
-# 2026-03-25 Rep. Lofgren, Zoe [D-CA-18]
-# 2026-06-08 Rep. Taylor, David J. [R-OH-2]
-# 18 actions; the milestones, oldest first:
-#   2026-02-26 Introduced in House
-#   2026-09-16 Passed/agreed to in House: On motion to suspend the rules an
-#   2026-09-28 Passed/agreed to in Senate: Passed Senate without amendment
-```
-
-Rep. Joe Neguse, who represents Colorado's 2nd district, which includes Boulder, was one of the bill's three original cosponsors. The milestones trace its path: introduced on February 26, 2026, passed by the House on September 16 and by the Senate on September 28. The other actions, 18 in all, fill in the steps between: the committee's markup, its report, the floor debate, the messages between the chambers. Notice what the code didn't do. It never built an address for the cosponsors or the actions; it read each one from the record, and sent it.
-
-### Paging with `next`: Colorado's Delegation
-
-The same idea pages through a list. Ask for Colorado's current members of the 119th Congress, which sits from January 2025 to January 2027, at the API's [member endpoint](https://github.com/LibraryOfCongress/api.congress.gov/blob/main/Documentation/MemberEndpoint.md):
-
-```{python}
-params = {"currentMember": "true", "format": "json", "limit": 250}
-response = requests.get(f"{congress_base}/member/congress/119/CO", params=params, headers=congress_headers, timeout=30)
-response.raise_for_status()
-members = response.json()["members"]
-
-for member in members:
-    print(f"{member['bioguideId']}  {member['name']:22} {member['partyName']:11} {member.get('district') or 'Senate'}")
-# E000300  Evans, Gabe            Republican  8
-# C001137  Crank, Jeff            Republican  5
-# P000620  Pettersen, Brittany    Democratic  7
-# C001121  Crow, Jason            Democratic  6
-# N000191  Neguse, Joe            Democratic  2
-# H001100  Hurd, Jeff             Republican  3
-# D000197  DeGette, Diana         Democratic  1
-# B000825  Boebert, Lauren        Republican  4
-# H000273  Hickenlooper, John W.  Democratic  Senate
-# B001267  Bennet, Michael F.     Democratic  Senate
-```
-
-Each member's `sponsored-legislation` lists everything they have sponsored, in every Congress they have served in, at most 250 items a page, as the API's [documentation](https://github.com/LibraryOfCongress/api.congress.gov#limit-and-offset) says. The response's `pagination` holds `count`, the total, and `next`, the full address of the next page, which is missing on the last page. That is a third way to page, after @sec-wikipedia's `continue` token and the EIA's `offset`: the server hands you the next request whole, and you send it. Keep the bills from the 119th Congress: House bills (`HR`) and Senate bills (`S`), leaving out resolutions and amendments, which have no `type`:
-
-```{python}
-rows = []
-for member in members:
-    # The first page's address; every later page's address comes from the response
-    url = f"{congress_base}/member/{member['bioguideId']}/sponsored-legislation?format=json&limit=250"
-    while url:
-        response = requests.get(url, headers=congress_headers, timeout=30)
-        response.raise_for_status()
-        page = response.json()
-        for item in page["sponsoredLegislation"]:
-            if item.get("congress") == 119 and item.get("type") in ("HR", "S"):
-                rows.append({"member": member["name"], "type": item["type"], "number": item["number"], "title": item["title"]})
-        url = page["pagination"].get("next")   # missing on the last page
-
-bills = pd.DataFrame(rows)
-print(len(bills), "bills")
-print(bills["member"].value_counts().to_string())
-# 353 bills
-# member
-# Neguse, Joe              88
-# Bennet, Michael F.       72
-# Pettersen, Brittany      40
-# Hickenlooper, John W.    33
-# Crow, Jason              27
-# Hurd, Jeff               27
-# Evans, Gabe              23
-# Boebert, Lauren          20
-# DeGette, Diana           14
-# Crank, Jeff               9
-```
-
-### Following Every Link: How Far Each Bill Got
-
-A bill's record says where it is now, but how far it got is in its actions. Congress.gov records each milestone in standard words, as in H.R. 7730's actions above: "Passed/agreed to in House", "Passed/agreed to in Senate", "Became Public Law". So follow every bill's `actions` link, one request a bill, and keep the furthest milestone each reached. The address of a bill's actions has the form you saw in its record, `bill/{congress}/{type}/{number}/actions`. With 300-odd bills, this cell takes a few minutes, and it spends one request a bill from your key's 5,000 an hour, the limit Congress.gov's [documentation](https://github.com/LibraryOfCongress/api.congress.gov#rate-limit) gives. Every response reports what is left in a header, `X-RateLimit-Remaining`:
-
-```{python}
-print("Requests left this hour, before:", response.headers["X-RateLimit-Remaining"])
-
-stages = []
-for bill_type, number in zip(bills["type"], bills["number"]):
-    url = f"{congress_base}/bill/119/{bill_type.lower()}/{number}/actions"
-    response = requests.get(url, params={"format": "json", "limit": 250}, headers=congress_headers, timeout=30)
-    response.raise_for_status()
-    texts = [action["text"] for action in response.json()["actions"]]
-    passed_house = any(text.startswith("Passed/agreed to in House") for text in texts)
-    passed_senate = any(text.startswith("Passed/agreed to in Senate") for text in texts)
-    if any(text.startswith("Became Public Law") for text in texts):
-        stages.append("became law")
-    elif passed_house and passed_senate:
-        stages.append("passed both chambers")
-    elif passed_house or passed_senate:
-        stages.append("passed one chamber")
-    else:
-        stages.append("introduced")
-bills["stage"] = stages
-
-print("Requests left this hour, after:", response.headers["X-RateLimit-Remaining"])
-print(bills["stage"].value_counts().to_string())
-# Requests left this hour, before: 19208
-# Requests left this hour, after: 18855
-# stage
-# introduced              326
-# passed one chamber       25
-# became law                1
-# passed both chambers      1
-```
-
-Of the delegation's 353 bills, 326 had gone no further than introduction, 25 had passed one chamber, one had passed both, and one had become law: H.R. 2316, sponsored by Rep. Jeff Hurd, which became Public Law 119-40. The loop spent 353 requests, the difference between the two counts. Run it twice within an hour, and the difference can come out smaller than the requests made: the limit is per hour, so requests from more than an hour ago stop counting. (The key that ran this chapter's code has a higher limit than the default; a new key starts at 5,000.)
-
-A count of milestones is not a measure of a legislator's effectiveness. Senators and representatives work under different rules, and bills differ in what they would do. Volden and Wiseman's measure of legislative effectiveness follows the same stages, from introduction to law, and weighs each bill by how much it would change [@volden2014legislative]. A table of members by stage shows the shape of the delegation's year, and a stacked bar for each member draws it:
-
-```{python}
-order = ["introduced", "passed one chamber", "passed both chambers", "became law"]
-table = pd.crosstab(bills["member"], bills["stage"]).reindex(columns=order, fill_value=0)
-table = table.loc[table.sum(axis=1).sort_values().index]   # the most bills at the top
-
-ax = table.plot.barh(stacked=True, figsize=(8, 4.5))
-ax.set_title("Bills sponsored by Colorado's delegation, 119th Congress")
-ax.set_xlabel("Bills")
-ax.set_ylabel("")
-ax.legend(title="")
-plt.tight_layout()
-plt.show()
-```
-
-![Bills sponsored by Colorado's ten current members of Congress in the 119th Congress, as of October 25, 2026, by the furthest milestone each had reached in Congress.gov's records, drawn by the code above.](images/ch-11/colorado-bills-stages.png){#fig-colorado-bills-stages .lightbox fig-alt="Stacked horizontal bar chart, one bar per member of Colorado's delegation, longest at the top. Rep. Neguse sponsored 88 bills, 2 of which passed one chamber; Sen. Bennet 72, 1 of which passed the Senate; Rep. Pettersen 40; Sen. Hickenlooper 33, 5 of which passed the Senate; Reps. Crow and Hurd 27 each; Rep. Evans 23, 8 of which passed the House; Rep. Boebert 20, one of which passed both chambers; Rep. DeGette 14; Rep. Crank 9. Nearly every bar is almost all the color for introduced. Rep. Hurd's ends with his one bill that became law."}
-
-Almost every bar is almost all one color (@fig-colorado-bills-stages): introducing a bill is easy, and most bills stop there. The members whose bills moved are not the ones who introduced the most. Rep. Gabe Evans's 23 bills include 8 that passed the House, more than any other member's, and Sen. John Hickenlooper's 33 include 5 that passed the Senate. The figure is a snapshot of a Congress still in session, so any vote changes it, and running the loop again to find out costs another 353 requests.
-
-### What Changed: `fromDateTime`
-
-Rerun that cell next week, and it makes the same 300-odd requests to learn about the few bills that moved. The list endpoints answer a cheaper question: which records changed in a window of time. `fromDateTime` and `toDateTime`, in the form `2026-10-01T00:00:00Z`, keep only the bills whose record was updated between them; the bill endpoint lists both in the API's interactive documentation at [api.congress.gov](https://api.congress.gov/). Page through every bill of the 119th Congress updated in the first week of October 2026, and check which of the delegation's are among them:
-
-```{python}
-changed = set()
-url = f"{congress_base}/bill/119?format=json&limit=250&fromDateTime=2026-10-01T00:00:00Z&toDateTime=2026-10-08T00:00:00Z"
-while url:
-    response = requests.get(url, headers=congress_headers, timeout=30)
-    response.raise_for_status()
-    page = response.json()
-    for item in page["bills"]:
-        changed.add((item["type"], item["number"]))
-    url = page["pagination"].get("next")
-print(len(changed), "bills changed that week")
-
-ours = [(bill_type, number) in changed for bill_type, number in zip(bills["type"], bills["number"])]
-print(bills[ours][["member", "type", "number", "stage"]].to_string(index=False))
-# 925 bills changed that week
-#                member type number              stage
-#           Evans, Gabe   HR   9340 passed one chamber
-#   Pettersen, Brittany   HR  10216         introduced
-#   Pettersen, Brittany   HR   4718         introduced
-#   Pettersen, Brittany   HR   2461         introduced
-#   Pettersen, Brittany   HR   1734         introduced
-#           Crow, Jason   HR  10541         introduced
-#           Neguse, Joe   HR  10584         introduced
-#           Neguse, Joe   HR   4109         introduced
-#           Neguse, Joe   HR   2649         introduced
-#           Neguse, Joe   HR   2648         introduced
-#           Neguse, Joe   HR   1726         introduced
-#        DeGette, Diana   HR   8432         introduced
-#        DeGette, Diana   HR  10227         introduced
-# Hickenlooper, John W.    S   2437 passed one chamber
-#    Bennet, Michael F.    S   5444         introduced
-```
-
-In the first week of October 2026, 925 of the 119th Congress's bills changed, and 15 of them were the delegation's. Only those 15 need their actions asked for again. Two cautions. A bill's `updateDate` is "the date of the last update received" for it, "not a date corresponding to the legislative date or legislative action date," in the [documentation](https://github.com/LibraryOfCongress/api.congress.gov/blob/main/Documentation/BillEndpoint.md)'s words, so a change can be a corrected title or a new cosponsor as well as a vote: "changed" means "worth checking". And a window in the past can shrink. A bill updated on October 3 and again on October 20 now carries the later date, so it no longer appears in the first week of October. The dependable pattern is to save the time each run starts, and ask the next run for everything changed since then.
-
 ## Combining Census and EIA Data
 
 Each API in this chapter answers a question on its own. Some questions need two. What does electricity cost a household, against what households earn? The EIA (U.S. Energy Information Administration) knows what homes paid for electricity in each state; the Census Bureau's American Community Survey (ACS) knows the state's median household income. Joining them is a matter of putting each state's two numbers in one row, and the real work of a join is finding the identifier that says two rows are the same state.
@@ -1127,7 +929,7 @@ Electricity bills don't rise with income in any simple way (@fig-state-electrici
 
 ## More Government APIs for Colorado
 
-The four APIs in this chapter are a small part of what governments publish. Each of these is free, documented, and has data about Colorado; most answer the same three questions you asked of this chapter's: what can I ask for, how do I narrow it, and how do I page through it. Where an API wants a key, the list says so.
+The three APIs in this chapter are a small part of what governments publish. Each of these is free, documented, and has data about Colorado; most answer the same three questions you asked of this chapter's: what can I ask for, how do I narrow it, and how do I page through it. Where an API wants a key, the list says so.
 
 **Federal**
 
@@ -1138,17 +940,18 @@ The four APIs in this chapter are a small part of what governments publish. Each
 5. **EPA [AirNow API](https://docs.airnowapi.org/).** Current and forecast air quality from more than 2,500 monitoring stations, including Colorado's. Requires a free account and key.
 6. **[USAspending API](https://api.usaspending.gov/).** Federal contracts, grants, and loans, by recipient, agency, and place, under the DATA Act, such as every federal award to recipients in Colorado. No key.
 7. **[OpenFEMA](https://www.fema.gov/about/openfema/api).** The Federal Emergency Management Agency's disaster declarations, assistance, and flood-insurance records, filtered with `$filter`, as in `state eq 'CO'`. Boulder County's records include the Marshall Fire of December 2021. No key.
+8. **[Congress.gov API](https://api.congress.gov/).** The Library of Congress's records of bills, members, committees, and votes, such as every bill Colorado's delegation has sponsored. A bill's record links to its actions, cosponsors, and text, each a request of its own, and lists page with a `next` link. Requires a free [api.data.gov](https://api.data.gov/signup/) key.
 
 **State**
 
-8. **[Colorado Information Marketplace](https://data.colorado.gov/).** The State of Colorado's open-data portal: the Secretary of State's records of business entities, and many other datasets. Each dataset has an endpoint in the Socrata Open Data API ([SODA](https://dev.socrata.com/)), queried with a SQL-like language, SoQL. No key, but a free [application token](https://dev.socrata.com/docs/app-tokens.html) raises the limit on how fast you can ask.
-9. **Colorado Division of Water Resources' [CDSS REST API](https://dwr.state.co.us/Rest/GET/Help).** The Colorado Decision Support System's stream gauges, wells, diversions, and water rights. Answers anonymous and registered users; a free key raises the daily limits.
-10. **Regional Transportation District (RTD) [real-time feeds](https://www.rtd-denver.com/open-records/open-spatial-information/real-time-feeds).** Where the Denver area's buses and trains are, and their delays and alerts, in GTFS Realtime, a binary format (protocol buffers) rather than JSON. Used under RTD's license agreement.
+9. **[Colorado Information Marketplace](https://data.colorado.gov/).** The State of Colorado's open-data portal: the Secretary of State's records of business entities, and many other datasets. Each dataset has an endpoint in the Socrata Open Data API ([SODA](https://dev.socrata.com/)), queried with a SQL-like language, SoQL. No key, but a free [application token](https://dev.socrata.com/docs/app-tokens.html) raises the limit on how fast you can ask.
+10. **Colorado Division of Water Resources' [CDSS REST API](https://dwr.state.co.us/Rest/GET/Help).** The Colorado Decision Support System's stream gauges, wells, diversions, and water rights. Answers anonymous and registered users; a free key raises the daily limits.
+11. **Regional Transportation District (RTD) [real-time feeds](https://www.rtd-denver.com/open-records/open-spatial-information/real-time-feeds).** Where the Denver area's buses and trains are, and their delays and alerts, in GTFS Realtime, a binary format (protocol buffers) rather than JSON. Used under RTD's license agreement.
 
 **Local**
 
-11. **[City of Boulder Open Data](https://open-data.bouldercolorado.gov/).** Construction permits, the police department's crime blotter and stops, parcels, and Open Space trails. Each dataset has an ArcGIS REST endpoint, which pages with `resultOffset` and filters with a `where` clause.
-12. **City and County of Denver [Open Data Catalog](https://opendata-geospatialdenver.hub.arcgis.com/).** Crime, 311 service requests, permits, and parcels for Denver, on the same ArcGIS platform as Boulder's.
+12. **[City of Boulder Open Data](https://open-data.bouldercolorado.gov/).** Construction permits, the police department's crime blotter and stops, parcels, and Open Space trails. Each dataset has an ArcGIS REST endpoint, which pages with `resultOffset` and filters with a `where` clause.
+13. **City and County of Denver [Open Data Catalog](https://opendata-geospatialdenver.hub.arcgis.com/).** Crime, 311 service requests, permits, and parcels for Denver, on the same ArcGIS platform as Boulder's.
 
 Before you build on any of them, read its terms, its limits, and its `robots.txt` where it has one (@sec-ethics), and note the date you used it: local portals rename and retire datasets more often than federal APIs do.
 
@@ -1208,9 +1011,9 @@ These are open-ended extensions — no scaffold, no fixed path. Use them for fur
 
 2. **FRED time series.** Retrieve two related economic time series for your local area or state using the FRED API. Plot them on the same or side-by-side axes. What story does the data tell? Common pairings include housing prices and mortgage rates, unemployment and job creation, or income and cost of living.
 
-3. **Who signs on.** Choose a member of Congress, such as your own representative. Using the Congress.gov API, list the bills they sponsored in the 119th Congress, and follow each bill's `cosponsors` link. Which bills drew cosponsors from the other party, and how many? Each cosponsor's record gives a party. Does the bipartisan share differ between bills that moved past introduction and bills that didn't?
+3. **Where the power comes from, state by state.** Using the EIA's `electric-power-operational-data` route, retrieve annual generation by source for Colorado and two neighboring states of your choice, filtering on the server with facets as "Let the Server Filter" does. Chart each state's coal, gas, wind, and solar shares since 2001. Which state changed fastest, and in which years? Check one of your numbers against the EIA's API Dashboard (@fig-eia-browser).
 
-4. **Two agencies, one identifier.** Join two of this chapter's APIs on a shared identifier, through a crosswalk if their codes differ, as "Combining Census and EIA Data" does. For example, join the EIA's residential electricity price with the share of each state's homes heated by electricity (ACS table `B25040`, House Heating Fuel), or join Congress.gov's members for a state with that state's ACS figures. Report every row that didn't match, and say why it didn't.
+4. **Two agencies, one identifier.** Join two of this chapter's APIs on a shared identifier, through a crosswalk if their codes differ, as "Combining Census and EIA Data" does. For example, join the EIA's residential electricity price with the share of each state's homes heated by electricity (ACS table `B25040`, House Heating Fuel). Report every row that didn't match, and say why it didn't.
 
 
 5. **Graduate extension (INFO 5617).** Read @lazer2020computational on the obstacles and opportunities facing computational social science. Then design and execute a small study that combines data from at least two of this chapter's government APIs to examine one obstacle or opportunity the paper raises — for example, the promise and difficulty of linking administrative data across agencies and geographic units. Write a formal limitations section that addresses measurement (what your variables actually capture) and coverage (which people, places, or time periods your linked data misses). The goal is not a definitive finding but a defensible design that takes the paper's warnings seriously.
@@ -1223,8 +1026,6 @@ FRED, from the Federal Reserve Bank of St. Louis, grew from a similar philosophy
 
 The EIA was established on October 1, 1977, under the Department of Energy Organization Act, as the federal government's independent authority for energy statistics and analysis ([EIA](https://www.eia.gov/about/)), on the same day the Department of Energy itself began work ([Department of Energy](https://www.energy.gov/lm/doe-history/doe-history-timeline)). Its independence is written into the law: its Administrator "shall not be required to obtain the approval of any other officer or employee of the Department" to collect or analyze information, nor, before publishing, anyone else's approval of "the substance of any statistical or forecasting technical reports" ([42 U.S.C. § 7135(d)](https://www.law.cornell.edu/uscode/text/42/7135)). The numbers in "EIA API v2", above, come from an agency built so that its energy statistics would not have to answer to its own department's policy.
 
-Congress's records reached the web through THOMAS, which the Library of Congress launched on January 5, 1995, as a bipartisan project initiated by the congressional leadership and named for Thomas Jefferson ([*Library of Congress Information Bulletin*, 1995](https://www.loc.gov/loc/lcib/9502/thomas.html)). Congress.gov replaced it: introduced in September 2012, it took over THOMAS's addresses in November 2013 ([Weber, 2015](https://blogs.loc.gov/law/2015/01/twenty-years-of-thomas/)), and THOMAS was retired on July 5, 2016 ([Nextgov, 2016](https://www.nextgov.com/digital-government/2016/04/library-of-congress-to-retire-thomas/220635/)). Before its API, people who wanted the data whole "scraped" Congress.gov or downloaded the Government Publishing Office's bulk files for some collections, "somewhat imperfect measures" in the Library's words; it introduced the API in beta in September 2022 ([Wood, 2022](https://blogs.loc.gov/law/2022/09/introducing-the-congress-gov-api/)) and took the beta label off a year later ([Reiter, 2023](https://blogs.loc.gov/law/2023/09/an-update-on-the-congress-gov-api/)).
-
 But government data infrastructure is not immune to erosion. Datasets are withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. In 2019 the Supreme Court refused to let the Commerce Department add a citizenship question to the 2020 census on the reason it had given, which "seems to have been contrived" ([*Department of Commerce v. New York*, 2019](https://www.supremecourt.gov/opinions/18pdf/18-966_bq7c.pdf)). In 2017, the first year of the first Trump administration, the Environmental Data & Governance Initiative documented agencies removing or overhauling webpages, documents, and whole websites about climate change, although it found no climate data removed [@edgi2018changing]. In early 2025, after an Office of Personnel Management memo applying an executive order on "gender ideology," the CDC, the FDA, and their parent department took down webpages and datasets, until a federal judge ordered them restored to their versions of January 30 ([Alder, 2025](https://fedscoop.com/federal-judge-orders-hhs-cdc-fda-to-restore-webpages-datasets/)). That August President Trump fired the commissioner of the Bureau of Labor Statistics after a weak jobs report, calling the data "rigged" ([PBS NewsHour, 2025](https://www.pbs.org/newshour/show/firing-of-labor-statistics-head-undermines-trust-in-key-data-ex-trump-official-warns)), and in December the American Statistical Association reported that most of the 13 federal statistical agencies had lost 20 to 30% of their staff ([ASA, 2025](https://www.amstat.org/news-listing/2025/12/10/new-report-documents-challenges-facing-federal-statistical-system--offers-roadmap-for-strengthening)). The fragility of government data infrastructure is itself a public interest concern, and a reason to record the date, version, and URL of every government dataset you use.
 
 ## Common Issues to Debug
@@ -1232,24 +1033,19 @@ But government data infrastructure is not immune to erosion. Datasets are withdr
 - **Census variable codes**: The naming convention is opaque. Bookmark the variable catalog and use it as a reference. Variables ending in `E` are estimates; those ending in `M` are margins of error.
 - **FIPS codes**: Geographic identifiers like `08` (Colorado) and `07850` (Boulder) are strings, not integers. Do not strip leading zeros.
 - **FRED series IDs**: These are alphanumeric strings; some families follow a pattern (like the SAIPE income series earlier in this chapter), but many do not. Use the FRED website search to find them, then copy the ID into your code exactly.
+- **`KeyError` or `MISSING` for a key**: Jupyter never received the environment variable. Start Jupyter after setting it, from the same terminal or the `webdata` environment, and see "When a Key Says `MISSING`", above, for the other causes and a stopgap.
 - **API key exposure**: The most common mistake. Environment variables never enter your repository; if you use the JSON-file alternative, add `api_keys.json` to `.gitignore` *before* your first commit, or the key will persist in your git history even after deletion.
 - **Rate limiting**: Limits vary by agency. As of mid-2026, the Census API publishes no hard limit for keyed users (but expects polite use), and FRED allows roughly 120 requests per minute. Check each API's documentation for current figures, and stay well within them, especially during automated collection.
-- **One api.data.gov key, one budget**: api.data.gov's default limit is 1,000 requests an hour, and "for each API key, these limits are applied across all api.data.gov API requests" ([developer manual](https://api.data.gov/docs/developer-manual/)). Congress.gov sets its own, 5,000 an hour. A loop over one agency's API spends the same key you use for another's; read `X-RateLimit-Remaining` before a long run. Going over blocks the key for up to an hour.
 - **The EIA's 5,000-row cap**: A request to the EIA's API returns at most 5,000 rows, with an `"incomplete return"` warning if more match. Filter with facets, a shorter span, or a lower frequency first; page with `offset` and `length` only for what is still too large ("Paging with `offset` and `length`", above).
-- **Congress.gov's links carry no key**: A link in a Congress.gov response, such as a bill's `actions` URL or a list's `next`, has `format=json` but not your key, and sent as it is, it fails with a 403 and `API_KEY_MISSING`. Send the key in the `X-Api-Key` header, as this chapter does, and every link works as it arrives.
-- **Congress.gov's format**: Ask for `format=json` on the first request, as this chapter does. The Library's announcement of the API in 2022 said that XML was its default ([Wood, 2022](https://blogs.loc.gov/law/2022/09/introducing-the-congress-gov-api/)); in October 2026 it answered JSON without being asked. Naming the format keeps your code from depending on a default.
 
 ## Key Takeaways
 
-Government APIs provide access to some of the most valuable, reliable, and stable data sources available. The Census Bureau, the Federal Reserve Bank of St. Louis, the EIA, and the Library of Congress each serve a public mandate, and each API in this chapter carries an idea you will meet again: ask the API what you can ask for (the Census Bureau's catalogs); let the server compute (FRED's `units` and `frequency`); let the server filter (the EIA's facets); and follow the links (Congress.gov's records). Keep keys out of your notebooks, and when you combine two agencies' data, spend your effort on the identifiers that join them. These APIs exist because of public interest mandates, and using them effectively is itself a form of civic engagement.
+Government APIs provide access to some of the most valuable, reliable, and stable data sources available. The Census Bureau, the Federal Reserve Bank of St. Louis, and the EIA each serve a public mandate, and each API in this chapter carries an idea you will meet again: ask the API what you can ask for (the Census Bureau's groups and variables); let the server compute (FRED's `units` and `frequency`); and let the server filter (the EIA's facets). Keep keys out of your notebooks, and when you combine two agencies' data, spend your effort on the identifiers that join them. These APIs exist because of public interest mandates, and using them effectively is itself a form of civic engagement.
 
 ## Further Reading
 
 - U.S. Census Bureau API: <https://www.census.gov/data/developers.html>
 - FRED API documentation: <https://fred.stlouisfed.org/docs/api/fred/>
 - EIA API documentation: <https://www.eia.gov/opendata/documentation.php>
-- Congress.gov API documentation: <https://api.congress.gov/>, and the Library of Congress's repository of endpoint guides: <https://github.com/LibraryOfCongress/api.congress.gov>
-- api.data.gov developer manual, on keys and rate limits: <https://api.data.gov/docs/developer-manual/>
-- @volden2014legislative — How far members' bills get, and why, measured across Congresses since the 1970s
 - @salganik2018bit — Chapter 2: Observing Behavior
 - @munzert2014automated — Chapter on working with web APIs

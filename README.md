@@ -2,7 +2,7 @@
 
 A Quarto textbook for **INFO 4617 / 5617: Web Data Science** at the University of Colorado Boulder, Department of Information Science.
 
-This book teaches advanced undergraduates and master's students how to retrieve, parse, and analyze data from the web using Python. It covers static and dynamic web scraping, structured data formats (XML, JSON), the protocol stack (TCP/IP, DNS, HTTP), document extraction (HTML, archived pages, PDFs), and authenticated APIs (Wikipedia, U.S. Census, FRED, EIA, Congress.gov, Reddit, Spotify, Bluesky, Mastodon, OpenAI, Anthropic), along with automation via GitHub Actions and a capstone treatment of research design.
+This book teaches advanced undergraduates and master's students how to retrieve, parse, and analyze data from the web using Python. It covers static and dynamic web scraping, structured data formats (XML, JSON), the protocol stack (TCP/IP, DNS, HTTP), document extraction (HTML, archived pages, PDFs), and authenticated APIs (Wikipedia, U.S. Census, FRED, EIA, Reddit, Spotify, Bluesky, Mastodon, OpenAI, Anthropic), along with automation via GitHub Actions and a capstone treatment of research design.
 
 A theoretical thread on the **post-API age** — the structural pressures of *enclosure*, *exemption*, and *erosion* shaping access to web data, and the counter-values of *openness*, *oversight*, and *ownership* — runs throughout the book.
 

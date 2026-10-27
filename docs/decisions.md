@@ -2,7 +2,19 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
-## 2026-10-25 · Chapter 11's fourth API is Congress.gov's, and its join is Census with the EIA
+## 2026-10-26 · Chapter 11 drops Congress.gov, and its Census section starts from the website's table
+
+**Decision.**
+- Chapter 11 teaches three APIs: Census, FRED, and the EIA. Congress.gov's section, the tour's bill page (figure 11.4), the delegation's chart, its key (`DATAGOV_KEY`), its Social History paragraph (THOMAS), its Common Issues, and Additional Exercise 3 are removed; the exercise becomes one on the EIA's generation by source for Colorado and two neighbors. Congress.gov stays as one entry in "More Government APIs for Colorado". The removed text and figures are in git's history (#290, #292, #294).
+- The Census section goes from the website to the API in concrete steps: table B19013 in figure 11.1; its group in `groups.json`; the group's variables in `groups/B19013.json`; the request that returns the website's numbers; and the same variable for Colorado, Boulder County, and the city of Boulder, with what `for` and `in` each needs. The 10 MB `variables.json` search and the `geography.json` listing are gone; the dataset's `geography.html` and `examples.html` pages are linked for other kinds of place.
+- Week 11's lab teaches Census, FRED, and the EIA, and Friday ends with the Census–EIA join, as "Combining Census and EIA Data" does.
+- "API Key Management" gains "When a Key Says `MISSING`": the causes of a `KeyError` (Jupyter started elsewhere or before the variable was set; `!export` in a cell; `export` on Windows; conda without reactivating; a different name) and a stopgap cell that asks for a missing key with `getpass()`.
+
+**Why.** The instructor's notes from Monday's lab (2026-10-26): `os.environ['CENSUS_KEY']` raised `KeyError` for students who had run `export`; students wanted to start from a list of groups and their variables, and to get from the website's table to the same data from the API; the list of geographies was a distraction without concrete examples; and Congress.gov is dropped from the week and, on the instructor's decision the same day, from the chapter.
+
+**Where.** `ch-11-government.qmd`; `tools/shots/recipes/ch-11.yml`, `renders/ch-11.py`, and `images/ch-11/`; `index.qmd`, `README.md`, and `appendix-ai-disclosure.qmd`; the course lab plan, [`plans/2026-10-26-week11-after-monday.md`](plans/2026-10-26-week11-after-monday.md).
+
+## 2026-10-25 · Chapter 11's fourth API is Congress.gov's, and its join is Census with the EIA (*superseded* in part, 2026-10-26, above: Congress.gov is removed; the join stays)
 
 **Decision.**
 - Congress.gov's API replaces the FEC's. Its idea is *follow the links*: a bill's record (H.R. 7730, the tour's bill) links to its cosponsors and actions; a list's `pagination.next` is the next request, whole; every bill Colorado's current delegation sponsored in the 119th Congress is followed to its actions to find the furthest milestone it reached; and `fromDateTime` asks which bills changed in a window.
@@ -26,7 +38,7 @@ Standing decisions for the book and its tools, newest first. Each entry gives th
 
 **Where.** `AGENTS.md` ("Chapter structure", "Callout types"), `CONTRIBUTING.md` ("Markdown and Quarto"), `README.md`, and each chapter's "Social History and Public Interest".
 
-## 2026-10-25 · Chapter 11 teaches four APIs, one idea each, with four keys under new names
+## 2026-10-25 · Chapter 11 teaches four APIs, one idea each, with four keys under new names (*superseded* in part, 2026-10-26, above: three APIs and three keys)
 
 **Decision.**
 - Chapter 11 teaches Census (*what can I ask for?*), FRED (*let the server compute*), the EIA's API v2 (*let the server filter*), and Congress.gov's API v3 (*follow the links*). FEC leaves the chapter; its section stays until the second pull request replaces it with Congress.gov, and in the meantime its cells use `datagov_key`, since the FEC's API takes api.data.gov keys.
