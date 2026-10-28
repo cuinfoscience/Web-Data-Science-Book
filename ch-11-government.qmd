@@ -171,7 +171,14 @@ fred_key = os.environ["FRED_KEY"]
 eia_key = os.environ["EIA_KEY"]
 ```
 
-Treat this as a stopgap: the next time you start Jupyter, it asks again. Fix the cause when you have time.
+To use it:
+
+1. **Run the cell.** If a key is missing, a box opens under the cell, with the words `CENSUS_KEY isn't set. Paste it here:`. In VS Code, the box opens at the top of the window instead. If every key is set, the cell does nothing, so it is safe to leave in a notebook you run from the top.
+2. **Click in the box, paste the key, and press Enter.** Nothing shows as you paste, or only dots, so you can't check what you pasted: copy the whole key again if you're unsure. The box asks again for each key that's missing.
+3. **Wait for the cell to finish.** Until you press Enter, the cell shows `[*]` and no other cell will run. A notebook that seems stuck on this cell is waiting for you: look for the box.
+4. **Run the cells below it.** They read the keys from `os.environ` as usual. If a request then fails as if the key were wrong, the box may have been left empty or the paste cut short: run this cell again, and it asks again.
+
+Paste the key only into the box. The words between the quotation marks in `getpass(...)` are the question it asks, and they're saved with the notebook like any other code; a key typed there is a key in the notebook. Treat this as a stopgap: the next time you start Jupyter, it asks again. Fix the cause when you have time.
 
 The Census Bureau, FRED, and the EIA all take the key as a parameter in the URL, so the address `requests` sends, `response.url`, contains your key. Print a response's JSON, never its URL, and never paste a URL from an error message into a forum or a pull request without deleting the key first.
 
