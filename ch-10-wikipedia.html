@@ -674,7 +674,7 @@ Figure&nbsp;10.10: Jimbo Wales’s contributions, October 2026: each row is an e
 <section id="the-anatomy-of-an-api-call" class="level2" data-number="10.3">
 <h2 data-number="10.3" class="anchored" data-anchor-id="the-anatomy-of-an-api-call"><span class="header-section-number">10.3</span> The Anatomy of an API Call</h2>
 <p>Every request to the MediaWiki <a href="https://www.mediawiki.org/wiki/API:Action_API">Action API</a> follows the same structure: a base URL, an <code>action</code> parameter specifying what you want to do, additional parameters narrowing your request, and a <code>format</code> parameter specifying the response format. Here is the request from <a href="ch-05-protocols.html" class="quarto-xref"><span>Chapter 5</span></a> again:</p>
-<div id="e97bb1f3" class="cell" data-execution_count="1">
+<div id="dc21b0ea" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
@@ -709,7 +709,7 @@ Figure&nbsp;10.11: The chapter’s first request in a browser, with <code>format
 </figure>
 </div>
 <p>The response is a nested JSON structure. You navigate it one level at a time:</p>
-<div id="b9bae8ab" class="cell" data-execution_count="2">
+<div id="ecd1e3ef" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co"># The data lives inside data &gt; query &gt; pages &gt; {page_id}</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a>pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
@@ -742,7 +742,7 @@ Figure&nbsp;10.11: The chapter’s first request in a browser, with <code>format
 <section id="getting-revisions" class="level2" data-number="10.4">
 <h2 data-number="10.4" class="anchored" data-anchor-id="getting-revisions"><span class="header-section-number">10.4</span> Getting Revisions</h2>
 <p>Every edit ever made to a Wikipedia article is recorded and accessible through the API. The revisions endpoint returns metadata about each edit: who made it, when, how much the article size changed, and what edit summary they left. One request returns at most 500 revisions, so the function asks again until the API says there are no more:</p>
-<div id="b28ccecf" class="cell" data-execution_count="3">
+<div id="57f5cc22" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="kw">def</span> get_revisions(title, until<span class="op">=</span><span class="st">"2026-09-30T23:59:59Z"</span>):</span>
@@ -789,7 +789,7 @@ Figure&nbsp;10.11: The chapter’s first request in a browser, with <code>format
 </section>
 <section id="analyzing-revision-history" class="level3" data-number="10.4.2">
 <h3 data-number="10.4.2" class="anchored" data-anchor-id="analyzing-revision-history"><span class="header-section-number">10.4.2</span> Analyzing Revision History</h3>
-<div id="5b0472ef" class="cell" data-execution_count="4">
+<div id="18e3fa84" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>cu_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(cu_revisions[<span class="st">"timestamp"</span>])</span>
@@ -816,7 +816,7 @@ Figure&nbsp;10.12: Edits per month to University of Colorado Boulder, from its f
 </figure>
 </div>
 <p>The article’s busiest years were 2006 and 2007, about 30 edits a month, when much of it was being written (<a href="#fig-cu-monthly-edits" class="quarto-xref">Figure&nbsp;<span>10.12</span></a>). Since 2012 it has averaged fewer than ten edits a month: upkeep, such as new enrollment figures, more than new writing. You can also analyze who edits the article:</p>
-<div id="d6707c1d" class="cell" data-execution_count="5">
+<div id="e151743c" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Editors with the most revisions</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>top_editors <span class="op">=</span> cu_revisions[<span class="st">"user"</span>].value_counts().head(<span class="dv">10</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="bu">print</span>(top_editors)</span>
@@ -843,7 +843,7 @@ Figure&nbsp;10.12: Edits per month to University of Colorado Boulder, from its f
 <section id="getting-pageviews" class="level2" data-number="10.5">
 <h2 data-number="10.5" class="anchored" data-anchor-id="getting-pageviews"><span class="header-section-number">10.5</span> Getting Pageviews</h2>
 <p>The Wikimedia REST API, separate from the MediaWiki Action API, counts how many times an article was viewed. Its address is built from parts, like a file path: the project, the access method (desktop, mobile web, mobile app, or all), the <strong>agent</strong> (who is reading), the article, the granularity, and the dates. The function builds the address and returns a DataFrame:</p>
-<div id="ebb074bb" class="cell" data-execution_count="6">
+<div id="df86d4d1" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="kw">def</span> get_pageviews(title, start, end, agent<span class="op">=</span><span class="st">"user"</span>, granularity<span class="op">=</span><span class="st">"daily"</span>):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>    article <span class="op">=</span> title.replace(<span class="st">" "</span>, <span class="st">"_"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>    url <span class="op">=</span> (</span>
@@ -857,7 +857,7 @@ Figure&nbsp;10.12: Edits per month to University of Colorado Boulder, from its f
 <span id="cb6-11"><a href="#cb6-11" aria-label="11"></a>    <span class="cf">return</span> views[[<span class="st">"timestamp"</span>, <span class="st">"views"</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>With the function defined, retrieving and plotting a series takes a few lines:</p>
-<div id="fedaee9a" class="cell" data-execution_count="7">
+<div id="aae4a758" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a>cu_views <span class="op">=</span> get_pageviews(<span class="st">"University of Colorado Boulder"</span>, <span class="st">"20210101"</span>, <span class="st">"20260930"</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(cu_views)<span class="sc">:,}</span><span class="ss"> days, </span><span class="sc">{</span>cu_views[<span class="st">'views'</span>]<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">:,}</span><span class="ss"> views"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a></span>
@@ -889,7 +889,7 @@ Figure&nbsp;10.13: Daily pageviews of University of Colorado Boulder by human re
 <li><strong>The agent splits who is reading.</strong> <code>user</code> is meant to be people; <code>spider</code> is self-identified crawlers, such as search engines; and <code>automated</code> is traffic that Wikimedia’s analysts judged to be bots that don’t say so. The rules for that judgment change, as “Social History and Public Interest” describes, and when they do, past counts can be reclassified.</li>
 </ul>
 <p>You can ask the API for each agent separately:</p>
-<div id="ee026ea5" class="cell" data-execution_count="8">
+<div id="3d6fbbdd" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a>agents <span class="op">=</span> []</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a><span class="cf">for</span> agent <span class="kw">in</span> [<span class="st">"user"</span>, <span class="st">"spider"</span>, <span class="st">"automated"</span>]:</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a>    monthly <span class="op">=</span> get_pageviews(<span class="st">"University of Colorado Boulder"</span>, <span class="st">"20240101"</span>, <span class="st">"20260930"</span>,</span>
@@ -935,7 +935,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="getting-links-categories-templates-and-languages" class="level2" data-number="10.6">
 <h2 data-number="10.6" class="anchored" data-anchor-id="getting-links-categories-templates-and-languages"><span class="header-section-number">10.6</span> Getting Links, Categories, Templates, and Languages</h2>
 <p>The tour’s other features all come from the same endpoint, <code>action=query</code>, with a different <code>prop</code> or <code>list</code>, and they all paginate the same way. Rather than write one function per feature, write one function that runs any query and follows its continuation, and collects the pages it returns:</p>
-<div id="96ce6818" class="cell" data-execution_count="9">
+<div id="52e138ea" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="kw">def</span> query_all(params):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>    params <span class="op">=</span> {<span class="st">"action"</span>: <span class="st">"query"</span>, <span class="st">"format"</span>: <span class="st">"json"</span>, <span class="op">**</span>params}</span>
@@ -960,7 +960,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <span id="cb9-22"><a href="#cb9-22" aria-label="22"></a>    <span class="cf">return</span> items</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Each feature on the tour is then one call:</p>
-<div id="3d1e2a39" class="cell" data-execution_count="10">
+<div id="ad6fdef0" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a>title <span class="op">=</span> <span class="st">"University of Colorado Boulder"</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a>links <span class="op">=</span> page_list(title, <span class="st">"links"</span>, <span class="st">"pllimit"</span>)</span>
@@ -984,7 +984,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 </div>
 <p>The API counts 40 categories, more than the box at the foot of the article shows (<a href="#fig-article-categories" class="quarto-xref">Figure&nbsp;<span>10.5</span></a>). The first ones it returns are why: “All Wikipedia articles written in American English” and “All articles containing potentially dated statements” are <strong>hidden categories</strong>, which editors use to track maintenance work and which readers don’t see. To leave them out, add <code>"clshow": "!hidden"</code> to the query.</p>
 <p>What links here is a <code>list</code>, not a <code>prop</code>: it asks about all of Wikipedia rather than one page. Its results come under <code>backlinks</code>:</p>
-<div id="046802db" class="cell" data-execution_count="11">
+<div id="e542a263" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>backlinks <span class="op">=</span> []</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="cf">for</span> batch <span class="kw">in</span> query_all({<span class="st">"list"</span>: <span class="st">"backlinks"</span>, <span class="st">"bltitle"</span>: title, <span class="st">"bllimit"</span>: <span class="st">"max"</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>                        <span class="st">"blnamespace"</span>: <span class="dv">0</span>}):    <span class="co"># namespace 0: articles only</span></span>
@@ -995,7 +995,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="interlanguage-links" class="level3" data-number="10.6.1">
 <h3 data-number="10.6.1" class="anchored" data-anchor-id="interlanguage-links"><span class="header-section-number">10.6.1</span> Interlanguage Links</h3>
 <p>Which editions have an article on a topic is itself a measurement. Each <code>langlinks</code> entry gives the edition’s language code and the article’s title there:</p>
-<div id="85ca86fd" class="cell" data-execution_count="12">
+<div id="0c86d1b3" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a>langs <span class="op">=</span> pd.DataFrame(langlinks)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(langs)<span class="sc">}</span><span class="ss"> other editions"</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a><span class="bu">print</span>(langs[[<span class="st">"lang"</span>, <span class="st">"*"</span>]].head(<span class="dv">8</span>).to_string(index<span class="op">=</span><span class="va">False</span>))</span>
@@ -1016,7 +1016,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="getting-user-contributions" class="level2" data-number="10.7">
 <h2 data-number="10.7" class="anchored" data-anchor-id="getting-user-contributions"><span class="header-section-number">10.7</span> Getting User Contributions</h2>
 <p><code>list=usercontribs</code> returns an editor’s edits across all of Wikipedia, newest first. Here are the latest edits by Jimbo Wales, whose user page and contributions were on the tour:</p>
-<div id="34a78484" class="cell" data-execution_count="13">
+<div id="33fbfbe6" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a>contribs <span class="op">=</span> []</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="cf">for</span> batch <span class="kw">in</span> query_all({<span class="st">"list"</span>: <span class="st">"usercontribs"</span>, <span class="st">"ucuser"</span>: <span class="st">"Jimbo Wales"</span>,</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>                        <span class="st">"uclimit"</span>: <span class="st">"max"</span>, <span class="st">"ucend"</span>: <span class="st">"2026-01-01T00:00:00Z"</span>,</span>
@@ -1039,17 +1039,17 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="from-raw-requests-to-a-client-mwclient" class="level2" data-number="10.8">
 <h2 data-number="10.8" class="anchored" data-anchor-id="from-raw-requests-to-a-client-mwclient"><span class="header-section-number">10.8</span> From Raw Requests to a Client: mwclient</h2>
 <p>This chapter has written its requests by hand, so that you can see every parameter and every continuation. In practice, most people who use the MediaWiki API from Python use a client library that does those parts for them. <a href="https://github.com/mwclient/mwclient">mwclient</a> (<a href="https://mwclient.readthedocs.io/">documentation</a>) is one of the simplest. It isn’t in <code>webdata</code>, so install it once, from the same conda-forge channel as the rest of the environment:</p>
-<div id="3e7ba5be" class="cell" data-execution_count="14">
+<div id="25775396" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="op">%</span>conda install <span class="op">-</span>y <span class="op">-</span>c conda<span class="op">-</span>forge mwclient</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Then check that Python can import it, and which version you have:</p>
-<div id="748c8bc9" class="cell" data-execution_count="15">
+<div id="7be9f899" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="im">import</span> mwclient</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="bu">print</span>(mwclient.__version__)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="co"># 0.10.1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>conda-forge has version 0.10.1. The <a href="https://pypi.org/project/mwclient/">Python Package Index</a> has a newer one, 0.11, which renames one argument used below: <code>limit</code>, the number of results to ask for in each request, becomes <code>api_chunk_size</code>. With 0.11, write <code>api_chunk_size=500</code> where the code says <code>limit=500</code>.</p>
-<div id="9cb4c40f" class="cell" data-execution_count="16">
+<div id="c267eef8" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a>site <span class="op">=</span> mwclient.Site(<span class="st">"en.wikipedia.org"</span>,</span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>                     clients_useragent<span class="op">=</span>CLIENT)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a>page <span class="op">=</span> site.pages[<span class="st">"University of Colorado Boulder"</span>]</span>
@@ -1075,7 +1075,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="a-second-case-study-boulder-colorado" class="level2" data-number="10.9">
 <h2 data-number="10.9" class="anchored" data-anchor-id="a-second-case-study-boulder-colorado"><span class="header-section-number">10.9</span> A Second Case Study: Boulder, Colorado</h2>
 <p>The same functions work on any article. <a href="https://en.wikipedia.org/wiki/Boulder,_Colorado">Boulder, Colorado</a> is the city around the university, and its article answers to different events:</p>
-<div id="49c7de00" class="cell" data-execution_count="17">
+<div id="67f276f9" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a>boulder <span class="op">=</span> <span class="st">"Boulder, Colorado"</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a>boulder_revisions <span class="op">=</span> get_revisions(boulder)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a>boulder_views <span class="op">=</span> get_pageviews(boulder, <span class="st">"20210101"</span>, <span class="st">"20260930"</span>)</span>
@@ -1092,7 +1092,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="combining-endpoints" class="level3" data-number="10.9.1">
 <h3 data-number="10.9.1" class="anchored" data-anchor-id="combining-endpoints"><span class="header-section-number">10.9.1</span> Combining Endpoints</h3>
 <p>The real analytical power of the API emerges when you combine endpoints. A natural question is whether editing and reading move together: do articles get edited more when more people are reading them?</p>
-<div id="97a93167" class="cell" data-execution_count="18">
+<div id="96ccba07" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a>boulder_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(boulder_revisions[<span class="st">"timestamp"</span>])</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
@@ -1133,37 +1133,37 @@ Figure&nbsp;10.15: Monthly views (top) and monthly edits (bottom) of University 
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will build a complete profile of one Wikipedia article: who reads it, who writes it, and what it connects to.</p>
 <p><strong>Step 1 — Choose an article and get its pageviews.</strong> Pick an article about a place, institution, or event you know, with at least one newsworthy moment since 2021. Define your <code>HEADERS</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), then use the chapter’s <code>get_pageviews()</code> to retrieve daily views by human readers for a fixed period that ends before today. Build the DataFrame and plot the series.</p>
-<div id="421e1db0" class="cell" data-execution_count="19">
+<div id="398a4a50" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="co"># Step 1: Retrieve daily pageviews for your article, build the DataFrame, and plot it.</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Find the spike.</strong> Identify the highest-traffic day with <code>idxmax()</code> (<a href="ch-01-introduction.html" class="quarto-xref"><span>Chapter 1</span></a> showed you this) and print the date and view count. Note in a comment what real-world event you think explains it, and check the article’s revision history around that date for edits that mention it.</p>
-<div id="8540b74d" class="cell" data-execution_count="20">
+<div id="93bf63a9" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 2: Find the peak day and connect it to an event.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Get the revision history.</strong> Use the chapter’s <code>get_revisions()</code>, following continuation tokens so you page through the full history up to a fixed date. Print the total count and the date range.</p>
-<div id="27c31f2a" class="cell" data-execution_count="21">
+<div id="ce11bfc8" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># Step 3: Retrieve the full revision history, handling pagination, and build a revisions DataFrame.</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Profile the editors.</strong> How many unique editors does the article have? Use <code>value_counts()</code> on the user column to see edits per editor, and print the top ten. Is the editing concentrated in a few hands or spread out?</p>
-<div id="268fb2f6" class="cell" data-execution_count="22">
+<div id="822de5b5" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># Step 4: Count unique editors and show the top ten by revision count.</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Align edits with attention.</strong> Resample the revisions by month, and plot monthly edits alongside the monthly pageview totals from Step 1. Do the two series move together around your spike?</p>
-<div id="79d7f3a5" class="cell" data-execution_count="23">
+<div id="310b2da1" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="co"># Step 5: Plot monthly edits and monthly pageviews for comparison.</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Map the neighborhood.</strong> Use <code>page_list()</code> for the article’s wikilinks, categories, and language editions, and <code>query_all()</code> for what links here. Print each count and five examples of each.</p>
-<div id="f57481b8" class="cell" data-execution_count="24">
+<div id="4f2615ca" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="co"># Step 6: Retrieve the article's links, categories, language editions, and backlinks.</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In four to six sentences: What does the alignment (or misalignment) of edits and views around your spike suggest about how Wikipedia responds to events? Is your article maintained by a dedicated few or a broad crowd, and why might that matter for how much you trust it? What kind of article do its links and categories suggest it is?</p>
-<div id="f35e0728" class="cell" data-execution_count="25">
+<div id="01d39582" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
