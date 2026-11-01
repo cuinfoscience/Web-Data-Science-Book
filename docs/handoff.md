@@ -1,5 +1,13 @@
 # Hand-off note
 
+**Updated 2026-11-01: chapter 11 is done; chapter 12's sprint starts.**
+- **Chapter 11.** It is on `main` after #295–#297: three APIs (Census, FRED, the EIA), the `getpass()` steps, and the fresh start after setting a key (quit Jupyter, open a new terminal).
+- **Week 11's lab.** Taught as Census and FRED only, with the EIA and Congress.gov left for students to explore (course #153, #154).
+- **The review of the sprint.** It is the course's [AAR of weeks 10–11](https://github.com/cuinfoscience/INFO4617-Fall2026/blob/main/docs/aar/2026-11-01-weeks-10-11.md). Two of its findings concern this repository:
+  - a lab or deck pins the chapter commit it follows, and a check should say when the chapter has moved past it (P0-2);
+  - a lab's scope is settled before the chapter grows to match it (P0-3).
+- **Next: chapter 12, social and media platform APIs, for week 12 (November 2–6).** Its plan goes in `docs/plans/` once the instructor has settled the scope.
+
 **Updated 2026-10-26: chapter 11 and week 11, after Monday's lab.** Chapter 11's PR A and PR B (#289–#294) are merged. This note's pull request acts on the instructor's notes from Monday: chapter 11 drops Congress.gov (three APIs, three keys), its Census section goes from the website's table to the API in concrete steps, and "API Key Management" says what to do when a key reads `MISSING`. The course side waits for a session that can reach the course repository; its changes are in [`plans/2026-10-26-week11-after-monday.md`](plans/2026-10-26-week11-after-monday.md):
 - **Wednesday:** Part 1's steps 4–5, then FRED, then the EIA if time allows; Part 1 revised to match the chapter.
 - **Friday:** the EIA, then the Census–EIA join (decided 2026-10-26), then the revision block. No Congress.gov.
