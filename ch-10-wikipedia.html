@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.20">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -94,14 +94,15 @@ div.csl-indent {
 <link href="./ch-09-pdfs.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-17888a1159294d3eb470f19f6f52f5a5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-c3f275f737c858eb27d6953de92c0275.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-48102b1fb5dc9f619f8d242bc6aaae63.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -136,17 +137,17 @@ div.csl-indent {
 
 </head>
 
-<body class="nav-sidebar docked quarto-light">
+<body class="nav-sidebar docked quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html">APIs</a></li><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html">APIs</a></li><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -157,7 +158,7 @@ div.csl-indent {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto" aria-label="Site">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Web Data Science</a> 
@@ -181,13 +182,10 @@ div.csl-indent {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Foundations</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Foundations</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch-01-introduction.html" class="sidebar-item-text sidebar-link">
@@ -222,13 +220,10 @@ div.csl-indent {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Documents</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Documents</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch-06-static-pages.html" class="sidebar-item-text sidebar-link">
@@ -257,13 +252,10 @@ div.csl-indent {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">APIs</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-controls="quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-3-label">APIs</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" aria-labelledby="quarto-sidebar-section-3-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch-10-wikipedia.html" class="sidebar-item-text sidebar-link active">
@@ -292,13 +284,10 @@ div.csl-indent {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
- <span class="menu-text">Practice</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-controls="quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-4-label">Practice</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-4" aria-labelledby="quarto-sidebar-section-4-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch-14-automation.html" class="sidebar-item-text sidebar-link">
@@ -315,13 +304,10 @@ div.csl-indent {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-controls="quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text" id="quarto-sidebar-section-5-label">Appendices</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-5" aria-labelledby="quarto-sidebar-section-5-label" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./appendix-notebooks.html" class="sidebar-item-text sidebar-link">
@@ -348,7 +334,7 @@ div.csl-indent {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
@@ -395,9 +381,9 @@ div.csl-indent {
 <div class="toc-actions"><ul><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/edit/main/ch-10-wikipedia.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/cuinfoscience/Web-Data-Science-Book/issues/new/choose" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html">APIs</a></li><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html">APIs</a></li><li class="breadcrumb-item"><a href="./ch-10-wikipedia.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></a></li></ol></nav>
 <div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title"><span id="sec-wikipedia" class="quarto-section-identifier"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to APIs: Wikipedia</span></span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
@@ -674,7 +660,7 @@ Figure&nbsp;10.10: Jimbo Wales’s contributions, October 2026: each row is an e
 <section id="the-anatomy-of-an-api-call" class="level2" data-number="10.3">
 <h2 data-number="10.3" class="anchored" data-anchor-id="the-anatomy-of-an-api-call"><span class="header-section-number">10.3</span> The Anatomy of an API Call</h2>
 <p>Every request to the MediaWiki <a href="https://www.mediawiki.org/wiki/API:Action_API">Action API</a> follows the same structure: a base URL, an <code>action</code> parameter specifying what you want to do, additional parameters narrowing your request, and a <code>format</code> parameter specifying the response format. Here is the request from <a href="ch-05-protocols.html" class="quarto-xref"><span>Chapter 5</span></a> again:</p>
-<div id="a38b47b5" class="cell" data-execution_count="1">
+<div id="85b43cfd" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
@@ -709,7 +695,7 @@ Figure&nbsp;10.11: The chapter’s first request in a browser, with <code>format
 </figure>
 </div>
 <p>The response is a nested JSON structure. You navigate it one level at a time:</p>
-<div id="5f32cec1" class="cell" data-execution_count="2">
+<div id="200e7e9e" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co"># The data lives inside data &gt; query &gt; pages &gt; {page_id}</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a>pages <span class="op">=</span> data[<span class="st">"query"</span>][<span class="st">"pages"</span>]</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a></span>
@@ -742,7 +728,7 @@ Figure&nbsp;10.11: The chapter’s first request in a browser, with <code>format
 <section id="getting-revisions" class="level2" data-number="10.4">
 <h2 data-number="10.4" class="anchored" data-anchor-id="getting-revisions"><span class="header-section-number">10.4</span> Getting Revisions</h2>
 <p>Every edit ever made to a Wikipedia article is recorded and accessible through the API. The revisions endpoint returns metadata about each edit: who made it, when, how much the article size changed, and what edit summary they left. One request returns at most 500 revisions, so the function asks again until the API says there are no more:</p>
-<div id="bf4fc7b8" class="cell" data-execution_count="3">
+<div id="21962eb3" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="kw">def</span> get_revisions(title, until<span class="op">=</span><span class="st">"2026-09-30T23:59:59Z"</span>):</span>
@@ -789,7 +775,7 @@ Figure&nbsp;10.11: The chapter’s first request in a browser, with <code>format
 </section>
 <section id="analyzing-revision-history" class="level3" data-number="10.4.2">
 <h3 data-number="10.4.2" class="anchored" data-anchor-id="analyzing-revision-history"><span class="header-section-number">10.4.2</span> Analyzing Revision History</h3>
-<div id="0c43be53" class="cell" data-execution_count="4">
+<div id="1106cce1" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>cu_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(cu_revisions[<span class="st">"timestamp"</span>])</span>
@@ -816,7 +802,7 @@ Figure&nbsp;10.12: Edits per month to University of Colorado Boulder, from its f
 </figure>
 </div>
 <p>The article’s busiest years were 2006 and 2007, about 30 edits a month, when much of it was being written (<a href="#fig-cu-monthly-edits" class="quarto-xref">Figure&nbsp;<span>10.12</span></a>). Since 2012 it has averaged fewer than ten edits a month: upkeep, such as new enrollment figures, more than new writing. You can also analyze who edits the article:</p>
-<div id="ac25faa6" class="cell" data-execution_count="5">
+<div id="ad8df32d" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Editors with the most revisions</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>top_editors <span class="op">=</span> cu_revisions[<span class="st">"user"</span>].value_counts().head(<span class="dv">10</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="bu">print</span>(top_editors)</span>
@@ -843,7 +829,7 @@ Figure&nbsp;10.12: Edits per month to University of Colorado Boulder, from its f
 <section id="getting-pageviews" class="level2" data-number="10.5">
 <h2 data-number="10.5" class="anchored" data-anchor-id="getting-pageviews"><span class="header-section-number">10.5</span> Getting Pageviews</h2>
 <p>The Wikimedia REST API, separate from the MediaWiki Action API, counts how many times an article was viewed. Its address is built from parts, like a file path: the project, the access method (desktop, mobile web, mobile app, or all), the <strong>agent</strong> (who is reading), the article, the granularity, and the dates. The function builds the address and returns a DataFrame:</p>
-<div id="38b02d6d" class="cell" data-execution_count="6">
+<div id="8922fb8b" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="kw">def</span> get_pageviews(title, start, end, agent<span class="op">=</span><span class="st">"user"</span>, granularity<span class="op">=</span><span class="st">"daily"</span>):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>    article <span class="op">=</span> title.replace(<span class="st">" "</span>, <span class="st">"_"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>    url <span class="op">=</span> (</span>
@@ -857,7 +843,7 @@ Figure&nbsp;10.12: Edits per month to University of Colorado Boulder, from its f
 <span id="cb6-11"><a href="#cb6-11" aria-label="11"></a>    <span class="cf">return</span> views[[<span class="st">"timestamp"</span>, <span class="st">"views"</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>With the function defined, retrieving and plotting a series takes a few lines:</p>
-<div id="211d8e4c" class="cell" data-execution_count="7">
+<div id="62e9df53" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a>cu_views <span class="op">=</span> get_pageviews(<span class="st">"University of Colorado Boulder"</span>, <span class="st">"20210101"</span>, <span class="st">"20260930"</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(cu_views)<span class="sc">:,}</span><span class="ss"> days, </span><span class="sc">{</span>cu_views[<span class="st">'views'</span>]<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">:,}</span><span class="ss"> views"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a></span>
@@ -889,7 +875,7 @@ Figure&nbsp;10.13: Daily pageviews of University of Colorado Boulder by human re
 <li><strong>The agent splits who is reading.</strong> <code>user</code> is meant to be people; <code>spider</code> is self-identified crawlers, such as search engines; and <code>automated</code> is traffic that Wikimedia’s analysts judged to be bots that don’t say so. The rules for that judgment change, as “Social History and Public Interest” describes, and when they do, past counts can be reclassified.</li>
 </ul>
 <p>You can ask the API for each agent separately:</p>
-<div id="5b6c5728" class="cell" data-execution_count="8">
+<div id="c20b1c23" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a>agents <span class="op">=</span> []</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a><span class="cf">for</span> agent <span class="kw">in</span> [<span class="st">"user"</span>, <span class="st">"spider"</span>, <span class="st">"automated"</span>]:</span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a>    monthly <span class="op">=</span> get_pageviews(<span class="st">"University of Colorado Boulder"</span>, <span class="st">"20240101"</span>, <span class="st">"20260930"</span>,</span>
@@ -935,7 +921,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="getting-links-categories-templates-and-languages" class="level2" data-number="10.6">
 <h2 data-number="10.6" class="anchored" data-anchor-id="getting-links-categories-templates-and-languages"><span class="header-section-number">10.6</span> Getting Links, Categories, Templates, and Languages</h2>
 <p>The tour’s other features all come from the same endpoint, <code>action=query</code>, with a different <code>prop</code> or <code>list</code>, and they all paginate the same way. Rather than write one function per feature, write one function that runs any query and follows its continuation, and collects the pages it returns:</p>
-<div id="27efc642" class="cell" data-execution_count="9">
+<div id="8d0c83f0" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="kw">def</span> query_all(params):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>    url <span class="op">=</span> <span class="st">"https://en.wikipedia.org/w/api.php"</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>    params <span class="op">=</span> {<span class="st">"action"</span>: <span class="st">"query"</span>, <span class="st">"format"</span>: <span class="st">"json"</span>, <span class="op">**</span>params}</span>
@@ -960,7 +946,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <span id="cb9-22"><a href="#cb9-22" aria-label="22"></a>    <span class="cf">return</span> items</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Each feature on the tour is then one call:</p>
-<div id="c813688f" class="cell" data-execution_count="10">
+<div id="bb14feaa" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a>title <span class="op">=</span> <span class="st">"University of Colorado Boulder"</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a>links <span class="op">=</span> page_list(title, <span class="st">"links"</span>, <span class="st">"pllimit"</span>)</span>
@@ -984,7 +970,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 </div>
 <p>The API counts 40 categories, more than the box at the foot of the article shows (<a href="#fig-article-categories" class="quarto-xref">Figure&nbsp;<span>10.5</span></a>). The first ones it returns are why: “All Wikipedia articles written in American English” and “All articles containing potentially dated statements” are <strong>hidden categories</strong>, which editors use to track maintenance work and which readers don’t see. To leave them out, add <code>"clshow": "!hidden"</code> to the query.</p>
 <p>What links here is a <code>list</code>, not a <code>prop</code>: it asks about all of Wikipedia rather than one page. Its results come under <code>backlinks</code>:</p>
-<div id="8282a8c5" class="cell" data-execution_count="11">
+<div id="bec4bfef" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>backlinks <span class="op">=</span> []</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="cf">for</span> batch <span class="kw">in</span> query_all({<span class="st">"list"</span>: <span class="st">"backlinks"</span>, <span class="st">"bltitle"</span>: title, <span class="st">"bllimit"</span>: <span class="st">"max"</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>                        <span class="st">"blnamespace"</span>: <span class="dv">0</span>}):    <span class="co"># namespace 0: articles only</span></span>
@@ -995,7 +981,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="interlanguage-links" class="level3" data-number="10.6.1">
 <h3 data-number="10.6.1" class="anchored" data-anchor-id="interlanguage-links"><span class="header-section-number">10.6.1</span> Interlanguage Links</h3>
 <p>Which editions have an article on a topic is itself a measurement. Each <code>langlinks</code> entry gives the edition’s language code and the article’s title there:</p>
-<div id="f669377c" class="cell" data-execution_count="12">
+<div id="90bafc1c" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a>langs <span class="op">=</span> pd.DataFrame(langlinks)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(langs)<span class="sc">}</span><span class="ss"> other editions"</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a><span class="bu">print</span>(langs[[<span class="st">"lang"</span>, <span class="st">"*"</span>]].head(<span class="dv">8</span>).to_string(index<span class="op">=</span><span class="va">False</span>))</span>
@@ -1016,7 +1002,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="getting-user-contributions" class="level2" data-number="10.7">
 <h2 data-number="10.7" class="anchored" data-anchor-id="getting-user-contributions"><span class="header-section-number">10.7</span> Getting User Contributions</h2>
 <p><code>list=usercontribs</code> returns an editor’s edits across all of Wikipedia, newest first. Here are the latest edits by Jimbo Wales, whose user page and contributions were on the tour:</p>
-<div id="a24faa22" class="cell" data-execution_count="13">
+<div id="106d651d" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a>contribs <span class="op">=</span> []</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="cf">for</span> batch <span class="kw">in</span> query_all({<span class="st">"list"</span>: <span class="st">"usercontribs"</span>, <span class="st">"ucuser"</span>: <span class="st">"Jimbo Wales"</span>,</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>                        <span class="st">"uclimit"</span>: <span class="st">"max"</span>, <span class="st">"ucend"</span>: <span class="st">"2026-01-01T00:00:00Z"</span>,</span>
@@ -1039,17 +1025,17 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="from-raw-requests-to-a-client-mwclient" class="level2" data-number="10.8">
 <h2 data-number="10.8" class="anchored" data-anchor-id="from-raw-requests-to-a-client-mwclient"><span class="header-section-number">10.8</span> From Raw Requests to a Client: mwclient</h2>
 <p>This chapter has written its requests by hand, so that you can see every parameter and every continuation. In practice, most people who use the MediaWiki API from Python use a client library that does those parts for them. <a href="https://github.com/mwclient/mwclient">mwclient</a> (<a href="https://mwclient.readthedocs.io/">documentation</a>) is one of the simplest. It isn’t in <code>webdata</code>, so install it once, from the same conda-forge channel as the rest of the environment:</p>
-<div id="88920e16" class="cell" data-execution_count="14">
+<div id="8e92ce3b" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="op">%</span>conda install <span class="op">-</span>y <span class="op">-</span>c conda<span class="op">-</span>forge mwclient</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Then check that Python can import it, and which version you have:</p>
-<div id="08a94951" class="cell" data-execution_count="15">
+<div id="17ae497f" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="im">import</span> mwclient</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="bu">print</span>(mwclient.__version__)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="co"># 0.10.1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>conda-forge has version 0.10.1. The <a href="https://pypi.org/project/mwclient/">Python Package Index</a> has a newer one, 0.11, which renames one argument used below: <code>limit</code>, the number of results to ask for in each request, becomes <code>api_chunk_size</code>. With 0.11, write <code>api_chunk_size=500</code> where the code says <code>limit=500</code>.</p>
-<div id="712d3fd6" class="cell" data-execution_count="16">
+<div id="9101a9a2" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a>site <span class="op">=</span> mwclient.Site(<span class="st">"en.wikipedia.org"</span>,</span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>                     clients_useragent<span class="op">=</span>CLIENT)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a>page <span class="op">=</span> site.pages[<span class="st">"University of Colorado Boulder"</span>]</span>
@@ -1075,7 +1061,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="a-second-case-study-boulder-colorado" class="level2" data-number="10.9">
 <h2 data-number="10.9" class="anchored" data-anchor-id="a-second-case-study-boulder-colorado"><span class="header-section-number">10.9</span> A Second Case Study: Boulder, Colorado</h2>
 <p>The same functions work on any article. <a href="https://en.wikipedia.org/wiki/Boulder,_Colorado">Boulder, Colorado</a> is the city around the university, and its article answers to different events:</p>
-<div id="ea90d935" class="cell" data-execution_count="17">
+<div id="aa628ee8" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a>boulder <span class="op">=</span> <span class="st">"Boulder, Colorado"</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a>boulder_revisions <span class="op">=</span> get_revisions(boulder)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a>boulder_views <span class="op">=</span> get_pageviews(boulder, <span class="st">"20210101"</span>, <span class="st">"20260930"</span>)</span>
@@ -1092,7 +1078,7 @@ Figure&nbsp;10.14: Monthly pageviews of University of Colorado Boulder for each 
 <section id="combining-endpoints" class="level3" data-number="10.9.1">
 <h3 data-number="10.9.1" class="anchored" data-anchor-id="combining-endpoints"><span class="header-section-number">10.9.1</span> Combining Endpoints</h3>
 <p>The real analytical power of the API emerges when you combine endpoints. A natural question is whether editing and reading move together: do articles get edited more when more people are reading them?</p>
-<div id="88af8502" class="cell" data-execution_count="18">
+<div id="1d6935da" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a>boulder_revisions[<span class="st">"timestamp"</span>] <span class="op">=</span> pd.to_datetime(boulder_revisions[<span class="st">"timestamp"</span>])</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
@@ -1133,37 +1119,37 @@ Figure&nbsp;10.15: Monthly views (top) and monthly edits (bottom) of University 
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
 <p>You will build a complete profile of one Wikipedia article: who reads it, who writes it, and what it connects to.</p>
 <p><strong>Step 1 — Choose an article and get its pageviews.</strong> Pick an article about a place, institution, or event you know, with at least one newsworthy moment since 2021. Define your <code>HEADERS</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>), then use the chapter’s <code>get_pageviews()</code> to retrieve daily views by human readers for a fixed period that ends before today. Build the DataFrame and plot the series.</p>
-<div id="4a7b507f" class="cell" data-execution_count="19">
+<div id="4b34289e" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="co"># Step 1: Retrieve daily pageviews for your article, build the DataFrame, and plot it.</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Find the spike.</strong> Identify the highest-traffic day with <code>idxmax()</code> (<a href="ch-01-introduction.html" class="quarto-xref"><span>Chapter 1</span></a> showed you this) and print the date and view count. Note in a comment what real-world event you think explains it, and check the article’s revision history around that date for edits that mention it.</p>
-<div id="41ddce2f" class="cell" data-execution_count="20">
+<div id="586ebebc" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 2: Find the peak day and connect it to an event.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Get the revision history.</strong> Use the chapter’s <code>get_revisions()</code>, following continuation tokens so you page through the full history up to a fixed date. Print the total count and the date range.</p>
-<div id="45f8aaf5" class="cell" data-execution_count="21">
+<div id="d96b6f68" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># Step 3: Retrieve the full revision history, handling pagination, and build a revisions DataFrame.</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Profile the editors.</strong> How many unique editors does the article have? Use <code>value_counts()</code> on the user column to see edits per editor, and print the top ten. Is the editing concentrated in a few hands or spread out?</p>
-<div id="1c1bc066" class="cell" data-execution_count="22">
+<div id="00f7e78c" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># Step 4: Count unique editors and show the top ten by revision count.</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Align edits with attention.</strong> Resample the revisions by month, and plot monthly edits alongside the monthly pageview totals from Step 1. Do the two series move together around your spike?</p>
-<div id="be169a62" class="cell" data-execution_count="23">
+<div id="cc82e2c0" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="co"># Step 5: Plot monthly edits and monthly pageviews for comparison.</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Map the neighborhood.</strong> Use <code>page_list()</code> for the article’s wikilinks, categories, and language editions, and <code>query_all()</code> for what links here. Print each count and five examples of each.</p>
-<div id="b85ef99c" class="cell" data-execution_count="24">
+<div id="255de174" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="co"># Step 6: Retrieve the article's links, categories, language editions, and backlinks.</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In four to six sentences: What does the alignment (or misalignment) of edits and views around your spike suggest about how Wikipedia responds to events? Is your article maintained by a dedicated few or a broad crowd, and why might that matter for how much you trust it? What kind of article do its links and categories suggest it is?</p>
-<div id="b44350c1" class="cell" data-execution_count="25">
+<div id="2c7ec1e3" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1379,7 +1365,8 @@ Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 201
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -1388,8 +1375,69 @@ Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 201
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -1403,6 +1451,7 @@ Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 201
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -1565,44 +1614,54 @@ Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 201
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -1701,7 +1760,10 @@ Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 201
     }
   });
   </script>
-<nav class="page-navigation">
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
   <div class="nav-page nav-page-previous">
       <a href="./ch-09-pdfs.html" class="pagination-link" aria-label="Extracting Data from PDFs">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Extracting Data from PDFs</span></span>
