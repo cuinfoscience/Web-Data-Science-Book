@@ -6,7 +6,7 @@ Every chapter of this book has a companion Jupyter Notebook that replicates the 
 
 1. **Download** the notebook for the chapter you are reading. Each link below opens the notebook on GitHub, which displays the cells so you can read it in the browser. To get a copy you can run, use the download button above the notebook (the ⤓ icon, or **Raw** then "Save as…").
 2. **Launch** Jupyter (`jupyter lab` or `jupyter notebook`) from the folder where you saved it. If you need help getting Jupyter running, see *Missing Manual* Chapter 16: Jupyter.
-3. **Install as you go.** Each chapter introduces its own libraries (`pip install` lines appear in the first code cells). You do not need everything installed to start.
+3. **Start Jupyter from `webdata`.** Chapter 1's `webdata` environment, built from conda-forge, has every library the chapters import, and Tesseract for chapter 9 (@sec-introduction). Run `conda activate webdata` before `jupyter notebook`. Chapters 7 to 10 also start with a `%conda install` cell, which adds their libraries to whichever environment runs the notebook.
 4. **Supply your own credentials.** Notebooks for the API chapters (@sec-government through @sec-ai-apis) require your own API keys, set as environment variables — never pasted into cells.
 
 The code cells ship unexecuted by design: running code, encountering errors, and debugging them is where the learning happens. Expect some cells to require your input (API keys, file paths, a chosen article or subreddit) before they run.
