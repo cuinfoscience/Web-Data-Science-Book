@@ -350,6 +350,7 @@ In September 2026 that printed Firefox `156.0.1` and geckodriver `0.37.1`. The n
 On Ubuntu 22.04 and later, the Firefox that comes with the system is a snap, a package that runs in a container with its own view of the files, and a driver outside the container can leave it hanging at startup. Mozilla's fix is to use the driver that comes inside the snap:
 
 ```python
+# Ubuntu 22.04 or later with snap Firefox only; on macOS or Windows, skip this cell
 service = webdriver.FirefoxService(executable_path="/snap/bin/geckodriver")
 driver = webdriver.Firefox(service=service)
 ```
