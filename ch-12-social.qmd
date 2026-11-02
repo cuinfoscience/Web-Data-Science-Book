@@ -2,11 +2,12 @@
 
 ::: {.callout-tip}
 ## Learning Objectives
-- Explain how OAuth-based authentication grants applications scoped access to platform data
-- Retrieve and analyze subreddit metadata, submissions, comment trees, and user histories from Reddit
-- Retrieve artist, album, track, and playlist metadata from Spotify
-- Access decentralized social network data from Bluesky and Mastodon
-- Compare API design patterns across platforms and assess research implications of different access models
+- Explain why a platform's API, unlike a government agency's, exists at the platform's discretion, and date what you collect accordingly
+- Check who an account belongs to before you collect its posts: a domain handle, a verification, or neither
+- Read profiles and posts from Bluesky's public API with no account or key, and page through more posts than one request returns with a `cursor`
+- Read a channel's videos and their statistics from the YouTube Data API with a key, and stay inside its daily quota
+- Evaluate the archives that replaced Pushshift for Reddit data, and what each one keeps that its users deleted
+- Keep private people out of what you collect, save, and show
 :::
 
 ::: {.callout-tip}
@@ -17,523 +18,421 @@ Run this chapter's code as you read: open the [companion notebook](https://githu
 
 ## Platforms, Data, and Power
 
-Social and media platform APIs mediate access to an enormous share of public discourse. Unlike the government APIs in @sec-government — which exist because of transparency mandates — platform APIs exist at the discretion of private companies. This means access can change overnight, as the Reddit and Twitter cases illustrate.
+The government APIs in @sec-government exist because a law says the data is public. A social platform's API exists because the company that runs the platform chooses to offer it, and the company can choose again. Since 2023, most of them have:
 
-This chapter teaches authenticated API access through four platforms that represent different points on the spectrum from proprietary to open: Reddit (PRAW), Spotify (spotipy), Bluesky (AT Protocol), and Mastodon (Mastodon.py). Pay attention to the structural differences — they embody the tensions between enclosure and openness discussed in @sec-post-api.
+- **Reddit** priced heavy use of its API in 2023 and closed self-service access on November 11, 2025: a new app now needs Reddit's approval ([Reddit's announcement](https://www.reddit.com/r/redditdev/comments/1oug31u/introducing_the_responsible_builder_policy_new/)).
+- **Spotify** removed its audio features from new apps in November 2024, and since February 11, 2026, every new developer app's owner needs a Premium subscription, with top tracks, popularity, and follower counts removed ([Spotify's migration guide](https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide)).
+- **X**, formerly Twitter, ended free research access in 2023 [@davidson2023platform].
 
-::: {.callout-warning}
-## Social Data Is People Data
-Everything you retrieve in this chapter — posts, comments, profiles, listening patterns — was produced by people, most of whom never imagined their activity in a research dataset. Before collecting, revisit @sec-ethics: check the platform's Terms of Service, consider whether your project needs IRB review, collect the minimum you need, and never gather private or direct-message content. When you report findings, avoid quoting posts verbatim in ways that let a search engine re-identify the author.
-:::
+Two platforms in this chapter answer differently. **Bluesky** is built on an open protocol, the AT Protocol, and its public API answers anyone, with no account and no key. **YouTube**'s Data API asks for a key, which anyone with a Google account can make in a few minutes, and counts what each key uses against a daily quota. Between them, they show two ways an API can be open: to anyone, or to anyone who identifies themselves.
 
-## Reddit via PRAW
+| Platform | Who can read, as of November 2026 | What it asks of you | This chapter |
+|---|---|---|---|
+| Bluesky | Anyone | Nothing; a User-Agent, as always | Code |
+| YouTube | Anyone with a Google account | A key, and a daily quota | Code |
+| Reddit | Approved apps; archives of past posts | Reddit's approval, or an archive's terms | An archive's code, and history |
+| Spotify | App owners with Premium | A subscription, and fewer endpoints | History |
 
-Reddit provides a free API tier for non-commercial use (100 queries per minute). The PRAW (Python Reddit API Wrapper) library simplifies authentication and data retrieval.
+Every claim in this chapter about a platform's rules is dated, because they change. When you collect from a platform, record the date, the endpoint, and what access you had, so a reader can tell what you could and couldn't see.
 
-### Authentication
+### Social Data Is People Data
 
-Reddit's API uses **OAuth2**, the authorization standard behind most platform APIs. The core idea: instead of sending your password with every request, your application exchanges its credentials for a scoped, revocable token. OAuth2 comes in several *flows* for different situations. The **client credentials** flow used below authenticates your *application* and grants read-only access to public data — sufficient for research collection. The **authorization code** flow additionally asks a *user* to grant your app permission to act on their behalf (post, vote, read private feeds); you will not need it in this chapter, but you will recognize it from every "Sign in with Google" dialog you have ever clicked through.
+Almost everything a platform's API returns was made by a person, most of whom never imagined it in a research dataset. Before collecting, revisit @sec-ethics: read the platform's terms of service, consider whether your project needs a review by your institution's IRB, collect the minimum you need, and never collect private messages. When you report what you found, don't quote a post if a search engine could lead a reader to its author [@ayers2018dont].
 
-```{python}
-# praw is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge praw
-import praw
-
-reddit = praw.Reddit(
-    client_id="your_client_id",
-    client_secret="your_client_secret",
-    user_agent="WebDataScience/1.0 by u/your_username"
-)
-
-# Verify the client is working: with app-only credentials, PRAW operates in read-only mode
-print(f"Read-only mode: {reddit.read_only}")
-# Read-only mode: True
-```
-
-You will need to create a Reddit app at <https://www.reddit.com/prefs/apps/> and obtain your client ID and secret. Store them in environment variables (or a credentials file excluded from version control), never directly in your notebook.
+This chapter's running case avoids most of that: it reads **federal agencies**, public institutions that post in order to be read. Even so, an agency's posts can carry other people's: a repost shares someone else's post, and replies come from anyone. The code below sets those aside, and no private person's handle or post appears in any output.
 
 ::: {.callout-tip}
 ## Missing Manual Reference
-For patterns for storing and loading API credentials safely — environment variables, `.env` files, and what belongs in `.gitignore` — see *Missing Manual* Chapter 34: Environment Variables and Secrets.
+For storing and loading API keys safely, with environment variables, `.env` files, and what belongs in `.gitignore`, see the *Missing Manual*'s [Chapter 34: Environment Variables and Secrets](https://cuinfoscience.github.io/INFO-Missing-Manual/chapters/secrets.html).
 :::
 
-### Exploring Subreddits
+## A Tour: From a Platform's Website to Its API
+
+As in @sec-government, start with the page a person reads. Open the National Weather Service's profile on Bluesky's website, [bsky.app/profile/nws.noaa.gov](https://bsky.app/profile/nws.noaa.gov), and NOAA's channel on YouTube, [youtube.com/@NOAA](https://www.youtube.com/@NOAA). Every number on those pages comes from the platform's API, and each feature of the page has a request behind it:
+
+| On the page | Bluesky | YouTube |
+|---|---|---|
+| The account's name and handle | `app.bsky.actor.getProfile`: `displayName`, `handle` | `channels.list`: `snippet.title`, `snippet.customUrl` |
+| Proof the account is the agency's | The `.gov` handle; `verification` | The channel linked from the agency's own website |
+| Followers or subscribers | `followersCount` | `statistics.subscriberCount` |
+| The list of posts or videos | `app.bsky.feed.getAuthorFeed`, newest first | `playlistItems.list` on the channel's uploads playlist |
+| Likes, reposts, views on each item | `likeCount`, `repostCount`, `replyCount` | `videos.list`: `statistics.viewCount`, `likeCount` |
+| More, as you scroll | The `cursor` the last answer ended with | The `nextPageToken` |
+
+The two columns differ in one way that matters: the Bluesky requests need nothing from you, and every YouTube request carries a key.
+
+## Bluesky's Public API
+
+Bluesky is a social network built on the AT Protocol, an open protocol: its specifications are public, and anyone may run the services that make up the network. One of those services, the **AppView**, assembles posts, profiles, and counts from across the network and answers questions about them. Bluesky runs a public AppView at `https://public.api.bsky.app/xrpc/` that answers reads for anyone, with no login ([API hosts](https://docs.bsky.app/docs/advanced-guides/api-directory)). Each method's name is part of the address: `app.bsky.actor.getProfile` reads a profile, `app.bsky.feed.getAuthorFeed` an account's posts. Like Wikipedia's API in @sec-wikipedia, it still wants to know who is asking:
 
 ```{python}
+import requests
 import pandas as pd
-from datetime import datetime
-
-subreddit = reddit.subreddit("news")
-
-# Subreddit metadata
-print(f"Subscribers: {subreddit.subscribers:,}")
-print(f"Created: {datetime.fromtimestamp(subreddit.created_utc)}")
-print(f"Description: {subreddit.public_description[:200]}")
-
-# Subreddit rules (PRAW returns Rule objects; use attribute access)
-for rule in subreddit.rules:
-    print(f"- {rule.short_name}")
-```
-
-### Retrieving Submissions
-
-```{python}
-# Get the top 25 submissions
-submissions = []
-for submission in subreddit.top(limit=25, time_filter="week"):
-    submissions.append({
-        "title": submission.title,
-        "score": submission.score,
-        "num_comments": submission.num_comments,
-        "author": str(submission.author),
-        "created_utc": datetime.fromtimestamp(submission.created_utc),
-        "url": submission.url
-    })
-
-df = pd.DataFrame(submissions)
-
 import matplotlib.pyplot as plt
 
-plt.figure(figsize=(8, 6))
-plt.scatter(df["score"], df["num_comments"], alpha=0.7)
-plt.xlabel("Score")
-plt.ylabel("Number of Comments")
-plt.title("r/news: Score vs. Comments (Top 25 Weekly)")
-plt.tight_layout()
-plt.show()
+# Every request in this chapter says who is asking, as chapter 1's did; put your own address here
+HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+bsky_base = "https://public.api.bsky.app/xrpc"
 ```
 
-### Comment Trees
+### Who Is Posting: A Profile
+
+[`app.bsky.actor.getProfile`](https://docs.bsky.app/docs/api/app-bsky-actor-get-profile) takes an account's handle and returns its profile:
 
 ```{python}
-# Take the current top submission from the subreddit's hot listing.
-# (You can also pass any thread URL from your browser via
-# reddit.submission(url="https://www.reddit.com/r/.../comments/..."))
-submission = next(subreddit.hot(limit=1))
-submission.comments.replace_more(limit=0)  # Flatten the tree
-
-comments = []
-for comment in submission.comments.list():
-    comments.append({
-        "body": comment.body[:200],
-        "score": comment.score,
-        "depth": comment.depth,
-        "author": str(comment.author)
-    })
-
-df_comments = pd.DataFrame(comments)
-print(f"Total comments: {len(df_comments)}")
+response = requests.get(f"{bsky_base}/app.bsky.actor.getProfile",
+                        params={"actor": "nws.noaa.gov"}, headers=HEADERS, timeout=30)
+response.raise_for_status()
+profile = response.json()
+for field in ["did", "handle", "displayName", "followersCount", "followsCount", "postsCount", "createdAt"]:
+    print(f"{field}: {profile[field]}")
+print("verifiedStatus:", profile["verification"]["verifiedStatus"])
+# did: did:plc:pfot5zyhod4cxwc5gfhzds4i
+# handle: nws.noaa.gov
+# displayName: National Weather Service
+# followersCount: 63022
+# followsCount: 4
+# postsCount: 1394
+# createdAt: 2025-01-17T17:50:18.044Z
+# verifiedStatus: valid
 ```
 
-### Analyzing Comment Engagement
+The counts match the profile page, give or take the followers who arrived between the page loading and the request. Two fields deserve a closer look:
 
-With the comment tree flattened into a DataFrame, you can start asking quantitative questions about how engagement varies with comment structure and position. One natural question: do deeper comments — replies to replies to replies — receive less attention than top-level responses? The `depth` field PRAW provides makes this straightforward to investigate.
+- **`did`**, a decentralized identifier, is the account's permanent ID. A handle can change; the DID doesn't, so a dataset that will be compared later should key on it.
+- **`handle`**, `nws.noaa.gov`, is a domain name. An account can take a domain as its handle only by proving that it controls the domain ([Bluesky's guide](https://bsky.social/about/blog/4-28-2023-domain-handle-tutorial)), so no one but NOAA can post as `nws.noaa.gov`.
+
+The `verification` field is a second, separate proof: Bluesky itself, as a trusted verifier, has checked the account and says so in the profile, which the website shows as a blue check ([how verification works](https://bsky.social/about/blog/04-21-2025-verification)). Accounts that look official but carry neither proof are common. A search for "National Park Service" on 2026-11-02 found "Alt National Park Service" and "The National Park Service UNCENSORED", with no `.gov` handle and no verification. Collect their posts as the agency's, and every conclusion you draw is about someone else.
+
+### Several Accounts at Once
+
+Five federal accounts had a `.gov` handle on Bluesky on November 2, 2026, four of them NOAA's. Others, like the Library of Congress and the Federal Reserve Bank of St. Louis, which runs FRED (@sec-government), have a `.bsky.social` handle and a verification instead. [`app.bsky.actor.getProfiles`](https://docs.bsky.app/docs/api/app-bsky-actor-get-profiles) takes up to 25 accounts in one request; `requests` repeats the `actors` parameter once for each item of a list:
 
 ```{python}
-import matplotlib.pyplot as plt
-
-fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-
-# Scatter plot: comment depth vs. score
-axes[0].scatter(df_comments["depth"], df_comments["score"], alpha=0.4)
-axes[0].set_xlabel("Comment Depth")
-axes[0].set_ylabel("Score (Upvotes - Downvotes)")
-axes[0].set_title("Comment Depth vs. Score")
-
-# Histogram of comment lengths (word count)
-df_comments["word_count"] = df_comments["body"].apply(lambda x: len(x.split()))
-axes[1].hist(df_comments["word_count"], bins=30, edgecolor="black", alpha=0.7)
-axes[1].set_xlabel("Word Count")
-axes[1].set_ylabel("Frequency")
-axes[1].set_title("Distribution of Comment Lengths")
-
-plt.tight_layout()
-plt.show()
+agencies = ["noaa.gov", "nws.noaa.gov", "climate.noaa.gov", "noaacomms.noaa.gov", "federalreserve.gov",
+            "librarycongress.bsky.social", "stlouisfed.bsky.social"]
+response = requests.get(f"{bsky_base}/app.bsky.actor.getProfiles",
+                        params={"actors": agencies}, headers=HEADERS, timeout=30)
+response.raise_for_status()
+rows = []
+for p in response.json()["profiles"]:
+    rows.append({"handle": p["handle"], "followers": p["followersCount"], "posts": p["postsCount"],
+                 "joined": p["createdAt"][:10], "verified": p["verification"]["verifiedStatus"]})
+accounts = pd.DataFrame(rows).sort_values("followers", ascending=False)
+print(accounts.to_string(index=False))
+#                      handle  followers  posts     joined verified
+#                nws.noaa.gov      63022   1394 2025-01-17    valid
+#            climate.noaa.gov      46965     93 2025-01-14    valid
+#                    noaa.gov      41938    150 2025-01-14    valid
+# librarycongress.bsky.social       9237    551 2025-01-17    valid
+#          federalreserve.gov       8405   1029 2024-12-06    valid
+#          noaacomms.noaa.gov       5620    117 2025-01-14    valid
+#      stlouisfed.bsky.social       1121    450 2024-12-12    valid
 ```
 
-```{python}
-# Summary statistics by depth
-depth_summary = df_comments.groupby("depth").agg(
-    mean_score=("score", "mean"),
-    mean_length=("word_count", "mean"),
-    count=("score", "size")
-).reset_index()
+Most federal agencies, the Census Bureau and NASA among them, have no `.gov` handle on Bluesky, and a study of "government on Bluesky" would see the agencies that chose to come, not the government. The National Weather Service has more followers than NOAA, the agency it belongs to, and posts nearly ten times as often.
 
-print(depth_summary)
-# depth  mean_score  mean_length  count
-# 0        45.2        28.1       312
-# 1        12.8        22.5       487
-# 2         5.3        18.9       201
-# ...
-```
+### An Account's Posts
 
-You can also compute the correlation between depth and score to quantify this relationship. A Spearman rank correlation is appropriate here because the score distribution is heavily skewed — a handful of top-level comments accumulate hundreds or thousands of votes while most comments hover near zero.
-
-The pattern you will typically observe is a clear decay: top-level comments (depth 0) receive the highest scores because they are the most visible, appearing directly below the submission. Each additional level of nesting reduces both visibility and engagement. This is not necessarily a reflection of comment quality — it is an artifact of Reddit's interface design, where nested comments are progressively collapsed and harder to reach.
-
-Comment length tells a complementary story. Most Reddit comments are short — a few sentences at most — but the distribution has a long right tail of substantive, multi-paragraph responses. These longer comments often appear in subreddits with stricter moderation norms (like r/AskHistorians or r/science), where low-effort replies are actively removed. The relationship between platform governance and the data you can collect is not incidental; it is fundamental to interpreting what you find.
-
-The rules that govern what you can collect from Reddit changed sharply in 2023, as "Social History and Public Interest", at the end of this chapter, describes.
-
-## Spotify via spotipy
-
-Spotify's API provides metadata about artists, albums, tracks, and playlists — a window into the catalog and popularity dynamics of the world's largest music streaming platform:
+[`app.bsky.feed.getAuthorFeed`](https://docs.bsky.app/docs/api/app-bsky-feed-get-author-feed) returns an account's posts, newest first, up to 100 a request. With `filter="posts_no_replies"` it leaves out the account's replies to others, but it still includes its **reposts**, other people's posts it shared, each marked with a `"reason"`. Those authors may be private people, so set them aside:
 
 ```{python}
-# spotipy is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge spotipy
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-
-auth = SpotifyClientCredentials(
-    client_id="your_spotify_client_id",
-    client_secret="your_spotify_client_secret"
-)
-sp = spotipy.Spotify(auth_manager=auth)
-```
-
-::: {.callout-warning}
-## A Shrinking API
-In November 2024, Spotify removed several popular endpoints for newly created apps — including audio features, audio analysis, related artists, recommendations, and access to Spotify-owned editorial playlists. Applications registered before the change kept their access; new apps (including yours, if you register one for this course) receive a `403 Forbidden` from those endpoints. The examples in this section use only endpoints available to new apps as of mid-2026 — but check the [Spotify developer documentation](https://developer.spotify.com/documentation/web-api) for the current state before building a project around any of them.
-:::
-
-### Searching and Exploring
-
-```{python}
-# Search for an artist
-results = sp.search(q="Queen", type="artist", limit=5)
-for artist in results["artists"]["items"]:
-    print(f"{artist['name']} — Followers: {artist['followers']['total']:,}")
-
-# Get the top artist's ID
-queen_id = results["artists"]["items"][0]["id"]
-
-# Get top tracks
-top_tracks = sp.artist_top_tracks(queen_id)
-for track in top_tracks["tracks"][:5]:
-    print(f"  {track['name']} ({track['album']['name']}) — popularity {track['popularity']}")
-```
-
-Every artist and track carries a **popularity** score (0–100), Spotify's algorithmic measure derived from recent play counts. Artists also carry genre labels and follower counts. These fields support a surprising range of research questions about attention, catalog structure, and cultural markets.
-
-### Comparing Artists with Catalog Metadata
-
-Metadata becomes revealing when you compare artists. Let us build a profile from three available endpoints — artist metadata, top tracks, and the album catalog — and compare two very different musicians:
-
-```{python}
-def get_artist_profile(sp, artist_name):
-    """Build a metadata profile for an artist from public catalog data.
-
-    Parameters
-    ----------
-    sp : spotipy.Spotify
-        Authenticated Spotify client
-    artist_name : str
-        Name of the artist to search for
-
-    Returns
-    -------
-    dict
-        Artist metadata, top-track popularity, and album release years
-    """
-    results = sp.search(q=artist_name, type="artist", limit=1)
-    artist = results["artists"]["items"][0]
-
-    top_tracks = sp.artist_top_tracks(artist["id"])
-    albums = sp.artist_albums(artist["id"], include_groups="album", limit=50)
-
-    return {
-        "name": artist["name"],
-        "followers": artist["followers"]["total"],
-        "artist_popularity": artist["popularity"],
-        "genres": artist["genres"],
-        "top_track_popularity": [t["popularity"] for t in top_tracks["tracks"]],
-        "album_years": sorted({a["release_date"][:4] for a in albums["items"]}),
-    }
-
-profile_classical = get_artist_profile(sp, "Yo-Yo Ma")
-profile_electronic = get_artist_profile(sp, "Daft Punk")
-
-for p in (profile_classical, profile_electronic):
-    print(f"{p['name']}: popularity {p['artist_popularity']}, "
-          f"{p['followers']:,} followers, "
-          f"albums {p['album_years'][0]}–{p['album_years'][-1]}")
-```
-
-```{python}
-import numpy as np
-
-# Compare the popularity distributions of each artist's top tracks
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.boxplot(
-    [profile_classical["top_track_popularity"],
-     profile_electronic["top_track_popularity"]],
-    tick_labels=[profile_classical["name"], profile_electronic["name"]]
-)
-ax.set_ylabel("Track Popularity (0–100)")
-ax.set_title("Top-Track Popularity by Artist")
-plt.tight_layout()
-plt.show()
-```
-
-Even without audio analysis, the catalog tells stories: Daft Punk's compact discography of studio albums contrasts with Yo-Yo Ma's decades-long recording career spanning dozens of releases; their popularity scores reveal how streaming-era attention concentrates on some catalogs and spreads thin across others.
-
-For playlist-based questions, `sp.playlist_tracks()` retrieves the contents of any *user-created* public playlist (Spotify-owned editorial playlists are no longer accessible to new apps):
-
-```{python}
-# Retrieve tracks from a user-created public playlist by its ID
-playlist_id = "spotify_playlist_id_here"  # From the playlist's share link
-items = sp.playlist_tracks(playlist_id, limit=100)["items"]
-
-tracks = pd.DataFrame([{
-    "name": it["track"]["name"],
-    "artist": it["track"]["artists"][0]["name"],
-    "popularity": it["track"]["popularity"],
-    "duration_min": it["track"]["duration_ms"] / 60000,
-    "release_year": int(it["track"]["album"]["release_date"][:4]),
-} for it in items if it["track"] is not None])
-
-print(tracks.describe())
-```
-
-### The Audio Features Story: An Enclosure Case Study
-
-For more than a decade, the Spotify API's signature research offering was **audio features**: algorithmic scores for every track's danceability, energy, valence (musical positivity), tempo, and more. Hundreds of published studies used them to map genres, model hit prediction, and study the emotional texture of playlists. The November 2024 deprecation cut new applications off from all of it — right as generative AI made music data newly valuable, and without a stated research alternative. It is @sec-post-api's **enclosure** pattern in miniature: a rich, freely available data resource, withdrawn by unilateral platform decision, with the accumulated literature now resting on measurements that new researchers cannot reproduce.
-
-The episode also carries a methodological lesson that outlives the endpoints. Audio features were never ground truth about music — they were Spotify's proprietary algorithmic interpretations, learned from training data and reflecting particular cultural assumptions about what makes music "danceable" or "positive." The same holds for the popularity scores you *can* still retrieve: they are engagement-weighted, region-influenced, and recomputed on Spotify's schedule. When you analyze platform data, you are always analyzing the platform's model of the world as much as the world itself.
-
-## Bluesky via AT Protocol
-
-Bluesky, built on the AT Protocol, represents a structural alternative to proprietary platforms. Its open protocol means that API access is an architectural feature, not a business decision:
-
-```{python}
-# atproto is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge atproto
-from atproto import Client
-
-client = Client()
-client.login("your-handle.bsky.social", "your-app-password")
-
-# Get your own profile
-profile = client.app.bsky.actor.get_profile({"actor": client.me.did})
-print(f"Handle: {profile.handle}")
-print(f"Followers: {profile.followers_count}")
-print(f"Following: {profile.follows_count}")
-
-# Get your timeline
-timeline = client.app.bsky.feed.get_timeline({"limit": 10})
-for item in timeline.feed:
-    post = item.post
-    print(f"@{post.author.handle}: {post.record.text[:80]}")
-```
-
-Note the authentication style: an **app password** generated in Bluesky's settings, distinct from your account password and revocable at any time — the same delegated-credential principle as OAuth, implemented more simply.
-
-Any account's public posts are available through `get_author_feed`:
-
-```{python}
-# Retrieve a user's recent posts (public data; any handle works)
-feed = client.app.bsky.feed.get_author_feed(
-    {"actor": "bsky.app", "limit": 50}
-)
-
+params = {"actor": "nws.noaa.gov", "limit": 25, "filter": "posts_no_replies"}
+response = requests.get(f"{bsky_base}/app.bsky.feed.getAuthorFeed", params=params, headers=HEADERS, timeout=30)
+response.raise_for_status()
+page = response.json()
 posts = []
-for item in feed.feed:
-    post = item.post
-    posts.append({
-        "text": post.record.text,
-        "created_at": post.record.created_at,
-        "likes": post.like_count,
-        "reposts": post.repost_count,
-        "is_reply": post.record.reply is not None,
-    })
-
-df_posts = pd.DataFrame(posts)
-print(f"Posts retrieved: {len(df_posts)}")
-print(f"Replies: {df_posts['is_reply'].mean():.0%}")
+for item in page["feed"]:
+    if "reason" in item:
+        continue
+    post = item["post"]
+    posts.append({"created": post["record"]["createdAt"], "likes": post["likeCount"],
+                  "reposts": post["repostCount"], "replies": post["replyCount"],
+                  "text": post["record"]["text"][:60].replace("\n", " ")})
+nws_posts = pd.DataFrame(posts)
+print(len(page["feed"]), "items,", len(nws_posts), "of them the agency's own posts")
+print(nws_posts.sort_values("reposts", ascending=False).head(3)[["created", "reposts", "text"]].to_string(index=False))
+print("cursor:", page["cursor"])
+# 25 items, 25 of them the agency's own posts
+#                  created  reposts                                                         text
+# 2026-10-31T18:01:13.067Z       80 Daylight Saving Time ends at 2am overnight tonight for those
+# 2026-10-30T20:59:33.470Z       33 Updated Extreme Rainfall Outlook for Sunday: Another high en
+# 2026-10-20T16:10:51.985Z       33 Here's a more detailed look at the expected rainfall amounts
+# cursor: 2026-10-20T15:17:31.698Z
 ```
 
-The key difference from Reddit and Spotify: Bluesky's protocol is designed so that no single company controls API access. Your identity, social graph, and data are portable across any service that implements the AT Protocol.
+Each post carries two times. `createdAt`, inside the `record`, is when its author made it; `indexedAt`, on the post, is when the AppView saw it. They are usually seconds apart, but an author's app sets `createdAt`, so a post can be backdated: say which one you used.
 
-### Building a Bluesky Social Network
+### More Than One Page: the `cursor`
 
-The AT Protocol makes social graph data directly accessible, enabling network analysis that would be difficult on more restricted platforms:
+The answer ended with a **cursor**, and the next request sends it back to get the page that follows, as Wikipedia's `continue` did in @sec-wikipedia: you send back what the server gave you, without needing to know what it means. When there is no cursor, there is nothing more. This loop reads up to five pages of 100 posts, and keeps only what it needs from each:
 
 ```{python}
-def get_social_graph(client, handle, direction="followers", limit=100):
-    """Get followers or following for a Bluesky user.
-
-    Parameters
-    ----------
-    client : atproto.Client
-        Authenticated Bluesky client
-    handle : str
-        The user's handle (e.g., 'username.bsky.social')
-    direction : str
-        'followers' or 'following'
-    limit : int
-        Maximum number of accounts to retrieve
-
-    Returns
-    -------
-    list
-        List of dictionaries with handle and display name
-    """
-    results = []
-    cursor = None
-
-    while len(results) < limit:
-        if direction == "followers":
-            response = client.app.bsky.graph.get_followers(
-                {"actor": handle, "limit": 50, "cursor": cursor}
-            )
-            accounts = response.followers
-        else:
-            response = client.app.bsky.graph.get_follows(
-                {"actor": handle, "limit": 50, "cursor": cursor}
-            )
-            accounts = response.follows
-
-        for account in accounts:
-            results.append({
-                "handle": account.handle,
-                "display_name": account.display_name or "",
-                "description": (account.description or "")[:100]
-            })
-
-        cursor = response.cursor
-        if not cursor or not accounts:
-            break
-
-    return results[:limit]
-
-# Get followers for a user
-followers = get_social_graph(client, "your-handle.bsky.social", "followers")
-following = get_social_graph(client, "your-handle.bsky.social", "following")
-
-print(f"Followers: {len(followers)}")
-print(f"Following: {len(following)}")
-
-# Find mutual connections
-follower_handles = {f["handle"] for f in followers}
-following_handles = {f["handle"] for f in following}
-mutuals = follower_handles & following_handles
-print(f"Mutual connections: {len(mutuals)}")
+posts = []
+cursor = None
+pages = 0
+while True:
+    params = {"actor": "nws.noaa.gov", "limit": 100, "filter": "posts_no_replies"}
+    if cursor:
+        params["cursor"] = cursor
+    response = requests.get(f"{bsky_base}/app.bsky.feed.getAuthorFeed", params=params, headers=HEADERS, timeout=30)
+    response.raise_for_status()
+    page = response.json()
+    pages += 1
+    for item in page["feed"]:
+        if "reason" in item:
+            continue
+        post = item["post"]
+        posts.append({"created": post["record"]["createdAt"], "likes": post["likeCount"],
+                      "reposts": post["repostCount"], "replies": post["replyCount"],
+                      "embed": post["record"].get("embed", {}).get("$type", "none")})
+    cursor = page.get("cursor")
+    if not cursor or pages == 5:
+        break
+nws = pd.DataFrame(posts)
+nws["created"] = pd.to_datetime(nws["created"], format="ISO8601", utc=True)
+print(pages, "pages,", len(nws), "posts, from", nws["created"].min().date(), "to", nws["created"].max().date())
+# 5 pages, 495 posts, from 2026-04-20 to 2026-10-31
 ```
 
-## Mastodon via Mastodon.py
+The loop stops at five pages on purpose: the account had 1,394 posts, and the fifth page still came with a cursor. Stop on a count, a date, or the end, and say which in what you write.
 
-Mastodon is a decentralized social network built on the ActivityPub protocol. Each server (instance) hosts its own API [@diener2026mastodonpy]:
+### When an Agency Posts, and What Travels
+
+The times are in UTC. Convert them to the agency's own time zone, Eastern for the Weather Service's headquarters, before asking what day or hour it posts:
 
 ```{python}
-# Mastodon.py is in webdata (chapter 1); an older environment adds it with: conda install -c conda-forge mastodon.py
-from mastodon import Mastodon
-
-# One-time setup: register an app on your home instance, then log in.
-# Both calls save credentials to local files you should .gitignore.
-# Mastodon.create_app(
-#     "WebDataScience",
-#     api_base_url="https://mastodon.social",
-#     to_file="app_cred.secret"
-# )
-# Mastodon(client_id="app_cred.secret").log_in(
-#     "your-email", "your-password", to_file="user_cred.secret"
-# )
-
-# In every session afterward, authenticate with the saved token
-mastodon = Mastodon(
-    access_token="user_cred.secret",
-    api_base_url="https://mastodon.social"
-)
-
-# Get the public timeline
-from bs4 import BeautifulSoup
-
-timeline = mastodon.timeline_public(limit=10)
-for toot in timeline:
-    # Statuses arrive as HTML; strip tags before analysis
-    text = BeautifulSoup(toot["content"], "html.parser").get_text()
-    print(f"@{toot['account']['username']}: {text[:80]}")
+local = nws["created"].dt.tz_convert("America/New_York")
+days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+by_day = local.dt.day_name().value_counts().reindex(days)
+ax = by_day.plot.bar(figsize=(7, 3.5), rot=0)
+ax.set(title="National Weather Service posts on Bluesky by weekday, April–October 2026", ylabel="Posts", xlabel="")
+plt.show()
+print(by_day.to_string())
+# created
+# Monday        83
+# Tuesday       78
+# Wednesday     79
+# Thursday      84
+# Friday       111
+# Saturday      20
+# Sunday        40
 ```
 
-### Working Across Instances
-
-A key difference between Mastodon and centralized platforms is that there is no single API endpoint for "all of Mastodon." Each instance maintains its own API, and you can only directly access the data on instances you authenticate with. This federated architecture means that comprehensive data collection requires accessing multiple instances — a fundamentally different research design challenge:
+The weather doesn't take weekends off, but the agency's social media staff mostly does: it posts on weekdays, most of all on Fridays, ahead of the weekend's weather. Which posts travel? Each post's `embed` says what it carries, and grouping by it compares reposts:
 
 ```{python}
-# Search for accounts across the instance you're connected to
-results = mastodon.account_search("data science", limit=10)
-for account in results:
-    print(f"@{account['acct']} — {account['followers_count']} followers")
-    print(f"  {account['note'][:100]}")
-    print()
-
-# Get a user's recent statuses (toots)
-user_id = results[0]["id"]
-statuses = mastodon.account_statuses(user_id, limit=20)
-
-for status in statuses[:5]:
-    # created_at is a datetime object; content is HTML
-    text = BeautifulSoup(status["content"], "html.parser").get_text()
-    print(f"  [{status['created_at'].date()}] {text[:100]}")
-
-# Track a hashtag
-tagged = mastodon.timeline_hashtag("datascience", limit=20)
-print(f"\nRecent posts tagged #datascience: {len(tagged)}")
+print(nws.groupby("embed")["reposts"].agg(["count", "median"]).sort_values("count", ascending=False).to_string())
+#                                 count  median
+# embed
+# app.bsky.embed.images             412    19.0
+# app.bsky.embed.video               59    23.0
+# app.bsky.embed.external            13    14.0
+# app.bsky.embed.recordWithMedia      5    23.0
+# app.bsky.embed.record               3    24.0
+# none                                3    28.0
 ```
 
-## Comparing Platform Architectures
+Almost every post carries a map or a graphic, so the comparison has little to compare: 412 of 495 are images. The medians say less than they seem to, too. A post's reach depends on the weather it warns about far more than on its format, and a comparison like this one can describe what the agency does, not say what causes a post to spread.
 
-The four platforms in this chapter represent fundamentally different governance architectures, and these differences shape what data is available, on what terms, and how durable the access is.
+### Logging In, When You Need To
 
-| Platform | Protocol | Authentication | Rate Limit (free) | Data Ownership |
-|----------|----------|----------------|-------------------|----------------|
-| Reddit | Proprietary REST API | OAuth2 | 100 QPM | Platform-controlled |
-| Spotify | Proprietary REST API | OAuth2 / Client Credentials | ~180 RPM | Platform-controlled |
-| Bluesky | AT Protocol (open) | App password | Generous, per-PDS | User-portable |
-| Mastodon | ActivityPub (open) | OAuth2, per-instance | Varies by instance | Instance-governed |
+Everything above reads public data. Writing posts, reading your own timeline, or reading some lists needs an account: create an **app password** in Bluesky's settings, a separate password you can revoke at any time, and log in with the [`atproto` library](https://atproto.blue/) (`conda install -c conda-forge atproto`), storing the app password as you stored keys in @sec-government. For research reads, the public API needs none of it.
 
-The structural difference matters: Reddit and Spotify can unilaterally change their API terms because they control both the platform and the protocol. Bluesky and Mastodon cannot — or at least, no single entity can — because the protocols are open standards that anyone can implement. This is the architectural embodiment of the **ownership** value from @sec-post-api.
+## YouTube Data API
+
+YouTube's [Data API](https://developers.google.com/youtube/v3) answers anyone with a key, and counts every request against a quota. Google's documentation describes 10,000 units a day for each project, where most reads cost 1 unit, and a separate cap of 100 searches a day ([getting started](https://developers.google.com/youtube/v3/getting-started), checked 2026-11-02; the costs have changed before, so check the page when you start). This section reads channels and their uploads, which cost 1 unit a request, and never searches.
+
+### Getting and Storing a Key
+
+1. Sign in to the [Google Cloud console](https://console.cloud.google.com/) with a personal Google account, and create a project.
+2. In the project's **API Library**, enable **YouTube Data API v3**.
+3. Under **Credentials**, create an **API key**, and restrict it to the YouTube Data API v3.
+4. Store it as the environment variable `YOUTUBE_KEY`, by one of the ways in @sec-government ("Setting Environment Variables"), then quit Jupyter, open a new terminal, and start Jupyter from it.
+
+```{python}
+import os
+
+# Say whether the key is set, without printing it
+print("YOUTUBE_KEY:", "set" if os.environ.get("YOUTUBE_KEY") else "MISSING")
+youtube_key = os.environ.get("YOUTUBE_KEY")
+yt_base = "https://www.googleapis.com/youtube/v3"
+```
+
+The key is sent as a URL parameter, so `response.url` contains it: print a response's JSON, never its URL (@sec-government, "When a Key Says `MISSING`").
+
+### A Channel by Its Handle
+
+[`channels.list`](https://developers.google.com/youtube/v3/docs/channels/list) finds a channel by its handle with `forHandle`, and `part` names the groups of fields you want back: `snippet` for the name and description, `statistics` for the counts, and `contentDetails` for the playlist of every video the channel has uploaded.
+
+```{python}
+params = {"part": "snippet,statistics,contentDetails", "forHandle": "@NOAA", "key": youtube_key}
+response = requests.get(f"{yt_base}/channels", params=params, headers=HEADERS, timeout=30)
+response.raise_for_status()
+channel = response.json()["items"][0]
+print(channel["snippet"]["title"], "|", channel["snippet"]["customUrl"])
+print("subscribers:", channel["statistics"]["subscriberCount"], "| videos:", channel["statistics"]["videoCount"])
+uploads = channel["contentDetails"]["relatedPlaylists"]["uploads"]
+```
+
+YouTube rounds `subscriberCount` down to three significant figures for every channel, so a change of a few hundred won't show. Several of this chapter's agencies have channels: `@NOAA`, `@NOAAClimate`, `@federalreserve`, `@stlouisfed`, `@uscensusbureau`, and `@NASA`. As on Bluesky, check that the agency's own website links to the channel before you treat it as theirs.
+
+### A Channel's Videos, and Their Statistics
+
+The uploads playlist lists every video, newest first, 50 at a time, with a `nextPageToken` to send back for the next 50. [`playlistItems.list`](https://developers.google.com/youtube/v3/docs/playlistItems/list) returns each video's ID, and [`videos.list`](https://developers.google.com/youtube/v3/docs/videos/list) takes up to 50 IDs, comma-separated, and returns their statistics:
+
+```{python}
+params = {"part": "contentDetails", "playlistId": uploads, "maxResults": 50, "key": youtube_key}
+response = requests.get(f"{yt_base}/playlistItems", params=params, headers=HEADERS, timeout=30)
+response.raise_for_status()
+video_ids = []
+for item in response.json()["items"]:
+    video_ids.append(item["contentDetails"]["videoId"])
+
+params = {"part": "snippet,statistics", "id": ",".join(video_ids), "key": youtube_key}
+response = requests.get(f"{yt_base}/videos", params=params, headers=HEADERS, timeout=30)
+response.raise_for_status()
+rows = []
+for v in response.json()["items"]:
+    rows.append({"published": v["snippet"]["publishedAt"][:10], "title": v["snippet"]["title"][:50],
+                 "views": int(v["statistics"].get("viewCount", 0)), "likes": int(v["statistics"].get("likeCount", 0))})
+videos = pd.DataFrame(rows)
+print(videos.sort_values("views", ascending=False).head(5).to_string(index=False))
+```
+
+Those two requests cost 2 units of the day's 10,000. Counts arrive as strings, as the Census Bureau's did, and a video whose owner hid its likes has no `likeCount` at all, which is why the code uses `.get()` with a default of 0. A default of 0 is a claim, though, not a fact: count how many videos had the field missing before you average it.
+
+## Reddit After Pushshift
+
+In 2023 Reddit priced heavy use of its API at \$0.24 per 1,000 calls (@fig-reddit-api-pricing), and about a month earlier it had cut off Pushshift, the volunteer-run archive that much of the research on Reddit was built on [@baumgartner2020pushshift]. (This book's author, Brian Keegan, is a co-author of that paper.) As of 2 November 2026, Pushshift answers only moderators whom Reddit has approved, and only for moderation ([Pushshift's guide](https://api.pushshift.io/guide)); anyone else gets the 403 you saw in @sec-post-api.
+
+On 11 November 2025 Reddit ended self-service access to its Data API ([r/redditdev, 2025](https://www.reddit.com/r/redditdev/comments/1oug31u/introducing_the_responsible_builder_policy_new/)). Under its [Responsible Builder Policy](https://support.reddithelp.com/hc/en-us/articles/42728983564564-Responsible-Builder-Policy) (updated 25 March 2026), you need approval before you use any Reddit data through the API. Its researchers' section covers "academic researchers affiliated with an accredited university" doing non-commercial work, who "must re-run queries against the most recent data export to ensure findings are up-to-date with any data removals or deletions," must not keep data beyond what the project needs, and "must never attempt to re-identify, de-anonymize, or reverse engineer data about Redditors." On 28 May 2026 Reddit announced that it was "shutting down unauthenticated .json endpoints," which "can be used to scrape Reddit without accountability" ([r/modnews, 2026](https://www.reddit.com/r/modnews/comments/1tq9vxo/protecting_communities_from_scrapers_and_platform/)). The `hot.json` request in @sec-post-api now gets a block page.
+
+Here is where Pushshift's successors stood on 2 November 2026, checked from a cloud server; a laptop on a campus network may get different answers, because some sites block cloud addresses.
+
+| Service | Who runs it | Access | Status on 2 November 2026 |
+|---|---|---|---|
+| [PullPush](https://pullpush.io/) | Not named in any source this chapter could check | No key; Pushshift-style search URLs | Status 522: the server behind its Cloudflare front was not answering |
+| [Arctic Shift API](https://github.com/ArthurHeitmann/arctic_shift/blob/master/api/README.md) | Arthur Heitmann, funded by donations | No key; limits change with server load | Status 200; posts are copied within seconds of being posted |
+| [Arctic Shift dumps](https://github.com/ArthurHeitmann/arctic_shift/blob/master/download_links.md) | The same project, on Academic Torrents | A torrent file for each month | Monthly files through September 2026; that month alone is 74 GB |
+| Watchful1's per-subreddit torrents | Watchful1, a Reddit user | Was a torrent | Gone: "They have taken down all their torrents" ([Arctic Shift issue #81](https://github.com/ArthurHeitmann/arctic_shift/issues/81), 14 October 2026) |
+| [Pushshift](https://api.pushshift.io/guide) | Pushshift, with Reddit's approval | Moderators only | Status 403 |
+| [ConvoKit Reddit corpora](https://convokit.cornell.edu/documentation/subreddit.html) | Cornell University | `pip install convokit`, then download | Built from Pushshift; data stops in October 2018 |
+
+Arctic Shift's API is the one you can try. Its [documentation](https://github.com/ArthurHeitmann/arctic_shift/blob/master/api/README.md) says its rate limits depend on server load, that a status 429 means you wait the seconds in the `X-RateLimit-Reset` header, and that it offers "No uptime or performance guarantees." The request below asks for the first five posts in r/boulder in a fixed past week. Its `fields` parameter leaves out `author`, so no username reaches your computer.
+
+```{python}
+import requests
+import pandas as pd
+
+HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+
+# Arctic Shift's search for Reddit posts; it needs no key or account
+url = "https://arctic-shift.photon-reddit.com/api/posts/search"
+params = {
+    "subreddit": "boulder",
+    # A fixed past week, so the archive has finished updating these posts
+    "after": "2026-10-01",
+    "before": "2026-10-08",
+    "sort": "asc",
+    "limit": 5,
+    # Ask only for the fields you need; author is left out
+    "fields": "id,created_utc,retrieved_on,title,selftext,num_comments,score",
+}
+response = requests.get(url, params=params, headers=HEADERS, timeout=30)
+response.raise_for_status()
+posts = response.json()["data"]
+print(response.status_code, len(posts), "posts")
+
+df = pd.DataFrame(posts)
+df["created"] = pd.to_datetime(df["created_utc"], unit="s")
+# How long after posting the archive copied each post
+df["archived_after"] = pd.to_timedelta(df["retrieved_on"] - df["created_utc"], unit="s")
+print(df[["created", "archived_after", "score", "num_comments"]].to_string())
+
+# Reddit puts a placeholder where a removed or deleted post's text was
+gone = df["selftext"].isin(["[removed]", "[deleted]"])
+print(gone.sum(), "of", len(df), "posts removed or deleted")
+
+# Output on 2 November 2026:
+# 200 5 posts
+#               created  archived_after  score  num_comments
+# 0 2026-10-01 00:27:03 0 days 00:00:13      8             5
+# 1 2026-10-01 01:28:30 0 days 00:00:18      1             0
+# 2 2026-10-01 01:59:31 0 days 00:00:25    210            12
+# 3 2026-10-01 02:23:51 0 days 00:00:28      6            10
+# 4 2026-10-01 03:43:46 0 days 00:00:23     14             7
+# 0 of 5 posts removed or deleted
+```
+
+The table leaves out the titles because a post's exact words, typed into a search engine, usually lead back to its author: in health studies that quoted tweets, searching for the quote found the person 84% of the time [@ayers2018dont].
+
+`retrieved_on` is when the archive copied a post, in seconds since 1970. Every post here was copied within half a minute, so a post deleted a minute later is already in the archive. `removed_by_category` says why a post is gone from Reddit: `deleted` if its author deleted it, and values such as `moderator` or `automod_filtered` if a moderator or AutoModerator removed it. `fields` can't select it (the API answers status 400, "'removed_by_category' is not a valid field"), but the full record, which also carries `author`, has it. Among the first 50 posts of October in r/boulder, requested that way on 2 November 2026, three had it set: one `deleted` and two `automod_filtered`. Their text reads `[deleted]` or `[removed]`, but the archive kept every title, including one that Reddit now shows as "[ Removed by moderator ]"; the archive records Reddit's version in `_meta.edited_title`.
+
+An archive keeps what users and moderators took down; the Responsible Builder Policy asks researchers to re-run queries so that deletions are reflected. Arctic Shift removes data only when someone files its removal form. Reddit's [Data API Terms](https://redditinc.com/policies/data-api-terms) (revised 20 July 2026) forbid keeping data beyond an approved use, and its [User Agreement](https://redditinc.com/policies/user-agreement) (effective 1 July 2026) prohibits scraping "without Reddit's prior written consent." As of 2 November 2026, this chapter found no public statement from Reddit about Arctic Shift. Reviews of 727 studies that used Reddit data [@proferes2021studying] and of 134 that discussed their ethics [@fiesler2024remember] trace the field's ethical problems; the second names privacy, vulnerable populations, and unintended consequences. Deleting a post is the plainest way a person can say they no longer want it public. If you use an archive, report counts and rates, as the Additional Exercises ask, and never a deleted post's words or its author.
+
+## Spotify: An Enclosure Case Study
+
+Earlier versions of this chapter taught Spotify's Web API, whose audio features scored every track for `danceability`, `energy` and `valence`. On 27 November 2024 Spotify announced that new apps could no longer use Related Artists, Recommendations, Audio Features, Audio Analysis, Featured Playlists, Category Playlists, the 30-second preview URLs in multi-item responses, or algorithmic and Spotify-owned editorial playlists ([Spotify for Developers, 2024](https://developer.spotify.com/blog/2024-11-27-changes-to-the-web-api)). Apps that already had extended access kept these endpoints. Spotify's reason: "creating a more secure platform." From 15 May 2025, extended access was "reserved for apps with established, scalable, and impactful use cases" ([Spotify for Developers, 2025](https://developer.spotify.com/blog/2025-04-15-updating-the-criteria-for-web-api-extended-access)).
+
+On 6 February 2026 Spotify said that "advances in automation and AI have fundamentally altered the usage patterns and risk profile of developer access," and that Development Mode, the tier every new app starts in, was a sandbox that "should not be relied on as a foundation for building or scaling a business" ([Spotify for Developers, 2026](https://developer.spotify.com/blog/2026-02-06-update-on-developer-access-and-platform-security)). Its [migration guide](https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide) (checked 2 November 2026) applied new rules to new Development Mode apps on 11 February 2026, and to existing ones on 9 March. The app's owner must have Premium: "If the owner's Premium subscription lapses, the app will stop working." A new app may have up to five users. Spotify removed an artist's top tracks, the batch endpoints that fetched several tracks, albums or artists in one call, and the `followers` and `popularity` fields. Search now returns at most 10 results per request, down from 50, and 5 by default.
+
+None of this is a per-call price like Reddit's. These are product decisions announced on a developer blog: the 2024 removals on the day they took effect, and the 2026 rules five days ahead. A study built on audio features in 2023 can't be rebuilt by a student who starts today. As of November 2026, a student who registers an app can look up one track at a time, see ten search results at a time, and do either only while paying for Premium.
+
+## Comparing Platforms
+
+| | Bluesky | YouTube | Reddit, through an archive | Spotify |
+|---|---|---|---|---|
+| Who controls access | No single company; Bluesky runs the public AppView | Google | The archive's maintainer, against Reddit's terms | Spotify |
+| What you need | Nothing | A key from a Google account | Nothing, for now | Premium, and fewer endpoints |
+| Limits | Rate limits, generous for reads | 10,000 units and 100 searches a day | Changes with the archive's load | Search capped at 10 results |
+| Deleted content | Gone from the API | Gone from the API | Often kept | — |
+| Stable enough to build on? | The protocol is open | As long as the key and quota hold | No guarantee | No |
+
+The last two rows pull in different directions. An open protocol makes a platform's data durable for research, and an archive that keeps deleted posts makes a study reproducible. But a person who deleted a post expected it to be gone, and an archive that keeps it keeps it against their wishes.
 
 ## Recommended Exercises
 
-This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.
+This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order; everything you need appears in this chapter or an earlier one.
 
-You will profile and compare the public activity of two Bluesky accounts. Bluesky is the chapter's lowest-friction platform — a free account and an app password are all you need, with no application process. Remember the chapter's caution: social data is people data, so pick public, organizational, or public-figure accounts rather than private individuals.
+You will compare how two federal accounts on Bluesky used the platform in September 2026. Pick two from this chapter's list, or another verified institutional account, never a private person's.
 
-**Step 1 — Authenticate.** Create an app password in Bluesky's settings (never your real password — the chapter explains the difference), log in with the `atproto` `Client`, and print your own handle to confirm the session works. Keep the credential out of the notebook, loading it the way you loaded API keys in @sec-government.
+**Step 1 — Set up, and check who you are asking about.** Define your `HEADERS` with your own email, and request both accounts' profiles with `getProfiles`. Print each handle, its `verifiedStatus`, and whether the handle is a domain, and say in a comment why you trust that each account is the institution's.
 
 ```{python}
-# Step 1: Log in with the atproto Client using an app password loaded from an environment variable. Confirm with your handle, not the secret.
+# Step 1: Define HEADERS, request both profiles with getProfiles, and print each handle, its verifiedStatus, and whether the handle ends in .gov
 # Your code here
 ```
 
-**Step 2 — Retrieve one account's posts.** Choose your first account and retrieve its 50 most recent posts with `get_author_feed`, building the list-of-dictionaries the chapter shows: text, created_at, likes, reposts, and whether each post is a reply. Convert to a DataFrame.
+**Step 2 — Collect one account's September posts.** Page through the first account's feed with `getAuthorFeed` and its `cursor`, skipping reposts, until you reach posts older than September 1, 2026. Keep the posts created in September, with their time, likes, reposts, replies, and embed type.
 
 ```{python}
-# Step 2: Retrieve 50 posts from your first account with get_author_feed and build a DataFrame.
+# Step 2: Page through the first account's feed until you pass September 1, 2026, and keep its own September posts in a DataFrame
 # Your code here
 ```
 
-**Step 3 — Compute an activity profile.** From the DataFrame, compute: average post length in characters, posts per day (use the first and last `created_at` to get the window), the fraction of posts that are replies, and mean likes per post.
+**Step 3 — Describe the month.** Convert the times to the account's time zone, and compute: the number of posts, posts by weekday, the share of posts with an image or a video, and the median reposts.
 
 ```{python}
-# Step 3: Compute post length, posting rate, reply fraction, and mean likes.
+# Step 3: Compute the number of posts, posts by weekday, the share with an image or video, and the median reposts
 # Your code here
 ```
 
-**Step 4 — Repeat for a second account.** Pick a second account you expect to behave differently — an institution vs. a person, a news outlet vs. a researcher — and run Steps 2–3 for it. Wrap the work in a function so you write the logic once, as you learned in @sec-static-pages.
+**Step 4 — Repeat for the second account.** Collect and describe the second account's September the same way.
 
 ```{python}
-# Step 4: Write a profile_account(handle) function and run it on your second account.
+# Step 4: Collect and describe the second account's September posts
 # Your code here
 ```
 
-**Step 5 — Compare.** Combine the two profiles into a single two-row DataFrame, and plot one comparison you find informative — likes per post, or the distribution of post lengths for both accounts.
+**Step 5 — Compare.** Put the two accounts' numbers side by side in one DataFrame, and plot one comparison you find informative, such as posts by weekday for both.
 
 ```{python}
-# Step 5: Build the two-row comparison DataFrame and plot one comparison.
+# Step 5: Build the comparison DataFrame and plot one comparison
 # Your code here
 ```
 
-**Step 6 — Interpret.** In four to six sentences: How do the two accounts differ, and did the numbers match your expectations? What does each account seem to use the platform *for*? What could you not measure from `get_author_feed` alone, and which of the chapter's other endpoints (or platforms) would you need for it?
+**Step 6 — Interpret.** In four to six sentences: how did the two accounts use the platform differently in September? What would you need to know to explain the difference, rather than describe it? What can't the public API tell you, such as who saw a post, and which other source would you need for it?
 
 ```{python}
 # Step 6: Write your answer here as comments, or convert this cell to Markdown.
@@ -541,48 +440,48 @@ You will profile and compare the public activity of two Bluesky accounts. Bluesk
 
 ## Additional Exercises
 
-These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.
+These are open-ended extensions, with no scaffold and no fixed path.
 
-1. **Reddit analysis.** Compare two subreddits on the same broad topic (e.g., r/science and r/askscience). How do submission patterns, comment engagement, and moderation structures differ?
+1. **The same agencies on YouTube.** For three of the chapter's agencies, read each channel's last 50 uploads and their statistics. How do views compare with the agency's Bluesky followers? Report what your collection cost in quota units, and how you'd collect a year of uploads within one day's quota.
 
-2. **Discography metadata.** Using spotipy, analyze an artist's full discography with `sp.artist_albums()` and `sp.album_tracks()`. How has their release cadence changed over their career? Do older or newer releases hold higher popularity scores today? What does that pattern suggest about how streaming shapes attention to back catalogs?
+2. **What an archive keeps.** Using the Arctic Shift API, collect a month of posts from a subreddit about your town, leaving out authors. What share was later removed, and by whom (`removed_by_category`)? Report counts only, and say how your findings would change if the archive honored deletions.
 
-3. **Open vs. closed.** Attempt to retrieve the same type of information (user profile, social graph, recent posts) from both Bluesky and Reddit. Compare the ease of access, the richness of the data, and the authentication requirements. What does this comparison tell you about platform governance?
+3. **Open and keyed.** Pick one agency with an account on both Bluesky and YouTube. Compare what each API let you learn about it, what each asked of you, and what each would let you share in a public repository under its terms.
 
-4. **Playlist fingerprints.** Choose two user-created public Spotify playlists representing different genres (e.g., country vs. electronic — note that Spotify-owned editorial playlists are not accessible to new apps). Retrieve their contents with `sp.playlist_tracks()` and compare the playlists on available metadata: track popularity, duration, release year, and the number of distinct artists. Create overlapping distribution plots for at least two of these measures. How well can you distinguish the genres from metadata alone — and what would you be missing without audio analysis?
-
-
-5. **Graduate extension (INFO 5617).** Read @bruns2019after and @davidson2023platform. Then design (do not execute) a measurement plan for studying the same construct — for example, cross-partisan interaction, or the spread of health misinformation — on one proprietary platform and one federated platform from this chapter. For each: specify the endpoints and fields you would use, the sampling frame, what the platform's access rules prevent you from observing, and how those constraints could bias your conclusions. Conclude with an assessment of whether the two platforms' results would be comparable at all.
+4. **Graduate extension (INFO 5617).** Read @bruns2019after and @davidson2023platform. Then design (do not execute) a measurement plan for studying how federal agencies communicate during an emergency, such as a hurricane, on one open and one keyed platform from this chapter. For each, specify the endpoints and fields, the sampling frame, what the platform's access rules prevent you from observing, and how those constraints could bias your conclusions. Then say whether research access under the European Union's Digital Services Act (@sec-post-api) would change any of it for a study like this one, and why.
 
 ## Social History and Public Interest
 
-The contrast between Reddit, Spotify, Bluesky, and Mastodon illustrates the governance spectrum described in @sec-post-api. Reddit's 2023 changes demonstrate how a platform can unilaterally restrict access that researchers depended on. Spotify's trajectory shows that even "productive commercial arrangements" narrow when the business calculus shifts: for years it offered rich audio analysis data, built on the work of The Echo Nest, a music-intelligence company it bought in 2014 ([Siegal, 2014](https://www.bgr.com/general/spotify-acquires-the-echo-nest/)), then in November 2024 withdrew audio features, audio analysis, recommendations, and related artists from every new application, research ones included ([Spotify, 2024](https://developer.spotify.com/blog/2024-11-27-changes-to-the-web-api)). Bluesky and Mastodon represent structural alternatives where open protocols make enclosure architecturally harder.
+The high-water mark of platform data for research came in January 2021, when Twitter opened its Academic Research track: free full-archive search, up to 10 million tweets a month, for approved non-commercial projects ([TechCrunch, 2021](https://techcrunch.com/2021/01/26/twitters-new-api-platform-now-opened-to-academic-researchers/)). Two years later, after the company's sale, researchers learned that free access was ending ([Ledford, 2023](https://www.nature.com/articles/d41586-023-00460-z)), and studies built on it became difficult or impossible to repeat [@davidson2023platform]. Freelon had named the condition in 2018, the "post-API age" [@freelon2018computational], after Facebook and Twitter, in the aftermath of the Cambridge Analytica controversy, severely restricted researchers' access to their APIs [@bruns2019after].
 
-Reddit's 2023 changes are a live example of **enclosure** (@sec-post-api). On 9 June 2023 the company set a price of \$0.24 per 1,000 calls for heavy users of its API, effective 1 July (@fig-reddit-api-pricing). The developer of Apollo, a popular iPhone client, calculated that the new price would cost him more than \$20 million a year, and shut the app down on 30 June ([Peters, 2023](https://www.theverge.com/2023/6/8/23754183/apollo-reddit-app-shutting-down-api)). About a month before the price was announced, Reddit had cut off Pushshift [@baumgartner2020pushshift], which an open letter from the Coalition for Independent Technology Research described as "a data resource widely used by communities, journalists, and thousands of academics worldwide" ([2023](https://independenttechresearch.org/reddit-data-access-letter/)). Pushshift still answers, but only to Reddit's moderators, as @sec-post-api found when it queried the old endpoint. The free tier described at the start of this chapter still supports noncommercial use, and Reddit runs a [program for researchers](https://support.reddithelp.com/hc/en-us/articles/49381918834964-Reddit-for-Researchers-Program). But with the third-party apps and the archive gone, what data is available, and on whose terms, is now Reddit's decision.
+Reddit's research data ran on volunteers. Pushshift began in 2015 with a dump advertised as "every publicly available Reddit comment," and its archive became a common source for Reddit research [@baumgartner2020pushshift] (disclosure: the book's author is a co-author of that paper). Archives built by volunteers are not complete: an early check of the 2015 comment dump found large-scale gaps that could bias studies built on it [@gaffney2018caveat]. They are also fragile: of the successors in this chapter's table, the one that worked depends on one person's server and on Reddit's tolerance.
 
-The PRAW library and Mastodon.py continue to work because their platforms maintain documented APIs. But the history of Twitter's API, which went from the most important data source in computational social science to essentially inaccessible within a year of its 2022 acquisition, is a reminder that platform goodwill is not infrastructure. In February 2023, researchers learned that free access was ending ([Ledford, 2023](https://www.nature.com/articles/d41586-023-00460-z)), and the studies built on it became difficult or impossible to reproduce [@davidson2023platform].
+Regulation offers a different route. Article 40 of the European Union's Digital Services Act requires very large online platforms and search engines to give vetted researchers access to data for research on systemic risks in the EU (@fig-dsa-article-40). The Commission adopted the delegated act that sets the procedure on 2 July 2025 ([European Commission, 2025](https://digital-strategy.ec.europa.eu/en/news/commission-adopts-delegated-act-data-access-under-digital-services-act)). It was published as [Delegated Regulation (EU) 2025/2050](https://eur-lex.europa.eu/eli/reg_del/2025/2050/oj/eng) on 9 October 2025 and entered into force twenty days later, on 29 October. A researcher applies to a Digital Services Coordinator, the national regulator, and must show an affiliation with a research organisation, independence from commercial interests, and the ability to keep data secure, disclose the project's funding, and commit to publishing the results. A new data access portal handles the messages among researchers, platforms and regulators. Access rests on law rather than on a platform's goodwill or a volunteer's server, and only researchers whom a regulator vets get it.
 
-The Fediverse offers two distinct architectural responses to this problem. ActivityPub, the protocol underlying Mastodon, has been a [W3C Recommendation](https://www.w3.org/TR/activitypub/) since January 2018. It creates a federated network where each instance is independently operated but can communicate with others, much like email servers; [Mastodon's own documentation](https://docs.joinmastodon.org/#federation) puts email and Mastodon in the same column. No single company controls the protocol, so no single company can revoke access. The AT Protocol, which powers Bluesky, takes a different approach centered on portable identity: its design assumes that a server holding your account may fail at any time, so your account data, social graph, and content can move to a new provider ([AT Protocol, "Account portability"](https://atproto.com/guides/overview)), preventing the lock-in that makes platform migration so costly. Both represent structural alternatives to centralized platforms, distributing control rather than concentrating it. This is the architectural embodiment of **ownership** (@sec-post-api) — users and communities, not corporations, control the infrastructure. For researchers, these open protocols mean that data access is a design feature rather than a business concession, offering more durable foundations for longitudinal research than any corporate API ever could. The trade-off is fragmentation: collecting comprehensive data from a federated network requires engaging with multiple instances, each with its own norms, moderation policies, and technical configurations. Decentralization solves the single-point-of-failure problem but introduces new challenges for research design that centralized platforms never posed.
+This chapter's running case is federal agencies' public accounts. When Fiesler and Proferes surveyed Twitter users, few knew that researchers used public tweets, and most felt researchers should not use them without permission [@fiesler2018participant]. A federal agency's account is different: it speaks for a public body, in public, as part of its job, and it has no privacy to lose. Quoting its posts identifies no private person, and when an agency deletes a post, it changes a public record.
 
 ## Common Issues to Debug
 
-- **PRAW `OAuthException`**: Double-check your `client_id`, `client_secret`, and `user_agent`. The user_agent must be unique and descriptive.
-- **Spotify `403 Forbidden` on audio features, recommendations, or related artists**: These endpoints were deprecated for apps created after November 2024. This is not a bug in your code — the access no longer exists for new apps.
-- **Spotify client credentials vs. authorization code**: Client credentials flow cannot access user-specific data like listening history. It works for public search, artist, album, track, and user-created playlist data.
-- **Bluesky `atproto` SDK**: Still evolving; API may change between versions. Check the changelog before upgrading.
-- **Mastodon instance differences**: Different instances have different rate limits, rules, and may block automated access. Always register your app properly.
-- **Mastodon HTML content**: Status `content` fields arrive as HTML and `created_at` fields as `datetime` objects — strip tags with BeautifulSoup and use datetime methods rather than string slicing.
+- **An account that isn't who it seems.** Check the handle and the `verification` field before you collect; a familiar name is not a proof.
+- **A repost in your data.** `getAuthorFeed` includes reposts, with a `"reason"`. Skip them, or you will have collected other people's posts, perhaps private people's, under the agency's name.
+- **A loop that never ends, or ends early.** Stop when the answer has no `cursor`, or on a count or a date you chose, and say which.
+- **Times in the wrong zone.** Bluesky's and YouTube's times are UTC. Convert them before counting by day or hour.
+- **`KeyError` or `MISSING` for `YOUTUBE_KEY`.** Jupyter never received the variable: quit Jupyter, open a new terminal, and start it again (@sec-government, "When a Key Says `MISSING`").
+- **YouTube's `403` with `quotaExceeded`.** The project used its 10,000 units, or its 100 searches, for the day; the quota resets at midnight Pacific time. Read channels and playlists instead of searching.
+- **YouTube's counts as strings, or missing.** Convert `viewCount` and `likeCount` with `int()`, and count the videos where a field is absent before treating it as zero.
+- **An archive that doesn't answer.** Archives of Reddit data run on volunteers' servers, with no guarantee: a `522` or a timeout is the service, not your code. Save what you collect, and cite the date.
 
 ## Key Takeaways
 
-Platform APIs provide access to behavioral data at unprecedented scale, but that access is conditional, costly, and fragile. The pattern across all four platforms is the same: authenticate, construct requests, parse nested JSON, convert to DataFrames. The difference is in governance: who controls the data, on what terms, and what happens when they change the rules. Build skills across both proprietary and open platforms so that the closure of any single source does not shut down your research.
+A platform's API exists at the platform's discretion, and since 2023 most platforms have narrowed theirs, so date what you collect and say what access you had. Check who an account belongs to before you collect it. Bluesky's open protocol answers anyone, YouTube's keyed API counts what you use, and Reddit's data now lives mostly in archives that keep what users deleted. Whichever you use, social data is people data: read public institutions, keep private people out of what you save and show, and prefer the source whose terms you can follow.
 
 ## Further Reading
 
-- PRAW documentation: <https://praw.readthedocs.io/>
-- spotipy documentation: <https://spotipy.readthedocs.io/>
-- AT Protocol SDK: <https://atproto.blue/>
-- Mastodon.py documentation: <https://mastodonpy.readthedocs.io/>
+- Bluesky API documentation: <https://docs.bsky.app/>
+- AT Protocol: <https://atproto.com/>
+- YouTube Data API: <https://developers.google.com/youtube/v3>
+- Arctic Shift: <https://github.com/ArthurHeitmann/arctic_shift>
+- Spotify Web API, February 2026 migration guide: <https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide>
 - @baumgartner2020pushshift — the Pushshift Reddit dataset
-- @diener2026mastodonpy — the Mastodon.py library
-- @bruns2019after — platforms versus scholarly research after the APIcalypse
+- @proferes2021studying — how researchers have studied Reddit, and the ethics of it
+- @bruns2019after — platforms versus scholarly research after the "APIcalypse"
