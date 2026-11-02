@@ -1,0 +1,71 @@
+# Recipes for Chapter 12's figures (ch-12-social.qmd). See tools/shots/README.md.
+#
+# "A Tour: From a Platform's Website to Its API" shows the two pages behind the
+# chapter's two runnable APIs: a federal agency's Bluesky profile and NOAA's
+# YouTube channel. Both are public and load signed out. They show federal
+# agencies' own posts and videos; neither may show a private person's handle,
+# post, or comment, so each crop stops above the feed's replies and comments.
+chapter: ch-12
+qmd: ch-12-social.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: bsky-profile
+    kind: capture
+    section: "A Tour: From a Platform's Website to Its API"
+    brief: >-
+      Show the National Weather Service's profile on Bluesky's website, signed
+      out, and the parts of it that the API's getProfile returns: the handle
+      nws.noaa.gov, a domain (marker 1), the display name with the blue check
+      of Bluesky's verification (2), the counts, rounded on the page (3), and
+      the Posts tab, the list getAuthorFeed returns (4). Keep the avatar through
+      the first post's text; leave out replies and anything posted by someone
+      else.
+    url: https://bsky.app/profile/nws.noaa.gov
+    window: [800, 600]
+    steps:
+      - wait: {text: 'National Weather Service'}
+      - wait: {text: 'followers'}
+    expect:
+      status: 200
+      text: ['National Weather Service', 'nws.noaa.gov']
+    # From the top of the avatar to the end of the first post's text: the banner image above
+    # adds nothing, and the sign-up bar fixed at the window's foot is left below the crop
+    crop: {top: 100, height: 390}
+    annotate:
+      marks:
+        - {n: 1, at: {text: '^@nws.noaa.gov$'}, side: right}
+        - {n: 2, at: {text: '^\s*National Weather Service\W*$', nth: 0}, side: right}   # the heading, not the first post's byline; its box takes in the blue check
+        - {n: 3, at: {text: '^posts$'}, side: right}
+        - {n: 4, at: {text: '^Posts$'}, side: right}
+    drifts: true        # the counts, the newest post, and the site's look
+
+  - id: youtube-channel
+    kind: capture
+    section: "A Tour: From a Platform's Website to Its API"
+    brief: >-
+      Show NOAA's channel page on YouTube, signed out, and the parts of it that
+      the API's channels.list returns: the channel's name with YouTube's check
+      (marker 1), its handle and the subscriber and video counts, rounded on the page (2), the
+      link to noaa.gov (3), which the chapter says proves nothing alone, and the Videos
+      tab, the uploads playlist the chapter reads (4). Keep the channel header
+      and the tabs; leave out the site's header bar and the videos below.
+    url: https://www.youtube.com/@NOAA
+    window: [800, 600]
+    steps:
+      - wait: {text: '@NOAA'}
+    expect:
+      status: 200
+      text: ['@NOAA']
+    # From the banner to the tabs: the site's header bar, with its search box and sign-in
+    # button, is above the crop, and the Home tab's videos below it
+    crop: {top: 56, height: 378}
+    annotate:
+      marks:
+        - {n: 1, at: {text: '^noaa$'}, side: right}   # the name; its box takes in the check
+        - {n: 2, at: {text: 'videos$'}, side: right}            # the end of the handle-and-counts line
+        - {n: 3, at: {text: '^\s*noaa\.gov\s*$'}, side: left, gap: 12}   # past the link icon
+        - {n: 4, at: {text: '^Videos$'}, side: above}
+    drifts: true        # the counts, the channel's banner, and the site's look
