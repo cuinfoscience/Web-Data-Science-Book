@@ -335,3 +335,17 @@ The ruleset on `main` requires a pull request with 0 approvals, and allows squas
 | P2-2 | P2 | `docs/handoff.md` | note | Read before editing after a compaction | auto | Applied 2026-10-06 | Edits refused for an unread file: 27 → ≤ 5 |
 | P2-3 | P2 | course decks; computed-outputs plan | content, decision | Three screenshots; four questions | maintainer | Deferred | Screenshots taken: 0 of 3 → 3; plan decided: no → yes |
 | P2-4 | P2 | `AGENTS.md` | definition | Write down the merge check | auto | Proposed | Merges that land a head CI didn't check: 0 → 0 |
+
+## 9. Follow-up (2026-11-01)
+
+The course's AAR of weeks 10–11 ([`2026-11-01-weeks-10-11.md`](https://github.com/cuinfoscience/INFO4617-Fall2026/blob/main/docs/aar/2026-11-01-weeks-10-11.md), §2a) checked this report's actions:
+- **Worked; closed:**
+  - P0-2, P0-3, P1-2, P1-4 and P2-1.
+  - P0-2 and P1-4 were applied in `CONTRIBUTING.md` (#285) rather than `AGENTS.md`. Chapter 11's code was run live, and it checks every response.
+- **Partly worked:**
+  - **P0-1, applied in `CONTRIBUTING.md`.** Two starting-point gaps reached chapter 11: Monday's class needed the website before the API, and the instructor had to ask twice for "open a new terminal".
+  - **P2-2.** Edits were refused as unread 10 times, against a target of 5 or fewer.
+- **Carried forward:**
+  - **P1-1:** repository settings can't be read from a cloud session.
+  - **P1-3, the collector's mid-turn messages:** it still counted none of 86. It is now P1-3 of the course report.
+- **Unchanged:** P2-3 is deferred. P2-4 is in the course's `AGENTS.md`.
