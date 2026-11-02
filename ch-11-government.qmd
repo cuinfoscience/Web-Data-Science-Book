@@ -997,6 +997,33 @@ You will answer one comparative question about Colorado with two federal data so
 # Your code here
 ```
 
+::: {.callout-note}
+## If your Census key will not work
+
+Do not lose the exercise over it. FRED carries the Census Bureau's SAIPE estimate of median household income for every Colorado county, and the county's FIPS code is part of the series ID: `MHICO08`, then the three digit county code, then `A052NCEN`. Colorado's 64 counties have the odd codes from 001 to 125, plus Broomfield at 014. This code builds a county table from your FRED key alone, and you can use it for Steps 3 and 4:
+
+```python
+import time
+
+county_codes = list(range(1, 126, 2)) + [14]
+
+rows = []
+for code in county_codes:
+    series_id = f"MHICO08{code:03d}A052NCEN"
+    title = fred_get("series", series_id=series_id)["seriess"][0]["title"]
+    latest = fred_observations(series_id, observation_start="2024-01-01", observation_end="2024-12-31")
+    name = title.replace("Estimate of Median Household Income for ", "").replace(", CO", "")
+    rows.append({"county": name, "income": latest["value"].iloc[0]})
+    time.sleep(0.6)   # stays under FRED's 120 requests a minute
+
+fred_counties = pd.DataFrame(rows).sort_values("income", ascending=False)
+print(len(fred_counties), "counties")
+print(fred_counties.head(5).to_string(index=False))
+```
+
+The loop makes two requests per county, so it takes about a minute and a half. These figures come from SAIPE, not the ACS 5-year estimate, so they will differ a little from the Census numbers. Say which one you used when you interpret the results in Step 6.
+:::
+
 **Step 3 — Build and clean the DataFrame.** First row is headers, the rest is data — the same shape you handled in @sec-archives. Convert your variable to numeric, sort by it, and print the top and bottom five counties.
 
 ```{python}
@@ -1055,6 +1082,7 @@ But government data infrastructure is not immune to erosion. Datasets are withdr
 - **FIPS codes**: Geographic identifiers like `08` (Colorado) and `07850` (Boulder) are strings, not integers. Do not strip leading zeros.
 - **FRED series IDs**: These are alphanumeric strings; some families follow a pattern (like the SAIPE income series earlier in this chapter), but many do not. Use the FRED website search to find them, then copy the ID into your code exactly.
 - **`KeyError` or `MISSING` for a key**: Jupyter never received the environment variable. After setting it, quit Jupyter, open a new terminal, and start Jupyter from it; restarting the kernel isn't enough. See "When a Key Says `MISSING`", above, for the other causes and a stopgap.
+- **`JSONDecodeError: Expecting value: line 1 column 1` from the Census API**: The Census Bureau answers a key it does not recognize with an ordinary page of HTML and a 200 status, so `raise_for_status()` passes and `response.json()` is the first line to fail. Print `response.text[:200]` to read the page, and never print `response.url`, because it contains your key. A message about an invalid or unknown key means the key was never activated, was mistyped, or was saved with extra text around it. A real Census key is 40 characters long, so `len(census_key)` is a quick check. Click the link in the Census email, or request a new key and activate it within 48 hours. If the key still will not work, the callout after Step 2 of the Recommended Exercises builds the county table from FRED instead.
 - **API key exposure**: The most common mistake. Environment variables never enter your repository; if you use the JSON-file alternative, add `api_keys.json` to `.gitignore` *before* your first commit, or the key will persist in your git history even after deletion.
 - **Rate limiting**: Limits vary by agency. As of mid-2026, the Census API publishes no hard limit for keyed users (but expects polite use), and FRED allows roughly 120 requests per minute. Check each API's documentation for current figures, and stay well within them, especially during automated collection.
 - **The EIA's 5,000-row cap**: A request to the EIA's API returns at most 5,000 rows, with an `"incomplete return"` warning if more match. Filter with facets, a shorter span, or a lower frequency first; page with `offset` and `length` only for what is still too large ("Paging with `offset` and `length`", above).
