@@ -1110,7 +1110,7 @@ REPORTS = ["revenue-report-2018.pdf", "revenue-report-2019.pdf", "revenue-report
 def find_summary_page(pdf):
     """Return the page of a revenue report that holds the sales and use tax summary, or None."""
     for page in pdf.pages[:4]:  # the summary is in the first four pages
-        # extract_text() gives None for a page with no text, so use "" instead
+        # pdfplumber before 0.6 (2021) gave None for a page with no text; or "" keeps this line safe on those versions
         if "This report provides" in (page.extract_text() or ""):
             return page
     return None  # no page had the sentence

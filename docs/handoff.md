@@ -1,5 +1,13 @@
 # Hand-off note
 
+**Updated 2026-11-02: a sweep of open pull requests and issues, at the maintainer's request** ([`decisions.md`](decisions.md), 2026-10-06).
+- **Merged, low-risk, each with a classmate's support:** #246, #248, #249, #275 (chapter 8); #272, #273 (chapter 9). This note's pull request regenerates the notebooks after them. The regeneration workflow's own pull request, #301, ran before the last three merges and is superseded.
+- **"Request changes":** #243, #244, #245, #250, #251, #252 (chapter 8); #268, #270, #271, #274, #276, #278, #279 (chapter 9). #274 and #278 need only a one-click suggestion. #239 got the same feedback as a comment, because the maintainer's unsent review from 2026-10-09 is still pending on it: GitHub allows one pending review per person, so only the maintainer can submit or delete it.
+- **Closed, nothing to merge:** #255 (duplicates #243 and #244), #269 (guards against a `None` that pypdf 6 never returns), #281 (repeats "Check 1").
+- **Reminders** on every chapter 5–7 pull request still waiting on its October 6 review, and on #173, #201, and #211 with news: #224 already made #173's second fix; #201 now conflicts, only in a notebook; and #211's review was wrong about trailing slashes, which the CDX server ignores (checked live: `facebook.com/terms` and `facebook.com/terms/` both give the key `com,facebook)/terms`).
+- **Issues.** Guidance for a pull request on #19, #241, #254, #256, #266, #267, #277, #282, and #286; #242 linked to #243 and #244; questions on #253 and #298. Closed: #49 (completed by #152), #64 and #280 (not planned).
+- **Fixed on `main` here:** chapter 9's comment on pdfplumber's `extract_text()`, which returns `""` for an empty page since pdfplumber 0.6 (2021), and step 3 of the notebooks appendix, which still said the chapters' first cells hold `pip install` lines.
+
 **Updated 2026-11-01: chapter 11 is done; chapter 12's sprint starts.**
 - **Chapter 11.** It is on `main` after #295–#297: three APIs (Census, FRED, the EIA), the `getpass()` steps, and the fresh start after setting a key (quit Jupyter, open a new terminal).
 - **Week 11's lab.** Taught as Census and FRED only, with the EIA and Congress.gov left for students to explore (course #153, #154).
