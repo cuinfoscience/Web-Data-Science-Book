@@ -48,7 +48,7 @@ Section order follows chapters 10 and 11.
 5. **YouTube Data API.**
    - Key management: a short pointer to chapter 11, then `YOUTUBE_KEY`.
    - `channels.list` by handle; `playlistItems.list` on a channel's uploads playlist; `videos.list` for statistics.
-   - The quota: 10,000 units a day, where a search costs 100 and most reads cost 1. Avoid `search.list`.
+   - The quota: 10,000 units a day, most reads costing 1 unit, and searches capped separately at 100 calls a day ([getting started](https://developers.google.com/youtube/v3/getting-started), checked 2026-11-02; the cost of a search changed, so the chapter says when it was checked). Read channels and uploads rather than searching.
 6. **Reddit After Pushshift** (evaluation, checked 2026-11-02; details in the table below).
    - **One runnable example:** an Arctic Shift search on r/boulder, `limit=5`, with `fields=` leaving out `author`, a User-Agent and a timeout. The example teaches `removed_by_category` and `retrieved_on`: the archive keeps what users deleted.
    - **A committed snapshot of the response**, so the chapter reads correctly when the service is down.
