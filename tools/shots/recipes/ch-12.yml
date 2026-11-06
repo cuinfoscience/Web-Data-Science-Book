@@ -71,3 +71,114 @@ figures:
         - {n: 4, at: {text: '^Videos$'}, side: above}
     targets: {slides: {width: 0.64}}   # week 12, Monday: "Friday's page: an agency's YouTube channel"
     drifts: true        # the counts, the channel's banner, and the site's look
+
+  # "Getting and Storing a Key": the Google Cloud console, signed in, so a person's
+  # screenshots (mode: hand; README, "Hand captures"). Brian C. Keegan took them in Firefox
+  # on 2026-11-06, in the console's dark theme, each cropped to the part the step needs.
+  # They are 1x screenshots (scale 1): a retake at 2x would be sharper on a projector.
+  # No account name, avatar, project ID, or key value is in any of them.
+  - id: yt-library
+    kind: capture
+    mode: hand
+    section: "Getting and Storing a Key"
+    brief: >-
+      Show the first page a student opens, the YouTube Data API's page in the
+      console's API Library: the product's name, to confirm it's the right API
+      (marker 1), and the Enable button (2).
+    url: https://console.cloud.google.com/apis/library/youtube.googleapis.com
+    hand:
+      why: the Google Cloud console needs a signed-in Google account, and the toolkit never signs in
+      steps: >-
+        Signed in, with a project selected that hasn't enabled the API, open the
+        URL and take a screenshot of the product's header, from Product details
+        to the Enable button.
+      text_px: 14          # the description and the buttons' labels
+    window: [739, 313]
+    scale: 1
+    annotate:
+      marks:
+        - {n: 1, at: {xy: [193, 85, 255, 30]}, side: right}
+        - {n: 2, at: {xy: [194, 250, 68, 34]}, side: below}
+    targets: {slides: {width: 0.56}}
+    drifts: true           # the console's look
+
+  - id: yt-enabled
+    kind: capture
+    mode: hand
+    section: "Getting and Storing a Key"
+    brief: >-
+      Show what the page becomes once the API is enabled: Status, Enabled (1),
+      and the Credentials tab, where the key is made (2).
+    url: https://console.cloud.google.com/apis/api/youtube.googleapis.com
+    hand:
+      why: the Google Cloud console needs a signed-in Google account, and the toolkit never signs in
+      steps: >-
+        Right after clicking Enable on yt-library's page, take a screenshot of
+        API/Service Details from its title to the row of tabs.
+      text_px: 14
+    window: [801, 371]
+    scale: 1
+    crop: {top: 0, left: 0, width: 800, height: 371}   # the screenshot's last column is the page's edge
+    annotate:
+      marks:
+        - {n: 1, at: {xy: [446, 255, 52, 20]}, side: right}
+        - {n: 2, at: {xy: [330, 333, 76, 20]}, side: right}
+    targets: {slides: {width: 0.6}}
+    drifts: true
+
+  - id: yt-create-credentials
+    kind: capture
+    mode: hand
+    section: "Getting and Storing a Key"
+    brief: >-
+      Show the Credentials tab's Create credentials menu (1), and the choice
+      the chapter needs, API key (2), above OAuth client ID, which it doesn't.
+    url: https://console.cloud.google.com/apis/api/youtube.googleapis.com/credentials
+    hand:
+      why: the Google Cloud console needs a signed-in Google account, and the toolkit never signs in
+      steps: >-
+        On the Credentials tab, click Create credentials and take a screenshot
+        of the button and its open menu.
+      text_px: 14          # the choices' names; their descriptions are 13
+    window: [528, 273]
+    scale: 1
+    annotate:
+      marks:
+        - {n: 1, at: {xy: [322, 26, 186, 32]}, side: left}
+        - {n: 2, at: {xy: [40, 72, 58, 22]}, side: right}
+    targets: {slides: {width: 0.46}}
+    drifts: true
+
+  - id: yt-create-key
+    kind: capture
+    mode: hand
+    section: "Getting and Storing a Key"
+    brief: >-
+      Show the Create API key dialog filled in as the chapter asks: a name (1),
+      Select API restrictions opened with YouTube Data API v3 to tick (2), OK
+      (3), and Application restrictions left at None (4). The note about a
+      service account is for the Gemini and Agent Platform APIs, which the
+      chapter doesn't use.
+    url: https://console.cloud.google.com/apis/credentials
+    hand:
+      why: the Google Cloud console needs a signed-in Google account, and the toolkit never signs in
+      steps: >-
+        After choosing API key from Create credentials, type a name, open
+        Select API restrictions, and take a screenshot of the whole dialog
+        before ticking the box.
+      text_px: 14
+    window: [595, 921]
+    scale: 1
+    # The screenshot's first 12 pixels on the left and at the top are the page behind the
+    # dialog, cut off mid-word; the crop leaves them out
+    crop: {top: 12, left: 12, width: 583, height: 909}
+    oversize: >-
+      the dialog is one form, 909 pixels tall: its name, its API restrictions, and its
+      application restrictions are set together before Create, so the figure shows all three
+    annotate:
+      marks:
+        - {n: 1, at: {xy: [32, 86, 110, 20]}, side: right}
+        - {n: 2, at: {xy: [72, 513, 132, 20]}, side: right}
+        - {n: 3, at: {xy: [484, 555, 44, 32]}, side: above}
+        - {n: 4, at: {xy: [52, 738, 40, 20]}, side: right}
+    drifts: true
