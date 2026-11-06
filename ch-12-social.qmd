@@ -249,14 +249,33 @@ Everything above reads public data. Writing posts, reading your own timeline, or
 
 ## YouTube Data API
 
-YouTube's [Data API](https://developers.google.com/youtube/v3) answers anyone with a key, and counts every request against a quota. Google's documentation describes 10,000 units a day for each project, where most reads cost 1 unit, and a separate cap of 100 searches a day ([getting started](https://developers.google.com/youtube/v3/getting-started), checked 2026-11-02; the costs have changed before, so check the page when you start). This section reads channels and their uploads, which cost 1 unit a request, and never searches.
+YouTube's [Data API](https://developers.google.com/youtube/v3) answers anyone with a key, and counts every request against a quota. Google's documentation describes 10,000 units a day for each project, where most reads cost 1 unit, and a separate cap of 100 searches a day ([getting started](https://developers.google.com/youtube/v3/getting-started), checked 2026-11-02; the costs have changed before, so check the page when you start). Every request costs at least 1 unit, even one that fails ([YouTube Data API overview](https://developers.google.com/youtube/data/getting-started), checked 2026-11-06). This section reads channels and their uploads, which cost 1 unit a request, and never searches.
 
 ### Getting and Storing a Key
 
-1. Sign in to the [Google Cloud console](https://console.cloud.google.com/) with a personal Google account, and create a project.
-2. In the project's **API Library**, enable **YouTube Data API v3**.
-3. Under **Credentials**, create an **API key**, and restrict it to the YouTube Data API v3.
-4. Store it as the environment variable `YOUTUBE_KEY`, by one of the ways in @sec-government ("Setting Environment Variables"), then quit Jupyter, open a new terminal, and start Jupyter from it.
+Google's console is built for companies that run many services, and the page you need is several menus deep. Start from this link, which opens the YouTube Data API's own page in the console:
+
+> **<https://console.cloud.google.com/apis/library/youtube.googleapis.com>**
+
+1. **Sign in, and choose a project.** Sign in with a personal Google account. If the console asks you to select a project, choose **New Project**, name it (`info4617` will do), and click **Create**. A project is what Google counts the quota against, and it can hold more than one key.
+2. **Enable the API.** Check that the page names **YouTube Data API v3** ①, and click **Enable** ② (@fig-yt-library).
+
+![The YouTube Data API's page in the Google Cloud console's API Library, November 2026: the API's name ①, to check you're on the right page, and Enable ②.](images/ch-12/yt-library_annotated.png){#fig-yt-library .lightbox fig-alt="Screenshot of the Google Cloud console's Product details page, in its dark theme. Beside YouTube's red play-button logo, marker 1 points at the title YouTube Data API v3, above the publisher, Google, and the description: The YouTube Data API v3 is an API that provides access to YouTube data, such as videos, playlists. Marker 2 points at the blue Enable button, beside Try this API."}
+
+3. **Open Credentials.** The page becomes **API/Service Details**, and its Status reads **Enabled** ①. Click the **Credentials** tab ② (@fig-yt-enabled).
+
+![The same API once it's enabled, November 2026: its status, Enabled ①, and the Credentials tab ②, where a key is made.](images/ch-12/yt-enabled_annotated.png){#fig-yt-enabled .lightbox fig-alt="Screenshot of the console's API/Service Details page for YouTube Data API v3, with a Disable API button at the top. A row of four facts: Service name youtube.googleapis.com, Type Public API, Status Enabled, marked 1, and Documentation, Learn more. Below them a row of tabs, Metrics, Quotas and System Limits, and Credentials, marked 2."}
+
+4. **Create an API key.** Click **Create credentials** ① and choose **API key** ② (@fig-yt-create-credentials). Not **OAuth client ID**: that is for a program acting on a person's own YouTube account, which this chapter never does. Google's [Python quickstart](https://developers.google.com/youtube/data/quickstart/python) makes both, because some of its examples need a person's permission; reading public channels and videos needs only the key.
+
+![The Credentials tab's Create credentials menu, November 2026: the button ① and the choice this chapter needs, API key ②.](images/ch-12/yt-create-credentials_annotated.png){#fig-yt-create-credentials .lightbox fig-alt="Screenshot of the console's Create credentials button, marked 1, with its menu open below it. The menu has three choices: API key, marked 2, Identifies your project using a simple API key to check quota and access; OAuth client ID, Requests user consent so your app can access the user's data; and Help me choose, Asks a few questions to help you decide which type of credential to use."}
+
+5. **Restrict the key to YouTube.** In the **Create API key** dialog (@fig-yt-create-key), give the key a name ①. Skip past the blue **Service account required** note: it is about the Gemini and Agent Platform APIs, which you aren't using. Open **Select API restrictions**, tick **YouTube Data API v3** ②, and click **OK** ③. Leave **Application restrictions** at **None** ④: a laptop's IP address changes from one network to the next, so an IP restriction would stop the key working whenever you change networks. Then click **Create** at the foot of the dialog.
+
+![The Create API key dialog, November 2026: the key's name ①, YouTube Data API v3 in Select API restrictions, to tick ②, OK ③, and Application restrictions left at None ④. The blue note about a service account is for Gemini, not YouTube.](images/ch-12/yt-create-key_annotated.png){#fig-yt-create-key .lightbox fig-alt="Screenshot of the Create API key dialog. Marker 1: the Name field, filled in as YouTube API key. Below it, a blue note headed Service account required, about the Agent Platform API and Gemini API. The Select API restrictions list is open, with Gemini API greyed out and YouTube Data API v3, marked 2, unticked. Marker 3: the OK button beside Cancel. Under Application restrictions, None is selected, marked 4."}
+
+6. **Copy the key**, and paste it only into the next step: never into a notebook cell, a code file, or a message. If you lose it, or it leaks, delete it on the Credentials page and make a new one.
+7. **Store it** as the environment variable `YOUTUBE_KEY`, by one of the ways in @sec-government ("Setting Environment Variables"), then quit Jupyter, open a new terminal, and start Jupyter from it. A terminal reads its environment variables when it opens, so one opened before you set the key doesn't have it.
 
 ```{python}
 import os
@@ -488,6 +507,8 @@ A platform's API exists at the platform's discretion, and since 2023 most platfo
 - Bluesky API documentation: <https://docs.bsky.app/>
 - AT Protocol: <https://atproto.com/>
 - YouTube Data API: <https://developers.google.com/youtube/v3>
+- YouTube Data API, getting started (quotas and credentials): <https://developers.google.com/youtube/data/getting-started>
+- YouTube Data API, Python quickstart (Google's own client library, with OAuth): <https://developers.google.com/youtube/data/quickstart/python>
 - Arctic Shift: <https://github.com/ArthurHeitmann/arctic_shift>
 - Spotify Web API, February 2026 migration guide: <https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide>
 - @baumgartner2020pushshift — the Pushshift Reddit dataset
