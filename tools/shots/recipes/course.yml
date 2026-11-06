@@ -814,3 +814,35 @@ figures:
     crop: {top: 0, height: 450, left: 0, width: 480}      # the header, the headline, and the paragraph under it
     targets: {slides: {width: 0.35}}
     drifts: true        # the site's own wording and look
+
+  # Week 12's slide copy of chapter 12's yt-create-key: the same screenshot, cut at the
+  # OK button. The whole dialog, 909 pixels tall, fits a slide only about 0.31 of its width
+  # wide, where its 14-pixel text comes out at 12.5 pixels; this crop is 600 tall.
+  - id: week12-yt-create-key
+    kind: capture
+    mode: hand
+    section: "week-12 slides, Friday: your YouTube key, step 5 (yt-create-key-top.png)"
+    brief: >-
+      The top of the Create API key dialog, for a slide: the key's name (1),
+      YouTube Data API v3 in Select API restrictions, to tick (2), and OK (3).
+      The slide says in words to leave Application restrictions at None, which
+      chapter 12's yt-create-key shows below this crop.
+    url: https://console.cloud.google.com/apis/credentials
+    hand:
+      why: the Google Cloud console needs a signed-in Google account, and the toolkit never signs in
+      steps: >-
+        The same screenshot as chapter 12's yt-create-key (Brian C. Keegan,
+        Firefox, 2026-11-06): after choosing API key from Create credentials,
+        type a name, open Select API restrictions, and take a screenshot of the
+        whole dialog before ticking the box.
+      text_px: 14
+    window: [595, 921]
+    scale: 1
+    crop: {top: 12, left: 12, width: 583, height: 600}
+    annotate:
+      marks:
+        - {n: 1, at: {xy: [32, 86, 110, 20]}, side: right}
+        - {n: 2, at: {xy: [72, 513, 132, 20]}, side: right}
+        - {n: 3, at: {xy: [484, 555, 44, 32]}, side: above}
+    targets: {slides: {width: 0.45}}
+    drifts: true           # the console's look
