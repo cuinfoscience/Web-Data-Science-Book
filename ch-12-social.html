@@ -277,7 +277,7 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch-13-ai-apis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI APIs as Data Tools</span></span></a>
   </div>
 </li>
       </ul>
@@ -572,7 +572,7 @@ Figure&nbsp;12.2: NOAA’s channel on youtube.com, November 2026: the channel’
 <section id="blueskys-public-api" class="level2" data-number="12.3">
 <h2 data-number="12.3" class="anchored" data-anchor-id="blueskys-public-api"><span class="header-section-number">12.3</span> Bluesky’s Public API</h2>
 <p>Bluesky is a social network built on the AT Protocol, an open protocol: its specifications are public, and anyone may run the services that make up the network. One of those services, the <strong>AppView</strong>, assembles posts, profiles, and counts from across the network and answers questions about them. Bluesky runs a public AppView at <code>https://public.api.bsky.app/xrpc/</code> that answers reads for anyone, with no login (<a href="https://docs.bsky.app/docs/advanced-guides/api-directory">API hosts</a>). Each method’s name is part of the address: <code>app.bsky.actor.getProfile</code> reads a profile, <code>app.bsky.feed.getAuthorFeed</code> an account’s posts. Like Wikipedia’s API in <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>, it still wants to know who is asking:</p>
-<div id="8e6fc002" class="cell" data-execution_count="1">
+<div id="dd7290d5" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -584,7 +584,7 @@ Figure&nbsp;12.2: NOAA’s channel on youtube.com, November 2026: the channel’
 <section id="who-is-posting-a-profile" class="level3" data-number="12.3.1">
 <h3 data-number="12.3.1" class="anchored" data-anchor-id="who-is-posting-a-profile"><span class="header-section-number">12.3.1</span> Who Is Posting: A Profile</h3>
 <p><a href="https://docs.bsky.app/docs/api/app-bsky-actor-get-profile"><code>app.bsky.actor.getProfile</code></a> takes an account’s handle and returns its profile:</p>
-<div id="1171fd40" class="cell" data-execution_count="2">
+<div id="c473e8dc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a>response <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>bsky_base<span class="sc">}</span><span class="ss">/app.bsky.actor.getProfile"</span>,</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a>                        params<span class="op">=</span>{<span class="st">"actor"</span>: <span class="st">"nws.noaa.gov"</span>}, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>response.raise_for_status()</span>
@@ -611,7 +611,7 @@ Figure&nbsp;12.2: NOAA’s channel on youtube.com, November 2026: the channel’
 <section id="several-accounts-at-once" class="level3" data-number="12.3.2">
 <h3 data-number="12.3.2" class="anchored" data-anchor-id="several-accounts-at-once"><span class="header-section-number">12.3.2</span> Several Accounts at Once</h3>
 <p>Five federal accounts had a <code>.gov</code> handle on Bluesky on November 2, 2026, four of them NOAA’s. Others, like the Library of Congress and the Federal Reserve Bank of St.&nbsp;Louis, which runs FRED (<a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a>), have a <code>.bsky.social</code> handle and a verification instead. <a href="https://docs.bsky.app/docs/api/app-bsky-actor-get-profiles"><code>app.bsky.actor.getProfiles</code></a> takes up to 25 accounts in one request; <code>requests</code> repeats the <code>actors</code> parameter once for each item of a list:</p>
-<div id="2dd9d703" class="cell" data-execution_count="3">
+<div id="eb645895" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a>agencies <span class="op">=</span> [<span class="st">"noaa.gov"</span>, <span class="st">"nws.noaa.gov"</span>, <span class="st">"climate.noaa.gov"</span>, <span class="st">"noaacomms.noaa.gov"</span>, <span class="st">"federalreserve.gov"</span>,</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>            <span class="st">"librarycongress.bsky.social"</span>, <span class="st">"stlouisfed.bsky.social"</span>]</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a>response <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>bsky_base<span class="sc">}</span><span class="ss">/app.bsky.actor.getProfiles"</span>,</span>
@@ -637,7 +637,7 @@ Figure&nbsp;12.2: NOAA’s channel on youtube.com, November 2026: the channel’
 <section id="an-accounts-posts" class="level3" data-number="12.3.3">
 <h3 data-number="12.3.3" class="anchored" data-anchor-id="an-accounts-posts"><span class="header-section-number">12.3.3</span> An Account’s Posts</h3>
 <p><a href="https://docs.bsky.app/docs/api/app-bsky-feed-get-author-feed"><code>app.bsky.feed.getAuthorFeed</code></a> returns an account’s posts, newest first, up to 100 a request. With <code>filter="posts_no_replies"</code> it leaves out the account’s replies to others, but it still includes its <strong>reposts</strong>, other people’s posts it shared, each marked with a <code>"reason"</code>. Those authors may be private people, so set them aside:</p>
-<div id="d316b0c7" class="cell" data-execution_count="4">
+<div id="7737adc5" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a>params <span class="op">=</span> {<span class="st">"actor"</span>: <span class="st">"nws.noaa.gov"</span>, <span class="st">"limit"</span>: <span class="dv">25</span>, <span class="st">"filter"</span>: <span class="st">"posts_no_replies"</span>}</span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>response <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>bsky_base<span class="sc">}</span><span class="ss">/app.bsky.feed.getAuthorFeed"</span>, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>response.raise_for_status()</span>
@@ -666,7 +666,7 @@ Figure&nbsp;12.2: NOAA’s channel on youtube.com, November 2026: the channel’
 <section id="more-than-one-page-the-cursor" class="level3" data-number="12.3.4">
 <h3 data-number="12.3.4" class="anchored" data-anchor-id="more-than-one-page-the-cursor"><span class="header-section-number">12.3.4</span> More Than One Page: the <code>cursor</code></h3>
 <p>The answer ended with a <strong>cursor</strong>, and the next request sends it back to get the page that follows, as Wikipedia’s <code>continue</code> did in <a href="ch-10-wikipedia.html" class="quarto-xref"><span>Chapter 10</span></a>: you send back what the server gave you, without needing to know what it means. When there is no cursor, there is nothing more. This loop reads up to five pages of 100 posts, and keeps only what it needs from each:</p>
-<div id="c3bb043c" class="cell" data-execution_count="5">
+<div id="5361fc3c" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a>posts <span class="op">=</span> []</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>cursor <span class="op">=</span> <span class="va">None</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a>pages <span class="op">=</span> <span class="dv">0</span></span>
@@ -698,7 +698,7 @@ Figure&nbsp;12.2: NOAA’s channel on youtube.com, November 2026: the channel’
 <section id="when-an-agency-posts-and-what-travels" class="level3" data-number="12.3.5">
 <h3 data-number="12.3.5" class="anchored" data-anchor-id="when-an-agency-posts-and-what-travels"><span class="header-section-number">12.3.5</span> When an Agency Posts, and What Travels</h3>
 <p>The times are in UTC. Convert them to the agency’s own time zone, Eastern for the Weather Service’s headquarters, before asking what day or hour it posts:</p>
-<div id="a2fb8f83" class="cell" data-execution_count="6">
+<div id="9f3f789e" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a>local <span class="op">=</span> nws[<span class="st">"created"</span>].dt.tz_convert(<span class="st">"America/New_York"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>days <span class="op">=</span> [<span class="st">"Monday"</span>, <span class="st">"Tuesday"</span>, <span class="st">"Wednesday"</span>, <span class="st">"Thursday"</span>, <span class="st">"Friday"</span>, <span class="st">"Saturday"</span>, <span class="st">"Sunday"</span>]</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>by_day <span class="op">=</span> local.dt.day_name().value_counts().reindex(days)</span>
@@ -716,7 +716,7 @@ Figure&nbsp;12.2: NOAA’s channel on youtube.com, November 2026: the channel’
 <span id="cb6-15"><a href="#cb6-15" aria-label="15"></a><span class="co"># Sunday        40</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The weather doesn’t take weekends off, but the agency’s social media staff mostly does: it posts on weekdays, most of all on Fridays, ahead of the weekend’s weather. Which posts travel? Each post’s <code>embed</code> says what it carries, and grouping by it compares reposts:</p>
-<div id="317adc59" class="cell" data-execution_count="7">
+<div id="4dcdd9db" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="bu">print</span>(nws.groupby(<span class="st">"embed"</span>)[<span class="st">"reposts"</span>].agg([<span class="st">"count"</span>, <span class="st">"median"</span>]).sort_values(<span class="st">"count"</span>, ascending<span class="op">=</span><span class="va">False</span>).to_string())</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="co">#                                 count  median</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="co"># embed</span></span>
@@ -800,7 +800,7 @@ Figure&nbsp;12.6: The Create API key dialog, November 2026: the key’s name ①
 <li><strong>Copy the key</strong>, and paste it only into the next step: never into a notebook cell, a code file, or a message. If you lose it, or it leaks, delete it on the Credentials page and make a new one.</li>
 <li><strong>Store it</strong> as the environment variable <code>YOUTUBE_KEY</code>, by one of the ways in <a href="ch-11-government.html" class="quarto-xref"><span>Chapter 11</span></a> (“Setting Environment Variables”), then quit Jupyter, open a new terminal, and start Jupyter from it. A terminal reads its environment variables when it opens, so one opened before you set the key doesn’t have it.</li>
 </ol>
-<div id="eaad23db" class="cell" data-execution_count="8">
+<div id="fd499a61" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="im">import</span> os</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="co"># Say whether the key is set, without printing it</span></span>
@@ -813,7 +813,7 @@ Figure&nbsp;12.6: The Create API key dialog, November 2026: the key’s name ①
 <section id="a-channel-by-its-handle" class="level3" data-number="12.4.2">
 <h3 data-number="12.4.2" class="anchored" data-anchor-id="a-channel-by-its-handle"><span class="header-section-number">12.4.2</span> A Channel by Its Handle</h3>
 <p><a href="https://developers.google.com/youtube/v3/docs/channels/list"><code>channels.list</code></a> finds a channel by its handle with <code>forHandle</code>, and <code>part</code> names the groups of fields you want back: <code>snippet</code> for the name and description, <code>statistics</code> for the counts, and <code>contentDetails</code> for the playlist of every video the channel has uploaded.</p>
-<div id="dda6a784" class="cell" data-execution_count="9">
+<div id="411d36c8" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a>params <span class="op">=</span> {<span class="st">"part"</span>: <span class="st">"snippet,statistics,contentDetails"</span>, <span class="st">"forHandle"</span>: <span class="st">"@NOAA"</span>, <span class="st">"key"</span>: youtube_key}</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a>response <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>yt_base<span class="sc">}</span><span class="ss">/channels"</span>, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>response.raise_for_status()</span>
@@ -827,7 +827,7 @@ Figure&nbsp;12.6: The Create API key dialog, November 2026: the key’s name ①
 <section id="a-channels-videos-and-their-statistics" class="level3" data-number="12.4.3">
 <h3 data-number="12.4.3" class="anchored" data-anchor-id="a-channels-videos-and-their-statistics"><span class="header-section-number">12.4.3</span> A Channel’s Videos, and Their Statistics</h3>
 <p>The uploads playlist lists every video, newest first, 50 at a time, with a <code>nextPageToken</code> to send back for the next 50. <a href="https://developers.google.com/youtube/v3/docs/playlistItems/list"><code>playlistItems.list</code></a> returns each video’s ID, and <a href="https://developers.google.com/youtube/v3/docs/videos/list"><code>videos.list</code></a> takes up to 50 IDs, comma-separated, and returns their statistics:</p>
-<div id="d5943523" class="cell" data-execution_count="10">
+<div id="19f23afd" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a>params <span class="op">=</span> {<span class="st">"part"</span>: <span class="st">"contentDetails"</span>, <span class="st">"playlistId"</span>: uploads, <span class="st">"maxResults"</span>: <span class="dv">50</span>, <span class="st">"key"</span>: youtube_key}</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a>response <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>yt_base<span class="sc">}</span><span class="ss">/playlistItems"</span>, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a>response.raise_for_status()</span>
@@ -902,7 +902,7 @@ Figure&nbsp;12.6: The Create API key dialog, November 2026: the key’s name ①
 </tbody>
 </table>
 <p>Arctic Shift’s API is the one you can try. Its <a href="https://github.com/ArthurHeitmann/arctic_shift/blob/master/api/README.md">documentation</a> says its rate limits depend on server load, that a status 429 means you wait the seconds in the <code>X-RateLimit-Reset</code> header, and that it offers “No uptime or performance guarantees.” The request below asks for the first five posts in r/boulder in a fixed past week. Its <code>fields</code> parameter leaves out <code>author</code>, so no username reaches your computer.</p>
-<div id="278fa382" class="cell" data-execution_count="11">
+<div id="9d795845" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a></span>
@@ -1019,32 +1019,32 @@ Figure&nbsp;12.6: The Create API key dialog, November 2026: the key’s name ①
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order; everything you need appears in this chapter or an earlier one.</p>
 <p>You will compare how two federal accounts on Bluesky used the platform in September 2026. Pick two from this chapter’s list, or another verified institutional account, never a private person’s.</p>
 <p><strong>Step 1 — Set up, and check who you are asking about.</strong> Define your <code>HEADERS</code> with your own email, and request both accounts’ profiles with <code>getProfiles</code>. Print each handle, its <code>verifiedStatus</code>, and whether the handle is a domain, and say in a comment why you trust that each account is the institution’s.</p>
-<div id="76456af8" class="cell" data-execution_count="12">
+<div id="59e0d4bc" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co"># Step 1: Define HEADERS, request both profiles with getProfiles, and print each handle, its verifiedStatus, and whether the handle ends in .gov</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Collect one account’s September posts.</strong> Page through the first account’s feed with <code>getAuthorFeed</code> and its <code>cursor</code>, skipping reposts, until you reach posts older than September 1, 2026. Keep the posts created in September, with their time, likes, reposts, replies, and embed type.</p>
-<div id="e98a73e1" class="cell" data-execution_count="13">
+<div id="dcc2d6ca" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co"># Step 2: Page through the first account's feed until you pass September 1, 2026, and keep its own September posts in a DataFrame</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Describe the month.</strong> Convert the times to the account’s time zone, and compute: the number of posts, posts by weekday, the share of posts with an image or a video, and the median reposts.</p>
-<div id="2cc25412" class="cell" data-execution_count="14">
+<div id="70cb57c5" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># Step 3: Compute the number of posts, posts by weekday, the share with an image or video, and the median reposts</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Repeat for the second account.</strong> Collect and describe the second account’s September the same way.</p>
-<div id="cd4b45e8" class="cell" data-execution_count="15">
+<div id="7d631234" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># Step 4: Collect and describe the second account's September posts</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Compare.</strong> Put the two accounts’ numbers side by side in one DataFrame, and plot one comparison you find informative, such as posts by weekday for both.</p>
-<div id="f8046e8f" class="cell" data-execution_count="16">
+<div id="f7f67354" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Step 5: Build the comparison DataFrame and plot one comparison</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: how did the two accounts use the platform differently in September? What would you need to know to explain the difference, rather than describe it? What can’t the public API tell you, such as who saw a post, and which other source would you need for it?</p>
-<div id="f68473c2" class="cell" data-execution_count="17">
+<div id="fdddc382" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1666,8 +1666,8 @@ Proferes, Nicholas, Naiyan Jones, Sarah Gilbert, Casey Fiesler, and Michael Zimm
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./ch-13-ai-apis.html" class="pagination-link" aria-label="AI and Language Model APIs">
-        <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI and Language Model APIs</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./ch-13-ai-apis.html" class="pagination-link" aria-label="AI APIs as Data Tools">
+        <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">AI APIs as Data Tools</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
