@@ -90,7 +90,9 @@ import pdfplumber
 
 # Say whether each key is set, without ever printing the key itself
 for name in ["DATALAB_KEY", "OPENROUTER_KEY"]:
+    # Inside the f-string's double quotes, single quotes mark the two strings it chooses between
     print(f"{name}: {'set' if os.environ.get(name) else 'MISSING'}")
+# Keep each key in a variable; os.environ.get() gives None for a key that isn't set
 datalab_key = os.environ.get("DATALAB_KEY")
 openrouter_key = os.environ.get("OPENROUTER_KEY")
 
@@ -103,6 +105,7 @@ HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 If either says `MISSING` and you can't restart Jupyter now, chapter 11's `getpass()` cell asks for a missing key without saving it in the notebook. Then set the two services' addresses, and the book's copies of the files:
 
 ```{python}
+# Each service's API address; each request below adds an endpoint's path to the end
 datalab_base = "https://www.datalab.to/api/v1"
 openrouter_base = "https://openrouter.ai/api/v1"
 # Chapter 9's copies of the city's PDFs, and this chapter's copies of Datalab's Markdown of them
@@ -110,6 +113,7 @@ book = "https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/ma
 saved = "https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-13/"
 
 # Each service reads its key from its own header; **HEADERS adds the User-Agent to each
+# Datalab wants the bare key in X-API-Key; OpenRouter wants "Bearer ", then the key, in Authorization
 datalab_headers = {"X-API-Key": datalab_key, **HEADERS}
 openrouter_headers = {"Authorization": f"Bearer {openrouter_key}", **HEADERS}
 ```
@@ -131,10 +135,13 @@ The other fields say what to make. `output_format` is `markdown`. `mode` chooses
 
 ```{python}
 # The December 2024 report, by its address; Datalab downloads it from there
+# The form fields: the PDF's address, Markdown back, the balanced mode, and a marker at each page
 data = {"file_url": book + "revenue-report-2024-12.pdf", "output_format": "markdown",
         "mode": "balanced", "paginate": "true"}
+# 1. Send the fields to /convert; data= sends them as a form, the way a web page's form does
 response = requests.post(f"{datalab_base}/convert", data=data, headers=datalab_headers, timeout=60)
 response.raise_for_status()
+# 2. Datalab answers at once with a ticket, not the document
 job = response.json()
 print(job)
 # {'success': True, 'error': None, 'request_id': 'W2Bdj6Blyn7oO0ZDUgBbUQ', 'request_check_url': 'https://www.datalab.to/api/v1/convert/W2Bdj6Blyn7oO0ZDUgBbUQ', 'versions': None, 'checkpoint_reused': None}
@@ -147,10 +154,11 @@ The answer isn't the document. Converting takes seconds for a report like this o
 Ask the ticket's address whether the job is done. The [result check](https://documentation.datalab.to/api-reference/convert-result-check) answers with a `status`, `processing` until the job is `complete`:
 
 ```{python}
+# Ask the ticket's address how the job is going
 response = requests.get(job["request_check_url"], headers=datalab_headers, timeout=60)
 response.raise_for_status()
 check = response.json()
-print(check["status"])
+print(check["status"])  # "processing" until the job is done, then "complete"
 # processing
 ```
 
@@ -159,12 +167,15 @@ Asking again by hand gets tedious, so let a loop ask, every two seconds. Chapter
 ```{python}
 # Ask again every two seconds, at most 60 times: two minutes
 for attempt in range(60):
+    # Leave the loop as soon as the job is done; the check from the cell above may already say so
     if check["status"] == "complete":
         break
-    time.sleep(2)
+    time.sleep(2)  # wait two seconds before asking again
+    # Ask again, and keep the newest answer in check
     response = requests.get(job["request_check_url"], headers=datalab_headers, timeout=60)
     response.raise_for_status()
     check = response.json()
+# The finished answer's account of the work: pages read, cost in cents, and seconds spent
 print(check["page_count"], "pages,", check["total_cost"], "cents,", round(check["runtime"], 1), "seconds")
 # 15 pages, 4.5 cents, 10.5 seconds
 ```
@@ -191,16 +202,19 @@ def convert(data):
     dict
         The result check's answer, with the document in "markdown"
     """
+    # 1. Submit the document; Datalab answers with a ticket, not the document
     response = requests.post(f"{datalab_base}/convert", data=data, headers=datalab_headers, timeout=60)
     response.raise_for_status()
-    ticket = response.json()["request_check_url"]
+    ticket = response.json()["request_check_url"]  # the address where the result will be
+    # 2. Ask that address every two seconds until the job is complete
     for attempt in range(60):  # at most two minutes
         time.sleep(2)
         response = requests.get(ticket, headers=datalab_headers, timeout=60)
         response.raise_for_status()
         result = response.json()
         if result["status"] == "complete":
-            return result
+            return result  # return leaves the loop and the function at once
+    # 3. Reached only if all 60 checks said the job wasn't complete
     raise TimeoutError(f"Not complete after two minutes; the result will be at {ticket}")
 ```
 
@@ -209,14 +223,21 @@ def convert(data):
 With `paginate`, each page of the Markdown starts with its number in braces, counting from 0, and a line of dashes, such as `{14}------------------------------------------------`. [`re.split()`](https://docs.python.org/3/library/re.html#re.split) on that marker gives a list of pages. The text before the first marker is empty, so `[1:]` drops it, and `pages[0]` is page 1:
 
 ```{python}
-markdown = check["markdown"]
-pages = re.split(r"\n*\{\d+\}-{10,}\n*", markdown)[1:]
+markdown = check["markdown"]  # the whole document, as one string
+# Split at each page marker; the pattern, piece by piece: \n* any newlines before it,
+# \{\d+\} a number in braces, -{10,} ten or more dashes, and \n* any newlines after it
+pages = re.split(r"\n*\{\d+\}-{10,}\n*", markdown)[1:]  # [1:] drops the empty text before page 1
 print(len(pages), "pages")
+# 15 pages
+```
+
+Fifteen pages, as many as `page_count` reported. Page 2 is the summary; print the lines of its table that hold a total:
+
+```{python}
 # Page 2, the summary: the rows of its table that hold a total; " ".join(line.split()) squeezes out the padding
 for line in pages[1].splitlines():
     if "Total" in line:
         print(" ".join(line.split()))
-# 15 pages
 # | <b>Total Sales &amp; Use Tax based on current economic activity</b> | <b>\$172,401,668</b> | <b>\$171,006,199</b> | <b>-\$1,395,469</b> | <b>-0.81%</b> | <b>-0.81%</b> |
 # | <b>Total Sales and Use Tax</b> | <b>\$175,517,129</b> | <b>\$173,908,431</b> | <b>-\$1,608,698</b> | <b>-0.92%</b> | <b>-0.92%</b> |
 ```
@@ -229,8 +250,10 @@ Now page 15, Exhibit 3, the picture of a table:
 
 ```{python}
 # Page 15, Exhibit 3: only the lines of its table, not the note above it
+# A Markdown table's lines start with "|"; the list comprehension keeps those lines and no others
 exhibit_lines = [line for line in pages[14].splitlines() if line.startswith("|")]
 print(len(exhibit_lines), "lines of table")
+# Two of them, the first and the fourth, each with its padding squeezed out and cut to 100 characters
 for line in [exhibit_lines[0], exhibit_lines[3]]:
     print(" ".join(line.split())[:100])
 # 43 lines of table
@@ -246,8 +269,10 @@ A document-understanding model does more than read. Where a page has a chart, Da
 
 ```{python}
 # Page 9: from Chart 8's title to Chart 9's, leaving out the line that links the image
+# find() gives the position where each title starts; the slice [start:end] keeps the text between
 chart_8 = pages[8][pages[8].find("**Chart 8"):pages[8].find("**Chart 9")]
 for line in chart_8.splitlines():
+    # Skip blank lines, and the image's own line, which starts with "![" in Markdown
     if line.strip() and not line.startswith("!["):
         print(" ".join(line.split()))
 # **Chart 8: Distribution of YTD Marijuana Revenues**
@@ -269,6 +294,7 @@ Page 10 goes further. Its bar chart of sugar-sweetened beverage tax by month has
 ```{python}
 # Page 10: the description, the table's heading, and its December row
 for line in pages[9].splitlines():
+    # Given a tuple, startswith() is true when the line starts with any one of the three
     if line.startswith(("A bar chart", "| Month", "| December")):
         print(" ".join(line.split()))
 # A bar chart showing monthly values from January to December for the years 2019 through 2024. The y-axis represents values in dollars, ranging from \$- to \$600,000. The x-axis shows the months. 2019 is the highest in November, while 2024 is the highest in March and November.
@@ -279,12 +305,15 @@ for line in pages[9].splitlines():
 The table has 72 estimates, each marked with a `~`, and none of them is printed in the report. The description contradicts the table beside it, too: the table puts November 2024 at about \$250,000, the lowest November of the six years, while the description calls November one of 2024's highest months. The PDF's own text layer shows what the page prints. Read it with pdfplumber, as in chapter 9, from the book's copy:
 
 ```{python}
+# Chapter 9's copy of the PDF itself, not Datalab's Markdown of it
 response = requests.get(book + "revenue-report-2024-12.pdf", headers=HEADERS, timeout=60)
 response.raise_for_status()
 # The text layer of every page, from the PDF's bytes in memory
 text_layer = []
+# io.BytesIO() lets pdfplumber open the downloaded bytes as if they were a file on disk
 with pdfplumber.open(io.BytesIO(response.content)) as pdf:
     for page in pdf.pages:
+        # extract_text() gives None for a page without text; "or" puts an empty string in its place
         text_layer.append(page.extract_text() or "")
 # Page 10's lines with a dollar sign: everything it prints in dollars
 print([line for line in text_layer[9].splitlines() if "$" in line])
@@ -300,13 +329,20 @@ The page prints the axis and nothing else. Keep `text_layer`: "Retrieval-Augment
 ```{python}
 lite = convert({**data, "mode": "lite"})  # the same fields, with the mode changed
 print(lite["page_count"], "pages,", lite["total_cost"], "cents,", round(lite["runtime"], 1), "seconds")
+# 15 pages, 0.5625 cents, 1.9 seconds
+```
+
+Fifteen pages again, for 0.5625 cents in 1.9 seconds; `balanced` took 4.5 cents and 10.5 seconds. What did the cheaper mode give up? Look at Chart 9, the line chart under Chart 8:
+
+```{python}
+# Split lite's Markdown into pages, with the same pattern as before
 lite_pages = re.split(r"\n*\{\d+\}-{10,}\n*", lite["markdown"])[1:]
 # Chart 9, the line chart under Chart 8, as lite mode read it
-chart_9 = lite_pages[8][lite_pages[8].find("Chart 9"):]
+chart_9 = lite_pages[8][lite_pages[8].find("Chart 9"):]  # from Chart 9's title to the end of the page
+# Its first seven lines, skipping the blank ones
 for line in chart_9.splitlines()[:7]:
     if line.strip():
         print(" ".join(line.split()))
-# 15 pages, 0.5625 cents, 1.9 seconds
 # Chart 9: Historical Trends for YTD Marijuana Revenues3
 # | | | | | |
 # |-------------|-------------|-------------------|---------------|-------------|
@@ -327,6 +363,7 @@ Chapter 9's first check on Exhibit 3 was a sum: each row's twelve months should 
 def table_cells(line):
     """Split one line of a Markdown table into its cells, without bold tags, commas, or spaces."""
     cells = []
+    # Each piece between two "|" characters is one cell; clean it and keep it
     for cell in line.split("|"):
         cells.append(cell.replace("<b>", "").replace("</b>", "").replace(",", "").strip())
     return cells
@@ -336,16 +373,18 @@ def figure_rows(page):
     rows = []
     for line in page.splitlines():
         cells = table_cells(line)
+        # Keep a line with more than 16 cells, as a row with twelve months has, and a year as its third
+        # re.fullmatch() is true only when the whole cell matches: "20", then two digits (\d\d)
         if len(cells) > 16 and re.fullmatch(r"20\d\d", cells[2]):
             rows.append(cells)
     return rows
 
-exhibit = figure_rows(pages[14])
+exhibit = figure_rows(pages[14])  # page 15, Exhibit 3
 print(len(exhibit), "rows of figures")
 # Each category's name starts its first row
 labels = []
 for cells in exhibit:
-    if cells[1]:
+    if cells[1]:  # an empty label cell counts as false, so rows without a name are skipped
         labels.append(cells[1])
 print(labels)
 # 30 rows of figures
@@ -359,10 +398,12 @@ def largest_gap(rows):
     """Return the largest difference, in dollars, between a row's twelve months and its printed total."""
     largest = 0
     for cells in rows:
+        # Cells 3 to 14 hold the twelve months; cell 15 holds the printed total
         months = []
         for cell in cells[3:15]:
-            months.append(int(cell))
-        gap = abs(sum(months) - int(cells[15]))
+            months.append(int(cell))  # each cell is text; int() makes it a whole number
+        gap = abs(sum(months) - int(cells[15]))  # abs(): the size of the gap, whichever is larger
+        # Keep the largest gap seen so far
         if gap > largest:
             largest = gap
     return largest
@@ -376,8 +417,10 @@ Every row adds up within \$2, as Tesseract's rows did in chapter 9. A digit misr
 The 2018 report is older, and its Exhibit 3 is a table of text, not a picture. Its Markdown is in the book's saved copy, so checking it costs nothing:
 
 ```{python}
+# The book's saved Markdown of the 2018 report: no request to Datalab, so no cost
 response = requests.get(saved + "revenue-report-2018.md", headers=HEADERS, timeout=60)
 response.raise_for_status()
+# Split it into pages, and keep the rows of figures on page 15, as for 2024
 pages_2018 = re.split(r"\n*\{\d+\}-{10,}\n*", response.text)[1:]
 rows_2018 = figure_rows(pages_2018[14])
 print(len(pages_2018), "pages;", len(rows_2018), "rows of figures; largest gap:", largest_gap(rows_2018), "dollars")
@@ -406,14 +449,21 @@ The rest of the chapter reads the book's saved copies of the seven reports' Mark
 OpenRouter accepts one kind of request, OpenAI's chat-completions format, and passes it to models from many companies ([quickstart](https://openrouter.ai/docs/quickstart)). Which models are free, and what each accepts, is in its list of models, which needs no key:
 
 ```{python}
+# OpenRouter's list of every model it offers; HEADERS has no key, and this request needs none
 response = requests.get(f"{openrouter_base}/models", headers=HEADERS, timeout=60)
 response.raise_for_status()
-models = response.json()["data"]
+models = response.json()["data"]  # a list of dictionaries, one for each model
+# Keep the models whose ID ends in ":free"
 free = [model for model in models if model["id"].endswith(":free")]
 print(len(models), "models;", len(free), "free")
+# 460 models; 12 free
+```
+
+Of the 460 models listed, 12 are free. Which of those accept a JSON Schema? Each model's entry lists its `supported_parameters`:
+
+```{python}
 # The free models whose list of supported parameters includes structured outputs
 print([model["id"] for model in free if "structured_outputs" in model["supported_parameters"]])
-# 460 models; 12 free
 # ['liquid/lfm-3-1.7b:free', 'recursive/flint-v1.0:free', 'xingchen-agi/xing4.0-29b-a4b:free', 'nvidia/nemotron-3.5-super-vl:free', 'dots-studio/dots-3-note-preview:free']
 ```
 
@@ -422,10 +472,13 @@ The list changes from week to week; this is 2026-11-07's. This chapter uses thre
 Read the summary page of the December 2024 report, the first page whose text holds the table's last row:
 
 ```{python}
+# The book's saved Markdown of the December 2024 report, split into pages as before
 response = requests.get(saved + "revenue-report-2024-12.md", headers=HEADERS, timeout=60)
 response.raise_for_status()
 pages = re.split(r"\n*\{\d+\}-{10,}\n*", response.text)[1:]
+# Every page whose text holds the totals row; [0] takes the first of them
 summary = [page for page in pages if "Total Sales and Use Tax" in page][0]
+# index() gives the page's place in the list, counting from 0, so add 1 for its page number
 print("page", pages.index(summary) + 1, "|", len(summary), "characters")
 # page 2 | 4902 characters
 ```
@@ -433,12 +486,13 @@ print("page", pages.index(summary) + 1, "|", len(summary), "characters")
 Now the shape of the answer. A **JSON Schema** describes JSON the way a form describes what goes in each box: an object with these four properties, each of this type, all of them required, and no others. `month` must be one of twelve strings (`enum`), the years and totals whole numbers (`integer`). Each property's `description` says what belongs in it, in words:
 
 ```{python}
+# The twelve months, so that "month" can only be one of them
 MONTHS = ["January", "February", "March", "April", "May", "June", "July",
           "August", "September", "October", "November", "December"]
 SCHEMA = {
-    "type": "object",
-    "properties": {
-        "month": {"type": "string", "enum": MONTHS,
+    "type": "object",  # the answer is a JSON object: a dictionary, in Python
+    "properties": {  # its fields, each with a type and a description
+        "month": {"type": "string", "enum": MONTHS,  # enum: only these values are allowed
                   "description": "The month the year-to-date figures run through"},
         "year": {"type": "integer",
                  "description": "The report's current year: the later of the two years the table compares"},
@@ -447,9 +501,10 @@ SCHEMA = {
         "total_current": {"type": "integer",
                           "description": "The table's last row, Total Sales and Use Tax, for the report's current year, in dollars"},
     },
-    "required": ["month", "year", "total_prior", "total_current"],
-    "additionalProperties": False,
+    "required": ["month", "year", "total_prior", "total_current"],  # every field must be there
+    "additionalProperties": False,  # and no other; requests sends Python's False as JSON's false
 }
+# The system message; two strings side by side inside parentheses join into one
 INSTRUCTION = ("You extract figures from one page of a City of Boulder revenue report. "
                "Copy numbers exactly as printed, without $ or commas. Use only the page.")
 ```
@@ -462,18 +517,25 @@ The request's body has four parts, and the key goes in `openrouter_headers`:
 - **`models`**: a list, in place of a single `model`. If the first returns an error, including 429, the status a service sends when you pass its rate limit, OpenRouter tries the next ([Model Fallbacks](https://openrouter.ai/docs/guides/routing/model-fallbacks)). The page warns that a paid model in the list is billed at its price: "To keep a request free, list only :free models."
 
 ```{python}
+# Three free models, in order of preference; if one returns an error, OpenRouter tries the next
 MODELS = ["nvidia/nemotron-3.5-super-vl:free", "google/gemma-4-31b-it:free", "dots-studio/dots-3-note-preview:free"]
+# 1. The request's body: which models, how much chance, the conversation, and the answer's shape
 body = {"models": MODELS, "temperature": 0,
+        # The conversation: the instruction as the system message, the page as the user's
         "messages": [{"role": "system", "content": INSTRUCTION}, {"role": "user", "content": summary}],
+        # Ask for JSON that fits SCHEMA; strict asks the model to follow it exactly
         "response_format": {"type": "json_schema",
                             "json_schema": {"name": "totals", "strict": True, "schema": SCHEMA}}}
+# 2. Send it; json= sends the body as JSON, and a free model can take minutes, so allow three
 response = requests.post(f"{openrouter_base}/chat/completions", json=body, headers=openrouter_headers, timeout=180)
 response.raise_for_status()
 result = response.json()
-print(result["model"], "|", result["provider"])
+print(result["model"], "|", result["provider"])  # which model answered, and which company ran it
 # The answer is a string of JSON; json.loads() turns it into a dictionary
+# choices is a list of answers; this request asks for one, so [0] is the only one
 answer = json.loads(result["choices"][0]["message"]["content"])
 print(answer)
+# 3. What the request used: tokens read, tokens written, and the cost
 usage = result["usage"]
 print(usage["prompt_tokens"], "tokens in,", usage["completion_tokens"], "out, of them",
       usage["completion_tokens_details"]["reasoning_tokens"], "reasoning; cost:", usage["cost"])
@@ -498,7 +560,9 @@ TRUTH = {
     "revenue-report-2022-12": (152302653, 169112615), "revenue-report-2023-12": (169112615, 175517129),
     "revenue-report-2024-12": (175517129, 173908431),
 }
+# Unpack this report's pair of figures into two names
 prior, current = TRUTH["revenue-report-2024-12"]
+# Each line: the model's figure, chapter 9's, and whether the two are equal
 print("prior:  ", answer["total_prior"], prior, answer["total_prior"] == prior)
 print("current:", answer["total_current"], current, answer["total_current"] == current)
 print(answer["year"], answer["month"])
@@ -516,6 +580,7 @@ One right answer is a start. Send the same request for each of the seven reports
 ```{python}
 def extract_totals(page):
     """Send one page to a model with SCHEMA and INSTRUCTION; return the answer, as a dictionary, and the model that gave it."""
+    # The same request as above, with this page as the user's message
     body = {"models": MODELS, "temperature": 0,
             "messages": [{"role": "system", "content": INSTRUCTION}, {"role": "user", "content": page}],
             "response_format": {"type": "json_schema",
@@ -523,19 +588,25 @@ def extract_totals(page):
     response = requests.post(f"{openrouter_base}/chat/completions", json=body, headers=openrouter_headers, timeout=180)
     response.raise_for_status()
     result = response.json()
+    # Return two things: the answer, as a dictionary, and the model that gave it
     return json.loads(result["choices"][0]["message"]["content"]), result["model"]
 
-rows = []
+rows = []  # one dictionary for each report
+# items() gives each report's name and its pair of figures; the pair unpacks into prior and current
 for report, (prior, current) in TRUTH.items():
+    # 1. Read the report's saved Markdown and find its summary page, as above
     response = requests.get(saved + report + ".md", headers=HEADERS, timeout=60)
     response.raise_for_status()
     pages = re.split(r"\n*\{\d+\}-{10,}\n*", response.text)[1:]
     summary = [page for page in pages if "Total Sales and Use Tax" in page][0]
+    # 2. Ask the model; the function returns two things, so take two names
     answer, model = extract_totals(summary)
+    # 3. One row: report[15:] drops "revenue-report-", and **answer adds the answer's four fields
     rows.append({"report": report[15:], "model": model, **answer,
                  "prior_ok": answer["total_prior"] == prior, "current_ok": answer["total_current"] == current})
     time.sleep(2)  # a pause between requests; free models allow 20 a minute
-results = pd.DataFrame(rows)
+results = pd.DataFrame(rows)  # one row for each report, one column for each key
+# Every column but model; index=False leaves out the row numbers
 print(results.drop(columns="model").to_string(index=False))
 #  report    month  year  total_prior  total_current  prior_ok  current_ok
 #    2018 December  2018    140648710      139331838     False       False
@@ -555,6 +626,7 @@ So tell it. Add the schema to the instruction, as text, and run the seven report
 
 ```{python}
 # The same instruction, with the schema itself added as text; extract_totals() reads INSTRUCTION each time it runs
+# json.dumps() writes the dictionary as a string of JSON, so it can join the instruction's text
 INSTRUCTION = INSTRUCTION + " Answer with JSON that fits this schema: " + json.dumps(SCHEMA)
 ```
 
@@ -579,12 +651,14 @@ Seven of seven totals, years, and months. The reasoning shrank too: 450 to 720 t
 The single request at the start of this section returned 2024 as the year. The loop, three minutes later, returned 2025 for the same page with the same request. Send it three more times, with the instruction as it was:
 
 ```{python}
+# Put back the instruction without the schema, as it was for the first loop
 INSTRUCTION = ("You extract figures from one page of a City of Boulder revenue report. "
                "Copy numbers exactly as printed, without $ or commas. Use only the page.")
+# The same request, three times
 for attempt in range(3):
     answer, model = extract_totals(summary)  # summary: the last page the loop found, 2024's
     print(model, answer)
-    time.sleep(2)
+    time.sleep(2)  # a pause between requests
 # nvidia/nemotron-3.5-super-vl:free {'month': 'December', 'year': 2025, 'total_prior': 175517129, 'total_current': 173908431}
 # nvidia/nemotron-3.5-super-vl:free {'month': 'December', 'year': 2025, 'total_prior': 175517129, 'total_current': 173908431}
 # nvidia/nemotron-3.5-super-vl:free {'month': 'December', 'year': 2025, 'total_prior': 175517129, 'total_current': 173908431}
@@ -603,9 +677,12 @@ Structured output answered a question you could point at: this page, this row. O
 An embedding model reads a limited amount of text at once. Send it a whole page of Exhibit 3, from the saved 2024 Markdown that the loop above left in `pages`, and it refuses:
 
 ```{python}
+# The embedding model; every vector in this chapter comes from it
 EMBEDDER = "nvidia/nemotron-3-embed-1b:free"
+# Ask for an embedding of the whole of page 15; input is a list of texts, here a list of one
 response = requests.post(f"{openrouter_base}/embeddings", json={"model": EMBEDDER, "input": [pages[14]]},
                          headers=openrouter_headers, timeout=60)
+# No raise_for_status() here: the refusal is what to read, in the answer's "error" field
 print(len(pages[14]), "characters:", response.status_code, response.json()["error"]["message"])
 # 16333 characters: 422 HTTP 422: {"object":"error","message":"input length 7654 exceeds model maximum 4096; set truncate=END or START to truncate long inputs","type":"invalid_request_error"}
 ```
@@ -613,25 +690,33 @@ print(len(pages[14]), "characters:", response.status_code, response.json()["erro
 The page is 7,654 tokens; the model takes at most 4,096. Its entry in OpenRouter's list of embedding models gave a context of 32,768 on 2026-11-07, so the error, not the list, is the limit to trust. Truncating the input at the limit, as the message suggests, would throw away the rest of the page. Instead, cut each page into **chunks** of at most about 2,500 characters, about 600 tokens, breaking only between lines, so that a row of a table stays whole. Give each chunk an ID that says where it came from, the report, the page, and the chunk, such as `2024-12 p.9 #1`:
 
 ```{python}
+# The seven reports, by the names of the book's saved copies
 REPORTS = ["revenue-report-2018", "revenue-report-2019", "revenue-report-2020", "revenue-report-2021-12",
            "revenue-report-2022-12", "revenue-report-2023-12", "revenue-report-2024-12"]
 chunks = []
 for report in REPORTS:
+    # 1. Read the report's saved Markdown and split it into pages
     response = requests.get(saved + report + ".md", headers=HEADERS, timeout=60)
     response.raise_for_status()
     pages = re.split(r"\n*\{\d+\}-{10,}\n*", response.text)[1:]
+    # 2. Cut each page into chunks; enumerate() numbers the pages, and start=1 counts from 1
     for number, page in enumerate(pages, start=1):
-        text = ""
-        part = 1
+        text = ""  # the chunk being built
+        part = 1  # its number within the page
+        # keepends=True keeps each line's newline, so a chunk keeps its line breaks
         for line in page.splitlines(keepends=True):
             # Start a new chunk when this line would take the current one past 2,500 characters
+            # ("and text" never saves an empty chunk, even when one line alone is that long)
             if len(text) + len(line) > 2500 and text:
+                # Save the chunk so far, with an ID such as "2024-12 p.9 #1", and start an empty one
                 chunks.append({"id": f"{report[15:]} p.{number} #{part}", "report": report, "text": text})
                 text = ""
                 part = part + 1
-            text += line
+            text += line  # add the line to the current chunk
+        # Save the page's last chunk, which the loop leaves unsaved
         chunks.append({"id": f"{report[15:]} p.{number} #{part}", "report": report, "text": text})
-chunks = pd.DataFrame(chunks)
+chunks = pd.DataFrame(chunks)  # one row for each chunk: id, report, and text
+# nunique() counts the different values in a column
 print(len(chunks), "chunks from", chunks["report"].nunique(), "reports")
 # 243 chunks from 7 reports
 ```
@@ -643,12 +728,14 @@ Most pages are one chunk; Exhibit 3 and the long tables of Exhibit 1 are several
 [OpenRouter's embeddings endpoint](https://openrouter.ai/docs/api/reference/embeddings) takes a `model` and an `input`, a list of texts, and returns one vector for each. Embed one chunk first, the 2018 summary:
 
 ```{python}
+# Embed the second chunk, [1], the 2018 summary; input is a list of texts, here a list of one
 response = requests.post(f"{openrouter_base}/embeddings", json={"model": EMBEDDER, "input": [chunks["text"][1]]},
                          headers=openrouter_headers, timeout=60)
 response.raise_for_status()
-vector = response.json()["data"][0]["embedding"]
+vector = response.json()["data"][0]["embedding"]  # data holds one item for each text sent
+# How many numbers, and the first four, each rounded to four decimal places
 print(len(vector), "numbers:", [round(x, 4) for x in vector[:4]], "...")
-print(response.json()["usage"]["prompt_tokens"], "tokens")
+print(response.json()["usage"]["prompt_tokens"], "tokens")  # how long the chunk was, in tokens
 # 2048 numbers: [0.0494, 0.041, -0.0287, -0.0178] ...
 # 588 tokens
 ```
@@ -659,18 +746,21 @@ Embed all 243 chunks, 20 to a request, with a pause between requests; on 2026-11
 
 ```{python}
 vectors = []
+# Send the chunks 20 at a time: start is 0, 20, 40, and so on, up to the last chunk
 for start in range(0, len(chunks), 20):
-    batch = chunks["text"][start:start + 20].tolist()
+    batch = chunks["text"][start:start + 20].tolist()  # this batch's texts, as a list
     response = requests.post(f"{openrouter_base}/embeddings", json={"model": EMBEDDER, "input": batch},
                              headers=openrouter_headers, timeout=120)
     response.raise_for_status()
+    # One embedding for each text sent; add each to the list
     for item in response.json()["data"]:
         vectors.append(item["embedding"])
-    time.sleep(1)
-vectors = np.array(vectors)
+    time.sleep(1)  # a pause between requests
+vectors = np.array(vectors)  # a table of numbers: one row for each chunk, one column for each dimension
 # Scale each row to length 1: divide it by its length, np.linalg.norm
+# axis=1 measures each row; keepdims=True keeps the lengths as a column, so each row divides by its own
 vectors = vectors / np.linalg.norm(vectors, axis=1, keepdims=True)
-print(vectors.shape)
+print(vectors.shape)  # (rows, columns)
 # (243, 2048)
 ```
 
@@ -686,10 +776,13 @@ def embed_question(question):
     response = requests.post(f"{openrouter_base}/embeddings", json={"model": EMBEDDER, "input": [question]},
                              headers=openrouter_headers, timeout=60)
     response.raise_for_status()
-    query = np.array(response.json()["data"][0]["embedding"])
-    return query / np.linalg.norm(query)
+    query = np.array(response.json()["data"][0]["embedding"])  # the vector, as a NumPy array
+    return query / np.linalg.norm(query)  # divided by its length, so its length is 1
 
+# Score every chunk at once: @ multiplies each chunk's numbers by the question's, pair by pair, and adds
+# The scores, one for each chunk, go in a new column, score
 chunks["score"] = vectors @ embed_question("How much revenue did the state share back from marijuana taxes?")
+# nlargest(5, "score"): the five rows with the highest scores, highest first
 print(chunks.nlargest(5, "score")[["id", "score"]].round(3).to_string(index=False))
 #             id  score
 #    2019 p.8 #1  0.467
@@ -702,6 +795,7 @@ print(chunks.nlargest(5, "score")[["id", "score"]].round(3).to_string(index=Fals
 The five best chunks are the marijuana page of five different reports, and each of them answers the question for its own year. The search found the topic. It didn't find 2024's answer, because the question didn't name a year, and every year's page is about the same thing: the 2024 page ranked seventh. Ask about a figure, and the search finds something else:
 
 ```{python}
+# The same search, with a question about one figure
 chunks["score"] = vectors @ embed_question("Which revenue came to $529,220 in 2024?")
 print(chunks.nlargest(5, "score")[["id", "score"]].round(3).to_string(index=False))
 #              id  score
@@ -721,12 +815,13 @@ Two fixes follow. Name in the question what the passage would say, such as the y
 **Retrieval-augmented generation**, or RAG, combines the two halves of this chapter: retrieve the passages that best match a question, then ask a model to answer from them [@lewis2020retrieval]. This chapter keeps the generation, what the model writes, to a figure and its citations. The model must return JSON with two fields: `value`, the figure, or **null** when no passage prints it; and `source_ids`, the IDs of the passages it came from. Null is the model's way to say "the passages don't say," and a pipeline that can't say that will fill the gap with something.
 
 ```{python}
+# The answer's shape: a figure or null, and the IDs of the passages that print it
 ANSWER_SCHEMA = {
     "type": "object",
     "properties": {
-        "value": {"type": ["integer", "null"],
+        "value": {"type": ["integer", "null"],  # a list of types: either one is allowed
                   "description": "The figure, in dollars, exactly as printed in a passage; null if no passage prints it"},
-        "source_ids": {"type": "array", "items": {"type": "string"},
+        "source_ids": {"type": "array", "items": {"type": "string"},  # a list of strings
                        "description": "The IDs of the passages that print the figure; empty if value is null"},
     },
     "required": ["value", "source_ids"],
@@ -740,12 +835,17 @@ ANSWER_INSTRUCTION = ("Answer the question using only the passages, each headed 
 
 def answer_with_sources(question, report):
     """Score the chunks against a question, send one report's best three to a model, and return its answer."""
+    # 1. Retrieve: score every chunk against the question, then keep this report's best three
     chunks["score"] = vectors @ embed_question(question)
     top = chunks[chunks["report"] == report].nlargest(3, "score")
-    print(top[["id", "score"]].round(3).to_string(index=False))
+    print(top[["id", "score"]].round(3).to_string(index=False))  # the chunks sent, and their scores
+    # 2. Write the three chunks as one text
     # Each passage headed by its ID, with a blank line between passages
+    # itertuples() gives each row with its columns as names: row.id, row.text
     passages = "\n\n".join(f"{row.id}: {row.text}" for row in top.itertuples())
+    # 3. Ask a model, as in "Seven Reports," with the new instruction and schema
     body = {"models": MODELS, "temperature": 0,
+            # The user message: the question, a blank line (\n\n), and the passages
             "messages": [{"role": "system", "content": ANSWER_INSTRUCTION},
                          {"role": "user", "content": f"Question: {question}\n\n{passages}"}],
             "response_format": {"type": "json_schema",
@@ -753,9 +853,10 @@ def answer_with_sources(question, report):
     response = requests.post(f"{openrouter_base}/chat/completions", json=body, headers=openrouter_headers, timeout=180)
     response.raise_for_status()
     result = response.json()
-    print(result["model"])
-    return json.loads(result["choices"][0]["message"]["content"])
+    print(result["model"])  # which model answered
+    return json.loads(result["choices"][0]["message"]["content"])  # the answer, as a dictionary
 
+# The marijuana question again, asked only of the 2024 report
 print(answer_with_sources("How much revenue did the state share back from marijuana taxes?", "revenue-report-2024-12"))
 #              id  score
 #  2024-12 p.9 #1  0.452
@@ -771,7 +872,9 @@ Filtered to the 2024 report, the marijuana page ranks first, and the model retur
 def printed_on(value):
     """Return the pages of the PDF's text layer that print a figure, written with commas."""
     found = []
+    # Each page's text, with its page number, counting from 1
     for number, text in enumerate(text_layer, start=1):
+        # The format {value:,} writes the number with commas, as the report prints it: 529220 as "529,220"
         if f"{value:,}" in text:
             found.append(number)
     return found
@@ -783,15 +886,22 @@ print("529,220 is printed on pages", printed_on(529220))
 Page 9, the page `2024-12 p.9 #1` came from. Now a question whose answer the report doesn't print: the sugar-sweetened beverage tax for December 2024, which page 10 shows only as a bar.
 
 ```{python}
+# The beverage tax for December 2024, which page 10 shows only as a bar
 print(answer_with_sources("How much sugar-sweetened beverage tax did the city collect in December 2024?",
                           "revenue-report-2024-12"))
-print("285,000 is printed on pages", printed_on(285000))
 #              id  score
 #  2024-12 p.2 #1  0.469
 # 2024-12 p.10 #1  0.467
 #  2024-12 p.1 #1  0.456
 # nvidia/nemotron-3.5-super-vl:free
 # {'value': 285000, 'source_ids': ['2024-12 p.10 #1']}
+```
+
+A figure, and a source for it. Is the figure printed in the report? Ask the text layer, as for \$529,220:
+
+```{python}
+# Is the model's figure printed anywhere in the PDF's text layer?
+print("285,000 is printed on pages", printed_on(285000))
 # 285,000 is printed on pages []
 ```
 
@@ -808,39 +918,57 @@ Everything so far has your code in charge: it chooses the page, sends it, and ch
 **MCP**, the [Model Context Protocol](https://modelcontextprotocol.io/), is a common way for a server to offer tools to any program that uses models. Its messages follow [JSON-RPC](https://www.jsonrpc.org/specification), a standard for asking another program, in JSON, to run one of its functions: a *remote procedure call*. Each request is a JSON object with a `method`, the function's name; `params`, its arguments; and an `id` that its answer repeats. Over HTTP, a *client*, the program on your side, sends each message as a `POST`. It accepts the answer either as plain JSON or as a short stream of server-sent events, a text format explained below. [DeepWiki](https://deepwiki.com/), which writes documentation for public GitHub repositories, runs a public MCP server that needs no key. Introduce yourself with `initialize`:
 
 ```{python}
+# DeepWiki's MCP server: one address, and every message is a POST to it
 mcp = "https://mcp.deepwiki.com/mcp"
+# Accept either kind of answer: plain JSON, or a stream of server-sent events
 mcp_headers = {**HEADERS, "Accept": "application/json, text/event-stream"}
+# A JSON-RPC request: the version of JSON-RPC, an id the answer repeats, the method, and its params
 hello = {"jsonrpc": "2.0", "id": 1, "method": "initialize",
+         # The protocol version this client speaks, the extra features it offers (none), and its name
          "params": {"protocolVersion": "2025-06-18", "capabilities": {},
                     "clientInfo": {"name": "info4617", "version": "1.0"}}}
 response = requests.post(mcp, json=hello, headers=mcp_headers, timeout=30)
 response.raise_for_status()
-print(response.headers["Content-Type"])
+print(response.headers["Content-Type"])  # which of the two kinds the server sent
+# text/event-stream
+```
 
+The server chose the second of the two kinds that `mcp_headers` said you accept. Read the JSON out of its answer:
+
+```{python}
 def sse_json(text):
     """Return the JSON on the "data: " line of a server-sent event."""
     for line in text.splitlines():
         if line.startswith("data: "):
+            # Drop the six characters "data: " and read the rest of the line as JSON
             return json.loads(line[len("data: "):])
 
 reply = sse_json(response.text)
+# The protocol version the server agreed to, and the server's name and version
 print(reply["result"]["protocolVersion"], reply["result"]["serverInfo"])
-# text/event-stream
 # 2025-06-18 {'name': 'DeepWiki', 'version': '4.0.2'}
 ```
 
 The server answered as a *server-sent event*: lines of text, one of which starts with `data: ` and holds the JSON. Now ask what tools it has, with `tools/list`:
 
 ```{python}
+# A second request, with the next id; tools/list takes no params
 response = requests.post(mcp, json={"jsonrpc": "2.0", "id": 2, "method": "tools/list"}, headers=mcp_headers, timeout=30)
 response.raise_for_status()
-tools = sse_json(response.text)["result"]["tools"]
+tools = sse_json(response.text)["result"]["tools"]  # a list, one dictionary for each tool
+# Each tool's name, and the arguments it requires
 for tool in tools:
     print(tool["name"], tool["inputSchema"]["required"])
-print(json.dumps(tools[-1]["inputSchema"]))
 # ask_wiki_question ['repoName', 'question']
 # read_wiki_contents ['repoName']
 # read_wiki_structure ['repoName']
+```
+
+Three tools, each with the arguments it requires. Print the whole `inputSchema` of the last one, `read_wiki_structure`:
+
+```{python}
+# The last tool's whole input schema, written as JSON
+print(json.dumps(tools[-1]["inputSchema"]))
 # {"properties": {"repoName": {"description": "GitHub repository in owner/repo format (e.g. \"facebook/react\").", "type": "string"}}, "required": ["repoName"], "type": "object", "additionalProperties": false}
 ```
 
@@ -851,10 +979,12 @@ The protocol version your request names decides what a request this plain can do
 **Skills** are plainer still. A skill is a folder of instructions, in Markdown, that a program may give a model when a task calls for it. Its file, `SKILL.md`, starts with *front matter* between two lines of `---`: a `name`, and a `description` that says when to use it. Read the first lines of a public one, for PDFs, from Anthropic's [skills repository](https://github.com/anthropics/skills):
 
 ```{python}
+# The raw text of the PDF skill's SKILL.md file, from GitHub
 response = requests.get("https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md",
                         headers=HEADERS, timeout=30)
 response.raise_for_status()
 skill = response.text
+# The first five lines, each cut to 100 characters
 for line in skill.splitlines()[:5]:
     print(line[:100])
 # ---
