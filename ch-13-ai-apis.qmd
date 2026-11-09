@@ -70,12 +70,33 @@ Nothing on either page is a key. The next section gets them.
 
 ## Two Keys
 
-This chapter needs two keys, both free. Get them before you start, and store each as an environment variable by one of the ways in @sec-government ("Setting Environment Variables"), with the names this book uses:
+Everything this chapter sends goes to one of two companies, and each wants to know who is asking before it does any work. The Census Bureau in @sec-government asked for the same thing, for a different reason: it wanted to count your requests. These two services also bill for work, and a key is how they know whose free allowance to charge. So the first job is an account and a key at each, about ten minutes in all. Get both before you start: a key that turns out to be missing halfway through a section stops the code at its first request.
 
-- **`DATALAB_KEY`.** Sign up at [datalab.to/auth/sign_up](https://www.datalab.to/auth/sign_up), then create a key on the [API Keys](https://www.datalab.to/app/keys) page. New accounts get a free monthly allowance, with no credit card ([quickstart](https://documentation.datalab.to/docs/welcome/quickstart), checked 2026-11-07). Datalab's own documentation and its Python library call the variable `DATALAB_API_KEY`. This book names it `DATALAB_KEY`, as it named `CENSUS_KEY` and `YOUTUBE_KEY`; if you use Datalab's library, set both.
-- **`OPENROUTER_KEY`.** Sign up at [openrouter.ai](https://openrouter.ai), then create a key on the [Keys](https://openrouter.ai/settings/keys) page. Requests to `:free` models cost nothing, and this chapter sends no other kind.
+### A Datalab Key
 
-Treat each key like a password: never paste it into a notebook cell, a code file, or a message. If one leaks, delete it on its service's keys page and make another. Set the variables, quit Jupyter, open a new terminal, and start Jupyter from it. A Jupyter that was running before you set a variable never receives it (@sec-government, "When a Key Says `MISSING`"). Then check both:
+1. **Open the sign-in page.** Go to [datalab.to/app/keys](https://www.datalab.to/app/keys). Without an account, Datalab sends you to its sign-in page (@fig-datalab-signin). Choose **Sign up** ①, or sign up in one step with a Google account ②. A personal account is fine: the free allowance comes with any account, and needs no credit card ([quickstart](https://documentation.datalab.to/docs/welcome/quickstart), checked 2026-11-07).
+
+![Datalab's sign-in page, November 2026, where its API Keys address sends a visitor who isn't signed in: the link to sign up ①, and signing in with Google instead ②.](images/ch-13/datalab-signin_annotated.png){#fig-datalab-signin .lightbox fig-alt="Screenshot of Datalab's sign-in page, headed Sign in to your Datalab account, under the Datalab logo. It has an Email field reading Your email address, a black Continue with email button, the word OR, and a Continue with Google button, marked 2. Below them is the line Don't have an account? Sign up, with Sign up marked 1."}
+
+2. **Create a key.** Once you are signed in, the same address opens the **API Keys** page. Create a new key there, and name it something you'll recognize later, such as `info4617`.
+3. **Copy it once, and store it.** Copy the key as soon as it appears, and store it as `DATALAB_KEY` (below). Datalab's own documentation and its Python library call the variable `DATALAB_API_KEY`. This book calls it `DATALAB_KEY`, as it called the others `CENSUS_KEY` and `YOUTUBE_KEY`; if you later use Datalab's library, set both.
+
+<!-- Hand captures to come (tools/shots/recipes/ch-13.yml): datalab-keys after step 2, datalab-key-created after step 3. -->
+
+### An OpenRouter Key
+
+1. **Sign up.** Go to [openrouter.ai](https://openrouter.ai) and choose **Sign Up** ① (@fig-openrouter-home). **Get API Key** ② leads to the same sign-up if you aren't signed in yet.
+
+![OpenRouter's home page, November 2026: Sign Up ①, and Get API Key ②, which sends a visitor who isn't signed in to the same sign-up.](images/ch-13/openrouter-home_annotated.png){#fig-openrouter-home .lightbox fig-alt="Screenshot of the top of OpenRouter's home page. The header has the openrouter logo, a search icon, and a purple Sign Up button, marked 1. Below it the headline reads The Unified Interface For Every Model, with the line Better prices, better uptime, no subscriptions. Under that are two buttons, a purple Get API Key, marked 2, and Discover Models."}
+
+2. **Create a key.** Once you're signed in, open [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys), create a key, and name it `info4617`. If the form offers a credit limit, you can set it to 0: requests to `:free` models cost nothing, and this chapter sends no other kind.
+3. **Copy it once, and store it** as `OPENROUTER_KEY`. OpenRouter shows a new key's full value only when it is created; if you lose it, make another.
+
+<!-- Hand captures to come: openrouter-keys after step 2, openrouter-create-key and openrouter-key-created after step 3. -->
+
+### Storing Both Keys
+
+Store each key as an environment variable, by one of the ways in @sec-government ("Setting Environment Variables"). Treat each key like a password: never paste it into a notebook cell, a code file, or a message. If one leaks, delete it on its service's keys page and make another. Set the variables, quit Jupyter, open a new terminal, and start Jupyter from it. A Jupyter that was running before you set a variable never receives it (@sec-government, "When a Key Says `MISSING`"). Then check both:
 
 ```{python}
 import os

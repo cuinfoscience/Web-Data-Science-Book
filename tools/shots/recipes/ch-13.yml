@@ -1,0 +1,155 @@
+# Recipes for Chapter 13's figures (ch-13-ai-apis.qmd). See tools/shots/README.md.
+#
+# "Two Keys" walks through getting a Datalab key and an OpenRouter key. The first page
+# of each service loads signed out, so the toolkit captures it. Every page after that
+# needs a signed-in account, so a person takes it by hand (mode: hand): the instructor,
+# with a personal account, following each recipe's `hand.steps`. No hand screenshot may
+# show a key: each key's value is blacked out with a `redact:` box, and so is the
+# account's name, email and avatar.
+chapter: ch-13
+qmd: ch-13-ai-apis.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: datalab-signin
+    kind: capture
+    section: "Two Keys"
+    brief: >-
+      Show where a Datalab account starts: the sign-in page that Datalab's API Keys
+      address sends a signed-out visitor to, with the link to sign up (marker 1) and
+      the button to sign in with a Google account instead (2).
+    url: https://www.datalab.to/app/keys
+    steps:
+      - wait: {text: 'Sign in to your Datalab account'}
+    expect:
+      text: ['Sign in to your Datalab account', 'Sign up']
+    crop: {top: 20, height: 470}
+    annotate:
+      marks:
+        - {n: 1, at: {text: '^\s*Sign up\s*$'}, side: right}
+        - {n: 2, at: {text: 'Continue with Google'}, side: right}
+    drifts: true        # the sign-in service's look
+
+  - id: openrouter-home
+    kind: capture
+    section: "Two Keys"
+    brief: >-
+      Show where an OpenRouter account starts: the home page's Sign Up button
+      (marker 1), and Get API Key (2), which leads to the same sign-up for a visitor
+      who isn't signed in.
+    url: https://openrouter.ai/
+    steps:
+      - wait: {text: 'Get API Key'}
+    expect:
+      text: ['Get API Key', 'Sign Up']
+    crop: {top: 0, height: 400}
+    annotate:
+      marks:
+        - {n: 1, at: {text: '^Sign Up$', nth: 1}, side: below, gap: 10}
+        - {n: 2, at: {text: '^Get API Key$'}, side: right, gap: 8}
+    drifts: true        # the counts on the page and the site's look
+
+  # Hand captures: signed-in pages. Take them with a personal account in a window whose page is
+  # 800 CSS pixels wide (DevTools' device toolbar at 800 x 600 is easiest), at 100% zoom, and
+  # save each as a PNG of the page alone. Read window.devicePixelRatio in DevTools' console:
+  # that number is `scale` (2 on most Macs). Before import, set `crop` and `redact` from the
+  # screenshot (README, "Hand captures"): a redact box must cover every key value, and the
+  # account's name, email, avatar and organization name, wherever they show.
+  - id: datalab-keys
+    kind: capture
+    mode: hand
+    section: "Two Keys"
+    brief: >-
+      Show Datalab's API Keys page right after signing up: where the page is (its
+      heading or the menu item, marker 1) and the button that makes a key (2).
+    url: https://www.datalab.to/app/keys
+    hand:
+      why: Datalab's dashboard needs a signed-in account, and the toolkit never signs in
+      steps: >-
+        Sign up or sign in with a personal account and open the URL. If the page lists
+        keys already, that's fine: their values must be covered by redact boxes. Take a
+        screenshot of the page from the top of its heading to just below the create
+        button, with the left menu if it shows "API Keys". Note devicePixelRatio.
+      text_px: 14
+    window: [800, 600]
+    drifts: true
+
+  - id: datalab-key-created
+    kind: capture
+    mode: hand
+    section: "Two Keys"
+    brief: >-
+      Show the moment a Datalab key exists: the new key on screen with its copy
+      button (1), and any warning that it won't be shown again (2). The key's value
+      is blacked out.
+    url: https://www.datalab.to/app/keys
+    hand:
+      why: Datalab's dashboard needs a signed-in account, and the toolkit never signs in
+      steps: >-
+        On the API Keys page, create a key named info4617 (or the dialog's default). When
+        the key appears, take a screenshot of the dialog or row that shows it, with its copy
+        button. Then delete that key in Datalab, since it will appear in a public book, even
+        blacked out; make a fresh one for yourself. Note where the key's characters sit, so
+        a redact box can cover them.
+      text_px: 14
+    window: [800, 600]
+    drifts: true
+
+  - id: openrouter-keys
+    kind: capture
+    mode: hand
+    section: "Two Keys"
+    brief: >-
+      Show OpenRouter's Keys page after signing up: the page (its heading or the
+      settings menu's "API Keys", marker 1) and the Create button (2).
+    url: https://openrouter.ai/settings/keys
+    hand:
+      why: OpenRouter's settings need a signed-in account, and the toolkit never signs in
+      steps: >-
+        Sign up or sign in with a personal account and open the URL. Take a screenshot from
+        the page's heading down to the Create (API) Key button, with the settings menu on
+        the left if it shows. Existing keys' names and partial values must be covered by
+        redact boxes.
+      text_px: 14
+    window: [800, 600]
+    drifts: true
+
+  - id: openrouter-create-key
+    kind: capture
+    mode: hand
+    section: "Two Keys"
+    brief: >-
+      Show the Create API Key dialog filled in as the chapter asks: a name (1), the
+      credit limit left as it is or set to 0, since the chapter uses only free models
+      (2), and Create (3).
+    url: https://openrouter.ai/settings/keys
+    hand:
+      why: OpenRouter's settings need a signed-in account, and the toolkit never signs in
+      steps: >-
+        Click Create (API) Key. Type the name info4617; leave the other fields at their
+        defaults, except a credit limit, which you may set to 0. Before clicking Create,
+        take a screenshot of the whole dialog. Write down each field's label as shown, so
+        the chapter's text matches it.
+      text_px: 14
+    window: [800, 600]
+    drifts: true
+
+  - id: openrouter-key-created
+    kind: capture
+    mode: hand
+    section: "Two Keys"
+    brief: >-
+      Show the moment an OpenRouter key exists: the key with its copy button (1), and
+      the warning that it is shown only once (2). The key's value is blacked out.
+    url: https://openrouter.ai/settings/keys
+    hand:
+      why: OpenRouter's settings need a signed-in account, and the toolkit never signs in
+      steps: >-
+        Click Create in the dialog above. When the key appears, take a screenshot of the
+        dialog that shows it, its copy button and any "won't be shown again" warning. Then
+        delete that key on the Keys page, and make a fresh one for yourself.
+      text_px: 14
+    window: [800, 600]
+    drifts: true
