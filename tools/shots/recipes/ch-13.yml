@@ -1,0 +1,172 @@
+# Recipes for Chapter 13's figures (ch-13-ai-apis.qmd). See tools/shots/README.md.
+#
+# "Two Keys" walks through getting a Datalab key and an OpenRouter key. The first page
+# of each service loads signed out, so the toolkit captures it. Every page after that
+# needs a signed-in account, so a person takes it by hand (mode: hand): the instructor,
+# with a personal account, following each recipe's `hand.steps`. No hand screenshot may
+# show a key: each key's value is blacked out with a `redact:` box, and so is the
+# account's name, email and avatar.
+chapter: ch-13
+qmd: ch-13-ai-apis.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: datalab-signin
+    kind: capture
+    section: "Two Keys"
+    brief: >-
+      Show where a Datalab account starts: the sign-in page that Datalab's API Keys
+      address sends a signed-out visitor to, with the link to sign up (marker 1) and
+      the button to sign in with a Google account instead (2).
+    url: https://www.datalab.to/app/keys
+    steps:
+      - wait: {text: 'Sign in to your Datalab account'}
+    expect:
+      text: ['Sign in to your Datalab account', 'Sign up']
+    crop: {top: 20, height: 470}
+    annotate:
+      marks:
+        - {n: 1, at: {text: '^\s*Sign up\s*$'}, side: right}
+        - {n: 2, at: {text: 'Continue with Google'}, side: right}
+    drifts: true        # the sign-in service's look
+
+  - id: openrouter-home
+    kind: capture
+    section: "Two Keys"
+    brief: >-
+      Show where an OpenRouter account starts: the home page's Sign Up button
+      (marker 1), and Get API Key (2), which leads to the same sign-up for a visitor
+      who isn't signed in.
+    url: https://openrouter.ai/
+    steps:
+      - wait: {text: 'Get API Key'}
+    expect:
+      text: ['Get API Key', 'Sign Up']
+    crop: {top: 0, height: 400}
+    annotate:
+      marks:
+        - {n: 1, at: {text: '^Sign Up$', nth: 1}, side: below, gap: 10}
+        - {n: 2, at: {text: '^Get API Key$'}, side: right, gap: 8}
+    drifts: true        # the counts on the page and the site's look
+
+  - id: lead-similarity
+    kind: render
+    mode: hand
+    section: "Similarity Over Time"
+    brief: >-
+      Chart, for each of five Wikipedia articles (Barack Obama, Hillary Clinton,
+      Donald Trump, Joe Biden, Kamala Harris), the cosine similarity between its
+      lead section on January 1 of each year, 2004-2026, and its current lead, from
+      nvidia/nemotron-3-embed-1b:free, as the chapter's code draws it: one line per
+      article.
+    url: https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-13/wikipedia/leads.csv
+    api_client: true
+    hand:
+      why: >-
+        matplotlib draws it from the book's saved Wikipedia leads and OpenRouter's
+        embeddings, as the chapter's code does; no browser is involved
+      steps: >-
+        Run `python tools/shots/renders/ch-13.py OUTDIR --contact EMAIL` with
+        OPENROUTER_KEY set (add --data-url with a branch's raw address before the
+        data is on main); it writes OUTDIR/lead-similarity.png, 1600 by 900
+        pixels. Import it with --tool naming matplotlib's and requests' versions.
+      text_px: 13
+    window: [800, 450]
+
+  # Hand captures: signed-in pages. Take them with a personal account in a window whose page is
+  # 800 CSS pixels wide (DevTools' device toolbar at 800 x 600 is easiest), at 100% zoom, and
+  # save each as a PNG of the page alone. Read window.devicePixelRatio in DevTools' console:
+  # that number is `scale` (2 on most Macs). Before import, set `crop` and `redact` from the
+  # screenshot (README, "Hand captures"): a redact box must cover every key value, and the
+  # account's name, email, avatar and organization name, wherever they show.
+  - id: datalab-keys
+    kind: capture
+    mode: hand
+    section: "Two Keys"
+    brief: >-
+      Show Datalab's API Keys page right after signing up: where the page is (its
+      heading or the menu item, marker 1) and the button that makes a key (2).
+    url: https://www.datalab.to/app/keys
+    hand:
+      why: Datalab's dashboard needs a signed-in account, and the toolkit never signs in
+      steps: >-
+        Sign up or sign in with a personal account and open the URL. If the page lists
+        keys already, that's fine: their values must be covered by redact boxes. Take a
+        screenshot of the page from the top of its heading to just below the create
+        button, with the left menu if it shows "API Keys". Note devicePixelRatio.
+      text_px: 15
+    window: [1123, 415]
+    scale: 1
+    # The left menu is cut off so the page's text is large enough in the book's column
+    crop: {top: 0, left: 240, width: 883, height: 415}
+    oversize: "the button that makes a key sits at the page's right edge, 883 pixels from the cut"
+    redact:
+      - {box: [276, 353, 128, 31], why: the first and last characters of the instructor's key}
+    annotate:
+      marks:
+        - {n: 1, at: {xy: [22, 18, 64, 24]}, side: right}
+        - {n: 2, at: {xy: [767, 12, 104, 34]}, side: below}
+    drifts: true
+
+  - id: openrouter-keys
+    kind: capture
+    mode: hand
+    section: "Two Keys"
+    brief: >-
+      Show OpenRouter's Keys page after signing up: the page (its heading or the
+      settings menu's "API Keys", marker 1) and the Create button (2).
+    url: https://openrouter.ai/settings/keys
+    hand:
+      why: OpenRouter's settings need a signed-in account, and the toolkit never signs in
+      steps: >-
+        Sign up or sign in with a personal account and open the URL. Take a screenshot from
+        the page's heading down to the Create (API) Key button, with the settings menu on
+        the left if it shows. Existing keys' names and partial values must be covered by
+        redact boxes.
+      text_px: 15
+    window: [1101, 367]
+    scale: 1
+    # Cut below the header, which shows the account's avatar and name, and above the row of the
+    # instructor's other key; the settings menu is cut off so the text is large enough in the book
+    crop: {top: 60, left: 220, width: 881, height: 262}
+    oversize: "the New key button sits at the page's right edge, 881 pixels from the cut"
+    redact:
+      - {box: [20, 12, 110, 32], why: the account's avatar and name (outside the crop as well)}
+      - {box: [364, 280, 46, 22], why: the short ID of the instructor's key}
+    annotate:
+      marks:
+        - {n: 1, at: {xy: [23, 18, 86, 26]}, side: right}
+        - {n: 2, at: {xy: [768, 13, 103, 33]}, side: below}
+        - {n: 3, at: {xy: [78, 220, 60, 22]}, side: right, gap: 40}
+    drifts: true
+
+  - id: openrouter-create-key
+    kind: capture
+    mode: hand
+    section: "Two Keys"
+    brief: >-
+      Show the Create API Key dialog filled in as the chapter asks: a name (1), the
+      credit limit left as it is or set to 0, since the chapter uses only free models
+      (2), and Create (3).
+    url: https://openrouter.ai/settings/keys
+    hand:
+      why: OpenRouter's settings need a signed-in account, and the toolkit never signs in
+      steps: >-
+        Click Create (API) Key. Type the name info4617; leave the other fields at their
+        defaults, except a credit limit, which you may set to 0. Before clicking Create,
+        take a screenshot of the whole dialog. Write down each field's label as shown, so
+        the chapter's text matches it.
+      text_px: 15
+    window: [518, 765]
+    scale: 1
+    oversize: "the form is one dialog, 765 pixels tall: its name, expiration and credit limit are set together before Create"
+    annotate:
+      width_in: 5.4   # the dialog's own width (518 pixels at 96 per inch), so its markers keep their size
+      marks:
+        - {n: 1, at: {xy: [25, 50, 48, 20]}, side: right, gap: 34}
+        - {n: 2, at: {xy: [25, 151, 95, 20]}, side: right, gap: 26}
+        - {n: 3, at: {xy: [42, 334, 100, 20]}, side: right, gap: 26}
+        - {n: 4, at: {xy: [423, 696, 64, 40]}, side: left}
+    drifts: true

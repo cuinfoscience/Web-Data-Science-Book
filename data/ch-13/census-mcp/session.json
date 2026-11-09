@@ -1,0 +1,294 @@
+[
+ {
+  "sent": {
+   "jsonrpc": "2.0",
+   "id": 1,
+   "method": "initialize",
+   "params": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": {},
+    "clientInfo": {
+     "name": "info4617",
+     "version": "1.0"
+    }
+   }
+  }
+ },
+ {
+  "received": {
+   "result": {
+    "protocolVersion": "2025-03-26",
+    "capabilities": {
+     "tools": {},
+     "prompts": {}
+    },
+    "serverInfo": {
+     "name": "census-api",
+     "version": "0.1.0"
+    }
+   },
+   "jsonrpc": "2.0",
+   "id": 1
+  }
+ },
+ {
+  "sent": {
+   "jsonrpc": "2.0",
+   "method": "notifications/initialized"
+  }
+ },
+ {
+  "sent": {
+   "jsonrpc": "2.0",
+   "id": 2,
+   "method": "tools/list"
+  }
+ },
+ {
+  "received": {
+   "result": {
+    "tools": [
+     {
+      "name": "fetch-aggregate-data",
+      "description": "\n  Fetches statistical data from U.S. Census Bureau datasets including population, demographics, income, housing, employment, and economic indicators. Use this tool when users request Census statistics, demographic breakdowns, or socioeconomic data for specific geographic areas. Requires a dataset identifier, year/vintage, geographic scope (state, county, tract, etc.), and specific variables or table groups. Returns structured data with proper citations for authoritative government statistics.\n",
+      "inputSchema": {
+       "type": "object",
+       "properties": {
+        "dataset": {
+         "type": "string",
+         "description": "The dataset identifier.",
+         "examples": [
+          "acs/acs1"
+         ]
+        },
+        "descriptive": {
+         "type": "boolean",
+         "description": "Add variable labels to the second row of the API results.",
+         "examples": [
+          "true",
+          "false"
+         ]
+        },
+        "predicates": {
+         "type": "object",
+         "additionalProperties": {
+          "type": "string"
+         },
+         "description": "Used to filter table results with parameters outside of year and geography constraints.",
+         "examples": [
+          {
+           "NAICS2017": "31-33",
+           "EPSZES": "251"
+          }
+         ]
+        },
+        "year": {
+         "type": "number",
+         "description": "The year or vintage of the data.",
+         "examples": [
+          1987
+         ]
+        },
+        "get": {
+         "type": "object",
+         "description": "The group and variables that should be fetched.",
+         "properties": {
+          "variables": {
+           "type": "array",
+           "items": {
+            "type": "string"
+           },
+           "description": "The variables (or rows) that should be fetched from a given dataset. A max of 50 variables can be passed.",
+           "examples": [
+            [
+             "B24022_060E",
+             "B19001B_014E",
+             "C02014_002E"
+            ]
+           ]
+          },
+          "group": {
+           "type": "string",
+           "description": "The table ID to fetch. Use search-data-tables to find the correct ID. Overrides variables.",
+           "examples": [
+            "S0101",
+            "B24022"
+           ]
+          }
+         }
+        },
+        "for": {
+         "type": "string",
+         "description": "Geography restriction as comma-separated values. Required if 'ucgid' not defined.",
+         "examples": [
+          "us:*",
+          "state:*",
+          "state:01,02,06",
+          "county:001",
+          "county:*",
+          "tract:*",
+          "place:12345"
+         ]
+        },
+        "in": {
+         "type": "string",
+         "description": "Parent geography restriction as comma-separated values, with different summary levels separated by +.",
+         "examples": [
+          "state:01",
+          "state:01,02",
+          "county:075",
+          "state:01+county:001"
+         ]
+        },
+        "ucgid": {
+         "type": "string",
+         "description": "Alternative geography specification using Uniform Census Geography Identifier (UCGID). Required if 'for' not defined.",
+         "examples": [
+          "0100000US",
+          "0400000US06",
+          "0400000US41"
+         ]
+        }
+       },
+       "required": [
+        "dataset",
+        "year",
+        "get"
+       ]
+      }
+     },
+     {
+      "name": "fetch-dataset-geography",
+      "description": "\n  Returns available geographic levels and filtering options for a specific Census dataset. Use this tool BEFORE fetch-aggregate-data when you need to discover what geographic breakdowns are available (state, county, tract, place, etc.) for a dataset, or when users ask about geographic coverage. Required when constructing geography queries for unfamiliar datasets. Provides query syntax, codes, and hierarchy information for each geographic level.\n",
+      "inputSchema": {
+       "type": "object",
+       "properties": {
+        "dataset": {
+         "type": "string",
+         "description": "The dataset identifier (e.g., 'acs/acs1')"
+        },
+        "year": {
+         "type": "number",
+         "description": "The year of the data"
+        }
+       },
+       "required": [
+        "dataset"
+       ]
+      }
+     },
+     {
+      "name": "list-datasets",
+      "description": "\n  Returns complete catalog of available U.S. Census Bureau datasets with titles, identifiers, and available years. Use this tool FIRST when users request Census data but don't specify which dataset, or when you're unsure which dataset contains the requested statistics. Essential for mapping user requests about demographics, economics, housing, business, or government data to the correct Census dataset. After receiving results, analyze the catalog to identify the best dataset match based on topic relevance and temporal scope, then explain your reasoning to the user.\n",
+      "inputSchema": {
+       "type": "object",
+       "properties": {},
+       "required": []
+      }
+     },
+     {
+      "name": "resolve-geography-fips",
+      "description": "\n  Converts geographic place names into Census FIPS codes and query parameters. Use this tool when users reference locations by name (e.g., \"Philadelphia\", \"Cook County\", \"New York State\") rather than codes. Accepts natural language geography names and optional summary level filters (State, County, Place, County Subdivision). Returns FIPS codes, query syntax for fetch-aggregate-data tool, available vintages, and geographic hierarchy. Essential for translating human-readable location references into Census API parameters.\n",
+      "inputSchema": {
+       "type": "object",
+       "properties": {
+        "geography_name": {
+         "type": "string",
+         "description": "The name of the geography to resolve.",
+         "examples": [
+          "Philadelphia city, Pennsylvania",
+          "Philadelphia County, Pennsylvania",
+          "Philadelphia, Pennsylvania",
+          "Philadelphia"
+         ]
+        },
+        "summary_level": {
+         "type": "string",
+         "description": "Filters the geography resolution by the name or summary level code of a matching summary level.",
+         "examples": [
+          "Place",
+          "160",
+          "County Subdivision",
+          "County",
+          "State",
+          "040",
+          "Division",
+          "Region"
+         ]
+        }
+       },
+       "required": [
+        "geography_name"
+       ]
+      }
+     },
+     {
+      "name": "search-data-tables",
+      "description": "\n  Search for Census Bureau data tables by ID, label, or data API endpoint (e.g. acs/acs1). Use this tool when users reference a topic or variable category (e.g., \"language spoken at home\", \"income by race\") and need to identify the correct table ID before calling fetch-aggregate-data to retrieve the actual data. Accepts a table ID prefix (e.g., \"B16005\"), a natural language label query, and an optional API endpoint scope. Returns a ranked list of matching table metadata with their canonical labels, component, and available years.\n\n  Coverage: 32,000+ indexed tables, concentrated in ACS (~83%), CPS (~14%), and SIPP (~3%). Decennial Census, Population Estimates, and Decennial Census of Island Areas have limited coverage. Economic Census, Economic Surveys, Geography, Census Planning Database, and several other programs have no indexed tables \u2014 use variables with fetch-aggregate-data for those programs.\n\n  For best results, provide api_endpoint whenever the target survey or dataset is known. Scoping to a specific endpoint significantly improves ranking quality by eliminating cross-survey noise.\n\n  Each result object includes:\n  - data_table_id: maps to the get.group parameter in fetch-aggregate-data\n  - label: canonical label for the data table\n  - component: the program and component this table belongs to (e.g., \"American Community Survey - ACS 1-Year Estimates\")\n  - datasets: an object mapping years to arrays of API endpoints in which this table is available\n",
+      "inputSchema": {
+       "type": "object",
+       "properties": {
+        "data_table_id": {
+         "type": "string",
+         "description": "Census table ID or prefix to search by (e.g., \"B16005\" matches B16005, B16005A, B16005D, etc.). Supports exact match or prefix match."
+        },
+        "label_query": {
+         "type": "string",
+         "description": "Natural language search phrase for the table label (e.g., \"language spoken at home\", \"income by age\"). Uses fuzzy similarity matching against Census label vocabulary \u2014 results are sensitive to phrasing. Prefer Census terminology over plain language when possible (e.g., \"poverty\" over \"low income\", \"tenure\" over \"renting vs owning\"). Imprecise or paraphrased queries may return poor or irrelevant matches."
+        },
+        "api_endpoint": {
+         "type": "string",
+         "description": "Scope results to a specific data API endpoint (e.g., \"acs/acs1\"). Strongly recommended when the survey or dataset is already known \u2014 dramatically reduces noise and improves result quality. Use the datasets field from a prior search result, or the api_endpoint field from list-datasets, to identify valid values."
+        },
+        "limit": {
+         "type": "number",
+         "description": "Maximum number of results to return. Defaults to 20."
+        }
+       },
+       "required": []
+      }
+     }
+    ]
+   },
+   "jsonrpc": "2.0",
+   "id": 2
+  }
+ },
+ {
+  "sent": {
+   "jsonrpc": "2.0",
+   "id": 3,
+   "method": "tools/call",
+   "params": {
+    "name": "fetch-aggregate-data",
+    "arguments": {
+     "dataset": "acs/acs5",
+     "year": 2024,
+     "get": {
+      "variables": [
+       "NAME",
+       "B19013_001E",
+       "B19013_001M"
+      ]
+     },
+     "for": "county:013",
+     "in": "state:08"
+    }
+   }
+  }
+ },
+ {
+  "received": {
+   "result": {
+    "content": [
+     {
+      "type": "text",
+      "text": "Response from acs/acs5:\nNAME: Boulder County, Colorado, B19013_001E: 103994, B19013_001M: 2268, state: 08, county: 013\nSource: U.S. Census Bureau Data API (https://api.census.gov/data/2024/acs/acs5?get=NAME%2CB19013_001E%2CB19013_001M&for=county%3A013&in=state%3A08&descriptive=false&key=REDACTED)"
+     }
+    ]
+   },
+   "jsonrpc": "2.0",
+   "id": 3
+  }
+ }
+]
