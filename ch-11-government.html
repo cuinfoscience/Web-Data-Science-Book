@@ -545,7 +545,7 @@ div.csl-indent {
 </section>
 <section id="reading-the-keys-in-python" class="level3" data-number="11.2.3">
 <h3 data-number="11.2.3" class="anchored" data-anchor-id="reading-the-keys-in-python"><span class="header-section-number">11.2.3</span> Reading the Keys in Python</h3>
-<div id="cc498c74" class="cell" data-execution_count="1">
+<div id="c1a13c09" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="im">import</span> os</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="im">import</span> requests</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a></span>
@@ -578,7 +578,7 @@ div.csl-indent {
 <li><strong>A different name.</strong> The name must match exactly, in capitals: <code>CENSUS_KEY</code>, not <code>census_key</code> or <code>CENSUS_API_KEY</code>.</li>
 </ul>
 <p>When you can’t find the cause and need to keep working, ask for the missing keys in the notebook itself. <code>getpass()</code> shows a password box under the cell; what you paste isn’t displayed, isn’t saved in the notebook, and lasts until the kernel restarts:</p>
-<div id="fa679290" class="cell" data-execution_count="2">
+<div id="5f7d38c4" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="im">from</span> getpass <span class="im">import</span> getpass</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a><span class="co"># Ask only for keys that are missing; what you paste stays out of the notebook</span></span>
@@ -603,7 +603,7 @@ div.csl-indent {
 <section id="alternative-a-json-configuration-file" class="level3" data-number="11.2.5">
 <h3 data-number="11.2.5" class="anchored" data-anchor-id="alternative-a-json-configuration-file"><span class="header-section-number">11.2.5</span> Alternative: A JSON Configuration File</h3>
 <p>Some projects keep keys in a local configuration file instead of environment variables. Create a file called <code>api_keys.json</code> containing <code>{"census": "your-key", "fred": "your-key", "eia": "your-key"}</code>, add it to your <code>.gitignore</code> <strong>before your first commit</strong>, and load it into the same variable names:</p>
-<div id="ae466212" class="cell" data-execution_count="3">
+<div id="b01a383a" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="im">import</span> json</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"api_keys.json"</span>) <span class="im">as</span> f:</span>
@@ -723,7 +723,7 @@ Figure&nbsp;11.3: The EIA’s API Dashboard, October 2026, set to the route for 
 <h3 data-number="11.4.1" class="anchored" data-anchor-id="from-the-websites-table-to-the-apis-group"><span class="header-section-number">11.4.1</span> From the Website’s Table to the API’s Group</h3>
 <p>Each Census dataset has an address. This chapter uses the ACS 5-year estimates for 2020–2024, documented at <a href="https://www.census.gov/data/developers/data-sets/acs-5year.html">census.gov/data/developers/data-sets/acs-5year.html</a>, whose address in the API is <code>https://api.census.gov/data/2024/acs/acs5</code>. That is the product ② in <a href="#fig-census-table" class="quarto-xref">Figure&nbsp;<span>11.1</span></a>.</p>
 <p>The website calls B19013 a table; the API calls it a <strong>group</strong>. Every group the dataset holds is listed, with its title, at <code>groups.json</code>, and as a web page at <a href="https://api.census.gov/data/2024/acs/acs5/groups.html">api.census.gov/data/2024/acs/acs5/groups.html</a>, where your browser’s Find works as well as code does. Search the titles for the words on the website’s table:</p>
-<div id="415e78dc" class="cell" data-execution_count="4">
+<div id="c792e592" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a>census_base <span class="op">=</span> <span class="st">"https://api.census.gov/data/2024/acs/acs5"</span>   <span class="co"># ACS 5-year estimates, 2020-2024</span></span>
@@ -761,7 +761,7 @@ Figure&nbsp;11.3: The EIA’s API Dashboard, October 2026, set to the route for 
 <section id="from-the-group-to-its-variables" class="level3" data-number="11.4.2">
 <h3 data-number="11.4.2" class="anchored" data-anchor-id="from-the-group-to-its-variables"><span class="header-section-number">11.4.2</span> From the Group to Its Variables</h3>
 <p>A group’s own address, <code>groups/B19013.json</code>, lists its <strong>variables</strong>: every column the table has, each with a label. Its web page is <a href="https://api.census.gov/data/2024/acs/acs5/groups/B19013.html">groups/B19013.html</a>:</p>
-<div id="bab42601" class="cell" data-execution_count="5">
+<div id="addc84f4" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a>response <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>census_base<span class="sc">}</span><span class="ss">/groups/B19013.json"</span>, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a>response.raise_for_status()</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a>group_vars <span class="op">=</span> response.json()[<span class="st">"variables"</span>]</span>
@@ -781,7 +781,7 @@ Figure&nbsp;11.3: The EIA’s API Dashboard, October 2026, set to the route for 
 <section id="the-same-numbers-from-the-api" class="level3" data-number="11.4.3">
 <h3 data-number="11.4.3" class="anchored" data-anchor-id="the-same-numbers-from-the-api"><span class="header-section-number">11.4.3</span> The Same Numbers from the API</h3>
 <p>With a group and its variables, a request to the API is a few parameters, which its <a href="https://www.census.gov/data/developers/guidance/api-user-guide.html">user guide</a> lists: <code>get</code> names the variables, <code>for</code> the place, <code>in</code> what that place sits inside, and <code>key</code> your key. Here is the figure from <a href="#fig-census-table" class="quarto-xref">Figure&nbsp;<span>11.1</span></a>, with its margin of error:</p>
-<div id="337b34d5" class="cell" data-execution_count="6">
+<div id="9963f9d0" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a>params <span class="op">=</span> {</span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>    <span class="st">"get"</span>: <span class="st">"NAME,B19013_001E,B19013_001M"</span>,   <span class="co"># the place's name, the estimate, and its margin of error</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a>    <span class="st">"for"</span>: <span class="st">"county:013"</span>,                     <span class="co"># Boulder County...</span></span>
@@ -799,7 +799,7 @@ Figure&nbsp;11.3: The EIA’s API Dashboard, October 2026, set to the route for 
 <section id="the-same-variable-for-a-state-a-county-and-a-city" class="level3" data-number="11.4.4">
 <h3 data-number="11.4.4" class="anchored" data-anchor-id="the-same-variable-for-a-state-a-county-and-a-city"><span class="header-section-number">11.4.4</span> The Same Variable for a State, a County, and a City</h3>
 <p>Places are named by <strong>FIPS codes</strong> (Federal Information Processing Standards codes), numbers the federal government assigns: Colorado is state <code>08</code>; Boulder County is county <code>013</code> in Colorado; the city of Boulder is place <code>07850</code> in Colorado. You already have one of them. The website’s address in <a href="#fig-census-table" class="quarto-xref">Figure&nbsp;<span>11.1</span></a> ends <code>g=050XX00US08013</code>: <code>050</code> means a county, and <code>08013</code> is the state’s code followed by the county’s. Change only <code>for</code> and <code>in</code>, and the same request asks about a different kind of place:</p>
-<div id="2dbbf549" class="cell" data-execution_count="7">
+<div id="64efc286" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># The same two variables for three places, each named by its FIPS codes</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a>places_to_ask <span class="op">=</span> [</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a>    {<span class="st">"for"</span>: <span class="st">"state:08"</span>},                         <span class="co"># Colorado</span></span>
@@ -822,7 +822,7 @@ Figure&nbsp;11.3: The EIA’s API Dashboard, October 2026, set to the route for 
 <section id="comparing-places" class="level3" data-number="11.4.5">
 <h3 data-number="11.4.5" class="anchored" data-anchor-id="comparing-places"><span class="header-section-number">11.4.5</span> Comparing Places</h3>
 <p>Ask the Census Bureau’s API for several places at once by listing their FIPS codes (Federal Information Processing Standards codes), as its <a href="https://www.census.gov/data/developers/guidance/api-user-guide.html">user guide</a> shows. This request gets the age of the housing stock from the American Community Survey (ACS), group <code>B25034</code>, Year Structure Built, for the cities of Boulder and Longmont, and labels each column with the words from the group’s variables:</p>
-<div id="62b3e5c1" class="cell" data-execution_count="8">
+<div id="19652a58" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># Lines 002 to 011: built 2020 or later, 2010 to 2019, ..., 1939 or earlier</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a>housing_vars <span class="op">=</span> [<span class="ss">f"B25034_</span><span class="sc">{</span>line<span class="sc">:03d}</span><span class="ss">E"</span> <span class="cf">for</span> line <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, <span class="dv">12</span>)]</span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a></span>
@@ -860,7 +860,7 @@ Figure&nbsp;11.3: The EIA’s API Dashboard, October 2026, set to the route for 
 <span id="cb18-35"><a href="#cb18-35" aria-label="35"></a><span class="co"># Built 1939 or earlier                    3576                     2071</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The table holds the answer, but it takes reading: ten rows of two numbers each, newest first. A chart shows its shape at a glance. Draw one pair of bars for each decade, one bar per city, so that the two cities sit side by side wherever they differ. The labels came from the group’s variables, so the chart can use them as they are. Turn the table upside down first, so that time runs left to right, from the oldest decade to the newest:</p>
-<div id="53550d2f" class="cell" data-execution_count="9">
+<div id="b8797cee" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a><span class="co"># Oldest decade at the left, newest at the right</span></span>
@@ -888,7 +888,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 <section id="every-place-in-a-state-and-a-number-that-isnt" class="level3" data-number="11.4.6">
 <h3 data-number="11.4.6" class="anchored" data-anchor-id="every-place-in-a-state-and-a-number-that-isnt"><span class="header-section-number">11.4.6</span> Every Place in a State, and a Number That Isn’t</h3>
 <p>A wildcard asks the Census Bureau’s API for every place of a kind, as its <a href="https://www.census.gov/data/developers/guidance/api-user-guide.html">user guide</a> describes: <code>for=place:*</code> with <code>in=state:08</code> returns all of Colorado’s cities, towns, and census-designated places. The variable is again the American Community Survey’s (ACS) median household income. Here is median household income for each of them:</p>
-<div id="a43e7793" class="cell" data-execution_count="10">
+<div id="af2faf53" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a>params <span class="op">=</span> {<span class="st">"get"</span>: <span class="st">"NAME,B19013_001E"</span>, <span class="st">"for"</span>: <span class="st">"place:*"</span>, <span class="st">"in"</span>: <span class="st">"state:08"</span>, <span class="st">"key"</span>: census_key}</span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a>response <span class="op">=</span> requests.get(census_base, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb20-3"><a href="#cb20-3" aria-label="3"></a>response.raise_for_status()</span>
@@ -910,7 +910,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 <span id="cb20-19"><a href="#cb20-19" aria-label="19"></a><span class="co"># Name: income, dtype: float64</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>A median household income of minus 666 million dollars is not a number: it is a <strong>sentinel</strong>, a code that stands for “no estimate”. The Census Bureau’s <a href="https://www.census.gov/data/developers/data-sets/acs-1year/notes-on-acs-estimate-and-annotation-values.html">notes on ACS estimate values</a> list several, and <code>-666666666</code> means that the estimate could not be computed, because the survey had too few sample observations there. In a small town, that is common. Left in, the sentinels drag every average far below zero. Replace them with a missing value before you compute anything:</p>
-<div id="7d08144e" class="cell" data-execution_count="11">
+<div id="0f0c4eba" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a>no_estimate <span class="op">=</span> places[<span class="st">"income"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">666666666</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>no_estimate<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span><span class="bu">len</span>(places)<span class="sc">}</span><span class="ss"> places have no estimate"</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-label="3"></a></span>
@@ -928,7 +928,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 <section id="finding-series-ids" class="level3" data-number="11.5.1">
 <h3 data-number="11.5.1" class="anchored" data-anchor-id="finding-series-ids"><span class="header-section-number">11.5.1</span> Finding Series IDs</h3>
 <p>FRED (Federal Reserve Economic Data) organizes data by “series”, each with a unique ID. The easiest way to find one is to search the <a href="https://fred.stlouisfed.org/">FRED website</a> and read the ID off the series’ page, as in <a href="#fig-fred-series" class="quarto-xref">Figure&nbsp;<span>11.2</span></a>. The API’s <a href="https://fred.stlouisfed.org/docs/api/fred/series.html"><code>series</code> endpoint</a> then describes a series before you download it:</p>
-<div id="56d379b9" class="cell" data-execution_count="12">
+<div id="5b486b6d" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a>fred_base <span class="op">=</span> <span class="st">"https://api.stlouisfed.org/fred"</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-label="3"></a><span class="kw">def</span> fred_get(endpoint, <span class="op">**</span>params):</span>
@@ -949,7 +949,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 <span id="cb22-18"><a href="#cb22-18" aria-label="18"></a><span class="co"># observation_end: 2024-01-01</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The series is an annual estimate from the Census Bureau’s Small Area Income and Poverty Estimates (SAIPE) program, from 1989 to 2024. Its observations come from the <a href="https://fred.stlouisfed.org/docs/api/fred/series_observations.html"><code>series/observations</code> endpoint</a>. This function asks for them and returns them as a DataFrame with real dates and numbers; FRED writes a missing value as <code>"."</code>, which <code>errors="coerce"</code> turns into <code>NaN</code>:</p>
-<div id="f00ec567" class="cell" data-execution_count="13">
+<div id="adae7cdd" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="kw">def</span> fred_observations(series_id, <span class="op">**</span>params):</span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a>    <span class="co">"""Return a FRED series' observations as a DataFrame of dates and values."""</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-label="3"></a>    params.update(series_id<span class="op">=</span>series_id, api_key<span class="op">=</span>fred_key, file_type<span class="op">=</span><span class="st">"json"</span>)</span>
@@ -975,7 +975,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 <section id="let-the-server-compute-units" class="level3" data-number="11.5.2">
 <h3 data-number="11.5.2" class="anchored" data-anchor-id="let-the-server-compute-units"><span class="header-section-number">11.5.2</span> Let the Server Compute: <code>units</code></h3>
 <p>The <code>units</code> parameter of the <a href="https://fred.stlouisfed.org/docs/api/fred/series_observations.html"><code>series/observations</code> endpoint</a> asks FRED (Federal Reserve Economic Data) to transform a series’ values before it sends them. Ask for the same series, Boulder County’s median household income, twice more: with <code>units="chg"</code>, the change in dollars from the previous observation, and with <code>units="pch"</code>, the percent change. One series, three answers:</p>
-<div id="a1d36a90" class="cell" data-execution_count="14">
+<div id="7145ce48" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a>change <span class="op">=</span> fred_observations(<span class="st">"MHICO08013A052NCEN"</span>, units<span class="op">=</span><span class="st">"chg"</span>, observation_end<span class="op">=</span><span class="st">"2024-12-31"</span>)</span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a>growth <span class="op">=</span> fred_observations(<span class="st">"MHICO08013A052NCEN"</span>, units<span class="op">=</span><span class="st">"pch"</span>, observation_end<span class="op">=</span><span class="st">"2024-12-31"</span>)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-label="3"></a></span>
@@ -1030,7 +1030,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 <section id="let-the-server-compute-frequency-and-aggregation_method" class="level3" data-number="11.5.3">
 <h3 data-number="11.5.3" class="anchored" data-anchor-id="let-the-server-compute-frequency-and-aggregation_method"><span class="header-section-number">11.5.3</span> Let the Server Compute: <code>frequency</code> and <code>aggregation_method</code></h3>
 <p>A series’ <strong>frequency</strong> is how often it is measured. FRED (Federal Reserve Economic Data) can lower it before it sends the data, from monthly to quarterly or annual, and the <a href="https://fred.stlouisfed.org/docs/api/fred/series_observations.html"><code>series/observations</code> endpoint</a> documents how. Take one series through three requests: the Consumer Price Index (CPI) for all urban consumers in the United States, which the Bureau of Labor Statistics (BLS) publishes every month and FRED carries as <code>CPIAUCNS</code>. Ask FRED what it is first:</p>
-<div id="d212f6e7" class="cell" data-execution_count="15">
+<div id="01b46d5b" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a>info <span class="op">=</span> fred_get(<span class="st">"series"</span>, series_id<span class="op">=</span><span class="st">"CPIAUCNS"</span>)[<span class="st">"seriess"</span>][<span class="dv">0</span>]</span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a><span class="cf">for</span> field <span class="kw">in</span> [<span class="st">"title"</span>, <span class="st">"frequency"</span>, <span class="st">"units"</span>, <span class="st">"seasonal_adjustment"</span>]:</span>
 <span id="cb25-3"><a href="#cb25-3" aria-label="3"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>field<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>info[field]<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -1045,7 +1045,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 <li>with <code>frequency="a"</code> and <code>aggregation_method="avg"</code>, which turns each year’s twelve months into their mean (<code>sum</code> and <code>eop</code>, the end of the period, are the other methods);</li>
 <li>with <code>units="pc1"</code> added, the percent change of each year’s mean from the year before’s, which is the year’s inflation. FRED applies the frequency first, then the units.</li>
 </ol>
-<div id="5a8d420c" class="cell" data-execution_count="16">
+<div id="067f504f" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a>years <span class="op">=</span> {<span class="st">"observation_start"</span>: <span class="st">"2015-01-01"</span>, <span class="st">"observation_end"</span>: <span class="st">"2025-12-31"</span>}   <span class="co"># fixed, so the answer doesn't change</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-label="2"></a></span>
 <span id="cb26-3"><a href="#cb26-3" aria-label="3"></a>monthly <span class="op">=</span> fred_observations(<span class="st">"CPIAUCNS"</span>, <span class="op">**</span>years)</span>
@@ -1071,7 +1071,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 <span id="cb26-23"><a href="#cb26-23" aria-label="23"></a><span class="co">#  2025       321.9            2.6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Trust, but check once. Compute the same yearly means and percent changes in pandas, from the monthly values of the first request, and they should match FRED’s:</p>
-<div id="d603911e" class="cell" data-execution_count="17">
+<div id="d01c1d8f" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-label="1"></a>by_hand <span class="op">=</span> monthly.groupby(monthly[<span class="st">"date"</span>].dt.year)[<span class="st">"value"</span>].mean()</span>
 <span id="cb27-2"><a href="#cb27-2" aria-label="2"></a>check <span class="op">=</span> pd.DataFrame({<span class="st">"mean index"</span>: by_hand, <span class="st">"inflation (%)"</span>: by_hand.pct_change() <span class="op">*</span> <span class="dv">100</span>})</span>
 <span id="cb27-3"><a href="#cb27-3" aria-label="3"></a><span class="bu">print</span>(check.tail(<span class="dv">3</span>).to_string(float_format<span class="op">=</span><span class="st">"</span><span class="sc">%.1f</span><span class="st">"</span>))</span>
@@ -1083,7 +1083,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 </div>
 <p>They match. So <code>frequency="a"</code> with <code>aggregation_method="avg"</code> is the mean of each year’s twelve months, and <code>units="pc1"</code> on top of it is the percent change in that mean, and you can describe the numbers that way when you write them up. The index itself, 321.9 in 2025, means that prices were 3.2 times what they were in 1982–1984, the period the index sets at 100. (Ask pandas for 2015’s percent change, and it has none: the monthly request starts in January 2015. FRED reaches back to 2014’s months itself.)</p>
 <p>With one series understood, comparing two is a matter of asking each the same question. The BLS also publishes a CPI for the Denver area, which FRED carries as <code>CUUSA433SA0</code>. It is annual already, so it needs only <code>units="pc1"</code> to give the same year-over-year inflation:</p>
-<div id="63be9a77" class="cell" data-execution_count="18">
+<div id="4232d750" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-label="1"></a>denver <span class="op">=</span> fred_observations(<span class="st">"CUUSA433SA0"</span>, units<span class="op">=</span><span class="st">"pc1"</span>, <span class="op">**</span>years)</span>
 <span id="cb28-2"><a href="#cb28-2" aria-label="2"></a></span>
 <span id="cb28-3"><a href="#cb28-3" aria-label="3"></a>cpi <span class="op">=</span> denver.merge(inflation, on<span class="op">=</span><span class="st">"date"</span>, suffixes<span class="op">=</span>(<span class="st">"_denver"</span>, <span class="st">"_national"</span>))</span>
@@ -1103,7 +1103,7 @@ Figure&nbsp;11.4: Housing units by the decade they were built, in the cities of 
 <span id="cb28-17"><a href="#cb28-17" aria-label="17"></a><span class="co">#  2025           2.3             2.6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Eleven years of two numbers each are easier to compare as pairs of bars, one pair a year, with a line across them at 2 percent, the Federal Reserve’s target for inflation:</p>
-<div id="4a98a144" class="cell" data-execution_count="19">
+<div id="a7775d51" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-label="1"></a>pairs <span class="op">=</span> cpi.set_index(<span class="st">"year"</span>)[[<span class="st">"value_denver"</span>, <span class="st">"value_national"</span>]]</span>
 <span id="cb29-2"><a href="#cb29-2" aria-label="2"></a>pairs.columns <span class="op">=</span> [<span class="st">"Denver-Aurora-Lakewood"</span>, <span class="st">"United States"</span>]</span>
 <span id="cb29-3"><a href="#cb29-3" aria-label="3"></a></span>
@@ -1135,7 +1135,7 @@ Figure&nbsp;11.5: Annual inflation in the Denver area and the United States, 201
 <section id="routes-that-describe-themselves" class="level3" data-number="11.6.1">
 <h3 data-number="11.6.1" class="anchored" data-anchor-id="routes-that-describe-themselves"><span class="header-section-number">11.6.1</span> Routes That Describe Themselves</h3>
 <p>The EIA’s (U.S. Energy Information Administration’s) API is a tree of <strong>routes</strong>, paths such as <code>electricity/retail-sales/</code>, which its <a href="https://www.eia.gov/opendata/documentation.php">documentation</a> describes. Ask for a route without asking for its data, and it describes itself. At the top, it lists the routes under it:</p>
-<div id="57811f48" class="cell" data-execution_count="20">
+<div id="00874175" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-label="1"></a>eia_base <span class="op">=</span> <span class="st">"https://api.eia.gov/v2"</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-label="2"></a></span>
 <span id="cb30-3"><a href="#cb30-3" aria-label="3"></a><span class="kw">def</span> eia_get(route, params<span class="op">=</span><span class="va">None</span>):</span>
@@ -1156,7 +1156,7 @@ Figure&nbsp;11.5: Annual inflation in the Denver area and the United States, 201
 <span id="cb30-18"><a href="#cb30-18" aria-label="18"></a><span class="co"># facility-fuel                    Electric Power Operations for Individual Power Plants (Annual and Monthly)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>A route with data under it describes that data instead: how often it is measured, the <strong>facets</strong> it can be filtered by, the <strong>data columns</strong> it holds, with their units, and the span it covers:</p>
-<div id="9d244550" class="cell" data-execution_count="21">
+<div id="23ec923d" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-label="1"></a>meta <span class="op">=</span> eia_get(<span class="st">"electricity/retail-sales/"</span>)</span>
 <span id="cb31-2"><a href="#cb31-2" aria-label="2"></a><span class="bu">print</span>(<span class="st">"Frequencies:"</span>, [f[<span class="st">"id"</span>] <span class="cf">for</span> f <span class="kw">in</span> meta[<span class="st">"frequency"</span>]])</span>
 <span id="cb31-3"><a href="#cb31-3" aria-label="3"></a><span class="bu">print</span>(<span class="st">"Facets:"</span>, [f[<span class="st">"id"</span>] <span class="cf">for</span> f <span class="kw">in</span> meta[<span class="st">"facets"</span>]])</span>
@@ -1172,7 +1172,7 @@ Figure&nbsp;11.5: Annual inflation in the Denver area and the United States, 201
 <span id="cb31-13"><a href="#cb31-13" aria-label="13"></a><span class="co"># From 2001-01 to 2026-08</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Each facet lists its own values, at <code>facet/</code> and the facet’s name:</p>
-<div id="ae3ea271" class="cell" data-execution_count="22">
+<div id="0ad3746b" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-label="1"></a>sectors <span class="op">=</span> eia_get(<span class="st">"electricity/retail-sales/facet/sectorid/"</span>)</span>
 <span id="cb32-2"><a href="#cb32-2" aria-label="2"></a><span class="cf">for</span> facet <span class="kw">in</span> sectors[<span class="st">"facets"</span>]:</span>
 <span id="cb32-3"><a href="#cb32-3" aria-label="3"></a>    <span class="bu">print</span>(facet[<span class="st">"id"</span>], facet[<span class="st">"name"</span>])</span>
@@ -1188,7 +1188,7 @@ Figure&nbsp;11.5: Annual inflation in the Denver area and the United States, 201
 <section id="let-the-server-filter" class="level3" data-number="11.6.2">
 <h3 data-number="11.6.2" class="anchored" data-anchor-id="let-the-server-filter"><span class="header-section-number">11.6.2</span> Let the Server Filter</h3>
 <p>Add <code>data/</code> to an EIA (U.S. Energy Information Administration) route, and it returns rows; the API’s <a href="https://www.eia.gov/opendata/documentation.php">documentation</a> lists the parameters. Each parameter narrows them: <code>data[]</code> names the columns, <code>facets[stateid][]</code> and <code>facets[sectorid][]</code> keep only the values you list, <code>start</code> and <code>end</code> fix the span, and <code>sort</code> orders the rows. The square brackets are part of the parameters’ names, and <code>requests</code> encodes them for you:</p>
-<div id="c0fdff52" class="cell" data-execution_count="23">
+<div id="030b5cb5" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-label="1"></a>params <span class="op">=</span> {</span>
 <span id="cb33-2"><a href="#cb33-2" aria-label="2"></a>    <span class="st">"frequency"</span>: <span class="st">"annual"</span>,</span>
 <span id="cb33-3"><a href="#cb33-3" aria-label="3"></a>    <span class="st">"data[]"</span>: <span class="st">"price"</span>,              <span class="co"># one column: the average price</span></span>
@@ -1211,7 +1211,7 @@ Figure&nbsp;11.5: Annual inflation in the Denver area and the United States, 201
 </div>
 <p>Colorado’s households paid 15.69 cents a kilowatt-hour on average in 2025. The request returned 25 rows, one a year, from a route that holds every state and sector by month, quarter, and year, and nothing else crossed the network. The prices arrive as strings, as the Census Bureau’s numbers do, so convert them with <code>pd.to_numeric()</code> before computing with them; <code>total</code> is a string too.</p>
 <p>A facet can take several values: give <code>requests</code> a list, and it repeats the parameter once for each. This request asks the route for power plants’ operations for Colorado’s generation from five sources, plus all sources together:</p>
-<div id="12e92df6" class="cell" data-execution_count="24">
+<div id="e94d086a" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-label="1"></a>params <span class="op">=</span> {</span>
 <span id="cb34-2"><a href="#cb34-2" aria-label="2"></a>    <span class="st">"frequency"</span>: <span class="st">"annual"</span>,</span>
 <span id="cb34-3"><a href="#cb34-3" aria-label="3"></a>    <span class="st">"data[]"</span>: <span class="st">"generation"</span>,</span>
@@ -1236,7 +1236,7 @@ Figure&nbsp;11.5: Annual inflation in the Denver area and the United States, 201
 <span id="cb34-22"><a href="#cb34-22" aria-label="22"></a><span class="co"># 2025        24.7  32.0  30.0    9.9    3.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Three years in a table hide the path between them. The <code>shares</code> DataFrame already holds every year from 2001 to 2025, one column per source, which is the shape a line chart wants: one line per column, with the years along the bottom. The data are annual, so give the axis a tick for every year, in small type so that 25 labels fit:</p>
-<div id="cf570384" class="cell" data-execution_count="25">
+<div id="bbbf6ec4" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-label="1"></a>shares.index <span class="op">=</span> shares.index.astype(<span class="bu">int</span>)   <span class="co"># the years arrive as strings</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-label="2"></a>ax <span class="op">=</span> shares.plot(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">4.5</span>), marker<span class="op">=</span><span class="st">"."</span>, xticks<span class="op">=</span>shares.index)</span>
 <span id="cb35-3"><a href="#cb35-3" aria-label="3"></a>ax.tick_params(axis<span class="op">=</span><span class="st">"x"</span>, labelsize<span class="op">=</span><span class="dv">7</span>, labelrotation<span class="op">=</span><span class="dv">90</span>)</span>
@@ -1262,7 +1262,7 @@ Figure&nbsp;11.6: Colorado’s electricity generation from coal, natural gas, wi
 <section id="paging-with-offset-and-length" class="level3" data-number="11.6.3">
 <h3 data-number="11.6.3" class="anchored" data-anchor-id="paging-with-offset-and-length"><span class="header-section-number">11.6.3</span> Paging with <code>offset</code> and <code>length</code></h3>
 <p>The EIA’s (U.S. Energy Information Administration’s) API returns at most 5,000 rows a request, as its <a href="https://www.eia.gov/opendata/documentation.php">documentation</a> says. Ask for more, and you get the first 5,000 and a warning, <code>"incomplete return"</code>. Colorado’s monthly generation from every source, 2001 to 2025, is 9,289 rows. The response says how many rows match in <code>total</code>, and you ask for the next page with <code>offset</code>, the number of rows to skip, and <code>length</code>, the number to return:</p>
-<div id="4fbdce48" class="cell" data-execution_count="26">
+<div id="0e0e0fdb" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-label="1"></a><span class="kw">def</span> eia_get_all(route, params, page_size<span class="op">=</span><span class="dv">5000</span>):</span>
 <span id="cb36-2"><a href="#cb36-2" aria-label="2"></a>    <span class="co">"""Page through every row of an EIA data route, page_size rows at a time."""</span></span>
 <span id="cb36-3"><a href="#cb36-3" aria-label="3"></a>    rows <span class="op">=</span> []</span>
@@ -1307,7 +1307,7 @@ Figure&nbsp;11.6: Colorado’s electricity generation from coal, natural gas, wi
 <h2 data-number="11.7" class="anchored" data-anchor-id="combining-census-and-eia-data"><span class="header-section-number">11.7</span> Combining Census and EIA Data</h2>
 <p>Each API in this chapter answers a question on its own. Some questions need two. What does electricity cost a household, against what households earn? The EIA (U.S. Energy Information Administration) knows what homes paid for electricity in each state; the Census Bureau’s American Community Survey (ACS) knows the state’s median household income. Joining them is a matter of putting each state’s two numbers in one row, and the real work of a join is finding the identifier that says two rows are the same state.</p>
 <p>Ask each agency for every state. The Census Bureau’s <a href="https://www.census.gov/data/developers/guidance/api-user-guide.html">API</a> takes <code>for=state:*</code>; the EIA’s <a href="https://www.eia.gov/opendata/browser/electricity/retail-sales">retail-sales route</a> returns every state when you leave out the <code>stateid</code> facet. Ask the EIA for three of its data columns at once, the homes’ revenue, customers, and price in 2024:</p>
-<div id="0fe96688" class="cell" data-execution_count="27">
+<div id="537a01f1" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-label="1"></a>params <span class="op">=</span> {<span class="st">"get"</span>: <span class="st">"NAME,B19013_001E"</span>, <span class="st">"for"</span>: <span class="st">"state:*"</span>, <span class="st">"key"</span>: census_key}</span>
 <span id="cb37-2"><a href="#cb37-2" aria-label="2"></a>response <span class="op">=</span> requests.get(census_base, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb37-3"><a href="#cb37-3" aria-label="3"></a>response.raise_for_status()</span>
@@ -1338,7 +1338,7 @@ Figure&nbsp;11.6: Colorado’s electricity generation from coal, natural gas, wi
 <span id="cb37-28"><a href="#cb37-28" aria-label="28"></a><span class="co">#         Arkansas      AR</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The two agencies name Colorado differently. The Census Bureau uses its FIPS code (Federal Information Processing Standards code), <code>08</code>; the EIA uses its postal abbreviation, <code>CO</code>. The state’s name is in both, but a name is a poor key: a spelling, an abbreviation, or a “The” can keep two names for one place from matching. A <strong>crosswalk</strong> is a table that pairs one set of codes with the other, and the Census Bureau publishes one for states, a text file whose columns are separated by <code>|</code>, listed on its page of <a href="https://www.census.gov/library/reference/code-lists/ansi.html">FIPS codes</a> under “States”:</p>
-<div id="aa6412cc" class="cell" data-execution_count="28">
+<div id="b87f7aa2" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-label="1"></a><span class="im">import</span> io</span>
 <span id="cb38-2"><a href="#cb38-2" aria-label="2"></a></span>
 <span id="cb38-3"><a href="#cb38-3" aria-label="3"></a>response <span class="op">=</span> requests.get(<span class="st">"https://www2.census.gov/geo/docs/reference/codes2020/national_state2020.txt"</span>, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
@@ -1351,7 +1351,7 @@ Figure&nbsp;11.6: Colorado’s electricity generation from coal, natural gas, wi
 <span id="cb38-10"><a href="#cb38-10" aria-label="10"></a><span class="co">#    AZ      04 01779777    Arizona</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Join in two steps: the Census rows to the crosswalk on the FIPS code, then the result to the EIA’s rows on the postal code. An <strong>outer</strong> join keeps every row from both sides, and pandas’ <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html"><code>merge()</code></a> with <code>indicator=True</code> adds a column, <code>_merge</code>, that says where each row came from. Look at the rows that didn’t match before you trust the ones that did:</p>
-<div id="f31d5d58" class="cell" data-execution_count="29">
+<div id="06859216" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-label="1"></a><span class="co"># In the crosswalk, STATEFP is the FIPS code and STATE the postal code; the Census API's "state" column is a FIPS code</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-label="2"></a>states <span class="op">=</span> states.merge(codes[[<span class="st">"STATEFP"</span>, <span class="st">"STATE"</span>]], left_on<span class="op">=</span><span class="st">"state"</span>, right_on<span class="op">=</span><span class="st">"STATEFP"</span>, how<span class="op">=</span><span class="st">"left"</span>)</span>
 <span id="cb39-3"><a href="#cb39-3" aria-label="3"></a>joined <span class="op">=</span> states.merge(power, left_on<span class="op">=</span><span class="st">"STATE"</span>, right_on<span class="op">=</span><span class="st">"stateid"</span>, how<span class="op">=</span><span class="st">"outer"</span>, indicator<span class="op">=</span><span class="va">True</span>)</span>
@@ -1368,7 +1368,7 @@ Figure&nbsp;11.6: Colorado’s electricity generation from coal, natural gas, wi
 </div>
 <p>Fifty-one rows matched: the fifty states and the District of Columbia. The one Census row without a partner is Puerto Rico, which the American Community Survey covers and the EIA’s retail-sales route doesn’t. The eleven EIA rows without a partner aren’t states at all. They are regions (the Census Bureau’s divisions, with the Pacific division split into its contiguous and noncontiguous states) and the U.S. total, which the EIA puts in the same column as the states, <code>stateid</code>. An inner join would have dropped all twelve without a word, and a sum of the EIA’s column would have counted every state three times: as itself, in its region, and in the total.</p>
 <p>Keep the 51 rows that matched, and compute two things from them: a home’s average annual electricity bill, the residential revenue divided by the number of residential customers, and that bill as a share of the state’s median household income:</p>
-<div id="6d2fb7b8" class="cell" data-execution_count="30">
+<div id="c28a9165" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-label="1"></a>both <span class="op">=</span> joined[joined[<span class="st">"_merge"</span>] <span class="op">==</span> <span class="st">"both"</span>].copy()</span>
 <span id="cb40-2"><a href="#cb40-2" aria-label="2"></a><span class="cf">for</span> column <span class="kw">in</span> [<span class="st">"revenue"</span>, <span class="st">"customers"</span>, <span class="st">"price"</span>]:</span>
 <span id="cb40-3"><a href="#cb40-3" aria-label="3"></a>    both[column] <span class="op">=</span> pd.to_numeric(both[column])   <span class="co"># the EIA's numbers arrive as strings</span></span>
@@ -1389,7 +1389,7 @@ Figure&nbsp;11.6: Colorado’s electricity generation from coal, natural gas, wi
 <span id="cb40-18"><a href="#cb40-18" aria-label="18"></a><span class="co"># Colorado       1206.9 95470.0    1.3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>In Mississippi and Alabama, a home’s electricity bill averaged 3.3 percent of the median household’s income; in Colorado, 1.3 percent, $1,207 a year against $95,470. Two cautions come with the join. The years differ: the EIA’s figures are for 2024, while the ACS estimate pools 2020 to 2024 and states it in 2024 dollars. And the units differ: an EIA customer is not the same thing as an ACS household, so the share is an approximation, worth saying so whenever you report it. Matching identifiers is the first step of a join; matching what the numbers mean is the second. A scatter plot puts every state on one page:</p>
-<div id="8c933bb9" class="cell" data-execution_count="31">
+<div id="9684d77d" class="cell" data-execution_count="31">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-label="1"></a>ax <span class="op">=</span> both.plot.scatter(x<span class="op">=</span><span class="st">"income"</span>, y<span class="op">=</span><span class="st">"annual_bill"</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">4.5</span>))</span>
 <span id="cb41-2"><a href="#cb41-2" aria-label="2"></a><span class="cf">for</span> _, row <span class="kw">in</span> both[both[<span class="st">"STATE"</span>].isin([<span class="st">"CO"</span>, <span class="st">"HI"</span>, <span class="st">"CA"</span>, <span class="st">"MS"</span>, <span class="st">"UT"</span>])].iterrows():</span>
 <span id="cb41-3"><a href="#cb41-3" aria-label="3"></a>    ax.annotate(row[<span class="st">"STATE"</span>], (row[<span class="st">"income"</span>], row[<span class="st">"annual_bill"</span>]), xytext<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">4</span>), textcoords<span class="op">=</span><span class="st">"offset points"</span>)</span>
@@ -1443,33 +1443,33 @@ Figure&nbsp;11.7: Each state’s average annual residential electricity bill in 
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one. You will need your Census and FRED keys from the start of this chapter.</p>
 <p>You will answer one comparative question about Colorado with two federal data sources: how does a Census measure vary across the state’s counties, and what has a related economic indicator done over time?</p>
 <p><strong>Step 1 — Load your keys safely.</strong> Load your Census and FRED API keys from environment variables or your <code>api_keys.json</code>, exactly as the chapter shows. Confirm both loaded by printing only their lengths — never the keys themselves, since the notebook is what you submit.</p>
-<div id="e23660be" class="cell" data-execution_count="32">
+<div id="431a85a9" class="cell" data-execution_count="32">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-label="1"></a><span class="co"># Step 1: Load your Census and FRED keys and confirm they are present</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-label="2"></a><span class="co"># WITHOUT printing them.</span></span>
 <span id="cb42-3"><a href="#cb42-3" aria-label="3"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — Query every Colorado county.</strong> Choose one ACS variable you care about (browse the groups catalog to pick it; median household income is <code>B19013_001E</code>). Query the Census API with <code>for=county:*</code> and <code>in=state:08</code> to get all Colorado counties in one call.</p>
-<div id="9eaa5a2f" class="cell" data-execution_count="33">
+<div id="e2ceb6f7" class="cell" data-execution_count="33">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-label="1"></a><span class="co"># Step 2: Retrieve your chosen ACS variable for every Colorado county.</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Build and clean the DataFrame.</strong> First row is headers, the rest is data — the same shape you handled in <a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>. Convert your variable to numeric, sort by it, and print the top and bottom five counties.</p>
-<div id="c4ff6049" class="cell" data-execution_count="34">
+<div id="806dc270" class="cell" data-execution_count="34">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-label="1"></a><span class="co"># Step 3: Build the DataFrame, convert to numeric, sort, and print the extremes.</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Visualize the geography.</strong> Make a horizontal bar chart of the top 20 counties by your variable, labeled with county names.</p>
-<div id="dfc1b23c" class="cell" data-execution_count="35">
+<div id="a59e1793" class="cell" data-execution_count="35">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-label="1"></a><span class="co"># Step 4: Bar chart of the top 20 counties.</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Add the time dimension with FRED.</strong> Find one FRED series related to your Census variable for Colorado (unemployment rate, home price index, per-capita income — the chapter shows how to search for series IDs). Retrieve it, build a DataFrame with real dates, and plot the series over the last two decades.</p>
-<div id="54539aca" class="cell" data-execution_count="36">
+<div id="5126bbe8" class="cell" data-execution_count="36">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-label="1"></a><span class="co"># Step 5: Retrieve a related FRED series for Colorado and plot it over time.</span></span>
 <span id="cb46-2"><a href="#cb46-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: What geographic pattern did the county ranking reveal, and does it match what you know about Colorado? How does the FRED trend contextualize the Census snapshot — is the cross-sectional picture stable or a moment in a moving series? What would you need to be careful about before combining these two sources in one analysis (different geographies, different definitions, different vintages)?</p>
-<div id="6b6da03b" class="cell" data-execution_count="37">
+<div id="d2e59088" class="cell" data-execution_count="37">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
