@@ -2,6 +2,17 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-11-09 · Chapter 13's MCP example is the Census Bureau's server, recorded once
+
+**Decision.**
+- "Tools, MCP, and Skills" drops DeepWiki's public MCP server. Its example is the U.S. Census Bureau's Data API MCP server, which runs on the reader's computer over stdio and needs Docker, Node, a Census key, and a local Postgres database. Students install nothing: the server was run once, on 2026-11-09, and its `tools/list` answer and whole session are saved in `data/ch-13/census-mcp/`.
+- The section sends the server's real tool list to a free OpenRouter model with chapter 11's question (table B19013, Boulder County, 2024 ACS 5-year), with `tool_choice` `"required"`, and takes one tool call; no conversation follows. The reader's own code checks the call and runs it against `api.census.gov` with `CENSUS_KEY`, and compares the answer with chapter 11's $103,994 ± 2,268 and with the recorded server's.
+- The skills part, the PDF skill's `SKILL.md`, stays.
+
+**Why.** The instructor's decision of 2026-11-09, made together with the matching change to week 13's lab.
+
+**Where.** `ch-13-ai-apis.qmd`; `data/ch-13/census-mcp/`; the course's week 13 lab.
+
 ## 2026-10-26 · Chapter 11 drops Congress.gov, and its Census section starts from the website's table
 
 **Decision.**
