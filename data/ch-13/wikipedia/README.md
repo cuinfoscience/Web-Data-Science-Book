@@ -6,8 +6,8 @@ The lead sections (the text before the first heading) of five English Wikipedia 
 |---|---|
 | `revisions.csv` | One row per article and year, `current` included. Each row gives the revision in place at that moment: `revid`, `timestamp`, `size` in bytes, and the saved `html_file`. `revid` is empty where the title had no revision yet. |
 | `html/` | Each revision's lead as HTML, from `action=parse&oldid=REVID&prop=text&section=0`. |
-| `leads.csv` | Each lead's text: the HTML's `<p>` paragraphs, read with BeautifulSoup. Tables, reference marks and hatnotes are left out, and so are leftovers such as `Template:Active editnotice`, which appear when `action=parse` renders an old revision with templates that no longer exist. |
-| `lead-vectors.npy` | One embedding per row of `leads.csv` (116 × 2,048, float32), from `nvidia/nemotron-3-embed-1b:free` through OpenRouter on 2026-11-09. Each row is scaled to length 1. |
+| `leads.csv` | Each lead's text, with its length in `words`: the HTML's `<p>` paragraphs, read with BeautifulSoup by the chapter's `lead_text()`. Tables, reference marks and hatnotes are left out. So are two kinds of leftover from rendering one section of an old revision today: links to templates that no longer exist, such as `Template:Active editnotice`, and error messages (`class="error"`), such as a "Cite error" for footnotes whose list is further down the article, or `[invalid input: 'ɵ']` in a pronunciation. |
+| `lead-vectors.npy` | One embedding per row of `leads.csv` (116 × 2,048, float32), from `nvidia/nemotron-3-embed-1b:free` through OpenRouter on 2026-11-09, in six requests of 20 leads or fewer. Each row is scaled to length 1. |
 | `lead-vectors-rows.csv` | The title and year of each row of `lead-vectors.npy`. |
 
 **How it was collected:**
