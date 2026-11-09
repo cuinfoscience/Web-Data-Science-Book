@@ -51,6 +51,30 @@ figures:
         - {n: 2, at: {text: '^Get API Key$'}, side: right, gap: 8}
     drifts: true        # the counts on the page and the site's look
 
+  - id: lead-similarity
+    kind: render
+    mode: hand
+    section: "Similarity Over Time"
+    brief: >-
+      Chart, for each of five Wikipedia articles (Barack Obama, Hillary Clinton,
+      Donald Trump, Joe Biden, Kamala Harris), the cosine similarity between its
+      lead section on January 1 of each year, 2004-2026, and its current lead, from
+      nvidia/nemotron-3-embed-1b:free, as the chapter's code draws it: one line per
+      article.
+    url: https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-13/wikipedia/leads.csv
+    api_client: true
+    hand:
+      why: >-
+        matplotlib draws it from the book's saved Wikipedia leads and OpenRouter's
+        embeddings, as the chapter's code does; no browser is involved
+      steps: >-
+        Run `python tools/shots/renders/ch-13.py OUTDIR --contact EMAIL` with
+        OPENROUTER_KEY set (add --data-url with a branch's raw address before the
+        data is on main); it writes OUTDIR/lead-similarity.png, 1600 by 900
+        pixels. Import it with --tool naming matplotlib's and requests' versions.
+      text_px: 13
+    window: [800, 450]
+
   # Hand captures: signed-in pages. Take them with a personal account in a window whose page is
   # 800 CSS pixels wide (DevTools' device toolbar at 800 x 600 is easiest), at 100% zoom, and
   # save each as a PNG of the page alone. Read window.devicePixelRatio in DevTools' console:
