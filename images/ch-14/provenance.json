@@ -1,0 +1,162 @@
+{
+  "chapter": "ch-14",
+  "figures": {
+    "afternoon-forecasts": {
+      "by": "Claude Code, for Brian C. Keegan",
+      "captured": "2026-11-13",
+      "clip": {
+        "height": 450.0,
+        "width": 800.0,
+        "x": 0.0,
+        "y": 0.0
+      },
+      "crop": {
+        "window": true
+      },
+      "file": "afternoon-forecasts.png",
+      "final_url": null,
+      "image_sha256": "90933030e8c4fb793c7732187401faad752d48b1a28b81bda19eaedc68a6cdf5",
+      "imported": "2026-11-13T07:19:17+00:00",
+      "kind": "render",
+      "method": "rendered with matplotlib 3.11.2 with pandas 3.1.1 and requests 2.34.2; imported by tools/shots",
+      "raw": {
+        "sha256": "a84b56f979ee37ec607df784f3df14151f4a9d094bc629eab319c6737dca4337",
+        "size": [
+          1600,
+          900
+        ]
+      },
+      "recipe_sha256": "7e73517b0e117596e6d61c7c46fae3615f0f2a37c68e939a2bedd412944f86b0",
+      "redacted": [],
+      "scale": 2,
+      "size": [
+        1600,
+        900
+      ],
+      "status": null,
+      "text": {
+        "declared": 13,
+        "p20": 26
+      },
+      "tool": "matplotlib 3.11.2 with pandas 3.1.1 and requests 2.34.2",
+      "url": "https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-14/forecasts.csv",
+      "window": [
+        800,
+        450
+      ]
+    },
+    "nws-forecast-page": {
+      "browser": "Google Chrome for Testing 154.0.8037.92 (headless, Playwright 1.63.0)",
+      "by": "tools/shots",
+      "captured": "2026-11-13T02:53:32+00:00",
+      "clip": null,
+      "crop": {
+        "window": true
+      },
+      "file": "nws-forecast-page.png",
+      "final_url": "https://forecast.weather.gov/MapClick.php?lat=40.015&lon=-105.2705",
+      "image_sha256": "4a7a0b6345f4a95cc08672b44a58f0b45e93c4238a85546be959004fe780cab5",
+      "javascript": true,
+      "kind": "capture",
+      "parts": [
+        {
+          "image": "tools/shots/out/ch-14/nws-forecast-page-part1/20261113T025318Z.png",
+          "image_sha256": "03d19da1319d97adf970b27ba6132d7828845d7f2cc3cd5889779eb392299599",
+          "javascript": true,
+          "label": "Near the top of the page: the extended forecast",
+          "status": 200,
+          "url": "https://forecast.weather.gov/MapClick.php?lat=40.015&lon=-105.2705"
+        },
+        {
+          "image": "tools/shots/out/ch-14/nws-forecast-page-part2/20261113T025330Z.png",
+          "image_sha256": "bf2a4419bd83154c0c357d157068f40aa3f894bce55e2bae61f321631bbe7b4a",
+          "javascript": true,
+          "label": "At the foot of the page: About This Forecast",
+          "status": 200,
+          "url": "https://forecast.weather.gov/MapClick.php?lat=40.015&lon=-105.2705"
+        }
+      ],
+      "recipe_sha256": "ea3ed12e1b307f76841afc7c34e91bb7358a7916e8bc96a569471547bc8d0fb9",
+      "scale": 2,
+      "size": [
+        1600,
+        1164
+      ],
+      "status": 200,
+      "text": {
+        "chars": 387,
+        "median": 24.0,
+        "min": 24.0,
+        "p20": 24.0,
+        "sizes": {
+          "24": 361,
+          "32": 26
+        }
+      },
+      "url": "https://forecast.weather.gov/MapClick.php?lat=40.015&lon=-105.2705",
+      "user_agent": "WebDataScience/1.0 (brian.keegan@colorado.edu)",
+      "window": [
+        800,
+        600
+      ]
+    },
+    "nws-points-json": {
+      "annotated": {
+        "annotate_sha256": "afb7483d1d25dafa0c2d1a1c63faaf535f56870e81c920e36151233931cc121b",
+        "pdf_sha256": "9c80d1d050da48d558bdc69fc38eb83008c7fc0503a241e8bb62b810abd325df",
+        "png_sha256": "1d0cb19f4c3048d9ef2dda0634850c647be0aa1f924beb98b50540578f389825",
+        "unit_in": 0.005381252766710934,
+        "warnings": [],
+        "width_in": 8.1042
+      },
+      "browser": "Google Chrome for Testing 154.0.8037.92 (headless, Playwright 1.63.0)",
+      "by": "tools/shots",
+      "captured": "2026-11-13T02:53:05+00:00",
+      "clip": {
+        "height": 376,
+        "width": 752,
+        "x": 0,
+        "y": 30
+      },
+      "crop": {
+        "height": 376,
+        "in": "pre",
+        "match": "^    \"properties\": \\{$",
+        "pad": [
+          0,
+          0,
+          0,
+          8
+        ],
+        "width": 752
+      },
+      "file": "nws-points-json.png",
+      "final_url": "https://api.weather.gov/points/40.015,-105.2705",
+      "image_sha256": "d00b957841add3c44aac946db67d0c1a43aef88ea67852bd43093d29c0f752c5",
+      "javascript": true,
+      "kind": "capture",
+      "recipe_sha256": "61f7285657d33d63564cc621f3c365b4e45cc461f5028b04e1e521e621e62c7a",
+      "scale": 2,
+      "size": [
+        1504,
+        752
+      ],
+      "status": 200,
+      "text": {
+        "chars": 609,
+        "median": 26.0,
+        "min": 26.0,
+        "p20": 26.0,
+        "sizes": {
+          "26": 609
+        }
+      },
+      "url": "https://api.weather.gov/points/40.015,-105.2705",
+      "user_agent": "WebDataScience/1.0 (brian.keegan@colorado.edu)",
+      "window": [
+        760,
+        600
+      ]
+    }
+  }
+}

@@ -1,0 +1,96 @@
+# Recipes for Chapter 14's figures (ch-14-automation.qmd). See tools/shots/README.md.
+#
+# The chapter's case is the National Weather Service's hourly forecast for Boulder. Its tour
+# starts at the forecast page a person reads (forecast.weather.gov, which serves no robots.txt:
+# 404 on 2026-11-13), then shows the API's first answer (api.weather.gov, whose robots.txt is
+# "User-agent: *" and "Disallow: /", so that figure is captured as an API client, one request a
+# take). The chart is drawn by the chapter's own code from the course's collected series.
+chapter: ch-14
+qmd: ch-14-automation.qmd
+defaults:
+  window: [800, 600]
+  scale: 2
+
+figures:
+  - id: nws-forecast-page
+    kind: capture
+    section: "A Tour: From the Forecast Page to the API"
+    brief: >-
+      Show the NWS forecast page for Boulder as a person reads it, in the two places the
+      chapter's tour discusses: the extended forecast near the top ("Extended Forecast for
+      Boulder CO", seven periods with highs and lows), and the "About this forecast" box at
+      the page's foot, which names the point (Boulder CO 40.02°N 105.28°W) and gives Last
+      Update and Forecast Valid. Last Update is the API's updateTime, which the chapter
+      compares with the time the page was loaded. Leave out the current conditions, the
+      detailed text forecast, the map, and the links between the two parts.
+    url: https://forecast.weather.gov/MapClick.php?lat=40.015&lon=-105.2705
+    mode: composite
+    window: [800, 600]
+    parts:
+      - label: "Near the top of the page: the extended forecast"
+        steps:
+          - wait: {selector: '#seven-day-forecast-list'}
+          - scroll: {selector: '#seven-day-forecast', offset: 40}
+        expect:
+          text: ['Extended Forecast for', 'Boulder CO']
+        crop: {selector: '#seven-day-forecast'}
+      - label: "At the foot of the page: About This Forecast"
+        steps:
+          - wait: {text: 'Last Update'}
+          - scroll: {selector: '#about_forecast', offset: 40}
+        expect:
+          text: ['Point Forecast:', 'Last Update', 'Forecast Valid']
+        crop: {selector: '#about_forecast'}
+    layout: {direction: column, gap: 12, pad: 12, label_px: 15}
+    drifts: true        # a new forecast several times a day
+
+  - id: nws-points-json
+    kind: capture
+    section: "Finding the Grid: `/points`"
+    brief: >-
+      Show the API's answer to /points/40.015,-105.2705 as Chrome shows it, from
+      "properties" down to the nearest city: the office and grid square (gridId BOU,
+      gridX 54, gridY 75; marker 1, a brace), the forecastHourly address the collector
+      uses (2), and relativeLocation's city, Boulder (3). Leave out the JSON-LD @context
+      above, which the chapter doesn't discuss. The NWS indents the JSON itself, so
+      Pretty-print is left off and the caption says so.
+    url: https://api.weather.gov/points/40.015,-105.2705
+    api_client: true      # robots.txt disallows every path; see the header
+    window: [760, 600]    # wide enough that the forecastHourly line doesn't wrap
+    steps:
+      - wait: {selector: 'pre'}
+      - wait: {text: '"forecastHourly"'}
+      - scroll: {match: '^    "properties": \{$', in: 'pre', offset: 30}
+    expect:
+      text: ['"gridId": "BOU"', '"city": "Boulder"']
+    crop: {match: '^    "properties": \{$', in: 'pre', pad: [0, 0, 0, 8], width: 752, height: 376}
+    annotate:
+      marks:
+        - {n: 1, shape: brace, at: {match: '^\s*"gridId": "BOU",\n\s*"gridX": 54,\n\s*"gridY": 75,$', in: 'pre'}}
+        - {n: 2, at: {match: '^\s*"forecastHourly": .*$', in: 'pre'}, side: right}
+        - {n: 3, at: {match: '^\s*"city": "Boulder",$', in: 'pre'}}
+    drifts: true          # the grid can be remapped, and the answer's other fields change
+
+  - id: afternoon-forecasts
+    kind: render
+    mode: hand
+    section: "One Hour, Forecast Many Times"
+    brief: >-
+      Chart, for 3 p.m. Mountain time on each day the saved series covers, the forecast
+      temperature that each hourly run saved, against how many hours ahead of 3 p.m. the
+      run was made, as the chapter's code draws it: one stepped line per afternoon, far
+      ahead on the left. The reader should see that each line is flat between the
+      forecast's updates and moves in steps, and how far the forecasts moved over the
+      days before each afternoon.
+    url: https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-14/forecasts.csv
+    hand:
+      why: >-
+        matplotlib draws it from the book's saved copy of the course's series, as the
+        chapter's code does; no browser is involved
+      steps: >-
+        Run `python tools/shots/renders/ch-14.py OUTDIR --contact EMAIL` (add --data-url
+        with a branch's raw address, or the local data/ch-14/forecasts.csv, before the
+        data is on main); it writes OUTDIR/afternoon-forecasts.png, 1600 by 900 pixels.
+        Import it with --tool naming matplotlib's, pandas', and requests' versions.
+      text_px: 13
+    window: [800, 450]
