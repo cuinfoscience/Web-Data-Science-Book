@@ -1,5 +1,9 @@
 # Hand-off note
 
+**Updated 2026-11-13: chapter 14 is being rewritten, on `claude/ch14-automation`** ([plan](plans/2026-11-13-ch14-automation.md); [`decisions.md`](decisions.md), 2026-11-13).
+- **Done in the draft:** the whole chapter around the NWS's hourly forecast for Boulder; the course's `collector.py` and `collect.yml` shown as the course repository has them; two captures and their recipes; `tools/shots/renders/ch-14.py`, which runs the tutorial's cells live and, with `--fill`, writes their outputs into the chapter.
+- **Waiting for Tuesday, November 17:** `data/ch-14/forecasts.csv` is an interim series made from the drafting machine. Before the chapter merges, it is replaced by a copy of the course's `labs/week-14/data/forecasts.csv` (written hourly once course #186 merges), the render is run again with `--fill "## Reading What It Collected"`, the chart is imported, and every number marked with a `TODO(Tuesday refresh)` comment in the chapter and `data/ch-14/README.md` is updated.
+
 **Updated 2026-11-02: a sweep of open pull requests and issues, at the maintainer's request** ([`decisions.md`](decisions.md), 2026-10-06).
 - **Merged, low-risk, each with a classmate's support:** #246, #248, #249, #275 (chapter 8); #272, #273 (chapter 9). This note's pull request regenerates the notebooks after them. The regeneration workflow's own pull request, #301, ran before the last three merges and is superseded.
 - **"Request changes":** #243, #244, #245, #250, #251, #252 (chapter 8); #268, #270, #271, #274, #276, #278, #279 (chapter 9). #274 and #278 need only a one-click suggestion. #239 got the same feedback as a comment, because the maintainer's unsent review from 2026-10-09 is still pending on it: GitHub allows one pending review per person, so only the maintainer can submit or delete it.
