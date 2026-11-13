@@ -40,6 +40,10 @@ This chapter works through eight concrete strategies, moving roughly from the ea
 
 Start with the easiest case on the spectrum: a single site, a consistent template, and a page whose data lives in exactly one `<table>` with nothing else on the page competing for it. [Box Office Mojo](https://www.boxofficemojo.com)'s weekly box office charts are built this way, and the chart for the week ending December 28, 2018 — the lucrative corridor between Christmas and New Year's — sits at a URL that follows the same pattern every week:
 
+::: {.callout-note}
+If you need a refresher on dataframes, go back to Chapter 4 here: <https://cuinfoscience.github.io/Web-Data-Science-Book/ch-04-data-formats.html#from-xml-to-dataframe>
+:::
+
 ```{python}
 import pandas as pd
 
@@ -135,6 +139,10 @@ print(df.head())
 ```
 
 This manual approach gives you complete control over the extraction process. The tradeoff is that it requires more code and careful attention to the specific HTML structure of each page. The next strategy goes back to `pandas.read_html()` — but this time the challenge is not finding the right table, since there is only one; it is cleaning up the one you found.
+
+::: {.callout-note}
+If you need a refresher on dataframes, go back to Chapter 4 here: <https://cuinfoscience.github.io/Web-Data-Science-Book/ch-04-data-formats.html#from-xml-to-dataframe>
+:::
 
 ## Strategy 3: The Table That Needs Cleanup
 
