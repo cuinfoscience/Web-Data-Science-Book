@@ -7,6 +7,7 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 <!-- shots:begin: generated from provenance.json by tools/shots; edits between these markers are replaced -->
 | File | Kind | Captured | Source | How |
 |---|---|---|---|---|
+| `afternoon-forecasts.png` | render | 2026-11-13 | https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-14/forecasts.csv | Claude Code, for Brian C. Keegan: rendered with matplotlib 3.11.2 with pandas 3.1.1 and requests 2.34.2; imported by tools/shots |
 | `nws-forecast-page.png` | capture | 2026-11-13 | https://forecast.weather.gov/MapClick.php?lat=40.015&lon=-105.2705 | tools/shots: Google Chrome for Testing 154.0.8037.92, 800×600 at 2× |
 | `nws-points-json.png` and `nws-points-json_annotated.png`, `.pdf` | capture | 2026-11-13 | https://api.weather.gov/points/40.015,-105.2705 | tools/shots: Google Chrome for Testing 154.0.8037.92, 760×600 at 2× |
 <!-- shots:end -->

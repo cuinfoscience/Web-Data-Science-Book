@@ -424,7 +424,7 @@ Simon Willison named this pattern **git scraping** in 2020: a scheduled workflow
 
 ### What GitHub Promises, and What It Doesn't
 
-A schedule on GitHub is a request, and GitHub's documentation says how it can fall short (checked 2026-11-13). Runs can start late, and some never start: "The `schedule` event can be delayed during periods of high loads of GitHub Actions workflow runs. High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped" ([Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)). That is why the template runs at minute 17 rather than minute 0, and why `collected_at` records when a run actually asked rather than when it was scheduled. The same page sets the shortest interval at five minutes, and runs scheduled workflows only from the repository's default branch, usually `main`.
+GitHub's documentation says how a schedule can fall short (checked 2026-11-13). Runs can start late, and some never start: "The `schedule` event can be delayed during periods of high loads of GitHub Actions workflow runs. High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped" ([Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)). That is why the template runs at minute 17 rather than minute 0, and why `collected_at` records when a run actually asked rather than when it was scheduled. The same page sets the shortest interval at five minutes, and runs scheduled workflows only from the repository's default branch, usually `main`.
 
 A schedule can also stop for good. "In a public repository, scheduled workflows are automatically disabled when no repository activity has occurred in 60 days" ([Disabling and enabling a workflow](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/disable-and-enable-workflows)). The page doesn't define activity, so a collector meant to run for longer than two months needs someone to look in on it; the Actions tab has a button that enables a disabled workflow again.
 
@@ -445,9 +445,9 @@ series = pd.read_csv(data_url, parse_dates=["collected_at", "update_time"])
 print(len(series), "rows from", series["collected_at"].nunique(), "runs")
 print("first run:", series["collected_at"].min())
 print("last run: ", series["collected_at"].max())
-# 156 rows from 1 runs
+# 936 rows from 6 runs
 # first run: 2026-11-13 02:23:07+00:00
-# last run:  2026-11-13 02:23:07+00:00
+# last run:  2026-11-13 07:17:01+00:00
 ```
 
 ### How Often Did the Forecast Change?
@@ -460,12 +460,14 @@ runs = series.groupby("collected_at")["update_time"].first()
 print(runs.nunique(), "versions of the forecast in", len(runs), "runs")
 # How many runs found each version
 print(runs.value_counts().sort_index().to_string())
-# 1 versions of the forecast in 1 runs
+# 2 versions of the forecast in 6 runs
 # update_time
-# 2026-11-12 18:46:17+00:00    1
+# 2026-11-12 18:46:17+00:00    5
+# 2026-11-13 06:46:19+00:00    1
 ```
 
-ANALYSIS-PENDING
+<!-- TODO(Tuesday refresh): the counts, times, and the "12 hours" in this paragraph come from the interim copy; rewrite them from the refrozen series, and give the median and longest time a version stood. -->
+In this copy the forecast changed once. The version the forecasters made at 18:46 UTC on November 12 served five runs, the last at 06:17 the next morning, and the version of 06:46 UTC on November 13 served the run after it. Five of the six runs saved a forecast that an earlier run had already saved, and the one update came exactly 12 hours after the one before. A collector that asked twice a day, at the right minutes, would have saved both versions with a twelfth of the requests, but nothing in the API says in advance which minutes those are.
 
 ### When Did the Runs Actually Run?
 
@@ -481,9 +483,12 @@ print("minutes late: median", round(late.median(), 1), "| 90th percentile", roun
 # A gap of more than 90 minutes between runs means at least one scheduled run never happened
 gaps = times.diff()
 print("gaps of more than 90 minutes:", (gaps > pd.Timedelta(minutes=90)).sum())
+# minutes late: median 0.0 | 90th percentile 3.1 | most 6.1
+# gaps of more than 90 minutes: 0
 ```
 
-DELAY-PENDING
+<!-- TODO(Tuesday refresh): this paragraph describes the interim copy, collected by cron-like timing on one computer, not by GitHub. Rewrite it from the course's series: its median and worst lateness, and its gaps. On 2026-11-13 the course workflow's first scheduled runs (05:17, 06:17, 07:17 UTC) did not happen at all; only a run started by hand at 04:30 did, so expect gaps. -->
+The runs in this copy started on time, to the minute: the 6.1 minutes in "most" is the first run, made by hand at 02:23 before the schedule began. On GitHub, lateness and gaps are the numbers to watch, since GitHub's documentation warns of both, and the code above measures each from the data alone, without access to the repository's Actions tab.
 
 ### One Hour, Forecast Many Times
 
@@ -500,12 +505,14 @@ one_hour["hours_ahead"] = (ahead.dt.total_seconds() / 3600).round(1)
 changes = one_hour.drop_duplicates("update_time")
 print(len(one_hour), "runs forecast this hour;", len(changes), "versions:")
 print(changes[["update_time", "hours_ahead", "temperature", "precip_chance", "short_forecast"]].to_string(index=False))
-# 1 runs forecast this hour; 1 versions:
+# 6 runs forecast this hour; 2 versions:
 #               update_time  hours_ahead  temperature  precip_chance short_forecast
 # 2026-11-12 18:46:17+00:00        115.6           57              0          Sunny
+# 2026-11-13 06:46:19+00:00        110.7           59              0   Mostly Sunny
 ```
 
-LEAD-PENDING
+<!-- TODO(Tuesday refresh): rewrite from the refrozen series: how many runs forecast 3 p.m. on November 17, how many versions, and how far the temperature and sky moved between the first and the last. -->
+Six runs forecast 3 p.m. on Tuesday, November 17, and two versions of the forecast reached them. The first, made about 116 hours ahead, said 57 °F and sunny; the second, five hours later, said 59 °F and mostly sunny. Every run between two updates saved the same numbers, so the table shows each version once, with the first run that saw it.
 
 A table of versions for one hour shows how that hour's forecast moved. A chart can show several hours at once. This one takes 3 p.m. on each day the series covers, and draws its forecast temperature against how far ahead it was made:
 
@@ -527,9 +534,10 @@ plt.tight_layout()
 plt.show()
 ```
 
-![CAPTION-PENDING](images/ch-14/afternoon-forecasts.png){#fig-afternoon-forecasts .lightbox fig-alt="FIGALT-PENDING"}
+<!-- TODO(Tuesday refresh): redraw the chart from the refrozen series, import it, and rewrite the caption's span, the fig-alt, and the paragraph after the figure. -->
+![Boulder's forecast temperature for 3 p.m. on each day from November 13 to 18, 2026, against how many hours ahead of 3 p.m. each run made it, from the six runs of the book's copy of the series (02:23 to 07:17 UTC on November 13), drawn by the code above.](images/ch-14/afternoon-forecasts.png){#fig-afternoon-forecasts .lightbox fig-alt="Step chart of forecast temperature in °F, from 50 to 61, against hours ahead of 3 p.m., from 140 on the left to about 15 on the right, one line for each 3 p.m. from November 13 to 18. Each line is short and flat, then steps once at the forecast update: November 18 from 50 to 53, November 17 from 57 to 59, November 16 from 56 to 61, and November 15 from 53 to 55. November 14 stays at 51 and November 13 at 61."}
 
-CHART-PENDING
+Each afternoon's line is flat while the runs saved the same version and steps where a new version arrived. The step came at the same moment for every afternoon, 06:46 UTC on November 13, because an update replaces the whole forecast at once. It moved some afternoons more than others: November 16's 3 p.m. rose 5 degrees, and November 14's didn't move. With a week of runs, each line would start about 155 hours out and end at the hour itself, and the steps along it show how the forecast for that hour settled as it approached.
 
 ## Failures and Monitoring
 
@@ -581,7 +589,8 @@ print(check_freshness(series, now=pd.Timestamp.now(tz="UTC")))
 # []
 ```
 
-FRESHNESS-PENDING
+<!-- TODO(Tuesday refresh): this cell's output depends on when it runs; after the refreeze, run it on the day and rewrite this paragraph for what it prints (most likely "no run since ..."). -->
+An empty list means no problems. This cell ran minutes after the copy's last run, so it found none. Run it on the book's copy today and it reports "no run since" the copy's last run, which is true of a frozen copy and is the reason for that check: on a collector's own file, the same message means the collector has stopped. The 24-hour limit on a forecast's age is a choice the series has to support. The forecast of 18:46 UTC on November 12 stood for 12 hours, through the night, so a limit of 12 hours would have fired on an ordinary night.
 
 The same checks, applied to every run instead of the newest, describe the whole series:
 
@@ -592,12 +601,13 @@ per_run["forecast_age"] = per_run.index - per_run["updated"]
 print("hours saved per run:", per_run["hours"].value_counts().to_dict())
 print("empty precip_chance cells:", series["precip_chance"].isna().sum())
 print("oldest forecast any run saved:", per_run["forecast_age"].max())
-# hours saved per run: {156: 1}
+# hours saved per run: {156: 6}
 # empty precip_chance cells: 0
-# oldest forecast any run saved: 0 days 07:36:50
+# oldest forecast any run saved: 0 days 11:30:44
 ```
 
-PERRUN-PENDING
+<!-- TODO(Tuesday refresh): rewrite from the refrozen series' output. -->
+Every run in this copy saved 156 hours, no `precip_chance` cell was empty, and the oldest forecast any run saved was 11 hours and 31 minutes old: the run at 06:17 UTC on November 13, half an hour before the forecasters' next update.
 
 A check like this belongs on its own schedule, apart from the collector, because a collector that stopped running can't report that it stopped. It could be a second workflow that runs once a day, reads `forecasts.csv` from the repository, and fails, with a red X and an email, when the list of problems isn't empty. The second Recommended Exercise builds the function for your own collector.
 
@@ -686,7 +696,8 @@ The forecast in this chapter comes from a federal agency that publishes it for a
 
 The forecasts are made by people from observations, and in 2025 the NWS had fewer people to make both. On March 20, 2025, the NWS suspended weather balloon launches at Omaha and Rapid City "due to a lack of Weather Forecast Office (WFO) staffing," and cut six other sites, Grand Junction, Colorado, among them, to one launch a day instead of two ([PNS 25-17](https://www.weather.gov/media/notification/pdf_2025/pns25-17_Suspension_RAOB_Launches_OAX-UNR.pdf); [PNS 25-18](https://www.weather.gov/media/notification/pdf_2025/pns25-18_Reduction_RAOB_Launches_ABR_GJT_GRB_APX_LBF_RIW.pdf)). The instruments the balloons carry "send back a wide range of upper atmospheric data to support weather forecasts," in the notices' words. A month later, a further notice said that launches "may" be reduced or suspended at selected sites "due to staffing limitations or operational priorities" ([SCN 25-36](https://www.weather.gov/media/notification/pdf_2025/scn25-36_suspension_of_raob_launches.pdf)). The Associated Press found that 55 of the NWS's 122 forecast offices had vacancy rates of 20% or more in March 2025, and that the agency's overall rate had risen from 9.3% in March 2015 to 19% ([Borenstein, 2025](https://www.pbs.org/newshour/politics/nearly-half-of-national-weather-service-offices-are-critically-understaffed-experts-warn)). In August, NOAA received permission to fill 450 positions at the NWS ([Cain, 2025](https://www.nbcnews.com/science/science-news/nws-rehire-workers-deep-doge-cuts-rcna223684)). The cuts reached published datasets too. On May 8, 2025, NOAA announced that its Billion Dollar Weather and Climate Disasters product "will be retired, with no updates beyond calendar year 2024" ([NESDIS, 2025](https://www.nesdis.noaa.gov/news/billion-dollar-weather-and-climate-disasters)); a NOAA spokesperson put the change down to "evolving priorities, statutory mandates, and staffing changes" ([St. John, 2025](https://www.ksat.com/news/national/2025/05/08/us-retires-database-tracking-billions-of-dollars-of-climate-change-fueled-weather-damage/)). A collector like this chapter's records what the agency publishes and when it updates it. It records nothing about the observations a forecast was made from, so a balloon that wasn't launched leaves no trace in its rows.
 
-Every collector also has a cost on the other end of the request, and the **oversight** value from @sec-post-api applies to the collector as much as to the source. @thelwall2006crawling argued that a crawler's owner should weigh what the crawl costs the sites it visits against what the research gains, which requires finding out what the crawl costs them. The NWS's headers and fields give part of that answer for this chapter's collector: the API lets shared caches keep each answer for an hour (`s-maxage=3600`), while the forecasters update the forecast itself UPDATES-PER-DAY times a day in the course's series. An hourly collector saves, most hours, what it saved the hour before. The cost is small for one collector and grows with each copy. If 40 students each ran the template every hour for four weeks, they would send the NWS 26,880 requests for a forecast that changed about CHANGES-28 times in those weeks. At a larger scale, the Wikimedia Foundation reported in 2025 that bots made about 35% of its pageviews and at least 65% of its most expensive traffic, the requests for pages no nearby cache held, which travel to its core datacenters ([Mueller, Danis and Lavagetto, 2025](https://diff.wikimedia.org/2025/04/01/how-crawlers-impact-the-operations-of-the-wikimedia-projects/)). The course's collector stops itself on December 11 for that reason. When you write your own, give it a last day, ask no more often than the source changes, and put your address in its User-Agent, as the NWS asks of every program that uses its API.
+Every collector also has a cost on the other end of the request, and the **oversight** value from @sec-post-api applies to the collector as much as to the source. @thelwall2006crawling argued that a crawler's owner should weigh what the crawl costs the sites it visits against what the research gains, which requires finding out what the crawl costs them. The NWS's headers and fields give part of that answer for this chapter's collector: the API lets shared caches keep each answer for an hour (`s-maxage=3600`), while in the book's copy of the series the forecast itself stood for 12 hours between updates. An hourly collector saves, most hours, what it saved the hour before. The cost is small for one collector and grows with each copy. If 40 students each ran the template every hour for four weeks, they would send the NWS 26,880 requests, and at one update every 12 hours, each student's 672 requests would find a new forecast 56 times.
+<!-- TODO(Tuesday refresh): replace "12 hours between updates" and the 56 with the refrozen series' typical interval between updates and the count it implies. --> At a larger scale, the Wikimedia Foundation reported in 2025 that bots made about 35% of its pageviews and at least 65% of its most expensive traffic, the requests for pages no nearby cache held, which travel to its core datacenters ([Mueller, Danis and Lavagetto, 2025](https://diff.wikimedia.org/2025/04/01/how-crawlers-impact-the-operations-of-the-wikimedia-projects/)). The course's collector stops itself on December 11 for that reason. When you write your own, give it a last day, ask no more often than the source changes, and put your address in its User-Agent, as the NWS asks of every program that uses its API.
 
 ## Common Issues to Debug
 
@@ -705,7 +716,7 @@ Every collector also has a cost on the other end of the request, and the **overs
 
 ## Key Takeaways
 
-One request shows a source at one moment. A collector that runs on a schedule saves the source's answers over time, and for a source that keeps no history of its own, such as a forecast, those saved answers are the only record there will be. The NWS's hourly forecast for Boulder takes two requests to find and one to collect, and its `updateTime` says which version of the forecast each run saved. Turning notebook code into `collector.py` meant appending with the header written once, stopping on any HTTP error, guarding `main()`, and setting a last day. cron runs the script on your own computer while it is awake; GitHub Actions runs it on GitHub's computers on a schedule GitHub may delay, commits each run's rows back to the repository, and stops a public repository's schedule after 60 days without activity. In the course's series, SUMMARY-PENDING. Errors that stop a run reach you through a red X. A swapped grid square, an empty field, a short list, a stale forecast, or a run that never happened doesn't, so a separate check has to read the data. Every scheduled request costs the server something, so ask no more often than the source changes, name yourself in the User-Agent, and give the collector a last day.
+One request shows a source at one moment. A collector that runs on a schedule saves the source's answers over time, and for a source that keeps no history of its own, such as a forecast, those saved answers are the only record there will be. The NWS's hourly forecast for Boulder takes two requests to find and one to collect, and its `updateTime` says which version of the forecast each run saved. Turning notebook code into `collector.py` meant appending with the header written once, stopping on any HTTP error, guarding `main()`, and setting a last day. cron runs the script on your own computer while it is awake; GitHub Actions runs it on GitHub's computers on a schedule GitHub may delay, commits each run's rows back to the repository, and stops a public repository's schedule after 60 days without activity. In the book's copy of the series, a forecast stood for 12 hours between updates, so most runs saved rows an earlier run had saved, and an update moved every hour of the forecast at once.<!-- TODO(Tuesday refresh): restate from the refrozen series. --> Errors that stop a run reach you through a red X. A swapped grid square, an empty field, a short list, a stale forecast, or a run that never happened doesn't, so a separate check has to read the data. Every scheduled request costs the server something, so ask no more often than the source changes, name yourself in the User-Agent, and give the collector a last day.
 
 ## Further Reading
 

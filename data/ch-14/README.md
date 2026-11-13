@@ -10,7 +10,8 @@ rows a run.
 **This copy is an interim one, for drafting.** Its first run (156 rows, collected
 2026-11-13T02:23Z) is the course repository's own first run, made by hand; the runs after it
 were made by the same `collector.py`, unchanged but for the User-Agent's address, run at minute
-17 of each hour (UTC) from the machine the chapter was drafted on, starting 2026-11-13. Before
+17 of each hour (UTC) from the machine the chapter was drafted on: five runs, 03:17 to 07:17 UTC
+on 2026-11-13, for six in all (936 rows). Before
 the chapter merges, it is replaced by a copy of the course repository's
 `labs/week-14/data/forecasts.csv`, which `.github/workflows/collect-boulder-forecast.yml` writes
 every hour, and this section then says when it was copied and from which commit.
