@@ -2,6 +2,18 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-11-17 · Chapter 14's series is the course's as GitHub's schedule made it, frozen on November 17
+
+**Decision.**
+- The course's collector runs on GitHub's schedule alone, with no outside trigger, though GitHub has started its hourly schedule only every few hours (the instructor, 2026-11-13). The chapter keeps the sparse series and reports it: "When Did the Runs Actually Run?" measures the gaps between runs and the minutes past :17, as the chapter's example of GitHub not promising when scheduled runs start.
+- `data/ch-14/forecasts.csv` was frozen on 2026-11-17 at 23:34 UTC from the course repository's commit `acd392a1e33ac8f7d45b5e7f1a3ebcf2df3726d8`: 18 runs (2026-11-13T02:23Z to 2026-11-17T20:59Z), 2,808 rows, 13 versions of the forecast. The interim copy of 2026-11-13 (six runs, five of them from the drafting machine) is replaced; the chapter and the data's README cite it for the version of 06:46:19Z on November 13 that the course's runs missed, and the chapter for its runs' timing, within a second or two of minute 17.
+- "One Hour, Forecast Many Times" keeps 3 p.m. on November 17 as its hour, because all 18 runs forecast it and the last did so an hour ahead. The chart draws the five afternoons up to that one, November 13 to 17, and leaves out the six later ones the copy reaches.
+- `check_freshness()` keeps its two-hour limit, the right one for an hourly schedule, and the text says that it would fire daily on the course's file and that a limit has to come from the series.
+
+**Why.** The instructor's decision of 2026-11-13, and the plan's Tuesday refresh. A series with real gaps shows what GitHub's documentation warns of; a chart of eleven afternoons hid its own lines.
+
+**Where.** `ch-14-automation.qmd`; `data/ch-14/`; `images/ch-14/afternoon-forecasts.png` and its recipe; [`handoff.md`](handoff.md).
+
 ## 2026-11-13 · Chapter 14 collects the NWS's hourly forecast for Boulder, and reads the course's series
 
 **Decision.**
