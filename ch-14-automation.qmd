@@ -445,9 +445,9 @@ series = pd.read_csv(data_url, parse_dates=["collected_at", "update_time"])
 print(len(series), "rows from", series["collected_at"].nunique(), "runs")
 print("first run:", series["collected_at"].min())
 print("last run: ", series["collected_at"].max())
-# 936 rows from 6 runs
+# 2808 rows from 18 runs
 # first run: 2026-11-13 02:23:07+00:00
-# last run:  2026-11-13 07:17:01+00:00
+# last run:  2026-11-17 20:59:58+00:00
 ```
 
 ### How Often Did the Forecast Change?
@@ -460,10 +460,25 @@ runs = series.groupby("collected_at")["update_time"].first()
 print(runs.nunique(), "versions of the forecast in", len(runs), "runs")
 # How many runs found each version
 print(runs.value_counts().sort_index().to_string())
-# 2 versions of the forecast in 6 runs
+# Hours from each version's update to the next one's
+between = runs.drop_duplicates().diff().dt.total_seconds() / 3600
+print("hours between versions: shortest", round(between.min(), 1), "| median", round(between.median(), 1), "| longest", round(between.max(), 1))
+# 13 versions of the forecast in 18 runs
 # update_time
-# 2026-11-12 18:46:17+00:00    5
-# 2026-11-13 06:46:19+00:00    1
+# 2026-11-12 18:46:17+00:00    2
+# 2026-11-13 09:58:48+00:00    1
+# 2026-11-13 18:46:26+00:00    2
+# 2026-11-14 06:46:20+00:00    1
+# 2026-11-14 11:13:05+00:00    1
+# 2026-11-14 18:46:17+00:00    2
+# 2026-11-15 06:46:23+00:00    2
+# 2026-11-15 18:46:35+00:00    2
+# 2026-11-16 06:46:24+00:00    1
+# 2026-11-16 07:53:11+00:00    1
+# 2026-11-16 18:46:30+00:00    1
+# 2026-11-17 06:46:20+00:00    1
+# 2026-11-17 18:45:49+00:00    1
+# hours between versions: shortest 1.1 | median 12.0 | longest 15.2
 ```
 
 <!-- TODO(Tuesday refresh): the counts, times, and the "12 hours" in this paragraph come from the interim copy; rewrite them from the refrozen series, and give the median and longest time a version stood. -->
@@ -474,17 +489,23 @@ In this copy the forecast changed once. The version the forecasters made at 18:4
 The schedule says minute 17 of every hour. `collected_at` says when each run asked, which is later by however long GitHub took to start the run, plus the time the first three steps took:
 
 ```{python}
-# Each run's scheduled time: minute 17 of its hour, or of the hour before for a run more than 43 minutes late
+# Hours from each run to the next; a schedule that kept to minute 17 of every hour would print 1.0 three times
 times = runs.index.to_series()
+gaps = times.diff().dt.total_seconds() / 3600
+print("hours between runs: shortest", round(gaps.min(), 1), "| median", round(gaps.median(), 1), "| longest", round(gaps.max(), 1))
+# A gap of more than 90 minutes between runs means at least one scheduled run never happened
+print("gaps of more than 90 minutes:", (gaps > 1.5).sum(), "of", gaps.count())
+# Runs on each day, in UTC; an hourly schedule makes 24
+print("runs a day:", times.dt.strftime("%b %d").value_counts(sort=False).to_dict())
+# The nearest scheduled time before each run: minute 17 of its hour, or of the hour before
 scheduled = times.dt.floor("h") + pd.Timedelta(minutes=17)
 scheduled = scheduled.where(scheduled <= times, scheduled - pd.Timedelta(hours=1))
 late = (times - scheduled).dt.total_seconds() / 60
-print("minutes late: median", round(late.median(), 1), "| 90th percentile", round(late.quantile(0.9), 1), "| most", round(late.max(), 1))
-# A gap of more than 90 minutes between runs means at least one scheduled run never happened
-gaps = times.diff()
-print("gaps of more than 90 minutes:", (gaps > pd.Timedelta(minutes=90)).sum())
-# minutes late: median 0.0 | 90th percentile 3.1 | most 6.1
-# gaps of more than 90 minutes: 0
+print("minutes past :17, run by run:", late.round().astype(int).tolist())
+# hours between runs: shortest 2.1 | median 6.9 | longest 10.6
+# gaps of more than 90 minutes: 17 of 17
+# runs a day: {'Nov 13': 4, 'Nov 14': 4, 'Nov 15': 4, 'Nov 16': 3, 'Nov 17': 3}
+# minutes past :17, run by run: [6, 14, 54, 14, 12, 45, 35, 30, 49, 37, 25, 48, 49, 45, 22, 13, 42, 43]
 ```
 
 <!-- TODO(Tuesday refresh): this paragraph describes the interim copy, collected by cron-like timing on one computer, not by GitHub. Rewrite it from the course's series: its median and worst lateness, and its gaps. On 2026-11-13 the course workflow's first scheduled runs (05:17, 06:17, 07:17 UTC) did not happen at all; only a run started by hand at 04:30 did, so expect gaps. -->
@@ -505,10 +526,21 @@ one_hour["hours_ahead"] = (ahead.dt.total_seconds() / 3600).round(1)
 changes = one_hour.drop_duplicates("update_time")
 print(len(one_hour), "runs forecast this hour;", len(changes), "versions:")
 print(changes[["update_time", "hours_ahead", "temperature", "precip_chance", "short_forecast"]].to_string(index=False))
-# 6 runs forecast this hour; 2 versions:
+# 18 runs forecast this hour; 13 versions:
 #               update_time  hours_ahead  temperature  precip_chance short_forecast
 # 2026-11-12 18:46:17+00:00        115.6           57              0          Sunny
-# 2026-11-13 06:46:19+00:00        110.7           59              0   Mostly Sunny
+# 2026-11-13 09:58:48+00:00        104.8           59              0   Mostly Sunny
+# 2026-11-13 18:46:26+00:00         97.5           60              0   Mostly Sunny
+# 2026-11-14 06:46:20+00:00         85.0           59              0   Mostly Sunny
+# 2026-11-14 11:13:05+00:00         78.1           59              0   Mostly Sunny
+# 2026-11-14 18:46:17+00:00         73.2           62              0   Mostly Sunny
+# 2026-11-15 06:46:23+00:00         62.1           61              0   Mostly Sunny
+# 2026-11-15 18:46:35+00:00         48.9           61              0   Mostly Sunny
+# 2026-11-16 06:46:24+00:00         38.0           63              0   Mostly Sunny
+# 2026-11-16 07:53:11+00:00         27.4           63              0   Mostly Sunny
+# 2026-11-16 18:46:30+00:00         19.5           63              0   Mostly Sunny
+# 2026-11-17 06:46:20+00:00         10.0           62              0   Mostly Sunny
+# 2026-11-17 18:45:49+00:00          1.0           62              0   Mostly Sunny
 ```
 
 <!-- TODO(Tuesday refresh): rewrite from the refrozen series: how many runs forecast 3 p.m. on November 17, how many versions, and how far the temperature and sky moved between the first and the last. -->
@@ -519,6 +551,8 @@ A table of versions for one hour shows how that hour's forecast moved. A chart c
 ```{python}
 # 3 p.m. Mountain time on each day: start times that end in T15:00:00-07:00
 afternoons = series[series["start_time"].str.endswith("T15:00:00-07:00")].copy()
+# Keep the afternoons up to the target's, which the series follows almost to the hour itself
+afternoons = afternoons[afternoons["start_time"] <= target]
 ahead = pd.to_datetime(afternoons["start_time"], utc=True) - afternoons["collected_at"]
 afternoons["hours_ahead"] = ahead.dt.total_seconds() / 3600
 fig, ax = plt.subplots(figsize=(8, 4.5))
@@ -528,8 +562,8 @@ for day, rows in afternoons.groupby(afternoons["start_time"].str[:10]):
 ax.invert_xaxis()  # far ahead on the left, the hour itself on the right
 ax.set_xlabel("Hours ahead of 3 p.m.")
 ax.set_ylabel("Forecast temperature (°F)")
-ax.set_title("Boulder's 3 p.m. temperature, as each hourly run forecast it")
-ax.legend(title="3 p.m. on")
+ax.set_title("Boulder's 3 p.m. temperature, as each run forecast it")
+ax.legend(title="3 p.m. on", loc="lower left")
 plt.tight_layout()
 plt.show()
 ```
@@ -586,7 +620,7 @@ def check_freshness(series, now):
     return problems
 
 print(check_freshness(series, now=pd.Timestamp.now(tz="UTC")))
-# []
+# ['no run since 2026-11-17 20:59:58+00:00']
 ```
 
 <!-- TODO(Tuesday refresh): this cell's output depends on when it runs; after the refreeze, run it on the day and rewrite this paragraph for what it prints (most likely "no run since ..."). -->
@@ -601,9 +635,9 @@ per_run["forecast_age"] = per_run.index - per_run["updated"]
 print("hours saved per run:", per_run["hours"].value_counts().to_dict())
 print("empty precip_chance cells:", series["precip_chance"].isna().sum())
 print("oldest forecast any run saved:", per_run["forecast_age"].max())
-# hours saved per run: {156: 6}
+# hours saved per run: {156: 18}
 # empty precip_chance cells: 0
-# oldest forecast any run saved: 0 days 11:30:44
+# oldest forecast any run saved: 0 days 10:45:20
 ```
 
 <!-- TODO(Tuesday refresh): rewrite from the refrozen series' output. -->
