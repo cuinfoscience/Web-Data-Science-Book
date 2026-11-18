@@ -212,7 +212,7 @@ Each item has a recommendation, made on 2026-09-25; the decision is the maintain
 
 ## Hands off
 
-- Chapter 6 and course week 6: leave them untouched (maintainer's instruction). In the review pass of 2026-10-06 the maintainer had students' chapter 6 pull requests reviewed and merged like the others, and then asked for the fixes to chapter 6 that the reviews found. Other agent edits to chapter 6 still wait for the maintainer's request.
+- Chapter 6 and course week 6 are no longer hands-off: on 2026-11-18 the maintainer lifted the rule when merging chapter 6's fixes from the course's week 6 student review (#323). Students' open chapter 6 pull requests still follow the rules below.
 - Students' branches and pull requests: never edit or rebase them. Merge one only in a review pass the maintainer asks for, under the rules in [`decisions.md`](decisions.md) (2026-10-06); otherwise the maintainer merges them after the Friday code review.
 - Issues a student's open pull request already fixes: leave the fix to it. On 2026-09-24 a chapter 4 fix for #90 had to be withdrawn because #92, the reporter's own pull request, already fixed it. Check the issue's linked pull requests and the open ones on that chapter first.
 - Closing keywords: write "fixes #N", "closes #N", or "resolves #N" only where the change fixes #N. GitHub reads them anywhere in a commit message that reaches `main`; "already fixes #90", in a sentence about #92, closed #90. A quotation counts too, so search a branch's commit messages before merging it.
