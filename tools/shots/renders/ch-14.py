@@ -28,7 +28,7 @@ Run it in the webdata environment, then import the chart (tools/shots/README.md,
 "Hand captures"), naming the programs that drew it:
 
     tools/shots/run import ch-14 afternoon-forecasts --file OUTDIR/afternoon-forecasts.png \\
-        --by NAME --date YYYY-MM-DD --tool "matplotlib X.Y.Z with pandas X.Y.Z and requests X.Y.Z"
+        --by "Brian C. Keegan" --date YYYY-MM-DD --tool "matplotlib X.Y.Z with pandas X.Y.Z and requests X.Y.Z"
 """
 import argparse
 import contextlib

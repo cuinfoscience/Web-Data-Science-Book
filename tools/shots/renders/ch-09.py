@@ -13,7 +13,7 @@ pdfplumber, pypdf, pytesseract, and Tesseract, then import each one
 (tools/shots/README.md, "Hand captures"), naming the program that drew it:
 
     tools/shots/run import ch-09 pdf-objects --file OUTDIR/pdf-objects.png \\
-        --by NAME --date YYYY-MM-DD --tool "pdfplumber X.Y.Z"
+        --by "Brian C. Keegan" --date YYYY-MM-DD --tool "pdfplumber X.Y.Z"
 """
 import re
 import sys

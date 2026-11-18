@@ -29,7 +29,7 @@ Run it in the webdata environment, then import the chart (tools/shots/README.md,
 "Hand captures"), naming the programs that drew it:
 
     tools/shots/run import ch-13 lead-similarity --file OUTDIR/lead-similarity.png \\
-        --by NAME --date YYYY-MM-DD --tool "matplotlib X.Y.Z with requests X.Y.Z"
+        --by "Brian C. Keegan" --date YYYY-MM-DD --tool "matplotlib X.Y.Z with requests X.Y.Z"
 """
 import argparse
 import contextlib

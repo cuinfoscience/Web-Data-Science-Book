@@ -859,7 +859,9 @@ tools/shots/run import course issue-form --file issue.png --by "A. Person" --dat
   `--browser`. The record then reads "rendered with pdfplumber 0.11.10;
   imported by tools/shots", never "screenshot by hand". The rule that a
   screenshot is a real capture still holds, because the kind says what the
-  picture is.
+  picture is. A render is imported `--by "Brian C. Keegan"`, as each script
+  in `renders/` shows: the chart is credited to him, and `--tool` names the
+  programs that drew it (`docs/decisions.md`, 2026-11-18).
 
 Three course recipes wait for their screenshots (2026-09-25): `pr-review`,
 one image for weeks 1, 8, and 13's `pr_review.png`; `week01-issue-form`, a

@@ -9,7 +9,7 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 |---|---|---|---|---|
 | `datalab-keys.png` and `datalab-keys_annotated.png`, `.pdf` | capture | 2026-11-09 | https://www.datalab.to/app/keys | Brian C. Keegan: screenshot by hand in a desktop browser; imported by tools/shots, 1 area blacked out |
 | `datalab-signin.png` and `datalab-signin_annotated.png`, `.pdf` | capture | 2026-11-09 | https://www.datalab.to/app/keys | tools/shots: Google Chrome for Testing 154.0.8037.92, 800×600 at 2× |
-| `lead-similarity.png` | render | 2026-11-09 | https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-13/wikipedia/leads.csv | Claude Code, for Brian C. Keegan: rendered with matplotlib 3.11.2 with requests 2.34.2; imported by tools/shots |
+| `lead-similarity.png` | render | 2026-11-09 | https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-13/wikipedia/leads.csv | Brian C. Keegan: rendered with matplotlib 3.11.2 with requests 2.34.2; imported by tools/shots |
 | `openrouter-create-key.png` and `openrouter-create-key_annotated.png`, `.pdf` | capture | 2026-11-09 | https://openrouter.ai/settings/keys | Brian C. Keegan: screenshot by hand in a desktop browser; imported by tools/shots |
 | `openrouter-home.png` and `openrouter-home_annotated.png`, `.pdf` | capture | 2026-11-09 | https://openrouter.ai/ | tools/shots: Google Chrome for Testing 154.0.8037.92, 800×600 at 2× |
 | `openrouter-keys.png` and `openrouter-keys_annotated.png`, `.pdf` | capture | 2026-11-09 | https://openrouter.ai/settings/keys | Brian C. Keegan: screenshot by hand in a desktop browser; imported by tools/shots, 2 areas blacked out |
