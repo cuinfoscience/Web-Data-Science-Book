@@ -167,14 +167,22 @@ sites = {
 
 for name, url in sites.items():
     response = requests.get(url, headers=HEADERS)   # same header as above
+    # A 403 or 404 page is not a rules file: say so, and go on to the next site instead of counting it
+    if response.status_code != 200:
+        print(f"{name}: got {response.status_code}, not a robots.txt to count")
+        continue
     lines = response.text.strip().split("\n")
-    disallow_count = sum(1 for line in lines if line.startswith("Disallow"))
-    allow_count = sum(1 for line in lines if line.startswith("Allow"))
+    # Rule names are case-insensitive, so lower() counts "disallow:" as well as "Disallow:"
+    disallow_count = sum(1 for line in lines if line.lower().startswith("disallow"))
+    allow_count = sum(1 for line in lines if line.lower().startswith("allow"))
     print(f"{name}: {len(lines)} lines, {disallow_count} Disallow rules, {allow_count} Allow rules")
+# In November 2026:
 # Wikipedia: 712 lines, 460 Disallow rules, 4 Allow rules
 # Reddit: 8 lines, 1 Disallow rules, 0 Allow rules
-# NY Times: 359 lines, 149 Disallow rules, 27 Allow rules
+# NY Times: 386 lines, 149 Disallow rules, 38 Allow rules
 ```
+
+Without the status check, a site that refused you would still be counted: its error page has lines but no `Disallow` rules, so it would look like a site with no rules at all. Treat a file you can't read (a 403, a server error) as a no. A 404 is different: a site with no file has set no rules, as the caveats above say, but there is still nothing to count. The check reports either one and goes on to the next site, where `raise_for_status()` above would stop.
 
 Wikipedia's `robots.txt` is permissive where it matters most — the encyclopedia articles under `/wiki/` are open to crawlers — while restricting dynamic pages, editing interfaces, and internal administration paths under `/w/` and `Special:`. Programmatic access to its data happens instead through the API and public database dumps, governed by their own etiquette policies. This division of labor reflects Wikipedia's organizational commitment to openness: the data exists to be shared, through channels designed for sharing it. The New York Times restricts selectively, blocking large sections of the site while leaving others open — reflecting the fact that its content is a commercial product.
 
@@ -254,7 +262,7 @@ def responsible_get(url, headers=None, delay=1.0):
         The response object, or None if the request failed
     """
     default_headers = {
-        "User-Agent": "WebDataScience/1.0 (student-project; your-email@colorado.edu)"
+        "User-Agent": "WebDataScience/1.0 (INFO 4617; your-email@colorado.edu)"
     }
     if headers:
         default_headers.update(headers)
@@ -308,6 +316,17 @@ This guided exercise is the chapter's take-home assignment. Work through it in t
 
 You will audit how three websites govern automated access, using the tools this chapter introduced: a named `User-Agent`, `robots.txt`, `RobotFileParser`, and polite request pacing.
 
+**Setup.** Run this cell first, rather than **Run All**: Run All would also send every request in the chapter's examples above, to Wikipedia, Reddit, the Times, and `example.com`. This cell sends no request.
+
+```{python}
+# Setup: the libraries the steps use. It sends no request.
+import time
+
+import pandas as pd
+import requests
+from urllib.robotparser import RobotFileParser
+```
+
 **Step 1 — Identify yourself.** Define a `HEADERS` dictionary with a `User-Agent` string that names this course and includes your email, following the chapter's pattern. You will send it with every request in this exercise.
 
 ```{python}
@@ -315,10 +334,10 @@ You will audit how three websites govern automated access, using the tools this 
 # Your code here
 ```
 
-**Step 2 — Fetch a robots.txt.** Retrieve `https://en.wikipedia.org/robots.txt` with your headers. Print the status code and the first 500 characters, as you printed a response body in @sec-introduction.
+**Step 2 — Fetch a robots.txt.** Retrieve `https://en.wikipedia.org/robots.txt` with your headers, and print the status code. The file opens with comments, so its first 500 characters show none of the rules Step 3 tests. Split the text into lines with `splitlines()`, find the line `User-agent: *` with the list's `index()` method, and print the 15 lines that start there: the rules for every crawler the file doesn't name.
 
 ```{python}
-# Step 2: Fetch Wikipedia's robots.txt and print the status code and the first 500 characters.
+# Step 2: Fetch Wikipedia's robots.txt, print the status code, and print the 15 lines that start at "User-agent: *".
 # Your code here
 ```
 
@@ -329,14 +348,14 @@ You will audit how three websites govern automated access, using the tools this 
 # Your code here
 ```
 
-**Step 4 — Widen the comparison.** Pick two more websites you actually use. Fetch each site's `robots.txt` politely — with your headers and `time.sleep(1)` between requests — and for each file count total lines, `Disallow` rules, and `Allow` rules, following the chapter's comparison code.
+**Step 4 — Widen the comparison.** Pick two more websites you actually use. Fetch each site's `robots.txt` politely — with your headers and `time.sleep(1)` between requests — and for each file count total lines, `Disallow` rules, and `Allow` rules, following the chapter's comparison code. Print each status code before you count: a 403 or 404 page is not a rules file. A site whose file you can't read (a 403, a server error) counts as a no; a 404 means it has no file, and so no rules; either way, choose another site to count. Keep each site's text and its parser (a `RobotFileParser` for each), since Step 5 needs both.
 
 ```{python}
 # Step 4: Fetch robots.txt for two sites of your choice, sleeping between requests, and count lines, Disallow rules, and Allow rules for each.
 # Your code here
 ```
 
-**Step 5 — Tabulate.** Build a DataFrame with one row per site (all three) and columns for line count, Disallow count, Allow count, and the value of `crawl_delay("*")` if the parser reports one.
+**Step 5 — Tabulate.** Build a DataFrame with one row per site (all three) and columns for line count, Disallow count, Allow count, and the value of `crawl_delay("*")` if the parser reports one. One way: a dictionary for each site, whose keys are the column names, kept in a dictionary whose keys are the sites; then `pd.DataFrame(rows).T` puts one site on each row. `crawl_delay("*")` gives `None`, which the table shows as `NaN`, when the site declares no crawl delay.
 
 ```{python}
 # Step 5: Build a DataFrame summarizing all three sites' robots.txt rules.
@@ -357,7 +376,7 @@ These are open-ended extensions — no scaffold, no fixed path. Use them for fur
 
 2. **Ethical decision framework.** Apply the five-question framework to a hypothetical scenario: a researcher wants to scrape user profiles from a dating app to study patterns in self-presentation across demographic groups. Work through each question and write a recommendation.
 
-3. **Rate limiting experiment.** Using `time.time()` to measure elapsed time, write a loop that makes five requests to a public website with a one-second delay between each. Then modify the delay to two seconds. Confirm that your actual request timing matches your intended rate.
+3. **Rate limiting experiment.** Using `time.time()` to measure elapsed time, write a loop that makes five requests to a public website with a one-second delay between each. Read the site's `robots.txt` first, and choose a page it allows for `*`; if you can't read the file (a 403, a server error), choose another site. Then modify the delay to two seconds. Confirm that your actual request timing matches your intended rate.
 
 4. **Personal robots.txt audit.** Retrieve `robots.txt` for a website you use daily but have never scraped. Read the `Disallow` rules carefully. Then find and read the site's Terms of Service (look for links in the footer). Write a 300-word analysis: if you wanted to collect data from this site for a class project, what would `robots.txt`, the Terms of Service, and the five-question ethical framework each permit and restrict? Where do these three sources of guidance agree, and where do they conflict?
 
@@ -381,6 +400,7 @@ Your own practice is part of that effort. Responsible data collection is itself 
 - **Every `can_fetch()` returns `False`, including for pages you know are allowed**: You probably called `RobotFileParser.read()`. It fetches with `urllib`'s default User-Agent, many sites answer that with `403`, and `read()` silently records a 403 as "disallow everything." Fetch the file yourself with a real User-Agent and use `rp.parse(text.splitlines())` instead. Check for this before you conclude a site bans crawlers.
 - **Requests blocked despite `robots.txt` allowing access**: Some sites use additional bot detection (CAPTCHAs, JavaScript challenges, behavioral analysis) beyond `robots.txt`.
 - **403 Forbidden with a responsible User-Agent**: The site may be blocking all automated access regardless of your headers. Respect this.
+- **Your `can_fetch()` answers differ from a classmate's, or from this book's**: check your Python version with `platform.python_version()`. Python 3.14.5 and later, and 3.13.14 and later, follow RFC 9309: when two rules match a path, the longest one wins, and a group of `User-agent` lines runs on past a blank line to the rules that follow. Earlier versions obey the first matching rule in the file, and end a group at a blank line, so a file that names some crawlers, then a blank line, then more crawlers and their rules, leaves the first ones to the rules for `*`. The examples in this chapter give the same answers on both.
 - **Forgetting `time.sleep()`**: If your IP gets temporarily banned, wait at least an hour before trying again, and add appropriate delays to your code.
 
 ## Key Takeaways
