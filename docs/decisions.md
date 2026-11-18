@@ -2,6 +2,16 @@
 
 Standing decisions for the book and its tools, newest first. Each entry gives the decision, the reason, and where the decision is written or enforced. Entries are never deleted. When a decision is replaced, it is marked *superseded*, with a link to the entry that replaces it. Proposals that nobody has decided yet are listed in [`handoff.md`](handoff.md), not here.
 
+## 2026-11-18 · Rendered charts are credited to Brian C. Keegan
+
+**Decision.**
+- A render's record (`provenance.json`'s `by`, and so the "How" column of `IMAGES.md`) credits Brian C. Keegan. The five charts credited "Claude Code, for Brian C. Keegan" now read "Brian C. Keegan": chapter 11's `cpi-denver-national`, `co-generation-mix` and `state-electricity-bills`, chapter 13's `lead-similarity`, and chapter 14's `afternoon-forecasts`.
+- Each script in `tools/shots/renders/` gives the import command with `--by "Brian C. Keegan"`, so a chart rendered again is credited the same way. `--tool` still names the programs that drew it.
+
+**Why.** The maintainer's decision of 2026-11-18.
+
+**Where.** `images/ch-11/`, `images/ch-13/` and `images/ch-14/` (`provenance.json` and `IMAGES.md`); `tools/shots/renders/*.py`; `tools/shots/README.md` ("Renders"). The course repository's copies (`slides/week-11/img/shots.json` and `IMAGES.md`) still carry the old credit; they change when those figures are next copied with `tools/shots/run sync`.
+
 ## 2026-11-17 · Chapter 14's series is the course's as GitHub's schedule made it, frozen on November 17
 
 **Decision.**
