@@ -14,8 +14,9 @@ Run from the repository root after editing any chapter's code:
 
 The script is deterministic: regenerating without chapter changes
 produces byte-identical notebooks, so `git status` shows drift. It exits
-with an error when a figure or an @fig- reference is left unconverted,
-which would show as a broken image in the notebook.
+with an error when a figure or an @fig- or @sec- reference is left
+unconverted, which would show as a broken image or raw text in the
+notebook.
 """
 
 import json
@@ -97,6 +98,34 @@ def convert_figures(text: str, chapter: int, numbers: dict = None) -> str:
     return re.sub(r"@(fig-[\w-]+)", lambda m: numbers.get(m.group(1), m.group(0)), text)
 
 
+def section_names() -> dict:
+    """{label: Markdown link} for each chapter's and appendix's @sec- label.
+
+    Quarto renders "@sec-ethics" as "Chapter 2"; a notebook would show the
+    raw label, so it becomes a link to the chapter in the published book.
+    """
+    names = {}
+    for qmd in sorted(ROOT.glob("*.qmd")):
+        first = qmd.read_text(encoding="utf-8").split("\n", 1)[0]
+        match = re.match(r"^# (.+?)\s*\{#(sec-[\w-]+)\}", first)
+        if not match:
+            continue
+        chapter = re.match(r"ch-(\d+)", qmd.stem)
+        text = f"Chapter {int(chapter.group(1))}" if chapter else match.group(1)
+        names[match.group(2)] = f"[{text}]({BOOK_URL}{qmd.stem}.html)"
+    return names
+
+
+def convert_sections(text: str, names: dict, links: bool = True) -> str:
+    """Rewrite @sec- references as links to the book's chapters, or, in code comments, as plain names."""
+    def replace(match):
+        name = names.get(match.group(1))
+        if name is None:
+            return match.group(0)
+        return name if links else re.match(r"\[(.*)\]\(", name).group(1)
+    return re.sub(r"@(sec-[\w-]+)", replace, text)
+
+
 def split_at_sections(prose: str) -> list:
     """Split a prose run into one markdown cell per ## section.
 
@@ -137,12 +166,12 @@ def leftovers(nb: dict) -> list:
         if cell["cell_type"] != "markdown":
             continue
         source = "".join(cell["source"])
-        found += [f"unconverted reference {m}" for m in re.findall(r"@fig-[\w-]+", source)]
+        found += [f"unconverted reference {m}" for m in re.findall(r"@(?:fig|sec)-[\w-]+", source)]
         found += [f"unconverted image path {m}" for m in re.findall(r"\]\((images/[^)\s]*)", source)]
     return found
 
 
-def make_notebook(qmd_path: Path, numbers: dict = None) -> dict:
+def make_notebook(qmd_path: Path, numbers: dict = None, names: dict = None) -> dict:
     text = qmd_path.read_text(encoding="utf-8")
     # The chapters' "Companion Notebook" download callout is navigation
     # for the rendered book; inside the notebook itself it is noise.
@@ -167,12 +196,14 @@ def make_notebook(qmd_path: Path, numbers: dict = None) -> dict:
         # nbformat stores sources as lists of lines with trailing newlines.
         source_lines = source.splitlines(keepends=True)
         if kind == "markdown":
+            source_lines = convert_sections(source, names or {}).splitlines(keepends=True)
             nb_cells.append({
                 "cell_type": "markdown",
                 "metadata": {},
                 "source": source_lines,
             })
         else:
+            source_lines = convert_sections(source, names or {}, links=False).splitlines(keepends=True)
             nb_cells.append({
                 "cell_type": "code",
                 "execution_count": None,
@@ -207,9 +238,10 @@ def main() -> None:
     for qmd in chapters:
         chapter = int(re.match(r"ch-(\d+)", qmd.stem).group(1))
         numbers.update(figure_numbers(qmd.read_text(encoding="utf-8"), chapter))
+    names = section_names()
     problems = []
     for qmd in chapters:
-        nb = make_notebook(qmd, numbers)
+        nb = make_notebook(qmd, numbers, names)
         out = OUT_DIR / (qmd.stem + ".ipynb")
         out.write_text(
             json.dumps(nb, indent=1, ensure_ascii=False) + "\n",
@@ -219,7 +251,7 @@ def main() -> None:
         print(f"{out.relative_to(ROOT)}: {len(nb['cells'])} cells ({n_code} code)")
         problems += [f"{qmd.name}: {p}" for p in leftovers(nb)]
     if problems:
-        print("\nFigures the notebooks could not convert:", *problems, sep="\n  ")
+        print("\nFigures and references the notebooks could not convert:", *problems, sep="\n  ")
         raise SystemExit(
             "Check each figure's caption and label in its chapter: an unbalanced "
             "bracket, or a reference to a label no chapter defines."

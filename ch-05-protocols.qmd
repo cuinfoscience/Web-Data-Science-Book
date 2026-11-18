@@ -88,12 +88,8 @@ You can find your own computer's IP address programmatically:
 ```{python}
 import socket
 
-# Your computer's hostname on the local network
-hostname = socket.gethostname()
-print(f"Hostname: {hostname}")
-
-# Your local IP address
-local_ip = socket.gethostbyname(hostname)
+# Your local IP address, looked up by your computer's name. The name isn't printed: it often holds your own
+local_ip = socket.gethostbyname(socket.gethostname())
 print(f"Local IP: {local_ip}")
 ```
 
@@ -104,9 +100,13 @@ To see your *public* IP address (as seen by servers on the internet), you can qu
 ```{python}
 import requests
 
-response = requests.get("https://api.ipify.org?format=json")
-print(response.json())
-# {'ip': '128.138.xxx.xxx'} — your public IP
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+response = requests.get("https://api.ipify.org?format=json", headers=headers)
+public_ip = response.json()["ip"]
+
+# Print only the first two numbers: notebooks end up on screens and in repositories
+numbers = public_ip.split(".")
+print(numbers[0] + "." + numbers[1] + ".xxx.xxx")  # 128.138.xxx.xxx
 ```
 
 **From the terminal, inside the notebook.** Some of the most useful network tools are programs that come with your operating system rather than Python libraries: `ping`, `traceroute`, and `curl`. A notebook can run them too. When a line in a code cell starts with `!`, Jupyter hands the rest of the line to your computer's terminal, and the program's output appears under the cell. There is nothing to install, and no administrator rights are needed.
@@ -146,15 +146,21 @@ To work with the output in Python instead of reading it, put a variable in front
 ```{python}
 import requests
 
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+
 def geolocate_ip(ip):
     """Look up the geographic location of an IP address."""
-    response = requests.get(f"http://ip-api.com/json/{ip}")
+    # ip-api's free service answers over http:// only; https:// is for paying customers
+    response = requests.get(f"http://ip-api.com/json/{ip}", headers=headers)
     return response.json()
 
 # Note: ip-api.com limits you to 45 requests per minute
-location = geolocate_ip("151.101.130.133")
-print(f"{location['city']}, {location['country']}")
+# One of Wikipedia's addresses, as DNS gave it in November 2026; yours may differ
+location = geolocate_ip("208.80.153.224")
+print(f"{location['city']}, {location['country']}")  # San Francisco, United States
 ```
+
+ip-api's `robots.txt` disallows `/json/` for every client. That file is written for crawlers that wander a site's pages; `/json/` is the endpoint ip-api's [documentation](https://ip-api.com/docs/api:json) offers programs, and its [terms](https://ip-api.com/docs/legal) allow non-commercial use at up to 45 requests a minute. A documented API is governed by its own terms and limits, so calling it this way is fine. A loop that looked up every address it could find would be a crawl, and the file would apply.
 
 #### Interpreting Traceroute Output
 
@@ -277,6 +283,7 @@ def diagnose_request(url, headers=None):
         print(f"Response size: {len(response.content):,} bytes")
         if response.history:
             print(f"Redirected from: {response.history[0].url}")
+            print(f"Ended at: {response.url}")
         return response
     except requests.exceptions.ConnectionError:
         print(f"Connection failed: {url}")
@@ -288,6 +295,8 @@ headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 diagnose_request("https://en.wikipedia.org/wiki/Python_(programming_language)", headers=headers)
 diagnose_request("https://en.wikipedia.org/wiki/Nonexistent_Page_12345", headers=headers)
 ```
+
+`response.history` lists the redirects that `requests` followed, so `history[0].url` is where the chain started, and `response.url` is where it ended. A site can also redirect inside its server, with no 301 to see: Wikipedia's `https://en.wikipedia.org/wiki/CU_Boulder` answers 200 with an empty history, under the article's real title. When the request fails to connect or times out, the function prints why and returns `None`, so a loop over its results checks for `None` before reading one.
 
 The most common errors you will encounter in practice are 403 (Forbidden) and 429 (Too Many Requests). A 403 often means the server detected your request as automated — either because you are missing a `User-Agent` header or because the site blocks scraping entirely. A 429 means you are hitting the server too frequently. For 429 errors, a retry-with-backoff strategy helps:
 
@@ -366,7 +375,7 @@ plt.show()
 
 Every request this chapter has made has honestly identified itself — `WebDataScience/1.0 (your-email@colorado.edu)`, a real contact address a server operator could actually use to reach you. **User-Agent spoofing** means sending a `User-Agent` header that claims to be something you are not: a specific browser, operating system, or device you are not actually running. It is worth understanding both because you will encounter it — some sites behave differently depending on what you claim to be — and because doing it yourself raises questions this book has otherwise been able to sidestep by simply identifying itself truthfully.
 
-There are legitimate, unremarkable reasons to change a `User-Agent`: testing how your own site renders on a phone without owning one, checking whether a page serves a simplified version to older browsers, or working around a service that blocks a legitimate research tool's honest identification for no defensible reason. There are also reasons that are not legitimate, covered below.
+There are legitimate, unremarkable reasons to change a `User-Agent`: testing how your own site renders on a phone without owning one, or checking whether a page serves a simplified version to older browsers. Getting past a site that refuses your honest identification is not one of them, as the callout below explains.
 
 Mechanically, spoofing is nothing more than the `headers` dictionary you already know how to build — just with a value that describes a browser and device you are not actually using:
 
@@ -434,9 +443,10 @@ for article in articles:
     url = f"https://en.wikipedia.org/wiki/{article}"
     response = session.get(url)  # Connection reused; headers already set
     print(article, response.status_code, len(response.text))
-# Python_(programming_language) 200 812394
-# Web_scraping 200 145207
-# Data_science 200 291846
+# In November 2026 (the lengths change whenever an article is edited):
+# Python_(programming_language) 200 1027634
+# Web_scraping 200 244347
+# Data_science 200 287994
 ```
 
 The setup costs six lines, and everything after that behaves exactly like the `requests.get()` calls you already know — `session.get()` returns the same `Response` object with the same `.json()`, `.text`, and `.status_code`.
@@ -611,6 +621,17 @@ This guided exercise is the chapter's take-home assignment. Work through it in t
 
 You will build a URL diagnostic tool from the protocol layers this chapter covered — DNS, HTTP status codes, headers, and redirects — and use it to profile five real URLs.
 
+**Before you start.** Run this cell first, with your own email address in `HEADERS`. It imports what the steps use and defines the User-Agent every request below sends (@sec-ethics).
+
+```{python}
+# Run this first: the imports and the User-Agent every step below uses
+import requests
+import dns.resolver
+from urllib.parse import urlparse
+
+HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+```
+
 **Step 1 — Take a URL apart.** Use `urlparse()` on three URLs of different shapes — a plain page, a URL with a query string, and one of the API URLs from earlier chapters. For each, print the scheme, netloc, path, and query.
 
 ```{python}
@@ -625,26 +646,26 @@ You will build a URL diagnostic tool from the protocol layers this chapter cover
 # Your code here
 ```
 
-**Step 3 — Request with named headers.** Define your `HEADERS` (@sec-ethics) and request one of the three URLs from Step 1. Print the status code and three response headers: `Content-Type`, `Server`, and `Content-Length` (or the length of `response.content` if the header is absent).
+**Step 3 — Request with named headers.** Send your `HEADERS`, from the cell above, with a request for one of the three URLs from Step 1. Print the status code and three response headers: `Content-Type`, `Server`, and `Content-Length` (or the length of `response.content` if the header is absent).
 
 ```{python}
 # Step 3: Make a request with your HEADERS and print the status code and three response headers.
 # Your code here
 ```
 
-**Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check `response.history`, and if it redirected, print where it ended up. Include a docstring.
+**Step 4 — Write `diagnose_url()`.** Wrap Step 3 in a function `diagnose_url(url)` that prints the status code, Content-Type, Server header, response size in bytes, and whether the request was redirected — check `response.history`, and if it redirected, print where it ended up (`response.url`, not `response.history[0].url`, which is where it started). Include a docstring.
 
 ```{python}
 # Step 4: Write diagnose_url(url) -- status, content-type, server, size, and the redirect chain if any. Include a docstring. Use a timeout like `timeout=10` so an unresponsive URL does not stall the entire notebook.
 # Your code here
 ```
 
-**Step 5 — Profile five URLs.** Run `diagnose_url()` on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an `http://` address of a site that upgrades you to `https://`), an API endpoint, and a site known to restrict automated access (@sec-post-api showed you one).
+**Step 5 — Profile five URLs.** Run `diagnose_url()` on five URLs chosen to behave differently: a working page, a page that 404s, a URL that redirects (try an `http://` address of a site that upgrades you to `https://`), an API endpoint, and a URL whose server refuses automated clients. Before you send anything to a site, read its `robots.txt` (@sec-ethics). If it disallows the path for every client (`User-agent: *`) or for a group that names yours, choose another URL, and treat a file that won't load as a no; a site with no file has set no rules. Many sites that turn scripts away do it with a firewall, not in `robots.txt`, so a URL the file allows can still answer 403. If you can't find one, `https://httpbin.org/status/403` is a test endpoint that answers every request with a 403, and its `robots.txt` allows it.
 
 Record what you actually receive from the fifth site: its behavior can vary with your network, request headers, and the time of the request. Inspect a short excerpt of `response.text` as well as the status and headers. A `200` response or a small HTML body alone does not tell you whether you received the requested content, a page that needs JavaScript, or an access challenge. If the response does not clearly show a refusal, report that you could not confirm a block; you do not need to keep trying sites until one refuses you.
 
 ```{python}
-# Step 5: Diagnose five URLs -- working, 404, redirect, API, and potentially blocked.
+# Step 5: Diagnose five URLs -- working, 404, redirect, API, and potentially blocked. Read each site's robots.txt first.
 # Your code here
 ```
 
