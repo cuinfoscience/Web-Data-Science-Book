@@ -137,6 +137,8 @@ print(data)
 
 The `HEADERS` constant deserves a comment before we go further. The [Wikimedia User-Agent policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy) asks every client to identify itself with a descriptive User-Agent string that includes contact information. Since 2026, Wikimedia's [rate limits](https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits) also depend on it: a client that identifies itself gets far more requests a minute than one that doesn't. Put your own email address in place of `your-email@colorado.edu`, keeping the policy's form: a name and version, your contact information in parentheses, then the library that sends the request and its version, here `python-requests/` and the number `requests.__version__` gives. `CLIENT` holds the first two parts on their own, because mwclient, later in this chapter, adds its own name and version to whatever you give it.
 
+The API's address starts with `/w/`, and Wikipedia's `robots.txt`, which @sec-ethics read, says `Disallow: /w/` to every crawler. As that chapter explains, `robots.txt` addresses crawlers that find pages by following links; a documented API has rules of its own, which are the ones this chapter follows: the User-Agent policy, the rate limits in "Common Issues to Debug", Wikimedia's [Terms of Use](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use), and its [API etiquette](https://www.mediawiki.org/wiki/API:Etiquette), which asks for one request at a time. The pageviews API, later in this chapter, is on `wikimedia.org`, which serves no `robots.txt` at all (checked 2026-11-18).
+
 The same request works in a browser. Paste the address that `requests` builds into the address bar, with `format=jsonfm` in place of `format=json`, and the API lays its JSON out as a web page (@fig-api-response). Under `pages` is one key, the page's ID ①, and under it the facts `prop=info` asks for, such as the article's length in bytes ②. The [API sandbox](https://en.wikipedia.org/wiki/Special:ApiSandbox) goes further: it builds a request from a form, with every module and parameter documented beside it, and shows the request it made, so you can copy it into Python.
 
 ![The chapter's first request in a browser, with `format=jsonfm`, October 2026. The page's ID ① is the key under `pages`, and `length` ② is the article's size in bytes.](images/ch-10/api-response_annotated.png){#fig-api-response .lightbox fig-alt="Screenshot of the MediaWiki API's HTML view of a JSON response. A note at the top says this is the HTML representation of the JSON format. Below it, formatted JSON: batchcomplete, then query, pages, and a page ID key. Marker 1: the line pageid with the number 289672. Under it come ns 0, title University of Colorado Boulder, and other fields. Marker 2: the line length with the article's size in bytes."}
@@ -171,6 +173,8 @@ For strategies on reading and navigating unfamiliar API documentation, see *Miss
 Every edit ever made to a Wikipedia article is recorded and accessible through the API. The revisions endpoint returns metadata about each edit: who made it, when, how much the article size changed, and what edit summary they left. One request returns at most 500 revisions, so the function asks again until the API says there are no more:
 
 ```{python}
+import time
+
 import pandas as pd
 
 def get_revisions(title, until="2026-09-30T23:59:59Z"):
@@ -194,6 +198,7 @@ def get_revisions(title, until="2026-09-30T23:59:59Z"):
         all_revisions.extend(pages[page_id].get("revisions", []))
         if "continue" in data:
             params.update(data["continue"])       # ask for the next batch
+            time.sleep(1)                         # one request at a time, a second apart
         else:
             break
     return pd.DataFrame(all_revisions)
@@ -217,7 +222,7 @@ The MediaWiki API limits the number of results returned per request. When more r
 
 The critical mistake newcomers make is forgetting to check for continuation. Without the `while True` loop and `"continue"` check, you only get the first batch of results — potentially a small fraction of the total dataset.
 
-Two smaller details in `get_revisions()` are worth adopting as habits. The `response.raise_for_status()` call makes HTTP failures loud: if the server returns an error status, your code stops with an informative exception instead of failing confusingly when you try to parse the JSON. And for bulk jobs, API etiquette suggests adding `"maxlag": 5` to your parameters, which tells overloaded Wikimedia servers to refuse your request with a retryable error so that automated traffic yields to human readers.
+Three smaller details in `get_revisions()` are worth adopting as habits. The `response.raise_for_status()` call makes HTTP failures loud: if the server returns an error status, your code stops with an informative exception instead of failing confusingly when you try to parse the JSON. The `time.sleep(1)` waits a second before each next request, which keeps a long loop well inside the rate limits in "Common Issues to Debug", even on a network that many people share. And for bulk jobs, API etiquette suggests adding `"maxlag": 5` to your parameters, which tells overloaded Wikimedia servers to refuse your request with a retryable error so that automated traffic yields to human readers.
 
 ### Analyzing Revision History
 
@@ -363,6 +368,7 @@ def query_all(params):
         results.append(data["query"])
         if "continue" in data:
             params.update(data["continue"])
+            time.sleep(1)            # a second between requests, as in get_revisions()
         else:
             break
     return results
@@ -403,15 +409,15 @@ print("First categories:", [c["title"] for c in categories[:3]])
 
 The API counts 40 categories, more than the box at the foot of the article shows (@fig-article-categories). The first ones it returns are why: "All Wikipedia articles written in American English" and "All articles containing potentially dated statements" are **hidden categories**, which editors use to track maintenance work and which readers don't see. To leave them out, add `"clshow": "!hidden"` to the query.
 
-What links here is a `list`, not a `prop`: it asks about all of Wikipedia rather than one page. Its results come under `backlinks`:
+What links here is a `list`, not a `prop`: it asks about all of Wikipedia rather than one page. Its results come under `backlinks`. They include the redirects to the article, each marked with a `redirect` key, because [`blfilterredir`](https://www.mediawiki.org/wiki/API:Backlinks) is `all` unless you set it; `"blfilterredir": "nonredirects"` leaves them out:
 
 ```{python}
 backlinks = []
 for batch in query_all({"list": "backlinks", "bltitle": title, "bllimit": "max",
                         "blnamespace": 0}):    # namespace 0: articles only
     backlinks.extend(batch["backlinks"])
-print(f"Articles that link to {title}: {len(backlinks)}")
-# Articles that link to University of Colorado Boulder: 3294
+print(f"Pages that link to {title}, redirects included: {len(backlinks)}")
+# Pages that link to University of Colorado Boulder, redirects included: 3294
 ```
 
 ### Interlanguage Links
@@ -564,14 +570,89 @@ This guided exercise is the chapter's take-home assignment. Work through it in t
 
 You will build a complete profile of one Wikipedia article: who reads it, who writes it, and what it connects to.
 
-**Step 1 — Choose an article and get its pageviews.** Pick an article about a place, institution, or event you know, with at least one newsworthy moment since 2021. Define your `HEADERS` (@sec-ethics), then use the chapter's `get_pageviews()` to retrieve daily views by human readers for a fixed period that ends before today. Build the DataFrame and plot the series.
+**Setup.** Run this cell first, whether or not you ran the chapter's cells above: it defines `HEADERS` and the four functions the steps call, `get_pageviews()`, `get_revisions()`, `query_all()`, and `page_list()`, as this chapter wrote them. It sends no request.
+
+```{python}
+# Setup: the libraries, your User-Agent, and the chapter's four functions; put your own address in CLIENT
+import time
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import requests
+
+CLIENT = "WebDataScience/1.0 (your-email@colorado.edu)"
+HEADERS = {"User-Agent": f"{CLIENT} python-requests/{requests.__version__}"}
+
+def get_pageviews(title, start, end, agent="user", granularity="daily"):
+    article = title.replace(" ", "_")
+    url = (
+        "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
+        f"/en.wikipedia/all-access/{agent}/{article}/{granularity}/{start}/{end}"
+    )
+    response = requests.get(url, headers=HEADERS)
+    response.raise_for_status()
+    views = pd.DataFrame(response.json()["items"])
+    views["timestamp"] = pd.to_datetime(views["timestamp"], format="%Y%m%d%H")
+    return views[["timestamp", "views"]]
+
+def get_revisions(title, until="2026-09-30T23:59:59Z"):
+    url = "https://en.wikipedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "titles": title,
+        "prop": "revisions",
+        "rvprop": "ids|timestamp|user|size|comment",
+        "rvlimit": "max",
+        "rvstart": until,
+        "format": "json",
+    }
+    all_revisions = []
+    while True:
+        response = requests.get(url, params=params, headers=HEADERS)
+        response.raise_for_status()
+        data = response.json()
+        pages = data["query"]["pages"]
+        page_id = list(pages.keys())[0]
+        all_revisions.extend(pages[page_id].get("revisions", []))
+        if "continue" in data:
+            params.update(data["continue"])
+            time.sleep(1)
+        else:
+            break
+    return pd.DataFrame(all_revisions)
+
+def query_all(params):
+    url = "https://en.wikipedia.org/w/api.php"
+    params = {"action": "query", "format": "json", **params}
+    results = []
+    while True:
+        response = requests.get(url, params=params, headers=HEADERS)
+        response.raise_for_status()
+        data = response.json()
+        results.append(data["query"])
+        if "continue" in data:
+            params.update(data["continue"])
+            time.sleep(1)
+        else:
+            break
+    return results
+
+def page_list(title, prop, limit_param):
+    items = []
+    for batch in query_all({"titles": title, "prop": prop, limit_param: "max"}):
+        for page in batch["pages"].values():
+            items.extend(page.get(prop, []))
+    return items
+```
+
+**Step 1 — Choose an article and get its pageviews.** Pick an article about a place, institution, or event you know, with at least one newsworthy moment since 2021. With your own address in the setup cell's `CLIENT`, use `get_pageviews()` to retrieve daily views by human readers for a fixed period that ends before today. Build the DataFrame and plot the series.
 
 ```{python}
 # Step 1: Retrieve daily pageviews for your article, build the DataFrame, and plot it.
 # Your code here
 ```
 
-**Step 2 — Find the spike.** Identify the highest-traffic day with `idxmax()` (@sec-introduction showed you this) and print the date and view count. Note in a comment what real-world event you think explains it, and check the article's revision history around that date for edits that mention it.
+**Step 2 — Find the spike.** Identify the highest-traffic day with `idxmax()`, which gives the row label of the largest value, and print the date and view count. Note in a comment what real-world event you think explains it, and check the article's revision history around that date for edits that mention it; if none does, write that down, since an event can bring readers without bringing editors. If the biggest day isn't the news you chose the article for, say so, and check that the article already had its current title then ("Renamed articles" in "Common Issues to Debug").
 
 ```{python}
 # Step 2: Find the peak day and connect it to an event.
@@ -585,28 +666,28 @@ You will build a complete profile of one Wikipedia article: who reads it, who wr
 # Your code here
 ```
 
-**Step 4 — Profile the editors.** How many unique editors does the article have? Use `value_counts()` on the user column to see edits per editor, and print the top ten. Is the editing concentrated in a few hands or spread out?
+**Step 4 — Profile the editors.** How many unique editors does the article have? Use `value_counts()` on the user column to see edits per editor, and print the top ten's counts without their usernames: `.values` gives the counts alone, ranked 1 to 10. Look at the names yourself if you need to, but don't paste them into the notebook you submit. The usernames are public on the article's history, but the people behind them are private individuals. Some of the top ten may be bots, whose usernames usually include "bot": count them. Is the editing concentrated in a few hands or spread out?
 
 ```{python}
-# Step 4: Count unique editors and show the top ten by revision count.
+# Step 4: Count unique editors, and print the top ten's edit counts without their usernames.
 # Your code here
 ```
 
-**Step 5 — Align edits with attention.** Resample the revisions by month, and plot monthly edits alongside the monthly pageview totals from Step 1. Do the two series move together around your spike?
+**Step 5 — Align edits with attention.** Resample the revisions by month, and plot monthly edits alongside the monthly pageview totals from Step 1. The revisions' timestamps carry a time zone and the pageviews' don't, so drop it with `tz_localize(None)` before comparing them, as "Combining Endpoints" does. Do the two series move together around your spike?
 
 ```{python}
 # Step 5: Plot monthly edits and monthly pageviews for comparison.
 # Your code here
 ```
 
-**Step 6 — Map the neighborhood.** Use `page_list()` for the article's wikilinks, categories, and language editions, and `query_all()` for what links here. Print each count and five examples of each.
+**Step 6 — Map the neighborhood.** Use `page_list()` for the article's wikilinks, categories, and language editions, and `query_all()` for what links here. Print each count and five examples of each. A language edition's entry holds `lang` and `*` (its title there), not `title`, as "Interlanguage Links" shows.
 
 ```{python}
 # Step 6: Retrieve the article's links, categories, language editions, and backlinks.
 # Your code here
 ```
 
-**Step 7 — Interpret.** In four to six sentences: What does the alignment (or misalignment) of edits and views around your spike suggest about how Wikipedia responds to events? Is your article maintained by a dedicated few or a broad crowd, and why might that matter for how much you trust it? What kind of article do its links and categories suggest it is?
+**Step 7 — Interpret.** In four to six sentences: What does the alignment (or misalignment) of edits and views around your spike suggest about how Wikipedia responds to events? If you quote a correlation, compute it again without your busiest month and give both: for this chapter's university article, 0.21 becomes 0.41 without September 2023. Is your article maintained by a dedicated few or a broad crowd, and why might that matter for how much you trust it? What kind of article do its links and categories suggest it is?
 
 ```{python}
 # Step 7: Write your answer here as comments, or convert this cell to Markdown.
@@ -650,6 +731,7 @@ For a data scientist, these changes are both a subject and a responsibility. The
 - **Nested JSON navigation**: The MediaWiki API nests data several levels deep. Print `data.keys()`, then `data["query"].keys()`, then `data["query"]["pages"].keys()` to navigate step by step.
 - **Titles**: The Action API accepts titles with spaces; the REST pageviews API wants underscores, which is why `get_pageviews()` swaps them. For titles with other special characters (slashes, question marks), encode them with `urllib.parse.quote(title, safe="")`.
 - **Rate limiting (status 429)**: Wikimedia counts requests per minute across the Action API and the REST APIs, pageviews included: 200 a minute for a client whose User-Agent follows the policy, and 10 a minute for one that doesn't, shared with everyone else on its network address ([Wikimedia APIs/Rate limits](https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits); the limits are new in 2026 and may change). Past the limit, the answer is status 429, with a `retry-after` header that says how many seconds to wait; wait that long before trying again. The practical rule: serial requests, follow `continue` tokens, `maxlag` for bulk work, and always an informative User-Agent.
+- **Renamed articles**: Pageviews belong to a title, and edits to a page. When an article is moved to a new title, its revision history moves with it, but the pageviews counted before the move stay with the old title, which becomes a redirect. If your article is recent or was renamed, find when it got its current title (a "moved page" edit summary in its history says so) and check that your window and your peak come after that, or add the old title's views.
 - **Missing pages**: If you request an article that does not exist, the page ID will be negative (e.g., `-1`). Always check for this before trying to access revision data.
 
 ## Key Takeaways
