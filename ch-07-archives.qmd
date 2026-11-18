@@ -153,10 +153,12 @@ import requests
 
 url = "https://www.cnn.com"
 timestamp = "20000815"  # August 15, 2000
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 
 # Pass query arguments as a params dictionary — requests handles the URL encoding, which matters here because one of the values is itself a URL
 api_url = "https://archive.org/wayback/available"
-response = requests.get(api_url, params={"url": url, "timestamp": timestamp})
+response = requests.get(api_url, params={"url": url, "timestamp": timestamp}, headers=headers)
+print(response.status_code, response.text[:200])  # Look before you read: a busy Archive can answer 200 with an "error" and no capture
 data = response.json()
 
 # Check if a snapshot is available
@@ -178,7 +180,9 @@ from bs4 import BeautifulSoup
 ts = snapshot["timestamp"]
 archived_url = snapshot["url"].replace(ts, ts + "id_")
 
-archived_response = requests.get(archived_url)
+archived_response = requests.get(archived_url, headers=headers)
+# A refusal page has no links, so check the status and size before you count
+print(archived_response.status_code, len(archived_response.text))
 soup = BeautifulSoup(archived_response.text, "html.parser")
 
 # Extract links from the year-2000 version of CNN
@@ -291,7 +295,7 @@ print(f"Total snapshots: {len(df)}")
 print(f"Date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
 ```
 
-Two of these parameters do server-side filtering that saves you cleanup work later. The `filter=statuscode:200` parameter returns only successful captures, so failed requests and redirects never reach your DataFrame. The `collapse=digest` parameter drops consecutive captures whose content hash is identical — the Archive often captures a page daily even when nothing changed, and collapsing on digest keeps one capture per distinct version. While developing, it is also worth adding `"limit": 100` to cap the response at a manageable size until your code works.
+Two of these parameters do server-side filtering that saves you cleanup work later. The `filter=statuscode:200` parameter returns only successful captures, so failed requests and redirects never reach your DataFrame. The `collapse=digest` parameter drops consecutive captures whose content hash is identical — the Archive often captures a page daily even when nothing changed, and collapsing on digest keeps the first capture of each run of identical ones. It compares each capture only with the one just before it ([Collapsing](https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server#collapsing)), so a wording that returns after a change is counted again. While developing, it is also worth adding `"limit": 100` to cap the response at a manageable size until your code works. The server has a cap of its own: one query returns at most 150,000 rows by default ([Query Result Limits](https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server#query-result-limits)), and nothing in the answer says it stopped there, so a page with a longer history needs the server's paging or a narrower `from` and `to`.
 
 You can visualize how frequently the page was captured and how its size changed over time:
 
@@ -319,7 +323,7 @@ plt.show()
 The raw CDX feed includes every capture attempt — failed requests, redirects, and duplicate captures that can skew your analysis. Because our query already filtered to status 200 and collapsed identical captures on the server side, the DataFrame arrives analysis-ready; had you omitted those parameters, the equivalent pandas filter would be `df[df["statuscode"] == "200"]`. Prefer the server-side version: it transfers less data and leaves less cleanup code to maintain.
 
 ```{python}
-# Every row is already a successful, distinct capture (filtered server-side), so we can go straight to trend analysis
+# Every row is already a successful capture that differs from the one before it (filtered server-side), so we can go straight to trend analysis
 df_ok = df.set_index("timestamp")
 
 # Resample to quarterly frequency
@@ -435,10 +439,11 @@ def get_wayback_content(url, date, headers=None):
 The function retrieves one snapshot; a loop over the quarterly dates assembles the history. Note where the `time.sleep()` lives — in the loop, between requests, just as in @sec-static-pages — and that failed retrievals (returned as `None`) are simply skipped rather than crashing the run:
 
 ```{python}
+headers = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
 results = []
 for date in dates:
     print(f"Fetching snapshot near {date.date()}...")
-    result = get_wayback_content(fb_tos_url, date)
+    result = get_wayback_content(fb_tos_url, date, headers=headers)
     if result is not None:
         results.append(result)
     time.sleep(1)  # Rest between iterations — the Archive is a nonprofit
@@ -474,8 +479,9 @@ os.makedirs("wayback_cache", exist_ok=True)
 
 def get_wayback_content_cached(url, date, headers=None):
     """Fetch a snapshot, reading from and writing to a local cache."""
-    # Key the cache file by the snapshot's target date
-    cache_path = f"wayback_cache/{date.strftime('%Y%m%d')}.json"
+    # Key the cache file by the address and the target date, so two pages asked for on one date don't share a file
+    safe_url = url.replace("/", "_")
+    cache_path = f"wayback_cache/{safe_url}-{date.strftime('%Y%m%d')}.json"
 
     if os.path.exists(cache_path):  # Already fetched — skip the network
         with open(cache_path, "r") as f:
@@ -598,7 +604,7 @@ This guided exercise is the chapter's take-home assignment. Work through it in t
 
 You will reconstruct the archival history of one website you care about, then measure how much its earliest and latest captures differ.
 
-**Step 1 — Choose a page and query its history.** Pick a website that has existed for at least ten years (your high school, a news outlet, a company). Define your `HEADERS` (@sec-ethics), then query the CDX Server API for its capture history, using the chapter's parameters: `output=json`, `fl=timestamp,original,statuscode,length`, filtering for status 200 and collapsing on digest. Remember from @sec-post-api that `archive.org` answers 429 when busy — treat that as an outcome, wait, and retry.
+**Step 1 — Choose a page and query its history.** Pick a website that has existed for at least ten years (your high school, a news outlet, a company). Define your `HEADERS` (@sec-ethics), then query the CDX Server API for its capture history, using the chapter's parameters: `output=json`, `fl=timestamp,original,statuscode,length`, filtering for status 200 and collapsing on digest. Remember from @sec-post-api that `archive.org` answers 429 when busy: treat that as a result to handle, not a crash, by waiting and asking again. A refusal can also come as a dropped connection, which `requests` raises as an exception rather than a status code; the retrying session in @sec-protocols handles both.
 
 ```{python}
 # Step 1: Query the CDX API for your chosen page's capture history.
@@ -613,14 +619,14 @@ You will reconstruct the archival history of one website you care about, then me
 # Your code here
 ```
 
-**Step 3 — Plot the archival record.** Make two plots: captures per year (a bar chart from grouping on the timestamp's year), and page size over time. Mark any visible gaps or jumps.
+**Step 3 — Plot the archival record.** Make two plots: captures per year (a bar chart from grouping on the timestamp's year, which `df["timestamp"].dt.year` gives you), and page size over time. Mark any visible gaps or jumps.
 
 ```{python}
 # Step 3: Plot captures per year and page size over time.
 # Your code here
 ```
 
-**Step 4 — Retrieve two raw captures.** Take the earliest and the most recent capture. Fetch each snapshot with the `id_` suffix on the timestamp — the chapter explains why the toolbar-wrapped version would poison your measurements — sleeping between requests, and cache both pages to local files as you did in @sec-static-pages.
+**Step 4 — Retrieve two raw captures.** Take the earliest and the most recent capture. A CDX row gives a `timestamp` and an `original`, not an address: build each capture's address as `https://web.archive.org/web/`, then the timestamp as 14 digits, then `id_/`, then the `original`. Step 2 turned `timestamp` into dates, so write each back with `.strftime("%Y%m%d%H%M%S")`; `str()` of a date has dashes and spaces that the address can't use. Fetch each snapshot with the `id_` suffix — the chapter explains why the toolbar-wrapped version would poison your measurements — check its status and length before you keep it, sleep between requests, and cache both pages to local files as you did in @sec-static-pages.
 
 ```{python}
 # Step 4: Fetch the earliest and latest captures with the id_ suffix, politely, and cache both to disk.
@@ -672,6 +678,7 @@ The Internet Archive's work also raises fundamental questions about the right to
 - **Wayback Machine rate limiting**: Space your requests with `time.sleep()`. The service is free and community-maintained; do not abuse it.
 - **`NameError: name 'snapshot' is not defined`**: The Availability API cell printed "No snapshot available near this date," so `snapshot` was never created and the next cell has nothing to use. The Archive sometimes sends back an empty answer when it is busy, even for pages it has. Wait a minute, rerun the Availability API cell until it prints a URL, then run the next cell.
 - **`502 Bad Gateway`, "Temporarily Offline," or dropped connections**: These usually mean the Archive is overloaded, not that your code is wrong. Wait 30 to 90 seconds, retry, and slow your request rate; the retrying session from @sec-protocols handles this if you give it a longer `backoff_factor`. While this chapter's screenshots were being made in September 2026, roughly half of the first requests to the Archive failed this way and then succeeded on a retry.
+- **A capture with 0 links, or a handful of words**: the Archive, or a network between you and it, answered with a short refusal page, sometimes with status 200. A count from it looks like a finding. Print the status code and `len(response.text)` before you parse, and treat a page of a few dozen words as a refusal: delete its cached file and fetch it again later.
 - **Incomplete archived pages**: Many snapshots are missing CSS, images, or JavaScript-rendered content. The text content is usually preserved, but visual rendering may be broken. Open **About this capture** to see when each embedded file was saved, and the Network tab (@sec-protocols) to see which files failed to load.
 - **CDX data inconsistencies**: Some entries may have missing fields or redirect status codes instead of actual content. Filter your data carefully.
 - **`ModuleNotFoundError: No module named 'gensim'`**: Your `webdata` was made before chapter 1's command included gensim. In a terminal where `webdata` is active, run `conda install -c conda-forge gensim`, then restart the kernel. `pip install gensim` finds no Python 3.14 build, tries to compile gensim instead, and usually fails. If the `conda install` fails too, remove the environment with `conda env remove -n webdata` and make it again with chapter 1's command.
