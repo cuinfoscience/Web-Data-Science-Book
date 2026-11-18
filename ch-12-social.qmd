@@ -71,7 +71,7 @@ The two columns differ in one way that matters: the Bluesky requests need nothin
 
 ## Bluesky's Public API
 
-Bluesky is a social network built on the AT Protocol, an open protocol: its specifications are public, and anyone may run the services that make up the network. One of those services, the **AppView**, assembles posts, profiles, and counts from across the network and answers questions about them. Bluesky runs a public AppView at `https://public.api.bsky.app/xrpc/` that answers reads for anyone, with no login ([API hosts](https://docs.bsky.app/docs/advanced-guides/api-directory)). Each method's name is part of the address: `app.bsky.actor.getProfile` reads a profile, `app.bsky.feed.getAuthorFeed` an account's posts. Like Wikipedia's API in @sec-wikipedia, it still wants to know who is asking:
+Bluesky is a social network built on the AT Protocol, an open protocol: its specifications are public, and anyone may run the services that make up the network. One of those services, the **AppView**, assembles posts, profiles, and counts from across the network and answers questions about them. Bluesky runs a public AppView at `https://public.api.bsky.app/xrpc/` that answers reads for anyone, with no login ([API hosts](https://bsky.network/docs/advanced-guides/api-directory/)). Each method's name is part of the address: `app.bsky.actor.getProfile` reads a profile, `app.bsky.feed.getAuthorFeed` an account's posts. Like Wikipedia's API in @sec-wikipedia, it still wants to know who is asking:
 
 ```{python}
 import requests
@@ -85,7 +85,7 @@ bsky_base = "https://public.api.bsky.app/xrpc"
 
 ### Who Is Posting: A Profile
 
-[`app.bsky.actor.getProfile`](https://docs.bsky.app/docs/api/app-bsky-actor-get-profile) takes an account's handle and returns its profile:
+[`app.bsky.actor.getProfile`](https://endpoints.bsky.app/#bluesky-app/tag/appbskyactor/GET/xrpc/app.bsky.actor.getProfile) takes an account's handle and returns its profile:
 
 ```{python}
 response = requests.get(f"{bsky_base}/app.bsky.actor.getProfile",
@@ -114,35 +114,41 @@ The `verification` field is a second, separate proof: Bluesky itself, as a trust
 
 ### Several Accounts at Once
 
-Five federal accounts had a `.gov` handle on Bluesky on November 2, 2026, four of them NOAA's. Others, like the Library of Congress and the Federal Reserve Bank of St. Louis, which runs FRED (@sec-government), have a `.bsky.social` handle and a verification instead. [`app.bsky.actor.getProfiles`](https://docs.bsky.app/docs/api/app-bsky-actor-get-profiles) takes up to 25 accounts in one request; `requests` repeats the `actors` parameter once for each item of a list:
+Six of the federal accounts this chapter found on Bluesky had a `.gov` handle on November 2, 2026: five of NOAA's (`noaa.gov`, `nws.noaa.gov`, `climate.noaa.gov`, `noaacomms.noaa.gov` and `fisheries.noaa.gov`) and the Federal Reserve's. Others, like the Library of Congress and the Federal Reserve Bank of St. Louis, which runs FRED (@sec-government), have a `.bsky.social` handle and a verification instead. [`app.bsky.actor.getProfiles`](https://endpoints.bsky.app/#bluesky-app/tag/appbskyactor/GET/xrpc/app.bsky.actor.getProfiles) takes up to 25 accounts in one request; `requests` repeats the `actors` parameter once for each item of a list. It leaves out any account it can't find, with no error, so compare how many you asked for with how many came back. Not every account has a `verification` field, either: NOAA Fisheries has a `.gov` handle and no check, so read the field with `.get()`, which gives a default instead of a `KeyError`:
 
 ```{python}
-agencies = ["noaa.gov", "nws.noaa.gov", "climate.noaa.gov", "noaacomms.noaa.gov", "federalreserve.gov",
+agencies = ["nws.noaa.gov", "climate.noaa.gov", "noaacomms.noaa.gov", "fisheries.noaa.gov", "federalreserve.gov",
             "librarycongress.bsky.social", "stlouisfed.bsky.social"]
 response = requests.get(f"{bsky_base}/app.bsky.actor.getProfiles",
                         params={"actors": agencies}, headers=HEADERS, timeout=30)
 response.raise_for_status()
+profiles = response.json()["profiles"]
+print(len(agencies), "asked for,", len(profiles), "came back")
 rows = []
-for p in response.json()["profiles"]:
+for p in profiles:
     rows.append({"handle": p["handle"], "followers": p["followersCount"], "posts": p["postsCount"],
-                 "joined": p["createdAt"][:10], "verified": p["verification"]["verifiedStatus"]})
+                 "joined": p["createdAt"][:10], "verified": p.get("verification", {}).get("verifiedStatus", "none")})
 accounts = pd.DataFrame(rows).sort_values("followers", ascending=False)
 print(accounts.to_string(index=False))
+# Output on 18 November 2026:
+# 7 asked for, 7 came back
 #                      handle  followers  posts     joined verified
-#                nws.noaa.gov      63022   1394 2025-01-17    valid
-#            climate.noaa.gov      46965     93 2025-01-14    valid
-#                    noaa.gov      41938    150 2025-01-14    valid
-# librarycongress.bsky.social       9237    551 2025-01-17    valid
-#          federalreserve.gov       8405   1029 2024-12-06    valid
-#          noaacomms.noaa.gov       5620    117 2025-01-14    valid
-#      stlouisfed.bsky.social       1121    450 2024-12-12    valid
+#                nws.noaa.gov      64741   1429 2025-01-17    valid
+#            climate.noaa.gov      47017     93 2025-01-14    valid
+# librarycongress.bsky.social       9316    568 2025-01-17    valid
+#          federalreserve.gov       8419   1061 2024-12-06    valid
+#          noaacomms.noaa.gov       5636    119 2025-01-14    valid
+#      stlouisfed.bsky.social       1137    486 2024-12-12    valid
+#          fisheries.noaa.gov        797    498 2025-06-18     none
 ```
 
-Most federal agencies, the Census Bureau and NASA among them, have no `.gov` handle on Bluesky, and a study of "government on Bluesky" would see the agencies that chose to come, not the government. The National Weather Service has more followers than NOAA, the agency it belongs to, and posts nearly ten times as often.
+NOAA's own account, `noaa.gov`, is missing from the list on purpose. A domain proves a handle through a record that names one account, and by November 10, 2026, `noaa.gov`'s named two, NOAA's and NOAA Fisheries', so the protocol's [handle rules](https://atproto.com/specs/handle#handle-resolution) say to trust neither: asked for alone, `noaa.gov` gets `400 Profile not found`, in a list it is left out without a word, and asked for by its `did` the account is still there, with the handle `handle.invalid`. On November 2, when its handle still worked, it had 41,938 followers and 150 posts, so the National Weather Service has more followers than NOAA, the agency it belongs to, and posts nearly ten times as often.
+
+Most federal agencies, the Census Bureau and NASA among them, have no `.gov` handle on Bluesky, and a study of "government on Bluesky" would see the agencies that chose to come, not the government.
 
 ### An Account's Posts
 
-[`app.bsky.feed.getAuthorFeed`](https://docs.bsky.app/docs/api/app-bsky-feed-get-author-feed) returns an account's posts, newest first, up to 100 a request. With `filter="posts_no_replies"` it leaves out the account's replies to others, but it still includes its **reposts**, other people's posts it shared, each marked with a `"reason"`. Those authors may be private people, so set them aside:
+[`app.bsky.feed.getAuthorFeed`](https://endpoints.bsky.app/#bluesky-app/tag/appbskyfeed/GET/xrpc/app.bsky.feed.getAuthorFeed) returns an account's posts, newest first, up to 100 a request. With `filter="posts_no_replies"` it leaves out the account's replies to others, but it still includes its **reposts**, other people's posts it shared, each marked with a `"reason"`. Those authors may be private people, so set them aside:
 
 ```{python}
 params = {"actor": "nws.noaa.gov", "limit": 25, "filter": "posts_no_replies"}
@@ -207,12 +213,12 @@ The loop stops at five pages on purpose: the account had 1,394 posts, and the fi
 
 ### When an Agency Posts, and What Travels
 
-The times are in UTC. Convert them to the agency's own time zone, Eastern for the Weather Service's headquarters, before asking what day or hour it posts:
+The times are in UTC. Convert them to the agency's own time zone, Eastern for the Weather Service's headquarters, before asking what day or hour it posts. `reindex(days)` puts the counts in Monday-to-Sunday order, and `fill_value=0` gives a day with no posts a count of 0; without it, that day shows as `NaN`, and a bar chart leaves it out:
 
 ```{python}
 local = nws["created"].dt.tz_convert("America/New_York")
 days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-by_day = local.dt.day_name().value_counts().reindex(days)
+by_day = local.dt.day_name().value_counts().reindex(days, fill_value=0)
 ax = by_day.plot.bar(figsize=(7, 3.5), rot=0)
 ax.set(title="National Weather Service posts on Bluesky by weekday, April–October 2026", ylabel="Posts", xlabel="")
 plt.show()
@@ -286,7 +292,7 @@ youtube_key = os.environ.get("YOUTUBE_KEY")
 yt_base = "https://www.googleapis.com/youtube/v3"
 ```
 
-The key is sent as a URL parameter, so `response.url` contains it: print a response's JSON, never its URL (@sec-government, "When a Key Says `MISSING`").
+The key is sent as a URL parameter, so `response.url` contains it: print a response's JSON, never its URL (@sec-government, "When a Key Says `MISSING`"). `raise_for_status()` prints the URL too, key and all, in the error it raises, so the YouTube code below checks the status itself and shows Google's error message instead.
 
 ### A Channel by Its Handle
 
@@ -295,7 +301,8 @@ The key is sent as a URL parameter, so `response.url` contains it: print a respo
 ```{python}
 params = {"part": "snippet,statistics,contentDetails", "forHandle": "@NOAA", "key": youtube_key}
 response = requests.get(f"{yt_base}/channels", params=params, headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.json()['error']['message']}")
 channel = response.json()["items"][0]
 print(channel["snippet"]["title"], "|", channel["snippet"]["customUrl"])
 print("subscribers:", channel["statistics"]["subscriberCount"], "| videos:", channel["statistics"]["videoCount"])
@@ -311,14 +318,16 @@ The uploads playlist lists every video, newest first, 50 at a time, with a `next
 ```{python}
 params = {"part": "contentDetails", "playlistId": uploads, "maxResults": 50, "key": youtube_key}
 response = requests.get(f"{yt_base}/playlistItems", params=params, headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.json()['error']['message']}")
 video_ids = []
 for item in response.json()["items"]:
     video_ids.append(item["contentDetails"]["videoId"])
 
 params = {"part": "snippet,statistics", "id": ",".join(video_ids), "key": youtube_key}
 response = requests.get(f"{yt_base}/videos", params=params, headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.json()['error']['message']}")
 rows = []
 for v in response.json()["items"]:
     rows.append({"published": v["snippet"]["publishedAt"][:10], "title": v["snippet"]["title"][:50],
@@ -422,44 +431,46 @@ The last two rows pull in different directions. An open protocol makes a platfor
 
 This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order; everything you need appears in this chapter or an earlier one.
 
-You will compare how two federal accounts on Bluesky used the platform in September 2026. Pick two from this chapter's list, or another verified institutional account, never a private person's.
+You will compare how two federal accounts on Bluesky used the platform in September 2026. Pick two from the list in "Several Accounts at Once", or another verified institutional account, never a private person's.
 
-**Step 1 — Set up, and check who you are asking about.** Define your `HEADERS` with your own email, and request both accounts' profiles with `getProfiles`. Print each handle, its `verifiedStatus`, and whether the handle is a domain, and say in a comment why you trust that each account is the institution's.
+Start by running the notebook's first code cell, with your own email in `HEADERS`: it has the imports, `HEADERS` and `bsky_base`, and you don't need the cells between it and the exercises.
+
+**Step 1 — Set up, and check who you are asking about.** Define your `HEADERS` with your own email, and request both accounts' profiles with `getProfiles`. Print each handle, its `verifiedStatus` (read with `.get()`, as in "Several Accounts at Once", since an account may have none), and whether the handle ends in `.gov`, and say in a comment why you trust that each account is the institution's.
 
 ```{python}
 # Step 1: Define HEADERS, request both profiles with getProfiles, and print each handle, its verifiedStatus, and whether the handle ends in .gov
 # Your code here
 ```
 
-**Step 2 — Collect one account's September posts.** Page through the first account's feed with `getAuthorFeed` and its `cursor`, skipping reposts, until you reach posts older than September 1, 2026. Keep the posts created in September, with their time, likes, reposts, replies, and embed type.
+**Step 2 — Collect one account's September posts.** Page through the first account's feed with `getAuthorFeed` and its `cursor`, skipping reposts, until you reach posts older than September 1, 2026. Keep the posts created in September, between two dates, with their time, likes, reposts, replies (`replyCount`, the replies each post got), and embed type. The loop reads past September 1 before it stops, so cut both ends of the month, and say in a comment which time zone you cut it in.
 
 ```{python}
 # Step 2: Page through the first account's feed until you pass September 1, 2026, and keep its own September posts in a DataFrame
 # Your code here
 ```
 
-**Step 3 — Describe the month.** Convert the times to the account's time zone, and compute: the number of posts, posts by weekday, the share of posts with an image or a video, and the median reposts.
+**Step 3 — Describe the month.** Convert the times to the account's time zone, and compute: the number of posts, posts by weekday, the share of posts with an image or a video, and the median reposts. September 2026 has five Tuesdays and five Wednesdays, and four of every other day, so divide each weekday's count by how many of that day the month has before you call one the busiest; `pd.Series(pd.date_range("2026-09-01", "2026-09-30").day_name()).value_counts()` counts them. Say whether a quoted post that carries media (`recordWithMedia`) counts as an image or a video.
 
 ```{python}
 # Step 3: Compute the number of posts, posts by weekday, the share with an image or video, and the median reposts
 # Your code here
 ```
 
-**Step 4 — Repeat for the second account.** Collect and describe the second account's September the same way.
+**Step 4 — Repeat for the second account.** Collect and describe the second account's September the same way, with the same code.
 
 ```{python}
 # Step 4: Collect and describe the second account's September posts
 # Your code here
 ```
 
-**Step 5 — Compare.** Put the two accounts' numbers side by side in one DataFrame, and plot one comparison you find informative, such as posts by weekday for both.
+**Step 5 — Compare.** Put the two accounts' numbers side by side in one DataFrame, and plot one comparison you find informative, such as posts by weekday for both: a DataFrame with a column for each account, plotted with `.plot.bar()`, draws the two side by side with a legend.
 
 ```{python}
 # Step 5: Build the comparison DataFrame and plot one comparison
 # Your code here
 ```
 
-**Step 6 — Interpret.** In four to six sentences: how did the two accounts use the platform differently in September? What would you need to know to explain the difference, rather than describe it? What can't the public API tell you, such as who saw a post, and which other source would you need for it?
+**Step 6 — Interpret.** In four to six sentences: how did the two accounts use the platform differently in September? What would you need to know to explain the difference, rather than describe it? What can't the public API tell you, such as who saw a post, and which other source would you need for it? What did the filter and the repost skip leave out, such as the threads an account writes as replies to itself?
 
 ```{python}
 # Step 6: Write your answer here as comments, or convert this cell to Markdown.
@@ -504,7 +515,7 @@ A platform's API exists at the platform's discretion, and since 2023 most platfo
 
 ## Further Reading
 
-- Bluesky API documentation: <https://docs.bsky.app/>
+- Bluesky's developer documentation: <https://bsky.network/>, and its HTTP reference, every method and its parameters: <https://endpoints.bsky.app/>
 - AT Protocol: <https://atproto.com/>
 - YouTube Data API: <https://developers.google.com/youtube/v3>
 - YouTube Data API, getting started (quotas and credentials): <https://developers.google.com/youtube/data/getting-started>
