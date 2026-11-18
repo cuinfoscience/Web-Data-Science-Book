@@ -30,6 +30,7 @@ In @sec-static-pages, you learned to retrieve web pages with `requests` and pars
 When you use `requests.get()` on a dynamic page, you get the HTML skeleton before JavaScript has run. The data you see in your browser may simply not exist in the response that `requests` receives. You can verify this by comparing `requests.get(url).text` with what you see in the browser — if significant content is missing from the `requests` version, the page is dynamic.
 
 The solution is a tool that can execute JavaScript: a real web browser, controlled programmatically. This chapter teaches two. Selenium, the long-standing standard, runs in your notebook; Playwright, a newer tool, runs as a script from the terminal. First, though, check whether you need a browser at all.
+One thing that can be confusing about dynamic websites is why regular requests don't always collect all the information on a page. Some websites use JavaScript to load content after the page opens, so requests might only get the original HTML. Selenium helps with this because it opens the page in a browser and allows JavaScript to run. This is especially useful for websites that load more information when you scroll or click a button.
 
 ## Do You Need a Browser?
 
