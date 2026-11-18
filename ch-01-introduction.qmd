@@ -268,6 +268,8 @@ This guided exercise is the chapter's take-home assignment. Work through it in t
 
 Since this is the first chapter, the assignment is deliberately modest: prove that your environment works, then run the retrieve–parse–analyze loop once, end to end, on an article you choose.
 
+Before Step 1, restart the kernel (**Kernel → Restart Kernel**), and from then on run only the exercise cells. The chapter's cells above define `headers`, `url`, `response`, `data`, and `df`, the names these steps use. If they are still defined and one of your requests fails, the next step quietly works on the chapter's University of Colorado Boulder data under your article's title.
+
 **Step 1 — Verify your environment.** Import `requests`, `pandas` (as `pd`), and `matplotlib.pyplot` (as `plt`). If any import fails, revisit the setup section before going further.
 
 ```{python}
@@ -275,24 +277,24 @@ Since this is the first chapter, the assignment is deliberately modest: prove th
 # Your code here
 ```
 
-**Step 2 — Make your first request.** Use `requests.get()` to retrieve any web page you choose, sending a `User-Agent` header with your email as the chapter does. Print the status code and the length of `response.text`.
+**Step 2 — Make your first request.** Use `requests.get()` to retrieve a web page you choose, sending a `User-Agent` header with your email as the chapter does. Pass it as `headers=headers`: `requests.get(url, headers)` sends the dictionary as part of the address instead, and Wikipedia answers with a 403. A Wikipedia article is a safe choice. For another site, read its `/robots.txt` first (@sec-ethics), and don't request a page it disallows; if the file can't be read at all, choose another site. Print the status code and the length of `response.text`.
 
 ```{python}
 # Step 2: Retrieve a web page and print the status code and response length.
 # Your code here
 ```
 
-**Step 3 — Call the pageviews API.** Pick a Wikipedia article you are curious about. Using the pageviews API URL pattern from this chapter — including the `User-Agent` header with your email — retrieve its daily views for one full month, and parse the response with `.json()`.
+**Step 3 — Call the pageviews API.** Pick a Wikipedia article you are curious about, and copy its title from the address bar of the article itself, after Wikipedia has taken you there. The API doesn't follow redirects: a title that redirects, such as one missing a comma, gets status 200 and the redirect page's own few views. Using the pageviews API URL pattern from this chapter — including the `User-Agent` header with your email — retrieve its daily views for one full month. Print the status code before you parse the response with `.json()`. Then print the first item's `article` and `views`, and `len(data["items"])`: a little-read article can return fewer days than the month has, because the API leaves out days with no views.
 
 ```{python}
-# Step 3: Build the pageviews URL for your article, request it with a User-Agent header, and parse the JSON response.
+# Step 3: Build the pageviews URL for your article, request it with headers=headers, print the status code, parse the JSON response, and print the first item and the number of items.
 # Your code here
 ```
 
-**Step 4 — Build a DataFrame.** Convert `data["items"]` into a DataFrame, and convert the `timestamp` column into a real date with `pd.to_datetime()`, as the chapter demonstrates.
+**Step 4 — Build a DataFrame.** Convert `data["items"]` into a DataFrame, and convert the `timestamp` column into a real date with `pd.to_datetime()`, as the chapter demonstrates. Print `df["article"].unique()`: it should hold your article's title, and only that.
 
 ```{python}
-# Step 4: Convert data["items"] to a DataFrame and add a proper date column.
+# Step 4: Convert data["items"] to a DataFrame, add a proper date column, and print df["article"].unique().
 # Your code here
 ```
 
@@ -310,7 +312,7 @@ Since this is the first chapter, the assignment is deliberately modest: prove th
 # Your code here
 ```
 
-**Step 7 — Interpret.** In three to five sentences: What was the highest-traffic day, and can you connect it to a real-world event? What does the status code from Step 2 mean? And why did Step 6 matter — what can you now do without touching the network again?
+**Step 7 — Interpret.** In three to five sentences: Which were the three highest-traffic days, and how far was each above the median day? If they are close, say so. Can you connect the busiest to a real-world event, or say what you would need to check before you could? What does the status code from Step 2 mean? And why did Step 6 matter — what can you now do without touching the network again?
 
 ```{python}
 # Step 7: Write your answer here as comments, or convert this cell to Markdown.
@@ -326,7 +328,9 @@ These are open-ended extensions — no scaffold, no fixed path. Use them for fur
 
 3. **Multi-article comparison.** Retrieve daily pageview data for three Wikipedia articles of your choice over the same month. Save each to a separate CSV file using `df.to_csv()`. Load all three back with `pd.read_csv()` and create a single plot with all three time series on the same axes, with a legend identifying each article. Which article had the most variable traffic, and can you hypothesize why?
 
-4. **Graduate extension (INFO 5617).** Read the computational social science manifesto by @lazer2009computational — a short, field-defining argument about what digital trace data makes possible. Identify three specific claims the authors make about the promise or the perils of studying society through digital traces, such as claims about data access, privacy, or the capacity of academic institutions to compete with industry. For each claim, write a paragraph connecting it to a concrete technique or data source covered in this book's table of contents, and assess whether the claim has held up in the years since publication. Submit your response as a Jupyter Notebook that uses Markdown cells for the written analysis.
+4. **People or programs?** The chapter's URL asks for `all-agents`, so its counts include crawlers and other automated traffic. Request your Step 3 month again with `user` in place of `all-agents` (one of the values the [pageviews API's documentation](https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/reference/page-views.html#get-number-of-page-views-for-a-page) lists for `agent`), and compare the two. What share of the views does the API count as people's, does that share change from day to day, and is the busiest day the same? Which claims about interest in your article does each count support?
+
+5. **Graduate extension (INFO 5617).** Read the computational social science manifesto by @lazer2009computational — a short, field-defining argument about what digital trace data makes possible. Identify three specific claims the authors make about the promise or the perils of studying society through digital traces, such as claims about data access, privacy, or the capacity of academic institutions to compete with industry. For each claim, write a paragraph connecting it to a concrete technique or data source covered in this book's table of contents, and assess whether the claim has held up in the years since publication. Submit your response as a Jupyter Notebook that uses Markdown cells for the written analysis.
 
 ## Social History and Public Interest
 
@@ -346,7 +350,8 @@ The intellectual roots of web data science run deeper than any single investigat
 - **`ModuleNotFoundError`**: A library is not installed in the Python your notebook runs. In a terminal where `webdata` is active (the prompt starts with `(webdata)`), run `conda install -c conda-forge library-name`, then restart your Jupyter kernel. If the library is installed and the error remains, Jupyter was started from another environment: run `import sys; print(sys.executable)` in the notebook, and check that the path includes `webdata`.
 - **A library imports, but a program that came with it can't be found**: Some conda packages also set an environment variable when you activate `webdata`, and Jupyter keeps the variables it had when it started. A kernel gets its variables from Jupyter, so restarting the kernel doesn't help. Close Jupyter, run `conda activate webdata` again, and start `jupyter notebook`. Selenium is the example in this book: after you add `selenium` to an older environment, its `Unable to obtain driver for chrome` has this cause (@sec-dynamic-pages).
 - **`ConnectionError`**: Your computer cannot reach the server. Check your internet connection; if you are on a university network, try a different network.
-- **Status code 403 (Forbidden)**: The server rejected your request, often because you did not include a `User-Agent` header; Wikipedia refuses `requests`' default. Send one with your email, as this chapter's requests do, and see @sec-ethics for more on headers.
+- **Status code 403 (Forbidden)**: The server rejected your request, often because you did not include a `User-Agent` header; Wikipedia refuses `requests`' default. Send one with your email, as this chapter's requests do, and see @sec-ethics for more on headers. If you did write a header, check that you passed it as `headers=headers`: `requests.get(url, headers)` sends it as query parameters in the address, with your email in them.
+- **Status code 429 (Too Many Requests)**: The server is limiting how often you, or everyone on your network, may ask. Wait the number of seconds in the response's `Retry-After` header (`response.headers.get("Retry-After")`), then run the cell again. A 429's body is plain text, not JSON, so calling `.json()` on it raises `JSONDecodeError: Expecting value: line 1 column 1 (char 0)`; print `response.status_code` and `response.text[:200]` before you parse.
 - **Cells running out of order**: Jupyter cells can be executed in any order, which leads to stale variables. When in doubt, restart the kernel and run all cells from the top.
 
 ## Key Takeaways

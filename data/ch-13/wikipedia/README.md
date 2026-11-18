@@ -16,6 +16,7 @@ The lead sections (the text before the first heading) of five English Wikipedia 
 
 **What's missing:**
 - No revision existed yet under the title for Barack Obama on 2004-01-01, Donald Trump on 2004-01-01, or Kamala Harris on 2004-01-01 and 2005-01-01.
+- One leftover the cleanup missed: Donald Trump's lead of January 1, 2006 begins with a note for readers, "For the champion Australian racehorse, see: The Trump", 9 of its 35 words. It is the only one of the 116 leads that starts with such a note. It was kept, not cleaned, so that the vectors, the chapter's table and the lab's stay as they are; the week 13 lab asks about it in Step 11's Discuss box.
 - For Donald Trump, this follows the page history of the current title. Wikipedia's history of a title doesn't always reach back to the article's first version, for example when pages were moved or merged.
 
 **License:** Wikipedia's text is © its contributors, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Each revision's authors are listed in its history, at `https://en.wikipedia.org/w/index.php?oldid=REVID&action=history`. These copies keep that license.

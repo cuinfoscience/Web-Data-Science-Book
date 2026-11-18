@@ -194,7 +194,12 @@ To use it:
 
 Paste the key only into the box. The words between the quotation marks in `getpass(...)` are the question it asks, and they're saved with the notebook like any other code; a key typed there is a key in the notebook. Treat this as a stopgap: the next time you start Jupyter, it asks again. Fix the cause when you have time.
 
-The Census Bureau, FRED, and the EIA all take the key as a parameter in the URL, so the address `requests` sends, `response.url`, contains your key. Print a response's JSON, never its URL, and never paste a URL from an error message into a forum or a pull request without deleting the key first.
+The Census Bureau, FRED, and the EIA all take the key as a parameter in the URL, so the address `requests` sends, `response.url`, contains your key. Print a response's JSON, never its URL, and never paste a URL from an error message into a forum or a pull request without deleting the key first. For the same reason, this chapter's code doesn't stop a failed request with `response.raise_for_status()`, the usual way: its message, `400 Client Error: Bad Request for url: …`, holds the whole URL, key and all, and a notebook you submit keeps the message in its output. Each request checks the status itself instead, and stops with the agency's own reason, the first 200 characters of its answer. None of the three agencies repeats the key in that answer (checked in November 2026):
+
+```python
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
+```
 
 ### Alternative: A JSON Configuration File
 
@@ -269,7 +274,8 @@ census_base = "https://api.census.gov/data/2024/acs/acs5"   # ACS 5-year estimat
 
 # Every group (table) in the dataset, with its title
 response = requests.get(f"{census_base}/groups.json", headers=HEADERS, timeout=60)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
 groups = response.json()["groups"]
 print(f"{len(groups):,} groups")
 
@@ -304,7 +310,8 @@ A group's own address, `groups/B19013.json`, lists its **variables**: every colu
 
 ```{python}
 response = requests.get(f"{census_base}/groups/B19013.json", headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
 group_vars = response.json()["variables"]
 
 for var_id, info in sorted(group_vars.items()):
@@ -333,7 +340,8 @@ params = {
     "key": census_key,
 }
 response = requests.get(census_base, params=params, headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
 rows = response.json()
 print(rows)
 # [['NAME', 'B19013_001E', 'B19013_001M', 'state', 'county'], ['Boulder County, Colorado', '103994', '2268', '08', '013']]
@@ -355,7 +363,8 @@ places_to_ask = [
 for geography in places_to_ask:
     params = {"get": "NAME,B19013_001E,B19013_001M", "key": census_key, **geography}
     response = requests.get(census_base, params=params, headers=HEADERS, timeout=30)
-    response.raise_for_status()
+    if response.status_code != 200:
+        raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
     name, estimate, margin = response.json()[1][:3]
     print(f"{name:26} {int(estimate):>8,} ± {int(margin):,}")
 # Colorado                     95,470 ± 578
@@ -382,7 +391,8 @@ params = {
     "key": census_key,
 }
 response = requests.get(census_base, params=params, headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
 rows = response.json()
 
 # First row is column names, the rest are data; every value arrives as a string
@@ -391,7 +401,8 @@ df[housing_vars] = df[housing_vars].apply(pd.to_numeric)
 
 # The group's labels; the last part of each is the decade, such as "Built 2010 to 2019"
 response = requests.get(f"{census_base}/groups/B25034.json", headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
 b25034 = response.json()["variables"]
 labels = {var: b25034[var]["label"].split("!!")[-1] for var in housing_vars}
 housing = df.set_index("NAME")[housing_vars].rename(columns=labels).T
@@ -436,7 +447,8 @@ A wildcard asks the Census Bureau's API for every place of a kind, as its [user 
 ```{python}
 params = {"get": "NAME,B19013_001E", "for": "place:*", "in": "state:08", "key": census_key}
 response = requests.get(census_base, params=params, headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
 rows = response.json()
 
 places = pd.DataFrame(rows[1:], columns=rows[0])
@@ -484,7 +496,8 @@ def fred_get(endpoint, **params):
     """Call one FRED endpoint, such as "series", with its own parameters, and return the JSON."""
     params.update(api_key=fred_key, file_type="json")
     response = requests.get(f"{fred_base}/{endpoint}", params=params, headers=HEADERS, timeout=30)
-    response.raise_for_status()
+    if response.status_code != 200:
+        raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
     return response.json()
 
 info = fred_get("series", series_id="MHICO08013A052NCEN")["seriess"][0]
@@ -505,7 +518,8 @@ def fred_observations(series_id, **params):
     """Return a FRED series' observations as a DataFrame of dates and values."""
     params.update(series_id=series_id, api_key=fred_key, file_type="json")
     response = requests.get(f"{fred_base}/series/observations", params=params, headers=HEADERS, timeout=30)
-    response.raise_for_status()
+    if response.status_code != 200:
+        raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
     df = pd.DataFrame(response.json()["observations"])[["date", "value"]]
     df["date"] = pd.to_datetime(df["date"])
     df["value"] = pd.to_numeric(df["value"], errors="coerce")
@@ -570,7 +584,7 @@ for field in ["title", "frequency", "units", "seasonal_adjustment"]:
 It is a monthly index. Ask for it three ways, changing one parameter at a time:
 
 1. as published, one value a month;
-2. with `frequency="a"` and `aggregation_method="avg"`, which turns each year's twelve months into their mean (`sum` and `eop`, the end of the period, are the other methods);
+2. with `frequency="a"` and `aggregation_method="avg"`, which turns the months FRED has for each year into their mean (`sum` and `eop`, the end of the period, are the other methods);
 3. with `units="pc1"` added, the percent change of each year's mean from the year before's, which is the year's inflation. FRED applies the frequency first, then the units.
 
 ```{python}
@@ -612,7 +626,7 @@ print(check.tail(3).to_string(float_format="%.1f"))
 # 2025       321.9            2.6
 ```
 
-They match. So `frequency="a"` with `aggregation_method="avg"` is the mean of each year's twelve months, and `units="pc1"` on top of it is the percent change in that mean, and you can describe the numbers that way when you write them up. The index itself, 321.9 in 2025, means that prices were 3.2 times what they were in 1982–1984, the period the index sets at 100. (Ask pandas for 2015's percent change, and it has none: the monthly request starts in January 2015. FRED reaches back to 2014's months itself.)
+They match. So `frequency="a"` with `aggregation_method="avg"` is the mean of the months FRED has for each year, and `units="pc1"` on top of it is the percent change in that mean, and you can describe the numbers that way when you write them up. For 2025, that is eleven months, not twelve. The Bureau of Labor Statistics collected no prices during the lapse in federal appropriations from October 1 to November 12, 2025, and published no October index for most of its series ([BLS, 2025](https://www.bls.gov/cpi/additional-resources/2025-federal-government-shutdown-impact-cpi-faq.htm)). So `monthly` holds `NaN` for October 2025, `monthly["value"].isna()` finds it, and both means, FRED's and pandas', leave it out. A 2025 figure from this series needs that footnote, and so does any year you average: count the months before you trust the mean. The index itself, 321.9 in 2025, means that prices were 3.2 times what they were in 1982–1984, the period the index sets at 100. (Ask pandas for 2015's percent change, and it has none: the monthly request starts in January 2015. FRED reaches back to 2014's months itself.)
 
 With one series understood, comparing two is a matter of asking each the same question. The BLS also publishes a CPI for the Denver area, which FRED carries as `CUUSA433SA0`. It is annual already, so it needs only `units="pc1"` to give the same year-over-year inflation:
 
@@ -671,7 +685,8 @@ def eia_get(route, params=None):
     """GET one EIA route, such as "electricity/", and return the "response" part of its JSON."""
     params = dict(params or {}, api_key=eia_key)
     response = requests.get(f"{eia_base}/{route}", params=params, headers=HEADERS, timeout=60)
-    response.raise_for_status()
+    if response.status_code != 200:
+        raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
     return response.json()["response"]
 
 electricity = eia_get("electricity/")
@@ -803,7 +818,8 @@ def eia_get_all(route, params, page_size=5000):
     while True:
         page_params = dict(params, api_key=eia_key, offset=len(rows), length=page_size)
         response = requests.get(f"{eia_base}/{route}", params=page_params, headers=HEADERS, timeout=60)
-        response.raise_for_status()
+        if response.status_code != 200:
+            raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
         page = response.json()["response"]
         print(f"offset {len(rows):>5}: {len(page['data'])} rows of {page['total']}")
         rows.extend(page["data"])
@@ -845,7 +861,8 @@ Ask each agency for every state. The Census Bureau's [API](https://www.census.go
 ```{python}
 params = {"get": "NAME,B19013_001E", "for": "state:*", "key": census_key}
 response = requests.get(census_base, params=params, headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
 rows = response.json()
 states = pd.DataFrame(rows[1:], columns=rows[0])
 states["income"] = pd.to_numeric(states["B19013_001E"])
@@ -879,7 +896,8 @@ The two agencies name Colorado differently. The Census Bureau uses its FIPS code
 import io
 
 response = requests.get("https://www2.census.gov/geo/docs/reference/codes2020/national_state2020.txt", headers=HEADERS, timeout=30)
-response.raise_for_status()
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
 codes = pd.read_csv(io.StringIO(response.text), sep="|", dtype=str)   # dtype=str keeps "08" as "08"
 print(codes.head(3).to_string(index=False))
 # STATE STATEFP  STATENS STATE_NAME
@@ -982,15 +1000,29 @@ This guided exercise is the chapter's take-home assignment. Work through it in t
 
 You will answer one comparative question about Colorado with two federal data sources: how does a Census measure vary across the state's counties, and what has a related economic indicator done over time?
 
-**Step 1 — Load your keys safely.** Load your Census and FRED API keys from environment variables or your `api_keys.json`, exactly as the chapter shows. Confirm both loaded by printing only their lengths — never the keys themselves, since the notebook is what you submit.
+**Before you start.** Run this cell first. It imports what the steps use and sets the two base addresses; it reads no keys, which is Step 1's job. These exercises need only the Census and FRED keys, so if the chapter's `getpass()` cell asks for `EIA_KEY`, press Enter. For Step 5, the chapter's `fred_observations()` does the request: run its cell, in "Finding Series IDs", or copy it into your notebook.
 
 ```{python}
-# Step 1: Load your Census and FRED keys and confirm they are present
-# WITHOUT printing them.
+# Run this first: the imports and addresses every step below uses
+import os
+import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Every request says who is asking; put your own address here
+HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+census_base = "https://api.census.gov/data/2024/acs/acs5"   # ACS 5-year estimates, 2020-2024
+fred_base = "https://api.stlouisfed.org/fred"
+```
+
+**Step 1 — Load your keys safely.** Load your Census and FRED API keys from environment variables or your `api_keys.json`, exactly as the chapter shows. Confirm both loaded by printing, for each key, `set` or `MISSING` and its length, never the key itself, since the notebook is what you submit. A Census key has 40 characters and a FRED key 32; a key of another length was cut off, or picked up a space, when you pasted it.
+
+```{python}
+# Step 1: Load your Census and FRED keys and confirm they are present, WITHOUT printing them.
 # Your code here
 ```
 
-**Step 2 — Query every Colorado county.** Choose one ACS variable you care about (browse the groups catalog to pick it; median household income is `B19013_001E`). Query the Census API with `for=county:*` and `in=state:08` to get all Colorado counties in one call.
+**Step 2 — Query every Colorado county.** Choose one ACS variable you care about (browse the groups catalog to pick it; median household income is `B19013_001E`). A median or a share compares counties fairly; a count, such as the number of households with an internet subscription, mostly ranks counties by their size. Query the Census API with `for=county:*` and `in=state:08` to get all Colorado counties in one call, and print how many rows came back: Colorado has 64 counties, and without `in`, the same request returns every county in the country.
 
 ```{python}
 # Step 2: Retrieve your chosen ACS variable for every Colorado county.
@@ -1011,7 +1043,7 @@ You will answer one comparative question about Colorado with two federal data so
 # Your code here
 ```
 
-**Step 5 — Add the time dimension with FRED.** Find one FRED series related to your Census variable for Colorado (unemployment rate, home price index, per-capita income — the chapter shows how to search for series IDs). Retrieve it, build a DataFrame with real dates, and plot the series over the last two decades.
+**Step 5 — Add the time dimension with FRED.** Find one FRED series related to your Census variable for Colorado (unemployment rate, home price index, per-capita income — the chapter shows how to search for series IDs). Ask the `series` endpoint for its title, units, and frequency, as "Finding Series IDs" does. Retrieve it, build a DataFrame with real dates, and plot the series over the last two decades, with its units on the axis.
 
 ```{python}
 # Step 5: Retrieve a related FRED series for Colorado and plot it over time.
@@ -1028,7 +1060,7 @@ You will answer one comparative question about Colorado with two federal data so
 
 These are open-ended extensions — no scaffold, no fixed path. Use them for further practice or deeper exploration.
 
-1. **Census exploration.** Using the Census API, retrieve a variable group of your choice (browse at `api.census.gov/data/2022/acs/acs5/groups.html`) for at least five geographic areas. Create a comparative visualization and write a brief analytical narrative explaining what the data reveals.
+1. **Census exploration.** Using the Census API, retrieve a variable group of your choice (browse at `api.census.gov/data/2024/acs/acs5/groups.html`) for at least five geographic areas. Create a comparative visualization and write a brief analytical narrative explaining what the data reveals.
 
 2. **FRED time series.** Retrieve two related economic time series for your local area or state using the FRED API. Plot them on the same or side-by-side axes. What story does the data tell? Common pairings include housing prices and mortgage rates, unemployment and job creation, or income and cost of living.
 
@@ -1047,7 +1079,7 @@ FRED, from the Federal Reserve Bank of St. Louis, grew from a similar philosophy
 
 The EIA was established on October 1, 1977, under the Department of Energy Organization Act, as the federal government's independent authority for energy statistics and analysis ([EIA](https://www.eia.gov/about/)), on the same day the Department of Energy itself began work ([Department of Energy](https://www.energy.gov/lm/doe-history/doe-history-timeline)). Its independence is written into the law: its Administrator "shall not be required to obtain the approval of any other officer or employee of the Department" to collect or analyze information, nor, before publishing, anyone else's approval of "the substance of any statistical or forecasting technical reports" ([42 U.S.C. § 7135(d)](https://www.law.cornell.edu/uscode/text/42/7135)). The numbers in "EIA API v2", above, come from an agency built so that its energy statistics would not have to answer to its own department's policy.
 
-But government data infrastructure is not immune to erosion. Datasets are withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. In 2019 the Supreme Court refused to let the Commerce Department add a citizenship question to the 2020 census on the reason it had given, which "seems to have been contrived" ([*Department of Commerce v. New York*, 2019](https://www.supremecourt.gov/opinions/18pdf/18-966_bq7c.pdf)). In 2017, the first year of the first Trump administration, the Environmental Data & Governance Initiative documented agencies removing or overhauling webpages, documents, and whole websites about climate change, although it found no climate data removed [@edgi2018changing]. In early 2025, after an Office of Personnel Management memo applying an executive order on "gender ideology," the CDC, the FDA, and their parent department took down webpages and datasets, until a federal judge ordered them restored to their versions of January 30 ([Alder, 2025](https://fedscoop.com/federal-judge-orders-hhs-cdc-fda-to-restore-webpages-datasets/)). That August President Trump fired the commissioner of the Bureau of Labor Statistics after a weak jobs report, calling the data "rigged" ([PBS NewsHour, 2025](https://www.pbs.org/newshour/show/firing-of-labor-statistics-head-undermines-trust-in-key-data-ex-trump-official-warns)), and in December the American Statistical Association reported that most of the 13 federal statistical agencies had lost 20 to 30% of their staff ([ASA, 2025](https://www.amstat.org/news-listing/2025/12/10/new-report-documents-challenges-facing-federal-statistical-system--offers-roadmap-for-strengthening)). The fragility of government data infrastructure is itself a public interest concern, and a reason to record the date, version, and URL of every government dataset you use.
+But government data infrastructure is not immune to erosion. Datasets are withdrawn, APIs deprecated, and political pressure on statistical agencies can affect what data is collected and how it is presented. In 2019 the Supreme Court refused to let the Commerce Department add a citizenship question to the 2020 census on the reason it had given, which "seems to have been contrived" ([*Department of Commerce v. New York*, 2019](https://www.supremecourt.gov/opinions/18pdf/18-966_bq7c.pdf)). In 2017, the first year of the first Trump administration, the Environmental Data & Governance Initiative documented agencies removing or overhauling webpages, documents, and whole websites about climate change, although it found no climate data removed [@edgi2018changing]. In early 2025, after an Office of Personnel Management memo applying an executive order on "gender ideology," the CDC, the FDA, and their parent department took down webpages and datasets, until a federal judge ordered them restored to their versions of January 30 ([Alder, 2025](https://fedscoop.com/federal-judge-orders-hhs-cdc-fda-to-restore-webpages-datasets/)). That August President Trump fired the commissioner of the Bureau of Labor Statistics after a weak jobs report, calling the data "rigged" ([PBS NewsHour, 2025](https://www.pbs.org/newshour/show/firing-of-labor-statistics-head-undermines-trust-in-key-data-ex-trump-official-warns)); that fall, the lapse in appropriations from October 1 to November 12 stopped the Bureau from collecting prices, so the Consumer Price Index has no October 2025 for most series ([BLS, 2025](https://www.bls.gov/cpi/additional-resources/2025-federal-government-shutdown-impact-cpi-faq.htm)); and in December the American Statistical Association reported that most of the 13 federal statistical agencies had lost 20 to 30% of their staff ([ASA, 2025](https://www.amstat.org/news-listing/2025/12/10/new-report-documents-challenges-facing-federal-statistical-system--offers-roadmap-for-strengthening)). The fragility of government data infrastructure is itself a public interest concern, and a reason to record the date, version, and URL of every government dataset you use.
 
 ## Common Issues to Debug
 
@@ -1055,6 +1087,7 @@ But government data infrastructure is not immune to erosion. Datasets are withdr
 - **FIPS codes**: Geographic identifiers like `08` (Colorado) and `07850` (Boulder) are strings, not integers. Do not strip leading zeros.
 - **FRED series IDs**: These are alphanumeric strings; some families follow a pattern (like the SAIPE income series earlier in this chapter), but many do not. Use the FRED website search to find them, then copy the ID into your code exactly.
 - **`KeyError` or `MISSING` for a key**: Jupyter never received the environment variable. After setting it, quit Jupyter, open a new terminal, and start Jupyter from it; restarting the kernel isn't enough. See "When a Key Says `MISSING`", above, for the other causes and a stopgap.
+- **A key in a traceback**: `response.raise_for_status()` raises an error whose message holds the request's whole URL, and these three APIs put your key in the URL. That is why this chapter checks `response.status_code` instead. If an output or a traceback shows your key, clear that cell's output before you submit or commit the notebook, and if it was published, ask the agency for a new key.
 - **API key exposure**: The most common mistake. Environment variables never enter your repository; if you use the JSON-file alternative, add `api_keys.json` to `.gitignore` *before* your first commit, or the key will persist in your git history even after deletion.
 - **Rate limiting**: Limits vary by agency. As of mid-2026, the Census API publishes no hard limit for keyed users (but expects polite use), and FRED allows roughly 120 requests per minute. Check each API's documentation for current figures, and stay well within them, especially during automated collection.
 - **The EIA's 5,000-row cap**: A request to the EIA's API returns at most 5,000 rows, with an `"incomplete return"` warning if more match. Filter with facets, a shorter span, or a lower frequency first; page with `offset` and `length` only for what is still too large ("Paging with `offset` and `length`", above).
