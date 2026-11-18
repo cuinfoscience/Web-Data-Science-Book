@@ -185,13 +185,13 @@ print(check["status"])  # "processing" until the job is done, then "complete"
 # processing
 ```
 
-Asking again by hand gets tedious, so let a loop ask, every two seconds. Chapter 12's loop followed a `cursor` until there wasn't one; this one follows the status until the job is complete. Give it a limit, so that a job that never finishes doesn't stop your notebook forever:
+Asking again by hand gets tedious, so let a loop ask, every two seconds. Chapter 12's loop followed a `cursor` until there wasn't one; this one follows the status while it says `processing`. It stops on any other status, not only on `complete`, because a job that fails says `failed` and never becomes `complete`. Give it a limit, so that a job that never finishes doesn't stop your notebook forever:
 
 ```{python}
 # Ask again every two seconds, at most 60 times: two minutes
 for attempt in range(60):
-    # Leave the loop as soon as the job is done; the check from the cell above may already say so
-    if check["status"] == "complete":
+    # Leave the loop as soon as the job isn't processing: complete, or failed; the check above may already say so
+    if check["status"] != "processing":
         break
     time.sleep(2)  # wait two seconds before asking again
     # Ask again, and keep the newest answer in check
@@ -203,9 +203,9 @@ print(check["page_count"], "pages,", check["total_cost"], "cents,", round(check[
 # 15 pages, 4.5 cents, 10.5 seconds
 ```
 
-The finished answer holds the document, in `check["markdown"]`, and an account of the work: `page_count`, the pages it read; `runtime`, the seconds it spent; and the cost, in cents. Datalab's reference marks `total_cost` as *deprecated*: still sent, but on its way out, in favor of `cost_breakdown`, which here was `{'final_cost_cents': 4.5}`. When a result is too large to send directly, the answer gives a signed `result_url` instead: an address that carries its own permission to download the result. For these reports it was `None`.
+The finished answer holds the document, in `check["markdown"]`, and an account of the work: `page_count`, the pages it read; `runtime`, the seconds it spent; and the cost, in cents. Datalab's reference marks `total_cost` as *deprecated*: still sent, but on its way out, in favor of `cost_breakdown`, which here was `{'final_cost_cents': 4.5}`. When Datalab processes a request in the EU, the answer gives a signed `result_url` instead of the document: an address that carries its own permission to download the result ([Regional Result Downloads](https://documentation.datalab.to/docs/recipes/conversion/conversion-api-overview#regional-result-downloads)). For these reports it was `None`.
 
-Fifteen pages cost 4.5 cents, 0.3 cents a page. Datalab's [pricing page](https://www.datalab.to/pricing) listed, on 2026-11-07, \$4 per 1,000 pages for `fast` and `balanced`, \$0.50 for `lite`, and \$10 for `accurate`. This bill was three-quarters of the list rate. The same page offers 25% off for opting into data retention, which lets Datalab keep copies of what you send. Check your account's setting, and what it allows, before you send anything. The free allowance was \$10 a month on a personal email (\$20 on a work email), about 2,500 pages at the list rate for `balanced`, with at most 25 requests a minute. All seven year-end reports, converted the same way on 2026-11-07 for `data/ch-13/`, came to 106 pages and 31.8 cents.
+Fifteen pages cost 4.5 cents, 0.3 cents a page. Datalab's [pricing page](https://www.datalab.to/pricing) listed, on 2026-11-07, \$4 per 1,000 pages for `fast` and `balanced`, \$0.50 for `lite`, and \$10 for `accurate`. This bill was three-quarters of the list rate. The same page offers 25% off for opting into data retention, which lets Datalab keep copies of what you send. Check your account's setting, and what it allows, before you send anything. The free allowance was \$10 a month on a personal email (\$20 on a work email), about 2,500 pages at the list rate for `balanced`. The free tier allows 10 requests a minute ([API Limits](https://documentation.datalab.to/docs/common/limits), checked 2026-11-18). All seven year-end reports, converted the same way on 2026-11-07 for `data/ch-13/`, came to 106 pages and 31.8 cents.
 
 The output above comes from this chapter's second try. The first time it sent the request, the job was complete at the first check, for 0 cents, in 0.1 seconds. The same file had been converted from the same account earlier that day, and Datalab answered from its **cache**, the store of results it had already made. The second request added `"skip_cache": "true"` to `data`, which forces a new conversion and bills for it. A model's output can also differ from one conversion to the next, as "What the Model Wrote" shows.
 
@@ -235,10 +235,10 @@ def convert(data):
         response = requests.get(ticket, headers=datalab_headers, timeout=60)
         response.raise_for_status()
         result = response.json()
-        if result["status"] == "complete":
-            return result  # return leaves the loop and the function at once
-    # 3. Reached only if all 60 checks said the job wasn't complete
-    raise TimeoutError(f"Not complete after two minutes; the result will be at {ticket}")
+        if result["status"] != "processing":
+            return result  # complete or failed; check "error" either way. return leaves the loop and the function at once
+    # 3. Reached only if all 60 checks said the job was still processing
+    raise TimeoutError(f"Still processing after two minutes; the result will be at {ticket}")
 ```
 
 ### Reading the Markdown
@@ -490,7 +490,7 @@ print([model["id"] for model in free if "structured_outputs" in model["supported
 # ['liquid/lfm-3-1.7b:free', 'recursive/flint-v1.0:free', 'xingchen-agi/xing4.0-29b-a4b:free', 'nvidia/nemotron-3.5-super-vl:free', 'dots-studio/dots-3-note-preview:free']
 ```
 
-The list changes from week to week; this is 2026-11-07's. This chapter uses three free models, checked that day, in order of preference: NVIDIA's Nemotron 3.5 Super VL, Google's Gemma 4 31B, and Dots Studio's Dots3-Note Preview. Gemma's entry lists `response_format` but not `structured_outputs`, so OpenRouter doesn't count it among the models that enforce a *schema*, the shape you define for the answer. The first and third models are on that list.
+The list changes from week to week; this is 2026-11-07's. This chapter uses three free models, checked that day, in order of preference: NVIDIA's Nemotron 3.5 Super VL, Google's Gemma 4 31B, and Dots Studio's Dots3-Note Preview. Gemma's entry lists `response_format` but not `structured_outputs`, so OpenRouter doesn't count it among the models that enforce a *schema*, the shape you define for the answer. The first and third models are on that list. The request below adds `"provider": {"require_parameters": True}`, which tells OpenRouter to skip any model whose endpoint can't honor every parameter the request sends ([provider routing](https://openrouter.ai/docs/guides/routing/provider-selection#requiring-providers-to-support-all-parameters)). With it, Gemma is passed over, and the list is in effect the first and third models; without it, Gemma could answer without holding to the schema.
 
 Read the summary page of the December 2024 report, the first page whose text holds the table's last row:
 
@@ -532,12 +532,13 @@ INSTRUCTION = ("You extract figures from one page of a City of Boulder revenue r
                "Copy numbers exactly as printed, without $ or commas. Use only the page.")
 ```
 
-The request's body has four parts, and the key goes in `openrouter_headers`:
+The request's body has five parts, and the key goes in `openrouter_headers`:
 
 - **`messages`**: a list with two items. The `system` message is the instruction; the `user` message is the page. That is the whole conversation, and no request in this chapter adds a third.
 - **`response_format`**: `type` `json_schema`, with the schema, a `name` for it, and `strict` set to `True`, which asks the model to follow the schema exactly ([Structured Outputs](https://openrouter.ai/docs/guides/features/structured-outputs)). OpenRouter's page adds that enforcement "varies by provider," so "exact compliance is not guaranteed on every endpoint."
 - **`temperature`**: how much chance goes into the model's choice of each next token. `0` asks the model for its most likely answer at every step, rather than a sample, a random pick among the likely tokens. "Non-determinism," below, shows that this isn't the same as getting the same answer every time.
-- **`models`**: a list, in place of a single `model`. If the first returns an error, including 429, the status a service sends when you pass its rate limit, OpenRouter tries the next ([Model Fallbacks](https://openrouter.ai/docs/guides/routing/model-fallbacks)). The page warns that a paid model in the list is billed at its price: "To keep a request free, list only :free models."
+- **`models`**: a list, in place of a single `model`. If the first returns an error, including 429, the status a service sends when you pass its rate limit, OpenRouter tries the next ([Model Fallbacks](https://openrouter.ai/docs/guides/routing/model-fallbacks)). The page warns that a paid model in the list is billed at its price: "To keep a request free, list only :free models." Mind the *s*: a request without `models` and without a `model` is answered by your account's default model, which may not be free ([API reference](https://openrouter.ai/docs/api/reference/overview)), and a misspelled key is ignored without an error.
+- **`provider`**: `{"require_parameters": True}`, so that only models that can honor the schema answer.
 
 ```{python}
 # Three free models, in order of preference; if one returns an error, OpenRouter tries the next
@@ -548,7 +549,9 @@ body = {"models": MODELS, "temperature": 0,
         "messages": [{"role": "system", "content": INSTRUCTION}, {"role": "user", "content": summary}],
         # Ask for JSON that fits SCHEMA; strict asks the model to follow it exactly
         "response_format": {"type": "json_schema",
-                            "json_schema": {"name": "totals", "strict": True, "schema": SCHEMA}}}
+                            "json_schema": {"name": "totals", "strict": True, "schema": SCHEMA}},
+        # Skip any model that can't honor every parameter above, the schema included
+        "provider": {"require_parameters": True}}
 # 2. Send it; json= sends the body as JSON, and a free model can take minutes, so allow three
 response = requests.post(f"{openrouter_base}/chat/completions", json=body, headers=openrouter_headers, timeout=180)
 response.raise_for_status()
@@ -607,7 +610,8 @@ def extract_totals(page):
     body = {"models": MODELS, "temperature": 0,
             "messages": [{"role": "system", "content": INSTRUCTION}, {"role": "user", "content": page}],
             "response_format": {"type": "json_schema",
-                                "json_schema": {"name": "totals", "strict": True, "schema": SCHEMA}}}
+                                "json_schema": {"name": "totals", "strict": True, "schema": SCHEMA}},
+            "provider": {"require_parameters": True}}
     response = requests.post(f"{openrouter_base}/chat/completions", json=body, headers=openrouter_headers, timeout=180)
     response.raise_for_status()
     result = response.json()
@@ -625,23 +629,28 @@ for report, (prior, current) in TRUTH.items():
     # 2. Ask the model; the function returns two things, so take two names
     answer, model = extract_totals(summary)
     # 3. One row: report[15:] drops "revenue-report-", and **answer adds the answer's four fields
+    # Check all four: both totals against chapter 9's, the year against the report's name, and the month
     rows.append({"report": report[15:], "model": model, **answer,
-                 "prior_ok": answer["total_prior"] == prior, "current_ok": answer["total_current"] == current})
+                 "prior_ok": answer["total_prior"] == prior, "current_ok": answer["total_current"] == current,
+                 "year_ok": answer["year"] == int(report[15:19]), "month_ok": answer["month"] == "December"})
     time.sleep(2)  # a pause between requests; free models allow 20 a minute
 results = pd.DataFrame(rows)  # one row for each report, one column for each key
 # Every column but model; index=False leaves out the row numbers
 print(results.drop(columns="model").to_string(index=False))
-#  report    month  year  total_prior  total_current  prior_ok  current_ok
-#    2018 December  2018    140648710      139331838     False       False
-#    2019  January  2020    141954650      139548151     False       False
-#    2020 December  2020    141954650      135195413      True        True
-# 2021-12 December  2021    135195413      152302653      True        True
-# 2022-12 December  2022    152302653      169112615      True        True
-# 2023-12 December  2023    169112615      175517129      True        True
-# 2024-12 December  2025    175517129      173908431      True        True
+# all(axis=1) is True for a row whose four checks are all True; sum() counts those rows
+print(results[["prior_ok", "current_ok", "year_ok", "month_ok"]].all(axis=1).sum(), "of 7 right in all four fields")
+#  report    month  year  total_prior  total_current  prior_ok  current_ok  year_ok  month_ok
+#    2018 December  2018    140648710      139331838     False       False     True      True
+#    2019  January  2020    141954650      139548151     False       False    False     False
+#    2020 December  2020    141954650      135195413      True        True     True      True
+# 2021-12 December  2021    135195413      152302653      True        True     True      True
+# 2022-12 December  2022    152302653      169112615      True        True     True      True
+# 2023-12 December  2023    169112615      175517129      True        True     True      True
+# 2024-12 December  2025    175517129      173908431      True        True    False      True
+# 4 of 7 right in all four fields
 ```
 
-Every answer came from the first model in the list, and every answer is valid JSON in the schema's shape. Five of the seven reports' totals match chapter 9. Two don't, and the year is wrong in two rows. Print the 2018 summary page and find where the wrong figures came from. The whole table is on the page, totals row included, and both wrong figures are in it, in the 2018 column. \$140,648,710, returned as the year before, is 2018's own total. \$139,331,838, returned as 2018's total, is the row above the totals, "Total Sales & Use Tax based on current economic activity," a subtotal that leaves out audit revenue. The model moved one column over and one row up. The 2019 answer made the same two moves. Its year and month, 2020 and January, come from a sentence on the page: the revenue "was received by the city through January 2020." The 2024 answer's year, 2025, comes from the same sentence in that report. Chapter 9's code read these rows by their labels and positions; the model chose by what the words seemed to mean.
+Every answer came from the first model in the list, and every answer is valid JSON in the schema's shape. Five of the seven reports' totals match chapter 9. Two don't, and the year is wrong in two rows, one of them a row whose totals are right: a check of the totals alone would have passed the 2024 report, dated 2025. Counted on all four fields, four of the seven answers are right. Print the 2018 summary page and find where the wrong figures came from. The whole table is on the page, totals row included, and both wrong figures are in it, in the 2018 column. \$140,648,710, returned as the year before, is 2018's own total. \$139,331,838, returned as 2018's total, is the row above the totals, "Total Sales & Use Tax based on current economic activity," a subtotal that leaves out audit revenue. The model moved one column over and one row up. The 2019 answer made the same two moves. Its year and month, 2020 and January, come from a sentence on the page: the revenue "was received by the city through January 2020." The 2024 answer's year, 2025, comes from the same sentence in that report. Chapter 9's code read these rows by their labels and positions; the model chose by what the words seemed to mean.
 
 The responses hold a clue to why. Each one carries the model's reasoning, 4,000 to 12,000 characters of it for these reports. Not one of the eight responses so far (this section's seven and the single request above) mentions `total_prior`, `total_current`, or JSON. In the 2018 reasoning, the model planned to answer with a list of every figure on the page, and wrote out the summary table along the way with the totals row right. The JSON came afterward. The provider held the model's output to the schema's shape as it wrote it, but the descriptions that say which row and which year each field means seem never to have reached the model. The schema fixed the answer's form, and nothing told the model what the fields meant.
 
@@ -657,14 +666,15 @@ Run the loop above again, unchanged:
 
 ```{python}
 # Run the loop that starts "rows = []" again; it printed:
-#  report    month  year  total_prior  total_current  prior_ok  current_ok
-#    2018 December  2018    134538892      140648710      True        True
-#    2019 December  2019    140609751      141954650      True        True
-#    2020 December  2020    141954650      135195413      True        True
-# 2021-12 December  2021    135195413      152302653      True        True
-# 2022-12 December  2022    152302653      169112615      True        True
-# 2023-12 December  2023    169112615      175517129      True        True
-# 2024-12 December  2024    175517129      173908431      True        True
+#  report    month  year  total_prior  total_current  prior_ok  current_ok  year_ok  month_ok
+#    2018 December  2018    134538892      140648710      True        True     True      True
+#    2019 December  2019    140609751      141954650      True        True     True      True
+#    2020 December  2020    141954650      135195413      True        True     True      True
+# 2021-12 December  2021    135195413      152302653      True        True     True      True
+# 2022-12 December  2022    152302653      169112615      True        True     True      True
+# 2023-12 December  2023    169112615      175517129      True        True     True      True
+# 2024-12 December  2024    175517129      173908431      True        True     True      True
+# 7 of 7 right in all four fields
 ```
 
 Seven of seven totals, years, and months. The reasoning shrank too: 450 to 720 tokens per report, where the first run spent 2,400 to 6,000, and the loop took under a minute instead of nearly three. A second try of the 2018 page five minutes later repeated both results: wrong with the plain instruction (this time with January 2019 as the month and year), and right with the schema in it. Two runs of one model on seven pages can't show that this works for every model. They are reason enough to describe the fields in the instruction as well as in the schema, and to keep the check that found the problem.
@@ -1259,7 +1269,7 @@ for field, value in expected.items():
 
 The tool and all four arguments are the ones the question named. A check this exact works because you already know the answer's address. A program that answers many questions checks what it can instead: that the tool is one it runs, the dataset one it allows, the year a number, and the place codes digits, and it refuses anything else.
 
-Now turn the arguments into chapter 11's parameters. Each form of the model's `get` becomes the API's `get`: a list of variables, joined with commas, or `group(B19013)`, which asks for every variable in the table. When the model names variables, the code adds `NAME`, and each estimate's margin of error, the `M` beside each `E`, because chapter 11 asks for the margin whenever it asks for the estimate and the model didn't. The code passes `for` and `in` along, and leaves out the inputs it doesn't implement: `descriptive`, `ucgid`, and `predicates`.
+Now turn the arguments into chapter 11's parameters. Each form of the model's `get` becomes the API's `get`: a list of variables, joined with commas, or `group(B19013)`, which asks for every variable in the table. When the model names variables, the code adds `NAME`, and each estimate's margin of error, the `M` beside each `E`, because chapter 11 asks for the margin whenever it asks for the estimate and the model didn't. The code passes `for` and `in` along, and leaves out the inputs it doesn't implement: `descriptive`, `ucgid`, and `predicates`. It checks the status itself rather than calling `raise_for_status()`, whose error message holds the whole URL, key and all, so a failed call would print your key in a notebook you might submit; the Census API's answer to a bad request names only the problem, such as `error: unknown variable 'B19013_001X'`, and doesn't repeat the key (checked in November 2026).
 
 ```{python}
 # The API's get: group(...) for a whole table, or the model's variables with NAME and their margins
@@ -1274,7 +1284,9 @@ else:
 census_url = f"https://api.census.gov/data/{args['year']}/{args['dataset']}"
 params = {"get": get, "for": args["for"], "in": args["in"], "key": census_key}
 response = requests.get(census_url, params=params, headers=HEADERS, timeout=30)
-response.raise_for_status()
+# Not raise_for_status(): its message holds the URL, and the URL holds your key
+if response.status_code != 200:
+    raise RuntimeError(f"Got {response.status_code}, not 200: {response.text[:200]}")
 # The key is in response.url, so print the JSON, as chapter 11 did
 rows = response.json()
 print(rows)
@@ -1350,7 +1362,7 @@ This chapter's live run for the Boulder sections, on 2026-11-07, cost 5.06 cents
 
 | Service | Free limit, checked 2026-11-07 | What happens at the limit | What to do |
 |---|---|---|---|
-| Datalab | \$10 of usage a month on a personal email (\$20 on a work email); 25 requests a minute | Pay-as-you-go rates apply | Convert once, save the Markdown, and work from the file |
+| Datalab | \$10 of usage a month on a personal email (\$20 on a work email); 10 requests a minute on the free tier (checked 2026-11-18) | Pay-as-you-go rates apply | Convert once, save the Markdown, and work from the file |
 | OpenRouter, `:free` models | 20 requests a minute; 50 a day on an account that has bought less than \$10 of credits, 1,000 a day on one that has bought at least \$10 | Status 429 | Pause between requests; check `GET /api/v1/key` |
 | A free model's provider | Shared by everyone using it | 429 from the provider, "rate-limited upstream" | A `models` fallback list, then wait and retry |
 | Wikipedia's APIs | 200 requests a minute for a client whose User-Agent follows the policy, shared by everyone on one network address (@sec-wikipedia) | Status 429, with `retry-after` | Wait as long as `retry-after` says; collect once, save the HTML, and work from the files |
@@ -1382,14 +1394,78 @@ You will measure how alike two texts are, as "Embedding and Cosine Similarity" d
 - **Two Wikipedia articles**, compared by their current leads: two cities, two agencies, or two people in the same office, for example.
 - **Two public PDFs**, compared one page each: two years of the same report, or two agencies' reports on the same subject. Choose documents that name no private individuals; chapter 9's sources (@sec-pdfs) are a good place to look. Keep to Datalab's free allowance: Step 5 needs a third document, so three conversions in all.
 
-**Step 1 — Choose, and check your key.** Name your two articles or documents, and say in a comment why you expect them to be alike, and in what. Check that `OPENROUTER_KEY` is set without printing it, and `DATALAB_KEY` too if you chose PDFs.
+**Start here.** Run the cell below, not the chapter's cells above it: those send their own requests, two of them pay Datalab, and several stop when Wikipedia or a free model is busy. This cell sends nothing. It imports what the steps need, reads your keys without printing them, and defines the addresses and the chapter's three functions: `lead_text()` ("Five Articles, Twenty-Three Years"), `embed_text()` ("Embedding and Cosine Similarity"), and, for PDFs, `convert()` ("Waiting for the Result"). Put your own address in `HEADERS` first.
+
+```{python}
+# Setup for the Recommended Exercises: run this cell, not the cells above it. It sends nothing.
+import os
+import re
+import time
+import requests
+import numpy as np
+from bs4 import BeautifulSoup
+
+# Your own address, as in chapter 1
+HEADERS = {"User-Agent": "WebDataScience/1.0 (your-email@colorado.edu)"}
+# Each key, read without printing it; os.environ.get() gives None for a key that isn't set
+datalab_key = os.environ.get("DATALAB_KEY")
+openrouter_key = os.environ.get("OPENROUTER_KEY")
+datalab_headers = {"X-API-Key": datalab_key, **HEADERS}
+openrouter_headers = {"Authorization": f"Bearer {openrouter_key}", **HEADERS}
+# The addresses: Datalab's API, OpenRouter's, and Wikipedia's Action API
+datalab_base = "https://www.datalab.to/api/v1"
+openrouter_base = "https://openrouter.ai/api/v1"
+wiki_api = "https://en.wikipedia.org/w/api.php"
+# The embedding model; every vector you compare must come from it
+EMBEDDER = "nvidia/nemotron-3-embed-1b:free"
+
+
+def lead_text(html):
+    """Return the text of the paragraphs in a piece of Wikipedia's HTML, without tables or footnote marks."""
+    soup = BeautifulSoup(html, "html.parser")
+    for tag in soup.select("table, .reference, .hatnote, .shortdescription, style, "
+                           "a.new[title^='Template:'], .error"):
+        tag.decompose()
+    paragraphs = []
+    for p in soup.find_all("p"):
+        text = p.get_text(" ", strip=True)
+        if text:
+            paragraphs.append(text)
+    return re.sub(r" ([,.;:])", r"\1", "\n\n".join(paragraphs))
+
+
+def embed_text(text):
+    """Return one text's embedding from EMBEDDER, as a NumPy array scaled to length 1."""
+    response = requests.post(f"{openrouter_base}/embeddings", json={"model": EMBEDDER, "input": [text]},
+                             headers=openrouter_headers, timeout=60)
+    response.raise_for_status()
+    vector = np.array(response.json()["data"][0]["embedding"])
+    return vector / np.linalg.norm(vector)
+
+
+def convert(data):
+    """Submit a document to Datalab's Convert API, wait for it, and return the finished (or failed) result."""
+    response = requests.post(f"{datalab_base}/convert", data=data, headers=datalab_headers, timeout=60)
+    response.raise_for_status()
+    ticket = response.json()["request_check_url"]
+    for attempt in range(60):
+        time.sleep(2)
+        response = requests.get(ticket, headers=datalab_headers, timeout=60)
+        response.raise_for_status()
+        result = response.json()
+        if result["status"] != "processing":
+            return result
+    raise TimeoutError(f"Still processing after two minutes; the result will be at {ticket}")
+```
+
+**Step 1 — Choose, and check your key.** Name your two articles or documents, and say in a comment why you expect them to be alike, and in what. For PDFs, read the `robots.txt` of each site you'll send a request to before you send it (@sec-ethics), and treat a file you can't read, refused or failing, as a no; Wikipedia's articles come through its Action API, which has its own terms and rate limits. Check that `OPENROUTER_KEY` is set without printing it, and `DATALAB_KEY` too if you chose PDFs.
 
 ```{python}
 # Step 1: Name your two texts and why you expect them to be alike; check your key or keys without printing them
 # Your code here
 ```
 
-**Step 2 — Get the first text.** For an article, find its latest revision with the first request of "Five Articles, Twenty-Three Years", leaving out `rvstart`, then get its lead with the second request and `lead_text()`. For a PDF, convert it with `convert()`, save the Markdown to a file, split it into pages, and choose one page of fewer than 2,000 words; say in a comment which page and why ("Why the Lead Section" explains the limit). Print the text's word count and its first 300 characters.
+**Step 2 — Get the first text.** For an article, find its latest revision with the first request of "Five Articles, Twenty-Three Years", leaving out `rvstart`, then get its lead with the second request and `lead_text()`. If Wikipedia answers 429, wait as many seconds as its `retry-after` header says, and send the request again. For a PDF, convert it with `convert()`, save the Markdown to a file, split it into pages, and choose one page of fewer than 2,000 words; say in a comment which page and why ("Why the Lead Section" explains the limit). Print the text's word count and its first 300 characters.
 
 ```{python}
 # Step 2: Get your first text, and print its word count and its first 300 characters
@@ -1403,21 +1479,21 @@ You will measure how alike two texts are, as "Embedding and Cosine Similarity" d
 # Your code here
 ```
 
-**Step 4 — The second text, and their similarity.** Turn Step 2's code into a function that takes a title or a file and returns the text. Use it to get your second text, print its word count and its first 300 characters, embed it, and print the cosine similarity of the two vectors, rounded to three decimal places.
+**Step 4 — The second text, and their similarity.** Turn Step 2's code into a function that takes a title or a file and returns the text. It starts with `def get_text(title):` (or `source`, for a file), holds Step 2's lines indented under it, with `title` where your first article's name was, and ends with `return` and the text, as `return lead`. Without the `return`, it gives back `None`. Use it to get your second text, print its word count and its first 300 characters, embed it, and print the cosine similarity of the two vectors, rounded to three decimal places.
 
 ```{python}
 # Step 4: Write a function for Step 2's code; get and embed the second text, and print the two texts' similarity
 # Your code here
 ```
 
-**Step 5 — Compare with a baseline.** One similarity means little on its own. Use your function to get a third text, from the same source, that you expect to be unlike both of the others, and embed it. Print the three pairs' similarities as a small table. Is your pair's similarity higher than both pairs that include the third text, and by how much?
+**Step 5 — Compare with a baseline.** One similarity means little on its own. Use your function to get a third text, from the same source, that you expect to be unlike both of the others, and embed it. Print the three pairs' similarities as a small table. Is your pair's similarity higher than both pairs that include the third text, and by how much? Give the difference, one similarity minus the other, not a ratio.
 
 ```{python}
 # Step 5: Get and embed a third, unlike text; print the similarity of each of the three pairs
 # Your code here
 ```
 
-**Step 6 — Report.** In a short paragraph: were your two texts as alike as you expected, judged against the baseline? Read the two texts side by side, and name one thing they share that might raise their similarity and one difference the number can't show you. How many requests did the whole run make, and which embedding model did it use?
+**Step 6 — Report.** In a short paragraph: were your two texts as alike as you expected, judged against the baseline? Read the two texts side by side, and name one thing they share that might raise their similarity and one difference the number can't show you. How many requests did the whole run make, and which embedding model did it use? The response's own `model` names the provider's copy of `EMBEDDER` (`private/openrouter/nvidia/nemotron-3-embed-1b` on 2026-11-18): name the model you asked for.
 
 ```{python}
 # Step 6: Write your answer here as comments, or convert this cell to Markdown.
@@ -1459,9 +1535,9 @@ The models also rest on human work that rarely shows. Behind many automated serv
 
 - **`KeyError` or `MISSING` for `DATALAB_KEY` or `OPENROUTER_KEY`.** Jupyter never received the variable: quit Jupyter, open a new terminal, and start it again (@sec-government, "When a Key Says `MISSING`"). Datalab's own examples read `DATALAB_API_KEY`; this book's code reads `DATALAB_KEY`.
 - **Datalab answers 401 or 403.** The key is wrong or missing from the `X-API-Key` header. Print `datalab_key is None`, never the key.
-- **A Datalab job that is never `complete`.** Check `success` and `error` in the result; a `file_url` that isn't public fails. The loop's limit stops your notebook from waiting forever, and the ticket's address still holds the result later.
+- **A Datalab job that is never `complete`.** A failed job says `failed`, and stays that way, so wait while the status is `processing`, not until it is `complete`. Check `success` and `error` in the result; a `file_url` that isn't public fails. The loop's limit stops your notebook from waiting forever, and the ticket's address still holds the result later.
 - **A result that arrives at once, for 0 cents.** Datalab answered from its cache. Add `"skip_cache": "true"` only if you need a new conversion, and expect to pay for it.
-- **`KeyError: 'markdown'`.** The result had a `result_url` instead: download the JSON from that address, without your key.
+- **`KeyError: 'markdown'`.** The result had a `result_url` instead, as a request processed in the EU does: download the JSON from that address, without your key.
 - **429 from OpenRouter.** A free model is rate-limited, for your account (20 a minute) or upstream at its provider. Use a `models` list of `:free` IDs only, pause between requests, and retry after a minute. Check your day's count with `GET /api/v1/key`.
 - **`json.loads()` fails, or a field is missing.** The model that answered may not support structured outputs: check `result["model"]` against the list of models' `supported_parameters`, and put the schema in the instruction too.
 - **Valid JSON, wrong figures.** Expected, sometimes. Compare with a ground truth, print the page the model read, and find where its figures came from.
@@ -1469,8 +1545,9 @@ The models also rest on human work that rarely shows. Behind many automated serv
 - **429 from Wikipedia.** Wikimedia's limit is shared by everyone on your network address. Wait as long as `retry-after` says, and load the saved copies in `data/ch-13/wikipedia/` instead of collecting every year yourself.
 - **`KeyError: 'revisions'`.** No revision existed under that title at the time you asked for, as for "Kamala Harris" on January 1, 2005. Check `"revisions" in page` before reading it.
 - **"Template:" or "Cite error" in a lead's text.** An old revision rendered today calls templates that no longer exist, and a lead rendered alone can't find its footnotes' list. `lead_text()` removes both; check a few old leads by eye before you embed them.
+- **`AttributeError: 'NoneType' object has no attribute ...`.** A function you wrote gave back `None`: it has no `return` line, so whatever called it got nothing. End the function with `return` and the value.
 - **Similarity scores that make no sense.** Vectors from two different embedding models, or vectors not scaled to length 1. Embed everything with one model, and scale before `@`.
-- **`KeyError: 'tool_calls'`, or a tool call with `content` instead.** The model answered with text. Send `"tool_choice": "required"`, and check that the model that answered, `result["model"]`, lists `tools` among its `supported_parameters`.
+- **`KeyError: 'tool_calls'`, or a tool call with `content` instead.** The model answered with text. Send `"tool_choice": "required"`, which OpenRouter's [parameters reference](https://openrouter.ai/docs/api/reference/parameters#tool-choice) lists, and check that the model that answered, `result["model"]`, lists `tools` among its `supported_parameters`. Not every model handles `"required"` well: in the course's runs of 2026-11-09, Dots answered it with garbled arguments or no call at all, and did better with `"auto"`, the default, and a check for `tool_calls`.
 - **A tool call your code can't run.** The model chose a tool you didn't implement, such as `resolve-geography-fips`, which needs the Census server's own database, or gave a tool an input its schema doesn't define. Check `call["name"]` and every argument before you send anything, and give the model the codes and IDs it would otherwise have to look up.
 - **The Census API answers 400 to the model's request, with `error: unknown variable 'B19013'`.** A table's ID went out as a variable. A `get` with `group` becomes `group(B19013)`, and a `get` with `variables` becomes a comma-separated list. Print the arguments and `response.text`, never `response.url`, which holds your key.
 
