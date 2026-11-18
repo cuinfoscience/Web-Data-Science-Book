@@ -517,7 +517,7 @@ Figure&nbsp;14.1: The NWS forecast page for Boulder on the evening of November 1
 <section id="finding-the-grid-points" class="level3" data-number="14.3.1">
 <h3 data-number="14.3.1" class="anchored" data-anchor-id="finding-the-grid-points"><span class="header-section-number">14.3.1</span> Finding the Grid: <code>/points</code></h3>
 <p>The API’s forecasts are filed by grid square, so the first request turns a latitude and longitude into the square that holds them. Boulder’s are 40.015 and −105.2705. Give at most four decimal places: the API answers a longer one with a redirect to the point rounded to four (on 2026-11-13, <code>40.01499,-105.27055</code> was redirected to <code>40.015,-105.2706</code>), which <code>requests</code> follows on its own.</p>
-<div id="a320b7c6" class="cell" data-execution_count="1">
+<div id="2bfe5355" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -552,7 +552,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <section id="the-hourly-forecast" class="level3" data-number="14.3.2">
 <h3 data-number="14.3.2" class="anchored" data-anchor-id="the-hourly-forecast"><span class="header-section-number">14.3.2</span> The Hourly Forecast</h3>
 <p>The second request asks for the address that the first one gave:</p>
-<div id="982ac713" class="cell" data-execution_count="2">
+<div id="f823c3b1" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co"># The address the /points answer gave for the hourly forecast</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a>hourly_url <span class="op">=</span> point[<span class="st">"forecastHourly"</span>]</span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>response <span class="op">=</span> requests.get(hourly_url, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
@@ -568,14 +568,14 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <section id="when-was-this-forecast-made" class="level3" data-number="14.3.3">
 <h3 data-number="14.3.3" class="anchored" data-anchor-id="when-was-this-forecast-made"><span class="header-section-number">14.3.3</span> When Was This Forecast Made?</h3>
 <p>The forecast carries two times of its own, and they disagree:</p>
-<div id="1ac16707" class="cell" data-execution_count="3">
+<div id="eab14739" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="bu">print</span>(<span class="st">"updateTime: "</span>, forecast[<span class="st">"updateTime"</span>])</span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a><span class="bu">print</span>(<span class="st">"generatedAt:"</span>, forecast[<span class="st">"generatedAt"</span>])</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="co"># updateTime:  2026-11-12T18:46:17+00:00</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-label="4"></a><span class="co"># generatedAt: 2026-11-13T02:04:16+00:00</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><code>updateTime</code> is when the NWS’s forecasters last changed the forecast for this grid square: the “Last Update” on the forecast page. <code>generatedAt</code> is when the API built this JSON document from it, more than seven hours later. The response’s headers, which <code>requests</code> keeps in <code>response.headers</code> (<a href="ch-05-protocols.html" class="quarto-xref"><span>Chapter 5</span></a>), add a third and a fourth time:</p>
-<div id="4ee876fb" class="cell" data-execution_count="4">
+<div id="33c1132d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Three of the response's headers: the time of the answer, and how long a copy of it may be reused</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="cf">for</span> name <span class="kw">in</span> [<span class="st">"Date"</span>, <span class="st">"Last-Modified"</span>, <span class="st">"Cache-Control"</span>]:</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>response<span class="sc">.</span>headers[name]<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -593,7 +593,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <section id="one-row-per-hour" class="level3" data-number="14.4.1">
 <h3 data-number="14.4.1" class="anchored" data-anchor-id="one-row-per-hour"><span class="header-section-number">14.4.1</span> One Row per Hour</h3>
 <p>The collector’s first job is to turn one answer into rows: one row for each forecast hour, each carrying the two times that say when it was collected and which version of the forecast it came from.</p>
-<div id="6a24716d" class="cell" data-execution_count="5">
+<div id="89ca714b" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timezone</span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="co"># When this run asked, in UTC, to the second; every row of the run gets the same time</span></span>
@@ -622,7 +622,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <section id="appending-to-a-csv-file" class="level3" data-number="14.4.2">
 <h3 data-number="14.4.2" class="anchored" data-anchor-id="appending-to-a-csv-file"><span class="header-section-number">14.4.2</span> Appending to a CSV File</h3>
 <p>Each run has to add its rows to what earlier runs saved, never replace them. Python’s <code>open()</code> with mode <code>"a"</code>, for <em>append</em>, writes at the end of a file and creates the file if it doesn’t exist. The CSV’s header line, the column names, must be written exactly once, by the first run; after that, every run adds rows only. <code>csv.DictWriter</code> writes dictionaries as CSV rows, in the order of a list of field names:</p>
-<div id="ff83e808" class="cell" data-execution_count="6">
+<div id="78159552" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="im">import</span> csv</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="im">import</span> os</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a></span>
@@ -652,7 +652,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <section id="stopping-loudly-on-an-error" class="level3" data-number="14.4.3">
 <h3 data-number="14.4.3" class="anchored" data-anchor-id="stopping-loudly-on-an-error"><span class="header-section-number">14.4.3</span> Stopping Loudly on an Error</h3>
 <p>A collector that runs while you sleep has to fail in a way you will notice in the morning. Suppose the address had a typo:</p>
-<div id="d7977d0e" class="cell" data-execution_count="7">
+<div id="e7913461" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co"># A mistyped address: "hourli" for "hourly"</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a>bad <span class="op">=</span> requests.get(<span class="st">"https://api.weather.gov/gridpoints/BOU/54,75/forecast/hourli"</span>, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="bu">print</span>(bad.status_code)</span>
@@ -669,7 +669,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a>    main()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Python sets <code>__name__</code> to <code>"__main__"</code> when a file is run as a program, and to the file’s name when another file imports it. The guard runs <code>main()</code> in the first case only, so that a notebook can <code>import collector</code> to borrow its constants without asking the NWS for anything.</p>
 <p>The third piece is a last day. A collector left running keeps asking a server for data nobody reads, and on GitHub it can run for months after its author has moved on. The course’s collector checks the date at the start of every run and does nothing after December 11, 2026, a week after the course’s last class:</p>
-<div id="d8875cb4" class="cell" data-execution_count="8">
+<div id="e98ff0a7" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a>LAST_DAY <span class="op">=</span> date(<span class="dv">2026</span>, <span class="dv">12</span>, <span class="dv">11</span>)</span>
@@ -887,7 +887,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <section id="reading-what-it-collected" class="level2" data-number="14.7">
 <h2 data-number="14.7" class="anchored" data-anchor-id="reading-what-it-collected"><span class="header-section-number">14.7</span> Reading What It Collected</h2>
 <p>The course’s repository has had <code>collector.py</code> on the template’s hourly schedule since November 13, 2026, writing to <code>labs/week-14/data/forecasts.csv</code>, and keeps it there until December 11. The book saved a copy of that file in <code>data/ch-14/</code> on November 17, so that this section’s numbers are the ones you get; its README says when the copy was made, and from which commit. The course’s own file keeps growing, and the Recommended Exercises read it.</p>
-<div id="43a23b19" class="cell" data-execution_count="9">
+<div id="c880926b" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co"># The book's copy of the course's series</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a>data_url <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/cuinfoscience/Web-Data-Science-Book/main/data/ch-14/forecasts.csv"</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a>series <span class="op">=</span> pd.read_csv(data_url, parse_dates<span class="op">=</span>[<span class="st">"collected_at"</span>, <span class="st">"update_time"</span>])</span>
@@ -902,7 +902,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <section id="how-often-did-the-forecast-change" class="level3" data-number="14.7.1">
 <h3 data-number="14.7.1" class="anchored" data-anchor-id="how-often-did-the-forecast-change"><span class="header-section-number">14.7.1</span> How Often Did the Forecast Change?</h3>
 <p>Each run saved the <code>update_time</code> of the forecast it found. One row per run, then, and a count of the versions:</p>
-<div id="1f144e29" class="cell" data-execution_count="10">
+<div id="b85d7dc1" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="co"># One row per run: when it asked, and which version of the forecast it found</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a>runs <span class="op">=</span> series.groupby(<span class="st">"collected_at"</span>)[<span class="st">"update_time"</span>].first()</span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="bu">print</span>(runs.nunique(), <span class="st">"versions of the forecast in"</span>, <span class="bu">len</span>(runs), <span class="st">"runs"</span>)</span>
@@ -935,7 +935,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <section id="when-did-the-runs-actually-run" class="level3" data-number="14.7.2">
 <h3 data-number="14.7.2" class="anchored" data-anchor-id="when-did-the-runs-actually-run"><span class="header-section-number">14.7.2</span> When Did the Runs Actually Run?</h3>
 <p>The schedule says minute 17 of every hour. <code>collected_at</code> says when each run asked, which is later by however long GitHub took to start the run, plus the time the first three steps took:</p>
-<div id="d17594b6" class="cell" data-execution_count="11">
+<div id="1eed3a6f" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="co"># Hours from each run to the next; a schedule that kept to minute 17 of every hour would print 1.0 three times</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>times <span class="op">=</span> runs.index.to_series()</span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a>gaps <span class="op">=</span> times.diff().dt.total_seconds() <span class="op">/</span> <span class="dv">3600</span></span>
@@ -961,7 +961,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 <section id="one-hour-forecast-many-times" class="level3" data-number="14.7.3">
 <h3 data-number="14.7.3" class="anchored" data-anchor-id="one-hour-forecast-many-times"><span class="header-section-number">14.7.3</span> One Hour, Forecast Many Times</h3>
 <p>Every hour in the series was forecast by several runs, the first about six and a half days ahead. Choose one hour and follow its forecast as the hour approached. This cell takes 3 p.m. on Tuesday, November 17, the one 3 p.m. that all 18 runs forecast and that the copy follows almost to the hour: the first run asked almost five days ahead, and the last, just before 2 p.m. that afternoon, an hour ahead.</p>
-<div id="f0d59680" class="cell" data-execution_count="12">
+<div id="a975c577" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a><span class="co"># The forecast for 3 p.m. Mountain time on Tuesday, November 17, from every run that forecast it</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a>target <span class="op">=</span> <span class="st">"2026-11-17T15:00:00-07:00"</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a>one_hour <span class="op">=</span> series[series[<span class="st">"start_time"</span>] <span class="op">==</span> target].copy()</span>
@@ -990,7 +990,7 @@ Figure&nbsp;14.2: The API’s answer to <code>/points/40.015,-105.2705</code> in
 </div>
 <p>All 18 runs forecast 3 p.m. on Tuesday, November 17, and all 13 versions of the forecast reached them. The first, found about 116 hours ahead, said 57 °F and sunny. The next said 59 °F and mostly sunny, and the sky stayed mostly sunny in every version after it. The temperature went to 60, back to 59, up to 62, down to 61, and reached 63 in the three versions of November 16, found from 38 to 20 hours ahead; the last two versions, found 10 hours and 1 hour ahead, said 62. From the first version to the last the forecast for this hour rose 5 degrees, and it never moved more than 3 degrees from one row of the table to the next. A run that found a version an earlier run had saved has the same numbers, so the table shows each version once, with the first run that saw it.</p>
 <p>A table of versions for one hour shows how that hour’s forecast moved. A chart can show several hours at once. This one takes 3 p.m. on each day from November 13 to 17, the five afternoons the copy follows to within a few hours of 3 p.m., and draws each one’s forecast temperature against how far ahead it was made:</p>
-<div id="f146a014" class="cell" data-execution_count="13">
+<div id="6632aa9e" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co"># 3 p.m. Mountain time on each day: start times that end in T15:00:00-07:00</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a>afternoons <span class="op">=</span> series[series[<span class="st">"start_time"</span>].<span class="bu">str</span>.endswith(<span class="st">"T15:00:00-07:00"</span>)].copy()</span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a><span class="co"># Keep the afternoons up to the target's, which the series follows almost to the hour itself</span></span>
@@ -1026,7 +1026,7 @@ Figure&nbsp;14.3: Boulder’s forecast temperature for 3 p.m. on each day from N
 <h2 data-number="14.8" class="anchored" data-anchor-id="failures-and-monitoring"><span class="header-section-number">14.8</span> Failures and Monitoring</h2>
 <p>A scheduled collector fails in two ways. Some failures stop the run: the NWS answers 500 or 503 because a server is busy, the address is mistyped, the network times out, or the push is refused. <code>raise_for_status()</code> and Python’s own errors make these loud. The run gets a red X on the Actions tab and its log ends with the traceback. GitHub sends its notices about a scheduled workflow “to the user who last modified the cron syntax in the workflow file” (<a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule">Events that trigger workflows</a>), so the person who set up the schedule hears about a failed run without having to look.</p>
 <p>Other failures let the run finish. The script prints its line, the commit goes through, and the check is green, while the data is wrong. The most instructive one comes from a typo. Swap the grid square’s column and row, 75,54 for 54,75, and the API doesn’t object:</p>
-<div id="3616b085" class="cell" data-execution_count="14">
+<div id="6a1326da" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="co"># The grid square's column and row, swapped by mistake</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a>wrong <span class="op">=</span> requests.get(<span class="st">"https://api.weather.gov/gridpoints/BOU/75,54/forecast/hourly"</span>, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">30</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a><span class="bu">print</span>(wrong.status_code, <span class="bu">len</span>(wrong.json()[<span class="st">"properties"</span>][<span class="st">"periods"</span>]), <span class="st">"periods"</span>)</span>
@@ -1040,7 +1040,7 @@ Figure&nbsp;14.3: Boulder’s forecast temperature for 3 p.m. on each day from N
 <p>The API answered 200 with 156 hours of forecast, for a grid square whose nearest city is Aurora, on the other side of Denver. <code>raise_for_status()</code> lets a 200 through, the rows look like any other run’s, and a collector with this typo would have saved Aurora’s weather under Boulder’s name for as long as it ran. A wrong office ID does the same: <code>BOX</code> for <code>BOU</code> is the office for Boston, and its square 54,75 is nearest to Chepachet, Rhode Island (checked 2026-11-13). Only a check against something you know about the place catches it, such as the <code>/points</code> answer you started from.</p>
 <p>A field can come back empty: <code>probabilityOfPrecipitation</code> has a <code>value</code> that can be <code>null</code>, which <code>csv</code> writes as an empty cell, and a field the NWS stopped filling would leave a column of blanks, run after run. A list can come back short, and the collector would save 12 rows as readily as 156. The forecast can stop changing: if the forecast office’s updates stopped reaching the API, every run would save the same <code>update_time</code> for days, and nothing in a run would say so. And a run can fail to happen at all. A disabled workflow, or a run GitHub dropped, leaves no red X, only a gap in <code>collected_at</code>.</p>
 <p>None of these shows up on the Actions tab. They show up in the data, if you look for them, so the looking has to be scheduled too: a check that reads the CSV and reports what is wrong with its newest run.</p>
-<div id="3ee749c8" class="cell" data-execution_count="15">
+<div id="bc2dba2c" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="kw">def</span> check_freshness(series, now):</span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a>    <span class="co">"""List the problems with the newest run in series, as of the time now."""</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-label="3"></a>    problems <span class="op">=</span> []</span>
@@ -1068,7 +1068,7 @@ Figure&nbsp;14.3: Boulder’s forecast temperature for 3 p.m. on each day from N
 <p>An empty list means no problems. This cell ran at 23:37 UTC on November 17, a little more than two and a half hours after the copy’s last run, so the first check fired. Run it on the book’s copy on any later day and it prints the same message, which is true of a frozen copy and is the reason for that check: on a collector’s own file, the message means the collector has stopped.</p>
 <p>On the course’s file it would also have fired on an ordinary day. Two hours is the right limit for a collector that runs every hour, and GitHub ran this one 4 to 10.6 hours apart, so the check would have reported missing runs for hours of every day. The report is true, since scheduled runs were missing, and a check that reports the same thing every day stops being read. Each limit is a choice the series has to support. For runs as GitHub made them, a limit of 12 hours would have stayed quiet through these five days and still caught a collector that stopped. The 24-hour limit on a forecast’s age was chosen the same way: versions of this forecast regularly stood for 12 hours, and one run found a forecast 10 hours and 45 minutes old, so a limit of 12 hours would leave an ordinary day almost no margin.</p>
 <p>The same checks, applied to every run instead of the newest, describe the whole series:</p>
-<div id="c794fe47" class="cell" data-execution_count="16">
+<div id="4c4ab19d" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># One row per run: how many hours it saved, and how old its forecast was when it asked</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a>per_run <span class="op">=</span> series.groupby(<span class="st">"collected_at"</span>).agg(hours<span class="op">=</span>(<span class="st">"start_time"</span>, <span class="st">"size"</span>), updated<span class="op">=</span>(<span class="st">"update_time"</span>, <span class="st">"first"</span>))</span>
 <span id="cb21-3"><a href="#cb21-3" aria-label="3"></a>per_run[<span class="st">"forecast_age"</span>] <span class="op">=</span> per_run.index <span class="op">-</span> per_run[<span class="st">"updated"</span>]</span>
@@ -1146,7 +1146,7 @@ Figure&nbsp;14.3: Boulder’s forecast temperature for 3 p.m. on each day from N
 <p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order; everything you need appears in this chapter or an earlier one.</p>
 <p>You will plan a collector for another place, or another of the NWS’s products, and check the course’s series as its monitor would. Choose a place in the United States other than Boulder: your hometown, or a Colorado town with weather unlike Boulder’s, such as Grand Junction or Leadville.</p>
 <p><strong>Setup.</strong> Run this cell first, whether or not you ran the chapter’s cells above: the steps use its imports and <code>HEADERS</code>. It sends no request.</p>
-<div id="b4d821ac" class="cell" data-execution_count="17">
+<div id="6d614e4e" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># Setup: the libraries the steps use, and your User-Agent; put your own address in HEADERS</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="im">import</span> csv</span>
 <span id="cb22-3"><a href="#cb22-3" aria-label="3"></a><span class="im">import</span> os</span>
@@ -1159,32 +1159,32 @@ Figure&nbsp;14.3: Boulder’s forecast temperature for 3 p.m. on each day from N
 <span id="cb22-10"><a href="#cb22-10" aria-label="10"></a>HEADERS <span class="op">=</span> {<span class="st">"User-Agent"</span>: <span class="st">"WebDataScience/1.0 (your-email@colorado.edu)"</span>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 1 — Find your grid square.</strong> With your own email in the setup cell’s <code>HEADERS</code>, request <code>/points</code> for your place’s latitude and longitude, to four decimal places. Print the forecast office, the grid column and row, the nearest city, and the <code>forecastHourly</code> and <code>forecast</code> addresses.</p>
-<div id="e69b1506" class="cell" data-execution_count="18">
+<div id="a283b5de" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="co"># Step 1: Request /points for your place; print gridId, gridX, gridY, the nearest city, and the two forecast addresses</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 2 — One request, read closely.</strong> Request your place’s hourly forecast. Print the number of periods, <code>updateTime</code>, <code>generatedAt</code>, and the <code>Last-Modified</code> and <code>Cache-Control</code> headers. Then request the <code>forecast</code> address, the 12-hour periods of the forecast page, and print its number of periods and its <code>updateTime</code>. In a comment, say whether the two products have the same <code>updateTime</code>, which would mean the forecasters update them together, and whether each <code>Last-Modified</code> equals its <code>updateTime</code> or falls at the top of an hour, as Boulder’s hourly forecast’s did in “When Was This Forecast Made?”. What does that suggest about when each document is rebuilt?</p>
-<div id="e14a37d6" class="cell" data-execution_count="19">
+<div id="22df0639" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="co"># Step 2: Request the hourly forecast and the 12-hour forecast; print their periods, times, and headers</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Adapt the collector.</strong> Copy <code>collector.py</code>’s imports, constants and <code>main()</code> into this cell. Change <code>URL</code> to your place’s hourly forecast and <code>FILE</code> to a name of your own, and add one column the course’s collector leaves out, such as the period’s relative humidity (<code>period["relativeHumidity"]["value"]</code>). A new column goes in two places: its name in <code>FIELDS</code>, and its value in the dictionary that <code>writerow()</code> writes. Call <code>main()</code> twice, a few seconds apart (<code>time.sleep(2)</code>), since <code>collected_at</code> is kept to the second and two runs in the same second read as one. Then load your file with <code>pd.read_csv()</code> and show that it has one header, two runs, and your new column. If a run stops partway, delete your file before you run again: the old header stays in it, and rows written under a different <code>FIELDS</code> read back shifted, with no error (“Common Issues to Debug”). If you will do Step 5 in a repository, save the same code as a script too, such as <code>my_collector.py</code>.</p>
-<div id="2ba63c07" class="cell" data-execution_count="20">
+<div id="91fb6a7c" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a><span class="co"># Step 3: Adapt collector.py for your place, with one more column; run main() twice and check the file</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 4 — Check the course’s series.</strong> Load the course’s growing series from <code>https://raw.githubusercontent.com/cuinfoscience/INFO4617-Fall2026/main/labs/week-14/data/forecasts.csv</code> (GitHub may serve a copy up to five minutes old). First, print the thresholds the series itself supports: the longest gap between its runs, and the longest a forecast stood unchanged between the versions the series saw, which is a lower bound, since a version can come and go between two runs (“How Often Did the Forecast Change?”). Then write a <code>check_series()</code> function that takes its limits as arguments and returns a list of problems, building on <code>check_freshness()</code>: a gap between consecutive runs longer than the gap limit, a run with fewer than 150 rows, a run whose forecast was older than the age limit, and a column empty in every row of a run. Choose the limits from what you printed, as “Failures and Monitoring” chose 12 hours for the gap: with a two-hour limit, the first check would report nearly every gap in the series (“When Did the Runs Actually Run?” says why). Run it on the series, then on copies you break on purpose: one with some of one run’s rows dropped, and one with a column emptied in one run. Show that it catches each. A collector that has stopped leaves no gap inside the series, so <code>check_series()</code> can’t see it; <code>check_freshness(series, now)</code> can.</p>
-<div id="308f1af5" class="cell" data-execution_count="21">
+<div id="09c939bc" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a><span class="co"># Step 4: Load the course's series, write check_series(), and run it on the series and on a broken copy</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 5 — Write a workflow.</strong> Write a workflow file for your collector as a Python string, and save it to <code>collect.yml</code> with <code>open()</code> and <code>write()</code>. Schedule it every three hours, at a minute other than 0, and explain each of the <code>cron</code> expression’s five fields in a YAML comment (YAML comments start with <code>#</code>). Keep <code>workflow_dispatch</code> and the commit step, and make both match Step 3: run your own script (<code>python my_collector.py</code>, say) and stage your own <code>FILE</code>, since the template’s <code>git add forecasts.csv</code> stops the run with a pathspec error when there is no such file. Print the file back. You don’t need to run it, though you may, in a public repository of your own.</p>
-<div id="3f2666b8" class="cell" data-execution_count="22">
+<div id="7ca9f26b" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-label="1"></a><span class="co"># Step 5: Write your collect.yml as a string, save it, and print it back</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Interpret.</strong> In four to six sentences: in the course’s series, how many runs found a forecast the previous run had already saved? (In the book’s copy, 5 of 18 did; the course’s file has grown since, so count it there.) How many requests would your three-hour schedule save the NWS in a semester, compared with an hourly one, and what would it miss? What can no collector of this forecast record, however often it runs?</p>
-<div id="9a385519" class="cell" data-execution_count="23">
+<div id="e87c3124" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-label="1"></a><span class="co"># Step 6: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
