@@ -6,7 +6,10 @@ prose becomes Markdown cells, ```{python} blocks become (unexecuted)
 code cells. Quarto-specific syntax that Jupyter cannot render —
 callout fences, heading anchors, and figure attributes and
 cross-references — is stripped or simplified so the notebooks read
-cleanly on their own.
+cleanly on their own. A chapter cross-reference, `@sec-ethics`, becomes
+a link to that chapter in the published book, and a citation from
+`references.bib`, `[@key]` or `@key`, becomes author and year, as the
+book prints them.
 
 Run from the repository root after editing any chapter's code:
 
@@ -97,6 +100,105 @@ def convert_figures(text: str, chapter: int, numbers: dict = None) -> str:
     return re.sub(r"@(fig-[\w-]+)", lambda m: numbers.get(m.group(1), m.group(0)), text)
 
 
+LATEX_ACCENTS = {"\\'": "\u0301", '\\"': "\u0308", "\\`": "\u0300", "\\^": "\u0302", "\\~": "\u0303"}
+LATEX_LETTERS = {"\\ss": "ß", "\\AA": "Å", "\\aa": "å", "\\o": "ø", "\\O": "Ø"}
+
+
+def bib_text(value: str) -> str:
+    """A BibTeX field as plain text: accents resolved, braces dropped."""
+    import unicodedata
+    for macro, letter in LATEX_LETTERS.items():
+        value = re.sub(r"\{" + re.escape(macro) + r"\}", letter, value)
+    for macro, mark in LATEX_ACCENTS.items():
+        value = re.sub(r"\{" + re.escape(macro) + r"(\w)\}", lambda m: m.group(1) + mark, value)
+    value = value.replace("\\&", "&").replace("{", "").replace("}", "")
+    return unicodedata.normalize("NFC", value)
+
+
+def read_bib(path: Path) -> dict:
+    """{key: "Lazer et al." , ...} and years, from references.bib: (names, year) per key."""
+    entries = {}
+    text = path.read_text(encoding="utf-8")
+    for match in re.finditer(r"^@\w+\{([^,\s]+),", text, re.M):
+        key, start = match.group(1), match.end()
+        end = text.find("\n@", start)
+        body = text[start:end if end != -1 else len(text)]
+        author = re.search(r"^\s*author\s*=\s*\{(.*)\},?\s*$", body, re.M)
+        year = re.search(r"^\s*year\s*=\s*\{?(\d{4})", body, re.M)
+        if not (author and year):
+            continue
+        raw = author.group(1)
+        if raw.startswith("{") and raw.endswith("}"):   # an organization, kept whole
+            names = [bib_text(raw)]
+        else:
+            names = [bib_text(n.split(",")[0].strip()) for n in raw.split(" and ")]
+        if len(names) == 1:
+            who = names[0]
+        elif len(names) == 2:
+            who = f"{names[0]} and {names[1]}"
+        else:
+            who = f"{names[0]} et al."
+        entries[key] = (who, year.group(1))
+    return entries
+
+
+def section_links(root: Path) -> dict:
+    """{"sec-ethics": "[Chapter 2](…ch-02-ethics.html)", …}, as Quarto numbers chapters and appendices."""
+    links = {}
+    config = (root / "_quarto.yml").read_text(encoding="utf-8")
+    appendices = re.findall(r"^\s+- (appendix-[\w-]+\.qmd)", config.split("appendices:", 1)[-1], re.M)
+    files = [("Chapter " + str(int(re.match(r"ch-(\d+)", q.name).group(1))), q)
+             for q in sorted(root.glob("ch-*.qmd"))]
+    files += [(f"Appendix {chr(ord('A') + i)}", root / name) for i, name in enumerate(appendices)]
+    for label_text, qmd in files:
+        if not qmd.exists():
+            continue
+        label = re.search(r"^# .*\{#(sec-[\w-]+)\}", qmd.read_text(encoding="utf-8"), re.M)
+        if label:
+            links[label.group(1)] = f"[{label_text}]({BOOK_URL}{qmd.stem}.html)"
+    return links
+
+
+CODE_SPAN = re.compile(r"(`+)(?:.(?!\1))*?.?\1", re.S)
+BRACKET_CITE = re.compile(r"\[([^\[\]]*?-?@[^\[\]]*)\]")
+NARRATIVE_CITE = re.compile(r"(?<![\w@.\-/])@([A-Za-z][\w-]*\d{4}[\w]*)")
+
+
+def convert_references(prose: str, links: dict, bib: dict) -> str:
+    """Chapter references and citations in Markdown prose, outside code spans."""
+
+    def bracket(match):
+        parts = []
+        for part in match.group(1).split(";"):
+            cite = re.fullmatch(r"\s*(.*?)(-?)@([\w-]+)(.*?)\s*", part, re.S)
+            if not cite or cite.group(3) not in bib:
+                return match.group(0)
+            prefix, suppress, key, locator = cite.groups()
+            who, year = bib[key]
+            parts.append(f"{prefix}{'' if suppress else who + ' '}{year}{locator}")
+        return "(" + "; ".join(parts) + ")"
+
+    def narrative(match):
+        key = match.group(1)
+        if key not in bib:
+            return match.group(0)
+        who, year = bib[key]
+        return f"{who} ({year})"
+
+    def outside_code(text):
+        text = re.sub(r"@(sec-[\w-]+)", lambda m: links.get(m.group(1), m.group(0)), text)
+        text = BRACKET_CITE.sub(bracket, text)
+        return NARRATIVE_CITE.sub(narrative, text)
+
+    pieces, pos = [], 0
+    for span in CODE_SPAN.finditer(prose):
+        pieces.append(outside_code(prose[pos:span.start()]))
+        pieces.append(span.group(0))
+        pos = span.end()
+    pieces.append(outside_code(prose[pos:]))
+    return "".join(pieces)
+
+
 def split_at_sections(prose: str) -> list:
     """Split a prose run into one markdown cell per ## section.
 
@@ -107,20 +209,20 @@ def split_at_sections(prose: str) -> list:
     return [p.strip() for p in parts if p.strip()]
 
 
-def qmd_to_cells(text: str) -> list:
+def qmd_to_cells(text: str, links: dict = None, bib: dict = None) -> list:
     """Split chapter text into alternating markdown and code cells."""
     cells = []
     pattern = re.compile(r"^```\{python\}\s*$(.*?)^```\s*$", re.M | re.S)
     pos = 0
     for match in pattern.finditer(text):
-        prose = strip_quarto_syntax(text[pos:match.start()])
+        prose = convert_references(strip_quarto_syntax(text[pos:match.start()]), links or {}, bib or {})
         for part in split_at_sections(prose):
             cells.append(("markdown", part))
         code = match.group(1).strip("\n")
         if code.strip():
             cells.append(("code", code))
         pos = match.end()
-    tail = strip_quarto_syntax(text[pos:])
+    tail = convert_references(strip_quarto_syntax(text[pos:]), links or {}, bib or {})
     for part in split_at_sections(tail):
         cells.append(("markdown", part))
     return cells
@@ -142,7 +244,7 @@ def leftovers(nb: dict) -> list:
     return found
 
 
-def make_notebook(qmd_path: Path, numbers: dict = None) -> dict:
+def make_notebook(qmd_path: Path, numbers: dict = None, links: dict = None, bib: dict = None) -> dict:
     text = qmd_path.read_text(encoding="utf-8")
     # The chapters' "Companion Notebook" download callout is navigation
     # for the rendered book; inside the notebook itself it is noise.
@@ -160,7 +262,7 @@ def make_notebook(qmd_path: Path, numbers: dict = None) -> dict:
     header = HEADER_TEMPLATE.format(
         title=title, book_url=BOOK_URL, source=qmd_path.name
     )
-    cells = [("markdown", header)] + qmd_to_cells(text)
+    cells = [("markdown", header)] + qmd_to_cells(text, links, bib)
 
     nb_cells = []
     for kind, source in cells:
@@ -207,9 +309,11 @@ def main() -> None:
     for qmd in chapters:
         chapter = int(re.match(r"ch-(\d+)", qmd.stem).group(1))
         numbers.update(figure_numbers(qmd.read_text(encoding="utf-8"), chapter))
+    links = section_links(ROOT)
+    bib = read_bib(ROOT / "references.bib")
     problems = []
     for qmd in chapters:
-        nb = make_notebook(qmd, numbers)
+        nb = make_notebook(qmd, numbers, links, bib)
         out = OUT_DIR / (qmd.stem + ".ipynb")
         out.write_text(
             json.dumps(nb, indent=1, ensure_ascii=False) + "\n",
