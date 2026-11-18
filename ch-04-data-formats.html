@@ -102,7 +102,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-5e47b74b0d76349b8611012ae61c8e00.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ab63f03c35f301beae6f936ff8ee3633.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -434,7 +434,7 @@ div.csl-indent {
 <section id="the-tree-structure" class="level3" data-number="4.2.1">
 <h3 data-number="4.2.1" class="anchored" data-anchor-id="the-tree-structure"><span class="header-section-number">4.2.1</span> The Tree Structure</h3>
 <p>XML organizes data as a hierarchy of nested tags. Each tag can contain text, attributes, and child tags. Here is a simplified example of Congressional member data, using the same tag names as the real U.S. House data feed you will retrieve later in this chapter:</p>
-<div id="cb8ef304" class="cell" data-execution_count="1">
+<div id="d6030536" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a>house_raw <span class="op">=</span> <span class="st">"""&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-label="2"></a><span class="st">&lt;MemberData publish-date="July 1, 2026"&gt;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="st">  &lt;members&gt;</span></span>
@@ -469,7 +469,7 @@ div.csl-indent {
 </section>
 <section id="parsing-with-beautifulsoup" class="level3" data-number="4.2.2">
 <h3 data-number="4.2.2" class="anchored" data-anchor-id="parsing-with-beautifulsoup"><span class="header-section-number">4.2.2</span> Parsing with BeautifulSoup</h3>
-<div id="4b694716" class="cell" data-execution_count="2">
+<div id="d7651f0b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb2-2"><a href="#cb2-2" aria-label="2"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>soup <span class="op">=</span> BeautifulSoup(house_raw, <span class="st">"xml"</span>)</span>
@@ -489,7 +489,7 @@ div.csl-indent {
 </div>
 </div>
 <p>The power of BeautifulSoup is in its search methods. The <code>.find()</code> method returns the first tag matching your criteria — searching all descendants, no matter how deeply nested. The <code>.find_all()</code> method returns all matching tags as a list:</p>
-<div id="0c7e2293" class="cell" data-execution_count="3">
+<div id="469feb4b" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co"># Find all member tags</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>members <span class="op">=</span> soup.find_all(<span class="st">"member"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="bu">print</span>(<span class="bu">len</span>(members))  <span class="co"># 2</span></span>
@@ -505,7 +505,7 @@ div.csl-indent {
 </div>
 <p>Notice that <code>member.find("firstname")</code> works even though <code>&lt;firstname&gt;</code> sits inside a nested <code>&lt;member-info&gt;</code> block — <code>.find()</code> searches the entire subtree beneath a tag. Also notice which names you can reach with dot notation. Shortcuts like <code>soup.members.member</code> only work for tag names that are valid Python identifiers; hyphenated names like <code>&lt;member-info&gt;</code> and <code>&lt;state-fullname&gt;</code> break dot notation (Python would read <code>soup.member-info</code> as subtraction), so you must use <code>.find()</code> for them.</p>
 <p>XML tags can also carry <strong>attributes</strong> — key-value pairs inside the opening tag itself. In this schema, the <code>&lt;state&gt;</code> tag stores the two-letter postal code as an attribute and spells out the full state name in a child tag. BeautifulSoup exposes attributes through dictionary-style bracket notation:</p>
-<div id="7f10820c" class="cell" data-execution_count="4">
+<div id="8f151d29" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co"># Attributes are accessed with brackets, text with .text</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>state_tag <span class="op">=</span> soup.find(<span class="st">"state"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="bu">print</span>(state_tag[<span class="st">"postal-code"</span>])               <span class="co"># CO</span></span>
@@ -519,20 +519,20 @@ div.csl-indent {
 <section id="extracting-and-counting" class="level3" data-number="4.2.3">
 <h3 data-number="4.2.3" class="anchored" data-anchor-id="extracting-and-counting"><span class="header-section-number">4.2.3</span> Extracting and Counting</h3>
 <p>A common pattern is extracting all values for a particular tag and then analyzing the distribution:</p>
-<div id="d32ecc47" class="cell" data-execution_count="5">
+<div id="a7014402" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co"># Count party affiliations</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>parties <span class="op">=</span> [m.find(<span class="st">"party"</span>).text <span class="cf">for</span> m <span class="kw">in</span> soup.find_all(<span class="st">"member"</span>)]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="bu">print</span>(parties)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-label="4"></a><span class="co"># ['D', 'R']</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-label="5"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-label="6"></a><span class="co"># In a real dataset with all 435 members, you could count:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-label="6"></a><span class="co"># In the real roster, with all 441 entries, you could count:</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-label="7"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
 <span id="cb5-8"><a href="#cb5-8" aria-label="8"></a>party_counts <span class="op">=</span> Counter(parties)</span>
 <span id="cb5-9"><a href="#cb5-9" aria-label="9"></a><span class="bu">print</span>(party_counts)</span>
 <span id="cb5-10"><a href="#cb5-10" aria-label="10"></a><span class="co"># Counter({'D': 1, 'R': 1}) — with full data you'd see actual totals</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The <code>.contents</code> method gives you a list of a tag’s direct children, which is useful for exploring unfamiliar XML structures:</p>
-<div id="06845fd2" class="cell" data-execution_count="6">
+<div id="936f0601" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a>first_member <span class="op">=</span> soup.find(<span class="st">"member"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="bu">print</span>(first_member.contents)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co"># A list of child tags and whitespace strings</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -540,7 +540,7 @@ div.csl-indent {
 </section>
 <section id="working-with-real-xml" class="level3" data-number="4.2.4">
 <h3 data-number="4.2.4" class="anchored" data-anchor-id="working-with-real-xml"><span class="header-section-number">4.2.4</span> Working with Real XML</h3>
-<p>Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at <a href="https://clerk.house.gov">clerk.house.gov</a> in XML format. Its structure is what the synthetic example prepared you for: a root <code>&lt;MemberData&gt;</code> tag with a <code>publish-date</code> attribute, containing a <code>&lt;members&gt;</code> tag, containing one <code>&lt;member&gt;</code> per representative, each with the biographical details nested inside <code>&lt;member-info&gt;</code>. The real file adds two blocks we will ignore here: a <code>&lt;title-info&gt;</code> header before <code>&lt;members&gt;</code>, and a <code>&lt;committee-assignments&gt;</code> block in each <code>&lt;member&gt;</code>. You can check that shape before writing any code by opening the file’s address in Chrome, which draws an XML file that has no stylesheet as a tree you can fold (<a href="#fig-house-xml-tree" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>).</p>
+<p>Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at <a href="https://clerk.house.gov">clerk.house.gov</a> in XML format, and documents every tag in its <a href="https://clerk.house.gov/member_info/MemberData_UserGuide.pdf">user guide and data dictionary</a>. Its structure is what the synthetic example prepared you for: a root <code>&lt;MemberData&gt;</code> tag with a <code>publish-date</code> attribute, containing a <code>&lt;members&gt;</code> tag, containing one <code>&lt;member&gt;</code> per representative, each with the biographical details nested inside <code>&lt;member-info&gt;</code>. The real file adds two blocks we will ignore here: a <code>&lt;title-info&gt;</code> header before <code>&lt;members&gt;</code>, and a <code>&lt;committee-assignments&gt;</code> block in each <code>&lt;member&gt;</code>. You can check that shape before writing any code by opening the file’s address in Chrome, which draws an XML file that has no stylesheet as a tree you can fold (<a href="#fig-house-xml-tree" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>).</p>
 <div id="fig-house-xml-tree" class="lightbox quarto-float quarto-figure quarto-figure-center anchored" alt="Screenshot of Chrome's tree view of MemberData.xml. Marker 1: the root tag, MemberData, publish-date October 1, 2026. Under a folded title-info, marker 2: members, and marker 3: the first member, statedistrict AK00. Marker 4: member-info, listing Nicholas Begich's names, bioguideID, party R, caucus R, state Alaska, district At Large, office, phone, and election and swearing-in dates. Marker 3 again: the second member.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-house-xml-tree-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -552,7 +552,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 </figure>
 </div>
 <p>In Python, fetch the file with <code>requests</code> and parse it with BeautifulSoup’s <code>"xml"</code> parser:</p>
-<div id="fadd00a3" class="cell" data-execution_count="7">
+<div id="25e1fee4" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb7-3"><a href="#cb7-3" aria-label="3"></a></span>
@@ -582,13 +582,13 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <span id="cb7-27"><a href="#cb7-27" aria-label="27"></a><span class="co"># Counter({'R': 221, 'D': 217, '': 2, 'I': 1})</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Notice <code>response.content</code> rather than <code>response.text</code>. The Clerk’s server labels the file <code>text/xml</code> without naming a character set, so <code>requests</code> falls back to ISO-8859-1, and <code>.text</code> would turn Linda T. Sánchez into “Linda T. SÃ¡nchez”. Given the raw bytes, BeautifulSoup reads the encoding the file declares in its first line, UTF-8, and every name comes out right.</p>
-<p>Why 441 rather than 435? The file includes the six non-voting delegates and resident commissioner alongside the 435 voting representatives. Your exact counts will also drift as members resign and seats are filled — which is why the <code>publish-date</code> attribute matters. Record it alongside your data so your analysis documents exactly which snapshot of Congress it describes.</p>
-<p>That <code>Counter</code> already shows drift in two different ways, and both are worth reading rather than discarding. The two blank-string parties are not a parsing bug: they are vacant seats. The feed’s <code>&lt;member&gt;</code> block for each still exists, but every biographical tag inside it — <code>&lt;firstname&gt;</code>, <code>&lt;lastname&gt;</code>, <code>&lt;party&gt;</code> — is present and empty, and a <code>&lt;footnote&gt;</code> names the reason (<code>"Vacancy due to the resignation of..."</code>, with the departing member’s information preserved in a <code>&lt;predecessor-info&gt;</code> block). A seat count of 441 was never a claim that 441 people are serving; it is a claim that 441 <em>lines</em> exist in the roster, two of which are placeholders. And the lone <code>'I'</code> is Kevin Kiley of California’s 3rd district, whose <code>&lt;party&gt;</code> tag reads <code>I</code> while his <code>&lt;caucus&gt;</code> tag reads <code>R</code> — the schema distinguishes formal party registration from which caucus a member actually sits with, and a <code>Counter</code> over <code>party</code> alone will call him something his colleagues would not. Neither wrinkle shows up unless you go looking; a <code>Counter(parties)</code> that only reports round numbers is one you should not fully trust.</p>
+<p>Why 441 rather than 435? The file includes six non-voting members, five delegates and a resident commissioner, for the District of Columbia and five territories; their <code>&lt;district&gt;</code> tag reads <code>Delegate</code> or <code>Resident Commissioner</code>. Take them and the two vacancies below away, and 433 serving members can vote. Your exact counts will also drift as members resign and seats are filled — which is why the <code>publish-date</code> attribute matters. Record it alongside your data so your analysis documents exactly which snapshot of Congress it describes.</p>
+<p>That <code>Counter</code> already shows drift in two different ways, and both are worth reading rather than discarding. The two blank-string parties are not a parsing bug: they are vacant seats. The feed’s <code>&lt;member&gt;</code> block for each still exists, but every biographical tag inside it — <code>&lt;firstname&gt;</code>, <code>&lt;lastname&gt;</code>, <code>&lt;party&gt;</code> — is present and empty, and a <code>&lt;footnote&gt;</code> names the reason (<code>"Vacancy due to the resignation of..."</code>, with the departing member’s information preserved in a <code>&lt;predecessor-info&gt;</code> block). A seat count of 441 was never a claim that 441 people are serving; it is a claim that 441 <em>lines</em> exist in the roster, two of which are placeholders. And the lone <code>'I'</code> is Kevin Kiley of California’s 3rd district, whose <code>&lt;party&gt;</code> tag reads <code>I</code> while his <code>&lt;caucus&gt;</code> tag reads <code>R</code> — the schema records a member’s party and, separately, the caucus the member sits with, and a <code>Counter</code> over <code>party</code> alone will call him something his colleagues would not. Neither wrinkle shows up unless you go looking; a <code>Counter(parties)</code> that only reports round numbers is one you should not fully trust.</p>
 </section>
 <section id="from-xml-to-dataframe" class="level3" data-number="4.2.5">
 <h3 data-number="4.2.5" class="anchored" data-anchor-id="from-xml-to-dataframe"><span class="header-section-number">4.2.5</span> From XML to DataFrame</h3>
 <p>Counting party affiliations is useful, but the larger payoff is converting the XML into a DataFrame for systematic analysis. The pattern is straightforward: use <code>find_all()</code> to get all records, extract the fields you need from each one, build a list of dictionaries, and pass it to <code>pd.DataFrame()</code>:</p>
-<div id="505b7fa9" class="cell" data-execution_count="8">
+<div id="3b1b05fa" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb8-2"><a href="#cb8-2" aria-label="2"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="co"># Extract structured data from each member</span></span>
@@ -615,7 +615,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 </div>
 <p>Note the <code>state</code> field: because the postal code is stored as an attribute of the <code>&lt;state&gt;</code> tag rather than as its text, we grab the tag once with <code>.find("state")</code> and then use bracket notation — the same pattern you practiced on the synthetic example. The <code>district</code> column contains strings like <code>"1st"</code> and <code>"At Large"</code> rather than numbers, a reminder that XML gives you text and any type conversion is your job.</p>
 <p>With the full Congressional dataset, you can now perform real analysis:</p>
-<div id="31ae6c2f" class="cell" data-execution_count="9">
+<div id="58d6b3b5" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co"># Party breakdown</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-label="2"></a><span class="bu">print</span>(df.groupby(<span class="st">"party"</span>).size())</span>
 <span id="cb9-3"><a href="#cb9-3" aria-label="3"></a><span class="co">#</span></span>
@@ -642,7 +642,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 </div>
 <p>The empty-string party appears here too, sorted before <code>"D"</code> because pandas orders group keys alphabetically and an empty string sorts first. If you wanted only the 439 members actually serving, <code>df[df["party"] != ""]</code> drops the two vacancies before you count.</p>
 <p>This <code>find_all</code> → extract fields → list of dictionaries → DataFrame pipeline is the parsing half of the book’s retrieve–parse–analyze loop. You will use it to parse HTML tables in <a href="ch-06-static-pages.html" class="quarto-xref"><span>Chapter 6</span></a>, extract data from archived web pages in <a href="ch-07-archives.html" class="quarto-xref"><span>Chapter 7</span></a>, and process PDF text in <a href="ch-09-pdfs.html" class="quarto-xref"><span>Chapter 9</span></a>. The data source changes, the tag names change, but the pipeline stays the same. Once you internalize this pattern, every new parsing challenge becomes a question of “what tags contain the data I need?” rather than “how do I get data into a DataFrame?”</p>
-<p>The conditional checks (<code>if m.find("firstname") else None</code>) protect against missing tags — a common issue with real-world XML where not every record contains every field. Without these checks, a single missing tag would crash your entire extraction loop with an <code>AttributeError</code>.</p>
+<p>The conditional checks (<code>if m.find("firstname") else None</code>) protect against missing tags — a common issue with real-world XML where not every record contains every field. Without these checks, a single missing tag would crash your entire extraction loop with an <code>AttributeError</code>. The House roster never needs them: every <code>&lt;member&gt;</code> has every one of these tags, vacancies included. An RSS feed does: in November 2026, three of the 355 items in NPR’s Planet Money feed had no <code>&lt;link&gt;</code>, and an unguarded loop stopped at the first of them.</p>
 <p>Once the data is in a DataFrame, you have the full power of pandas at your disposal. You can filter members by state (<code>df[df["state"] == "CO"]</code>), compute cross-tabulations of party by state (<code>pd.crosstab(df["state"], df["party"])</code>), or merge Congressional data with external datasets like election results or demographic information. The DataFrame is the universal intermediate format — regardless of whether your data started as XML, JSON, HTML, or PDF text, getting it into a DataFrame is the step that unlocks analysis. This chapter introduces the pattern with XML; the chapters that follow apply it to every other data source on the web.</p>
 </section>
 </section>
@@ -651,13 +651,13 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="lists-and-dictionaries" class="level3" data-number="4.3.1">
 <h3 data-number="4.3.1" class="anchored" data-anchor-id="lists-and-dictionaries"><span class="header-section-number">4.3.1</span> Lists and Dictionaries</h3>
 <p>JSON maps onto two Python data structures you already know. A JSON <strong>array</strong> is a Python <strong>list</strong> — ordered, indexed by position:</p>
-<div id="819c2980" class="cell" data-execution_count="10">
+<div id="96c3ea7d" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a>classroom <span class="op">=</span> [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Carol"</span>]</span>
 <span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="bu">print</span>(classroom[<span class="dv">0</span>])   <span class="co"># "Alice"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="bu">print</span>(<span class="bu">len</span>(classroom))  <span class="co"># 3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>A JSON object naturally maps to a Python dictionary, which is accessed by key. Python dictionaries preserve insertion order, but JSON object member order should not be relied on:</p>
-<div id="df117e9e" class="cell" data-execution_count="11">
+<div id="1a4ced0e" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>state <span class="op">=</span> {</span>
 <span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>    <span class="st">"name"</span>: <span class="st">"Colorado"</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>    <span class="st">"capital"</span>: <span class="st">"Denver"</span>,</span>
@@ -670,7 +670,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="nested-structures" class="level3" data-number="4.3.2">
 <h3 data-number="4.3.2" class="anchored" data-anchor-id="nested-structures"><span class="header-section-number">4.3.2</span> Nested Structures</h3>
 <p>Real-world JSON data nests these structures inside each other. A dictionary can contain lists, lists can contain dictionaries, and the nesting can go several levels deep:</p>
-<div id="71fc3520" class="cell" data-execution_count="12">
+<div id="6eed236f" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a>schools <span class="op">=</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-label="2"></a>    <span class="st">"School 1"</span>: {</span>
 <span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>        <span class="st">"Classroom A"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>],</span>
@@ -690,7 +690,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="the-list-of-dictionaries-pattern" class="level3" data-number="4.3.3">
 <h3 data-number="4.3.3" class="anchored" data-anchor-id="the-list-of-dictionaries-pattern"><span class="header-section-number">4.3.3</span> The List-of-Dictionaries Pattern</h3>
 <p>The most common JSON pattern you will encounter in web data is a list of dictionaries, where each dictionary represents a record and each key-value pair represents a field:</p>
-<div id="e0798863" class="cell" data-execution_count="13">
+<div id="af0b5542" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a>census_data <span class="op">=</span> [</span>
 <span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>    {<span class="st">"state"</span>: <span class="st">"Colorado"</span>, <span class="st">"year"</span>: <span class="dv">2020</span>, <span class="st">"population"</span>: <span class="dv">5773714</span>},</span>
 <span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>    {<span class="st">"state"</span>: <span class="st">"Colorado"</span>, <span class="st">"year"</span>: <span class="dv">2010</span>, <span class="st">"population"</span>: <span class="dv">5029196</span>},</span>
@@ -701,7 +701,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <span id="cb13-8"><a href="#cb13-8" aria-label="8"></a><span class="bu">print</span>(census_data[<span class="dv">0</span>][<span class="st">"population"</span>])  <span class="co"># 5773714</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This pattern converts directly into a pandas DataFrame:</p>
-<div id="ad7b4bf7" class="cell" data-execution_count="14">
+<div id="95bae4b0" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb14-2"><a href="#cb14-2" aria-label="2"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-label="3"></a>df <span class="op">=</span> pd.DataFrame(census_data)</span>
@@ -716,7 +716,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="parsing-json-strings" class="level3" data-number="4.3.4">
 <h3 data-number="4.3.4" class="anchored" data-anchor-id="parsing-json-strings"><span class="header-section-number">4.3.4</span> Parsing JSON Strings</h3>
 <p>When you receive JSON data from the web (as a string), you need to parse it into Python objects. Python’s built-in <a href="https://docs.python.org/3/library/json.html"><code>json</code> module</a> does the work; its documentation lists every option these functions take:</p>
-<div id="c2d21488" class="cell" data-execution_count="15">
+<div id="f3a25a46" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="im">import</span> json</span>
 <span id="cb15-2"><a href="#cb15-2" aria-label="2"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="co"># Parse a JSON string into a Python object</span></span>
@@ -730,7 +730,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <span id="cb15-11"><a href="#cb15-11" aria-label="11"></a><span class="bu">print</span>(json_output)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>When working with <code>requests</code>, the <code>.json()</code> method on a response object does this parsing for you automatically:</p>
-<div id="7397f185" class="cell" data-execution_count="16">
+<div id="cceb9ae5" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a>response <span class="op">=</span> requests.get(<span class="st">"https://jsonverse.dev/examples/json-metrics.json"</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-label="2"></a>data <span class="op">=</span> response.json()  <span class="co"># Equivalent to json.loads(response.text)</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-label="3"></a><span class="bu">print</span>(data)</span>
@@ -742,7 +742,7 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 <section id="working-with-a-real-json-object" class="level3" data-number="4.3.5">
 <h3 data-number="4.3.5" class="anchored" data-anchor-id="working-with-a-real-json-object"><span class="header-section-number">4.3.5</span> Working with a Real JSON Object</h3>
 <p>Here is a simplified version of a social media post object, similar to what Twitter’s API used to return:</p>
-<div id="ce47d798" class="cell" data-execution_count="17">
+<div id="b8441efe" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-label="1"></a>tweet <span class="op">=</span> {</span>
 <span id="cb17-2"><a href="#cb17-2" aria-label="2"></a>    <span class="st">"id"</span>: <span class="dv">266031293945503744</span>,</span>
 <span id="cb17-3"><a href="#cb17-3" aria-label="3"></a>    <span class="st">"text"</span>: <span class="st">"Four more years."</span>,</span>
@@ -775,8 +775,8 @@ Figure&nbsp;4.1: The House roster in Chrome, October 2026: the root <code>&lt;Me
 </section>
 <section id="handling-deeply-nested-json" class="level3" data-number="4.3.6">
 <h3 data-number="4.3.6" class="anchored" data-anchor-id="handling-deeply-nested-json"><span class="header-section-number">4.3.6</span> Handling Deeply Nested JSON</h3>
-<p>The Twitter example above is only two levels deep. Real API responses often nest data three or four levels down, and the path to the data you need is not always obvious. Let us work through a live example using the Open-Meteo weather API, which returns a forecast for Boulder, Colorado:</p>
-<div id="494ab05a" class="cell" data-execution_count="18">
+<p>The Twitter example above is only two levels deep. Real API responses often nest data three or four levels down, and the path to the data you need is not always obvious. Let us work through a live example using the Open-Meteo weather API, which returns a forecast for Boulder, Colorado. Its host’s <code>robots.txt</code> (<code>api.open-meteo.com/robots.txt</code>) disallows every path for every user agent. That file is written for crawlers that wander a site, as <a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a> explains; a documented API is governed by its own terms, and <a href="https://open-meteo.com/en/terms">Open-Meteo’s</a> allow the free API for non-commercial use, under 10,000 calls a day. One request is well within them:</p>
+<div id="edfb6f22" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="im">import</span> requests</span>
 <span id="cb18-2"><a href="#cb18-2" aria-label="2"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-label="3"></a>url <span class="op">=</span> <span class="st">"https://api.open-meteo.com/v1/forecast"</span></span>
@@ -819,7 +819,7 @@ Figure&nbsp;4.2: The chapter’s Open-Meteo request, its full URL pasted into Ch
 </figure>
 </div>
 <p>The strategy is always the same: start with <code>type()</code> and <code>.keys()</code> at the top level, then work inward one key at a time. When you find the lists you need, convert them to a DataFrame:</p>
-<div id="316324a0" class="cell" data-execution_count="19">
+<div id="eff2619f" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb19-2"><a href="#cb19-2" aria-label="2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb19-3"><a href="#cb19-3" aria-label="3"></a></span>
@@ -920,9 +920,9 @@ Figure&nbsp;4.2: The chapter’s Open-Meteo request, its full URL pasted into Ch
 </section>
 <section id="recommended-exercises" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="recommended-exercises"><span class="header-section-number">4.5</span> Recommended Exercises</h2>
-<p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</p>
+<p>This guided exercise is the chapter’s take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one. In the notebook the exercise’s cells follow the chapter’s own, which send requests to the House, jsonverse.dev, and Open-Meteo, so run the Step cells one at a time rather than running the whole notebook.</p>
 <p>You will parse one real dataset in each format: an RSS feed (XML) and a weather forecast (JSON), ending with both as DataFrames.</p>
-<p><strong>Step 1 — Set up politely.</strong> Define your <code>HEADERS</code> with a named <code>User-Agent</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>). Find an RSS feed from a news outlet or podcast — most sites serve one at <code>/rss</code> or <code>/feed</code> — and check the site’s <code>robots.txt</code> permits fetching it.</p>
+<p><strong>Step 1 — Set up politely.</strong> Define your <code>HEADERS</code> with a named <code>User-Agent</code> (<a href="ch-02-ethics.html" class="quarto-xref"><span>Chapter 2</span></a>). Find an RSS feed from a news outlet or podcast — most sites serve one at <code>/rss</code> or <code>/feed</code> — and read the site’s <code>robots.txt</code> before you send the feed any request, to check that it permits fetching it. Treat a <code>robots.txt</code> you can’t read (refused, or a server error) as a no; a site with no file at all (a 404) has set no rules.</p>
 <div class="callout callout-style-simple callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -952,8 +952,8 @@ Figure&nbsp;4.2: The chapter’s Open-Meteo request, its full URL pasted into Ch
 <td><code>https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml</code></td>
 </tr>
 <tr class="even">
-<td>BBC News</td>
-<td><code>https://feeds.bbci.co.uk/news/rss.xml</code></td>
+<td>Boulder Reporting Lab</td>
+<td><code>https://boulderreportinglab.org/feed/</code></td>
 </tr>
 <tr class="odd">
 <td>The Guardian</td>
@@ -969,7 +969,7 @@ Figure&nbsp;4.2: The chapter’s Open-Meteo request, its full URL pasted into Ch
 </tr>
 </tbody>
 </table>
-<p>AP and Reuters are conspicuously absent: both discontinued their public RSS feeds (Reuters in 2020, AP some time after) — a small, real instance of the decline this chapter describes below.</p>
+<p>BBC News was on this list until November 2026: its main site’s <code>robots.txt</code> asks for “no creating datasets from BBC content”, so a feed whose <code>robots.txt</code> allows every user agent replaced it. AP and Reuters are conspicuously absent: both discontinued their public RSS feeds (Reuters in 2020, AP some time after) — a small, real instance of the decline this chapter describes below.</p>
 <p><strong>Podcasts (data, tech, and data journalism)</strong></p>
 <table class="caption-top table">
 <thead>
@@ -1020,7 +1020,7 @@ Figure&nbsp;4.3: PBS NewsHour’s home page in View Source, searched with Chrome
 </div>
 </div>
 </div>
-<div id="405ece8a" class="cell" data-execution_count="20">
+<div id="91feed0b" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="co"># Step 1: Define HEADERS and choose an RSS feed URL you have checked against the site's robots.txt.</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -1035,32 +1035,32 @@ Figure&nbsp;4.4: BBC News’s science and environment feed in Chrome, October 20
 </figcaption>
 </figure>
 </div>
-<div id="10f2053d" class="cell" data-execution_count="21">
+<div id="24355a18" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="co"># Step 2: Fetch the feed and inspect the first 500 characters of raw XML.</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 3 — Parse the tree.</strong> Parse the response with BeautifulSoup’s <code>"xml"</code> parser, use <code>find_all()</code> to collect the items, and print how many the feed contains.</p>
-<div id="57d50caf" class="cell" data-execution_count="22">
+<div id="72edf550" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-label="1"></a><span class="co"># Step 3: Parse with the "xml" parser, find_all the repeating items, and count them.</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Step 4 — Extract to a DataFrame.</strong> Loop over the items, building a list of dictionaries with each item’s title, link, and publication date — the list-of-dictionaries pattern from this chapter — then convert to a DataFrame.</p>
-<div id="364d973c" class="cell" data-execution_count="23">
+<p><strong>Step 4 — Extract to a DataFrame.</strong> Loop over the items, building a list of dictionaries with each item’s title, link, and publication date — the list-of-dictionaries pattern from this chapter — then convert to a DataFrame. Tag names are case-sensitive (<code>pubDate</code>), and real feeds leave tags out, so guard each field as “From XML to DataFrame” does.</p>
+<div id="d53488be" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-label="1"></a><span class="co"># Step 4: Build a list of dicts (title, link, pubDate) and convert it to a DataFrame.</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Step 5 — Fetch nested JSON.</strong> Retrieve the Boulder forecast from <code>https://api.open-meteo.com/v1/forecast?latitude=40.01&amp;longitude=-105.27&amp;daily=temperature_2m_max&amp;timezone=America/Denver</code> and parse it with <code>.json()</code>. Print the top-level keys, then the keys under <code>"daily"</code> — map the nesting before you extract anything.</p>
-<div id="0a53787e" class="cell" data-execution_count="24">
+<p><strong>Step 5 — Fetch nested JSON.</strong> Retrieve the Boulder forecast from <code>https://api.open-meteo.com/v1/forecast?latitude=40.01&amp;longitude=-105.27&amp;daily=temperature_2m_max&amp;timezone=America/Denver</code>, with your <code>HEADERS</code>, and parse it with <code>.json()</code>. Its <code>robots.txt</code> disallows every path, and its terms allow this request, as “Handling Deeply Nested JSON” says. Print the top-level keys, then the keys under <code>"daily"</code> — map the nesting before you extract anything.</p>
+<div id="aedd5a12" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-label="1"></a><span class="co"># Step 5: Fetch the Open-Meteo forecast, parse the JSON, and print the top-level keys and the keys nested under "daily".</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 6 — Extract the parallel lists.</strong> The <code>"daily"</code> object holds parallel lists of dates and temperatures. Build a DataFrame from them and plot maximum temperature over the forecast days.</p>
-<div id="4ea16bff" class="cell" data-execution_count="25">
+<div id="46665466" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-label="1"></a><span class="co"># Step 6: Build a DataFrame of dates and max temperatures, then plot it.</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-label="2"></a><span class="co"># Your code here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Step 7 — Interpret.</strong> In three to five sentences: The RSS feed nested repeating <em>elements</em>; the forecast nested parallel <em>lists</em>. Which was easier to get into a DataFrame, and why? What did you have to know about each structure before you could write the extraction code?</p>
-<div id="7e813960" class="cell" data-execution_count="26">
+<div id="01447c2a" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-label="1"></a><span class="co"># Step 7: Write your answer here as comments, or convert this cell to Markdown.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -1086,6 +1086,7 @@ Figure&nbsp;4.4: BBC News’s science and environment feed in Chrome, October 20
 <li><strong>Parser selection</strong>: Use <code>"xml"</code> for XML documents and <code>"html.parser"</code> or <code>"lxml"</code> for HTML. Using the wrong parser produces unexpected results.</li>
 <li><strong><code>json.JSONDecodeError</code></strong>: The string is not valid JSON. Common causes include trailing commas, single quotes (JSON requires double quotes), or the response containing HTML error pages instead of JSON.</li>
 <li><strong><code>KeyError</code> in dictionaries</strong>: The key does not exist. Use <code>.get("key", default_value)</code> for safe access.</li>
+<li><strong><code>AttributeError: 'NoneType' object has no attribute 'text'</code></strong>: <code>.find()</code> found no tag of that name, in this record, and returned <code>None</code>. Check the tag’s spelling and case (<code>pubDate</code>, not <code>pubdate</code>), then guard the field with <code>if ... else None</code>, as “From XML to DataFrame” does.</li>
 <li><strong>Garbled accented letters, such as <code>SÃ¡nchez</code> for <code>Sánchez</code></strong>: <code>requests</code> decoded the body with the wrong character set, usually because the server’s <code>Content-Type</code> header names none; <code>requests</code> then falls back to ISO-8859-1. Pass <code>response.content</code> to BeautifulSoup so the parser reads the encoding the document declares, or set <code>response.encoding = "utf-8"</code> before reading <code>response.text</code>.</li>
 <li><strong>Confusion between <code>json.loads()</code> and <code>json.load()</code></strong>: <code>loads</code> parses a <strong>s</strong>tring; <code>load</code> parses a <strong>f</strong>ile object.</li>
 </ul>
@@ -1790,7 +1791,7 @@ Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media 
 <span id="cb27-132"><a href="#cb27-132" aria-label="122"></a><span class="bu">print</span>(parties)</span>
 <span id="cb27-133"><a href="#cb27-133" aria-label="123"></a><span class="co"># ['D', 'R']</span></span>
 <span id="cb27-134"><a href="#cb27-134" aria-label="124"></a></span>
-<span id="cb27-135"><a href="#cb27-135" aria-label="125"></a><span class="co"># In a real dataset with all 435 members, you could count:</span></span>
+<span id="cb27-135"><a href="#cb27-135" aria-label="125"></a><span class="co"># In the real roster, with all 441 entries, you could count:</span></span>
 <span id="cb27-136"><a href="#cb27-136" aria-label="126"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
 <span id="cb27-137"><a href="#cb27-137" aria-label="127"></a>party_counts <span class="op">=</span> Counter(parties)</span>
 <span id="cb27-138"><a href="#cb27-138" aria-label="128"></a><span class="bu">print</span>(party_counts)</span>
@@ -1807,7 +1808,7 @@ Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media 
 <span id="cb27-151"><a href="#cb27-151" aria-label="139"></a></span>
 <span id="cb27-152"><a href="#cb27-152" aria-label="140"></a><span class="fu">### Working with Real XML</span></span>
 <span id="cb27-153"><a href="#cb27-153" aria-label="141"></a></span>
-<span id="cb27-154"><a href="#cb27-154" aria-label="142"></a>Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at <span class="co">[</span><span class="ot">clerk.house.gov</span><span class="co">](https://clerk.house.gov)</span> in XML format. Its structure is what the synthetic example prepared you for: a root <span class="in">`&lt;MemberData&gt;`</span> tag with a <span class="in">`publish-date`</span> attribute, containing a <span class="in">`&lt;members&gt;`</span> tag, containing one <span class="in">`&lt;member&gt;`</span> per representative, each with the biographical details nested inside <span class="in">`&lt;member-info&gt;`</span>. The real file adds two blocks we will ignore here: a <span class="in">`&lt;title-info&gt;`</span> header before <span class="in">`&lt;members&gt;`</span>, and a <span class="in">`&lt;committee-assignments&gt;`</span> block in each <span class="in">`&lt;member&gt;`</span>. You can check that shape before writing any code by opening the file's address in Chrome, which draws an XML file that has no stylesheet as a tree you can fold (@fig-house-xml-tree).</span>
+<span id="cb27-154"><a href="#cb27-154" aria-label="142"></a>Let us retrieve and parse actual Congressional member data. The Office of the Clerk of the U.S. House of Representatives publishes a membership roster at <span class="co">[</span><span class="ot">clerk.house.gov</span><span class="co">](https://clerk.house.gov)</span> in XML format, and documents every tag in its <span class="co">[</span><span class="ot">user guide and data dictionary</span><span class="co">](https://clerk.house.gov/member_info/MemberData_UserGuide.pdf)</span>. Its structure is what the synthetic example prepared you for: a root <span class="in">`&lt;MemberData&gt;`</span> tag with a <span class="in">`publish-date`</span> attribute, containing a <span class="in">`&lt;members&gt;`</span> tag, containing one <span class="in">`&lt;member&gt;`</span> per representative, each with the biographical details nested inside <span class="in">`&lt;member-info&gt;`</span>. The real file adds two blocks we will ignore here: a <span class="in">`&lt;title-info&gt;`</span> header before <span class="in">`&lt;members&gt;`</span>, and a <span class="in">`&lt;committee-assignments&gt;`</span> block in each <span class="in">`&lt;member&gt;`</span>. You can check that shape before writing any code by opening the file's address in Chrome, which draws an XML file that has no stylesheet as a tree you can fold (@fig-house-xml-tree).</span>
 <span id="cb27-155"><a href="#cb27-155" aria-label="143"></a></span>
 <span id="cb27-156"><a href="#cb27-156" aria-label="144"></a><span class="al">![The House roster in Chrome, October 2026: the root `&lt;MemberData&gt;` ① with its `publish-date`, `&lt;members&gt;` ②, and one `&lt;member&gt;` ③ per seat, whose biographical details sit in `&lt;member-info&gt;` ④. The second `&lt;member&gt;` ③ begins at the bottom. Chrome's triangles fold `&lt;title-info&gt;` and the first member's `&lt;committee-assignments&gt;`. Chrome's note above the tree, that the file has no style information, is cropped out.](images/ch-04/house-xml-tree_annotated.png)</span>{#fig-house-xml-tree .lightbox fig-alt="Screenshot of Chrome's tree view of MemberData.xml. Marker 1: the root tag, MemberData, publish-date October 1, 2026. Under a folded title-info, marker 2: members, and marker 3: the first member, statedistrict AK00. Marker 4: member-info, listing Nicholas Begich's names, bioguideID, party R, caucus R, state Alaska, district At Large, office, phone, and election and swearing-in dates. Marker 3 again: the second member."}</span>
 <span id="cb27-157"><a href="#cb27-157" aria-label="145"></a></span>
@@ -1845,9 +1846,9 @@ Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media 
 <span id="cb27-191"><a href="#cb27-191" aria-label="177"></a></span>
 <span id="cb27-192"><a href="#cb27-192" aria-label="178"></a>Notice <span class="in">`response.content`</span> rather than <span class="in">`response.text`</span>. The Clerk's server labels the file <span class="in">`text/xml`</span> without naming a character set, so <span class="in">`requests`</span> falls back to ISO-8859-1, and <span class="in">`.text`</span> would turn Linda T. Sánchez into "Linda T. SÃ¡nchez". Given the raw bytes, BeautifulSoup reads the encoding the file declares in its first line, UTF-8, and every name comes out right.</span>
 <span id="cb27-193"><a href="#cb27-193" aria-label="179"></a></span>
-<span id="cb27-194"><a href="#cb27-194" aria-label="180"></a>Why 441 rather than 435? The file includes the six non-voting delegates and resident commissioner alongside the 435 voting representatives. Your exact counts will also drift as members resign and seats are filled — which is why the <span class="in">`publish-date`</span> attribute matters. Record it alongside your data so your analysis documents exactly which snapshot of Congress it describes.</span>
+<span id="cb27-194"><a href="#cb27-194" aria-label="180"></a>Why 441 rather than 435? The file includes six non-voting members, five delegates and a resident commissioner, for the District of Columbia and five territories; their <span class="in">`&lt;district&gt;`</span> tag reads <span class="in">`Delegate`</span> or <span class="in">`Resident Commissioner`</span>. Take them and the two vacancies below away, and 433 serving members can vote. Your exact counts will also drift as members resign and seats are filled — which is why the <span class="in">`publish-date`</span> attribute matters. Record it alongside your data so your analysis documents exactly which snapshot of Congress it describes.</span>
 <span id="cb27-195"><a href="#cb27-195" aria-label="181"></a></span>
-<span id="cb27-196"><a href="#cb27-196" aria-label="182"></a>That <span class="in">`Counter`</span> already shows drift in two different ways, and both are worth reading rather than discarding. The two blank-string parties are not a parsing bug: they are vacant seats. The feed's <span class="in">`&lt;member&gt;`</span> block for each still exists, but every biographical tag inside it — <span class="in">`&lt;firstname&gt;`</span>, <span class="in">`&lt;lastname&gt;`</span>, <span class="in">`&lt;party&gt;`</span> — is present and empty, and a <span class="in">`&lt;footnote&gt;`</span> names the reason (<span class="in">`"Vacancy due to the resignation of..."`</span>, with the departing member's information preserved in a <span class="in">`&lt;predecessor-info&gt;`</span> block). A seat count of 441 was never a claim that 441 people are serving; it is a claim that 441 *lines* exist in the roster, two of which are placeholders. And the lone <span class="in">`'I'`</span> is Kevin Kiley of California's 3rd district, whose <span class="in">`&lt;party&gt;`</span> tag reads <span class="in">`I`</span> while his <span class="in">`&lt;caucus&gt;`</span> tag reads <span class="in">`R`</span> — the schema distinguishes formal party registration from which caucus a member actually sits with, and a <span class="in">`Counter`</span> over <span class="in">`party`</span> alone will call him something his colleagues would not. Neither wrinkle shows up unless you go looking; a <span class="in">`Counter(parties)`</span> that only reports round numbers is one you should not fully trust.</span>
+<span id="cb27-196"><a href="#cb27-196" aria-label="182"></a>That <span class="in">`Counter`</span> already shows drift in two different ways, and both are worth reading rather than discarding. The two blank-string parties are not a parsing bug: they are vacant seats. The feed's <span class="in">`&lt;member&gt;`</span> block for each still exists, but every biographical tag inside it — <span class="in">`&lt;firstname&gt;`</span>, <span class="in">`&lt;lastname&gt;`</span>, <span class="in">`&lt;party&gt;`</span> — is present and empty, and a <span class="in">`&lt;footnote&gt;`</span> names the reason (<span class="in">`"Vacancy due to the resignation of..."`</span>, with the departing member's information preserved in a <span class="in">`&lt;predecessor-info&gt;`</span> block). A seat count of 441 was never a claim that 441 people are serving; it is a claim that 441 *lines* exist in the roster, two of which are placeholders. And the lone <span class="in">`'I'`</span> is Kevin Kiley of California's 3rd district, whose <span class="in">`&lt;party&gt;`</span> tag reads <span class="in">`I`</span> while his <span class="in">`&lt;caucus&gt;`</span> tag reads <span class="in">`R`</span> — the schema records a member's party and, separately, the caucus the member sits with, and a <span class="in">`Counter`</span> over <span class="in">`party`</span> alone will call him something his colleagues would not. Neither wrinkle shows up unless you go looking; a <span class="in">`Counter(parties)`</span> that only reports round numbers is one you should not fully trust.</span>
 <span id="cb27-197"><a href="#cb27-197" aria-label="183"></a></span>
 <span id="cb27-198"><a href="#cb27-198" aria-label="184"></a><span class="fu">### From XML to DataFrame</span></span>
 <span id="cb27-199"><a href="#cb27-199" aria-label="185"></a></span>
@@ -1913,7 +1914,7 @@ Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media 
 <span id="cb27-263"><a href="#cb27-263" aria-label="245"></a></span>
 <span id="cb27-264"><a href="#cb27-264" aria-label="246"></a>This <span class="in">`find_all`</span> → extract fields → list of dictionaries → DataFrame pipeline is the parsing half of the book's retrieve–parse–analyze loop. You will use it to parse HTML tables in @sec-static-pages, extract data from archived web pages in @sec-archives, and process PDF text in @sec-pdfs. The data source changes, the tag names change, but the pipeline stays the same. Once you internalize this pattern, every new parsing challenge becomes a question of "what tags contain the data I need?" rather than "how do I get data into a DataFrame?"</span>
 <span id="cb27-265"><a href="#cb27-265" aria-label="247"></a></span>
-<span id="cb27-266"><a href="#cb27-266" aria-label="248"></a>The conditional checks (<span class="in">`if m.find("firstname") else None`</span>) protect against missing tags — a common issue with real-world XML where not every record contains every field. Without these checks, a single missing tag would crash your entire extraction loop with an <span class="in">`AttributeError`</span>.</span>
+<span id="cb27-266"><a href="#cb27-266" aria-label="248"></a>The conditional checks (<span class="in">`if m.find("firstname") else None`</span>) protect against missing tags — a common issue with real-world XML where not every record contains every field. Without these checks, a single missing tag would crash your entire extraction loop with an <span class="in">`AttributeError`</span>. The House roster never needs them: every <span class="in">`&lt;member&gt;`</span> has every one of these tags, vacancies included. An RSS feed does: in November 2026, three of the 355 items in NPR's Planet Money feed had no <span class="in">`&lt;link&gt;`</span>, and an unguarded loop stopped at the first of them.</span>
 <span id="cb27-267"><a href="#cb27-267" aria-label="249"></a></span>
 <span id="cb27-268"><a href="#cb27-268" aria-label="250"></a>Once the data is in a DataFrame, you have the full power of pandas at your disposal. You can filter members by state (<span class="in">`df[df["state"] == "CO"]`</span>), compute cross-tabulations of party by state (<span class="in">`pd.crosstab(df["state"], df["party"])`</span>), or merge Congressional data with external datasets like election results or demographic information. The DataFrame is the universal intermediate format — regardless of whether your data started as XML, JSON, HTML, or PDF text, getting it into a DataFrame is the step that unlocks analysis. This chapter introduces the pattern with XML; the chapters that follow apply it to every other data source on the web.</span>
 <span id="cb27-269"><a href="#cb27-269" aria-label="251"></a></span>
@@ -2059,7 +2060,7 @@ Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media 
 <span id="cb27-425"><a href="#cb27-425" aria-label="391"></a></span>
 <span id="cb27-426"><a href="#cb27-426" aria-label="392"></a><span class="fu">### Handling Deeply Nested JSON</span></span>
 <span id="cb27-427"><a href="#cb27-427" aria-label="393"></a></span>
-<span id="cb27-428"><a href="#cb27-428" aria-label="394"></a>The Twitter example above is only two levels deep. Real API responses often nest data three or four levels down, and the path to the data you need is not always obvious. Let us work through a live example using the Open-Meteo weather API, which returns a forecast for Boulder, Colorado:</span>
+<span id="cb27-428"><a href="#cb27-428" aria-label="394"></a>The Twitter example above is only two levels deep. Real API responses often nest data three or four levels down, and the path to the data you need is not always obvious. Let us work through a live example using the Open-Meteo weather API, which returns a forecast for Boulder, Colorado. Its host's <span class="in">`robots.txt`</span> (<span class="in">`api.open-meteo.com/robots.txt`</span>) disallows every path for every user agent. That file is written for crawlers that wander a site, as @sec-ethics explains; a documented API is governed by its own terms, and <span class="co">[</span><span class="ot">Open-Meteo's</span><span class="co">](https://open-meteo.com/en/terms)</span> allow the free API for non-commercial use, under 10,000 calls a day. One request is well within them:</span>
 <span id="cb27-429"><a href="#cb27-429" aria-label="395"></a></span>
 <span id="cb27-432"><a href="#cb27-432" aria-label="396"></a><span class="in">```{python}</span></span>
 <span id="cb27-433"><a href="#cb27-433" aria-label="397"></a><span class="im">import</span> requests</span>
@@ -2154,11 +2155,11 @@ Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media 
 <span id="cb27-524"><a href="#cb27-524" aria-label="486"></a></span>
 <span id="cb27-525"><a href="#cb27-525" aria-label="487"></a><span class="fu">## Recommended Exercises</span></span>
 <span id="cb27-526"><a href="#cb27-526" aria-label="488"></a></span>
-<span id="cb27-527"><a href="#cb27-527" aria-label="489"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one.</span>
+<span id="cb27-527"><a href="#cb27-527" aria-label="489"></a>This guided exercise is the chapter's take-home assignment. Work through it in the companion notebook, filling in each empty code cell, and submit the completed notebook. The steps build on one another, so do them in order — everything you need appears in this chapter or an earlier one. In the notebook the exercise's cells follow the chapter's own, which send requests to the House, jsonverse.dev, and Open-Meteo, so run the Step cells one at a time rather than running the whole notebook.</span>
 <span id="cb27-528"><a href="#cb27-528" aria-label="490"></a></span>
 <span id="cb27-529"><a href="#cb27-529" aria-label="491"></a>You will parse one real dataset in each format: an RSS feed (XML) and a weather forecast (JSON), ending with both as DataFrames.</span>
 <span id="cb27-530"><a href="#cb27-530" aria-label="492"></a></span>
-<span id="cb27-531"><a href="#cb27-531" aria-label="493"></a>**Step 1 — Set up politely.** Define your <span class="in">`HEADERS`</span> with a named <span class="in">`User-Agent`</span> (@sec-ethics). Find an RSS feed from a news outlet or podcast — most sites serve one at <span class="in">`/rss`</span> or <span class="in">`/feed`</span> — and check the site's <span class="in">`robots.txt`</span> permits fetching it.</span>
+<span id="cb27-531"><a href="#cb27-531" aria-label="493"></a>**Step 1 — Set up politely.** Define your <span class="in">`HEADERS`</span> with a named <span class="in">`User-Agent`</span> (@sec-ethics). Find an RSS feed from a news outlet or podcast — most sites serve one at <span class="in">`/rss`</span> or <span class="in">`/feed`</span> — and read the site's <span class="in">`robots.txt`</span> before you send the feed any request, to check that it permits fetching it. Treat a <span class="in">`robots.txt`</span> you can't read (refused, or a server error) as a no; a site with no file at all (a 404) has set no rules.</span>
 <span id="cb27-532"><a href="#cb27-532" aria-label="494"></a></span>
 <span id="cb27-533"><a href="#cb27-533" aria-label="495"></a>::: {.callout-tip}</span>
 <span id="cb27-534"><a href="#cb27-534" aria-label="496"></a><span class="fu">## Starter feeds</span></span>
@@ -2170,12 +2171,12 @@ Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media 
 <span id="cb27-540"><a href="#cb27-540" aria-label="502"></a><span class="pp">|</span> Outlet <span class="pp">|</span> Feed <span class="pp">|</span></span>
 <span id="cb27-541"><a href="#cb27-541" aria-label="503"></a><span class="pp">|---|---|</span></span>
 <span id="cb27-542"><a href="#cb27-542" aria-label="504"></a><span class="pp">|</span> The New York Times <span class="pp">|</span> <span class="in">`https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml`</span> <span class="pp">|</span></span>
-<span id="cb27-543"><a href="#cb27-543" aria-label="505"></a><span class="pp">|</span> BBC News <span class="pp">|</span> <span class="in">`https://feeds.bbci.co.uk/news/rss.xml`</span> <span class="pp">|</span></span>
+<span id="cb27-543"><a href="#cb27-543" aria-label="505"></a><span class="pp">|</span> Boulder Reporting Lab <span class="pp">|</span> <span class="in">`https://boulderreportinglab.org/feed/`</span> <span class="pp">|</span></span>
 <span id="cb27-544"><a href="#cb27-544" aria-label="506"></a><span class="pp">|</span> The Guardian <span class="pp">|</span> <span class="in">`https://www.theguardian.com/world/rss`</span> <span class="pp">|</span></span>
 <span id="cb27-545"><a href="#cb27-545" aria-label="507"></a><span class="pp">|</span> PBS NewsHour <span class="pp">|</span> <span class="in">`https://www.pbs.org/newshour/feeds/rss/headlines`</span> <span class="pp">|</span></span>
 <span id="cb27-546"><a href="#cb27-546" aria-label="508"></a><span class="pp">|</span> Al Jazeera <span class="pp">|</span> <span class="in">`https://www.aljazeera.com/xml/rss/all.xml`</span> <span class="pp">|</span></span>
 <span id="cb27-547"><a href="#cb27-547" aria-label="509"></a></span>
-<span id="cb27-548"><a href="#cb27-548" aria-label="510"></a>AP and Reuters are conspicuously absent: both discontinued their public RSS feeds (Reuters in 2020, AP some time after) — a small, real instance of the decline this chapter describes below.</span>
+<span id="cb27-548"><a href="#cb27-548" aria-label="510"></a>BBC News was on this list until November 2026: its main site's <span class="in">`robots.txt`</span> asks for "no creating datasets from BBC content", so a feed whose <span class="in">`robots.txt`</span> allows every user agent replaced it. AP and Reuters are conspicuously absent: both discontinued their public RSS feeds (Reuters in 2020, AP some time after) — a small, real instance of the decline this chapter describes below.</span>
 <span id="cb27-549"><a href="#cb27-549" aria-label="511"></a></span>
 <span id="cb27-550"><a href="#cb27-550" aria-label="512"></a>**Podcasts (data, tech, and data journalism)**</span>
 <span id="cb27-551"><a href="#cb27-551" aria-label="513"></a></span>
@@ -2218,14 +2219,14 @@ Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media 
 <span id="cb27-594"><a href="#cb27-594" aria-label="550"></a><span class="co"># Your code here</span></span>
 <span id="cb27-595"><a href="#cb27-595" aria-label="551"></a><span class="in">```</span></span>
 <span id="cb27-596"><a href="#cb27-596" aria-label="552"></a></span>
-<span id="cb27-597"><a href="#cb27-597" aria-label="553"></a>**Step 4 — Extract to a DataFrame.** Loop over the items, building a list of dictionaries with each item's title, link, and publication date — the list-of-dictionaries pattern from this chapter — then convert to a DataFrame.</span>
+<span id="cb27-597"><a href="#cb27-597" aria-label="553"></a>**Step 4 — Extract to a DataFrame.** Loop over the items, building a list of dictionaries with each item's title, link, and publication date — the list-of-dictionaries pattern from this chapter — then convert to a DataFrame. Tag names are case-sensitive (<span class="in">`pubDate`</span>), and real feeds leave tags out, so guard each field as "From XML to DataFrame" does.</span>
 <span id="cb27-598"><a href="#cb27-598" aria-label="554"></a></span>
 <span id="cb27-601"><a href="#cb27-601" aria-label="555"></a><span class="in">```{python}</span></span>
 <span id="cb27-602"><a href="#cb27-602" aria-label="556"></a><span class="co"># Step 4: Build a list of dicts (title, link, pubDate) and convert it to a DataFrame.</span></span>
 <span id="cb27-603"><a href="#cb27-603" aria-label="557"></a><span class="co"># Your code here</span></span>
 <span id="cb27-604"><a href="#cb27-604" aria-label="558"></a><span class="in">```</span></span>
 <span id="cb27-605"><a href="#cb27-605" aria-label="559"></a></span>
-<span id="cb27-606"><a href="#cb27-606" aria-label="560"></a>**Step 5 — Fetch nested JSON.** Retrieve the Boulder forecast from <span class="in">`https://api.open-meteo.com/v1/forecast?latitude=40.01&amp;longitude=-105.27&amp;daily=temperature_2m_max&amp;timezone=America/Denver`</span> and parse it with <span class="in">`.json()`</span>. Print the top-level keys, then the keys under <span class="in">`"daily"`</span> — map the nesting before you extract anything.</span>
+<span id="cb27-606"><a href="#cb27-606" aria-label="560"></a>**Step 5 — Fetch nested JSON.** Retrieve the Boulder forecast from <span class="in">`https://api.open-meteo.com/v1/forecast?latitude=40.01&amp;longitude=-105.27&amp;daily=temperature_2m_max&amp;timezone=America/Denver`</span>, with your <span class="in">`HEADERS`</span>, and parse it with <span class="in">`.json()`</span>. Its <span class="in">`robots.txt`</span> disallows every path, and its terms allow this request, as "Handling Deeply Nested JSON" says. Print the top-level keys, then the keys under <span class="in">`"daily"`</span> — map the nesting before you extract anything.</span>
 <span id="cb27-607"><a href="#cb27-607" aria-label="561"></a></span>
 <span id="cb27-610"><a href="#cb27-610" aria-label="562"></a><span class="in">```{python}</span></span>
 <span id="cb27-611"><a href="#cb27-611" aria-label="563"></a><span class="co"># Step 5: Fetch the Open-Meteo forecast, parse the JSON, and print the top-level keys and the keys nested under "daily".</span></span>
@@ -2270,24 +2271,25 @@ Roberts, Hal, Rahul Bhargava, Linas Valiukas, et al. 2021. <span>“<span>Media 
 <span id="cb27-654"><a href="#cb27-654" aria-label="602"></a><span class="ss">- </span>**Parser selection**: Use <span class="in">`"xml"`</span> for XML documents and <span class="in">`"html.parser"`</span> or <span class="in">`"lxml"`</span> for HTML. Using the wrong parser produces unexpected results.</span>
 <span id="cb27-655"><a href="#cb27-655" aria-label="603"></a><span class="ss">- </span>**`json.JSONDecodeError`**: The string is not valid JSON. Common causes include trailing commas, single quotes (JSON requires double quotes), or the response containing HTML error pages instead of JSON.</span>
 <span id="cb27-656"><a href="#cb27-656" aria-label="604"></a><span class="ss">- </span>**`KeyError` in dictionaries**: The key does not exist. Use <span class="in">`.get("key", default_value)`</span> for safe access.</span>
-<span id="cb27-657"><a href="#cb27-657" aria-label="605"></a><span class="ss">- </span>**Garbled accented letters, such as `SÃ¡nchez` for `Sánchez`**: <span class="in">`requests`</span> decoded the body with the wrong character set, usually because the server's <span class="in">`Content-Type`</span> header names none; <span class="in">`requests`</span> then falls back to ISO-8859-1. Pass <span class="in">`response.content`</span> to BeautifulSoup so the parser reads the encoding the document declares, or set <span class="in">`response.encoding = "utf-8"`</span> before reading <span class="in">`response.text`</span>.</span>
-<span id="cb27-658"><a href="#cb27-658" aria-label="606"></a><span class="ss">- </span>**Confusion between `json.loads()` and `json.load()`**: `loads` parses a **s**tring; `load` parses a **f**ile object.</span>
-<span id="cb27-659"><a href="#cb27-659" aria-label="607"></a></span>
-<span id="cb27-660"><a href="#cb27-660" aria-label="608"></a><span class="fu">## Key Takeaways</span></span>
-<span id="cb27-661"><a href="#cb27-661" aria-label="609"></a></span>
-<span id="cb27-662"><a href="#cb27-662" aria-label="610"></a>XML and JSON are the two structural languages of web data. XML organizes data as a tree of nested tags; BeautifulSoup makes that tree navigable through <span class="in">`.find()`</span>, <span class="in">`.find_all()`</span>, and <span class="in">`.text`</span>. JSON organizes data as nested lists and dictionaries; Python's native data structures map directly onto it. The skill of converting nested structures into flat DataFrames — the list-of-dictionaries-to-DataFrame pipeline — is the bridge between raw web data and analysis, and you will use it in nearly every subsequent chapter.</span>
-<span id="cb27-663"><a href="#cb27-663" aria-label="611"></a></span>
-<span id="cb27-664"><a href="#cb27-664" aria-label="612"></a><span class="fu">## Further Reading</span></span>
-<span id="cb27-665"><a href="#cb27-665" aria-label="613"></a></span>
-<span id="cb27-666"><a href="#cb27-666" aria-label="614"></a><span class="ss">- </span>BeautifulSoup documentation: <span class="ot">&lt;https://www.crummy.com/software/BeautifulSoup/bs4/doc/&gt;</span></span>
-<span id="cb27-667"><a href="#cb27-667" aria-label="615"></a><span class="ss">- </span>Python <span class="in">`json`</span> module: <span class="ot">&lt;https://docs.python.org/3/library/json.html&gt;</span></span>
-<span id="cb27-668"><a href="#cb27-668" aria-label="616"></a><span class="ss">- </span>W3C XML specification: <span class="ot">&lt;https://www.w3.org/XML/&gt;</span></span>
-<span id="cb27-669"><a href="#cb27-669" aria-label="617"></a><span class="ss">- </span>JSON specification: <span class="ot">&lt;https://www.json.org/&gt;</span></span>
-<span id="cb27-670"><a href="#cb27-670" aria-label="618"></a><span class="ss">- </span>awesome-rsshub-routes, a health-checked directory of official and RSSHub-generated feeds: <span class="ot">&lt;https://github.com/JackyST0/awesome-rsshub-routes&gt;</span></span>
-<span id="cb27-671"><a href="#cb27-671" aria-label="619"></a><span class="ss">- </span>awesome-rss-feeds, a curated list of RSS feeds and OPML files: <span class="ot">&lt;https://github.com/plenaryapp/awesome-rss-feeds&gt;</span></span>
-<span id="cb27-672"><a href="#cb27-672" aria-label="620"></a><span class="ss">- </span>RSS.com's roundup of popular podcast RSS feeds: <span class="ot">&lt;https://rss.com/blog/popular-rss-feeds/#the-most-popular-podcast-rss-feeds&gt;</span></span>
-<span id="cb27-673"><a href="#cb27-673" aria-label="621"></a><span class="ss">  - </span>Examples of JSON versus XML: <span class="ot">&lt;https://www.json.org/example.html&gt;</span></span>
-<span id="cb27-674"><a href="#cb27-674" aria-label="622"></a><span class="ss">- </span>@mitchell2018web — Chapter 1: Your First Web Scraper</span>
+<span id="cb27-657"><a href="#cb27-657" aria-label="605"></a><span class="ss">- </span>**`AttributeError: 'NoneType' object has no attribute 'text'`**: <span class="in">`.find()`</span> found no tag of that name, in this record, and returned <span class="in">`None`</span>. Check the tag's spelling and case (<span class="in">`pubDate`</span>, not <span class="in">`pubdate`</span>), then guard the field with <span class="in">`if ... else None`</span>, as "From XML to DataFrame" does.</span>
+<span id="cb27-658"><a href="#cb27-658" aria-label="606"></a><span class="ss">- </span>**Garbled accented letters, such as `SÃ¡nchez` for `Sánchez`**: <span class="in">`requests`</span> decoded the body with the wrong character set, usually because the server's <span class="in">`Content-Type`</span> header names none; <span class="in">`requests`</span> then falls back to ISO-8859-1. Pass <span class="in">`response.content`</span> to BeautifulSoup so the parser reads the encoding the document declares, or set <span class="in">`response.encoding = "utf-8"`</span> before reading <span class="in">`response.text`</span>.</span>
+<span id="cb27-659"><a href="#cb27-659" aria-label="607"></a><span class="ss">- </span>**Confusion between `json.loads()` and `json.load()`**: `loads` parses a **s**tring; `load` parses a **f**ile object.</span>
+<span id="cb27-660"><a href="#cb27-660" aria-label="608"></a></span>
+<span id="cb27-661"><a href="#cb27-661" aria-label="609"></a><span class="fu">## Key Takeaways</span></span>
+<span id="cb27-662"><a href="#cb27-662" aria-label="610"></a></span>
+<span id="cb27-663"><a href="#cb27-663" aria-label="611"></a>XML and JSON are the two structural languages of web data. XML organizes data as a tree of nested tags; BeautifulSoup makes that tree navigable through <span class="in">`.find()`</span>, <span class="in">`.find_all()`</span>, and <span class="in">`.text`</span>. JSON organizes data as nested lists and dictionaries; Python's native data structures map directly onto it. The skill of converting nested structures into flat DataFrames — the list-of-dictionaries-to-DataFrame pipeline — is the bridge between raw web data and analysis, and you will use it in nearly every subsequent chapter.</span>
+<span id="cb27-664"><a href="#cb27-664" aria-label="612"></a></span>
+<span id="cb27-665"><a href="#cb27-665" aria-label="613"></a><span class="fu">## Further Reading</span></span>
+<span id="cb27-666"><a href="#cb27-666" aria-label="614"></a></span>
+<span id="cb27-667"><a href="#cb27-667" aria-label="615"></a><span class="ss">- </span>BeautifulSoup documentation: <span class="ot">&lt;https://www.crummy.com/software/BeautifulSoup/bs4/doc/&gt;</span></span>
+<span id="cb27-668"><a href="#cb27-668" aria-label="616"></a><span class="ss">- </span>Python <span class="in">`json`</span> module: <span class="ot">&lt;https://docs.python.org/3/library/json.html&gt;</span></span>
+<span id="cb27-669"><a href="#cb27-669" aria-label="617"></a><span class="ss">- </span>W3C XML specification: <span class="ot">&lt;https://www.w3.org/XML/&gt;</span></span>
+<span id="cb27-670"><a href="#cb27-670" aria-label="618"></a><span class="ss">- </span>JSON specification: <span class="ot">&lt;https://www.json.org/&gt;</span></span>
+<span id="cb27-671"><a href="#cb27-671" aria-label="619"></a><span class="ss">- </span>awesome-rsshub-routes, a health-checked directory of official and RSSHub-generated feeds: <span class="ot">&lt;https://github.com/JackyST0/awesome-rsshub-routes&gt;</span></span>
+<span id="cb27-672"><a href="#cb27-672" aria-label="620"></a><span class="ss">- </span>awesome-rss-feeds, a curated list of RSS feeds and OPML files: <span class="ot">&lt;https://github.com/plenaryapp/awesome-rss-feeds&gt;</span></span>
+<span id="cb27-673"><a href="#cb27-673" aria-label="621"></a><span class="ss">- </span>RSS.com's roundup of popular podcast RSS feeds: <span class="ot">&lt;https://rss.com/blog/popular-rss-feeds/#the-most-popular-podcast-rss-feeds&gt;</span></span>
+<span id="cb27-674"><a href="#cb27-674" aria-label="622"></a><span class="ss">  - </span>Examples of JSON versus XML: <span class="ot">&lt;https://www.json.org/example.html&gt;</span></span>
+<span id="cb27-675"><a href="#cb27-675" aria-label="623"></a><span class="ss">- </span>@mitchell2018web — Chapter 1: Your First Web Scraper</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
