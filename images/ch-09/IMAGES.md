@@ -7,11 +7,11 @@ for people: what a figure shows that is easy to miss, and what a retake needs.
 <!-- shots:begin: generated from provenance.json by tools/shots; edits between these markers are replaced -->
 | File | Kind | Captured | Source | How |
 |---|---|---|---|---|
-| `missing-totals-row.png` | render | 2026-10-06 | https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2 | Claude Code: rendered with pdfplumber 0.11.10; imported by tools/shots |
-| `ocr-confidence.png` | render | 2026-10-06 | https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2 | Claude Code: rendered with pytesseract 0.3.13 with Tesseract 5.5.3; imported by tools/shots |
-| `pdf-objects.png` | render | 2026-10-06 | https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2 | Claude Code: rendered with pdfplumber 0.11.10; imported by tools/shots |
-| `sales-use-tax.png` | render | 2026-10-12 | https://documents.bouldercolorado.gov/WebLink/Browse.aspx?id=194345&dbid=0&repo=LF8PROD2 | Claude Code: rendered with matplotlib 3.11.2 with pdfplumber 0.11.10; imported by tools/shots |
-| `two-exhibit-3s.png` | render | 2026-10-06 | https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2 | Claude Code: rendered with pdfplumber 0.11.10; imported by tools/shots, 1 area blacked out |
+| `missing-totals-row.png` | render | 2026-10-06 | https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2 | Brian C. Keegan: rendered with pdfplumber 0.11.10; imported by tools/shots |
+| `ocr-confidence.png` | render | 2026-10-06 | https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2 | Brian C. Keegan: rendered with pytesseract 0.3.13 with Tesseract 5.5.3; imported by tools/shots |
+| `pdf-objects.png` | render | 2026-10-06 | https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2 | Brian C. Keegan: rendered with pdfplumber 0.11.10; imported by tools/shots |
+| `sales-use-tax.png` | render | 2026-10-12 | https://documents.bouldercolorado.gov/WebLink/Browse.aspx?id=194345&dbid=0&repo=LF8PROD2 | Brian C. Keegan: rendered with matplotlib 3.11.2 with pdfplumber 0.11.10; imported by tools/shots |
+| `two-exhibit-3s.png` | render | 2026-10-06 | https://documents.bouldercolorado.gov/WebLink/ElectronicFile.aspx?docid=194397&dbid=0&repo=LF8PROD2 | Brian C. Keegan: rendered with pdfplumber 0.11.10; imported by tools/shots, 1 area blacked out |
 <!-- shots:end -->
 
 ## Notes
