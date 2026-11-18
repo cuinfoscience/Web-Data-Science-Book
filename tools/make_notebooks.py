@@ -7,7 +7,8 @@ code cells. Quarto-specific syntax that Jupyter cannot render —
 callout fences, heading anchors, and figure attributes and
 cross-references — is stripped or simplified so the notebooks read
 cleanly on their own. A chapter cross-reference, `@sec-ethics`, becomes
-a link to that chapter in the published book, and a citation from
+a link to that chapter in the published book (in a code comment, the
+chapter's name alone, "Chapter 2"), and a citation from
 `references.bib`, `[@key]` or `@key`, becomes author and year, as the
 book prints them.
 
@@ -199,6 +200,14 @@ def convert_references(prose: str, links: dict, bib: dict) -> str:
     return "".join(pieces)
 
 
+def name_sections(code: str, links: dict) -> str:
+    """Chapter references in a code cell's comments, as the chapter's name alone ("Chapter 2"), with no link."""
+    def name(match):
+        link = links.get(match.group(1))
+        return re.match(r"\[(.*?)\]", link).group(1) if link else match.group(0)
+    return re.sub(r"@(sec-[\w-]+)", name, code)
+
+
 def split_at_sections(prose: str) -> list:
     """Split a prose run into one markdown cell per ## section.
 
@@ -229,10 +238,12 @@ def qmd_to_cells(text: str, links: dict = None, bib: dict = None) -> list:
 
 
 def leftovers(nb: dict) -> list:
-    """What a figure conversion missed: @fig- references and images/ paths left in the Markdown.
+    """What a conversion missed: @fig- and @sec- references and images/ paths left in the Markdown.
 
-    Either one means a figure the pattern above did not match, so the
-    notebook would show a broken image and an unresolved reference.
+    A figure the pattern above did not match would show as a broken image
+    and an unresolved reference; a chapter reference to a label no chapter
+    defines would show as raw text. References inside code spans are left
+    as written on purpose.
     """
     found = []
     for cell in nb["cells"]:
@@ -240,6 +251,8 @@ def leftovers(nb: dict) -> list:
             continue
         source = "".join(cell["source"])
         found += [f"unconverted reference {m}" for m in re.findall(r"@fig-[\w-]+", source)]
+        prose = CODE_SPAN.sub("", source)
+        found += [f"unconverted reference {m}" for m in re.findall(r"@sec-[\w-]+", prose)]
         found += [f"unconverted image path {m}" for m in re.findall(r"\]\((images/[^)\s]*)", source)]
     return found
 
@@ -275,6 +288,7 @@ def make_notebook(qmd_path: Path, numbers: dict = None, links: dict = None, bib:
                 "source": source_lines,
             })
         else:
+            source_lines = name_sections(source, links or {}).splitlines(keepends=True)
             nb_cells.append({
                 "cell_type": "code",
                 "execution_count": None,
